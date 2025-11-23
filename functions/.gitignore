@@ -79,7 +79,7 @@ functions/config/firebase-service-account.json
 
 # Debug logs
 *-debug.log
-functions/
+
 # Firebase
 .firebase/
 .runtimeconfig.json
