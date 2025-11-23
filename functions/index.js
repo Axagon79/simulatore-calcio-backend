@@ -1,78 +1,34 @@
 const functions = require('firebase-functions');
 const express = require('express');
 const cors = require('cors');
-const server = require('./server');
-const notificationFunctions = require('./notificationFunctions');
+const connectDB = require('./config/db');
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 
+// Inizializza l'app Express
 const app = express();
 
+// Connetti al Database
+connectDB();
+
+// Middleware
+app.use(cors({ origin: true })); // Abilita CORS per tutte le richieste
+app.use(express.json()); // Permette di leggere i JSON inviati dal frontend
+
+// === ROTTE ===
+// Qui colleghiamo il file teams.js che hai appena creato
+const teamsRouter = require('./routes/teams');
+
+// Usa le rotte
+app.use('/api/teams', teamsRouter);
 
 
-// Configurazione CORS
-const corsConfig = {
-  origin: ['https://pup-pals.vercel.app', 'http://localhost:3000'],
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
-};
-
-// API principale
-exports.api = functions.https.onRequest(async (req, res) => {
-  cors(corsConfig)(req, res, async () => {
-    try {
-      const configuredApp = await server(app);
-      return configuredApp(req, res);
-    } catch (error) {
-      console.error('Errore nella funzione api:', error);
-      res.status(500).json({ error: 'Errore interno del server' });
-    }
-  });
+// Rotta di benvenuto (per testare se il server è vivo)
+app.get('/', (req, res) => {
+  res.send('Simulatore Calcio API is running...');
 });
 
-// Endpoint specifico per Gemini con CORS (onRequest)
-exports.callGeminiHttp = functions.https.onRequest(async (req, res) => {
-  cors(corsConfig)(req, res, async () => {
-    try {
-      const configuredApp = await server(app);
-      const geminiModel = configuredApp.get('geminiModel');
 
-      if (!geminiModel) {
-        res.status(500).json({ error: 'Assistente virtuale non disponibile.' });
-        return;
-      }
-
-      const { systemPrompt } = req.body;
-
-      // Validazione base
-      if (!systemPrompt || typeof systemPrompt !== 'string') {
-        res.status(400).json({ error: 'Il campo systemPrompt è richiesto e deve essere una stringa.' });
-        return;
-      }
-
-      console.log('Elaborazione prompt:', systemPrompt); // Per debug
-
-      const result = await geminiModel.generateContent(systemPrompt);
-      
-      if (!result || !result.response) {
-        throw new Error('Risposta non valida dal modello Gemini');
-      }
-
-      res.json({ 
-        response: result.response.text(),
-        success: true
-      });
-
-    } catch (error) {
-      console.error('Errore dettagliato in callGeminiHttp:', error);
-      res.status(500).json({ 
-        error: 'Errore durante l\'elaborazione della richiesta',
-        details: error.message,
-        success: false
-      });
-    }
-  });
-});
-
-// Funzione per inviare notifiche
-exports.sendNotification = notificationFunctions.sendNotification;
+// Esporta l'app come funzione Firebase
+exports.api = functions.https.onRequest(app);
