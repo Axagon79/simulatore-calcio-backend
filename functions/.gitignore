@@ -1,99 +1,31 @@
+# --- Dipendenze ---
 node_modules/
-*.local
-# Node.js
-node_modules/
-.env
-*.log
+package-lock.json
 
-# Dependency directories
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Editors
-.vscode/
-.idea/
-
-# Build output
-build/
-dist/
-
-# Temporary files
-*.tmp
-*.bak
-.DS_Store
-
-# Firebase Credentials
-config/*.json
-!package.json
-config/puppals-*-firebase-adminsdk-*.json
-config/firebase-adminsdk.json
-# Ignore everything in the root
-/*
-
-# But not these files...
-!.gitignore
-!README.md
-!package.json
-
-# ...and not these folders...
-!/src
-!/config
-!/public
-# Dependency directories
-**/node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Build output
-**/build/
-**/dist/
-
-# Environment files
-.env
-*.env
-
-# Editor directories and files
-**/.vscode/
-**/.idea/
-*.swp
-*.swo
-.DS_Store
-
-# Firebase credentials
-**/config/*.json
-!**/config/package.json
-
-# Specific project folders
-!clone_pup_pals_visualstudio/
-!pup-pals-backend/
-!Pup_Pals/
-node_modules
-node_modules
-# Firebase service account
-functions/config/firebase-service-account.json
-
-# Environment variables
-.env
-
-# Debug logs
-*-debug.log
-
-# Firebase
-.firebase/
-.runtimeconfig.json
-
-# Environment variables
+# --- File di Ambiente e Segreti (MAI caricare questi!) ---
 .env
 .env.local
-.env.*.local
-functions/.env
-functions/config/firebase-service-account.json
-.env
-functions/.env
-functions/config/firebase-service-account.json
-.env
-functions/config/firebase-service-account.json
-functions/package-lock.json
-node_modules/@google/
+.runtimeconfig.json
+config/*.json
+firebase-service-account.json
+
+# --- File di Sistema e Log ---
+.DS_Store
+Thumbs.db
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+firestore-debug.log
+ui-debug.log
+
+# --- Cartelle IDE/Editor ---
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# --- Build e Cache Firebase ---
+build/
+dist/
+.firebase/
