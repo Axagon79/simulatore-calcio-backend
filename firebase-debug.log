@@ -1,0 +1,28 @@
+[debug] [2025-11-23T18:09:11.917Z] ----------------------------------------------------------------------
+[debug] [2025-11-23T18:09:11.921Z] Command:       C:\Program Files\nodejs\node.exe C:\Progetti\simulatore-calcio-backend\node_modules\firebase-tools\lib\bin\firebase.js emulators:start
+[debug] [2025-11-23T18:09:11.921Z] CLI Version:   13.29.1
+[debug] [2025-11-23T18:09:11.921Z] Platform:      win32
+[debug] [2025-11-23T18:09:11.922Z] Node Version:  v22.12.0
+[debug] [2025-11-23T18:09:11.922Z] Time:          Sun Nov 23 2025 19:09:11 GMT+0100 (Ora standard dell’Europa centrale)
+[debug] [2025-11-23T18:09:11.922Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-11-23T18:09:12.056Z] Object ".functions" in "firebase.json" has unknown property: {"additionalProperty":"include"}
+[debug] [2025-11-23T18:09:12.057Z] Field ".functions" in "firebase.json" is possibly invalid: should be array
+[debug] [2025-11-23T18:09:12.057Z] Field ".functions" in "firebase.json" is possibly invalid: should match some schema in anyOf
+[debug] [2025-11-23T18:09:12.063Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-11-23T18:09:12.064Z] > authorizing via signed-in user (lollotj@gmail.com)
+[debug] [2025-11-23T18:09:12.174Z] openjdk version "17.0.9" 2023-10-17
+
+[debug] [2025-11-23T18:09:12.174Z] OpenJDK Runtime Environment Temurin-17.0.9+9 (build 17.0.9+9)
+OpenJDK 64-Bit Server VM Temurin-17.0.9+9 (build 17.0.9+9, mixed mode, sharing)
+
+[debug] [2025-11-23T18:09:12.188Z] Parsed Java major version: 17
+[info] i  emulators: Starting emulators: functions, firestore, hosting, storage, extensions {"metadata":{"emulator":{"name":"hub"},"message":"Starting emulators: functions, firestore, hosting, storage, extensions"}}
+[debug] [2025-11-23T18:09:12.190Z] Checked if tokens are valid: false, expires at: 1737838279247
+[debug] [2025-11-23T18:09:12.190Z] Checked if tokens are valid: false, expires at: 1737838279247
+[debug] [2025-11-23T18:09:12.191Z] > refreshing access token with scopes: []
+[debug] [2025-11-23T18:09:12.193Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-11-23T18:09:12.193Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-11-23T18:09:12.308Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 400
+[debug] [2025-11-23T18:09:12.308Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-11-23T18:09:12.309Z] >>> [apiv2][query] GET https://cloudresourcemanager.googleapis.com/v1/projects/puppals-456c7 [none]

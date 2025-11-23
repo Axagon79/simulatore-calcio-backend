@@ -3,9 +3,9 @@ const mongoose = require('mongoose');
 const TeamSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: [true, 'Il nome della squadra è obbligatorio'],
-    trim: true,
-    unique: true
+    required: true,
+    unique: true,
+    trim: true
   },
   league: {
     type: String,
@@ -14,26 +14,40 @@ const TeamSchema = new mongoose.Schema({
   },
   country: {
     type: String,
-    required: true,
     default: 'Italia'
   },
-  // Valori tecnici (da 0 a 100) per la simulazione
+  logoUrl: String,
+  
+  // --- FATTORI STATISTICI (Per Algoritmo v3.0) ---
+  
+  // 4.1 LUCIFERO (Forma ponderata ultime 6)
+  form: {
+    last6: [{ type: String, enum: ['W', 'D', 'L'] }], // Es. ['W', 'W', 'D', 'L', 'W', 'W']
+    score: { type: Number, default: 50 } // Punteggio calcolato (0-100)
+  },
+
+  // 4.3 COEFFICIENTI GOL (Stagionali + Ultime 10)
   stats: {
-    attack: { type: Number, default: 50 },
-    defense: { type: Number, default: 50 },
-    midfield: { type: Number, default: 50 },
-    overall: { type: Number, default: 50 }
+    goalsScoredHome: { type: Number, default: 0 },
+    goalsConcededHome: { type: Number, default: 0 },
+    goalsScoredAway: { type: Number, default: 0 },
+    goalsConcededAway: { type: Number, default: 0 },
+    matchesPlayed: { type: Number, default: 0 }
   },
-  // URL del logo (opzionale per ora)
-  logoUrl: {
-    type: String,
-    default: ''
+
+  // 4.7 VALORE ROSA (Transfermarkt)
+  marketValue: {
+    type: Number, // In milioni di euro
+    default: 0
   },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  }
+
+  // 4.6 MOTIVAZIONE (Classifica e Obiettivi)
+  standings: {
+    position: { type: Number, default: 0 },
+    points: { type: Number, default: 0 }
+  },
+  
+  updatedAt: { type: Date, default: Date.now }
 });
 
 module.exports = mongoose.model('Team', TeamSchema);
-
