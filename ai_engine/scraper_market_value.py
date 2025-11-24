@@ -7,21 +7,22 @@ from dotenv import load_dotenv
 from fake_useragent import UserAgent
 import random
 
-# 1. CARICAMENTO VARIABILI
+# --- CONFIGURAZIONE ---
 current_dir = os.path.dirname(os.path.abspath(__file__))
-env_path = os.path.join(current_dir, '..', '.env')
+env_path = os.path.join(current_dir, '..', '.env') # O il percorso corretto del tuo .env
 load_dotenv(env_path)
 
-MONGO_URI = os.getenv('MONGODB_URI') or os.getenv('MONGO_URI')
+MONGO_URI = os.getenv('MONGO_URI') or os.getenv('MONGODB_URI')
 if not MONGO_URI:
     print("❌ ERRORE: Variabile MONGO_URI non trovata nel file .env")
+    # Fallback per test rapido se serve
+    # MONGO_URI = "mongodb+srv://..." 
     exit()
 
 client = pymongo.MongoClient(MONGO_URI)
 db = client.get_database()
 teams_collection = db['teams']
 
-# --- CONFIGURAZIONE COMPLETA (CON SERIE B) ---
 LEAGUES_CONFIG = [
     # --- ITALIA ---
     {
@@ -49,7 +50,7 @@ LEAGUES_CONFIG = [
         "country": "Italy",
         "url": "https://www.transfermarkt.it/serie-c-girone-c/startseite/wettbewerb/IT3C"
     },
-    
+
     # --- EUROPA TOP 5 ---
     {
         "name": "Premier League",
@@ -71,8 +72,6 @@ LEAGUES_CONFIG = [
         "country": "France",
         "url": "https://www.transfermarkt.it/ligue-1/startseite/wettbewerb/FR1"
     },
-
-    # --- ALTRE LEGHE TECNICHE ---
     {
         "name": "Eredivisie",
         "country": "Netherlands",
@@ -106,15 +105,33 @@ def clean_money_value(value_str):
     except:
         return 0
 
+def smart_find_team(tm_name):
+    """
+    Cerca la squadra nel DB pulito usando Nome Esatto, Regex o Alias.
+    Evita di creare duplicati.
+    """
+    # 1. Cerca nome esatto
+    t = teams_collection.find_one({"name": tm_name})
+    if t: return t
+    
+    # 2. Cerca parziale (case insensitive)
+    t = teams_collection.find_one({"name": {"$regex": f"^{tm_name}$", "$options": "i"}})
+    if t: return t
+    
+    # 3. Cerca negli alias (la parte più importante!)
+    t = teams_collection.find_one({"aliases": tm_name})
+    if t: return t
+    
+    return None
+
 def scrape_league(league_conf):
     url = league_conf['url']
     league_name = league_conf['name']
-    country = league_conf['country']
     
-    print(f"\n🌍 Inizio scraping: {league_name} ({country})")
+    print(f"\n🌍 {league_name}: Scarico Valori di Mercato...")
     
     ua = UserAgent()
-    headers = {'User-Agent': ua.random, 'Accept-Language': 'it-IT,it;q=0.9'}
+    headers = {'User-Agent': ua.random}
 
     try:
         r = requests.get(url, headers=headers, timeout=15)
@@ -126,64 +143,64 @@ def scrape_league(league_conf):
         table = soup.find('table', class_='items')
         
         if not table:
-            print(f"❌ Tabella non trovata per {league_name}!")
+            print(f"❌ Tabella non trovata!")
             return
 
         rows = table.find('tbody').find_all('tr', recursive=False)
-        count = 0
+        updated_count = 0
         
         for row in rows:
             name_tag = row.find('td', class_='hauptlink')
             if not name_tag: continue
-            team_name = name_tag.text.strip().replace('\n', '')
+            
+            # Nome usato da Transfermarkt
+            tm_name = name_tag.text.strip().replace('\n', '')
 
+            # Estrazione Valore
             value_cells = row.find_all('td', class_='rechts')
             market_value = 0
-            raw_value = "0"
-
-            found_val = False
-            # Cerca cella con simbolo valuta
+            raw_val = "0"
+            
             for cell in reversed(value_cells):
                 txt = cell.text.strip()
-                if '€' in txt or 'mln' in txt or 'mila' in txt:
+                if '€' in txt:
                     market_value = clean_money_value(txt)
-                    raw_value = txt
-                    found_val = True
+                    raw_val = txt
                     break
-            
-            # Fallback ultima cella
-            if not found_val and value_cells:
-                last_cell = value_cells[-1]
-                market_value = clean_money_value(last_cell.text.strip())
-                raw_value = last_cell.text.strip()
 
-            # SALVA NEL DB
-            teams_collection.update_one(
-                {"name": team_name}, 
-                {"$set": {
-                    "name": team_name,
-                    "league": league_name,
-                    "country": country,
-                    "stats.marketValue": market_value,
-                    "stats.lastUpdated": time.strftime("%Y-%m-%d")
-                }}, 
-                upsert=True
-            )
-            count += 1
-            print(f"\r   ✅ {team_name[:20]:20} ({raw_value})", end="")
-            
-        print(f"\n   ✨ Completato: {count} squadre aggiornate.")
+            # --- INTEGRAZIONE INTELLIGENTE ---
+            # Invece di fare upsert brutale, cerchiamo la squadra esistente
+            db_team = smart_find_team(tm_name)
+
+            if db_team:
+                # Aggiorniamo solo il valore di mercato della squadra esistente
+                teams_collection.update_one(
+                    {"_id": db_team["_id"]},
+                    {
+                        "$set": {
+                            "marketValue": market_value, # Salvo direttamente alla radice o in stats
+                            "stats.marketValue": market_value,
+                            "lastUpdateValue": time.strftime("%Y-%m-%d")
+                        },
+                        # Aggiungiamo il nome TM agli alias se non c'è, così la prossima volta la trova subito
+                        "$addToSet": {"aliases": tm_name} 
+                    }
+                )
+                print(f"   💰 {db_team['name']:20} <- Aggiornato valore: {raw_val}")
+                updated_count += 1
+            else:
+                print(f"   ⚠️  Saltato: '{tm_name}' non trovato nel DB (Nessun match con alias).")
+
+        print(f"✨ Aggiornati valori per {updated_count} squadre in {league_name}.")
 
     except Exception as e:
-        print(f"❌ Errore su {league_name}: {e}")
+        print(f"❌ Errore critico: {e}")
 
 if __name__ == "__main__":
-    print(f"🚀 START SCRAPER - {len(LEAGUES_CONFIG)} Campionati Selezionati")
+    print(f"🚀 START SCRAPER VALORI (TRANSFERMARKT)")
     
     for league in LEAGUES_CONFIG:
         scrape_league(league)
-        wait = random.randint(4, 7)
-        print(f"⏳ Pause {wait}s...")
-        time.sleep(wait)
+        time.sleep(3) # Pausa etica
         
-    print("\n🏁 TUTTO FINITO! Database popolato.")
+    print("\n🏁 Finito. I valori di mercato sono stati integrati nel DB.")

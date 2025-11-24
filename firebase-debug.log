@@ -26,3 +26,364 @@ OpenJDK 64-Bit Server VM Temurin-17.0.9+9 (build 17.0.9+9, mixed mode, sharing)
 [debug] [2025-11-23T18:09:12.308Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 400
 [debug] [2025-11-23T18:09:12.308Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
 [debug] [2025-11-23T18:09:12.309Z] >>> [apiv2][query] GET https://cloudresourcemanager.googleapis.com/v1/projects/puppals-456c7 [none]
+[debug] [2025-11-23T18:09:13.048Z] <<< [apiv2][status] GET https://cloudresourcemanager.googleapis.com/v1/projects/puppals-456c7 401
+[debug] [2025-11-23T18:09:13.048Z] <<< [apiv2][body] GET https://cloudresourcemanager.googleapis.com/v1/projects/puppals-456c7 {"error":{"code":401,"message":"Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.","status":"UNAUTHENTICATED","details":[{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"ACCESS_TOKEN_TYPE_UNSUPPORTED","metadata":{"method":"google.cloudresourcemanager.v1.Projects.GetProject","service":"cloudresourcemanager.googleapis.com"}}]}}
+[debug] [2025-11-23T18:09:13.048Z] Got a 401 Unauthenticated error for a call that required authentication. Refreshing tokens.
+[debug] [2025-11-23T18:09:13.048Z] Checked if tokens are valid: false, expires at: 1737838279247
+[debug] [2025-11-23T18:09:13.049Z] Checked if tokens are valid: false, expires at: 1737838279247
+[debug] [2025-11-23T18:09:13.049Z] > refreshing access token with scopes: []
+[debug] [2025-11-23T18:09:13.049Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-11-23T18:09:13.049Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-11-23T18:09:13.096Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 400
+[debug] [2025-11-23T18:09:13.096Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[error] !!  extensions: Unable to look up project number for puppals-456c7.
+ If this is a real project, ensure that you are logged in and have access to it.
+ If this is a fake project, please use a project ID starting with 'demo-' to skip production calls.
+ Continuing with a fake project number - secrets and other features that require production access may behave unexpectedly. {"metadata":{"emulator":{"name":"extensions"},"message":"Unable to look up project number for puppals-456c7.\n If this is a real project, ensure that you are logged in and have access to it.\n If this is a fake project, please use a project ID starting with 'demo-' to skip production calls.\n Continuing with a fake project number - secrets and other features that require production access may behave unexpectedly."}}
+[debug] [2025-11-23T18:09:13.114Z] [logging] Logging Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2025-11-23T18:09:13.114Z] [firestore] Firestore Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2025-11-23T18:09:13.115Z] [firestore.websocket] websocket server for firestore only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2025-11-23T18:09:13.115Z] [hosting] Hosting Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2025-11-23T18:09:13.115Z] [storage] Storage Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2025-11-23T18:09:13.115Z] assigned listening specs for emulators {"user":{"hub":[{"address":"127.0.0.1","family":"IPv4","port":4400},{"address":"::1","family":"IPv6","port":4400}],"ui":[{"address":"127.0.0.1","family":"IPv4","port":4000},{"address":"::1","family":"IPv6","port":4000}],"logging":[{"address":"127.0.0.1","family":"IPv4","port":4500}],"firestore":[{"address":"127.0.0.1","family":"IPv4","port":8080}],"firestore.websocket":[{"address":"127.0.0.1","family":"IPv4","port":9150}],"hosting":[{"address":"127.0.0.1","family":"IPv4","port":5000}],"storage":[{"address":"127.0.0.1","family":"IPv4","port":9199}]},"metadata":{"message":"assigned listening specs for emulators"}}
+[debug] [2025-11-23T18:09:13.123Z] [hub] writing locator at C:\Users\lollo\AppData\Local\Temp\hub-puppals-456c7.json
+[debug] [2025-11-23T18:09:13.130Z] [Extensions] Started Extensions emulator, this is a noop.
+[debug] [2025-11-23T18:09:13.136Z] [functions] Functions Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2025-11-23T18:09:13.136Z] [eventarc] Eventarc Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2025-11-23T18:09:13.136Z] [tasks] Cloud Tasks Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2025-11-23T18:09:13.136Z] late-assigned ports for functions and eventarc emulators {"user":{"hub":[{"address":"127.0.0.1","family":"IPv4","port":4400},{"address":"::1","family":"IPv6","port":4400}],"ui":[{"address":"127.0.0.1","family":"IPv4","port":4000},{"address":"::1","family":"IPv6","port":4000}],"logging":[{"address":"127.0.0.1","family":"IPv4","port":4500}],"firestore":[{"address":"127.0.0.1","family":"IPv4","port":8080}],"firestore.websocket":[{"address":"127.0.0.1","family":"IPv4","port":9150}],"hosting":[{"address":"127.0.0.1","family":"IPv4","port":5000}],"storage":[{"address":"127.0.0.1","family":"IPv4","port":9199}],"functions":[{"address":"127.0.0.1","family":"IPv4","port":5001}],"eventarc":[{"address":"127.0.0.1","family":"IPv4","port":9299}],"tasks":[{"address":"127.0.0.1","family":"IPv4","port":9499}]},"metadata":{"message":"late-assigned ports for functions and eventarc emulators"}}
+[warn] !  functions: The following emulators are not running, calls to these services from the Functions emulator will affect production: apphosting, auth, database, pubsub, dataconnect {"metadata":{"emulator":{"name":"functions"},"message":"The following emulators are not running, calls to these services from the Functions emulator will affect production: \u001b[1mapphosting, auth, database, pubsub, dataconnect\u001b[22m"}}
+[debug] [2025-11-23T18:09:13.140Z] defaultcredentials: writing to file C:\Users\lollo\AppData\Roaming\firebase\lollotj_gmail_com_application_default_credentials.json
+[debug] [2025-11-23T18:09:13.142Z] Setting GAC to C:\Users\lollo\AppData\Roaming\firebase\lollotj_gmail_com_application_default_credentials.json {"metadata":{"emulator":{"name":"functions"},"message":"Setting GAC to C:\\Users\\lollo\\AppData\\Roaming\\firebase\\lollotj_gmail_com_application_default_credentials.json"}}
+[debug] [2025-11-23T18:09:13.142Z] Checked if tokens are valid: false, expires at: 1737838279247
+[debug] [2025-11-23T18:09:13.142Z] Checked if tokens are valid: false, expires at: 1737838279247
+[debug] [2025-11-23T18:09:13.143Z] > refreshing access token with scopes: []
+[debug] [2025-11-23T18:09:13.143Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-11-23T18:09:13.143Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-11-23T18:09:13.189Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 400
+[debug] [2025-11-23T18:09:13.189Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-11-23T18:09:13.189Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/puppals-456c7/adminSdkConfig [none]
+[debug] [2025-11-23T18:09:13.312Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/puppals-456c7/adminSdkConfig 401
+[debug] [2025-11-23T18:09:13.312Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/puppals-456c7/adminSdkConfig {"error":{"code":401,"message":"Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.","status":"UNAUTHENTICATED"}}
+[debug] [2025-11-23T18:09:13.312Z] Got a 401 Unauthenticated error for a call that required authentication. Refreshing tokens.
+[debug] [2025-11-23T18:09:13.312Z] Checked if tokens are valid: false, expires at: 1737838279247
+[debug] [2025-11-23T18:09:13.312Z] Checked if tokens are valid: false, expires at: 1737838279247
+[debug] [2025-11-23T18:09:13.312Z] > refreshing access token with scopes: []
+[debug] [2025-11-23T18:09:13.312Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-11-23T18:09:13.313Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-11-23T18:09:13.354Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 400
+[debug] [2025-11-23T18:09:13.354Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-11-23T18:09:13.354Z] Failed to get Admin SDK config for puppals-456c7, falling back to cache Failed to get Admin SDK for Firebase project puppals-456c7. Please make sure the project exists and your account has permission to access it. {"name":"FirebaseError","children":[],"exit":2,"message":"Failed to get Admin SDK for Firebase project puppals-456c7. Please make sure the project exists and your account has permission to access it.","original":{"name":"FirebaseError","children":[],"context":{"body":{"error":{"code":401,"message":"Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.","status":"UNAUTHENTICATED"}},"response":{"statusCode":401}},"exit":1,"message":"Request to https://firebase.googleapis.com/v1beta1/projects/puppals-456c7/adminSdkConfig had HTTP Error: 401, Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.","status":401},"status":500}
+[debug] [2025-11-23T18:09:13.367Z] Ignoring unsupported arg: auto_download {"metadata":{"emulator":{"name":"firestore"},"message":"Ignoring unsupported arg: auto_download"}}
+[debug] [2025-11-23T18:09:13.368Z] Ignoring unsupported arg: single_project_mode_error {"metadata":{"emulator":{"name":"firestore"},"message":"Ignoring unsupported arg: single_project_mode_error"}}
+[debug] [2025-11-23T18:09:13.368Z] Starting Firestore Emulator with command {"binary":"java","args":["-Dgoogle.cloud_firestore.debug_log_level=FINE","-Duser.language=en","-jar","C:\\Users\\lollo\\.cache\\firebase\\emulators\\cloud-firestore-emulator-v1.19.8.jar","--host","127.0.0.1","--port",8080,"--websocket_port",9150,"--project_id","puppals-456c7","--rules","C:\\Progetti\\simulatore-calcio-backend\\firestore.rules","--single_project_mode",true,"--functions_emulator","127.0.0.1:5001"],"optionalArgs":["port","webchannel_port","host","rules","websocket_port","functions_emulator","seed_from_export","project_id","single_project_mode"],"joinArgs":false,"shell":false,"port":8080} {"metadata":{"emulator":{"name":"firestore"},"message":"Starting Firestore Emulator with command {\"binary\":\"java\",\"args\":[\"-Dgoogle.cloud_firestore.debug_log_level=FINE\",\"-Duser.language=en\",\"-jar\",\"C:\\\\Users\\\\lollo\\\\.cache\\\\firebase\\\\emulators\\\\cloud-firestore-emulator-v1.19.8.jar\",\"--host\",\"127.0.0.1\",\"--port\",8080,\"--websocket_port\",9150,\"--project_id\",\"puppals-456c7\",\"--rules\",\"C:\\\\Progetti\\\\simulatore-calcio-backend\\\\firestore.rules\",\"--single_project_mode\",true,\"--functions_emulator\",\"127.0.0.1:5001\"],\"optionalArgs\":[\"port\",\"webchannel_port\",\"host\",\"rules\",\"websocket_port\",\"functions_emulator\",\"seed_from_export\",\"project_id\",\"single_project_mode\"],\"joinArgs\":false,\"shell\":false,\"port\":8080}"}}
+[info] i  firestore: Firestore Emulator logging to firestore-debug.log {"metadata":{"emulator":{"name":"firestore"},"message":"Firestore Emulator logging to \u001b[1mfirestore-debug.log\u001b[22m"}}
+[debug] [2025-11-23T18:09:15.070Z] Nov 23, 2025 7:09:15 PM com.google.cloud.datastore.emulator.firestore.websocket.WebSocketServer start
+INFO: Started WebSocket server on ws://127.0.0.1:9150
+ {"metadata":{"emulator":{"name":"firestore"},"message":"Nov 23, 2025 7:09:15 PM com.google.cloud.datastore.emulator.firestore.websocket.WebSocketServer start\r\nINFO: Started WebSocket server on ws://127.0.0.1:9150\r\n"}}
+[debug] [2025-11-23T18:09:15.103Z] API endpoint: http://127.0.0.1:8080 {"metadata":{"emulator":{"name":"firestore"},"message":"API endpoint: http://127.0.0.1:8080"}}
+[debug] [2025-11-23T18:09:15.104Z] 
+If you are using a library that supports the FIRESTORE_EMULATOR_HOST environment variable, run:
+
+   export FIRESTORE_EMULATOR_HOST=127.0.0.1:8080
+
+If you are running a Firestore in Datastore Mode project, run:
+
+   export DATASTORE_EMULATOR_HOST=127.0.0.1:8080
+
+Note: Support for Datastore Mode is in preview. If you encounter any bugs please file at https://github.com/firebase/firebase-tools/issues.
+Dev App Server is now running.
+
+ {"metadata":{"emulator":{"name":"firestore"},"message":"\nIf you are using a library that supports the FIRESTORE_EMULATOR_HOST environment variable, run:\r\n\n   export FIRESTORE_EMULATOR_HOST=127.0.0.1:8080\n\nIf you are running a Firestore in Datastore Mode project, run:\r\n\n   export DATASTORE_EMULATOR_HOST=127.0.0.1:8080\n\nNote: Support for Datastore Mode is in preview. If you encounter any bugs please file at https://github.com/firebase/firebase-tools/issues.\r\nDev App Server is now running.\n\r\n"}}
+[info] +  firestore: Firestore Emulator UI websocket is running on 9150. {"metadata":{"emulator":{"name":"firestore"},"message":"Firestore Emulator UI websocket is running on 9150."}}
+[debug] [2025-11-23T18:09:15.187Z] Ignoring unsupported arg: port {"metadata":{"emulator":{"name":"storage"},"message":"Ignoring unsupported arg: port"}}
+[debug] [2025-11-23T18:09:16.069Z] Temp file directory for storage emulator: C:\Users\lollo\AppData\Local\Temp/firebase/storage/blobs {"metadata":{"emulator":{"name":"storage"},"message":"Temp file directory for storage emulator: C:\\Users\\lollo\\AppData\\Local\\Temp/firebase/storage/blobs"}}
+[debug] [2025-11-23T18:09:16.073Z] Checked if tokens are valid: false, expires at: 1737838279247
+[debug] [2025-11-23T18:09:16.074Z] Checked if tokens are valid: false, expires at: 1737838279247
+[debug] [2025-11-23T18:09:16.074Z] > refreshing access token with scopes: []
+[debug] [2025-11-23T18:09:16.074Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-11-23T18:09:16.074Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-11-23T18:09:16.123Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 400
+[debug] [2025-11-23T18:09:16.123Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-11-23T18:09:16.123Z] >>> [apiv2][query] GET https://firebasehosting.googleapis.com/v1beta1/projects/puppals-456c7/sites 
+[debug] [2025-11-23T18:09:16.986Z] <<< [apiv2][status] GET https://firebasehosting.googleapis.com/v1beta1/projects/puppals-456c7/sites 401
+[debug] [2025-11-23T18:09:16.986Z] <<< [apiv2][body] GET https://firebasehosting.googleapis.com/v1beta1/projects/puppals-456c7/sites {"error":{"code":401,"message":"Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.","status":"UNAUTHENTICATED"}}
+[debug] [2025-11-23T18:09:16.986Z] Got a 401 Unauthenticated error for a call that required authentication. Refreshing tokens.
+[debug] [2025-11-23T18:09:16.986Z] Checked if tokens are valid: false, expires at: 1737838279247
+[debug] [2025-11-23T18:09:16.986Z] Checked if tokens are valid: false, expires at: 1737838279247
+[debug] [2025-11-23T18:09:16.986Z] > refreshing access token with scopes: []
+[debug] [2025-11-23T18:09:16.986Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-11-23T18:09:16.986Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-11-23T18:09:17.030Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 400
+[debug] [2025-11-23T18:09:17.030Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-11-23T18:09:17.030Z] Failed to list hosting sites
+[debug] Request to https://firebasehosting.googleapis.com/v1beta1/projects/puppals-456c7/sites had HTTP Error: 401, Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.
+[debug] [2025-11-23T18:09:17.031Z] Checked if tokens are valid: false, expires at: 1737838279247
+[debug] [2025-11-23T18:09:17.031Z] Checked if tokens are valid: false, expires at: 1737838279247
+[debug] [2025-11-23T18:09:17.031Z] > refreshing access token with scopes: []
+[debug] [2025-11-23T18:09:17.031Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-11-23T18:09:17.031Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-11-23T18:09:17.070Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 400
+[debug] [2025-11-23T18:09:17.071Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-11-23T18:09:17.071Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/puppals-456c7/webApps/-/config [none]
+[debug] [2025-11-23T18:09:17.118Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/puppals-456c7/webApps/-/config 401
+[debug] [2025-11-23T18:09:17.118Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/puppals-456c7/webApps/-/config {"error":{"code":401,"message":"Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.","status":"UNAUTHENTICATED"}}
+[debug] [2025-11-23T18:09:17.118Z] Got a 401 Unauthenticated error for a call that required authentication. Refreshing tokens.
+[debug] [2025-11-23T18:09:17.119Z] Checked if tokens are valid: false, expires at: 1737838279247
+[debug] [2025-11-23T18:09:17.119Z] Checked if tokens are valid: false, expires at: 1737838279247
+[debug] [2025-11-23T18:09:17.119Z] > refreshing access token with scopes: []
+[debug] [2025-11-23T18:09:17.119Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-11-23T18:09:17.119Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-11-23T18:09:17.162Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 400
+[debug] [2025-11-23T18:09:17.162Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-11-23T18:09:17.162Z] fetchWebSetup error: FirebaseError: Request to https://firebase.googleapis.com/v1beta1/projects/puppals-456c7/webApps/-/config had HTTP Error: 401, Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.
+[warn] !  hosting: Using web app configuration from cache. 
+[debug] [2025-11-23T18:09:17.164Z] Checked if tokens are valid: false, expires at: 1737838279247
+[debug] [2025-11-23T18:09:17.164Z] Checked if tokens are valid: false, expires at: 1737838279247
+[debug] [2025-11-23T18:09:17.164Z] > refreshing access token with scopes: []
+[debug] [2025-11-23T18:09:17.164Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-11-23T18:09:17.164Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-11-23T18:09:17.208Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 400
+[debug] [2025-11-23T18:09:17.208Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-11-23T18:09:17.209Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/puppals-456c7 [none]
+[debug] [2025-11-23T18:09:17.290Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/puppals-456c7 401
+[debug] [2025-11-23T18:09:17.290Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/puppals-456c7 {"error":{"code":401,"message":"Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.","status":"UNAUTHENTICATED"}}
+[debug] [2025-11-23T18:09:17.290Z] Got a 401 Unauthenticated error for a call that required authentication. Refreshing tokens.
+[debug] [2025-11-23T18:09:17.291Z] Checked if tokens are valid: false, expires at: 1737838279247
+[debug] [2025-11-23T18:09:17.291Z] Checked if tokens are valid: false, expires at: 1737838279247
+[debug] [2025-11-23T18:09:17.291Z] > refreshing access token with scopes: []
+[debug] [2025-11-23T18:09:17.291Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-11-23T18:09:17.291Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-11-23T18:09:17.341Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 400
+[debug] [2025-11-23T18:09:17.341Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-11-23T18:09:17.341Z] Request to https://firebase.googleapis.com/v1beta1/projects/puppals-456c7 had HTTP Error: 401, Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.
+[debug] [2025-11-23T18:09:17.342Z] Specified "public" directory "build" does not exist; Deploy to Hosting site "puppals-456c7" may fail or be empty.
+[info] i  hosting[puppals-456c7]: Serving hosting files from: build {"metadata":{"emulator":{"name":"hosting"},"message":"Serving hosting files from: \u001b[1mbuild\u001b[22m"}}
+[info] +  hosting[puppals-456c7]: Local server: http://127.0.0.1:5000 {"metadata":{"emulator":{"name":"hosting"},"message":"Local server: \u001b[4m\u001b[1mhttp://127.0.0.1:5000\u001b[22m\u001b[24m"}}
+[debug] [2025-11-23T18:09:17.397Z] [Extensions] Connecting Extensions emulator, this is a noop.
+[info] i  functions: Watching "C:\Progetti\simulatore-calcio-backend\functions" for Cloud Functions... {"metadata":{"emulator":{"name":"functions"},"message":"Watching \"C:\\Progetti\\simulatore-calcio-backend\\functions\" for Cloud Functions..."}}
+[debug] [2025-11-23T18:09:17.404Z] Validating nodejs source
+[warn] !  functions: package.json indicates an outdated version of firebase-functions. Please upgrade using npm install --save firebase-functions@latest in your functions directory. 
+[warn] !  functions: Please note that there will be breaking changes when you upgrade. 
+[debug] [2025-11-23T18:09:18.492Z] > [functions] package.json contents: {
+  "name": "functions",
+  "description": "Cloud Functions for Firebase",
+  "scripts": {
+    "lint": "eslint .",
+    "serve": "firebase emulators:start --only functions",
+    "shell": "firebase functions:shell",
+    "start": "yarn run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log",
+    "lint:fix": "eslint . --fix",
+    "predeploy": "yarn run lint"
+  },
+  "engines": {
+    "node": "22"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "@google-cloud/vertexai": "^1.9.2",
+    "@google/generative-ai": "^0.21.0",
+    "@types/cors": "^2.8.17",
+    "axios": "^1.7.9",
+    "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.3",
+    "cors": "^2.8.5",
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.6.1",
+    "express": "^4.21.2",
+    "firebase-admin": "^13.0.2",
+    "firebase-functions": "^6.2.0",
+    "gcp-metadata": "^5.3.0",
+    "google-auth-library": "^9.15.0",
+    "googleapis": "^144.0.0",
+    "helmet": "^8.0.0",
+    "https": "^1.0.0",
+    "jest": "^29.7.0",
+    "joi": "^17.13.3",
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.12.0",
+    "mongoose": "^8.20.1",
+    "multer": "^1.4.5-lts.1",
+    "path": "^0.12.7",
+    "winston": "^3.17.0"
+  },
+  "devDependencies": {
+    "eslint": "^9.17.0",
+    "eslint-config-google": "^0.14.0",
+    "eslint-plugin-import": "^2.29.1",
+    "firebase-functions-test": "^3.4.0"
+  },
+  "private": true
+}
+[debug] [2025-11-23T18:09:18.493Z] Building nodejs source
+[debug] [2025-11-23T18:09:18.493Z] Failed to find version of module node: reached end of search path C:\Progetti\simulatore-calcio-backend\functions\node_modules
+[info] +  functions: Using node@22 from host. 
+[info] i  functions: Loaded environment variables from .env. 
+[debug] [2025-11-23T18:09:18.498Z] Could not find functions.yaml. Must use http discovery
+[debug] [2025-11-23T18:09:18.504Z] Found firebase-functions binary at 'C:\Progetti\simulatore-calcio-backend\functions\node_modules\.bin\firebase-functions'
+[info] Serving at port 8477
+
+[error] (node:7736) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+[debug] [2025-11-23T18:09:19.765Z] Got response from /__/functions.yaml {"endpoints":{"api":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"httpsTrigger":{},"entryPoint":"api"}},"specVersion":"v1alpha1","requiredAPIs":[],"extensions":{}}
+[info] MongoDB Connesso: pup-pals-cluster-shard-00-01.y1h2r.mongodb.net
+
+[debug] [2025-11-23T18:09:29.786Z] defaultcredentials: writing to file C:\Users\lollo\AppData\Roaming\firebase\lollotj_gmail_com_application_default_credentials.json
+[debug] [2025-11-23T18:09:29.787Z] Setting GAC to C:\Users\lollo\AppData\Roaming\firebase\lollotj_gmail_com_application_default_credentials.json {"metadata":{"emulator":{"name":"functions"},"message":"Setting GAC to C:\\Users\\lollo\\AppData\\Roaming\\firebase\\lollotj_gmail_com_application_default_credentials.json"}}
+[info] +  functions: Loaded functions definitions from source: api. {"metadata":{"emulator":{"name":"functions"},"message":"Loaded functions definitions from source: api."}}
+[info] +  functions[us-central1-api]: http function initialized (http://127.0.0.1:5001/puppals-456c7/us-central1/api). {"metadata":{"emulator":{"name":"functions"},"message":"\u001b[1mhttp\u001b[22m function initialized (http://127.0.0.1:5001/puppals-456c7/us-central1/api)."}}
+[debug] [2025-11-23T18:09:29.798Z] Could not find VSCode notification endpoint: FetchError: request to http://localhost:40001/vscode/notify failed, reason: connect ECONNREFUSED ::1:40001. If you are not running the Firebase Data Connect VSCode extension, this is expected and not an issue.
+[info] 
+┌─────────────────────────────────────────────────────────────┐
+│ ✔  All emulators ready! It is now safe to connect your app. │
+│ i  View Emulator UI at http://127.0.0.1:4000/               │
+└─────────────────────────────────────────────────────────────┘
+
+┌────────────┬────────────────┬──────────────────────────────────┐
+│ Emulator   │ Host:Port      │ View in Emulator UI              │
+├────────────┼────────────────┼──────────────────────────────────┤
+│ Functions  │ 127.0.0.1:5001 │ http://127.0.0.1:4000/functions  │
+├────────────┼────────────────┼──────────────────────────────────┤
+│ Firestore  │ 127.0.0.1:8080 │ http://127.0.0.1:4000/firestore  │
+├────────────┼────────────────┼──────────────────────────────────┤
+│ Hosting    │ 127.0.0.1:5000 │ n/a                              │
+├────────────┼────────────────┼──────────────────────────────────┤
+│ Storage    │ 127.0.0.1:9199 │ http://127.0.0.1:4000/storage    │
+├────────────┼────────────────┼──────────────────────────────────┤
+│ Extensions │ 127.0.0.1:5001 │ http://127.0.0.1:4000/extensions │
+└────────────┴────────────────┴──────────────────────────────────┘
+  Emulator Hub running at 127.0.0.1:4400
+  Other reserved ports: 4500, 9150
+┌─────────────────────────┬───────────────┬─────────────────────┐
+│ Extension Instance Name │ Extension Ref │ View in Emulator UI │
+└─────────────────────────┴───────────────┴─────────────────────┘
+Issues? Report them at https://github.com/firebase/firebase-tools/issues and attach the *-debug.log files.
+ 
+[debug] [2025-11-23T18:10:46.801Z] [work-queue] {"queuedWork":["/puppals-456c7/us-central1/api/api/teams-2025-11-23T18:10:46.801Z"],"queueLength":1,"runningWork":[],"workRunningCount":0}
+[debug] [2025-11-23T18:10:46.801Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":["/puppals-456c7/us-central1/api/api/teams-2025-11-23T18:10:46.801Z"],"workRunningCount":1}
+[debug] [2025-11-23T18:10:46.802Z] Accepted request GET /puppals-456c7/us-central1/api/api/teams --> us-central1-api
+[debug] [2025-11-23T18:10:46.804Z] [functions] Runtime ready! Sending request! {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Runtime ready! Sending request!"}}
+[debug] [2025-11-23T18:10:46.805Z] [functions] Got req.url=/puppals-456c7/us-central1/api/api/teams, mapping to path=/api/teams {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Got req.url=/puppals-456c7/us-central1/api/api/teams, mapping to path=/api/teams"}}
+[info] i  functions: Loaded environment variables from .env. 
+[debug] [2025-11-23T18:10:46.817Z] [worker-pool] addWorker(us-central1-api) {"metadata":{"emulator":{"name":"functions"},"message":"[worker-pool] addWorker(us-central1-api)"}}
+[debug] [2025-11-23T18:10:46.817Z] [worker-pool] Adding worker with key us-central1-api, total=1 {"metadata":{"emulator":{"name":"functions"},"message":"[worker-pool] Adding worker with key us-central1-api, total=1"}}
+[info] >  (node:1432) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead. {"user":"(node:1432) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"\u001b[90m> \u001b[39m (node:1432) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead."}}
+[info] >  (Use `node --trace-deprecation ...` to show where the warning was created) {"user":"(Use `node --trace-deprecation ...` to show where the warning was created)","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"\u001b[90m> \u001b[39m (Use `node --trace-deprecation ...` to show where the warning was created)"}}
+[debug] [2025-11-23T18:10:48.187Z] [runtime-status] [1432] Resolved module firebase-admin {"declared":true,"installed":true,"version":"13.0.2","resolution":"C:\\Progetti\\simulatore-calcio-backend\\functions\\node_modules\\firebase-admin\\lib\\index.js"} {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[runtime-status] [1432] Resolved module firebase-admin {\"declared\":true,\"installed\":true,\"version\":\"13.0.2\",\"resolution\":\"C:\\\\Progetti\\\\simulatore-calcio-backend\\\\functions\\\\node_modules\\\\firebase-admin\\\\lib\\\\index.js\"}"}}
+[debug] [2025-11-23T18:10:48.189Z] [runtime-status] [1432] Resolved module firebase-functions {"declared":true,"installed":true,"version":"6.2.0","resolution":"C:\\Progetti\\simulatore-calcio-backend\\functions\\node_modules\\firebase-functions\\lib\\v2\\index.js"} {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[runtime-status] [1432] Resolved module firebase-functions {\"declared\":true,\"installed\":true,\"version\":\"6.2.0\",\"resolution\":\"C:\\\\Progetti\\\\simulatore-calcio-backend\\\\functions\\\\node_modules\\\\firebase-functions\\\\lib\\\\v2\\\\index.js\"}"}}
+[debug] [2025-11-23T18:10:48.189Z] [runtime-status] [1432] Found local functions config: C:\Progetti\simulatore-calcio-backend\functions/.runtimeconfig.json {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[runtime-status] [1432] Found local functions config: C:\\Progetti\\simulatore-calcio-backend\\functions/.runtimeconfig.json"}}
+[debug] [2025-11-23T18:10:48.189Z] [runtime-status] [1432] Outgoing network have been stubbed. [{"name":"http","status":"mocked"},{"name":"http","status":"mocked"},{"name":"https","status":"mocked"},{"name":"https","status":"mocked"},{"name":"net","status":"mocked"}] {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[runtime-status] [1432] Outgoing network have been stubbed. [{\"name\":\"http\",\"status\":\"mocked\"},{\"name\":\"http\",\"status\":\"mocked\"},{\"name\":\"https\",\"status\":\"mocked\"},{\"name\":\"https\",\"status\":\"mocked\"},{\"name\":\"net\",\"status\":\"mocked\"}]"}}
+[debug] [2025-11-23T18:10:48.190Z] [runtime-status] [1432] Resolved module firebase-functions {"declared":true,"installed":true,"version":"6.2.0","resolution":"C:\\Progetti\\simulatore-calcio-backend\\functions\\node_modules\\firebase-functions\\lib\\v2\\index.js"} {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[runtime-status] [1432] Resolved module firebase-functions {\"declared\":true,\"installed\":true,\"version\":\"6.2.0\",\"resolution\":\"C:\\\\Progetti\\\\simulatore-calcio-backend\\\\functions\\\\node_modules\\\\firebase-functions\\\\lib\\\\v2\\\\index.js\"}"}}
+[debug] [2025-11-23T18:10:48.610Z] [runtime-status] [1432] Checked functions.config() {"config":{"mongodb":{"uri":"mongodb+srv://Database_User:LPmYAZkzEVxjSaAd@pup-pals-cluster.y1h2r.mongodb.net/pup_pals_db?retryWrites=true&w=majority&appName=pup-pals-cluster"},"jwt":{"secret":"T4bc6L!Kth5qYE$E^+*DjK!AkHc58VsKLvceDZVK@4XA8#Ug5^S$k*e&S+!REpkb"},"server":{"port":5000}}} {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[runtime-status] [1432] Checked functions.config() {\"config\":{\"mongodb\":{\"uri\":\"mongodb+srv://Database_User:LPmYAZkzEVxjSaAd@pup-pals-cluster.y1h2r.mongodb.net/pup_pals_db?retryWrites=true&w=majority&appName=pup-pals-cluster\"},\"jwt\":{\"secret\":\"T4bc6L!Kth5qYE$E^+*DjK!AkHc58VsKLvceDZVK@4XA8#Ug5^S$k*e&S+!REpkb\"},\"server\":{\"port\":5000}}}"}}
+[debug] [2025-11-23T18:10:48.611Z] [runtime-status] [1432] firebase-functions has been stubbed. {"functionsResolution":{"declared":true,"installed":true,"version":"6.2.0","resolution":"C:\\Progetti\\simulatore-calcio-backend\\functions\\node_modules\\firebase-functions\\lib\\v2\\index.js"}} {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[runtime-status] [1432] firebase-functions has been stubbed. {\"functionsResolution\":{\"declared\":true,\"installed\":true,\"version\":\"6.2.0\",\"resolution\":\"C:\\\\Progetti\\\\simulatore-calcio-backend\\\\functions\\\\node_modules\\\\firebase-functions\\\\lib\\\\v2\\\\index.js\"}}"}}
+[debug] [2025-11-23T18:10:48.611Z] [runtime-status] [1432] Resolved module firebase-functions {"declared":true,"installed":true,"version":"6.2.0","resolution":"C:\\Progetti\\simulatore-calcio-backend\\functions\\node_modules\\firebase-functions\\lib\\v2\\index.js"} {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[runtime-status] [1432] Resolved module firebase-functions {\"declared\":true,\"installed\":true,\"version\":\"6.2.0\",\"resolution\":\"C:\\\\Progetti\\\\simulatore-calcio-backend\\\\functions\\\\node_modules\\\\firebase-functions\\\\lib\\\\v2\\\\index.js\"}"}}
+[debug] [2025-11-23T18:10:48.616Z] [runtime-status] [1432] Resolved module firebase-admin {"declared":true,"installed":true,"version":"13.0.2","resolution":"C:\\Progetti\\simulatore-calcio-backend\\functions\\node_modules\\firebase-admin\\lib\\index.js"} {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[runtime-status] [1432] Resolved module firebase-admin {\"declared\":true,\"installed\":true,\"version\":\"13.0.2\",\"resolution\":\"C:\\\\Progetti\\\\simulatore-calcio-backend\\\\functions\\\\node_modules\\\\firebase-admin\\\\lib\\\\index.js\"}"}}
+[debug] [2025-11-23T18:10:48.619Z] [runtime-status] [1432] Resolved module firebase-functions {"declared":true,"installed":true,"version":"6.2.0","resolution":"C:\\Progetti\\simulatore-calcio-backend\\functions\\node_modules\\firebase-functions\\lib\\v2\\index.js"} {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[runtime-status] [1432] Resolved module firebase-functions {\"declared\":true,\"installed\":true,\"version\":\"6.2.0\",\"resolution\":\"C:\\\\Progetti\\\\simulatore-calcio-backend\\\\functions\\\\node_modules\\\\firebase-functions\\\\lib\\\\v2\\\\index.js\"}"}}
+[debug] [2025-11-23T18:10:48.619Z] [runtime-status] [1432] firebase-admin has been stubbed. {"adminResolution":{"declared":true,"installed":true,"version":"13.0.2","resolution":"C:\\Progetti\\simulatore-calcio-backend\\functions\\node_modules\\firebase-admin\\lib\\index.js"}} {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[runtime-status] [1432] firebase-admin has been stubbed. {\"adminResolution\":{\"declared\":true,\"installed\":true,\"version\":\"13.0.2\",\"resolution\":\"C:\\\\Progetti\\\\simulatore-calcio-backend\\\\functions\\\\node_modules\\\\firebase-admin\\\\lib\\\\index.js\"}}"}}
+[debug] [2025-11-23T18:10:49.149Z] [runtime-status] [1432] Functions runtime initialized. {"cwd":"C:\\Progetti\\simulatore-calcio-backend\\functions","node_version":"22.12.0"} {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[runtime-status] [1432] Functions runtime initialized. {\"cwd\":\"C:\\\\Progetti\\\\simulatore-calcio-backend\\\\functions\",\"node_version\":\"22.12.0\"}"}}
+[debug] [2025-11-23T18:10:49.149Z] [runtime-status] [1432] Listening to port: \\?\pipe\fire_emu_32efaeff5186f69d {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[runtime-status] [1432] Listening to port: \\\\?\\pipe\\fire_emu_32efaeff5186f69d"}}
+[debug] [2025-11-23T18:10:49.241Z] [worker-us-central1-api-3e182abc-eb88-44e4-88aa-a03dd9fd9a7e]: IDLE {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-3e182abc-eb88-44e4-88aa-a03dd9fd9a7e]: IDLE"}}
+[debug] [2025-11-23T18:10:49.242Z] [worker-pool] submitRequest(triggerId=us-central1-api) {"metadata":{"emulator":{"name":"functions"},"message":"[worker-pool] submitRequest(triggerId=us-central1-api)"}}
+[info] i  functions: Beginning execution of "us-central1-api" {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Beginning execution of \"us-central1-api\""}}
+[debug] [2025-11-23T18:10:49.242Z] [worker-us-central1-api-3e182abc-eb88-44e4-88aa-a03dd9fd9a7e]: BUSY {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-3e182abc-eb88-44e4-88aa-a03dd9fd9a7e]: BUSY"}}
+[info] >  MongoDB Connesso: pup-pals-cluster-shard-00-00.y1h2r.mongodb.net {"user":"MongoDB Connesso: pup-pals-cluster-shard-00-00.y1h2r.mongodb.net","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"\u001b[90m> \u001b[39m MongoDB Connesso: pup-pals-cluster-shard-00-00.y1h2r.mongodb.net"}}
+[debug] [2025-11-23T18:10:49.656Z] Finishing up request with event=pause {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=pause"}}
+[info] i  functions: Finished "us-central1-api" in 413.3631ms {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finished \"us-central1-api\" in 413.3631ms"}}
+[debug] [2025-11-23T18:10:49.657Z] [worker-us-central1-api-3e182abc-eb88-44e4-88aa-a03dd9fd9a7e]: IDLE {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-3e182abc-eb88-44e4-88aa-a03dd9fd9a7e]: IDLE"}}
+[debug] [2025-11-23T18:10:49.657Z] Finishing up request with event=finish {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=finish"}}
+[debug] [2025-11-23T18:10:49.657Z] Finishing up request with event=close {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=close"}}
+[debug] [2025-11-23T18:10:49.657Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":[],"workRunningCount":0}
+[debug] [2025-11-23T18:12:05.312Z] [work-queue] {"queuedWork":["/puppals-456c7/us-central1/api/api/teams-2025-11-23T18:12:05.312Z"],"queueLength":1,"runningWork":[],"workRunningCount":0}
+[debug] [2025-11-23T18:12:05.312Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":["/puppals-456c7/us-central1/api/api/teams-2025-11-23T18:12:05.312Z"],"workRunningCount":1}
+[debug] [2025-11-23T18:12:05.312Z] Accepted request DELETE /puppals-456c7/us-central1/api/api/teams --> us-central1-api
+[debug] [2025-11-23T18:12:05.315Z] [functions] Runtime ready! Sending request! {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Runtime ready! Sending request!"}}
+[debug] [2025-11-23T18:12:05.315Z] [functions] Got req.url=/puppals-456c7/us-central1/api/api/teams, mapping to path=/api/teams {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Got req.url=/puppals-456c7/us-central1/api/api/teams, mapping to path=/api/teams"}}
+[debug] [2025-11-23T18:12:05.315Z] [worker-pool] submitRequest(triggerId=us-central1-api) {"metadata":{"emulator":{"name":"functions"},"message":"[worker-pool] submitRequest(triggerId=us-central1-api)"}}
+[info] i  functions: Beginning execution of "us-central1-api" {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Beginning execution of \"us-central1-api\""}}
+[debug] [2025-11-23T18:12:05.316Z] [worker-us-central1-api-3e182abc-eb88-44e4-88aa-a03dd9fd9a7e]: BUSY {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-3e182abc-eb88-44e4-88aa-a03dd9fd9a7e]: BUSY"}}
+[debug] [2025-11-23T18:12:05.321Z] Finishing up request with event=pause {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=pause"}}
+[info] i  functions: Finished "us-central1-api" in 5.278ms {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finished \"us-central1-api\" in 5.278ms"}}
+[debug] [2025-11-23T18:12:05.321Z] [worker-us-central1-api-3e182abc-eb88-44e4-88aa-a03dd9fd9a7e]: IDLE {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-3e182abc-eb88-44e4-88aa-a03dd9fd9a7e]: IDLE"}}
+[debug] [2025-11-23T18:12:05.322Z] Finishing up request with event=finish {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=finish"}}
+[debug] [2025-11-23T18:12:05.322Z] Finishing up request with event=close {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=close"}}
+[debug] [2025-11-23T18:12:05.322Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":[],"workRunningCount":0}
+[debug] [2025-11-23T18:16:17.033Z] File C:\Progetti\simulatore-calcio-backend\functions\models\Match.js changed, reloading triggers {"metadata":{"emulator":{"name":"functions"},"message":"File C:\\Progetti\\simulatore-calcio-backend\\functions\\models\\Match.js changed, reloading triggers"}}
+[debug] [2025-11-23T18:16:18.034Z] Validating nodejs source
+[warn] !  functions: package.json indicates an outdated version of firebase-functions. Please upgrade using npm install --save firebase-functions@latest in your functions directory. 
+[warn] !  functions: Please note that there will be breaking changes when you upgrade. 
+[debug] [2025-11-23T18:16:19.292Z] > [functions] package.json contents: {
+  "name": "functions",
+  "description": "Cloud Functions for Firebase",
+  "scripts": {
+    "lint": "eslint .",
+    "serve": "firebase emulators:start --only functions",
+    "shell": "firebase functions:shell",
+    "start": "yarn run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log",
+    "lint:fix": "eslint . --fix",
+    "predeploy": "yarn run lint"
+  },
+  "engines": {
+    "node": "22"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "@google-cloud/vertexai": "^1.9.2",
+    "@google/generative-ai": "^0.21.0",
+    "@types/cors": "^2.8.17",
+    "axios": "^1.7.9",
+    "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.3",
+    "cors": "^2.8.5",
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.6.1",
+    "express": "^4.21.2",
+    "firebase-admin": "^13.0.2",
+    "firebase-functions": "^6.2.0",
+    "gcp-metadata": "^5.3.0",
+    "google-auth-library": "^9.15.0",
+    "googleapis": "^144.0.0",
+    "helmet": "^8.0.0",
+    "https": "^1.0.0",
+    "jest": "^29.7.0",
+    "joi": "^17.13.3",
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.12.0",
+    "mongoose": "^8.20.1",
+    "multer": "^1.4.5-lts.1",
+    "path": "^0.12.7",
+    "winston": "^3.17.0"
+  },
+  "devDependencies": {
+    "eslint": "^9.17.0",
+    "eslint-config-google": "^0.14.0",
+    "eslint-plugin-import": "^2.29.1",
+    "firebase-functions-test": "^3.4.0"
+  },
+  "private": true
+}
+[debug] [2025-11-23T18:16:19.292Z] Building nodejs source
+[debug] [2025-11-23T18:16:19.293Z] Failed to find version of module node: reached end of search path C:\Progetti\simulatore-calcio-backend\functions\node_modules
+[info] +  functions: Using node@22 from host. 
+[info] i  functions: Loaded environment variables from .env. 
+[debug] [2025-11-23T18:16:19.296Z] Could not find functions.yaml. Must use http discovery
+[debug] [2025-11-23T18:16:19.303Z] Found firebase-functions binary at 'C:\Progetti\simulatore-calcio-backend\functions\node_modules\.bin\firebase-functions'
+[info] Serving at port 8506
+
+[error] (node:17328) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+[debug] [2025-11-23T18:16:20.583Z] Got response from /__/functions.yaml {"endpoints":{"api":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"httpsTrigger":{},"entryPoint":"api"}},"specVersion":"v1alpha1","requiredAPIs":[],"extensions":{}}
+[info] MongoDB Connesso: pup-pals-cluster-shard-00-01.y1h2r.mongodb.net
+
+[debug] [2025-11-23T18:16:30.592Z] defaultcredentials: writing to file C:\Users\lollo\AppData\Roaming\firebase\lollotj_gmail_com_application_default_credentials.json
+[debug] [2025-11-23T18:16:30.593Z] Setting GAC to C:\Users\lollo\AppData\Roaming\firebase\lollotj_gmail_com_application_default_credentials.json {"metadata":{"emulator":{"name":"functions"},"message":"Setting GAC to C:\\Users\\lollo\\AppData\\Roaming\\firebase\\lollotj_gmail_com_application_default_credentials.json"}}
+[info] +  functions: Loaded functions definitions from source: api. {"metadata":{"emulator":{"name":"functions"},"message":"Loaded functions definitions from source: api."}}
+[debug] [2025-11-23T18:16:30.595Z] [worker-pool] Shutting down IDLE worker (us-central1-api) {"metadata":{"emulator":{"name":"functions"},"message":"[worker-pool] Shutting down IDLE worker (us-central1-api)"}}
+[debug] [2025-11-23T18:16:30.595Z] [worker-us-central1-api-3e182abc-eb88-44e4-88aa-a03dd9fd9a7e]: FINISHING {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-3e182abc-eb88-44e4-88aa-a03dd9fd9a7e]: FINISHING"}}
+[debug] [2025-11-23T18:16:30.607Z] [worker-us-central1-api-3e182abc-eb88-44e4-88aa-a03dd9fd9a7e]: exited {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-3e182abc-eb88-44e4-88aa-a03dd9fd9a7e]: exited"}}
+[debug] [2025-11-23T18:16:30.607Z] [worker-us-central1-api-3e182abc-eb88-44e4-88aa-a03dd9fd9a7e]: FINISHED {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-3e182abc-eb88-44e4-88aa-a03dd9fd9a7e]: FINISHED"}}
