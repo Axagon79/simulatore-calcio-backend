@@ -2,12 +2,14 @@ import pymongo
 
 from league_objectives import LEAGUE_OBJECTIVES
 
+
 # CONFIGURAZIONE DB
 MONGO_URI = "mongodb+srv://Database_User:LPmYAZkzEVxjSaAd@pup-pals-cluster.y1h2r.mongodb.net/pup_pals_db?retryWrites=true&w=majority"
 
 client = pymongo.MongoClient(MONGO_URI)
 db = client["pup_pals_db"]
 teams = db["teams"]
+
 
 # Parametri generali
 MIN_MATCHES_FOR_MOTIVATION = 6       # prima di questa giornata -> valore neutro
@@ -59,9 +61,11 @@ def compute_dynamic_radius(points_available: float, total_matches: int) -> float
     return D
 
 
-def compute_pressure_chasing(delta_points: float,
-                             points_available: float,
-                             total_matches: int) -> float:
+def compute_pressure_chasing(
+    delta_points: float,
+    points_available: float,
+    total_matches: int,
+) -> float:
     """
     Pressione per chi INSEGUE un confine (obiettivo positivo o salvezza).
     d = punti che mancano per raggiungere la soglia.
@@ -86,9 +90,11 @@ def compute_pressure_chasing(delta_points: float,
     return pressure
 
 
-def compute_pressure_ahead(advantage_points: float,
-                           points_available: float,
-                           total_matches: int) -> float:
+def compute_pressure_ahead(
+    advantage_points: float,
+    points_available: float,
+    total_matches: int,
+) -> float:
     """
     Pressione per chi ha GIA' raggiunto l'obiettivo e ha un margine sopra il confine.
     Più il vantaggio cresce, più la pressione cala (rischio calo motivazionale).
@@ -115,12 +121,14 @@ def compute_pressure_ahead(advantage_points: float,
 def main():
     print("🔥 Calcolo MOTIVAZIONE squadre (0-10) per tutti i campionati...")
 
-    cursor = teams.find({
-        "stats.ranking_c.position": {"$exists": True},
-        "stats.ranking_c.points": {"$exists": True},
-        "stats.ranking_c.played": {"$exists": True},
-        "league": {"$exists": True},
-    })
+    cursor = teams.find(
+        {
+            "stats.ranking_c.position": {"$exists": True},
+            "stats.ranking_c.points": {"$exists": True},
+            "stats.ranking_c.played": {"$exists": True},
+            "league": {"$exists": True},
+        }
+    )
 
     leagues = {}
     for team in cursor:
@@ -152,7 +160,9 @@ def main():
             pos = rc.get("position")
             pts = rc.get("points")
             played = rc.get("played")
-            if isinstance(pos, int) and isinstance(pts, (int, float)) and isinstance(played, int):
+            if isinstance(pos, int) and isinstance(pts, (int, float)) and isinstance(
+                played, int
+            ):
                 pos_map[pos] = (pts, played, t)
 
         if not pos_map:
@@ -163,7 +173,9 @@ def main():
         euro_positions = []
         for z_name, z_conf in zones.items():
             if z_name in EURO_ZONES:
-                euro_positions.extend(range(z_conf["min_pos"], z_conf["max_pos"] + 1))
+                euro_positions.extend(
+                    range(z_conf["min_pos"], z_conf["max_pos"] + 1)
+                )
         euro_positions = sorted(set(euro_positions))
 
         euro_min_pos = None
@@ -180,7 +192,9 @@ def main():
         releg_positions = []
         for z_name, z_conf in zones.items():
             if z_name in RELEGATION_ZONES:
-                releg_positions.extend(range(z_conf["min_pos"], z_conf["max_pos"] + 1))
+                releg_positions.extend(
+                    range(z_conf["min_pos"], z_conf["max_pos"] + 1)
+                )
         releg_positions = sorted(set(releg_positions))
 
         releg_playout_positions = []
@@ -229,8 +243,12 @@ def main():
 
             name = t.get("name", "???")
 
-            if not isinstance(pos, int) or not isinstance(pts, (int, float)) or not isinstance(played, int):
-                print(f"   ⚠️ {name}: dati classifica incompleti, salto motivazione.")
+            if not isinstance(pos, int) or not isinstance(
+                pts, (int, float)
+            ) or not isinstance(played, int):
+                print(
+                    f"   ⚠️ {name}: dati classifica incompleti, salto motivazione."
+                )
                 continue
 
             matches_left = max(0, total_matches - played)
@@ -245,37 +263,68 @@ def main():
 
             else:
                 # progress non lineare (fase del campionato)
-                progress_linear = min(max(played / float(total_matches), 0.0), 1.0)
+                progress_linear = min(
+                    max(played / float(total_matches), 0.0), 1.0
+                )
                 progress = progress_linear ** 0.5
 
                 # ---------- pressione obiettivo positivo (Europa / promozione) ----------
                 pressure_euro = 0.0
-                if euro_threshold_points is not None and euro_min_pos is not None and euro_max_pos is not None:
+                if (
+                    euro_threshold_points is not None
+                    and euro_min_pos is not None
+                    and euro_max_pos is not None
+                ):
                     if pos <= euro_max_pos:
-                        # già dentro la zona Europa: vantaggio sopra l'ultima posizione utile
+                        # già dentro la zona Europa/playoff
                         advantage = pts - euro_threshold_points
                         pressure_euro = compute_pressure_ahead(
                             advantage, points_available, total_matches
                         )
                     else:
-                        # fuori dalla zona Europa: distanza dall'ultima posizione utile
+                        # fuori dalla zona Europa/playoff
                         delta_euro = abs(pts - euro_threshold_points)
                         pressure_euro = compute_pressure_chasing(
                             delta_euro, points_available, total_matches
                         )
+
+                # --- boost specifico Serie C dentro i playoff (2–4, 5–8, 9–10) ---
+                is_serie_c = "serie c" in league.lower()
+                if (
+                    is_serie_c
+                    and euro_min_pos is not None
+                    and euro_max_pos is not None
+                    and euro_min_pos <= 2 <= euro_max_pos
+                ):
+                    # Applichiamo solo se siamo già in zona playoff
+                    if 2 <= pos <= 4:
+                        # Posizioni con ingresso tardivo e forti vantaggi nel tabellone
+                        pressure_euro *= 1.20
+                    elif 5 <= pos <= 8:
+                        # Posizioni medio-alte playoff
+                        pressure_euro *= 1.10
+                    elif 9 <= pos <= 10:
+                        # Ultimi posti playoff, pressione per non uscire
+                        pressure_euro *= 1.05
+
+                    # Clamp per sicurezza
+                    if pressure_euro > 1.0:
+                        pressure_euro = 1.0
+                    if pressure_euro < 0.0:
+                        pressure_euro = 0.0
 
                 # ---------- pressione zona pericolo (playout + retrocessione) ----------
                 pressure_releg_pl = 0.0
                 if releg_playout_points is not None and releg_playout_positions:
                     first_pl_pos = min(releg_playout_positions)
                     if pos < first_pl_pos:
-                        # sopra la zona playout: distanza dal confine per NON entrarci
+                        # sopra la zona playout
                         delta_pl = abs(pts - releg_playout_points)
                         pressure_releg_pl = compute_pressure_chasing(
                             delta_pl, points_available, total_matches
                         )
                     else:
-                        # dentro la zona playout: comunque grande pressione
+                        # dentro la zona playout
                         delta_pl = abs(pts - releg_playout_points)
                         pressure_releg_pl = compute_pressure_chasing(
                             delta_pl, points_available, total_matches
@@ -345,21 +394,29 @@ def main():
                     "$set": {
                         "stats.motivation": motivation,
                         "stats.motivation_progress": round(progress, 3),
-                        "stats.motivation_pressure_euro": round(pressure_euro, 3),
-                        "stats.motivation_pressure_releg": round(pressure_releg, 3),
-                        "stats.motivation_pressure_title": round(pressure_title, 3),
+                        "stats.motivation_pressure_euro": round(
+                            pressure_euro, 3
+                        ),
+                        "stats.motivation_pressure_releg": round(
+                            pressure_releg, 3
+                        ),
+                        "stats.motivation_pressure_title": round(
+                            pressure_title, 3
+                        ),
                     }
-                }
+                },
             )
             total_updated += 1
 
             print(
-                f"   ✅ {name[:20]:<20} | pos={pos:2d} pts={pts:3d} "
+                f"   ✅ {name[:20]:<20} | pos={pos:2d} pts={int(pts):3d} "
                 f"| Mot={motivation:4.2f} (prog={progress:.2f}, "
                 f"PE={pressure_euro:.2f}, PR={pressure_releg:.2f}, PT={pressure_title:.2f})"
             )
 
-    print(f"\n✅ Completato calcolo motivazione. Aggiornate {total_updated} squadre.")
+    print(
+        f"\n✅ Completato calcolo motivazione. Aggiornate {total_updated} squadre."
+    )
 
 
 if __name__ == "__main__":
