@@ -1,18 +1,7 @@
 """
 SCRAPER PORTIERI FBREF - TUTTE LE LEGHE SCELTE
 Stagione: 2025-2026
-
-Campionati inclusi (tutti tranne Serie C):
-- Serie A        (comp 11)  -> ITA1
-- Serie B        (comp 18)  -> ITA2
-- Premier League (comp 9)   -> ENG1
-- La Liga        (comp 12)  -> ESP1
-- Bundesliga     (comp 20)  -> GER1
-- Ligue 1        (comp 13)  -> FRA1
-- Eredivisie     (comp 23)  -> NED1
-- Liga Portugal  (comp 32)  -> POR1
-
-Collection Mongo: players_stats_fbref_gk
+VERSIONE AGGIORNATA: con minutes_90s
 """
 
 import re
@@ -29,7 +18,6 @@ from pymongo import UpdateOne
 
 SEASON = "2025-2026"
 
-# CONFIGURAZIONE MONGO CLUSTER (UGUALE AL RESTO DEL PROGETTO)
 MONGO_URI = "mongodb+srv://Database_User:LPmYAZkzEVxjSaAd@pup-pals-cluster.y1h2r.mongodb.net/pup_pals_db?retryWrites=true&w=majority"
 client = pymongo.MongoClient(MONGO_URI)
 db = client["pup_pals_db"]
@@ -151,13 +139,7 @@ def compute_gk_rating(
 ) -> float:
     """
     Rating puro GK su scala ~4-10.
-    Pesi:
-    - 45% Save%
-    - 35% PSxG-GA/90
-    - 15% Cross fermati%
-    - 5% Rigori parati%
     """
-
     def norm_pct(x):
         if x is None:
             return 0.5
@@ -167,7 +149,6 @@ def compute_gk_rating(
     r = norm_pct(save_pct_pk)
     c = norm_pct(cross_stop_pct)
 
-    # PSxG-GA/90, range [-0.3, +0.3] -> [0,1]
     if psxg_ga_per90 is None:
         p = 0.5
     else:
@@ -176,7 +157,6 @@ def compute_gk_rating(
 
     q = 0.35 * s + 0.35 * p + 0.20 * c + 0.10 * r
 
-    # Scala 4-10
     rating_puro = 4.0 + 6.0 * q
     return rating_puro
 
@@ -318,6 +298,9 @@ def main():
             save_pct_pk = parse_float_safe(base_row.get("gk_pens_save_pct"))
             psxg_ga_per90 = parse_float_safe(adv_row.get("gk_psxg_net_per90"))
             cross_stop_pct = parse_float_safe(adv_row.get("gk_crosses_stopped_pct"))
+            
+            # ⭐ NUOVO: Estrai minutes_90s
+            minutes_90s = parse_float_safe(base_row.get("minutes_90s"))
 
             rating_puro = compute_gk_rating(
                 save_pct_all,
@@ -347,6 +330,7 @@ def main():
                     "league_name": lg["name"],
                     "team_name_fbref": team_name,
                     "player_name_fbref": player_name,
+                    "minutes_90s": minutes_90s,  # ⭐ NUOVO CAMPO
                     "gk_stats": gk_stats,
                     "gk_rating": {
                         "rating_puro": rating_puro,
@@ -367,7 +351,7 @@ def main():
         else:
             print("   ⚠️ Nessun portiere da scrivere per questa lega.")
 
-        # Piccola pausa per non stressare FBref
+        # Pausa
         time.sleep(10)
 
     print("\n✅ SCRAPER GK FBREF COMPLETATO.")
