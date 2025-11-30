@@ -120,3 +120,10 @@ def calculate_field_factor(home_team_name, away_team_name, league_name):
     if away_score > 7: away_score = 7.0
 
     return round(home_score, 2), round(away_score, 2)
+if __name__ == "__main__":
+    casa = "Inter"
+    trasferta = "Napoli"
+    league = "Serie A"  # modifica se necessario
+
+    home_factor, away_factor = calculate_field_factor(casa, trasferta, league)
+    print(f"Fattore campo: {casa} = {home_factor}, {trasferta} = {away_factor}")

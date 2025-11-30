@@ -94,6 +94,11 @@ def calculate_all():
                 "defense_away": round((pct_def_a / 100) * 7, 2)
             }
 
+            # POTENZA TOTALE 0-14
+            scores['home_power'] = round(scores['attack_home'] + scores['defense_home'], 2)
+            scores['away_power'] = round(scores['attack_away'] + scores['defense_away'], 2)
+
+
             # Scrittura nel DB
             teams_collection.update_one(
                 {"_id": t["_id"]},

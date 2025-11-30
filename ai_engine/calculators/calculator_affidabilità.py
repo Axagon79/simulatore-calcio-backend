@@ -9,7 +9,8 @@ COLLECTION_HISTORY = "matches_history"
 COLLECTION_TEAMS = "teams"
 
 def connect_db():
-    return client[DB_NAME]
+    from config import db
+    return db 
 
 def get_team_aliases(db, team_name):
     """Cerca gli alias della squadra per trovarla nello storico anche se il nome è diverso."""
