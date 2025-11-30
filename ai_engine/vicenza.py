@@ -1,6 +1,6 @@
 import pymongo
 
-MONGO_URI = "mongodb+srv://Database_User:LPmYAZkzEVxjSaAd@pup-pals-cluster.y1h2r.mongodb.net/"
+MONGO_URI = "**********************************************************************"
 client = pymongo.MongoClient(MONGO_URI)
 db = client["pup_pals_db"]
 avail = db["players_availability_tm"]
