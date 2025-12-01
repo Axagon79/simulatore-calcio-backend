@@ -1,10 +1,10 @@
-import pymongo
+import os
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
-# CONFIGURAZIONE DB
-MONGO_URI = "mongodb+srv://Database_User:LPmYAZkzEVxjSaAd@pup-pals-cluster.y1h2r.mongodb.net/pup_pals_db?retryWrites=true&w=majority"
+from config import db  # ← CENTRALIZZATO!
 
-client = pymongo.MongoClient(MONGO_URI)
-db = client["pup_pals_db"]
+# Niente più pymongo.MongoClient qui!
 teams = db["teams"]
 
 # Mappa: Nome nel TUO DB -> Nome usato da TRANSFERMARKT
@@ -67,7 +67,7 @@ updates_transfermarkt = {
 
     "Juventus U23": "Juventus Next Gen",
     "Inter U23": "Inter U23",
-    "Guidonia": "Guidonia Montecelio",
+    "Guidonia": "Guidonia Montecelio 1937 FC", # CORRETTO
 
     "Atalanta B": "Atalanta U23",
     "Foggia": "Calcio Foggia 1920",
@@ -90,7 +90,7 @@ updates_transfermarkt = {
     "Altamura": "Team Altamura",
     "Potenza": "Potenza Calcio",
 
-    # --- SERIE C - GIRONE A: mancanti alias TM ---
+    # --- SERIE C - GIRONE A ---
     "Union Brescia": "Union Brescia",
     "Cittadella": "Cittadella",
     "Trento": "Trento",
@@ -101,7 +101,7 @@ updates_transfermarkt = {
     "Lumezzane": "Lumezzane",
     "Virtus Verona": "Virtus Verona",
 
-    # --- SERIE C - GIRONE B: mancanti alias TM ---
+    # --- SERIE C - GIRONE B ---
     "Arezzo": "Arezzo",
     "Ravenna": "Ravenna",
     "Ascoli": "Ascoli",
@@ -110,7 +110,7 @@ updates_transfermarkt = {
     "Pineto": "Pineto",
     "Campobasso": "Campobasso",
     "Vis Pesaro": "Vis Pesaro",
-    "Forli": "Forli",
+    "Forli": "Forlì FC",
     "Pianese": "Pianese",
     "Gubbio": "Gubbio",
     "Sambenedettese": "Sambenedettese",
@@ -121,142 +121,131 @@ updates_transfermarkt = {
     "Torres": "Torres",
     "Rimini": "Rimini",
 
-    # --- PREMIER LEAGUE ---
+    # --- PREMIER LEAGUE (CORRETTI) ---
     "Manchester City": "Manchester City",
     "Manchester Utd": "Manchester Utd.",
-    "Nottm Forest": "Nottm Forest",
-    "West Ham Utd": "West Ham Utd.",
-
-    # Mancanti da check_data_health
+    "Nottm Forest": "Nottingham Forest", # CORRETTO
+    "West Ham Utd": "West Ham United",   # CORRETTO
     "Aston Villa": "Aston Villa",
     "Crystal Palace": "Crystal Palace",
-    "Arsenal": "Arsenal",
-    "Chelsea": "Chelsea",
-    "Brighton": "Brighton",
-    "Sunderland": "Sunderland",
-    "Bournemouth": "Bournemouth",
-    "Tottenham": "Tottenham",
-    "Liverpool": "Liverpool",
-    "Brentford": "Brentford",
-    "Everton": "Everton",
-    "Newcastle Utd": "Newcastle Utd",
-    "Fulham": "Fulham",
-    "Leeds Utd": "Leeds Utd",
-    "Burnley": "Burnley",
-    "Wolverhampton": "Wolverhampton",
+    "Arsenal": "Arsenal FC",             # CORRETTO
+    "Chelsea": "Chelsea FC",             # CORRETTO
+    "Brighton": "Brighton & Hove Albion",# CORRETTO
+    "Sunderland": "Sunderland AFC",      # CORRETTO
+    "Bournemouth": "AFC Bournemouth",    # Probabile
+    "Tottenham": "Tottenham Hotspur",    # CORRETTO
+    "Liverpool": "Liverpool FC",         # CORRETTO
+    "Brentford": "Brentford FC",         # CORRETTO
+    "Everton": "Everton FC",             # CORRETTO
+    "Newcastle Utd": "Newcastle United", # CORRETTO
+    "Fulham": "Fulham FC",               # CORRETTO
+    "Leeds Utd": "Leeds United",         # CORRETTO
+    "Burnley": "Burnley FC",             # CORRETTO
+    "Wolverhampton": "Wolverhampton Wanderers", # CORRETTO
 
-    # --- LA LIGA (SPAGNA) ---
-    "Elche": "Elche",
-    "Villarreal": "Villarreal",
-    "Valencia": "Valencia",
-    "Atletico Madrid": "Atletico Madrid",
-    "Levante": "Levante",
-    "Alaves": "Alaves",
-    "Espanyol": "Espanyol",
-    "Real Betis": "Real Betis",
-
-    # Mancanti da check_data_health
-    "Real Madrid": "Real Madrid",
-    "Barcellona": "Barcellona",
-    "Athletic Club": "Athletic Club",
+    # --- LA LIGA (CORRETTI) ---
+    "Elche": "Elche CF",                 # CORRETTO
+    "Villarreal": "Villarreal CF",       # CORRETTO
+    "Valencia": "Valencia CF",           # CORRETTO
+    "Atletico Madrid": "Atlético de Madrid", # CORRETTO (accento)
+    "Levante": "Levante UD",             # CORRETTO
+    "Alaves": "Deportivo Alavés",        # CORRETTO
+    "Espanyol": "RCD Espanyol Barcelona",# CORRETTO
+    "Real Betis": "Real Betis Balompié", # CORRETTO
+    "Real Madrid": "Real Madrid CF",     # CORRETTO
+    "Barcellona": "FC Barcelona",        # CORRETTO
+    "Athletic Club": "Athletic Bilbao",  # Spesso è Bilbao su TM
     "Real Sociedad": "Real Sociedad",
-    "Siviglia": "Siviglia",
+    "Siviglia": "Sevilla FC",            # CORRETTO (Nome spagnolo)
     "Rayo Vallecano": "Rayo Vallecano",
     "Real Oviedo": "Real Oviedo",
-    "Getafe": "Getafe",
-    "Celta Vigo": "Celta Vigo",
-    "Mallorca": "Mallorca",
-    "Osasuna": "Osasuna",
-    "Girona": "Girona",
+    "Getafe": "Getafe CF",
+    "Celta Vigo": "Celta de Vigo",
+    "Mallorca": "RCD Mallorca",
+    "Osasuna": "CA Osasuna",
+    "Girona": "Girona FC",
 
-    # --- BUNDESLIGA (GERMANIA) ---
-    "Bayern": "FC Bayern Monaco",
+    # --- BUNDESLIGA (NOMI ORIGINALI TEDESCHI) ---
+    "Bayern": "FC Bayern München",
     "Dortmund": "Borussia Dortmund",
     "Leverkusen": "Bayer 04 Leverkusen",
-    "Stoccarda": "VfB Stoccarda",
-    "Eintracht": "Eintracht Francoforte",
-    "Lipsia": "RB Lipsia",
-    "Werder Brema": "SV Werder Brema",
+    "Stoccarda": "VfB Stuttgart",        # CORRETTO
+    "Eintracht": "Eintracht Frankfurt",  # CORRETTO
+    "Lipsia": "RB Leipzig",              # CORRETTO
+    "Werder Brema": "SV Werder Bremen",  # CORRETTO
     "Hoffenheim": "TSG 1899 Hoffenheim",
-    "Magonza": "1.FSV Magonza 05",
+    "Magonza": "1.FSV Mainz 05",         # CORRETTO
     "Monchengladbach": "Borussia Mönchengladbach",
-    "Union Berlino": "1.FC Union Berlino",
-    "Colonia": "1.FC Colonia",
+    "Union Berlino": "1.FC Union Berlin",# CORRETTO
+    "Colonia": "1.FC Köln",              # CORRETTO
     "Heidenheim": "1.FC Heidenheim 1846",
+    "Friburgo": "SC Freiburg",           # CORRETTO
+    "Augusta": "FC Augsburg",            # CORRETTO
+    "Amburgo": "Hamburger SV",           # CORRETTO
+    "Sankt Pauli": "FC St. Pauli",       # CORRETTO
+    "Wolfsburg": "VfL Wolfsburg",        # CORRETTO
 
-    # Mancanti da check_data_health
-    "Friburgo": "Friburgo",
-    "Augusta": "Augusta",
-    "Amburgo": "Amburgo",
-    "Sankt Pauli": "Sankt Pauli",
-    "Wolfsburg": "Wolfsburg",
-
-    # --- LIGUE 1 (FRANCIA) ---
-    "PSG": "FC Paris Saint-Germain",
-    "Marsiglia": "Olympique Marsiglia",
-    "Nizza": "OGC Nizza",
-    "Brest": "Stade Brest 29",
-
-    # Mancanti da check_data_health
-    "Monaco": "Monaco",
-    "Strasburgo": "Strasburgo",
-    "Lille": "Lille",
+    # --- LIGUE 1 (NOMI ORIGINALI FRANCESI) ---
+    "PSG": "Paris Saint-Germain",        # CORRETTO
+    "Marsiglia": "Olympique Marseille",  # CORRETTO
+    "Nizza": "OGC Nice",                 # CORRETTO
+    "Brest": "Stade Brestois 29",        # CORRETTO
+    "Monaco": "AS Monaco",
+    "Strasburgo": "RC Strasbourg Alsace",# CORRETTO
+    "Lille": "LOSC Lille",               # CORRETTO
     "Paris FC": "Paris FC",
-    "Lens": "Lens",
-    "Tolosa": "Tolosa",
-    "Lorient": "Lorient",
-    "Metz": "Metz",
-    "Le Havre": "Le Havre",
-    "Rennes": "Rennes",
-    "Lyon": "Lyon",
-    "Angers": "Angers",
-    "Nantes": "Nantes",
-    "Auxerre": "Auxerre",
+    "Lens": "RC Lens",                   # CORRETTO
+    "Tolosa": "FC Toulouse",             # CORRETTO
+    "Lorient": "FC Lorient",
+    "Metz": "FC Metz",
+    "Le Havre": "AC Le Havre",
+    "Rennes": "Stade Rennais FC",        # CORRETTO
+    "Lyon": "Olympique Lyon",            # CORRETTO
+    "Angers": "Angers SCO",
+    "Nantes": "FC Nantes",
+    "Auxerre": "AJ Auxerre",
 
     # --- LIGA PORTUGAL ---
-    "Guimaraes": "Vit. Guimarães",
-    "AVS": "Avs FS",
+    "Guimaraes": "Vitória Guimarães SC", # CORRETTO
+    "AVS": "Avs Futebol",                # CORRETTO
     "Tondela": "CD Tondela",
     "Estrela Amadora": "CF Estrela Amadora",
     "Estoril": "GD Estoril Praia",
     "Nacional": "CD Nacional",
     "Santa Clara": "CD Santa Clara",
-
-    # Mancanti da check_data_health
     "FC Porto": "FC Porto",
-    "Benfica": "Benfica",
-    "Gil Vicente": "Gil Vicente",
-    "Famalicao": "Famalicao",
-    "Moreirense": "Moreirense",
-    "Sporting Braga": "Sporting Braga",
-    "Rio Ave": "Rio Ave",
-    "Alverca": "Alverca",
-    "Casa Pia": "Casa Pia",
-    "Arouca": "Arouca",
+    "Benfica": "SL Benfica",             # CORRETTO
+    "Gil Vicente": "Gil Vicente FC",
+    "Famalicao": "FC Famalicão",         # CORRETTO
+    "Moreirense": "Moreirense FC",
+    "Sporting Braga": "SC Braga",
+    "Rio Ave": "Rio Ave FC",
+    "Alverca": "FC Alverca",
+    "Casa Pia": "Casa Pia AC",
+    "Arouca": "FC Arouca",
     "Sporting CP": "Sporting CP",
 
-    # --- EREDIVISIE (OLANDA) ---
+    # --- EREDIVISIE ---
     "Sparta": "Sparta Rotterdam",
     "Go Ahead Eagles": "Go Ahead Eagles Deventer",
     "Excelsior": "Excelsior Rotterdam",
-    "FC Twente": "FC Twente Enschede",
-
-    # Mancanti da check_data_health
+    "FC Twente": "Twente Enschede FC",   # CORRETTO
     "PSV Eindhoven": "PSV Eindhoven",
-    "Feyenoord": "Feyenoord",
+    "Feyenoord": "Feyenoord Rotterdam",
     "AZ Alkmaar": "AZ Alkmaar",
     "NEC Nijmegen": "NEC Nijmegen",
     "FC Utrecht": "FC Utrecht",
     "Ajax Amsterdam": "Ajax Amsterdam",
     "FC Groningen": "FC Groningen",
-    "Heerenveen": "Heerenveen",
+    "Heerenveen": "SC Heerenveen",
     "Fortuna Sittard": "Fortuna Sittard",
     "FC Volendam": "FC Volendam",
     "PEC Zwolle": "PEC Zwolle",
     "NAC Breda": "NAC Breda",
     "Heracles Almelo": "Heracles Almelo",
-    "Telstar": "Telstar",
+    "Telstar": "SC Telstar",
 }
+
 
 print("🔧 Inizio FIX Aliases Transfermarkt...")
 count = 0
@@ -265,13 +254,13 @@ for db_name, tm_name in updates_transfermarkt.items():
     res = teams.update_one(
         {"name": db_name},
         {"$set": {"aliases_transfermarkt": tm_name}},
-        upsert=False  # non crea nuove squadre, aggiorna solo quelle esistenti
+        upsert=False
     )
 
     if res.matched_count > 0:
-        print(f"✅ {db_name} -> aliases_transfermarkt = '{tm_name}'")
+        # print(f"✅ {db_name} -> aliases_transfermarkt = '{tm_name}'")
         count += 1
     else:
-        print(f"⚠️ Squadra '{db_name}' non trovata nel DB (controlla il name).")
+        print(f"⚠️ Squadra '{db_name}' non trovata nel DB.")
 
 print(f"\nFinito. Aggiornati {count} alias Transfermarkt.")
