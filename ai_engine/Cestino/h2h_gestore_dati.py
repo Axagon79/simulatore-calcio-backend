@@ -1,5 +1,5 @@
 from datetime import datetime
-from scrapers.scraper_precedenti_h2h import get_h2h_scores  # Importa il Musicista
+from ai_engine.Cestino.scraper_precedenti_h2h import get_h2h_scores  # Importa il Musicista
 from config import db  # Importa il Database
 
 def ottieni_dati_partita(home, away):

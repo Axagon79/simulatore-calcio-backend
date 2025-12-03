@@ -1,34 +1,15 @@
 import os
 import sys
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-from config import db
-
 import cloudscraper
 from bs4 import BeautifulSoup
-import os
 import time
 import random
-from dotenv import load_dotenv
 from datetime import datetime
+import pymongo # Aggiunto import mancante
 
-# 1. CONFIGURAZIONE E CONNESSIONE ROBUSTA
-current_dir = os.path.dirname(os.path.abspath(__file__))
-# Cerca .env nella cartella padre o corrente
-env_path = os.path.join(current_dir, '..', '.env')
-if not os.path.exists(env_path):
-    env_path = os.path.join(current_dir, '.env')
-
-load_dotenv(env_path)
-
-MONGO_URI = os.getenv('MONGODB_URI') or os.getenv('MONGO_URI')
-if not MONGO_URI:
-    print("❌ ERRORE CRITICO: MONGODB_URI non trovato. Controlla il file .env")
-    exit()
-
-
-# Tenta di connettersi al DB predefinito dell'URI, altrimenti usa 'football_simulator'
-try:
-except pymongo.errors.ConfigurationError:
+# --- FIX PERCORSI ---
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+from config import db
 
 fixtures_collection = db['fixtures']
 
@@ -122,14 +103,11 @@ def scrape_oddsmath():
                             pass
                     
                     # Logica FIX colonne:
-                    # Se il primo numero è un intero > 3 (es. 7 o 8) e il secondo è < 3 (es. 1.38),
-                    # allora il primo è il BN (Bookmaker Number) e va scartato.
                     if len(odds_vals) >= 4:
                          if odds_vals[0].is_integer() and odds_vals[0] > 3 and odds_vals[1] < 4.0:
-                            odds_vals.pop(0) # Rimuovi BN
+                            odds_vals.pop(0) # Rimuovi BN (Bookmaker Number)
                     elif len(odds_vals) == 3:
-                        # Se ne abbiamo solo 3, potrebbe essere che BN non c'è o è stato filtrato.
-                        # Ma se il primo è 7.0 e il secondo 1.38... rischiamo.
+                        # Se ne abbiamo solo 3, e il primo sembra un ID bookmaker
                         if odds_vals[0].is_integer() and odds_vals[0] > 3 and odds_vals[1] < 4.0:
                              # Rischio: se scartiamo il primo, ne restano 2 -> Troppe poche.
                              pass 
