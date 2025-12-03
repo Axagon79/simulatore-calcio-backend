@@ -1,0 +1,88 @@
+import os
+import sys
+from tqdm import tqdm
+from pymongo import UpdateOne
+
+# --- CONFIGURAZIONE PERCORSI ---
+# Assicurati che questo blocco punti correttamente al tuo config.py
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+sys.path.append(parent_dir)
+
+try:
+    from config import db
+except ImportError:
+    # Fallback se eseguito da posizioni diverse
+    sys.path.append(os.path.dirname(parent_dir))
+    from config import db
+
+def create_team_identity_collection():
+    print("🚀 CREAZIONE RUBRICA IDENTITÀ SQUADRE (teams_identity)...")
+    
+    # 1. Prendi tutte le squadre dalla collezione pesante 'teams'
+    all_teams = list(db.teams.find({}, {
+        "name": 1, 
+        "transfermarkt_id": 1, 
+        "aliases": 1, 
+        "country": 1, 
+        "league": 1,
+        "aliases_transfermarkt": 1
+    }))
+    
+    if not all_teams:
+        print("❌ Nessuna squadra trovata in 'teams'.")
+        return
+
+    print(f"📋 Trovate {len(all_teams)} squadre. Inizio estrazione...")
+
+    operations = []
+    for team in tqdm(all_teams):
+        # Estrai i dati essenziali
+        tm_id = team.get("transfermarkt_id")
+        name = team.get("name")
+        
+        if not tm_id or not name:
+            continue # Salta se mancano dati vitali
+            
+        # Raccogli tutti i possibili nomi (Alias) in una lista unica pulita
+        known_names = set()
+        known_names.add(name)
+        
+        # Aggiungi aliases dalla lista
+        if team.get("aliases"):
+            for a in team.get("aliases"):
+                known_names.add(a)
+                
+        # Aggiungi aliases transfermarkt
+        if team.get("aliases_transfermarkt"):
+            known_names.add(team.get("aliases_transfermarkt"))
+            
+        # Prepara il documento pulito
+        identity_doc = {
+            "tm_id": tm_id,  # Usiamo questo come chiave principale logica
+            "name": name,
+            "league": team.get("league", "Unknown"),
+            "country": team.get("country", "Unknown"),
+            "all_names": list(known_names) # Lista di tutti i nomi con cui è conosciuta
+        }
+        
+        # Prepariamo l'operazione di salvataggio (Upsert basato su tm_id)
+        # Usiamo tm_id come filtro univoco
+        operations.append(
+            UpdateOne(
+                {"tm_id": tm_id}, 
+                {"$set": identity_doc}, 
+                upsert=True
+            )
+        )
+
+    # Eseguiamo tutto in blocco (molto veloce)
+    if operations:
+        result = db.teams_identity.bulk_write(operations)
+        print(f"✅ Completato! Inseriti/Aggiornati: {result.upserted_count + result.modified_count} documenti.")
+        print("📂 Nuova collezione creata: 'teams_identity'")
+    else:
+        print("⚠️ Nessuna operazione da eseguire.")
+
+if __name__ == "__main__":
+    create_team_identity_collection()
