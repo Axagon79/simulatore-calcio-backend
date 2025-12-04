@@ -1,7 +1,19 @@
 import os
 import sys
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+import os
+import sys
+
+# --- FIX PERCORSI UNIVERSALE ---
+current_path = os.path.dirname(os.path.abspath(__file__))
+while not os.path.exists(os.path.join(current_path, 'config.py')):
+    parent = os.path.dirname(current_path)
+    if parent == current_path:
+        raise FileNotFoundError("Impossibile trovare config.py!")
+    current_path = parent
+sys.path.append(current_path)
+
 from config import db
+
 
 import cloudscraper
 from bs4 import BeautifulSoup
@@ -82,7 +94,7 @@ def scrape_fbref_results():
             
             for t in tables:
                 # Cerca intestazione che contiene 'Score' o 'Risultato'
-                if t.find('th', text=re.compile(r'Score|Risultato')):
+                if t.find('th', string=re.compile(r'Score|Risultato')):
                     target_table = t
                     break
             

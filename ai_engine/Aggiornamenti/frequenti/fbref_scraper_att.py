@@ -1,7 +1,19 @@
 import os
 import sys
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+import os
+import sys
+
+# --- FIX PERCORSI UNIVERSALE ---
+current_path = os.path.dirname(os.path.abspath(__file__))
+while not os.path.exists(os.path.join(current_path, 'config.py')):
+    parent = os.path.dirname(current_path)
+    if parent == current_path:
+        raise FileNotFoundError("Impossibile trovare config.py!")
+    current_path = parent
+sys.path.append(current_path)
+
 from config import db
+
 
 """
 SCRAPER ATTACCANTI FBREF - TUTTE LE LEGHE SCELTE
