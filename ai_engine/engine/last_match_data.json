@@ -1,0 +1,15 @@
+{
+    "match": "Trento vs Cittadella",
+    "home_data": {
+        "team": "Trento",
+        "league": "Serie C - Girone A",
+        "formation": "4-3-3",
+        "rating_0_10": 3.78
+    },
+    "away_data": {
+        "team": "Cittadella",
+        "league": "Serie C - Girone A",
+        "formation": "4-3-3",
+        "rating_0_10": 7.95
+    }
+}

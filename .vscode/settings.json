@@ -1,0 +1,7 @@
+{
+    "python.analysis.extraPaths": [
+        "./ai_engine",
+        "./ai_engine/calculators",
+        "./ai_engine/engine"
+    ]
+}

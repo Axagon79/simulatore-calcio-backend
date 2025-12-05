@@ -25,8 +25,7 @@ LEAGUES = [
     {"name": "Bundesliga", "url": "https://www.betexplorer.com/it/football/germany/bundesliga/results/"},
     {"name": "Ligue 1", "url": "https://www.betexplorer.com/it/football/france/ligue-1/results/"},
     {"name": "Eredivisie", "url": "https://www.betexplorer.com/it/football/netherlands/eredivisie/results/"},
-    {"name": "Liga Portugal", "url": "https://www.betexplorer.com/it/football/portugal/liga-portugal/results/"},
-    {"name": "Super Lig", "url": "https://www.betexplorer.com/it/football/turkey/super-lig/results/"}
+    {"name": "Liga Portugal", "url": "https://www.betexplorer.com/it/football/portugal/liga-portugal/results/"}
 ]
 
 def clean_float(txt):

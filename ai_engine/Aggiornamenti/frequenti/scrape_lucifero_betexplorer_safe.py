@@ -1,7 +1,7 @@
 import os
 import sys
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # --- FIX PERCORSI ---
 current_path = os.path.dirname(os.path.abspath(__file__))
@@ -17,7 +17,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 
-history_col = db['matches_history']
+# COLLEZIONE PARALLELA (Sandbox)
+safe_col = db['matches_history_betexplorer']
 
 LEAGUES = [
     {"name": "Serie A", "url": "https://www.betexplorer.com/football/italy/serie-a/results/"},
@@ -40,23 +41,62 @@ def clean_float(txt):
     except:
         return None
 
-def parse_betexplorer_date(date_str):
+def parse_date_cell(date_text):
+    """
+    Estrae la data dall'ultima cella della riga (es. 'Oggi', 'Ieri', '03.12.', '15.09.').
+    """
+    today = datetime.now()
+    txt = date_text.strip()
+    
+    if not txt: return "Unknown"
+
+    # Gestione Parole Chiave
+    if "Oggi" in txt or "Today" in txt:
+        return today.strftime("%Y-%m-%d")
+    if "Ieri" in txt or "Yesterday" in txt:
+        yesterday = today - timedelta(days=1)
+        return yesterday.strftime("%Y-%m-%d")
+    
+    # Gestione Formato numerico "DD.MM."
     try:
-        dt = datetime.strptime(date_str, "%d.%m.%Y")
-        return dt.strftime("%Y-%m-%d")
+        # Rimuovi punto finale se presente (es "03.12.")
+        clean_txt = txt.rstrip(".")
+        parts = clean_txt.split(".")
+        
+        if len(parts) >= 2:
+            day = int(parts[0])
+            month = int(parts[1])
+            
+            # Logica Anno Intelligente
+            # Se siamo a Dicembre e leggiamo "05.01", è probabile che sia Gennaio prossimo (o passato?)
+            # BetExplorer mostra risultati PASSATI. Quindi:
+            # Se oggi è 2025, e leggiamo 05.01, è Gennaio 2025.
+            # Se oggi è Gennaio 2026 e leggiamo 15.12, è Dicembre 2025.
+            
+            year = today.year
+            dt = datetime(year, month, day)
+            
+            # Se la data costruita è nel futuro (più di 2 giorni), allora è dell'anno scorso
+            if dt > (today + timedelta(days=2)):
+                year -= 1
+            
+            # Ricostruiamo con l'anno corretto
+            final_dt = datetime(year, month, day)
+            return final_dt.strftime("%Y-%m-%d")
+            
     except:
-        return date_str
+        pass # Fallback a Unknown
+
+    return "Unknown"
 
 def run_scraper():
-    print("🚀 AVVIO SCRAPER (MODALITÀ TABULA RASA: Sostituzione Totale)...")
-
-    # Lista temporanea in memoria per accumulare TUTTI i dati prima di cancellare
+    print("🚀 AVVIO SCRAPER V3 (DATA FIX)...")
+    
     ALL_MATCHES_BUFFER = []
-
     chrome_options = Options()
-    # chrome_options.add_argument("--headless") 
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--log-level=3")
+    # Blocca immagini
     prefs = {"profile.managed_default_content_settings.images": 2}
     chrome_options.add_experimental_option("prefs", prefs)
 
@@ -67,47 +107,48 @@ def run_scraper():
         print(f"\n🌍 Scarico {league['name']}...")
         try:
             driver.get(league['url'])
-            try:
-                WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "table-main")))
-            except:
-                print("⚠️ Timeout tabella.")
-                continue
+            time.sleep(3) 
 
             rows = driver.find_elements(By.CSS_SELECTOR, ".table-main tr")
-            current_date = "Unknown"
             league_count = 0
 
             for row in rows:
                 try:
-                    if "h-text-left" in row.get_attribute("class"):
-                        current_date = row.text.strip()
+                    # Ignora righe header data (es. "Round 15")
+                    if "h-text-left" in row.get_attribute("class") and not row.find_elements(By.TAG_NAME, "a"):
                         continue
                     
                     cells = row.find_elements(By.TAG_NAME, "td")
                     if len(cells) < 5: continue
 
+                    # 1. SQUADRE
                     match_text = cells[0].text
                     if "-" not in match_text: continue
                     parts = match_text.split("-")
                     home = parts[0].strip()
                     away = parts[1].strip()
 
+                    # 2. RISULTATO
                     score_text = cells[1].text
                     if ":" not in score_text: continue
                     score_parts = score_text.split(":")
                     gh = int(score_parts[0])
                     ga = int(score_parts[1])
 
+                    # 3. QUOTE
                     o1 = clean_float(cells[2].text)
                     ox = clean_float(cells[3].text)
                     o2 = clean_float(cells[4].text)
-                    formatted_date = parse_betexplorer_date(current_date)
+                    
+                    # 4. DATA (Ultima cella)
+                    date_text = cells[-1].text
+                    formatted_date = parse_date_cell(date_text)
 
+                    # Logica risultato 1X2
                     if gh > ga: res = '1'
                     elif ga > gh: res = '2'
                     else: res = 'X'
 
-                    # Aggiungi al buffer in memoria
                     doc = {
                         "league": league['name'],
                         "date": formatted_date,
@@ -125,24 +166,21 @@ def run_scraper():
 
                 except:
                     continue
-            print(f"   📦 In buffer: {league_count} partite.")
+            print(f"   📦 Trovate: {league_count} partite.")
 
         except Exception as e:
-            print(f"   ❌ Errore {league['name']}: {e}")
+            print(f"   ❌ Errore: {e}")
 
     driver.quit()
 
-    # --- FASE CRITICA: SOSTITUZIONE DB ---
-    if len(ALL_MATCHES_BUFFER) > 50: # Controllo sicurezza (non cancellare se lo scraper ha fallito)
-        print(f"\n🧹 SVUOTO DB VECCHIO...")
-        history_col.delete_many({}) # CANCELLA TUTTO
-        print("   ✅ DB Svuotato.")
-        
-        print(f"💾 SALVO {len(ALL_MATCHES_BUFFER)} NUOVE PARTITE...")
-        history_col.insert_many(ALL_MATCHES_BUFFER)
-        print("   ✅ Salvataggio completato! Il DB ora è pulito e aggiornato.")
+    # SALVATAGGIO FINALE
+    if len(ALL_MATCHES_BUFFER) > 50:
+        print(f"\n🧹 PULIZIA E SALVATAGGIO IN {safe_col.name}...")
+        safe_col.delete_many({}) 
+        safe_col.insert_many(ALL_MATCHES_BUFFER)
+        print(f"   ✅ Salvate {len(ALL_MATCHES_BUFFER)} partite correttamente.")
     else:
-        print("\n⚠️ ATTENZIONE: Scaricate poche partite (<50). Non tocco il DB per sicurezza.")
+        print("\n⚠️ Errore: Scaricate poche partite. DB non toccato.")
 
 if __name__ == "__main__":
     run_scraper()

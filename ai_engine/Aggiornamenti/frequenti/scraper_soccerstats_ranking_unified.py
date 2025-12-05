@@ -114,19 +114,34 @@ def scrape_unified_ranking():
                         ]
                     }
 
-                    # Usiamo la DOT NOTATION per non cancellare altri dati dentro "ranking"
+                                        # Usiamo la DOT NOTATION per non cancellare altri dati dentro "ranking"
                     update_doc = {
                         "$set": {
                             "ranking.league": league['name'],
-                            # Dati per Calcolatore Forza (dal v3)
-                            "ranking.homeStats": {"played": gp_h, "goalsFor": gf_h, "goalsAgainst": ga_h},
-                            "ranking.awayStats": {"played": gp_a, "goalsFor": gf_a, "goalsAgainst": ga_a},
+                            # Dati per Calcolatore Forza (dal v3) + BVS (W/D/L)
+                            "ranking.homeStats": {
+                                "played": gp_h, 
+                                "wins": wh, 
+                                "draws": dh, 
+                                "losses": lh, 
+                                "goalsFor": gf_h, 
+                                "goalsAgainst": ga_h
+                            },
+                            "ranking.awayStats": {
+                                "played": gp_a, 
+                                "wins": wa, 
+                                "draws": da, 
+                                "losses": la, 
+                                "goalsFor": gf_a, 
+                                "goalsAgainst": ga_a
+                            },
                             # Dati Punti (dal v4)
                             "ranking.homePoints": pts_h,
                             "ranking.awayPoints": pts_a,
                             "last_updated": time.time()
                         }
                     }
+
 
                     res = teams_collection.update_one(filter_q, update_doc)
                     if res.matched_count > 0:

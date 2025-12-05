@@ -486,7 +486,9 @@ def calculate_team_rating(team_name):
     # CAP massimo a 10 (nessun limite inferiore)
     team_rating_0_10 = min(10, team_rating_0_10)
     
-    # 7. OUTPUT
+        # ... (codice precedente fino al calcolo del rating) ...
+    
+    # 7. OUTPUT (UNICA VERSIONE)
     print(f"\n👥 TITOLARI ({num_starters}/11):")
     for p in starters:
         print(f"   {p['role']:12} | {p['player']:30} | {p['rating']:.2f} | Min: {p['minutes_90s']:.1f}")
@@ -496,6 +498,8 @@ def calculate_team_rating(team_name):
         for p in bench:
             print(f"   {p['role']:12} | {p['player']:30} | {p['rating']:.2f} → {p['effective_rating']:.2f} | Min: {p['minutes_90s']:.1f}")
     
+    total_sum = starters_sum + bench_sum
+
     print(f"\n📊 RATING:")
     print(f"   Somma titolari: {starters_sum:.2f}")
     print(f"   Media titolari (normale): {media_titolari_normale:.2f}")
@@ -512,57 +516,10 @@ def calculate_team_rating(team_name):
         "league": league,
         "formation": formation_str,
         "rating_0_10": round(team_rating_0_10, 2),
-        "total_sum": round(starters_sum + bench_sum, 2)
+        "total_sum": round(total_sum, 2),
+        "starters": starters,  # <--- FONDAMENTALE
+        "bench": bench         # <--- FONDAMENTALE
     }
-
-    
-    # 7. OUTPUT
-    print(f"\n👥 TITOLARI ({num_starters}/11):")
-    for p in starters:
-        print(f"   {p['role']:12} | {p['player']:30} | {p['rating']:.2f} | Min: {p['minutes_90s']:.1f}")
-    
-    if bench:
-        print(f"\n🪑 PANCHINA ({len(bench)}/7):")
-        for p in bench:
-            print(f"   {p['role']:12} | {p['player']:30} | {p['rating']:.2f} → {p['effective_rating']:.2f} | Min: {p['minutes_90s']:.1f}")
-    
-    print(f"\n📊 RATING:")
-    print(f"   Somma titolari: {starters_sum:.2f}")
-    print(f"   Media titolari (normale): {media_titolari_normale:.2f}")
-    print(f"   Media titolari (alzata /10): {media_titolari_alzata:.2f}")
-    print(f"   Somma panchina: {bench_sum:.2f}")
-    print(f"   Media panchina: {media_panchina:.2f}")
-    print(f"   Calcolo 1: {calcolo_1:.2f}")
-    print(f"   Calcolo 2: {calcolo_2:.2f}")
-    print(f"   🎯 RATING SQUADRA: {team_rating_0_10:.2f}/10")
-    print(f"{'='*70}\n")
-
-    
-    # 7. Output
-    print(f"\n👥 TITOLARI ({num_starters}/11):")
-    for p in starters:
-        print(f"   {p['role']:12} | {p['player']:30} | {p['rating']:.2f} | Min: {p['minutes_90s']:.1f}")
-    
-    if bench:
-        print(f"\n🪑 PANCHINA ({len(bench)}/7):")
-        for p in bench:
-            print(f"   {p['role']:12} | {p['player']:30} | {p['rating']:.2f} → {p['effective_rating']:.2f} | Min: {p['minutes_90s']:.1f}")
-    
-    print(f"\n📊 RATING:")
-    print(f"   Titolari: {starters_sum:.2f}")
-    print(f"   Panchina: {bench_sum:.2f}")
-    print(f"   TOTALE: {total_sum:.2f}")
-    print(f"   🎯 RATING SQUADRA: {team_rating_0_10:.2f}/10")
-    print(f"{'='*70}\n")
-    
-    return {
-        "team": team_name,
-        "league": league,
-        "formation": formation_str,
-        "rating_0_10": round(team_rating_0_10, 2),
-        "total_sum": round(total_sum, 2)
-    }
-
 
 # ==================== TEST ====================
 
@@ -571,7 +528,7 @@ if __name__ == "__main__":
         print("❌ Correggi rating anomali!\n")
         exit(1)
     
-    test_teams = ["Vicenza", "Lecco", "Pro Vercelli"]
+    test_teams = ["Inter", "Torino"]
     
     print("\n" + "="*70)
     print("🧪 TEST RATING SQUADRE")
