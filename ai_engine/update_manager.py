@@ -2,25 +2,24 @@ import os
 import sys
 import subprocess
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # ------------------------------------------------------------------------------
-# CONFIGURAZIONE PERCORSI
+# CONFIGURAZIONE PERCORSI (Adattata alla tua lista esistente)
 # ------------------------------------------------------------------------------
+
+# Percorso base del progetto (Fisso)
+BASE_PROJECT_DIR = r"C:\Progetti\simulatore-calcio-backend"
+
+# Qui definisco le variabili ESATTAMENTE con i nomi che usi nella lista sotto.
+# Così non devi cambiare nulla nella lista.
+
+FREQUENT_DIR = os.path.join(BASE_PROJECT_DIR, "ai_engine", "Aggiornamenti", "frequenti")
+
+CALCULATORS_DIR = os.path.join(BASE_PROJECT_DIR, "ai_engine", "calculators")
+
+# (Questa serve solo se qualche funzione vecchia la usa ancora)
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-# Assumendo che questo script sia nella cartella 'Aggiornamenti/frequenti' o 'ai_engine'
-# Cerchiamo di determinare le cartelle in modo dinamico ma robusto
-
-# Se il file scraper è nella stessa cartella di questo script:
-FREQUENT_DIR = CURRENT_DIR 
-
-# Per i calcolatori, dobbiamo risalire:
-# Se siamo in ai_engine/Aggiornamenti/frequenti -> ../../calculators
-CALCULATORS_DIR = os.path.abspath(os.path.join(CURRENT_DIR, "..", "..", "calculators"))
-
-# Controllo di sicurezza: se non esiste la cartella calculators lì, proviamo un livello sopra
-if not os.path.exists(CALCULATORS_DIR):
-    CALCULATORS_DIR = os.path.abspath(os.path.join(CURRENT_DIR, "..", "calculators"))
 
 
 # ------------------------------------------------------------------------------
@@ -31,7 +30,6 @@ if not os.path.exists(CALCULATORS_DIR):
 SCRAPER_SEQUENCE = [
       ("scraper_results_fbref.py", "📊 [1/13] Risultati & xG (FBref)", "Mancano risultati recenti e xG", FREQUENT_DIR),
       
-      # ⭐ NOME FILE CORRETTO APPENA INSERITO ⭐
       ("scrape_lucifero_betexplorer_safe.py", "🔥 [2/13] Lucifero & Serie C (BetExplorer)", "Il Lucifero non funziona senza questo", FREQUENT_DIR),
       
       ("scraper_quote_storiche_betexplorer.py", "💰 [3/13] Quote Storiche", "Calcolo Affidabilità/BVS impossibile", FREQUENT_DIR),
@@ -66,7 +64,7 @@ def run_single_script(filename, description, folder_path):
     # Controllo esistenza file
     if not os.path.exists(full_path):
         print(f"❌ Errore: File non trovato in {full_path}")
-        return False, "File non trovato"
+        return False, "File non trovato", 0.0
 
     start_time = time.time()
     
@@ -85,61 +83,76 @@ def run_single_script(filename, description, folder_path):
         
         elapsed = time.time() - start_time
         print(f"   ✅ COMPLETATO in {elapsed:.2f}s")
-        return True, None
+        return True, None, elapsed
         
     except subprocess.CalledProcessError as e:
+        elapsed = time.time() - start_time
         print("   🔴 ERRORE SCRIPT (Vedi output sopra)")
-        return False, "Script fallito (Exit Code != 0)"
+        return False, "Script fallito (Exit Code != 0)", elapsed
         
     except Exception as e:
-        return False, str(e)
+        return False, str(e), 0.0
 
 
 def main():
     print("\n" + "="*80)
-    print("🎩 DIRETTORE D'ORCHESTRA 3.1: ORA CON LUCIFERO")
+    print("🎩 DIRETTORE D'ORCHESTRA 3.3: CON CRONOMETRO & DIAGNOSTICA")
     print("="*80)
 
     report = []
+    total_start_time = time.time() # Start Cronometro Globale
 
     for filename, desc, impact, folder in SCRAPER_SEQUENCE:
-        ok, err_msg = run_single_script(filename, desc, folder)
+        ok, err_msg, duration = run_single_script(filename, desc, folder)
         report.append({
             "file": filename,
             "status": "✅ OK" if ok else "❌ KO",
             "error": err_msg,
             "impact": impact,
-            "folder": folder
+            "folder": folder,
+            "duration": duration
         })
         if ok: time.sleep(2)
 
+    total_duration_sec = time.time() - total_start_time
+    total_duration_str = str(timedelta(seconds=int(total_duration_sec))) # Converte in HH:MM:SS
 
     # --- REPORT FINALE ---
-    print("\n\n" + "="*90)
-    print("📊 REPORT AGGIORNAMENTO")
-    print("="*90)
-    print(f"{'STATO':<6} | {'FILE (Script)':<35} | {'IMPATTO (Se fallisce)'}")
-    print("-" * 90)
+    print("\n\n" + "="*100)
+    print(f"📊 REPORT AGGIORNAMENTO - DURATA TOTALE: {total_duration_str}")
+    print("="*100)
+    print(f"{'STATO':<6} | {'DURATA':<10} | {'FILE (Script)':<35} | {'IMPATTO (Se fallisce)'}")
+    print("-" * 100)
 
     failures = []
     for item in report:
-        print(f"{item['status']:<6} | {item['file']:<35} | {item['impact']}")
+        dur_str = f"{item['duration']:.1f}s"
+        print(f"{item['status']:<6} | {dur_str:<10} | {item['file']:<35} | {item['impact']}")
         if item['status'] == "❌ KO":
             failures.append(item)
 
 
-    # --- DETTAGLIO ERRORI ---
+    # --- DETTAGLIO ERRORI E SOLUZIONI ---
     if failures:
         print("\n" + "="*90)
-        print("⚠️  ANALISI FALLIMENTI")
+        print("⚠️  ANALISI FALLIMENTI & SOLUZIONI")
         print("="*90)
         for fail in failures:
+            try:
+                rel_path = os.path.relpath(os.path.join(fail['folder'], fail['file']), BASE_PROJECT_DIR)
+            except ValueError:
+                rel_path = os.path.join(fail['folder'], fail['file'])
+
             print(f"🔴 {fail['file']}")
             print(f"   └─ Errore: {fail['error']}")
             print(f"   └─ Conseguenza: {fail['impact']}")
-            print("-" * 40)
+            print(f"   └─ 🔧 SOLUZIONE RAPIDA: Copia e lancia questo comando:")
+            print(f"      python {rel_path}")
+            print("-" * 60)
+            
+        print("\n❌ L'aggiornamento ha avuto dei problemi. Controlla i comandi sopra.")
     else:
-        print("\n✨ SISTEMA PERFETTAMENTE AGGIORNATO (H2H + LUCIFERO)!")
+        print(f"\n✨ SISTEMA PERFETTAMENTE AGGIORNATO IN {total_duration_str}!")
 
     print("\n")
 

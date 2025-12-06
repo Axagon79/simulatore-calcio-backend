@@ -1,33 +1,6 @@
 {
-    "MATCH": "Torino vs Napoli",
+    "MATCH": "Napoli vs Juventus",
     "CASA": {
-        "Squadra": "Torino",
-        "Modulo": "3-4-2-1",
-        "Rating": 6.24,
-        "1_TITOLARI": [
-            "GK - Franco Israel (5.4)",
-            "DIF - Sa\u00fal Coco (7.8)",
-            "DIF - Guillermo Marip\u00e1n (7.1)",
-            "DIF - Valentino Lazaro (6.3)",
-            "MID - Cesare Casadei (6.2)",
-            "MID - Kristjan Asllani (5.9)",
-            "MID - Ivan Ili\u0107 (6.1)",
-            "MID - Emirhan \u0130lkhan (6.1)",
-            "ATT - Nikola Vla\u0161i\u0107 (5.4)",
-            "ATT - Giovanni Simeone (7.0)",
-            "ATT - Cyril Ngonge (5.8)"
-        ],
-        "2_PANCHINA": [
-            "GK - Alberto Paleari (6.4)",
-            "DIF - Marcus Pedersen (5.9)",
-            "DIF - Adrien Tameze (6.1)",
-            "MID (da DIF) - Ardian Ismajli (6.9)",
-            "MID (da DIF) - Cristiano Biraghi (6.4)",
-            "ATT - Che Adams (6.6)",
-            "ATT - Gvidas Gineitis (5.2)"
-        ]
-    },
-    "OSPITE": {
         "Squadra": "Napoli",
         "Modulo": "4-3-3",
         "Rating": 6.78,
@@ -52,6 +25,33 @@
             "MID - Billy Gilmour (6.9)",
             "ATT - Lorenzo Lucca (6.0)",
             "ATT - Elif Elmas (4.8)"
+        ]
+    },
+    "OSPITE": {
+        "Squadra": "Juventus",
+        "Modulo": "3-5-2",
+        "Rating": 6.39,
+        "1_TITOLARI": [
+            "GK - Michele Di Gregorio (6.5)",
+            "DIF - Pierre Kalulu (6.3)",
+            "DIF - Lloyd Kelly (6.8)",
+            "DIF - Andrea Cambiaso (6.3)",
+            "MID - Manuel Locatelli (7.5)",
+            "MID - Kh\u00e9phren Thuram (7.1)",
+            "MID - Teun Koopmeiners (6.5)",
+            "MID - Weston McKennie (6.0)",
+            "MID - Vasilije Ad\u017ei\u0107 (6.6)",
+            "ATT - Kenan Y\u0131ld\u0131z (7.1)",
+            "ATT - Du\u0161an Vlahovi\u0107 (6.5)"
+        ],
+        "2_PANCHINA": [
+            "GK - Mattia Perin (6.4)",
+            "DIF - Federico Gatti (6.3)",
+            "DIF - Gleison Bremer (5.8)",
+            "MID - Edon Zhegrova (4.3)",
+            "MID - Fabio Miretti (7.0)",
+            "ATT - Francisco Concei\u00e7\u00e3o (5.9)",
+            "ATT - Jonathan David (6.1)"
         ]
     }
 }

@@ -134,16 +134,23 @@ def get_team_data(db_conn, team_name):
     return data
 
 def get_h2h_data_from_db(db_conn, home_team, away_team):
-    if db_conn is None: return 0, 0, "Nessun Dato"
+    if db_conn is None: return 0, 0, "Nessun Dato", {}
     doc = db_conn.h2h_by_round.find_one(
         {"matches": {"$elemMatch": {"home": home_team, "away": away_team}}},
         {"matches.$": 1}
     )
     if doc and "matches" in doc and len(doc["matches"]) > 0:
         h2h = doc["matches"][0].get("h2h_data", {})
-        if h2h.get("status") == "No Data": return 0, 0, "Dati Insufficienti"
-        return h2h.get("home_score", 0), h2h.get("away_score", 0), h2h.get("history_summary", "")
-    return 0, 0, "Match non trovato in H2H DB"
+        if h2h.get("status") == "No Data": return 0, 0, "Dati Insufficienti", {}
+        
+        extra = {
+            "avg_goals_home": h2h.get("avg_goals_home", 1.2), 
+            "avg_goals_away": h2h.get("avg_goals_away", 1.0)
+        }
+        return h2h.get("home_score", 0), h2h.get("away_score", 0), h2h.get("history_summary", ""), extra
+        
+    return 0, 0, "Match non trovato in H2H DB", {}
+
 
 def get_dynamic_rating(team_name):
     if rating_lib is None: return 5.0, {}
@@ -385,8 +392,12 @@ def predict_match(home_team, away_team, mode=ALGO_MODE):
     print(f"🔥 Lucifero:    {home_team}={h_luc:.2f} | {away_team}={a_luc:.2f}")
     print(f"🔮 BVS Bonus:   {home_team}={h_bvs:+} | {away_team}={a_bvs:+}")
 
-    h2h_h, h2h_a, h2h_msg = get_h2h_data_from_db(db, home_team, away_team)
+    h2h_h, h2h_a, h2h_msg, h2h_extra = get_h2h_data_from_db(db, home_team, away_team)
     print(f"📜 H2H Info: {h2h_msg} [Bonus: {h2h_h:.2f} - {h2h_a:.2f}]")
+    
+    # Aggiungo medie gol ai dati raw per il futuro calcolo gol
+    home_raw['h2h_avg_goals'] = h2h_extra.get('avg_goals_home', 1.2)
+    away_raw['h2h_avg_goals'] = h2h_extra.get('avg_goals_away', 1.0)
 
     if mode == 5:
         print("✨ Esecuzione ENSEMBLE (Media Algo 1-4)...")
@@ -411,7 +422,7 @@ def predict_match(home_team, away_team, mode=ALGO_MODE):
     print(f"   ✈️ {away_team}: {net_away:.4f}")
     print("-" * 40)
     
-    return net_home, net_away
+    return net_home, net_away, home_raw, away_raw
 
 if __name__ == "__main__":
     print("\n--- TEST MOTORE V9 (FULL) ---")
