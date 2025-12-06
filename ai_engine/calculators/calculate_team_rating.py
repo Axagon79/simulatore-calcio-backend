@@ -11,7 +11,7 @@ GK ordinati per minutes_90s (come DEF/MID/ATT)
 
 # ==================== CONFIGURAZIONE ====================
 
-DB_NAME = "pup_pals_db"
+DB_NAME = db.name
 
 FORMATION_MAPPING = {
     "3-4-2-1": "3-4-3",

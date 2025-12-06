@@ -55,13 +55,9 @@ try:
     import calculator_fattore_campo as field_lib
     print("✅ [ENGINE] Libreria Fattore Campo caricata.")
 except ImportError as e:
-    # Fallback nome inglese se l'hai salvato diversamente
-    try:
-        import calculator_field_factor as field_lib
-        print("✅ [ENGINE] Libreria Fattore Campo caricata (eng).")
-    except ImportError:
-        print(f"❌ [ENGINE] Errore import Fattore Campo lib: {e}")
-        field_lib = None
+    print(f"❌ [ENGINE] Errore import Fattore Campo lib: {e}")
+    field_lib = None
+
 
 # 5. LUCIFERO (Forma Recente Ponderata)
 try:
@@ -307,18 +303,30 @@ def predict_match(home_team, away_team, mode=ALGO_MODE):
     h_rating_val, h_rating_full = get_dynamic_rating(home_team)
     a_rating_val, a_rating_full = get_dynamic_rating(away_team)
     
-    # Flash Data
+        # --- PREPARAZIONE JSON LEGGIBILE ---
+    def clean_roster(team_data_full):
+        if not team_data_full or "starters" not in team_data_full: return "N/A"
+        return {
+            "Squadra": team_data_full.get("team"),
+            "Modulo": team_data_full.get("formation"),
+            "Rating": team_data_full.get("rating_0_10"),
+            "1_TITOLARI": [f"{p['role']} - {p['player']} ({p.get('rating',0):.1f})" for p in team_data_full["starters"]],
+            "2_PANCHINA": [f"{p['role']} - {p['player']} ({p.get('rating',0):.1f})" for p in team_data_full.get("bench", [])]
+        }
+
     flash_data = {
-        "match": f"{home_team} vs {away_team}",
-        "home_data": h_rating_full,
-        "away_data": a_rating_full
+        "MATCH": f"{home_team} vs {away_team}",
+        "CASA": clean_roster(h_rating_full),
+        "OSPITE": clean_roster(a_rating_full)
     }
+    
     try:
         with open(CACHE_FILE, "w", encoding="utf-8") as f:
             json.dump(flash_data, f, indent=4)
-        print(f"💾 Dati Flash salvati in: {CACHE_FILE}")
+        print(f"💾 Dati Flash (Clean) salvati in: {CACHE_FILE}")
     except Exception as e:
         print(f"⚠️ Errore salvataggio Flash: {e}")
+
 
     # Calcoli Extra
     if reliability_lib:
@@ -370,6 +378,7 @@ def predict_match(home_team, away_team, mode=ALGO_MODE):
     
     print(f"📊 Motivazioni: {home_team}={home_raw['motivation']} | {away_team}={away_raw['motivation']}")
     print(f"⭐ Rating Rosa: {home_team}={h_rating_val} | {away_team}={a_rating_val}")
+    print(f"⚔️  Attacco/Difesa: {home_team}={home_raw['attack']:.1f}/{home_raw['defense']:.1f} | {away_team}={away_raw['attack']:.1f}/{away_raw['defense']:.1f}")
     print(f"💎 Valore Rosa: {home_team}={home_raw['strength_score']} | {away_team}={away_raw['strength_score']}")
     print(f"🍀 Affidabilità: {home_team}={h_rel} | {away_team}={a_rel}")
     print(f"🏟️  Fattore Campo:{home_team}={h_field} | {away_team}={a_field}")
@@ -413,4 +422,4 @@ if __name__ == "__main__":
     except ValueError:
         mode = 5
 
-    predict_match("Trento", "Cittadella", mode=mode)
+    predict_match("Torino", "Napoli", mode=mode)

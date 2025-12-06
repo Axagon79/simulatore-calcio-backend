@@ -1,15 +1,57 @@
 {
-    "match": "Trento vs Cittadella",
-    "home_data": {
-        "team": "Trento",
-        "league": "Serie C - Girone A",
-        "formation": "4-3-3",
-        "rating_0_10": 3.78
+    "MATCH": "Torino vs Napoli",
+    "CASA": {
+        "Squadra": "Torino",
+        "Modulo": "3-4-2-1",
+        "Rating": 6.24,
+        "1_TITOLARI": [
+            "GK - Franco Israel (5.4)",
+            "DIF - Sa\u00fal Coco (7.8)",
+            "DIF - Guillermo Marip\u00e1n (7.1)",
+            "DIF - Valentino Lazaro (6.3)",
+            "MID - Cesare Casadei (6.2)",
+            "MID - Kristjan Asllani (5.9)",
+            "MID - Ivan Ili\u0107 (6.1)",
+            "MID - Emirhan \u0130lkhan (6.1)",
+            "ATT - Nikola Vla\u0161i\u0107 (5.4)",
+            "ATT - Giovanni Simeone (7.0)",
+            "ATT - Cyril Ngonge (5.8)"
+        ],
+        "2_PANCHINA": [
+            "GK - Alberto Paleari (6.4)",
+            "DIF - Marcus Pedersen (5.9)",
+            "DIF - Adrien Tameze (6.1)",
+            "MID (da DIF) - Ardian Ismajli (6.9)",
+            "MID (da DIF) - Cristiano Biraghi (6.4)",
+            "ATT - Che Adams (6.6)",
+            "ATT - Gvidas Gineitis (5.2)"
+        ]
     },
-    "away_data": {
-        "team": "Cittadella",
-        "league": "Serie C - Girone A",
-        "formation": "4-3-3",
-        "rating_0_10": 7.95
+    "OSPITE": {
+        "Squadra": "Napoli",
+        "Modulo": "4-3-3",
+        "Rating": 6.78,
+        "1_TITOLARI": [
+            "GK - Vanja Milinkovi\u0107-Savi\u0107 (7.4)",
+            "DIF - Giovanni Di Lorenzo (7.3)",
+            "DIF - Alessandro Buongiorno (6.8)",
+            "DIF - Juan Jesus (7.8)",
+            "DIF - Sam Beukema (6.8)",
+            "MID - Scott McTominay (7.1)",
+            "MID - Andre-Frank Zambo Anguissa (7.8)",
+            "MID - Stanislav Lobotka (7.1)",
+            "ATT - Matteo Politano (5.5)",
+            "ATT - Rasmus H\u00f8jlund (6.7)",
+            "ATT - David Neres (7.3)"
+        ],
+        "2_PANCHINA": [
+            "GK - Alex Meret (6.6)",
+            "DIF - Leonardo Spinazzola (5.3)",
+            "DIF - Amir Rrahmani (7.4)",
+            "MID - Kevin De Bruyne (6.1)",
+            "MID - Billy Gilmour (6.9)",
+            "ATT - Lorenzo Lucca (6.0)",
+            "ATT - Elif Elmas (4.8)"
+        ]
     }
 }
