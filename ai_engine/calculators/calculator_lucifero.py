@@ -84,13 +84,11 @@ def get_lucifero_score(team_name):
         
         print(f"   {i+1}° ({match['date']}) vs {match['awayTeam'] if is_home else match['homeTeam']}: {esito} -> {punti_match}pt x {weight} = {score_partita}")
 
-    # 4. Normalizzazione su scala 13
+    # 4. Normalizzazione su scala 25
     if max_score == 0: return 0.0
-    
     forma_pct = (total_score / max_score)
-    lucifero_value = forma_pct * 13.0 # Max 13 punti
-    
-    print(f"   ⚡ POTENZA LUCIFERO: {lucifero_value:.2f}/13.0")
+    lucifero_value = forma_pct * 25.0 # Max 25 punti
+    print(f" ⚡ POTENZA LUCIFERO: {lucifero_value:.2f}/25.0")
     return round(lucifero_value, 2)
 
 if __name__ == "__main__":

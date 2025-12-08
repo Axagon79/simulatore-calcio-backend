@@ -49,9 +49,9 @@ def calculate_reliability(team_name):
     }))
 
     if not matches:
-        return 3.5 # Valore neutro se nessuna partita trovata
+        return 5.0 # Valore neutro se nessuna partita trovata
 
-    score = 3.5 # Partenza neutra
+    score = 5.0 # Partenza neutra
     match_count = 0
 
     for m in matches:
@@ -81,13 +81,13 @@ def calculate_reliability(team_name):
         # --- LOGICA PUNTEGGIO ---
 
         # 1. SQUADRA FAVORITA (Quota < 2.00)
-        if my_odds <= 2.05:
+        if my_odds <= 2.00:
             if won:
-                score += 0.5  # Affidabile: Ha vinto come previsto
+                score += 0.8  # Affidabile: Ha vinto come previsto
             elif draw:
                 score -= 0.5  # Delusione parziale
             elif lost:
-                score -= 1.0  # Grave inaffidabilità: Ha perso da favorita
+                score -= 1.2  # Grave inaffidabilità: Ha perso da favorita
 
         # 2. SQUADRA SFAVORITA (Quota > 3.00)
         elif my_odds >= 3.00:
@@ -101,19 +101,25 @@ def calculate_reliability(team_name):
         # 3. PARTITA EQUILIBRATA (2.05 < Quota < 3.00)
         else:
             # Qui l'affidabilità conta meno, ma premia comunque la vittoria
-            if won: score += 0.2
-            if lost: score -= 0.1
+            if won: score += 0.7   # 0.5 * 1.43
+            if draw: score -= 0.70
+            if lost: score -= 1.40
 
         match_count += 1
 
     # Normalizzazione e Cap (0 - 7)
-    if score > 7: score = 7.0
+    if score > 10: score = 10.0
     if score < 0: score = 0.0
 
     # Correzione per poche partite (Regressione verso la media)
     if match_count < 5:
-        # Se ho poche partite, il voto si avvicina a 3.5
-        score = (score + 3.5) / 2
+        # Regressione proporzionale ai match
+        weight = match_count / 5.0  # 0-1
+        score = score * weight + 5.0 * (1 - weight)
+    
+# Esempio:
+# 1 partita: score * 0.2 + 5.0 * 0.8 = più neutro
+# 4 partite: score * 0.8 + 5.0 * 0.2 = quasi originale
 
     return round(score, 2)
 

@@ -7,9 +7,6 @@ from datetime import datetime
 from bs4 import BeautifulSoup
 import requests
 
-import os
-import sys
-
 # --- FIX PERCORSI UNIVERSALE ---
 current_path = os.path.dirname(os.path.abspath(__file__))
 while not os.path.exists(os.path.join(current_path, 'config.py')):
@@ -21,9 +18,8 @@ sys.path.append(current_path)
 
 from config import db
 
-
 COLLECTION_NAME = "h2h_by_round"
-TARGET_SEASON = "2025" # Fondamentale: Puntiamo alla stagione corrente (2025/26)
+TARGET_SEASON = "2025"
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
@@ -43,19 +39,27 @@ LEAGUES_TM = [
     {"name": "Liga Portugal", "url": f"https://www.transfermarkt.it/liga-nos/gesamtspielplan/wettbewerb/PO1/saison_id/{TARGET_SEASON}"},
 ]
 
-def scrape_tm_calendar_v5():
-    print(f"🚀 AVVIO SCRAPER TM V5 (Smart Score Detection) - Stagione {TARGET_SEASON}")
+def parse_tm_date(date_str):
+    if not date_str: return None
+    clean_str = re.sub(r'[a-zA-Z]{3}\s+', '', date_str).strip()
+    match = re.search(r'(\d{1,2})/(\d{1,2})/(\d{2,4})', clean_str)
+    if match:
+        d, m, y = match.groups()
+        if len(y) == 2: y = "20" + y 
+        return f"{y}-{m}-{d}"
+    return None
+
+def scrape_tm_calendar_v8():
+    print(f"🚀 AVVIO SCRAPER TM V8 (Double Memory Fix) - Stagione {TARGET_SEASON}")
     col = db[COLLECTION_NAME]
     
     for league in LEAGUES_TM:
         print(f"\n🌍 Lega: {league['name']}")
         try:
-            time.sleep(random.uniform(4, 7))
+            time.sleep(random.uniform(3, 5))
             resp = requests.get(league['url'], headers=HEADERS, timeout=15)
             soup = BeautifulSoup(resp.content, "html.parser")
             
-            # 1. Trova gli Header Giornata
-            # In 'Gesamtspielplan', sono 'content-box-headline'
             headers = soup.find_all("div", class_="content-box-headline")
             print(f"   Giornate trovate: {len(headers)}")
             
@@ -71,57 +75,69 @@ def scrape_tm_calendar_v5():
                 matches = []
                 rows = table.find_all("tr")
                 
+                # --- DOPPIA MEMORIA ---
+                last_seen_date_str = None
+                last_seen_time_str = "00:00" # Default iniziale
+                
                 for row in rows:
-                    # Ignora righe data (colspan alto)
                     cells = row.find_all("td")
                     if len(cells) < 5: continue 
                     
-                    # --- RICERCA SQUADRE ---
-                    # Cerchiamo i link alle squadre
-                    # Solitamente i TD hanno classe 'hauptlink' o 'no-border-links'
+                    # 1. DATA (con memoria)
+                    raw_date = cells[0].get_text(strip=True)
+                    if raw_date:
+                        parsed_date = parse_tm_date(raw_date)
+                        if parsed_date: last_seen_date_str = parsed_date
+
+                    # 2. ORARIO (con memoria)
+                    raw_time = cells[1].get_text(strip=True)
+                    time_found = re.search(r'(\d{1,2}:\d{2})', raw_time)
+                    
+                    match_time = "00:00"
+                    if time_found:
+                        # Se troviamo un orario, aggiorniamo la memoria
+                        match_time = time_found.group(1)
+                        last_seen_time_str = match_time
+                    else:
+                        # Se è vuoto, usiamo l'ultimo orario visto
+                        # (Ma solo se abbiamo una data valida, per sicurezza)
+                        if last_seen_date_str:
+                            match_time = last_seen_time_str
+
+                    # 3. OGGETTO COMPLETO
+                    date_obj = None
+                    if last_seen_date_str:
+                        full_dt_str = f"{last_seen_date_str} {match_time}"
+                        try:
+                            date_obj = datetime.strptime(full_dt_str, "%Y-%m-%d %H:%M")
+                        except: pass
+
+                    # Squadre
                     team_links = []
                     for td in cells:
                         a_tag = td.find("a")
                         if a_tag and a_tag.get("title"): 
-                            # Escludiamo link che sono risultati o altro
-                            if "spielbericht" in a_tag.get("href", ""): continue # Link al report partita
-                            if "datum" in a_tag.get("href", ""): continue # Link alla data
+                            if "spielbericht" in a_tag.get("href", ""): continue 
+                            if "datum" in a_tag.get("href", ""): continue
                             team_links.append(a_tag.get_text(strip=True))
                     
-                    # Ci aspettiamo almeno 2 squadre (Casa, Ospite)
-                    # A volte trova anche i giocatori se ci sono marcatori? No, nel calendario no.
                     if len(team_links) < 2: continue
-                    
-                    # Prendiamo il primo e l'ultimo valido come Casa/Ospite?
-                    # O usiamo le classi 'text-right' (Casa) e 'no-border-links' (Ospite)
                     
                     home = None
                     away = None
-                    
-                    # Casa: align right
                     home_td = row.find("td", class_="text-right")
                     if home_td: home = home_td.get_text(strip=True)
-                    
-                    # Ospite: no border links (ultimo)
-                    # Spesso ci sono più 'no-border-links', prendiamo l'ultimo
                     no_border_tds = row.find_all("td", class_="no-border-links")
-                    if no_border_tds:
-                        away = no_border_tds[-1].get_text(strip=True)
-                        
+                    if no_border_tds: away = no_border_tds[-1].get_text(strip=True)
                     if not home or not away:
-                        # Fallback sui link trovati prima
                         home = team_links[0]
                         away = team_links[-1]
-
-                    # Pulizia nomi "(15.) Milan"
                     home = re.sub(r'\(\d+\.\)', '', home).strip()
                     away = re.sub(r'\(\d+\.\)', '', away).strip()
                     
-                    # --- RICERCA RISULTATO (SMART) ---
+                    # Risultato
                     score = None
                     status = "Scheduled"
-                    
-                    # 1. Cerca tag specifico 'ergebnis-link' (Vittoria sicura)
                     res_link = row.find("a", class_="ergebnis-link")
                     if res_link:
                         txt = res_link.get_text(strip=True)
@@ -129,27 +145,7 @@ def scrape_tm_calendar_v5():
                             score = txt
                             status = "Finished"
                     
-                    # 2. Se non trova link, cerca pattern "d:d" in qualsiasi cella
-                    if not score:
-                        for td in cells:
-                            txt = td.get_text(strip=True)
-                            # Regex per "1:0", "2:2", "10:1"
-                            # Evita orari "15:00" (che TM formatta spesso come HH:MM)
-                            # TM Risultati: Spesso grassetto o linkati.
-                            # Se troviamo "2:1", assumiamo risultato.
-                            # Se troviamo "15:00", assumiamo orario.
-                            if re.match(r'^\d{1,2}:\d{1,2}$', txt):
-                                # Distinguiamo orario da punteggio?
-                                # Punteggi > 5 gol rari, orari > 12:00 comuni.
-                                # Ma anche 1:0 è orario (di notte)? No.
-                                # Se è linkato è risultato. Se è testo semplice...
-                                # In 'Gesamtspielplan', i risultati sono QUASI SEMPRE linkati.
-                                # Se è testo semplice, è orario.
-                                pass 
-
-                    # Se abbiamo trovato score
                     if score:
-                        # Check rinvio
                         if "annull" in score.lower() or "post" in score.lower():
                             status = "Postponed"
                             score = None
@@ -159,6 +155,8 @@ def scrape_tm_calendar_v5():
                         "away": away, 
                         "status": status, 
                         "real_score": score,
+                        "date_obj": date_obj,     
+                        "match_time": match_time, 
                         "h2h_data": None
                     })
 
@@ -184,4 +182,4 @@ def save_round(col, league, round_name, matches):
     }, upsert=True)
 
 if __name__ == "__main__":
-    scrape_tm_calendar_v5()
+    scrape_tm_calendar_v8()

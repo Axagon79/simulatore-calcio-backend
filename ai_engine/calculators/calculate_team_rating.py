@@ -192,29 +192,54 @@ def calculate_team_rating(team_name):
     print(f"⚽ CALCOLO RATING: {team_name}")
     print(f"{'='*70}")
     
-    # 1. Trova squadra
+    # 1. Trova squadra (Ricerca Intelligente)
+    # Prima cerca il nome esatto
     team = teams_col.find_one({"name": team_name})
+    
+    # Se fallisce, prova a cercare dentro l'array "aliases"
     if not team:
-        print("\n❌ SQUADRA NON TROVATA\n")
+        # Cerca case-insensitive negli alias per essere sicuri
+        team = teams_col.find_one({"aliases": team_name})
+        
+        if team:
+            print(f"✅ Trovata tramite Alias: {team['name']} (Input: {team_name})")
+            # Aggiorna il nome con quello ufficiale del DB per le chiamate successive
+            team_name = team['name']
+
+    # Se ancora non trova nulla, allora è davvero assente
+    if not team:
+        print(f"\n❌ SQUADRA '{team_name}' NON TROVATA NEL DB\n")
         return None
+
     
     formation_str = team.get("formation", DEFAULT_FORMATION)
     league = team.get("league", "N/A")
-        # ⭐ SERIE C SPECIALE
+            # ⭐ SERIE C SPECIALE
     if "Serie C" in league:
         strength_09 = team.get("stats", {}).get("strengthScore09", 5.0)
 
         rating_0_10 = strength_09 * 0.9
+        
+        # CONVERSIONE A 5-25
+        rating_5_25 = 5 + (rating_0_10 * 2)
+        rating_5_25 = max(5, min(25, rating_5_25))
         
         print(f"\n======================================================================")
         print(f"⚽ CALCOLO RATING: {team_name}")
         print(f"======================================================================")
         print(f"\n📋 {league}")
         print(f"   📊 strengthScore09: {strength_09:.2f}/9")
-        print(f"   🎯 RATING: {rating_0_10:.2f}/10")
+        print(f"   🎯 RATING: {rating_0_10:.2f}/10 → {rating_5_25:.2f}/25")
         print(f"{'='*70}\n")
         
-        return {"team": team_name, "league": league, "formation": "4-3-3", "rating_0_10": round(rating_0_10, 2)}
+        return {
+            "team": team_name,
+            "league": league,
+            "formation": "4-3-3",
+            "rating_0_10": round(rating_0_10, 2),
+            "rating_5_25": round(rating_5_25, 2)
+        }
+
 
 
     team_aliases = get_team_aliases(team)
@@ -480,11 +505,14 @@ def calculate_team_rating(team_name):
     calcolo_1 = (media_titolari_alzata + media_panchina) / 2
     calcolo_2 = (media_titolari_normale * 10 + media_panchina * 1) / 11
     
-    # Rating finale
+    # Rating finale (0-10)
     team_rating_0_10 = (calcolo_1 + calcolo_2) / 2
-    
-    # CAP massimo a 10 (nessun limite inferiore)
-    team_rating_0_10 = min(10, team_rating_0_10)
+
+    # CONVERSIONE A 5-25
+    team_rating_5_25 = 5 + (team_rating_0_10 * 2)
+
+    # CAP: minimo 5, massimo 25
+    team_rating_5_25 = max(5, min(25, team_rating_5_25))
     
         # ... (codice precedente fino al calcolo del rating) ...
     
@@ -508,18 +536,21 @@ def calculate_team_rating(team_name):
     print(f"   Media panchina: {media_panchina:.2f}")
     print(f"   Calcolo 1: {calcolo_1:.2f}")
     print(f"   Calcolo 2: {calcolo_2:.2f}")
-    print(f"   🎯 RATING SQUADRA: {team_rating_0_10:.2f}/10")
+    print(f"   🎯 RATING SQUADRA: {team_rating_0_10:.2f}/10 → {team_rating_5_25:.2f}/25")
     print(f"{'='*70}\n")
+
     
     return {
-        "team": team_name,
-        "league": league,
-        "formation": formation_str,
-        "rating_0_10": round(team_rating_0_10, 2),
-        "total_sum": round(total_sum, 2),
-        "starters": starters,  # <--- FONDAMENTALE
-        "bench": bench         # <--- FONDAMENTALE
-    }
+    "team": team_name,
+    "league": league,
+    "formation": formation_str,
+    "rating_0_10": round(team_rating_0_10, 2),      # ← Mantengo per debug
+    "rating_5_25": round(team_rating_5_25, 2),      # ← NUOVO!
+    "total_sum": round(total_sum, 2),
+    "starters": starters,
+    "bench": bench
+}
+
 
 # ==================== TEST ====================
 
@@ -544,6 +575,7 @@ if __name__ == "__main__":
         print("\n" + "="*70)
         print("📊 RIEPILOGO")
         print("="*70)
-        for r in sorted(results, key=lambda x: x["rating_0_10"], reverse=True):
-            print(f"   {r['team']:20} | {r['formation']:8} | ⭐ {r['rating_0_10']:.2f}/10")
+        for r in sorted(results, key=lambda x: x["rating_5_25"], reverse=True):
+            print(f"   {r['team']:20} | {r['formation']:8} | ⭐ {r['rating_5_25']:.2f}/25 (base: {r['rating_0_10']:.2f}/10)")
         print("="*70 + "\n")
+

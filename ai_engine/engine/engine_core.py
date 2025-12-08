@@ -58,7 +58,6 @@ except ImportError as e:
     print(f"❌ [ENGINE] Errore import Fattore Campo lib: {e}")
     field_lib = None
 
-
 # 5. LUCIFERO (Forma Recente Ponderata)
 try:
     import calculator_lucifero as lucifero_lib
@@ -66,7 +65,6 @@ try:
 except ImportError as e:
     print(f"❌ [ENGINE] Errore import Lucifero lib: {e}")
     lucifero_lib = None
-
 
 # --- 2. CONFIGURAZIONE LEGHE ---
 AI_ENGINE_DIR = os.path.dirname(CURRENT_DIR) 
@@ -128,7 +126,7 @@ def get_team_data(db_conn, team_name):
     data = team.get("scores", {})
     stats = team.get("stats", {})
     
-    data['motivation'] = stats.get("motivation", 5.0)
+    data['motivation'] = stats.get("motivation", 10.0)
     data['strength_score'] = stats.get("strengthScore09", 5.0)
     
     return data
@@ -151,17 +149,17 @@ def get_h2h_data_from_db(db_conn, home_team, away_team):
         
     return 0, 0, "Match non trovato in H2H DB", {}
 
-
 def get_dynamic_rating(team_name):
-    if rating_lib is None: return 5.0, {}
+    if rating_lib is None: return 12.5, {}  # ← Default 12.5 (centro scala 5-25)
     try:
         result = rating_lib.calculate_team_rating(team_name)
         if result:
-            return result.get('rating_0_10', 5.0), result
-        return 5.0, {}
+            return result.get('rating_5_25', 12.5), result  # ← USA rating_5_25!
+        return 12.5, {}  # ← Default 12.5
     except Exception as e:
         print(f"⚠️ Errore calcolo rating {team_name}: {e}")
-        return 5.0, {}
+        return 12.5, {}  # ← Default 12.5
+
 
 def apply_randomness(value):
     if value == 0: return 0, 0
@@ -183,14 +181,14 @@ def calculate_match_score(home_raw, away_raw, h2h_scores, base_val, algo_mode):
     
     # Dati Extra
     h_h2h_val, a_h2h_val = h2h_scores
-    h_motiv = home_raw.get('motivation', 5.0)
-    a_motiv = away_raw.get('motivation', 5.0)
+    h_motiv = home_raw.get('motivation', 10.0)
+    a_motiv = away_raw.get('motivation', 10.0)
     h_rating = home_raw.get('rating', 5.0)
     a_rating = away_raw.get('rating', 5.0)
     h_rosa = home_raw.get('strength_score', 5.0)
     a_rosa = away_raw.get('strength_score', 5.0)
-    h_rel = home_raw.get('reliability', 3.5)
-    a_rel = away_raw.get('reliability', 3.5)
+    h_rel = home_raw.get('reliability', 5.0)
+    a_rel = away_raw.get('reliability', 5.0)
     h_bvs = home_raw.get('bvs', 0.0)
     a_bvs = away_raw.get('bvs', 0.0)
     h_field = home_raw.get('field_factor', 3.5)
@@ -289,118 +287,132 @@ def calculate_match_score(home_raw, away_raw, h2h_scores, base_val, algo_mode):
         
     return final_home, final_away
 
-# --- MOTORE PRINCIPALE ---
+# --- MOTORE PRINCIPALE (MODIFICATO PER PRELOAD) ---
 
-def predict_match(home_team, away_team, mode=ALGO_MODE):
-    print(f"\n🤖 [ENGINE] Analisi: {home_team} vs {away_team}")
-    print(f"⚙️  Algoritmo: {ALGO_NAMES.get(mode, mode)}")
+def predict_match(home_team, away_team, mode=ALGO_MODE, preloaded_data=None):
+    """
+    NUOVO PARAMETRO: preloaded_data
+    Se passato, SALTA il caricamento DB e usa i dati pronti.
+    """
     
-    if db is None:
-        print("❌ DB non connesso.")
-        return
+    # Se non siamo in modalità silenziosa, stampiamo info
+    if not preloaded_data:
+        print(f"\n🤖 [ENGINE] Analisi: {home_team} vs {away_team}")
+        print(f"⚙️  Algoritmo: {ALGO_NAMES.get(mode, mode)}")
 
-    match = db.matches.find_one({"home_team": home_team, "away_team": away_team})
-    competition = match.get("competition", "Sconosciuto") if match else "Sconosciuto"
-    base_val, _ = calculate_base_goals(competition)
-    
-    h_data = get_team_data(db, home_team)
-    a_data = get_team_data(db, away_team)
-    
-    # Rating Live
-    h_rating_val, h_rating_full = get_dynamic_rating(home_team)
-    a_rating_val, a_rating_full = get_dynamic_rating(away_team)
-    
-        # --- PREPARAZIONE JSON LEGGIBILE ---
-    def clean_roster(team_data_full):
-        if not team_data_full or "starters" not in team_data_full: return "N/A"
-        return {
-            "Squadra": team_data_full.get("team"),
-            "Modulo": team_data_full.get("formation"),
-            "Rating": team_data_full.get("rating_0_10"),
-            "1_TITOLARI": [f"{p['role']} - {p['player']} ({p.get('rating',0):.1f})" for p in team_data_full["starters"]],
-            "2_PANCHINA": [f"{p['role']} - {p['player']} ({p.get('rating',0):.1f})" for p in team_data_full.get("bench", [])]
-        }
-
-    flash_data = {
-        "MATCH": f"{home_team} vs {away_team}",
-        "CASA": clean_roster(h_rating_full),
-        "OSPITE": clean_roster(a_rating_full)
-    }
-    
-    try:
-        with open(CACHE_FILE, "w", encoding="utf-8") as f:
-            json.dump(flash_data, f, indent=4)
-        print(f"💾 Dati Flash (Clean) salvati in: {CACHE_FILE}")
-    except Exception as e:
-        print(f"⚠️ Errore salvataggio Flash: {e}")
-
-
-    # Calcoli Extra
-    if reliability_lib:
-        h_rel = reliability_lib.calculate_reliability(home_team)
-        a_rel = reliability_lib.calculate_reliability(away_team)
+    # --- 1. CARICAMENTO DATI (O USO PRELOAD) ---
+    if preloaded_data:
+        # FAST TRACK ⚡ (Usiamo i dati passati da fuori)
+        home_raw = preloaded_data['home_raw']
+        away_raw = preloaded_data['away_raw']
+        h2h_h = preloaded_data['h2h_h']
+        h2h_a = preloaded_data['h2h_a']
+        base_val = preloaded_data['base_val']
     else:
-        h_rel, a_rel = 3.5, 3.5
+        # SLOW TRACK 🐢 (Caricamento classico dal DB)
+        if db is None:
+            print("❌ DB non connesso.")
+            return
 
-    if bvs_lib:
-        h_bvs, a_bvs = bvs_lib.get_bvs_score(home_team, away_team)
-    else:
-        h_bvs, a_bvs = 0.0, 0.0
+        match = db.matches.find_one({"home_team": home_team, "away_team": away_team})
+        competition = match.get("competition", "Sconosciuto") if match else "Sconosciuto"
+        base_val, _ = calculate_base_goals(competition)
         
-    if field_lib:
-        h_field, a_field = field_lib.calculate_field_factor(home_team, away_team, competition)
-    else:
-        h_field, a_field = 3.5, 3.5
+        h_data = get_team_data(db, home_team)
+        a_data = get_team_data(db, away_team)
+        
+        # Rating Live
+        h_rating_val, h_rating_full = get_dynamic_rating(home_team)
+        a_rating_val, a_rating_full = get_dynamic_rating(away_team)
 
-    if lucifero_lib:
-        h_luc = lucifero_lib.get_lucifero_score(home_team)
-        a_luc = lucifero_lib.get_lucifero_score(away_team)
-    else:
-        h_luc, a_luc = 0.0, 0.0
+        # Salvataggio Flash Cache (Solo in slow track)
+        def clean_roster(team_data_full):
+            if not team_data_full or "starters" not in team_data_full: return "N/A"
+            return {
+                "Squadra": team_data_full.get("team"),
+                "Modulo": team_data_full.get("formation"),
+                "Rating": f"{team_data_full.get('rating_5_25', 'N/A')}/25",  # ← Mostra scala /25
+                "1_TITOLARI": [f"{p['role']} - {p['player']} ({p.get('rating',0):.1f})" for p in team_data_full["starters"]],
+                "2_PANCHINA": [f"{p['role']} - {p['player']} ({p.get('rating',0):.1f})" for p in team_data_full.get("bench", [])]
+            }
 
-    home_raw = {
-        'power': h_data.get("home_power", 0), 
-        'attack': h_data.get("attack_home", 0), 
-        'defense': h_data.get("defense_home", 0),
-        'motivation': h_data.get("motivation", 5.0),
-        'strength_score': h_data.get("strength_score", 5.0),
-        'rating': h_rating_val,
-        'reliability': h_rel,
-        'bvs': h_bvs,
-        'field_factor': h_field,
-        'lucifero': h_luc
-    }
-    away_raw = {
-        'power': a_data.get("away_power", 0), 
-        'attack': a_data.get("attack_away", 0), 
-        'defense': a_data.get("defense_away", 0),
-        'motivation': a_data.get("motivation", 5.0),
-        'strength_score': a_data.get("strength_score", 5.0),
-        'rating': a_rating_val,
-        'reliability': a_rel,
-        'bvs': a_bvs,
-        'field_factor': a_field,
-        'lucifero': a_luc
-    }
+        flash_data = {
+            "MATCH": f"{home_team} vs {away_team}",
+            "CASA": clean_roster(h_rating_full),
+            "OSPITE": clean_roster(a_rating_full)
+        }
+        try:
+            with open(CACHE_FILE, "w", encoding="utf-8") as f:
+                json.dump(flash_data, f, indent=4)
+            print(f"💾 Dati Flash (Clean) salvati in: {CACHE_FILE}")
+        except Exception as e:
+            print(f"⚠️ Errore salvataggio Flash: {e}")
+
+        # Calcoli Extra Librerie
+        if reliability_lib:
+            h_rel = reliability_lib.calculate_reliability(home_team)
+            a_rel = reliability_lib.calculate_reliability(away_team)
+        else: h_rel, a_rel = 5.0, 5.0
+
+        if bvs_lib:
+            h_bvs, a_bvs = bvs_lib.get_bvs_score(home_team, away_team)
+        else: h_bvs, a_bvs = 0.0, 0.0
+            
+        if field_lib:
+            h_field, a_field = field_lib.calculate_field_factor(home_team, away_team, competition)
+        else: h_field, a_field = 3.5, 3.5
+
+        if lucifero_lib:
+            h_luc = lucifero_lib.get_lucifero_score(home_team)
+            a_luc = lucifero_lib.get_lucifero_score(away_team)
+        else: h_luc, a_luc = 0.0, 0.0
+
+        # Creazione Strutture RAW
+        home_raw = {
+            'power': h_data.get("home_power", 0), 
+            'attack': h_data.get("attack_home", 0), 
+            'defense': h_data.get("defense_home", 0),
+            'motivation': h_data.get("motivation", 5.0),
+            'strength_score': h_data.get("strength_score", 5.0),
+            'rating': h_rating_val,
+            'reliability': h_rel,
+            'bvs': h_bvs,
+            'field_factor': h_field,
+            'lucifero': h_luc
+        }
+        away_raw = {
+            'power': a_data.get("away_power", 0), 
+            'attack': a_data.get("attack_away", 0), 
+            'defense': a_data.get("defense_away", 0),
+            'motivation': a_data.get("motivation", 5.0),
+            'strength_score': a_data.get("strength_score", 5.0),
+            'rating': a_rating_val,
+            'reliability': a_rel,
+            'bvs': a_bvs,
+            'field_factor': a_field,
+            'lucifero': a_luc
+        }
+        
+        # Stampe info (Solo in slow track)
+        print(f"📊 Motivazioni: {home_team}={home_raw['motivation']} | {away_team}={away_raw['motivation']}")
+        print(f"⭐ Rating Rosa: {home_team}={h_rating_val:.2f}/25 | {away_team}={a_rating_val:.2f}/25")
+        print(f"⚔️  Attacco/Difesa: {home_team}={home_raw['attack']:.1f}/{home_raw['defense']:.1f} | {away_team}={away_raw['attack']:.1f}/{away_raw['defense']:.1f}")
+        print(f"💎 Valore Rosa: {home_team}={home_raw['strength_score']} | {away_team}={away_raw['strength_score']}")
+        print(f"🍀 Affidabilità: {home_team}={h_rel} | {away_team}={a_rel}")
+        print(f"🏟️  Fattore Campo:{home_team}={h_field} | {away_team}={a_field}")
+        print(f"🔥 Lucifero:    {home_team}={h_luc:.2f} | {away_team}={a_luc:.2f}")
+        print(f"🔮 BVS Bonus:   {home_team}={h_bvs:+} | {away_team}={a_bvs:+}")
+
+        h2h_h, h2h_a, h2h_msg, h2h_extra = get_h2h_data_from_db(db, home_team, away_team)
+        print(f"📜 H2H Info: {h2h_msg} [Bonus: {h2h_h:.2f} - {h2h_a:.2f}]")
+        
+        home_raw['h2h_avg_goals'] = h2h_extra.get('avg_goals_home', 1.2)
+        away_raw['h2h_avg_goals'] = h2h_extra.get('avg_goals_away', 1.0)
+
+    # --- 2. CALCOLO DELLO SCORE (Applicazione Algoritmi + Random) ---
     
-    print(f"📊 Motivazioni: {home_team}={home_raw['motivation']} | {away_team}={away_raw['motivation']}")
-    print(f"⭐ Rating Rosa: {home_team}={h_rating_val} | {away_team}={a_rating_val}")
-    print(f"⚔️  Attacco/Difesa: {home_team}={home_raw['attack']:.1f}/{home_raw['defense']:.1f} | {away_team}={away_raw['attack']:.1f}/{away_raw['defense']:.1f}")
-    print(f"💎 Valore Rosa: {home_team}={home_raw['strength_score']} | {away_team}={away_raw['strength_score']}")
-    print(f"🍀 Affidabilità: {home_team}={h_rel} | {away_team}={a_rel}")
-    print(f"🏟️  Fattore Campo:{home_team}={h_field} | {away_team}={a_field}")
-    print(f"🔥 Lucifero:    {home_team}={h_luc:.2f} | {away_team}={a_luc:.2f}")
-    print(f"🔮 BVS Bonus:   {home_team}={h_bvs:+} | {away_team}={a_bvs:+}")
-
-    h2h_h, h2h_a, h2h_msg, h2h_extra = get_h2h_data_from_db(db, home_team, away_team)
-    print(f"📜 H2H Info: {h2h_msg} [Bonus: {h2h_h:.2f} - {h2h_a:.2f}]")
-    
-    # Aggiungo medie gol ai dati raw per il futuro calcolo gol
-    home_raw['h2h_avg_goals'] = h2h_extra.get('avg_goals_home', 1.2)
-    away_raw['h2h_avg_goals'] = h2h_extra.get('avg_goals_away', 1.0)
-
     if mode == 5:
-        print("✨ Esecuzione ENSEMBLE (Media Algo 1-4)...")
+        if not preloaded_data: print("✨ Esecuzione ENSEMBLE (Media Algo 1-4)...")
         results_h = []
         results_a = []
         for i in range(1, 5):
@@ -416,13 +428,50 @@ def predict_match(home_team, away_team, mode=ALGO_MODE):
     else:
         net_home, net_away = calculate_match_score(home_raw, away_raw, (h2h_h, h2h_a), base_val, mode)
 
-    print("-" * 40)
-    print(f"🏁 RISULTATO FINALE ({ALGO_NAMES.get(mode)}):")
-    print(f"   🏠 {home_team}: {net_home:.4f}")
-    print(f"   ✈️ {away_team}: {net_away:.4f}")
-    print("-" * 40)
+        # Stampe risultato (Solo se non stiamo simulando massivamente)
+    if not preloaded_data:
+        # TOTALE MASSIMO TEORICO = (Rating 5-25 invece di 0-10: +15 punti)
+        MAX_THEORETICAL_SCORE = 131.00
+        perc_h = (net_home / MAX_THEORETICAL_SCORE) * 100
+        perc_a = (net_away / MAX_THEORETICAL_SCORE) * 100
+
+        print("-" * 55)
+        print(f"🏁 RISULTATO FINALE ({ALGO_NAMES.get(mode)}):")
+        print(f"   🏠 {home_team:<15}: {net_home:6.2f} / 131.00 ({perc_h:.1f}%)")
+        print(f"   ✈️ {away_team:<15}: {net_away:6.2f} / 131.00 ({perc_a:.1f}%)")
+        print("-" * 55)
     
     return net_home, net_away, home_raw, away_raw
+
+
+# Funzione Helper per caricare i dati 1 volta sola (per Monte Carlo)
+def preload_match_data(home_team, away_team):
+    """
+    Esegue una 'finta' simulazione in modalità 1 (Statistica) 
+    solo per estrarre i dati RAW e restituirli puliti.
+    """
+    _, _, home_raw, away_raw = predict_match(home_team, away_team, mode=1)
+    
+    # Recuperiamo anche h2h e base_val (che sono nascosti dentro)
+    # Per farlo pulito, li ricalcoliamo velocemente qui perché predict_match li ha già usati
+    # ma non restituiti esplicitamente. 
+    # Trucco: Usiamo predict_match che ci ha dato home_raw/away_raw completi.
+    
+    # Ma ci mancano h2h_h e h2h_a puri per passarli al calcolatore.
+    # Quindi li ripeschiamo velocemente dal DB (è l'unico modo pulito senza rompere tutto)
+    
+    match = db.matches.find_one({"home_team": home_team, "away_team": away_team})
+    competition = match.get("competition", "Sconosciuto") if match else "Sconosciuto"
+    base_val, _ = calculate_base_goals(competition)
+    h2h_h, h2h_a, _, _ = get_h2h_data_from_db(db, home_team, away_team)
+
+    return {
+        'home_raw': home_raw,
+        'away_raw': away_raw,
+        'h2h_h': h2h_h,
+        'h2h_a': h2h_a,
+        'base_val': base_val
+    }
 
 if __name__ == "__main__":
     print("\n--- TEST MOTORE V9 (FULL) ---")

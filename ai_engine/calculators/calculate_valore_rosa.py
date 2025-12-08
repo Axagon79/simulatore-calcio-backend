@@ -7,7 +7,7 @@ from config import db  # ← CENTRALIZZATO!
 
 teams = db["teams"]
 
-MAX_SCORE = 9.0
+MAX_SCORE = 10.0  # Punteggio massimo teorico
 
 def compute_value_score_split(val, min_val, max_val, mean_val):
     """
@@ -33,14 +33,14 @@ def compute_value_score_split(val, min_val, max_val, mean_val):
         
         # Formula: parte da 1.0 e aggiunge fino ad arrivare a 4.5
         # (4.5 - 1.0 = 3.5 di spazio)
-        return 1.0 + (pct * 3.5)
+        return 1.0 + (pct * 4.0)
 
     # SOPRA LA MEDIA: scala da 4.5 a 9.0 (uguale a prima)
     else:
         if max_val == mean_val:
             return 4.5
         pct = (val - mean_val) / (max_val - mean_val)
-        return 4.5 + (pct * 4.5)
+        return 5.0 + (pct * 5.0)
 
 
 
@@ -73,10 +73,10 @@ def compute_age_multiplier(age, ages):
         # Quanto sono lontano dalla media verso il basso?
         distanza_norm = (A_mean - age) / (A_mean - A_min)
         # Se sono al minimo (distanza=1), tolgo 0.5. Se sono alla media (distanza=0), tolgo 0.
-        mult = 1.0 - (0.5 * distanza_norm)
+        mult = 1.0 - (0.3 * distanza_norm)
         
         # Sicurezza per non andare sotto 0.5 (es. se age < A_min per qualche errore dati)
-        if mult < 0.5: mult = 0.5
+        if mult < 3.0: mult = 3.0
         return round(mult, 4)
 
     # Caso VECCHIO (sopra media): sale linearmente da 1.0 a 1.5
@@ -86,7 +86,7 @@ def compute_age_multiplier(age, ages):
         # Quanto sono lontano dalla media verso l'alto?
         distanza_norm = (age - A_mean) / (A_max - A_mean)
         # Se sono al massimo (distanza=1), aggiungo 0.5.
-        mult = 1.0 + (0.5 * distanza_norm)
+        mult = 1.0 + (0.3 * distanza_norm)
 
         # Sicurezza per non andare sopra 1.5
         if mult > 1.5: mult = 1.5
@@ -151,10 +151,10 @@ def main():
             # Clipping finale: anche col bonus non andiamo oltre 9 (o vuoi che superi?)
             # Se vuoi che possa superare 9 (es. Real Madrid vecchio), togli le righe sotto.
             # Se vuoi scala rigida 0-9, lascia questo:
-            if final_score > 9.0:
-                final_score = 9.0
-            if final_score < 0.0: # Teoricamente impossibile ma per sicurezza
-                final_score = 0.0
+            if final_score > 10.0:
+                final_score = 10.0
+            if final_score < 3.0: # Teoricamente impossibile ma per sicurezza
+                final_score = 3.0
 
             update_fields = {
                 "stats.valueScore09": round(value_score, 2),

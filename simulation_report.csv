@@ -1,0 +1,90 @@
+
+=== ALGORITMO: STAT ===
+League;Match;Real Score;Real Sign;PRED Score;PRED Sign;1X2 Outcome;Exact Score;U/O 2.5 Pred;U/O Outcome;GG/NG Pred;GG/NG Outcome
+Serie A;Como vs Sassuolo;2-0;1;1-0;1;WIN;LOSS;UNDER;WIN;NG;WIN
+Serie A;Genoa vs Verona;2-1;1;2-0;1;WIN;LOSS;UNDER;LOSS;NG;LOSS
+Serie A;Parma vs Udinese;0-2;2;0-1;2;WIN;LOSS;UNDER;WIN;NG;WIN
+Serie A;Juventus vs Cagliari;2-1;1;3-0;1;WIN;LOSS;OVER;WIN;NG;LOSS
+Serie A;Milan vs Lazio;1-0;1;0-0;X;LOSS;LOSS;UNDER;WIN;NG;WIN
+Serie A;Lecce vs Torino;2-1;1;1-1;X;LOSS;LOSS;UNDER;LOSS;GG;WIN
+Serie A;Pisa vs Inter;0-2;2;0-2;2;WIN;WIN;UNDER;WIN;NG;WIN
+Serie A;Atalanta vs Fiorentina;2-0;1;2-1;1;WIN;LOSS;OVER;LOSS;GG;LOSS
+Serie A;Roma vs Napoli;0-1;2;0-1;2;WIN;WIN;UNDER;WIN;NG;WIN
+Serie A;Bologna vs Cremonese;1-3;2;8-2;1;LOSS;LOSS;OVER;WIN;GG;WIN
+--- PERCENTUALI ---;;;;;;70.0%;20.0%;;70.0%;;70.0%
+
+
+=== ALGORITMO: DIN ===
+League;Match;Real Score;Real Sign;PRED Score;PRED Sign;1X2 Outcome;Exact Score;U/O 2.5 Pred;U/O Outcome;GG/NG Pred;GG/NG Outcome
+Serie A;Como vs Sassuolo;2-0;1;3-1;1;WIN;LOSS;OVER;LOSS;GG;LOSS
+Serie A;Genoa vs Verona;2-1;1;2-0;1;WIN;LOSS;UNDER;LOSS;NG;LOSS
+Serie A;Parma vs Udinese;0-2;2;1-0;1;LOSS;LOSS;UNDER;WIN;NG;WIN
+Serie A;Juventus vs Cagliari;2-1;1;1-0;1;WIN;LOSS;UNDER;LOSS;NG;LOSS
+Serie A;Milan vs Lazio;1-0;1;0-1;2;LOSS;LOSS;UNDER;WIN;NG;WIN
+Serie A;Lecce vs Torino;2-1;1;0-3;2;LOSS;LOSS;OVER;WIN;NG;LOSS
+Serie A;Pisa vs Inter;0-2;2;1-2;2;WIN;LOSS;OVER;LOSS;GG;LOSS
+Serie A;Atalanta vs Fiorentina;2-0;1;0-1;2;LOSS;LOSS;UNDER;WIN;NG;WIN
+Serie A;Roma vs Napoli;0-1;2;0-2;2;WIN;LOSS;UNDER;WIN;NG;WIN
+Serie A;Bologna vs Cremonese;1-3;2;3-1;1;LOSS;LOSS;OVER;WIN;GG;WIN
+--- PERCENTUALI ---;;;;;;50.0%;0.0%;;60.0%;;50.0%
+
+
+=== ALGORITMO: TAT ===
+League;Match;Real Score;Real Sign;PRED Score;PRED Sign;1X2 Outcome;Exact Score;U/O 2.5 Pred;U/O Outcome;GG/NG Pred;GG/NG Outcome
+Serie A;Como vs Sassuolo;2-0;1;3-3;X;LOSS;LOSS;OVER;LOSS;GG;LOSS
+Serie A;Genoa vs Verona;2-1;1;0-0;X;LOSS;LOSS;UNDER;LOSS;NG;LOSS
+Serie A;Parma vs Udinese;0-2;2;2-1;1;LOSS;LOSS;OVER;LOSS;GG;LOSS
+Serie A;Juventus vs Cagliari;2-1;1;3-0;1;WIN;LOSS;OVER;WIN;NG;LOSS
+Serie A;Milan vs Lazio;1-0;1;0-1;2;LOSS;LOSS;UNDER;WIN;NG;WIN
+Serie A;Lecce vs Torino;2-1;1;0-1;2;LOSS;LOSS;UNDER;LOSS;NG;LOSS
+Serie A;Pisa vs Inter;0-2;2;0-1;2;WIN;LOSS;UNDER;WIN;NG;WIN
+Serie A;Atalanta vs Fiorentina;2-0;1;0-0;X;LOSS;LOSS;UNDER;WIN;NG;WIN
+Serie A;Roma vs Napoli;0-1;2;0-1;2;WIN;WIN;UNDER;WIN;NG;WIN
+Serie A;Bologna vs Cremonese;1-3;2;3-0;1;LOSS;LOSS;OVER;WIN;NG;LOSS
+--- PERCENTUALI ---;;;;;;30.0%;10.0%;;60.0%;;40.0%
+
+
+=== ALGORITMO: CAOS ===
+League;Match;Real Score;Real Sign;PRED Score;PRED Sign;1X2 Outcome;Exact Score;U/O 2.5 Pred;U/O Outcome;GG/NG Pred;GG/NG Outcome
+Serie A;Como vs Sassuolo;2-0;1;2-2;X;LOSS;LOSS;OVER;LOSS;GG;LOSS
+Serie A;Genoa vs Verona;2-1;1;1-0;1;WIN;LOSS;UNDER;LOSS;NG;LOSS
+Serie A;Parma vs Udinese;0-2;2;0-0;X;LOSS;LOSS;UNDER;WIN;NG;WIN
+Serie A;Juventus vs Cagliari;2-1;1;1-0;1;WIN;LOSS;UNDER;LOSS;NG;LOSS
+Serie A;Milan vs Lazio;1-0;1;0-2;2;LOSS;LOSS;UNDER;WIN;NG;WIN
+Serie A;Lecce vs Torino;2-1;1;0-0;X;LOSS;LOSS;UNDER;LOSS;NG;LOSS
+Serie A;Pisa vs Inter;0-2;2;0-1;2;WIN;LOSS;UNDER;WIN;NG;WIN
+Serie A;Atalanta vs Fiorentina;2-0;1;3-0;1;WIN;LOSS;OVER;LOSS;NG;WIN
+Serie A;Roma vs Napoli;0-1;2;0-1;2;WIN;WIN;UNDER;WIN;NG;WIN
+Serie A;Bologna vs Cremonese;1-3;2;1-2;2;WIN;LOSS;OVER;WIN;GG;WIN
+--- PERCENTUALI ---;;;;;;60.0%;10.0%;;50.0%;;60.0%
+
+
+=== ALGORITMO: MASTER ===
+League;Match;Real Score;Real Sign;PRED Score;PRED Sign;1X2 Outcome;Exact Score;U/O 2.5 Pred;U/O Outcome;GG/NG Pred;GG/NG Outcome
+Serie A;Como vs Sassuolo;2-0;1;4-2;1;WIN;LOSS;OVER;LOSS;GG;LOSS
+Serie A;Genoa vs Verona;2-1;1;0-0;X;LOSS;LOSS;UNDER;LOSS;NG;LOSS
+Serie A;Parma vs Udinese;0-2;2;1-2;2;WIN;LOSS;OVER;LOSS;GG;LOSS
+Serie A;Juventus vs Cagliari;2-1;1;0-2;2;LOSS;LOSS;UNDER;LOSS;NG;LOSS
+Serie A;Milan vs Lazio;1-0;1;0-3;2;LOSS;LOSS;OVER;LOSS;NG;WIN
+Serie A;Lecce vs Torino;2-1;1;2-0;1;WIN;LOSS;UNDER;LOSS;NG;LOSS
+Serie A;Pisa vs Inter;0-2;2;0-2;2;WIN;WIN;UNDER;WIN;NG;WIN
+Serie A;Atalanta vs Fiorentina;2-0;1;2-0;1;WIN;WIN;UNDER;WIN;NG;WIN
+Serie A;Roma vs Napoli;0-1;2;0-4;2;WIN;LOSS;OVER;LOSS;NG;WIN
+Serie A;Bologna vs Cremonese;1-3;2;1-2;2;WIN;LOSS;OVER;WIN;GG;WIN
+--- PERCENTUALI ---;;;;;;70.0%;20.0%;;30.0%;;50.0%
+
+
+=== ALGORITMO: MONTECARLO ===
+League;Match;Real Score;Real Sign;PRED Score;PRED Sign;1X2 Outcome;Exact Score;U/O 2.5 Pred;U/O Outcome;GG/NG Pred;GG/NG Outcome
+Serie A;Como vs Sassuolo;2-0;1;1-1;X;LOSS;LOSS;UNDER;WIN;GG;LOSS
+Serie A;Genoa vs Verona;2-1;1;1-0;1;WIN;LOSS;UNDER;LOSS;NG;LOSS
+Serie A;Parma vs Udinese;0-2;2;0-1;2;WIN;LOSS;UNDER;WIN;NG;WIN
+Serie A;Juventus vs Cagliari;2-1;1;1-0;1;WIN;LOSS;UNDER;LOSS;NG;LOSS
+Serie A;Milan vs Lazio;1-0;1;0-0;X;LOSS;LOSS;UNDER;WIN;NG;WIN
+Serie A;Lecce vs Torino;2-1;1;0-0;X;LOSS;LOSS;UNDER;LOSS;NG;LOSS
+Serie A;Pisa vs Inter;0-2;2;0-3;2;WIN;LOSS;OVER;LOSS;NG;WIN
+Serie A;Atalanta vs Fiorentina;2-0;1;1-0;1;WIN;LOSS;UNDER;WIN;NG;WIN
+Serie A;Roma vs Napoli;0-1;2;0-1;2;WIN;WIN;UNDER;WIN;NG;WIN
+Serie A;Bologna vs Cremonese;1-3;2;2-1;1;LOSS;LOSS;OVER;WIN;GG;WIN
+--- PERCENTUALI ---;;;;;;60.0%;10.0%;;60.0%;;60.0%
+

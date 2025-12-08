@@ -3,7 +3,9 @@ import sys
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from config import db
 
+
 teams_collection = db['teams']
+
 
 def calculate_all():
     print("🚀 AVVIO CALCOLO TOTALE (ATTACCO + DIFESA)...")
@@ -11,21 +13,26 @@ def calculate_all():
     leagues = teams_collection.distinct("league")
     total_updated = 0
 
+
     for league in leagues:
         if not league: continue
         teams = list(teams_collection.find({"league": league}))
         if not teams: continue
 
+
         print(f"\n🏆 {league} ({len(teams)} squadre)")
+
 
         # --- 1. CALCOLO MEDIE LEGA ---
         tot_gf_h, tot_ga_h, tot_gp_h = 0, 0, 0
         tot_gf_a, tot_ga_a, tot_gp_a = 0, 0, 0
 
+
         for t in teams:
             r = t.get("ranking", {})
             h = r.get("homeStats", {})
             a = r.get("awayStats", {})
+
 
             # Accumulo Casa
             tot_gf_h += h.get("goalsFor", 0)
@@ -37,6 +44,7 @@ def calculate_all():
             tot_ga_a += a.get("goalsAgainst", 0)
             tot_gp_a += a.get("played", 0)
 
+
         # Medie Gol
         avg_gf_h = tot_gf_h / tot_gp_h if tot_gp_h > 0 else 1.0
         avg_ga_h = tot_ga_h / tot_gp_h if tot_gp_h > 0 else 1.0
@@ -46,11 +54,13 @@ def calculate_all():
         
         print(f"   📊 Media Gol Lega: Casa {avg_gf_h:.2f} | Trasferta {avg_gf_a:.2f}")
 
+
         # --- 2. CALCOLO E AGGIORNAMENTO SQUADRE ---
         for t in teams:
             r = t.get("ranking", {})
             h = r.get("homeStats", {})
             a = r.get("awayStats", {})
+
 
             # --- CASA ---
             gp_h = h.get("played", 0)
@@ -67,7 +77,8 @@ def calculate_all():
                 def_h_ratio = my_ga_avg / avg_ga_h
                 pct_def_h = max(0, min(100, 50 - (def_h_ratio - 1) * 50))
             else:
-                pct_att_h = 50; pct_def_h = 50 # Default neutro (3.5)
+                pct_att_h = 50; pct_def_h = 50 # Default neutro
+
 
             # --- TRASFERTA ---
             gp_a = a.get("played", 0)
@@ -86,15 +97,19 @@ def calculate_all():
             else:
                 pct_att_a = 50; pct_def_a = 50
 
-            # Conversione 0-7
+
+            # ========================================
+            # CONVERSIONE NUOVI RANGE (0-15 ATT, 0-10 DIF)
+            # ========================================
             scores = {
-                "attack_home": round((pct_att_h / 100) * 7, 2),
-                "defense_home": round((pct_def_h / 100) * 7, 2),
-                "attack_away": round((pct_att_a / 100) * 7, 2),
-                "defense_away": round((pct_def_a / 100) * 7, 2)
+                "attack_home": round((pct_att_h / 100) * 15, 2),    # ← 0-15 invece di 0-7
+                "defense_home": round((pct_def_h / 100) * 10, 2),   # ← 0-10 invece di 0-7
+                "attack_away": round((pct_att_a / 100) * 15, 2),    # ← 0-15 invece di 0-7
+                "defense_away": round((pct_def_a / 100) * 10, 2)    # ← 0-10 invece di 0-7
             }
 
-            # POTENZA TOTALE 0-14
+
+            # POTENZA TOTALE 0-25 (invece di 0-14)
             scores['home_power'] = round(scores['attack_home'] + scores['defense_home'], 2)
             scores['away_power'] = round(scores['attack_away'] + scores['defense_away'], 2)
 
@@ -106,7 +121,34 @@ def calculate_all():
             )
             total_updated += 1
 
+
     print(f"\n✅ AGGIORNAMENTO COMPLETATO! {total_updated} squadre hanno nuovi punteggi.")
+
 
 if __name__ == "__main__":
     calculate_all()
+    
+    # 🔍 DEBUG: Verifica cosa è stato scritto nel DB
+    print("\n" + "="*60)
+    print("🔍 VERIFICA DATI SCRITTI NEL DB:")
+    
+    atalanta = teams_collection.find_one({"name": "Atalanta"})
+    if atalanta:
+        scores = atalanta.get('scores', {})
+        print(f"   Atalanta attack_home: {scores.get('attack_home', 'N/A')}")
+        print(f"   Atalanta defense_home: {scores.get('defense_home', 'N/A')}")
+        print(f"   Atalanta home_power: {scores.get('home_power', 'N/A')}")
+    else:
+        print("   ❌ Atalanta NON trovata!")
+    
+    cagliari = teams_collection.find_one({"name": "Cagliari"})
+    if cagliari:
+        scores = cagliari.get('scores', {})
+        print(f"   Cagliari attack_away: {scores.get('attack_away', 'N/A')}")
+        print(f"   Cagliari defense_away: {scores.get('defense_away', 'N/A')}")
+        print(f"   Cagliari away_power: {scores.get('away_power', 'N/A')}")
+    else:
+        print("   ❌ Cagliari NON trovata!")
+    
+    print("="*60)
+

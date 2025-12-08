@@ -13,16 +13,16 @@ teams = db["teams"]
 
 # Parametri generali
 MIN_MATCHES_FOR_MOTIVATION = 6       # prima di questa giornata -> valore neutro
-NEUTRAL_MOTIVATION = 5.0             # 0-10
-MAX_MOTIVATION = 10.0
+NEUTRAL_MOTIVATION = 10             # 5-15
+MAX_MOTIVATION = 15
 
 # Raggio di influenza in punti (obiettivo/pericolo) in funzione dei punti disponibili
 D_MAX = 15.0   # quando ci sono ancora tanti punti disponibili
 D_MIN = 3.0    # quando restano pochissimi punti da fare
 
 # Pavimenti/limiti sulla motivazione grezza
-MIN_RAW_WITH_PRESSURE = 0.20         # se c'è pressione (0-1) almeno ~2/10
-MIN_RAW_NO_PRESSURE = 0.10           # se non c'è pressione, almeno ~1/10
+MIN_RAW_WITH_PRESSURE = 0.40         # se c'è pressione (0-1) almeno ~2/10
+MIN_RAW_NO_PRESSURE = 0.33           # se non c'è pressione, almeno ~1/10
 # Niente tappo alto: lasciamo salire fino a 1.0
 
 # Zone considerate "obiettivo positivo" e "pericolo"
@@ -382,8 +382,8 @@ def main():
 
                 # scala a 0-10
                 motivation = motivation_raw * MAX_MOTIVATION
-                if motivation < 0:
-                    motivation = 0.0
+                if motivation < 5.0:
+                    motivation = 5.0
                 if motivation > MAX_MOTIVATION:
                     motivation = MAX_MOTIVATION
                 motivation = round(motivation, 2)

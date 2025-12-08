@@ -1,15 +1,38 @@
-"""
-ANALISI COMPLETA DATABASE
-Mostra struttura di tutte le collection e documenti esempio
-"""
-
 import os
 import sys
 from pprint import pprint
 
-# Aggiunge la cartella padre (ai_engine) al path e importa il db centralizzato
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-from config import db, MONGO_URI  # usa la connessione centralizzata
+# --- FIX PERCORSI UNIVERSALE ---
+current_file_path = os.path.abspath(__file__)
+current_dir = os.path.dirname(current_file_path)
+
+# Risali finché non trovi la cartella che contiene 'config.py'
+root_path = current_dir
+found = False
+for _ in range(5): # Prova a risalire 5 livelli
+    if os.path.exists(os.path.join(root_path, 'config.py')):
+        found = True
+        break
+    if os.path.exists(os.path.join(root_path, 'ai_engine')): # Trovata la root del progetto
+        found = True
+        break
+    root_path = os.path.dirname(root_path)
+
+if found:
+    sys.path.insert(0, root_path)
+    # Aggiungi anche ai_engine se serve
+    if os.path.exists(os.path.join(root_path, 'ai_engine')):
+        sys.path.insert(0, os.path.join(root_path, 'ai_engine'))
+else:
+    print("❌ Errore: Impossibile trovare config.py")
+    sys.exit(1)
+
+# ORA POSSIAMO IMPORTARE
+try:
+    from config import db, MONGO_URI
+except ImportError:
+    # Tentativo alternativo
+    from ai_engine.config import db, MONGO_URI
 
 def analyze_collection(collection_name, collection):
     """
