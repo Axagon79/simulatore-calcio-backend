@@ -1,0 +1,81 @@
+[Serie B] DB: 'Südtirol' vs 'Juve Stabia' | Nessun suggerimento evidente
+[Serie C - Girone A] DB: 'Cittadella' vs 'Giana Erminio' | Forse è questa riga? -> '38 26-04
+17:30 cittadella - giana...'
+[Serie C - Girone A] DB: 'Inter U23' vs 'Union Brescia' | Forse è questa riga? -> '38 26-04
+17:30 inter milan u23 - brescia...'
+[Serie C - Girone B] DB: 'Juve Next Gen' vs 'Bra' | Forse è questa riga? -> '38 26-04
+17:30 juventusu23 - a.s.d. bra...'
+[Serie C - Girone B] DB: 'Guidonia' vs 'Carpi' | Nessun suggerimento evidente
+[Serie C - Girone B] DB: 'Forlì' vs 'Perugia' | Nessun suggerimento evidente
+[Serie C - Girone C] DB: 'Benevento' vs 'Cerignola' | Nessun suggerimento evidente
+[Serie C - Girone C] DB: 'Team Altamura' vs 'Casarano' | Nessun suggerimento evidente
+[Serie C - Girone C] DB: 'Atalanta U23' vs 'Catania' | Nessun suggerimento evidente
+[Serie C - Girone C] DB: 'Cavese' vs 'Cosenza' | Nessun suggerimento evidente
+[Serie C - Girone C] DB: 'Casertana' vs 'Giugliano' | Nessun suggerimento evidente
+[Serie C - Girone C] DB: 'Crotone' vs 'Latina' | Nessun suggerimento evidente
+[Serie C - Girone C] DB: 'Potenza' vs 'Monopoli' | Nessun suggerimento evidente
+[Serie C - Girone C] DB: 'Foggia' vs 'Salernitana' | Nessun suggerimento evidente
+[Serie C - Girone C] DB: 'Trapani' vs 'Siracusa' | Nessun suggerimento evidente
+[Serie C - Girone C] DB: 'Picerno' vs 'Sorrento' | Nessun suggerimento evidente
+[Premier League] DB: 'Brighton' vs 'Manchester Utd.' | Forse è questa riga? -> '38 24-05
+16:00 brighton hove albion - ma...'
+[Premier League] DB: 'Burnley' vs 'Wolverhampton' | Forse è questa riga? -> '38 24-05
+16:00 burnley - wolves...'
+[Premier League] DB: 'FC Fulham' vs 'Newcastle' | Forse è questa riga? -> '38 24-05
+16:00 fulham - newcastle united...'
+[Premier League] DB: 'Man City' vs 'Aston Villa' | Forse è questa riga? -> '38 24-05
+16:00 manchester city - aston v...'
+[Premier League] DB: 'Nott'm Forest' vs 'Bournemouth' | Forse è questa riga? -> '38 24-05
+16:00 nottingham forest - afc b...'
+[Premier League] DB: 'West Ham Utd.' vs 'Leeds' | Forse è questa riga? -> '38 24-05
+16:00 west ham united - leeds u...'
+[La Liga] DB: 'Alavés' vs 'Rayo Vallecano' | Nessun suggerimento evidente
+[La Liga] DB: 'Celta de Vigo' vs 'Siviglia' | Forse è questa riga? -> '38 24-05
+17:00 celta vigo - sevilla...'
+[La Liga] DB: 'Getafe CF' vs 'CA Osasuna' | Forse è questa riga? -> '38 24-05
+17:00 getafe - osasuna...'
+[La Liga] DB: 'RCD Mallorca' vs 'Real Oviedo' | Forse è questa riga? -> '38 24-05
+17:00 mallorca - real oviedo...'
+[La Liga] DB: 'Real Madrid' vs 'Athletic Club' | Forse è questa riga? -> '38 24-05
+17:00 real betis - levante...'
+[La Liga] DB: 'Villarreal' vs 'Atlético' | Forse è questa riga? -> '38 24-05
+17:00 villarreal - atletico mad...'
+[La Liga] DB: 'Valencia' vs 'Barcellona' | Forse è questa riga? -> '38 24-05
+17:00 valencia - fc barcelona...'
+[La Liga] DB: 'Girona FC' vs 'Elche' | Forse è questa riga? -> '38 24-05
+17:00 girona - elche...'
+[Bundesliga] DB: 'Bayern' vs 'Colonia' | Forse è questa riga? -> '34 16-05
+14:30 bayern munchen - fc koln...'
+[Bundesliga] DB: 'Leverkusen' vs 'Amburgo' | Forse è questa riga? -> '34 16-05
+14:30 bayer leverkusen - hambur...'
+[Bundesliga] DB: 'Eintracht' vs 'Stoccarda' | Forse è questa riga? -> '34 16-05
+14:30 eintracht frankfurt - vfb...'
+[Bundesliga] DB: 'Friburgo' vs 'Lipsia' | Nessun suggerimento evidente
+[Bundesliga] DB: 'Werder Brema' vs 'Dortmund' | Forse è questa riga? -> '34 16-05
+14:30 werder bremen - borussia ...'
+[Bundesliga] DB: 'Bor. M'gladbach' vs 'Hoffenheim' | Nessun suggerimento evidente
+[Bundesliga] DB: 'Union Berlino' vs 'Augusta' | Forse è questa riga? -> '34 16-05
+14:30 union berlin - augsburg...'
+[Bundesliga] DB: 'Heidenheim' vs 'Magonza' | Forse è questa riga? -> '34 16-05
+14:30 heidenheimer - fsv mainz ...'
+[Ligue 1] DB: 'FC Nantes' vs 'Tolosa' | Forse è questa riga? -> '34 16-05
+16:00 nantes - toulouse...'
+[Ligue 1] DB: 'Brest' vs 'Angers SCO' | Forse è questa riga? -> '34 16-05
+16:00 stade brestois - angers...'
+[Ligue 1] DB: 'Nizza' vs 'Metz' | Nessun suggerimento evidente
+[Ligue 1] DB: 'Marsiglia' vs 'Stade Rennes' | Nessun suggerimento evidente
+[Ligue 1] DB: 'Strasburgo' vs 'Monaco' | Nessun suggerimento evidente
+[Ligue 1] DB: 'Olymp. Lione' vs 'Lens' | Nessun suggerimento evidente
+[Eredivisie] DB: 'FC Volendam' vs 'Telstar' | Forse è questa riga? -> '34 17-05
+13:30 volendam - sc telstar...'
+[Eredivisie] DB: 'Heracles Almelo' vs 'FC Groningen' | Forse è questa riga? -> '34 17-05
+13:30 heracles almelo - groning...'
+[Eredivisie] DB: 'Sparta R.' vs 'Excelsior' | Forse è questa riga? -> '34 17-05
+13:30 sparta rotterdam - excels...'
+[Liga Portugal] DB: 'Moreirense' vs 'Avs FS' | Forse è questa riga? -> '34 17-05
+18:00 moreirense - avs futebol ...'
+[Liga Portugal] DB: 'Famalicão' vs 'Alverca' | Nessun suggerimento evidente
+[Liga Portugal] DB: 'Nacional' vs 'Vit. Guimarães' | Forse è questa riga? -> '34 17-05
+18:00 nacional da madeira - vit...'
+[Liga Portugal] DB: 'SC Braga' vs 'Estrela Amadora' | Forse è questa riga? -> '34 17-05
+18:00 sporting braga - estrela ...'

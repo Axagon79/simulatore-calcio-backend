@@ -4,7 +4,13 @@ import os
 import sys
 import json
 
+
+#(** TRADUTTORE FINALE: CONVERTE I PUNTEGGI NUMERICI ASTRATTI (POWER) IN GOL REALI (0-0, 2-1) )
+#( GESTISCE LA LOGICA DI "ARROTONDAMENTO INTELLIGENTE" PER EVITARE RISULTATI IMPOSSIBILI (ES. 2.5 GOL) )
+#( CONTIENE LE TABELLE DI CONVERSIONE E LE PROBABILITÀ PER I RISULTATI ESATTI **)
 # --- 1. CONFIGURAZIONE PERCORSI E DB ---
+
+
 current_path = os.path.dirname(os.path.abspath(__file__))
 parent_path = os.path.dirname(current_path)
 sys.path.append(current_path)

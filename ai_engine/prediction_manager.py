@@ -3,6 +3,13 @@ import sys
 from datetime import datetime
 from pymongo import ASCENDING, DESCENDING, IndexModel
 
+
+#(** GESTORE DEL DATABASE: CREA LA STRUTTURA DATI E CALCOLA AUTOMATICAMENTE LA SCHEDINA COMPLETA )
+#( TRADUCE IL RISULTATO NUMERICO IN ESITI SCOMMESSA (1X2, UNDER/OVER, GOAL/NOGOAL, MULTIGOL) )
+#( ESEGUE FISICAMENTE L'INSERIMENTO O L'AGGIORNAMENTO DEI DATI NEL DATABASE MONGODB **)
+
+
+
 # --- CONFIGURAZIONE GLOBALE ---
 # False = Modalità Test/Backtesting (Salva in 'predictions_sandbox')
 # True  = Modalità Reale (Salva in 'predictions_official')

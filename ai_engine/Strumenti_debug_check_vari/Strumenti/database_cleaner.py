@@ -3,6 +3,11 @@ import sys
 from datetime import datetime
 import re
 
+#(** STRUMENTO DI MANUTENZIONE PER PULIRE E RESETTARE LE COLLEZIONI DEL DATABASE )
+#( RIMUOVE DUPLICATI NELLE PARTITE E CORREGGE FORMATI DATA ERRATI NELLO STORICO )
+#( PERMETTE DI CANCELLARE SELETTIVAMENTE I PRONOSTICI DI TEST O L'INTERO ARCHIVIO **)
+
+
 # --- FIX PERCORSI ---
 current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.dirname(current_dir) 

@@ -5,7 +5,13 @@ from pathlib import Path
 import sys
 import io
 
+
+#(** FILE DI CONFIGURAZIONE CENTRALE: CARICA LE VARIABILI D'AMBIENTE E I PERCORSI DEL DATABASE )​
+#( GESTISCE LA CONNESSIONE A MONGODB E STAMPA IL CONTEGGIO INIZIALE DI SQUADRE E PARTITE )​
+#( FORZA LA CODIFICA UTF-8 PER EVITARE ERRORI DI VISUALIZZAZIONE SU TERMINALI WINDOWS **)​
 # Forza la stampa in UTF-8 anche su Windows console vecchie
+
+
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 # Path assoluto alla root del progetto: .../simulatore-calcio-backend

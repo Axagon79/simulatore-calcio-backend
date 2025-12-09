@@ -5,7 +5,13 @@ from datetime import datetime
 from collections import Counter
 from tqdm import tqdm 
 
+
+#(** MODULO INTERATTIVO UTENTE: PERMETTE DI SCEGLIERE E SIMULARE UNA SPECIFICA PARTITA )
+#( VISUALIZZA IN TEMPO REALE TUTTI I PARAMETRI CHE INFLUENZANO IL MATCH (FORMA, TATTICA, ECC.) )
+#( CUORE DELL'ESPERIENZA GRAFICA: MOSTRA COME GLI ALGORITMI ELABORANO IL RISULTATO FINALE **)
 # --- SETUP PERCORSI ---
+
+
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(os.path.dirname(CURRENT_DIR))
 sys.path.append(PROJECT_ROOT)

@@ -8,6 +8,12 @@ from tqdm import tqdm
 import contextlib
 import random
 
+
+#(** VERSIONE DI TEST, NON IL MOTORE PRINCIPALE: USARE SOLO PER PROVE E BENCHMARK TECNICI )​
+#( LANCIA UN BENCHMARK AUTOMATICO SULL’ULTIMA GIORNATA E SOVRASCRIVE SEMPRE IL FILE 'benchmark_latest.csv' )​
+#( GEMELLO “SPERIMENTALE” DI universal_simulator: SE ATTIVATO PUÒ RIEMPIRE DB E CSV CON DATI DI PROVA **)
+
+
 # --- FIX PERCORSI ---
 current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.dirname(current_dir) 

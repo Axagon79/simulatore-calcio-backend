@@ -4,8 +4,10 @@ import subprocess
 import time
 from datetime import datetime, timedelta
 
+
+# (FA L AGGIORNAMENTO COMPLETO FREQUENTE)
 # ------------------------------------------------------------------------------
-# CONFIGURAZIONE PERCORSI (Adattata alla tua lista esistente)
+# (FA L AGGIORNAMENTO COMPLETO FREQUENTE) CONFIGURAZIONE PERCORSI (Adattata alla tua lista esistente)
 # ------------------------------------------------------------------------------
 
 # Percorso base del progetto (Fisso)
@@ -48,6 +50,8 @@ SCRAPER_SEQUENCE = [
     
       ("scraper_fixtures.py", "📆 [12/13] Partite Future", "Il motore non saprà cosa simulare", FREQUENT_DIR),
       ("scraper_odds_oddsmath.py", "💎 [13/13] Quote Future", "Manca confronto con bookmaker", FREQUENT_DIR),
+      # ⭐ NUOVO SCRIPT AGGIUNTO QUI ALLA FINE NELLA CARTELLA FREQUENTI
+      ("nowgoal_scraper.py", "🚀 [14/14] Quote H2H Arricchite (NowGoal)", "Mancano le quote precise nel CSV", FREQUENT_DIR),
 ]
 
 
