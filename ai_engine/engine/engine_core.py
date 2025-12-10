@@ -295,20 +295,49 @@ def calculate_match_score(home_raw, away_raw, h2h_scores, base_val, algo_mode):
     net_dyn_home = max(0, gross_dyn_home - freno_dyn_home)
     net_dyn_away = max(0, gross_dyn_away - freno_dyn_away)
     
-    # --- 4. SELEZIONE ---
-    if is_open_match:
-        final_home = max(net_base_home, net_dyn_home)
-        final_away = max(net_base_away, net_dyn_away)
-    else:
-        final_home = min(net_base_home, net_dyn_home)
-        final_away = min(net_base_away, net_dyn_away)
+    # --- 4. SELEZIONE (VECCHIA LOGICA MAX/MIN) ---
+    # if is_open_match:
+    #     final_home = max(net_base_home, net_dyn_home)
+    #     final_away = max(net_base_away, net_dyn_away)
+    # else:
+    #     final_home = min(net_base_home, net_dyn_home)
+    #     final_away = min(net_base_away, net_dyn_away)
+
+
+    # --- 4. SELEZIONE (NUOVA LOGICA: MEDIA TRE STRATI) ---
+    final_home = (h_power_total + net_base_home + net_dyn_home) / 3
+    final_away = (a_power_total + net_base_away + net_dyn_away) / 3
+
+
 
     # --- 5. RANDOM FINALE ---
     if algo_mode in [2, 3]:
         final_home, _ = apply_randomness(final_home)
         final_away, _ = apply_randomness(final_away)
+
+    # --- 6. ALGO 3: FRENI RANDOMIZZATI ---
+    if algo_mode == 3:
+        # Calcola freno medio per casa
+        freno_medio_home = (freno_base_home + freno_dyn_home) / 2
+        freno_medio_home, _ = apply_randomness(freno_medio_home)
         
+        # Calcola freno medio per trasferta
+        freno_medio_away = (freno_base_away + freno_dyn_away) / 2
+        freno_medio_away, _ = apply_randomness(freno_medio_away)
+        
+        # Applica come percentuale (se sopra 5 = malus, se sotto 5 = bonus)
+        if freno_medio_home >= 5:
+            final_home = final_home * (1 - freno_medio_home / 100)
+        else:
+            final_home = final_home * (1 + freno_medio_home / 100)
+        
+        if freno_medio_away >= 5:
+            final_away = final_away * (1 - freno_medio_away / 100)
+        else:
+            final_away = final_away * (1 + freno_medio_away / 100)
+
     return final_home, final_away
+
 
 # --- MOTORE PRINCIPALE (MODIFICATO PER PRELOAD) ---
 

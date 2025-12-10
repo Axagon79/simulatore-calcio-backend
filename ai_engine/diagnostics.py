@@ -98,7 +98,12 @@ def generate_html_report(filename, algos_indices, all_algos, data_by_algo, match
             if not m['has_real']: continue
             
             league = m['league']
-            if league not in league_stats: league_stats[league] = {'w': 0, 't': 0}
+            if league not in league_stats: 
+                league_stats[league] = {
+                    '1x2_w': 0, '1x2_t': 0,
+                    'uo_w': 0, 'uo_t': 0,
+                    'gg_w': 0, 'gg_t': 0
+                }
             
             ph, pa = item['pred_gh'], item['pred_ga']
             rh, ra = m['real_gh'], m['real_ga']
@@ -106,13 +111,30 @@ def generate_html_report(filename, algos_indices, all_algos, data_by_algo, match
             r_sign = get_sign(rh, ra)
             
             a_stats['Total'] += 1
-            league_stats[league]['t'] += 1
+            league_stats[league]['1x2_t'] += 1
+            league_stats[league]['uo_t'] += 1
+            league_stats[league]['gg_t'] += 1
             
+            # 1X2
             if p_sign == r_sign:
                 a_stats['1X2'] += 1
                 market_stats['1X2']['w'] += 1
-                league_stats[league]['w'] += 1
+                league_stats[league]['1x2_w'] += 1
             market_stats['1X2']['t'] += 1
+            
+            # Under/Over
+            if get_under_over(ph, pa) == get_under_over(rh, ra):
+                a_stats['UO'] += 1
+                market_stats['UO']['w'] += 1
+                league_stats[league]['uo_w'] += 1
+            market_stats['UO']['t'] += 1
+            
+            # Goal/NoGoal
+            if get_gol_nogol(ph, pa) == get_gol_nogol(rh, ra):
+                a_stats['GG'] += 1
+                market_stats['GG']['w'] += 1
+                league_stats[league]['gg_w'] += 1
+            market_stats['GG']['t'] += 1
 
             if idx == algos_indices[0] and m.get('odds') and '1' in m.get('odds'):
                 try:
@@ -131,16 +153,6 @@ def generate_html_report(filename, algos_indices, all_algos, data_by_algo, match
                     market_stats['Exact']['w'] += 1
             except: pass
             market_stats['Exact']['t'] += 1
-
-            if get_under_over(ph, pa) == get_under_over(rh, ra):
-                a_stats['UO'] += 1
-                market_stats['UO']['w'] += 1
-            market_stats['UO']['t'] += 1
-
-            if get_gol_nogol(ph, pa) == get_gol_nogol(rh, ra):
-                a_stats['GG'] += 1
-                market_stats['GG']['w'] += 1
-            market_stats['GG']['t'] += 1
 
         t = a_stats['Total'] if a_stats['Total'] > 0 else 1
         algo_stats[name] = {
@@ -248,21 +260,75 @@ def generate_html_report(filename, algos_indices, all_algos, data_by_algo, match
                 <div class="table-responsive">
                     <table class="table table-hover align-middle">
                         <thead class="table-dark">
-                            <tr><th>Campionato</th><th class="text-center">Partite</th><th class="text-center">1X2 OK</th><th class="text-center">%</th><th style="width: 30%;">Valutazione</th></tr>
+                            <tr>
+                                <th rowspan="2">Campionato</th>
+                                <th rowspan="2" class="text-center">Partite</th>
+                                <th colspan="2" class="text-center" style="border-left: 2px solid #495057;">1X2</th>
+                                <th colspan="2" class="text-center" style="border-left: 2px solid #495057;">Under/Over</th>
+                                <th colspan="2" class="text-center" style="border-left: 2px solid #495057;">Goal/NoGoal</th>
+                                <th rowspan="2" class="text-center" style="border-left: 2px solid #495057;">Media %</th>
+                            </tr>
+                            <tr>
+                                <th class="text-center" style="border-left: 2px solid #495057; font-size: 0.85rem;">OK</th>
+                                <th class="text-center" style="font-size: 0.85rem;">%</th>
+                                <th class="text-center" style="border-left: 2px solid #495057; font-size: 0.85rem;">OK</th>
+                                <th class="text-center" style="font-size: 0.85rem;">%</th>
+                                <th class="text-center" style="border-left: 2px solid #495057; font-size: 0.85rem;">OK</th>
+                                <th class="text-center" style="font-size: 0.85rem;">%</th>
+                            </tr>
                         </thead>
                         <tbody>"""
     
-    for league, stats in sorted(league_stats.items(), key=lambda x: x[1]['w']/max(x[1]['t'], 1), reverse=True):
-        tot = stats['t'] if stats['t'] > 0 else 1
-        pct = round(stats['w']/tot*100, 1)
-        color_cls, _, _ = get_thr_color_and_label('1X2', pct)
+    for league, stats in sorted(league_stats.items(), key=lambda x: (x[1]['1x2_w']+x[1]['uo_w']+x[1]['gg_w'])/(x[1]['1x2_t']+x[1]['uo_t']+x[1]['gg_t']) if (x[1]['1x2_t']+x[1]['uo_t']+x[1]['gg_t'])>0 else 0, reverse=True):
+        
+        pct_1x2 = round(stats['1x2_w']/max(stats['1x2_t'], 1)*100, 1)
+        pct_uo = round(stats['uo_w']/max(stats['uo_t'], 1)*100, 1)
+        pct_gg = round(stats['gg_w']/max(stats['gg_t'], 1)*100, 1)
+        pct_media = round((pct_1x2 + pct_uo + pct_gg) / 3, 1)
+        
+        color_1x2, _, _ = get_thr_color_and_label('1X2', pct_1x2)
+        color_uo, _, _ = get_thr_color_and_label('UO', pct_uo)
+        color_gg, _, _ = get_thr_color_and_label('GG', pct_gg)
+        color_media = 'success' if pct_media >= 60 else ('warning' if pct_media >= 45 else 'danger')
+        
         html += f"""
                             <tr>
                                 <td><strong>{league}</strong></td>
-                                <td class="text-center">{stats['t']}</td>
-                                <td class="text-center"><span class="badge bg-secondary">{stats['w']}</span></td>
-                                <td class="text-center"><span class="fw-bold fs-5">{pct}%</span></td>
-                                <td><div class="progress"><div class="progress-bar bg-{color_cls}" style="width: {pct}%">{pct}%</div></div></td>
+                                <td class="text-center">{stats['1x2_t']}</td>
+                                
+                                <td class="text-center" style="border-left: 2px solid #e0e0e0;">
+                                    <div class="fw-bold">{stats['1x2_w']}/{stats['1x2_t']}</div>
+                                    <div class="fw-bold text-primary">{pct_1x2}%</div>
+                                    <div class="progress mt-1" style="height: 8px;">
+                                        <div class="progress-bar bg-{color_1x2}" style="width: {pct_1x2}%"></div>
+                                    </div>
+                                </td>
+                                <td style="width: 1px;"></td>
+                                
+                                <td class="text-center" style="border-left: 2px solid #e0e0e0;">
+                                    <div class="fw-bold">{stats['uo_w']}/{stats['uo_t']}</div>
+                                    <div class="fw-bold text-warning">{pct_uo}%</div>
+                                    <div class="progress mt-1" style="height: 8px;">
+                                        <div class="progress-bar bg-{color_uo}" style="width: {pct_uo}%"></div>
+                                    </div>
+                                </td>
+                                <td style="width: 1px;"></td>
+                                
+                                <td class="text-center" style="border-left: 2px solid #e0e0e0;">
+                                    <div class="fw-bold">{stats['gg_w']}/{stats['gg_t']}</div>
+                                    <div class="fw-bold text-success">{pct_gg}%</div>
+                                    <div class="progress mt-1" style="height: 8px;">
+                                        <div class="progress-bar bg-{color_gg}" style="width: {pct_gg}%"></div>
+                                    </div>
+                                </td>
+                                <td style="width: 1px;"></td>
+                                
+                                <td class="text-center" style="border-left: 2px solid #e0e0e0;">
+                                    <div class="fw-bold fs-5">{pct_media}%</div>
+                                    <div class="progress mt-1" style="height: 12px;">
+                                        <div class="progress-bar bg-{color_media}" style="width: {pct_media}%">{pct_media}%</div>
+                                    </div>
+                                </td>
                             </tr>"""
 
     html += """

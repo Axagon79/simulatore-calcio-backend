@@ -132,7 +132,6 @@ def run_single_algo(algo_id, preloaded_data):
     return gh, ga
 
 
-# ✅ LOGICA CORRETTA: Top 3 per algoritmo (come File 1)
 def run_monte_carlo_verdict_detailed(preloaded_data):
     """
     Versione dettagliata con logica CORRETTA del File 1:
@@ -142,6 +141,7 @@ def run_monte_carlo_verdict_detailed(preloaded_data):
     """
     nominees = []
     algos_stats = {}  # Statistiche per algoritmo
+    algos_full_results = {}  # ← NUOVO: Tutti i risultati grezzi
     algos = [2, 3, 4, 5]
     cycles_per_algo = MONTE_CARLO_TOTAL_CYCLES // 4
     
@@ -154,6 +154,9 @@ def run_monte_carlo_verdict_detailed(preloaded_data):
             local_results.append(f"{gh}-{ga}")
         
         if not local_results: continue
+        
+        # ✅ SALVA TUTTI I RISULTATI GREZZI
+        algos_full_results[aid] = local_results.copy()  # ← NUOVO
         
         # ✅ PRENDE SOLO I TOP 3 RISULTATI (filtra il rumore)
         top_3 = Counter(local_results).most_common(3)
@@ -173,13 +176,43 @@ def run_monte_carlo_verdict_detailed(preloaded_data):
     # Calcola top 3 globale per display
     global_top3 = Counter(nominees).most_common(3)
     
+    # ========== SALVATAGGIO DEBUG FILE ========== 
+    import json
+    import os
+    from datetime import datetime
+    
+    debug_data = {
+        'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        'match': preloaded_data.get('match_info', 'Unknown'),  # Se hai info partita
+        'risultato_finale': f"{gh}-{ga}",
+        'algoritmi': {}
+    }
+    
+    algo_names = {2: 'Dinamico', 3: 'Tattico', 4: 'Caos', 5: 'Master'}
+    
+    for aid in algos:
+        if aid not in algos_full_results:
+            continue
+            
+        all_results = algos_full_results[aid]
+        freq_counter = Counter(all_results)
+        
+        debug_data['algoritmi'][algo_names[aid]] = {
+            'totale_simulazioni': len(all_results),
+            'risultati_completi': all_results,
+            'top_10': freq_counter.most_common(10),
+            'top_3_usati': algos_stats.get(aid, [])
+        }
+    
+    # Salva in JSON
+    debug_file = "monte_carlo_debug_NEW2.json"
+    with open(debug_file, "w", encoding="utf-8") as f:
+        json.dump(debug_data, f, indent=2, ensure_ascii=False)
+    
+    #print(f"\n💾 [DEBUG] Dati Monte Carlo salvati in: {debug_file}")
+    # ============================================
+    
     return (gh, ga), algos_stats, global_top3
-
-
-# Wrapper standard per compatibilità Massivo
-def run_monte_carlo_verdict(preloaded_data):
-    (gh, ga), _, _ = run_monte_carlo_verdict_detailed(preloaded_data)
-    return gh, ga
 
 
 # --- LOGICA NAVIGAZIONE GERARCHICA ---
