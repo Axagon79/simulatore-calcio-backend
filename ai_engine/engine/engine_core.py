@@ -3,11 +3,9 @@ import sys
 import json
 import random
 
-
-#(** MOTORE MATEMATICO CENTRALE: PRENDE DATI DAL DB, STATISTICHE DI LEGA E H2H E LI TRASFORMA IN PUNTEGGI DI FORZA )​
-#( INTEGRA LE LIBRERIE ESTERNE (RATING, AFFIDABILITÀ, BVS, FATTORE CAMPO, LUCIFERO) E CALCOLA I VALORI PER OGNI ALGORITMO )​
-#( ESPONE LE FUNZIONI PER PRECARICARE I DATI E PER PREDIRE UNA PARTITA, SALVANDO ANCHE UNA CACHE DELL’ULTIMO MATCH **)
-
+# (** MOTORE MATEMATICO CENTRALE: PRENDE DATI DAL DB, STATISTICHE DI LEGA E H2H E LI TRASFORMA IN PUNTEGGI DI FORZA )
+# ( INTEGRA LE LIBRERIE ESTERNE (RATING, AFFIDABILITÀ, BVS, FATTORE CAMPO, LUCIFERO) E CALCOLA I VALORI PER OGNI ALGORITMO )
+# ( ESPONE LE FUNZIONI PER PRECARICARE I DATI E PER PREDIRE UNA PARTITA, SALVANDO ANCHE UNA CACHE DELL’ULTIMO MATCH **)
 
 # --- 1. CONFIGURAZIONE PATH E IMPORT DB ---
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -78,15 +76,33 @@ STATS_FILE = os.path.join(AI_ENGINE_DIR, "league_stats.json")
 LEAGUE_STATS = {}
 CACHE_FILE = os.path.join(CURRENT_DIR, "last_match_data.json")
 
-# --- PESI DEL SISTEMA (CALDERONE TOTALE) ---
-H2H_WEIGHT = 1.0        
-MOTIVATION_WEIGHT = 1.0 
-RATING_WEIGHT = 1.0     
-ROSA_VALUE_WEIGHT = 1.0 
-RELIABILITY_WEIGHT = 1.0 
-BVS_WEIGHT = 1.0        
-FIELD_FACTOR_WEIGHT = 1.0 
-LUCIFERO_WEIGHT = 1.0   # Nuovo Peso Forma
+# --- CARICAMENTO SETTAGGI MIXER (TUNING) ---
+TUNING_FILE = os.path.join(CURRENT_DIR, "tuning_settings.json")
+
+def load_tuning():
+    try:
+        if os.path.exists(TUNING_FILE):
+            with open(TUNING_FILE, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                return {k: v["valore"] for k, v in data.items()}
+    except:
+        pass
+    return {} # Fallback se manca il file
+
+# Carica i valori (o usa 1.0 se fallisce)
+S = load_tuning()
+print(f"🎛️ [ENGINE] Tuning Mixer caricato: {len(S)} parametri.")
+
+# --- PESI DEL SISTEMA (CALDERONE TOTALE - DAL MIXER) ---
+# Se il mixer restituisce un valore, lo usa. Altrimenti usa 1.0 come default.
+H2H_WEIGHT          = S.get("PESO_STORIA_H2H", 1.0)
+MOTIVATION_WEIGHT   = S.get("PESO_MOTIVAZIONE", 1.0)
+RATING_WEIGHT       = S.get("PESO_RATING_ROSA", 1.0)
+ROSA_VALUE_WEIGHT   = S.get("PESO_VALORE_ROSA", 1.0)
+RELIABILITY_WEIGHT  = S.get("PESO_AFFIDABILITA", 1.0)
+BVS_WEIGHT          = S.get("PESO_BVS_QUOTE", 1.0)
+FIELD_FACTOR_WEIGHT = S.get("PESO_FATTORE_CAMPO", 1.0)
+LUCIFERO_WEIGHT     = S.get("PESO_FORMA_RECENTE", 1.0)
 
 ALGO_MODE = 5  
 ALGO_NAMES = {
@@ -113,6 +129,7 @@ except Exception as e:
     print(f"❌ [ENGINE] Errore JSON: {e}")
 
 DEFAULT_LEAGUE_AVG = 2.50
+
 
 def calculate_base_goals(league_name):
     league_data = LEAGUE_STATS.get(league_name, {})

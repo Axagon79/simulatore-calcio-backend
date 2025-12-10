@@ -37,7 +37,7 @@ LEAGUES_CONFIG = [
     {"name": "Serie B", "url": "https://football.nowgoal26.com/subleague/40"},
     {"name": "Serie C - Girone A", "url": "https://football.nowgoal26.com/subleague/142"},
     {"name": "Serie C - Girone B", "url": "https://football.nowgoal26.com/subleague/2025-2026/142/1526"},
-    {"name": "Serie C - Girone C", "url": "https://football.nowgoal26.com/subleague/144"},
+    {"name": "Serie C - Girone C", "url": "https://football.nowgoal26.com/subleague/2025-2026/142/1527"},
     {"name": "Premier League", "url": "https://football.nowgoal26.com/league/36"},
     {"name": "La Liga", "url": "https://football.nowgoal26.com/league/31"},
     {"name": "Bundesliga", "url": "https://football.nowgoal26.com/league/8"},

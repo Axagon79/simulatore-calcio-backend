@@ -2,26 +2,31 @@ import os
 import sys
 import csv
 import re
-from datetime import datetime
+from datetime import datetime, date
 from collections import Counter
 from tqdm import tqdm
 import contextlib
 import random
+import diagnostics
+
 
 # --- HARD FIX PERCORSI ---
 current_script_path = os.path.abspath(__file__)
 ai_engine_dir = os.path.dirname(current_script_path)
 project_root = os.path.dirname(ai_engine_dir)
 
+
 if project_root not in sys.path: sys.path.insert(0, project_root)
 if ai_engine_dir not in sys.path: sys.path.insert(0, ai_engine_dir)
 if os.path.join(ai_engine_dir, 'engine') not in sys.path: sys.path.insert(0, os.path.join(ai_engine_dir, 'engine'))
+
 
 try:
     try: from config import db
     except: 
         sys.path.append(project_root)
         from config import db
+
 
     import engine_core 
     from engine_core import predict_match, preload_match_data
@@ -34,13 +39,16 @@ try:
     except:
         print("⚠️ PredictionManager NON trovato (Salvataggio DB off).")
 
+
 except ImportError as e:
     print(f"❌ ERRORE FATALE IMPORT: {e}")
     sys.exit(1)
 
+
 # --- CONFIGURAZIONI ---
 MONTE_CARLO_TOTAL_CYCLES = 5000
 CSV_DELIMITER = ';'
+
 
 # --- MAPPA NAZIONI ---
 NATION_GROUPS = {
@@ -53,6 +61,7 @@ NATION_GROUPS = {
     "🇵🇹 PORTOGALLO": ["Liga Portugal"]
 }
 
+
 # --- HELPER FUNZIONI ---
 @contextlib.contextmanager
 def suppress_stdout():
@@ -62,22 +71,27 @@ def suppress_stdout():
         try: yield
         finally: sys.stdout = old_stdout
 
+
 def get_sign(h, a):
     if h > a: return "1"
     elif a > h: return "2"
     return "X"
 
+
 def get_under_over(h, a, threshold=2.5):
     return "OVER" if (h + a) > threshold else "UNDER"
 
+
 def get_gol_nogol(h, a):
     return "GG" if (h > 0 and a > 0) else "NG"
+
 
 def get_round_number(round_name):
     try:
         num = re.search(r'\d+', str(round_name))
         return int(num.group()) if num else 0
     except: return 0
+
 
 def has_valid_results(round_doc):
     for m in round_doc.get('matches', []):
@@ -86,12 +100,37 @@ def has_valid_results(round_doc):
             return True
     return False
 
+
+# --- NUOVA FUNZIONE ANALISI QUOTE ---
+def analyze_odds(match):
+    """Calcola favorita bookmaker e colora quote per HTML"""
+    odds = match.get("odds", {})
+    if not odds or "1" not in odds:
+        return '<span class="text-muted">-</span>', None, False
+    try:
+        q1 = float(odds.get("1", 0))
+        qx = float(odds.get("X", 0))
+        q2 = float(odds.get("2", 0))
+        min_q = min(q1, qx, q2)
+        fav_sign = "1" if q1 == min_q else ("2" if q2 == min_q else "X")
+        
+        # Colora la quota più bassa
+        s1 = f"<b>{q1:.2f}</b>" if fav_sign == "1" else f"{q1:.2f}"
+        sx = f"<b>{qx:.2f}</b>" if fav_sign == "X" else f"{qx:.2f}"
+        s2 = f"<b>{q2:.2f}</b>" if fav_sign == "2" else f"{q2:.2f}"
+        
+        return f"{s1} | {sx} | {s2}", fav_sign, True
+    except:
+        return '<span class="text-muted">Err</span>', None, False
+
+
 # --- MOTORI ---
 def run_single_algo(algo_id, preloaded_data):
     s_h, s_a, r_h, r_a = predict_match("", "", mode=algo_id, preloaded_data=preloaded_data)
     if s_h is None: return 0, 0
     gh, ga, _, _, _ = calculate_goals_from_engine(s_h, s_a, r_h, r_a, algo_mode=algo_id)
     return gh, ga
+
 
 # ✅ LOGICA CORRETTA: Top 3 per algoritmo (come File 1)
 def run_monte_carlo_verdict_detailed(preloaded_data):
@@ -125,7 +164,7 @@ def run_monte_carlo_verdict_detailed(preloaded_data):
             w = int(freq) 
             nominees.extend([sc] * w)
     
-    if not nominees: return (0, 0), algos_stats
+    if not nominees: return (0, 0), algos_stats, []
     
     # Scelta finale pesata
     final_verdict = random.choice(nominees)
@@ -136,12 +175,15 @@ def run_monte_carlo_verdict_detailed(preloaded_data):
     
     return (gh, ga), algos_stats, global_top3
 
+
 # Wrapper standard per compatibilità Massivo
 def run_monte_carlo_verdict(preloaded_data):
     (gh, ga), _, _ = run_monte_carlo_verdict_detailed(preloaded_data)
     return gh, ga
 
+
 # --- LOGICA NAVIGAZIONE GERARCHICA ---
+
 
 def flow_single_match():
     """Gestisce il flusso Nazione -> Lega -> Giornata -> Partita -> Algoritmo."""
@@ -175,6 +217,7 @@ def flow_single_match():
             if l_sel < 1 or l_sel > len(possible_leagues): continue
             selected_league_name = possible_leagues[l_sel-1]
 
+
             # 3. LOOP GIORNATA
             while True:
                 print(f"\n📅 SELEZIONA PERIODO ({selected_league_name}):")
@@ -182,6 +225,7 @@ def flow_single_match():
                 print("   [2] GIORNATA ATTUALE (In corso/Prossima)")
                 print("   [3] GIORNATA SUCCESSIVA (Futura)")
                 print("   [99] INDIETRO (Torna a Campionati)")
+
 
                 try: d_sel = int(input("   Scelta: ").strip())
                 except: continue
@@ -201,6 +245,7 @@ def flow_single_match():
                     if not rounds_list:
                         print("❌ Nessun dato trovato.")
                         break
+
 
                     rounds_list.sort(key=lambda x: get_round_number(x.get('round_name', '0')))
                     
@@ -222,11 +267,13 @@ def flow_single_match():
                         print(f"❌ Nessuna giornata trovata per l'offset selezionato.")
                         break
 
+
                     target_round = rounds_list[target_index]
                     matches = target_round.get('matches', [])
                     if not matches:
                         print("❌ Nessuna partita in questa giornata.")
                         break
+
 
                     print(f"📌 Giornata: {target_round.get('round_name')}")
                     print("\nPARTITE DISPONIBILI:")
@@ -240,12 +287,15 @@ def flow_single_match():
                             q_info = f" [Q:{o1}|{ox}|{o2}]"
                         print(f"   [{i+1}] {m['home']} vs {m['away']} {real}{q_info}")
 
+
                     print("   [99] INDIETRO")
+
 
                     try: m_sel = int(input("   Scegli partita: ").strip())
                     except: continue
                     if m_sel == 99: break
                     if m_sel < 1 or m_sel > len(matches): continue
+
 
                     selected_match = matches[m_sel-1]
                     selected_match['league'] = selected_league_name
@@ -270,89 +320,127 @@ def flow_single_match():
 def run_universal_simulator():
     while True:
         print(f"\n" + "="*60)
-        print(f"🌍 SIMULATORE UNIVERSALE (v5 - Fixed Monte Carlo)")
+        print(f"🌍 SIMULATORE UNIVERSALE (v6 - Total Edition + SafeGuard)")
         print(f"="*60)
         
         print("\n📅 MENU PRINCIPALE:")
+        print("   [0] 💎 TOTAL SIMULATION (Tutti i campionati: SOLO PARTITE FINITE)")
         print("   [1] MASSIVO: Giornata Precedente")
         print("   [2] MASSIVO: Giornata In Corso")
         print("   [3] MASSIVO: Giornata Successiva")
         print("   [4] SINGOLA: Analisi Dettagliata (Nazione -> Lega -> Giornata -> Match)")
         print("   [99] ESCI")
         
-        OFFSET = 0
+        offsets_to_run = []
         MODE_SINGLE = False
+        AUTO_ALL_LEAGUES = False
+        ONLY_FINISHED = False  # <--- AGGIUNGI QUESTA RIGA QUI
         selected_algo_id = 0
         
         try: main_choice = int(input("   Scelta: ").strip())
         except: continue
 
+
         if main_choice == 99: sys.exit(0)
-        elif main_choice == 1: OFFSET = -1
-        elif main_choice == 2: OFFSET = 0
-        elif main_choice == 3: OFFSET = 1
+        elif main_choice == 0:
+            # 💎 CONFIGURAZIONE SUPER TOTAL (SOLO FINITE)
+            offsets_to_run = [-1, 0, 1] 
+            AUTO_ALL_LEAGUES = True
+            ONLY_FINISHED = True # <--- ATTIVIAMO IL FILTRO
+            print("\n💎 MODALITÀ TOTAL (VERIFICA): Analisi partite CONCLUSE (con risultato) di Ieri, Oggi e Domani.")
+        elif main_choice == 1: offsets_to_run = [-1]
+        elif main_choice == 2: offsets_to_run = [0]
+        elif main_choice == 3: offsets_to_run = [1]
         elif main_choice == 4: MODE_SINGLE = True
         else: 
             print("❌ Scelta non valida."); continue
 
+
         matches_to_process = []
+
 
         if MODE_SINGLE:
             matches_to_process, selected_algo_id = flow_single_match()
             if not matches_to_process: continue
         
         else:
-            # --- FLUSSO MASSIVO ---
-            while True:
-                print("\n🏆 SELEZIONE CAMPIONATI (Massivo):")
-                print("   [0] TUTTI I CAMPIONATI")
-                all_leagues = sorted(db.h2h_by_round.distinct("league"))
-                for i, l in enumerate(all_leagues): 
-                    print(f"   [{i+1}] {l}")
-                print("   [99] INDIETRO (Menu Principale)")
-                
-                selected_leagues_names = []
-                try:
-                    l_choice = int(input("   Scelta: ").strip())
-                    if l_choice == 99: break
-                    if l_choice == 0: selected_leagues_names = all_leagues
-                    elif 1 <= l_choice <= len(all_leagues): 
-                        selected_leagues_names = [all_leagues[l_choice-1]]
-                    else: continue
-                except: continue
-
-                print(f"\n🔍 Recupero partite...")
-                for league_name in selected_leagues_names:
-                    rounds_cursor = db.h2h_by_round.find({"league": league_name})
-                    rounds_list = list(rounds_cursor)
-                    if not rounds_list: continue
-                    rounds_list.sort(key=lambda x: get_round_number(x.get('round_name', '0')))
+            # --- FLUSSO MASSIVO INTELLIGENTE ---
+            selected_leagues_names = []
+            
+            if AUTO_ALL_LEAGUES:
+                selected_leagues_names = sorted(db.h2h_by_round.distinct("league"))
+                print(f"📦 Caricamento automatico di {len(selected_leagues_names)} campionati...")
+            else:
+                while True:
+                    print("\n🏆 SELEZIONE CAMPIONATI (Massivo):")
+                    print("   [0] TUTTI I CAMPIONATI")
+                    all_leagues = sorted(db.h2h_by_round.distinct("league"))
+                    for i, l in enumerate(all_leagues): 
+                        print(f"   [{i+1}] {l}")
+                    print("   [99] INDIETRO (Menu Principale)")
                     
-                    anchor_index = -1
-                    for i, r in enumerate(rounds_list):
-                        if any(m.get('status') in ['Scheduled', 'Timed'] for m in r.get('matches', [])):
-                            anchor_index = i; break
-                    if anchor_index == -1:
-                         for i in range(len(rounds_list) - 1, -1, -1):
+                    try:
+                        l_choice = int(input("   Scelta: ").strip())
+                        if l_choice == 99: break
+                        if l_choice == 0: 
+                            selected_leagues_names = all_leagues
+                            break
+                        elif 1 <= l_choice <= len(all_leagues): 
+                            selected_leagues_names = [all_leagues[l_choice-1]]
+                            break
+                        else: continue
+                    except: continue
+
+                if not selected_leagues_names: continue
+
+
+            print(f"\n🔍 Recupero partite (Periodi: {offsets_to_run})...")
+            
+            # --- LOOP INTELLIGENTE SU LEGHE E OFFSETS ---
+            for league_name in selected_leagues_names:
+                rounds_cursor = db.h2h_by_round.find({"league": league_name})
+                rounds_list = list(rounds_cursor)
+                if not rounds_list: continue
+                rounds_list.sort(key=lambda x: get_round_number(x.get('round_name', '0')))
+                
+                # Trova Anchor
+                anchor_index = -1
+                for i, r in enumerate(rounds_list):
+                    if any(m.get('status') in ['Scheduled', 'Timed'] for m in r.get('matches', [])):
+                        anchor_index = i; break
+                if anchor_index == -1:
+                        for i in range(len(rounds_list) - 1, -1, -1):
                             if has_valid_results(rounds_list[i]): 
                                 anchor_index = i; break
-                    
-                    target_index = anchor_index + OFFSET if OFFSET != 0 else anchor_index
+                
+                # Cicla su tutti gli offsets richiesti (Super Total o singolo)
+                for off in offsets_to_run:
+                    target_index = anchor_index + off
                     if 0 <= target_index < len(rounds_list):
                         target_round = rounds_list[target_index]
                         r_name = target_round.get('round_name', 'Unknown')
+                        
                         for m in target_round.get('matches', []):
+                            
+                            # --- MODIFICA: FILTRO SOLO PARTITE FINITE ---
+                            # Se siamo in modalità Total/Verifica, prendiamo SOLO quelle con risultato reale
+                            if ONLY_FINISHED:
+                                s = m.get('real_score')
+                                # Se il risultato è nullo, vuoto o non ha il formato "X:Y", SALTA la partita
+                                if not (s and isinstance(s, str) and ":" in s and s != "null"):
+                                    continue
+                            # --------------------------------------------
+
                             m_copy = m.copy()
                             m_copy['league'] = league_name
                             m_copy['round'] = r_name
                             matches_to_process.append(m_copy)
-                break
 
-            if l_choice == 99: continue
 
         if not matches_to_process:
-            print("❌ Nessuna partita trovata.")
+            print("❌ Nessuna partita trovata (o nessuna partita conclusa, se in modalità Verifica).")
             continue
+
 
         # --- FORMATTAZIONE DATI ---
         final_matches_list = []
@@ -364,47 +452,80 @@ def run_universal_simulator():
             
             d_obj = m.get('date_obj')
             d_str = d_obj.strftime("%d/%m %H:%M") if d_obj else "Data N/D"
+            # Importante per Anti-Duplicati: data normalizzata ISO
+            d_iso = d_obj.strftime("%Y-%m-%d") if d_obj else str(datetime.now().date())
+            
             final_matches_list.append({
                 "home": m['home'], "away": m['away'],
                 "league": m.get('league', 'Unknown'), "round": m.get('round', '-'),
                 "real_gh": rh, "real_ga": ra,
                 "real_score_str": f"{rh}-{ra}" if has_real else "-",
-                "has_real": has_real, "date_obj": d_obj, "date_str": d_str,
+                "has_real": has_real, "date_obj": d_obj, "date_str": d_str, "date_iso": d_iso,
                 "status": m.get('status', 'Unknown'), "odds": m.get('odds', {}) 
             })
 
-                # --- ANTEPRIMA (Massiva) ---
+
+        # --- ANTEPRIMA ---
         if not MODE_SINGLE:
             print(f"\n📋 ANTEPRIMA ({len(final_matches_list)} partite):")
-            for m in final_matches_list[:10]:
+            limit_prev = 10 if not AUTO_ALL_LEAGUES else 5
+            for m in final_matches_list[:limit_prev]:
                 status_txt = f"[FINITA {m['real_score_str']}]" if m['has_real'] else "[DA GIOCARE]"
-                q_info = ""
-                if m.get('odds') and '1' in m.get('odds'):
-                     o1 = m['odds'].get('1', '-')
-                     ox = m['odds'].get('X', '-')
-                     o2 = m['odds'].get('2', '-')
-                     q_info = f" [Q:{o1}|{ox}|{o2}]"
-                print(f"   [{m['date_str']}] {m['home']} vs {m['away']} {status_txt}{q_info}")
-            if len(final_matches_list) > 10:
-                print(f"   ... e altre {len(final_matches_list)-10} partite")
+                print(f"   [{m['date_str']}] {m['home']} vs {m['away']} {status_txt}")
+            if len(final_matches_list) > limit_prev:
+                print(f"   ... e altre {len(final_matches_list)-limit_prev} partite")
 
 
-        # --- DOMANDA DATABASE ---
+        # --- BLOCCO DI CONTROLLO RIGIDO 🛡️ ---
+        proceed_with_simulation = False
         save_to_db = False
         manager = None
-        if PredictionManager:
-            print("\n💾 VUOI SALVARE I RISULTATI NEL DB?")
-            if MODE_SINGLE: print("   (Nota: Per singola partita è opzionale)")
-            ans = input("   (S/N): ").strip().upper()
-            if ans == 'S':
+        
+        while True:
+            print(f"\n⚙️ CONFIGURAZIONE AVVIO ({len(final_matches_list)} partite):")
+            
+            if PredictionManager:
+                print("   [S] AVVIA e SALVA nel Database (Anti-Duplicati Attivo)")
+            print("   [N] AVVIA SENZA salvare (Solo CSV)")
+            print("   [99] ANNULLA e TORNA AL MENU")
+            
+            ans = input("   Scelta: ").strip().upper()
+            
+            if ans == '99':
+                proceed_with_simulation = False
+                break
+            elif ans == 'N':
+                save_to_db = False
+                proceed_with_simulation = True
+                break
+            elif ans == 'S' and PredictionManager:
                 save_to_db = True
-                choice = input("   [1] SANDBOX | [2] UFFICIALE: ").strip()
+                proceed_with_simulation = True
+                
+                # Se è Total, forza Sandbox per sicurezza, altrimenti chiedi
+                if AUTO_ALL_LEAGUES:
+                    print("   (Total Mode: Salvataggio automatico su SANDBOX)")
+                    choice = '1'
+                else:
+                    while True:
+                        choice = input("   Destinazione? [1] SANDBOX | [2] UFFICIALE: ").strip()
+                        if choice in ['1', '2']: break
+                        print("❌ Scelta errata.")
+                
                 manager = PredictionManager()
                 manager.collection = db['predictions_official'] if choice == '2' else db['predictions_sandbox']
+                break
+            else:
+                print("❌ Scelta non valida. Inserisci 'S', 'N' o '99'.")
+
+        if not proceed_with_simulation:
+            print("🔙 Operazione annullata. Ritorno al menu...")
+            continue
+
 
         # --- ELABORAZIONE ---
-        filename = "simulation_report.csv"
-        if not MODE_SINGLE: print(f"\n⏳ Output: {filename}")
+        filename = "simulation_report.csv" if not AUTO_ALL_LEAGUES else "total_simulation_report.csv"
+        print(f"\n⏳ Elaborazione in corso... Output: {filename}")
         
         all_algos = ['Stat', 'Din', 'Tat', 'Caos', 'Master', 'MonteCarlo']
         data_by_algo = {name: [] for name in all_algos}
@@ -414,6 +535,7 @@ def run_universal_simulator():
         if selected_algo_id == 0: algos_indices = [1, 2, 3, 4, 5, 6]
         elif selected_algo_id == 6: algos_indices = [6]
         else: algos_indices = [selected_algo_id]
+
 
         iterator = tqdm(final_matches_list) if not MODE_SINGLE else final_matches_list
         
@@ -437,6 +559,7 @@ def run_universal_simulator():
                 if MODE_SINGLE:
                     print(f"   🔹 {name}: {th}-{ta} ({get_sign(th, ta)})")
 
+
             # Esegui MonteCarlo (6)
             mh, ma = 0, 0
             if 6 in algos_indices:
@@ -455,9 +578,11 @@ def run_universal_simulator():
                     for aid, top3 in algos_stats.items():
                         print(f"      [{algo_names_map[aid]}] Top 3: {top3}")
 
-            # Salvataggio DB
+
+            # --- SALVATAGGIO INTELLIGENTE (ANTI-DUPLICATI) ---
             if save_to_db and manager:
-                d_str = str(match.get('date_obj', datetime.now().date()))
+                d_str_iso = match['date_iso'] # Usa formato ISO per DB check
+                
                 snap = {
                     "home_att": 0, "away_att": 0,
                     "odds_1": match['odds'].get('1'), "odds_X": match['odds'].get('X'),
@@ -465,28 +590,63 @@ def run_universal_simulator():
                 }
                 final_score = f"{mh}-{ma}" if 6 in algos_indices else f"{th}-{ta}"
                 
-                pred_id, _ = manager.save_prediction(
-                    home=match['home'], away=match['away'], league=match['league'], date_str=d_str,
-                    snapshot_data=snap, algo_data=algo_preds_db, final_verdict_score=final_score 
-                )
-                if match['has_real']:
-                    p_s = get_sign(int(final_score.split("-")[0]), int(final_score.split("-")[1]))
-                    r_s = get_sign(match['real_gh'], match['real_ga'])
+                # 1. CHECK ESISTENZA
+                existing_doc = manager.collection.find_one({
+                    "home_team": match['home'],
+                    "away_team": match['away'],
+                    "match_date": d_str_iso 
+                })
+                
+                if existing_doc:
+                    # 2A. AGGIORNA
+                    if MODE_SINGLE: print("   ♻️  Previsione già presente. Aggiorno record.")
                     manager.collection.update_one(
-                        {"_id": pred_id}, 
+                        {"_id": existing_doc["_id"]},
                         {"$set": {
-                            "real_outcome": match['real_score_str'], 
-                            "status": "VERIFIED", 
-                            "check_sign": (p_s==r_s)
+                            "prediction_score": final_score,
+                            "algorithms_data": algo_preds_db,
+                            "snapshot_odds": snap,
+                            "last_updated": datetime.now()
                         }}
                     )
+                    # Gestione verifica se finita
+                    if match['has_real']:
+                         p_s = get_sign(int(final_score.split("-")[0]), int(final_score.split("-")[1]))
+                         r_s = get_sign(match['real_gh'], match['real_ga'])
+                         manager.collection.update_one(
+                            {"_id": existing_doc["_id"]},
+                            {"$set": {
+                                "real_outcome": match['real_score_str'], 
+                                "status": "VERIFIED", 
+                                "check_sign": (p_s==r_s)
+                            }}
+                        )
+                else:
+                    # 2B. INSERISCI NUOVO
+                    if MODE_SINGLE: print("   💾 Nuova previsione salvata.")
+                    pred_id, _ = manager.save_prediction(
+                        home=match['home'], away=match['away'], league=match['league'], date_str=d_str_iso,
+                        snapshot_data=snap, algo_data=algo_preds_db, final_verdict_score=final_score 
+                    )
+                    if match['has_real']:
+                        p_s = get_sign(int(final_score.split("-")[0]), int(final_score.split("-")[1]))
+                        r_s = get_sign(match['real_gh'], match['real_ga'])
+                        manager.collection.update_one(
+                            {"_id": pred_id}, 
+                            {"$set": {
+                                "real_outcome": match['real_score_str'], 
+                                "status": "VERIFIED", 
+                                "check_sign": (p_s==r_s)
+                            }}
+                        )
 
-        # --- CSV EXPORT ---
+
+                # --- CSV EXPORT ---
         with open(filename, 'w', newline='', encoding='utf-8') as csvfile:
             writer = csv.writer(csvfile, delimiter=CSV_DELIMITER)
             headers = ["League", "Match", "Data", "Q1", "QX", "Q2", "Real Score", 
-                      "Real Sign", "PRED Score", "PRED Sign", "1X2 Outcome", 
-                      "Exact Score", "U/O 2.5", "GG/NG"]
+                       "Real Sign", "PRED Score", "PRED Sign", "1X2 Outcome", 
+                       "Exact Score", "U/O 2.5", "GG/NG"]
 
             for idx in algos_indices:
                 algo_name = all_algos[idx-1]
@@ -536,12 +696,21 @@ def run_universal_simulator():
                     writer.writerow(["Nessuna statistica disponibile"])
                 writer.writerow([])
 
+        # --- GENERAZIONE DASHBOARD HTML (Fuori dal blocco CSV) ---
+        html_filename = filename.replace(".csv", ".html")
+        print(f"\n🎨 Generazione Dashboard HTML: {html_filename}...")
+        try:
+            diagnostics.generate_html_report(html_filename, algos_indices, all_algos, data_by_algo, final_matches_list)
+        except Exception as e:
+            print(f"⚠️ Errore creazione HTML: {e}")
+
         if MODE_SINGLE: 
             print(f"\n✅ Analisi completata! Risultati salvati in {filename}")
         else: 
-            print(f"\n✅ REPORT GENERATO: {filename}")
+            print(f"\n✅ REPORT GENERATO: {filename} + {html_filename}")
         
         input("\nPremi INVIO per tornare al menu principale...")
 
 if __name__ == "__main__":
     run_universal_simulator()
+

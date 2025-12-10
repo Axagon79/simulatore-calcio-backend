@@ -4,12 +4,33 @@ import os
 import sys
 import json
 
+# (** TRADUTTORE FINALE: CONVERTE I PUNTEGGI NUMERICI ASTRATTI (POWER) IN GOL REALI (0-0, 2-1) **)
+# ( GESTISCE LA LOGICA DI "ARROTONDAMENTO INTELLIGENTE" PER EVITARE RISULTATI IMPOSSIBILI (ES. 2.5 GOL) )
+# ( CONTIENE LE TABELLE DI CONVERSIONE E LE PROBABILITÀ PER I RISULTATI ESATTI )
 
-#(** TRADUTTORE FINALE: CONVERTE I PUNTEGGI NUMERICI ASTRATTI (POWER) IN GOL REALI (0-0, 2-1) )
-#( GESTISCE LA LOGICA DI "ARROTONDAMENTO INTELLIGENTE" PER EVITARE RISULTATI IMPOSSIBILI (ES. 2.5 GOL) )
-#( CONTIENE LE TABELLE DI CONVERSIONE E LE PROBABILITÀ PER I RISULTATI ESATTI **)
+# --- 0. CONFIGURAZIONE TUNING MIXER ---
+TUNING_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tuning_settings.json")
+
+def load_tuning():
+    try:
+        with open(TUNING_FILE, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            # Restituisce un dizionario pulito {CHIAVE: valore}
+            return {k: v["valore"] for k, v in data.items()}
+    except:
+        return {} # Fallback se manca il file
+
+# Carica i settaggi una volta all'avvio
+S = load_tuning()
+
+# Se i settaggi mancano, usa questi default di sicurezza
+S.setdefault("DIVISORE_MEDIA_GOL", 2.0)
+S.setdefault("POTENZA_FAVORITA_WINSHIFT", 0.40)
+S.setdefault("IMPATTO_DIFESA_TATTICA", 15.0)
+S.setdefault("TETTO_MAX_GOL_ATTESI", 3.8)
+
+
 # --- 1. CONFIGURAZIONE PERCORSI E DB ---
-
 
 current_path = os.path.dirname(os.path.abspath(__file__))
 parent_path = os.path.dirname(current_path)
@@ -37,6 +58,7 @@ try:
                 LEAGUE_AVERAGES[league] = val / 2.0
 except Exception as e:
     print(f"⚠️ Warning: Impossibile caricare league_stats.json ({e})")
+
 
 def get_league_avg(league_name):
     # Default 1.25 gol a squadra se lega sconosciuta
@@ -122,62 +144,56 @@ def calculate_goals_from_engine(home_score, away_score, home_data, away_data, al
 
     # --- B. MOTORE WIN: CHI COMANDA? (Probabilità 1X2) ---
     # Calcoliamo uno "Score Dominio" indipendente dai gol previsti.
-    # Usiamo TUTTI i pesi che contribuiscono a vincere una partita.
+    # Usiamo i pesi base normalizzati (0.25, 0.20...) moltiplicati per il fattore del Mixer.
     
     score_h = (
-        (h_rat * 0.25) +     # Forza Rating (25%): La rosa conta molto
-        (h_bvs * 0.20) +     # Valore Quote (20%): Dove il bookmaker sbaglia
-        (h_luc * 0.15) +     # Forma (15%): Lucifero "Win" (Stato di grazia)
-        (h_h2h_win * 0.15) + # Storia (15%): Tradizione vittorie
-        (h_mot * 0.10) +     # Motivazione (10%): Fame di punti
-        (h_fld * 0.10) +     # Fattore Campo (10%): Spinta pubblico
-        (h_rel * 0.05)       # Affidabilità (5%): Costanza risultati
+        (h_rat * 0.25 * S.get("PESO_RATING_ROSA", 1.0)) + 
+        (h_bvs * 0.20 * S.get("PESO_BVS_QUOTE", 1.0)) + 
+        (h_luc * 0.15 * S.get("PESO_FORMA_RECENTE", 1.0)) + 
+        (h_h2h_win * 0.15 * S.get("PESO_STORIA_H2H", 1.0)) + 
+        (h_mot * 0.10 * S.get("PESO_MOTIVAZIONE", 1.0)) + 
+        (h_fld * 0.10 * S.get("PESO_FATTORE_CAMPO", 1.0)) + 
+        (h_rel * 0.05 * S.get("PESO_AFFIDABILITA", 1.0))
     )
     
     score_a = (
-        (a_rat * 0.25) + 
-        (a_bvs * 0.20) + 
-        (a_luc * 0.15) + 
-        (a_h2h_win * 0.15) +
-        (a_mot * 0.10) + 
-        (a_fld * 0.10) + 
-        (a_rel * 0.05)
+        (a_rat * 0.25 * S.get("PESO_RATING_ROSA", 1.0)) + 
+        (a_bvs * 0.20 * S.get("PESO_BVS_QUOTE", 1.0)) + 
+        (a_luc * 0.15 * S.get("PESO_FORMA_RECENTE", 1.0)) + 
+        (a_h2h_win * 0.15 * S.get("PESO_STORIA_H2H", 1.0)) +
+        (a_mot * 0.10 * S.get("PESO_MOTIVAZIONE", 1.0)) + 
+        (a_fld * 0.10 * S.get("PESO_FATTORE_CAMPO", 1.0)) + 
+        (a_rel * 0.05 * S.get("PESO_AFFIDABILITA", 1.0))
     )
-    
+
     # Differenza di dominio (Delta)
     diff_dominio = score_h - score_a
     
     # Win Shift: Sposta l'inerzia probabilistica
     # Se la differenza è 0 (equilibrio), shift è 0.
-    # Se la differenza è alta, shift tende verso ±0.55 (55% di vantaggio).
     # Usiamo tanh per una curva morbida che non "esplode".
-    win_shift = np.tanh(diff_dominio / 25.0) * 0.40
+    win_shift = np.tanh(diff_dominio / 25.0) * S["POTENZA_FAVORITA_WINSHIFT"]
     
 
     # --- C. MOTORE GOL: CHE ARIA TIRA? (Aspettativa Gol) ---
     # Calcoliamo quanti gol ci aspettiamo indipendentemente da chi vince.
-    # Qui usiamo pesi che indicano "Spettacolo" e "Ritmo".
     
-    # 1. Base statistica (Volume FBRef diviso 2 per squadra)
-    base_lambda_h = vol_h / 2.0
-    base_lambda_a = vol_a / 2.0
+    # 1. Base statistica (Volume FBRef diviso per divisore Mixer)
+    base_lambda_h = vol_h / S["DIVISORE_MEDIA_GOL"]
+    base_lambda_a = vol_a / S["DIVISORE_MEDIA_GOL"]
     
     # 2. Lucifero (SHARED - Lato Gol)
     # Una squadra in forma (Lucifero alto) è più cinica e precisa.
-    # Una squadra fuori forma (Lucifero basso) spreca occasioni.
-    form_factor_h = 1 + ((h_luc - 12.5) / 60.0) 
-    form_factor_a = 1 + ((a_luc - 12.5) / 60.0)
+    form_factor_h = 1 + ((h_luc - 12.5) / 35.0) 
+    form_factor_a = 1 + ((a_luc - 12.5) / 35.0)
     
     # 3. H2H Storico (SHARED - Lato Gol)
-    # Se storicamente si segnano 4 gol a partita, alziamo l'aspettativa.
     hist_factor_h = max(0.85, min(1.15, h_h2h_g / 1.3)) 
     hist_factor_a = max(0.85, min(1.15, a_h2h_g / 1.1))
     
     # 4. Fattore Tattico (Puro tecnico: Attacco vs Difesa)
-    # Se la difesa avversaria è forte (10), il fattore scende < 1.
-    # Se la difesa è un colabrodo (0), il fattore sale > 1.
-    tactical_h = (h_att / 7.5) * (1 + (5.0 - a_def)/15.0) 
-    tactical_a = (a_att / 7.5) * (1 + (5.0 - h_def)/15.0)
+    tactical_h = (h_att / 7.5) * (1 + (5.0 - a_def)/S["IMPATTO_DIFESA_TATTICA"]) 
+    tactical_a = (a_att / 7.5) * (1 + (5.0 - h_def)/S["IMPATTO_DIFESA_TATTICA"])
     
     # 5. Calcolo RAW (Aspettativa Gol Pura)
     raw_lambda_h = base_lambda_h * tactical_h * form_factor_h * hist_factor_h
@@ -186,16 +202,14 @@ def calculate_goals_from_engine(home_score, away_score, home_data, away_data, al
 
     # --- D. FUSIONE MOTORI (SINTESI) ---
     # Il "Chi vince" (Win Shift) piega il "Quanti gol" (Raw Lambda).
-    # Chi domina vede salire la sua probabilità di concretizzare i gol previsti.
-    # Chi subisce vede scendere la sua probabilità, anche se ha un buon attacco.
     
     final_lambda_h = raw_lambda_h * (1 + win_shift)
     final_lambda_a = raw_lambda_a * (1 - win_shift)
     
     # Safety Cap (Limiti fisici del calcio)
-    # Minimo 0.15 gol attesi (mai zero assoluto), Massimo 3.8 (goleada rara)
-    final_lambda_h = max(0.15, min(3.8, final_lambda_h))
-    final_lambda_a = max(0.15, min(3.8, final_lambda_a))
+    # Minimo 0.15 gol attesi (mai zero assoluto), Massimo da Mixer
+    final_lambda_h = max(0.15, min(S["TETTO_MAX_GOL_ATTESI"], final_lambda_h))
+    final_lambda_a = max(0.15, min(S["TETTO_MAX_GOL_ATTESI"], final_lambda_a))
     
     
     # --- E. GENERAZIONE RISULTATO (POISSON) ---
