@@ -1,90 +1,90 @@
 
 === ALGORITMO: STAT ===
 League;Match;Data;Q1;QX;Q2;Real Score;Real Sign;PRED Score;PRED Sign;1X2 Outcome;Exact Score;U/O 2.5;GG/NG
-Bundesliga;Magonza vs Bor. M'gladbach;05/12 20:30;-;-;-;0-1;2;1-0;1;LOSS;LOSS;UNDER;NG
-Bundesliga;Stoccarda vs Bayern;06/12 15:30;6.25;4.75;1.44;0-5;2;0-0;X;LOSS;LOSS;UNDER;NG
-Bundesliga;Wolfsburg vs Union Berlino;06/12 15:30;2.25;3.5;2.9;3-1;1;0-0;X;LOSS;LOSS;UNDER;NG
-Bundesliga;Augusta vs Leverkusen;06/12 15:30;-;-;-;2-0;1;1-3;2;LOSS;LOSS;OVER;GG
-Bundesliga;Heidenheim vs Friburgo;06/12 15:30;3.7;3.6;1.91;2-1;1;2-0;1;WIN;LOSS;UNDER;NG
-Bundesliga;Colonia vs St. Pauli;06/12 15:30;1.9;3.6;3.8;1-1;X;1-0;1;LOSS;LOSS;UNDER;NG
-Bundesliga;Lipsia vs Eintracht;06/12 18:30;1.9;4.0;3.3;6-0;1;2-2;X;LOSS;LOSS;OVER;GG
-Bundesliga;Amburgo vs Werder Brema;07/12 15:30;2.15;3.6;3.0;3-2;1;1-0;1;WIN;LOSS;UNDER;NG
-Bundesliga;Dortmund vs Hoffenheim;07/12 17:30;1.55;4.2;5.0;2-0;1;2-0;1;WIN;WIN;UNDER;NG
+Serie C - Girone B;Livorno vs Arezzo;06/12 14:30;4.0;3.2;1.8;2-1;1;0-4;2;LOSS;LOSS;OVER;NG
+Serie C - Girone B;Pianese vs Gubbio;06/12 14:30;2.88;2.9;2.38;1-0;1;1-1;X;LOSS;LOSS;UNDER;GG
+Serie C - Girone B;Bra vs Campobasso;06/12 17:30;3.0;3.1;2.2;2-0;1;1-4;2;LOSS;LOSS;OVER;GG
+Serie C - Girone B;Guidonia vs Juve Next Gen;07/12 12:30;2.05;3.0;3.3;1-1;X;0-1;2;LOSS;LOSS;UNDER;NG
+Serie C - Girone B;Perugia vs Ternana;07/12 14:30;2.5;2.88;2.75;1-2;2;0-1;2;WIN;LOSS;UNDER;NG
+Serie C - Girone B;Torres vs Pineto;07/12 14:30;2.5;2.88;2.75;1-1;X;0-4;2;LOSS;LOSS;OVER;NG
+Serie C - Girone B;Ravenna vs Pontedera;07/12 17:30;1.53;3.6;5.5;2-1;1;4-0;1;WIN;LOSS;OVER;NG
+Serie C - Girone B;Ascoli vs Forlì;08/12 14:30;1.6;3.3;5.25;3-0;1;2-0;1;WIN;LOSS;UNDER;NG
+Serie C - Girone B;Carpi vs Vis Pesaro;08/12 14:30;2.3;2.9;3.0;1-1;X;0-3;2;LOSS;LOSS;OVER;NG
 "--- PERCENTUALI ---
-(Su partite finite)";;;;;;;;33.3%;11.1%;;44.4%;;33.3%
+(Su partite finite)";;;;;;;;33.3%;0.0%;;44.4%;;11.1%
 
 
 === ALGORITMO: DIN ===
 League;Match;Data;Q1;QX;Q2;Real Score;Real Sign;PRED Score;PRED Sign;1X2 Outcome;Exact Score;U/O 2.5;GG/NG
-Bundesliga;Magonza vs Bor. M'gladbach;05/12 20:30;-;-;-;0-1;2;1-0;1;LOSS;LOSS;UNDER;NG
-Bundesliga;Stoccarda vs Bayern;06/12 15:30;6.25;4.75;1.44;0-5;2;0-2;2;WIN;LOSS;UNDER;NG
-Bundesliga;Wolfsburg vs Union Berlino;06/12 15:30;2.25;3.5;2.9;3-1;1;0-0;X;LOSS;LOSS;UNDER;NG
-Bundesliga;Augusta vs Leverkusen;06/12 15:30;-;-;-;2-0;1;1-1;X;LOSS;LOSS;UNDER;GG
-Bundesliga;Heidenheim vs Friburgo;06/12 15:30;3.7;3.6;1.91;2-1;1;1-0;1;WIN;LOSS;UNDER;NG
-Bundesliga;Colonia vs St. Pauli;06/12 15:30;1.9;3.6;3.8;1-1;X;1-1;X;WIN;WIN;UNDER;GG
-Bundesliga;Lipsia vs Eintracht;06/12 18:30;1.9;4.0;3.3;6-0;1;2-3;2;LOSS;LOSS;OVER;GG
-Bundesliga;Amburgo vs Werder Brema;07/12 15:30;2.15;3.6;3.0;3-2;1;0-0;X;LOSS;LOSS;UNDER;NG
-Bundesliga;Dortmund vs Hoffenheim;07/12 17:30;1.55;4.2;5.0;2-0;1;1-0;1;WIN;LOSS;UNDER;NG
+Serie C - Girone B;Livorno vs Arezzo;06/12 14:30;4.0;3.2;1.8;2-1;1;1-6;2;LOSS;LOSS;OVER;GG
+Serie C - Girone B;Pianese vs Gubbio;06/12 14:30;2.88;2.9;2.38;1-0;1;1-1;X;LOSS;LOSS;UNDER;GG
+Serie C - Girone B;Bra vs Campobasso;06/12 17:30;3.0;3.1;2.2;2-0;1;1-0;1;WIN;LOSS;UNDER;NG
+Serie C - Girone B;Guidonia vs Juve Next Gen;07/12 12:30;2.05;3.0;3.3;1-1;X;0-2;2;LOSS;LOSS;UNDER;NG
+Serie C - Girone B;Perugia vs Ternana;07/12 14:30;2.5;2.88;2.75;1-2;2;0-1;2;WIN;LOSS;UNDER;NG
+Serie C - Girone B;Torres vs Pineto;07/12 14:30;2.5;2.88;2.75;1-1;X;1-1;X;WIN;WIN;UNDER;GG
+Serie C - Girone B;Ravenna vs Pontedera;07/12 17:30;1.53;3.6;5.5;2-1;1;2-0;1;WIN;LOSS;UNDER;NG
+Serie C - Girone B;Ascoli vs Forlì;08/12 14:30;1.6;3.3;5.25;3-0;1;5-0;1;WIN;LOSS;OVER;NG
+Serie C - Girone B;Carpi vs Vis Pesaro;08/12 14:30;2.3;2.9;3.0;1-1;X;0-3;2;LOSS;LOSS;OVER;NG
 "--- PERCENTUALI ---
-(Su partite finite)";;;;;;;;44.4%;11.1%;;55.6%;;44.4%
+(Su partite finite)";;;;;;;;55.6%;11.1%;;66.7%;;44.4%
 
 
 === ALGORITMO: TAT ===
 League;Match;Data;Q1;QX;Q2;Real Score;Real Sign;PRED Score;PRED Sign;1X2 Outcome;Exact Score;U/O 2.5;GG/NG
-Bundesliga;Magonza vs Bor. M'gladbach;05/12 20:30;-;-;-;0-1;2;0-0;X;LOSS;LOSS;UNDER;NG
-Bundesliga;Stoccarda vs Bayern;06/12 15:30;6.25;4.75;1.44;0-5;2;0-2;2;WIN;LOSS;UNDER;NG
-Bundesliga;Wolfsburg vs Union Berlino;06/12 15:30;2.25;3.5;2.9;3-1;1;0-0;X;LOSS;LOSS;UNDER;NG
-Bundesliga;Augusta vs Leverkusen;06/12 15:30;-;-;-;2-0;1;0-1;2;LOSS;LOSS;UNDER;NG
-Bundesliga;Heidenheim vs Friburgo;06/12 15:30;3.7;3.6;1.91;2-1;1;1-2;2;LOSS;LOSS;OVER;GG
-Bundesliga;Colonia vs St. Pauli;06/12 15:30;1.9;3.6;3.8;1-1;X;2-0;1;LOSS;LOSS;UNDER;NG
-Bundesliga;Lipsia vs Eintracht;06/12 18:30;1.9;4.0;3.3;6-0;1;2-2;X;LOSS;LOSS;OVER;GG
-Bundesliga;Amburgo vs Werder Brema;07/12 15:30;2.15;3.6;3.0;3-2;1;1-1;X;LOSS;LOSS;UNDER;GG
-Bundesliga;Dortmund vs Hoffenheim;07/12 17:30;1.55;4.2;5.0;2-0;1;3-1;1;WIN;LOSS;OVER;GG
+Serie C - Girone B;Livorno vs Arezzo;06/12 14:30;4.0;3.2;1.8;2-1;1;1-4;2;LOSS;LOSS;OVER;GG
+Serie C - Girone B;Pianese vs Gubbio;06/12 14:30;2.88;2.9;2.38;1-0;1;1-1;X;LOSS;LOSS;UNDER;GG
+Serie C - Girone B;Bra vs Campobasso;06/12 17:30;3.0;3.1;2.2;2-0;1;3-2;1;WIN;LOSS;OVER;GG
+Serie C - Girone B;Guidonia vs Juve Next Gen;07/12 12:30;2.05;3.0;3.3;1-1;X;1-0;1;LOSS;LOSS;UNDER;NG
+Serie C - Girone B;Perugia vs Ternana;07/12 14:30;2.5;2.88;2.75;1-2;2;1-3;2;WIN;LOSS;OVER;GG
+Serie C - Girone B;Torres vs Pineto;07/12 14:30;2.5;2.88;2.75;1-1;X;0-0;X;WIN;LOSS;UNDER;NG
+Serie C - Girone B;Ravenna vs Pontedera;07/12 17:30;1.53;3.6;5.5;2-1;1;2-0;1;WIN;LOSS;UNDER;NG
+Serie C - Girone B;Ascoli vs Forlì;08/12 14:30;1.6;3.3;5.25;3-0;1;3-0;1;WIN;WIN;OVER;NG
+Serie C - Girone B;Carpi vs Vis Pesaro;08/12 14:30;2.3;2.9;3.0;1-1;X;0-0;X;WIN;LOSS;UNDER;NG
 "--- PERCENTUALI ---
-(Su partite finite)";;;;;;;;22.2%;0.0%;;55.6%;;55.6%
+(Su partite finite)";;;;;;;;66.7%;11.1%;;77.8%;;33.3%
 
 
 === ALGORITMO: CAOS ===
 League;Match;Data;Q1;QX;Q2;Real Score;Real Sign;PRED Score;PRED Sign;1X2 Outcome;Exact Score;U/O 2.5;GG/NG
-Bundesliga;Magonza vs Bor. M'gladbach;05/12 20:30;-;-;-;0-1;2;1-0;1;LOSS;LOSS;UNDER;NG
-Bundesliga;Stoccarda vs Bayern;06/12 15:30;6.25;4.75;1.44;0-5;2;0-1;2;WIN;LOSS;UNDER;NG
-Bundesliga;Wolfsburg vs Union Berlino;06/12 15:30;2.25;3.5;2.9;3-1;1;1-3;2;LOSS;LOSS;OVER;GG
-Bundesliga;Augusta vs Leverkusen;06/12 15:30;-;-;-;2-0;1;0-0;X;LOSS;LOSS;UNDER;NG
-Bundesliga;Heidenheim vs Friburgo;06/12 15:30;3.7;3.6;1.91;2-1;1;1-0;1;WIN;LOSS;UNDER;NG
-Bundesliga;Colonia vs St. Pauli;06/12 15:30;1.9;3.6;3.8;1-1;X;2-0;1;LOSS;LOSS;UNDER;NG
-Bundesliga;Lipsia vs Eintracht;06/12 18:30;1.9;4.0;3.3;6-0;1;2-0;1;WIN;LOSS;UNDER;NG
-Bundesliga;Amburgo vs Werder Brema;07/12 15:30;2.15;3.6;3.0;3-2;1;1-1;X;LOSS;LOSS;UNDER;GG
-Bundesliga;Dortmund vs Hoffenheim;07/12 17:30;1.55;4.2;5.0;2-0;1;3-1;1;WIN;LOSS;OVER;GG
+Serie C - Girone B;Livorno vs Arezzo;06/12 14:30;4.0;3.2;1.8;2-1;1;0-4;2;LOSS;LOSS;OVER;NG
+Serie C - Girone B;Pianese vs Gubbio;06/12 14:30;2.88;2.9;2.38;1-0;1;1-0;1;WIN;WIN;UNDER;NG
+Serie C - Girone B;Bra vs Campobasso;06/12 17:30;3.0;3.1;2.2;2-0;1;3-1;1;WIN;LOSS;OVER;GG
+Serie C - Girone B;Guidonia vs Juve Next Gen;07/12 12:30;2.05;3.0;3.3;1-1;X;0-0;X;WIN;LOSS;UNDER;NG
+Serie C - Girone B;Perugia vs Ternana;07/12 14:30;2.5;2.88;2.75;1-2;2;1-0;1;LOSS;LOSS;UNDER;NG
+Serie C - Girone B;Torres vs Pineto;07/12 14:30;2.5;2.88;2.75;1-1;X;0-3;2;LOSS;LOSS;OVER;NG
+Serie C - Girone B;Ravenna vs Pontedera;07/12 17:30;1.53;3.6;5.5;2-1;1;1-0;1;WIN;LOSS;UNDER;NG
+Serie C - Girone B;Ascoli vs Forlì;08/12 14:30;1.6;3.3;5.25;3-0;1;3-1;1;WIN;LOSS;OVER;GG
+Serie C - Girone B;Carpi vs Vis Pesaro;08/12 14:30;2.3;2.9;3.0;1-1;X;0-1;2;LOSS;LOSS;UNDER;NG
 "--- PERCENTUALI ---
-(Su partite finite)";;;;;;;;44.4%;0.0%;;44.4%;;66.7%
+(Su partite finite)";;;;;;;;55.6%;11.1%;;55.6%;;11.1%
 
 
 === ALGORITMO: MASTER ===
 League;Match;Data;Q1;QX;Q2;Real Score;Real Sign;PRED Score;PRED Sign;1X2 Outcome;Exact Score;U/O 2.5;GG/NG
-Bundesliga;Magonza vs Bor. M'gladbach;05/12 20:30;-;-;-;0-1;2;0-0;X;LOSS;LOSS;UNDER;NG
-Bundesliga;Stoccarda vs Bayern;06/12 15:30;6.25;4.75;1.44;0-5;2;1-2;2;WIN;LOSS;OVER;GG
-Bundesliga;Wolfsburg vs Union Berlino;06/12 15:30;2.25;3.5;2.9;3-1;1;1-1;X;LOSS;LOSS;UNDER;GG
-Bundesliga;Augusta vs Leverkusen;06/12 15:30;-;-;-;2-0;1;0-3;2;LOSS;LOSS;OVER;NG
-Bundesliga;Heidenheim vs Friburgo;06/12 15:30;3.7;3.6;1.91;2-1;1;0-1;2;LOSS;LOSS;UNDER;NG
-Bundesliga;Colonia vs St. Pauli;06/12 15:30;1.9;3.6;3.8;1-1;X;3-0;1;LOSS;LOSS;OVER;NG
-Bundesliga;Lipsia vs Eintracht;06/12 18:30;1.9;4.0;3.3;6-0;1;0-1;2;LOSS;LOSS;UNDER;NG
-Bundesliga;Amburgo vs Werder Brema;07/12 15:30;2.15;3.6;3.0;3-2;1;3-0;1;WIN;LOSS;OVER;NG
-Bundesliga;Dortmund vs Hoffenheim;07/12 17:30;1.55;4.2;5.0;2-0;1;2-5;2;LOSS;LOSS;OVER;GG
+Serie C - Girone B;Livorno vs Arezzo;06/12 14:30;4.0;3.2;1.8;2-1;1;0-7;2;LOSS;LOSS;OVER;NG
+Serie C - Girone B;Pianese vs Gubbio;06/12 14:30;2.88;2.9;2.38;1-0;1;2-1;1;WIN;LOSS;OVER;GG
+Serie C - Girone B;Bra vs Campobasso;06/12 17:30;3.0;3.1;2.2;2-0;1;2-2;X;LOSS;LOSS;OVER;GG
+Serie C - Girone B;Guidonia vs Juve Next Gen;07/12 12:30;2.05;3.0;3.3;1-1;X;0-0;X;WIN;LOSS;UNDER;NG
+Serie C - Girone B;Perugia vs Ternana;07/12 14:30;2.5;2.88;2.75;1-2;2;2-1;1;LOSS;LOSS;OVER;GG
+Serie C - Girone B;Torres vs Pineto;07/12 14:30;2.5;2.88;2.75;1-1;X;0-0;X;WIN;LOSS;UNDER;NG
+Serie C - Girone B;Ravenna vs Pontedera;07/12 17:30;1.53;3.6;5.5;2-1;1;3-0;1;WIN;LOSS;OVER;NG
+Serie C - Girone B;Ascoli vs Forlì;08/12 14:30;1.6;3.3;5.25;3-0;1;2-1;1;WIN;LOSS;OVER;GG
+Serie C - Girone B;Carpi vs Vis Pesaro;08/12 14:30;2.3;2.9;3.0;1-1;X;0-5;2;LOSS;LOSS;OVER;NG
 "--- PERCENTUALI ---
-(Su partite finite)";;;;;;;;22.2%;0.0%;;33.3%;;44.4%
+(Su partite finite)";;;;;;;;55.6%;0.0%;;66.7%;;11.1%
 
 
 === ALGORITMO: MONTECARLO ===
 League;Match;Data;Q1;QX;Q2;Real Score;Real Sign;PRED Score;PRED Sign;1X2 Outcome;Exact Score;U/O 2.5;GG/NG
-Bundesliga;Magonza vs Bor. M'gladbach;05/12 20:30;-;-;-;0-1;2;0-0;X;LOSS;LOSS;UNDER;NG
-Bundesliga;Stoccarda vs Bayern;06/12 15:30;6.25;4.75;1.44;0-5;2;0-1;2;WIN;LOSS;UNDER;NG
-Bundesliga;Wolfsburg vs Union Berlino;06/12 15:30;2.25;3.5;2.9;3-1;1;0-0;X;LOSS;LOSS;UNDER;NG
-Bundesliga;Augusta vs Leverkusen;06/12 15:30;-;-;-;2-0;1;0-1;2;LOSS;LOSS;UNDER;NG
-Bundesliga;Heidenheim vs Friburgo;06/12 15:30;3.7;3.6;1.91;2-1;1;0-1;2;LOSS;LOSS;UNDER;NG
-Bundesliga;Colonia vs St. Pauli;06/12 15:30;1.9;3.6;3.8;1-1;X;1-0;1;LOSS;LOSS;UNDER;NG
-Bundesliga;Lipsia vs Eintracht;06/12 18:30;1.9;4.0;3.3;6-0;1;1-0;1;WIN;LOSS;UNDER;NG
-Bundesliga;Amburgo vs Werder Brema;07/12 15:30;2.15;3.6;3.0;3-2;1;0-0;X;LOSS;LOSS;UNDER;NG
-Bundesliga;Dortmund vs Hoffenheim;07/12 17:30;1.55;4.2;5.0;2-0;1;1-2;2;LOSS;LOSS;OVER;GG
+Serie C - Girone B;Livorno vs Arezzo;06/12 14:30;4.0;3.2;1.8;2-1;1;1-5;2;LOSS;LOSS;OVER;GG
+Serie C - Girone B;Pianese vs Gubbio;06/12 14:30;2.88;2.9;2.38;1-0;1;1-0;1;WIN;WIN;UNDER;NG
+Serie C - Girone B;Bra vs Campobasso;06/12 17:30;3.0;3.1;2.2;2-0;1;1-1;X;LOSS;LOSS;UNDER;GG
+Serie C - Girone B;Guidonia vs Juve Next Gen;07/12 12:30;2.05;3.0;3.3;1-1;X;1-0;1;LOSS;LOSS;UNDER;NG
+Serie C - Girone B;Perugia vs Ternana;07/12 14:30;2.5;2.88;2.75;1-2;2;0-0;X;LOSS;LOSS;UNDER;NG
+Serie C - Girone B;Torres vs Pineto;07/12 14:30;2.5;2.88;2.75;1-1;X;0-1;2;LOSS;LOSS;UNDER;NG
+Serie C - Girone B;Ravenna vs Pontedera;07/12 17:30;1.53;3.6;5.5;2-1;1;4-0;1;WIN;LOSS;OVER;NG
+Serie C - Girone B;Ascoli vs Forlì;08/12 14:30;1.6;3.3;5.25;3-0;1;2-0;1;WIN;LOSS;UNDER;NG
+Serie C - Girone B;Carpi vs Vis Pesaro;08/12 14:30;2.3;2.9;3.0;1-1;X;0-0;X;WIN;LOSS;UNDER;NG
 "--- PERCENTUALI ---
-(Su partite finite)";;;;;;;;22.2%;0.0%;;33.3%;;44.4%
+(Su partite finite)";;;;;;;;44.4%;11.1%;;77.8%;;33.3%
 

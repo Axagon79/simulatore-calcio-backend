@@ -1,5 +1,5 @@
 ========================================== 
-INIZIO AGGIORNAMENTO NOTTURNO: 10/12/2025  4:00:03,04 
+INIZIO AGGIORNAMENTO NOTTURNO: 11/12/2025  4:00:02,80 
 ========================================== 
  Connessione MongoDB...
  Database: football_simulator_db
@@ -194,7 +194,7 @@ INIZIO AGGIORNAMENTO NOTTURNO: 10/12/2025  4:00:03,04
 ➡️  Scarico MISC: https://fbref.com/en/comps/11/misc/Serie-A-Stats
    ➜ Dati MISC aggiunti
    💾 Scrivo 144 documenti in Mongo...
-   ➜ upserted: 0, modified: 27
+   ➜ upserted: 0, modified: 0
 
 ========================================
 🏆 LEGA: Serie B (ITA2)
@@ -210,7 +210,7 @@ INIZIO AGGIORNAMENTO NOTTURNO: 10/12/2025  4:00:03,04
 ➡️  Scarico MISC: https://fbref.com/en/comps/18/misc/Serie-B-Stats
    ➜ Dati MISC aggiunti
    💾 Scrivo 130 documenti in Mongo...
-   ➜ upserted: 3, modified: 67
+   ➜ upserted: 0, modified: 20
 
 ========================================
 🏆 LEGA: Premier League (ENG1)
@@ -226,7 +226,7 @@ INIZIO AGGIORNAMENTO NOTTURNO: 10/12/2025  4:00:03,04
 ➡️  Scarico MISC: https://fbref.com/en/comps/9/misc/Premier-League-Stats
    ➜ Dati MISC aggiunti
    💾 Scrivo 164 documenti in Mongo...
-   ➜ upserted: 0, modified: 8
+   ➜ upserted: 0, modified: 0
 
 ========================================
 🏆 LEGA: La Liga (ESP1)
@@ -242,7 +242,7 @@ INIZIO AGGIORNAMENTO NOTTURNO: 10/12/2025  4:00:03,04
 ➡️  Scarico MISC: https://fbref.com/en/comps/12/misc/La-Liga-Stats
    ➜ Dati MISC aggiunti
    💾 Scrivo 172 documenti in Mongo...
-   ➜ upserted: 0, modified: 12
+   ➜ upserted: 0, modified: 0
 
 ========================================
 🏆 LEGA: Bundesliga (GER1)
@@ -258,7 +258,7 @@ INIZIO AGGIORNAMENTO NOTTURNO: 10/12/2025  4:00:03,04
 ➡️  Scarico MISC: https://fbref.com/en/comps/20/misc/Bundesliga-Stats
    ➜ Dati MISC aggiunti
    💾 Scrivo 141 documenti in Mongo...
-   ➜ upserted: 0, modified: 1
+   ➜ upserted: 0, modified: 0
 
 ========================================
 🏆 LEGA: Ligue 1 (FRA1)
@@ -290,7 +290,7 @@ INIZIO AGGIORNAMENTO NOTTURNO: 10/12/2025  4:00:03,04
 ➡️  Scarico MISC: https://fbref.com/en/comps/23/misc/Eredivisie-Stats
    ➜ Dati MISC aggiunti
    💾 Scrivo 164 documenti in Mongo...
-   ➜ upserted: 0, modified: 13
+   ➜ upserted: 0, modified: 0
 
 ========================================
 🏆 LEGA: Liga Portugal (POR1)
@@ -306,7 +306,7 @@ INIZIO AGGIORNAMENTO NOTTURNO: 10/12/2025  4:00:03,04
 ➡️  Scarico MISC: https://fbref.com/en/comps/32/misc/Primeira-Liga-Stats
    ➜ Dati MISC aggiunti
    💾 Scrivo 169 documenti in Mongo...
-   ➜ upserted: 0, modified: 24
+   ➜ upserted: 0, modified: 21
 
 ✅ SCRAPER ATTACCANTI FBREF COMPLETATO.
  Connessione MongoDB...
@@ -326,7 +326,7 @@ INIZIO AGGIORNAMENTO NOTTURNO: 10/12/2025  4:00:03,04
 ➡️  Scarico MISC: https://fbref.com/en/comps/11/misc/Serie-A-Stats
    ➜ Dati MISC aggiunti
    💾 Scrivo 126 documenti in Mongo...
-   ➜ upserted: 0, modified: 22
+   ➜ upserted: 0, modified: 0
 
 ========================================
 🏆 LEGA: Serie B (ITA2)
@@ -340,7 +340,7 @@ INIZIO AGGIORNAMENTO NOTTURNO: 10/12/2025  4:00:03,04
 ➡️  Scarico MISC: https://fbref.com/en/comps/18/misc/Serie-B-Stats
    ➜ Dati MISC aggiunti
    💾 Scrivo 136 documenti in Mongo...
-   ➜ upserted: 3, modified: 67
+   ➜ upserted: 0, modified: 21
 
 ========================================
 🏆 LEGA: Premier League (ENG1)
@@ -354,7 +354,7 @@ INIZIO AGGIORNAMENTO NOTTURNO: 10/12/2025  4:00:03,04
 ➡️  Scarico MISC: https://fbref.com/en/comps/9/misc/Premier-League-Stats
    ➜ Dati MISC aggiunti
    💾 Scrivo 106 documenti in Mongo...
-   ➜ upserted: 0, modified: 7
+   ➜ upserted: 0, modified: 0
 
 ========================================
 🏆 LEGA: La Liga (ESP1)
@@ -368,7 +368,7 @@ INIZIO AGGIORNAMENTO NOTTURNO: 10/12/2025  4:00:03,04
 ➡️  Scarico MISC: https://fbref.com/en/comps/12/misc/La-Liga-Stats
    ➜ Dati MISC aggiunti
    💾 Scrivo 125 documenti in Mongo...
-   ➜ upserted: 0, modified: 8
+   ➜ upserted: 0, modified: 0
 
 ========================================
 🏆 LEGA: Bundesliga (GER1)
@@ -410,7 +410,7 @@ INIZIO AGGIORNAMENTO NOTTURNO: 10/12/2025  4:00:03,04
 ➡️  Scarico MISC: https://fbref.com/en/comps/23/misc/Eredivisie-Stats
    ➜ Dati MISC aggiunti
    💾 Scrivo 105 documenti in Mongo...
-   ➜ upserted: 0, modified: 10
+   ➜ upserted: 0, modified: 0
 
 ========================================
 🏆 LEGA: Liga Portugal (POR1)
@@ -424,7 +424,7 @@ INIZIO AGGIORNAMENTO NOTTURNO: 10/12/2025  4:00:03,04
 ➡️  Scarico MISC: https://fbref.com/en/comps/32/misc/Primeira-Liga-Stats
    ➜ Dati MISC aggiunti
    💾 Scrivo 114 documenti in Mongo...
-   ➜ upserted: 0, modified: 16
+   ➜ upserted: 0, modified: 7
 
 ✅ SCRAPER CENTROCAMPISTI FBREF COMPLETATO.
  Connessione MongoDB...
@@ -442,7 +442,7 @@ INIZIO AGGIORNAMENTO NOTTURNO: 10/12/2025  4:00:03,04
 ➡️  Scarico PLAYINGTIME: https://fbref.com/en/comps/11/playingtime/Serie-A-Stats
    ➜ Dati PLAYINGTIME aggiunti
    💾 Scrivo 191 documenti in Mongo...
-   ➜ upserted: 1, modified: 33
+   ➜ upserted: 0, modified: 0
 
 ========================================
 🏆 LEGA: Serie B (ITA2)
@@ -454,7 +454,7 @@ INIZIO AGGIORNAMENTO NOTTURNO: 10/12/2025  4:00:03,04
 ➡️  Scarico PLAYINGTIME: https://fbref.com/en/comps/18/playingtime/Serie-B-Stats
    ➜ Dati PLAYINGTIME aggiunti
    💾 Scrivo 197 documenti in Mongo...
-   ➜ upserted: 4, modified: 102
+   ➜ upserted: 0, modified: 29
 
 ========================================
 🏆 LEGA: Premier League (ENG1)
@@ -466,7 +466,7 @@ INIZIO AGGIORNAMENTO NOTTURNO: 10/12/2025  4:00:03,04
 ➡️  Scarico PLAYINGTIME: https://fbref.com/en/comps/9/playingtime/Premier-League-Stats
    ➜ Dati PLAYINGTIME aggiunti
    💾 Scrivo 165 documenti in Mongo...
-   ➜ upserted: 0, modified: 13
+   ➜ upserted: 0, modified: 0
 
 ========================================
 🏆 LEGA: La Liga (ESP1)
@@ -478,7 +478,7 @@ INIZIO AGGIORNAMENTO NOTTURNO: 10/12/2025  4:00:03,04
 ➡️  Scarico PLAYINGTIME: https://fbref.com/en/comps/12/playingtime/La-Liga-Stats
    ➜ Dati PLAYINGTIME aggiunti
    💾 Scrivo 173 documenti in Mongo...
-   ➜ upserted: 0, modified: 10
+   ➜ upserted: 0, modified: 0
 
 ========================================
 🏆 LEGA: Bundesliga (GER1)
@@ -514,7 +514,7 @@ INIZIO AGGIORNAMENTO NOTTURNO: 10/12/2025  4:00:03,04
 ➡️  Scarico PLAYINGTIME: https://fbref.com/en/comps/23/playingtime/Eredivisie-Stats
    ➜ Dati PLAYINGTIME aggiunti
    💾 Scrivo 147 documenti in Mongo...
-   ➜ upserted: 0, modified: 12
+   ➜ upserted: 0, modified: 0
 
 ========================================
 🏆 LEGA: Liga Portugal (POR1)
@@ -526,7 +526,7 @@ INIZIO AGGIORNAMENTO NOTTURNO: 10/12/2025  4:00:03,04
 ➡️  Scarico PLAYINGTIME: https://fbref.com/en/comps/32/playingtime/Primeira-Liga-Stats
    ➜ Dati PLAYINGTIME aggiunti
    💾 Scrivo 144 documenti in Mongo...
-   ➜ upserted: 0, modified: 17
+   ➜ upserted: 0, modified: 13
 
 ✅ SCRAPER DIFENSORI FBREF COMPLETATO.
  Connessione MongoDB...
@@ -538,8 +538,13 @@ INIZIO AGGIORNAMENTO NOTTURNO: 10/12/2025  4:00:03,04
 🏆 LEGA: Serie A (ITA1)
 ========================================
 ➡️  Scarico KEEPERS: https://fbref.com/en/comps/11/keepers/Serie-A-Stats
-   Status keepers: 403
-   ⚠️ Keepers non 200, salto lega.
+   Status keepers: 200
+   ➜ Portieri trovati in KEEPERS: 32
+➡️  Scarico KEEPERSADV: https://fbref.com/en/comps/11/keepersadv/Serie-A-Stats
+   Status keepersadv: 200
+   ➜ Portieri trovati in KEEPERSADV: 32
+   💾 Scrivo 32 documenti in Mongo...
+   ➜ upserted: 0, modified: 6
 
 ========================================
 🏆 LEGA: Serie B (ITA2)
@@ -551,7 +556,7 @@ INIZIO AGGIORNAMENTO NOTTURNO: 10/12/2025  4:00:03,04
    Status keepersadv: 200
    ➜ Portieri trovati in KEEPERSADV: 27
    💾 Scrivo 27 documenti in Mongo...
-   ➜ upserted: 0, modified: 17
+   ➜ upserted: 0, modified: 12
 
 ========================================
 🏆 LEGA: Premier League (ENG1)
@@ -563,7 +568,7 @@ INIZIO AGGIORNAMENTO NOTTURNO: 10/12/2025  4:00:03,04
    Status keepersadv: 200
    ➜ Portieri trovati in KEEPERSADV: 29
    💾 Scrivo 29 documenti in Mongo...
-   ➜ upserted: 0, modified: 2
+   ➜ upserted: 0, modified: 0
 
 ========================================
 🏆 LEGA: La Liga (ESP1)
@@ -575,7 +580,7 @@ INIZIO AGGIORNAMENTO NOTTURNO: 10/12/2025  4:00:03,04
    Status keepersadv: 200
    ➜ Portieri trovati in KEEPERSADV: 29
    💾 Scrivo 29 documenti in Mongo...
-   ➜ upserted: 0, modified: 2
+   ➜ upserted: 0, modified: 0
 
 ========================================
 🏆 LEGA: Bundesliga (GER1)
@@ -611,7 +616,7 @@ INIZIO AGGIORNAMENTO NOTTURNO: 10/12/2025  4:00:03,04
    Status keepersadv: 200
    ➜ Portieri trovati in KEEPERSADV: 28
    💾 Scrivo 28 documenti in Mongo...
-   ➜ upserted: 0, modified: 5
+   ➜ upserted: 0, modified: 0
 
 ========================================
 🏆 LEGA: Liga Portugal (POR1)
@@ -623,7 +628,7 @@ INIZIO AGGIORNAMENTO NOTTURNO: 10/12/2025  4:00:03,04
    Status keepersadv: 200
    ➜ Portieri trovati in KEEPERSADV: 30
    💾 Scrivo 30 documenti in Mongo...
-   ➜ upserted: 0, modified: 4
+   ➜ upserted: 0, modified: 8
 
 ✅ SCRAPER GK FBREF COMPLETATO.
  Connessione MongoDB...
@@ -732,10 +737,6 @@ INIZIO AGGIORNAMENTO NOTTURNO: 10/12/2025  4:00:03,04
    📊 Verifico avanzamento (partite giocate) per aggiornare solo chi è indietro...
    📊 Leggo classifica (table): https://www.transfermarkt.com/la-liga/tabelle/wettbewerb/ES1/saison_id/2025
    ✅ Partite giocate lette per 20 squadre
-   🔁 Aggiorno squadra CA Osasuna (team_id=331) perché max_matches_recorded=14 < matches_played=15
-      → Documenti giocatore salvati: 27, match distinti: 15
-   🔁 Aggiorno squadra Levante UD (team_id=3368) perché max_matches_recorded=14 < matches_played=15
-      → Documenti giocatore salvati: 32, match distinti: 15
 
    🏁 Fine campionato La Liga
 
@@ -802,7 +803,7 @@ INIZIO AGGIORNAMENTO NOTTURNO: 10/12/2025  4:00:03,04
 
 ================================================================================
 🎉 COMPLETATO!
-📊 Totale documenti giocatore salvati/aggiornati: 59
+📊 Totale documenti giocatore salvati/aggiornati: 0
 ================================================================================
 
  Connessione MongoDB...
@@ -861,7 +862,7 @@ INIZIO AGGIORNAMENTO NOTTURNO: 10/12/2025  4:00:03,04
 🧠 CALCOLATORE H2H v2.0 PRO (Formula Dinamica + GOL + FIX NOMI)
 Elaborazione:   0%|          | 0/402 [00:00<?, ?it/s]📥 Caricamento Cache Squadre...
 ✅ Cache pronta.
-Elaborazione:   0%|          | 1/402 [00:00<02:38,  2.53it/s]Elaborazione:   0%|          | 2/402 [00:00<02:16,  2.93it/s]Elaborazione:   1%|          | 3/402 [00:01<02:10,  3.05it/s]Elaborazione:   1%|          | 4/402 [00:01<02:07,  3.13it/s]Elaborazione:   1%|          | 5/402 [00:01<02:06,  3.14it/s]Elaborazione:   1%|▏         | 6/402 [00:01<02:04,  3.18it/s]Elaborazione:   2%|▏         | 7/402 [00:02<02:03,  3.21it/s]Elaborazione:   2%|▏         | 8/402 [00:02<02:02,  3.23it/s]Elaborazione:   2%|▏         | 9/402 [00:02<02:02,  3.20it/s]Elaborazione:   2%|▏         | 10/402 [00:03<02:03,  3.17it/s]Elaborazione:   3%|▎         | 11/402 [00:03<02:03,  3.17it/s]Elaborazione:   3%|▎         | 12/402 [00:03<02:01,  3.20it/s]Elaborazione:   3%|▎         | 13/402 [00:04<02:02,  3.18it/s]Elaborazione:   3%|▎         | 14/402 [00:04<02:01,  3.18it/s]Elaborazione:   4%|▎         | 15/402 [00:04<02:00,  3.21it/s]Elaborazione:   4%|▍         | 16/402 [00:05<02:01,  3.17it/s]Elaborazione:   4%|▍         | 17/402 [00:05<02:00,  3.20it/s]Elaborazione:   4%|▍         | 18/402 [00:05<01:59,  3.22it/s]Elaborazione:   5%|▍         | 19/402 [00:05<01:58,  3.23it/s]Elaborazione:   5%|▍         | 20/402 [00:06<01:57,  3.25it/s]Elaborazione:   5%|▌         | 21/402 [00:06<01:57,  3.25it/s]Elaborazione:   5%|▌         | 22/402 [00:06<01:56,  3.26it/s]Elaborazione:   6%|▌         | 23/402 [00:07<01:56,  3.25it/s]Elaborazione:   6%|▌         | 24/402 [00:07<01:56,  3.25it/s]Elaborazione:   6%|▌         | 25/402 [00:07<01:55,  3.26it/s]Elaborazione:   6%|▋         | 26/402 [00:08<01:56,  3.23it/s]Elaborazione:   7%|▋         | 27/402 [00:08<01:55,  3.24it/s]Elaborazione:   7%|▋         | 28/402 [00:08<01:55,  3.25it/s]Elaborazione:   7%|▋         | 29/402 [00:09<01:55,  3.23it/s]Elaborazione:   7%|▋         | 30/402 [00:09<01:54,  3.25it/s]Elaborazione:   8%|▊         | 31/402 [00:09<01:55,  3.21it/s]Elaborazione:   8%|▊         | 32/402 [00:10<01:54,  3.23it/s]Elaborazione:   8%|▊         | 33/402 [00:10<01:54,  3.22it/s]Elaborazione:   8%|▊         | 34/402 [00:10<01:56,  3.15it/s]Elaborazione:   9%|▊         | 35/402 [00:10<01:55,  3.19it/s]Elaborazione:   9%|▉         | 36/402 [00:11<01:55,  3.17it/s]Elaborazione:   9%|▉         | 37/402 [00:11<01:54,  3.19it/s]Elaborazione:   9%|▉         | 38/402 [00:11<01:53,  3.20it/s]Elaborazione:  10%|▉         | 39/402 [00:12<01:53,  3.21it/s]Elaborazione:  10%|▉         | 40/402 [00:12<01:52,  3.22it/s]Elaborazione:  10%|█         | 41/402 [00:12<01:52,  3.22it/s]Elaborazione:  10%|█         | 42/402 [00:13<01:53,  3.18it/s]Elaborazione:  11%|█         | 43/402 [00:13<01:51,  3.21it/s]Elaborazione:  11%|█         | 44/402 [00:13<01:52,  3.17it/s]Elaborazione:  11%|█         | 45/402 [00:14<01:51,  3.21it/s]Elaborazione:  11%|█▏        | 46/402 [00:14<01:50,  3.23it/s]Elaborazione:  12%|█▏        | 47/402 [00:14<01:49,  3.25it/s]Elaborazione:  12%|█▏        | 48/402 [00:15<01:49,  3.22it/s]Elaborazione:  12%|█▏        | 49/402 [00:15<01:50,  3.21it/s]Elaborazione:  12%|█▏        | 50/402 [00:15<01:49,  3.20it/s]Elaborazione:  13%|█▎        | 51/402 [00:15<01:51,  3.14it/s]Elaborazione:  13%|█▎        | 52/402 [00:16<01:51,  3.15it/s]Elaborazione:  13%|█▎        | 53/402 [00:16<01:51,  3.13it/s]Elaborazione:  13%|█▎        | 54/402 [00:17<01:59,  2.91it/s]Elaborazione:  14%|█▎        | 55/402 [00:17<01:56,  2.98it/s]Elaborazione:  14%|█▍        | 56/402 [00:17<01:54,  3.02it/s]Elaborazione:  14%|█▍        | 57/402 [00:17<01:51,  3.10it/s]Elaborazione:  14%|█▍        | 58/402 [00:18<01:49,  3.15it/s]Elaborazione:  15%|█▍        | 59/402 [00:18<01:49,  3.14it/s]Elaborazione:  15%|█▍        | 60/402 [00:18<01:47,  3.18it/s]Elaborazione:  15%|█▌        | 61/402 [00:19<01:45,  3.22it/s]Elaborazione:  15%|█▌        | 62/402 [00:19<01:47,  3.15it/s]Elaborazione:  16%|█▌        | 63/402 [00:19<01:49,  3.11it/s]Elaborazione:  16%|█▌        | 64/402 [00:20<01:48,  3.10it/s]Elaborazione:  16%|█▌        | 65/402 [00:20<01:47,  3.13it/s]Elaborazione:  16%|█▋        | 66/402 [00:20<01:46,  3.17it/s]Elaborazione:  17%|█▋        | 67/402 [00:21<01:45,  3.18it/s]Elaborazione:  17%|█▋        | 68/402 [00:21<01:45,  3.16it/s]Elaborazione:  17%|█▋        | 69/402 [00:21<01:44,  3.19it/s]Elaborazione:  17%|█▋        | 70/402 [00:22<01:43,  3.20it/s]Elaborazione:  18%|█▊        | 71/402 [00:22<01:44,  3.18it/s]Elaborazione:  18%|█▊        | 72/402 [00:22<01:42,  3.22it/s]Elaborazione:  18%|█▊        | 73/402 [00:22<01:41,  3.24it/s]Elaborazione:  18%|█▊        | 74/402 [00:23<01:40,  3.26it/s]Elaborazione:  19%|█▊        | 75/402 [00:23<01:41,  3.22it/s]Elaborazione:  19%|█▉        | 76/402 [00:23<01:41,  3.23it/s]Elaborazione:  19%|█▉        | 77/402 [00:24<01:42,  3.17it/s]Elaborazione:  19%|█▉        | 78/402 [00:24<01:42,  3.15it/s]Elaborazione:  20%|█▉        | 79/402 [00:24<01:40,  3.21it/s]Elaborazione:  20%|█▉        | 80/402 [00:25<01:40,  3.21it/s]Elaborazione:  20%|██        | 81/402 [00:25<01:39,  3.24it/s]Elaborazione:  20%|██        | 82/402 [00:25<01:38,  3.26it/s]Elaborazione:  21%|██        | 83/402 [00:26<01:37,  3.26it/s]Elaborazione:  21%|██        | 84/402 [00:26<01:37,  3.28it/s]Elaborazione:  21%|██        | 85/402 [00:26<01:36,  3.28it/s]Elaborazione:  21%|██▏       | 86/402 [00:26<01:37,  3.24it/s]Elaborazione:  22%|██▏       | 87/402 [00:27<01:37,  3.23it/s]Elaborazione:  22%|██▏       | 88/402 [00:27<01:36,  3.25it/s]Elaborazione:  22%|██▏       | 89/402 [00:27<01:37,  3.22it/s]Elaborazione:  22%|██▏       | 90/402 [00:28<01:36,  3.23it/s]Elaborazione:  23%|██▎       | 91/402 [00:28<01:35,  3.25it/s]Elaborazione:  23%|██▎       | 92/402 [00:28<01:36,  3.21it/s]Elaborazione:  23%|██▎       | 93/402 [00:29<01:36,  3.19it/s]Elaborazione:  23%|██▎       | 94/402 [00:29<01:35,  3.23it/s]Elaborazione:  24%|██▎       | 95/402 [00:29<01:35,  3.21it/s]Elaborazione:  24%|██▍       | 96/402 [00:30<01:34,  3.24it/s]Elaborazione:  24%|██▍       | 97/402 [00:30<01:35,  3.20it/s]Elaborazione:  24%|██▍       | 98/402 [00:30<01:34,  3.23it/s]Elaborazione:  25%|██▍       | 99/402 [00:31<01:33,  3.25it/s]Elaborazione:  25%|██▍       | 100/402 [00:31<01:32,  3.26it/s]Elaborazione:  25%|██▌       | 101/402 [00:31<01:32,  3.24it/s]Elaborazione:  25%|██▌       | 102/402 [00:31<01:32,  3.25it/s]Elaborazione:  26%|██▌       | 103/402 [00:32<01:31,  3.26it/s]Elaborazione:  26%|██▌       | 104/402 [00:32<01:30,  3.28it/s]Elaborazione:  26%|██▌       | 105/402 [00:32<01:30,  3.29it/s]Elaborazione:  26%|██▋       | 106/402 [00:33<01:30,  3.29it/s]Elaborazione:  27%|██▋       | 107/402 [00:33<01:30,  3.27it/s]Elaborazione:  27%|██▋       | 108/402 [00:33<01:31,  3.23it/s]Elaborazione:  27%|██▋       | 109/402 [00:34<01:31,  3.21it/s]Elaborazione:  27%|██▋       | 110/402 [00:34<01:30,  3.21it/s]Elaborazione:  28%|██▊       | 111/402 [00:34<01:29,  3.24it/s]Elaborazione:  28%|██▊       | 112/402 [00:35<01:29,  3.23it/s]Elaborazione:  28%|██▊       | 113/402 [00:35<01:29,  3.24it/s]Elaborazione:  28%|██▊       | 114/402 [00:35<01:29,  3.24it/s]Elaborazione:  29%|██▊       | 115/402 [00:35<01:25,  3.34it/s]Elaborazione:  29%|██▉       | 116/402 [00:36<01:24,  3.40it/s]Elaborazione:  29%|██▉       | 117/402 [00:36<01:22,  3.46it/s]Elaborazione:  29%|██▉       | 118/402 [00:36<01:23,  3.41it/s]Elaborazione:  30%|██▉       | 119/402 [00:37<01:21,  3.48it/s]Elaborazione:  30%|██▉       | 120/402 [00:37<01:19,  3.53it/s]Elaborazione:  30%|███       | 121/402 [00:37<01:20,  3.51it/s]Elaborazione:  30%|███       | 122/402 [00:37<01:19,  3.54it/s]Elaborazione:  31%|███       | 123/402 [00:38<01:18,  3.56it/s]Elaborazione:  31%|███       | 124/402 [00:38<01:17,  3.59it/s]Elaborazione:  31%|███       | 125/402 [00:38<01:16,  3.60it/s]Elaborazione:  31%|███▏      | 126/402 [00:38<01:16,  3.59it/s]Elaborazione:  32%|███▏      | 127/402 [00:39<01:16,  3.58it/s]Elaborazione:  32%|███▏      | 128/402 [00:39<01:16,  3.58it/s]Elaborazione:  32%|███▏      | 129/402 [00:39<01:16,  3.57it/s]Elaborazione:  32%|███▏      | 130/402 [00:40<01:17,  3.50it/s]Elaborazione:  33%|███▎      | 131/402 [00:40<01:17,  3.52it/s]Elaborazione:  33%|███▎      | 132/402 [00:40<01:15,  3.55it/s]Elaborazione:  33%|███▎      | 133/402 [00:40<01:15,  3.55it/s]Elaborazione:  33%|███▎      | 134/402 [00:41<01:14,  3.58it/s]Elaborazione:  34%|███▎      | 135/402 [00:41<01:14,  3.57it/s]Elaborazione:  34%|███▍      | 136/402 [00:41<01:14,  3.59it/s]Elaborazione:  34%|███▍      | 137/402 [00:42<01:13,  3.60it/s]Elaborazione:  34%|███▍      | 138/402 [00:42<01:13,  3.61it/s]Elaborazione:  35%|███▍      | 139/402 [00:42<01:13,  3.57it/s]Elaborazione:  35%|███▍      | 140/402 [00:42<01:15,  3.49it/s]Elaborazione:  35%|███▌      | 141/402 [00:43<01:14,  3.52it/s]Elaborazione:  35%|███▌      | 142/402 [00:43<01:15,  3.44it/s]Elaborazione:  36%|███▌      | 143/402 [00:43<01:14,  3.49it/s]Elaborazione:  36%|███▌      | 144/402 [00:44<01:13,  3.53it/s]Elaborazione:  36%|███▌      | 145/402 [00:44<01:13,  3.49it/s]Elaborazione:  36%|███▋      | 146/402 [00:44<01:12,  3.53it/s]Elaborazione:  37%|███▋      | 147/402 [00:44<01:13,  3.45it/s]Elaborazione:  37%|███▋      | 148/402 [00:45<01:12,  3.50it/s]Elaborazione:  37%|███▋      | 149/402 [00:45<01:11,  3.54it/s]Elaborazione:  37%|███▋      | 150/402 [00:45<01:10,  3.55it/s]Elaborazione:  38%|███▊      | 151/402 [00:46<01:10,  3.57it/s]Elaborazione:  38%|███▊      | 152/402 [00:46<01:09,  3.59it/s]Elaborazione:  38%|███▊      | 153/402 [00:46<01:11,  3.50it/s]Elaborazione:  38%|███▊      | 154/402 [00:46<01:12,  3.43it/s]Elaborazione:  39%|███▊      | 155/402 [00:47<01:13,  3.36it/s]Elaborazione:  39%|███▉      | 156/402 [00:47<01:13,  3.33it/s]Elaborazione:  39%|███▉      | 157/402 [00:47<01:13,  3.32it/s]Elaborazione:  39%|███▉      | 158/402 [00:48<01:13,  3.32it/s]Elaborazione:  40%|███▉      | 159/402 [00:48<01:13,  3.31it/s]Elaborazione:  40%|███▉      | 160/402 [00:48<01:13,  3.31it/s]Elaborazione:  40%|████      | 161/402 [00:49<01:13,  3.26it/s]Elaborazione:  40%|████      | 162/402 [00:49<01:13,  3.25it/s]Elaborazione:  41%|████      | 163/402 [00:49<01:13,  3.25it/s]Elaborazione:  41%|████      | 164/402 [00:50<01:13,  3.23it/s]Elaborazione:  41%|████      | 165/402 [00:50<01:13,  3.23it/s]Elaborazione:  41%|████▏     | 166/402 [00:50<01:13,  3.23it/s]Elaborazione:  42%|████▏     | 167/402 [00:50<01:13,  3.22it/s]Elaborazione:  42%|████▏     | 168/402 [00:51<01:12,  3.24it/s]Elaborazione:  42%|████▏     | 169/402 [00:51<01:11,  3.25it/s]Elaborazione:  42%|████▏     | 170/402 [00:51<01:10,  3.27it/s]Elaborazione:  43%|████▎     | 171/402 [00:52<01:11,  3.21it/s]Elaborazione:  43%|████▎     | 172/402 [00:52<01:13,  3.13it/s]Elaborazione:  43%|████▎     | 173/402 [00:52<01:12,  3.18it/s]Elaborazione:  43%|████▎     | 174/402 [00:53<01:11,  3.21it/s]Elaborazione:  44%|████▎     | 175/402 [00:53<01:10,  3.24it/s]Elaborazione:  44%|████▍     | 176/402 [00:53<01:09,  3.25it/s]Elaborazione:  44%|████▍     | 177/402 [00:54<01:08,  3.26it/s]Elaborazione:  44%|████▍     | 178/402 [00:54<01:09,  3.23it/s]Elaborazione:  45%|████▍     | 179/402 [00:54<01:09,  3.21it/s]Elaborazione:  45%|████▍     | 180/402 [00:54<01:09,  3.21it/s]Elaborazione:  45%|████▌     | 181/402 [00:55<01:08,  3.21it/s]Elaborazione:  45%|████▌     | 182/402 [00:55<01:09,  3.19it/s]Elaborazione:  46%|████▌     | 183/402 [00:55<01:07,  3.23it/s]Elaborazione:  46%|████▌     | 184/402 [00:56<01:08,  3.20it/s]Elaborazione:  46%|████▌     | 185/402 [00:56<01:09,  3.14it/s]Elaborazione:  46%|████▋     | 186/402 [00:56<01:07,  3.19it/s]Elaborazione:  47%|████▋     | 187/402 [00:57<01:06,  3.21it/s]Elaborazione:  47%|████▋     | 188/402 [00:57<01:06,  3.23it/s]Elaborazione:  47%|████▋     | 189/402 [00:57<01:06,  3.22it/s]Elaborazione:  47%|████▋     | 190/402 [00:58<01:05,  3.24it/s]Elaborazione:  48%|████▊     | 191/402 [00:58<01:05,  3.24it/s]Elaborazione:  48%|████▊     | 192/402 [00:58<01:04,  3.25it/s]Elaborazione:  48%|████▊     | 193/402 [00:59<01:04,  3.25it/s]Elaborazione:  48%|████▊     | 194/402 [00:59<01:04,  3.24it/s]Elaborazione:  49%|████▊     | 195/402 [00:59<01:03,  3.25it/s]Elaborazione:  49%|████▉     | 196/402 [00:59<01:04,  3.21it/s]Elaborazione:  49%|████▉     | 197/402 [01:00<01:04,  3.16it/s]Elaborazione:  49%|████▉     | 198/402 [01:00<01:04,  3.15it/s]Elaborazione:  50%|████▉     | 199/402 [01:00<01:03,  3.17it/s]Elaborazione:  50%|████▉     | 200/402 [01:01<01:03,  3.16it/s]Elaborazione:  50%|█████     | 201/402 [01:01<01:03,  3.15it/s]Elaborazione:  50%|█████     | 202/402 [01:01<01:03,  3.16it/s]Elaborazione:  50%|█████     | 203/402 [01:02<01:02,  3.17it/s]Elaborazione:  51%|█████     | 204/402 [01:02<01:01,  3.20it/s]Elaborazione:  51%|█████     | 205/402 [01:02<01:02,  3.18it/s]Elaborazione:  51%|█████     | 206/402 [01:03<01:02,  3.12it/s]Elaborazione:  51%|█████▏    | 207/402 [01:03<01:01,  3.17it/s]Elaborazione:  52%|█████▏    | 208/402 [01:03<01:01,  3.14it/s]Elaborazione:  52%|█████▏    | 209/402 [01:04<01:01,  3.14it/s]Elaborazione:  52%|█████▏    | 210/402 [01:04<01:00,  3.18it/s]Elaborazione:  52%|█████▏    | 211/402 [01:04<00:59,  3.20it/s]Elaborazione:  53%|█████▎    | 212/402 [01:05<00:58,  3.23it/s]Elaborazione:  53%|█████▎    | 213/402 [01:05<00:58,  3.24it/s]Elaborazione:  53%|█████▎    | 214/402 [01:05<00:57,  3.25it/s]Elaborazione:  53%|█████▎    | 215/402 [01:05<00:57,  3.25it/s]Elaborazione:  54%|█████▎    | 216/402 [01:06<00:57,  3.21it/s]Elaborazione:  54%|█████▍    | 217/402 [01:06<00:57,  3.20it/s]Elaborazione:  54%|█████▍    | 218/402 [01:06<00:57,  3.22it/s]Elaborazione:  54%|█████▍    | 219/402 [01:07<00:56,  3.23it/s]Elaborazione:  55%|█████▍    | 220/402 [01:07<00:56,  3.24it/s]Elaborazione:  55%|█████▍    | 221/402 [01:07<00:55,  3.25it/s]Elaborazione:  55%|█████▌    | 222/402 [01:08<00:55,  3.26it/s]Elaborazione:  55%|█████▌    | 223/402 [01:08<00:56,  3.19it/s]Elaborazione:  56%|█████▌    | 224/402 [01:08<00:56,  3.18it/s]Elaborazione:  56%|█████▌    | 225/402 [01:09<00:56,  3.15it/s]Elaborazione:  56%|█████▌    | 226/402 [01:09<00:55,  3.15it/s]Elaborazione:  56%|█████▋    | 227/402 [01:09<00:55,  3.15it/s]Elaborazione:  57%|█████▋    | 228/402 [01:10<00:55,  3.13it/s]Elaborazione:  57%|█████▋    | 229/402 [01:10<00:54,  3.16it/s]Elaborazione:  57%|█████▋    | 230/402 [01:10<00:53,  3.19it/s]Elaborazione:  57%|█████▋    | 231/402 [01:10<00:53,  3.21it/s]Elaborazione:  58%|█████▊    | 232/402 [01:11<00:53,  3.19it/s]Elaborazione:  58%|█████▊    | 233/402 [01:11<00:52,  3.20it/s]Elaborazione:  58%|█████▊    | 234/402 [01:11<00:52,  3.19it/s]Elaborazione:  58%|█████▊    | 235/402 [01:12<00:52,  3.20it/s]Elaborazione:  59%|█████▊    | 236/402 [01:12<00:51,  3.21it/s]Elaborazione:  59%|█████▉    | 237/402 [01:12<00:51,  3.22it/s]Elaborazione:  59%|█████▉    | 238/402 [01:13<00:50,  3.23it/s]Elaborazione:  59%|█████▉    | 239/402 [01:13<00:50,  3.23it/s]Elaborazione:  60%|█████▉    | 240/402 [01:13<00:50,  3.18it/s]Elaborazione:  60%|█████▉    | 241/402 [01:14<00:50,  3.18it/s]Elaborazione:  60%|██████    | 242/402 [01:14<00:50,  3.19it/s]Elaborazione:  60%|██████    | 243/402 [01:14<00:50,  3.15it/s]Elaborazione:  61%|██████    | 244/402 [01:15<00:49,  3.17it/s]Elaborazione:  61%|██████    | 245/402 [01:15<00:49,  3.20it/s]Elaborazione:  61%|██████    | 246/402 [01:15<00:49,  3.18it/s]Elaborazione:  61%|██████▏   | 247/402 [01:15<00:48,  3.19it/s]Elaborazione:  62%|██████▏   | 248/402 [01:16<00:48,  3.20it/s]Elaborazione:  62%|██████▏   | 249/402 [01:16<00:47,  3.21it/s]Elaborazione:  62%|██████▏   | 250/402 [01:16<00:47,  3.22it/s]Elaborazione:  62%|██████▏   | 251/402 [01:17<00:47,  3.18it/s]Elaborazione:  63%|██████▎   | 252/402 [01:17<00:47,  3.14it/s]Elaborazione:  63%|██████▎   | 253/402 [01:17<00:47,  3.13it/s]Elaborazione:  63%|██████▎   | 254/402 [01:18<00:46,  3.17it/s]Elaborazione:  63%|██████▎   | 255/402 [01:18<00:46,  3.18it/s]Elaborazione:  64%|██████▎   | 256/402 [01:18<00:46,  3.15it/s]Elaborazione:  64%|██████▍   | 257/402 [01:19<00:45,  3.18it/s]Elaborazione:  64%|██████▍   | 258/402 [01:19<00:45,  3.14it/s]Elaborazione:  64%|██████▍   | 259/402 [01:19<00:46,  3.09it/s]Elaborazione:  65%|██████▍   | 260/402 [01:20<00:46,  3.05it/s]Elaborazione:  65%|██████▍   | 261/402 [01:20<00:46,  3.03it/s]Elaborazione:  65%|██████▌   | 262/402 [01:20<00:45,  3.08it/s]Elaborazione:  65%|██████▌   | 263/402 [01:21<00:44,  3.12it/s]Elaborazione:  66%|██████▌   | 264/402 [01:21<00:43,  3.15it/s]Elaborazione:  66%|██████▌   | 265/402 [01:21<00:43,  3.14it/s]Elaborazione:  66%|██████▌   | 266/402 [01:22<00:43,  3.13it/s]Elaborazione:  66%|██████▋   | 267/402 [01:22<00:41,  3.23it/s]Elaborazione:  67%|██████▋   | 268/402 [01:22<00:40,  3.33it/s]Elaborazione:  67%|██████▋   | 269/402 [01:22<00:39,  3.34it/s]Elaborazione:  67%|██████▋   | 270/402 [01:23<00:38,  3.43it/s]Elaborazione:  67%|██████▋   | 271/402 [01:23<00:37,  3.48it/s]Elaborazione:  68%|██████▊   | 272/402 [01:23<00:36,  3.52it/s]Elaborazione:  68%|██████▊   | 273/402 [01:23<00:36,  3.54it/s]Elaborazione:  68%|██████▊   | 274/402 [01:24<00:35,  3.56it/s]Elaborazione:  68%|██████▊   | 275/402 [01:24<00:35,  3.57it/s]Elaborazione:  69%|██████▊   | 276/402 [01:24<00:35,  3.54it/s]Elaborazione:  69%|██████▉   | 277/402 [01:25<00:35,  3.54it/s]Elaborazione:  69%|██████▉   | 278/402 [01:25<00:34,  3.55it/s]Elaborazione:  69%|██████▉   | 279/402 [01:25<00:34,  3.53it/s]Elaborazione:  70%|██████▉   | 280/402 [01:25<00:34,  3.54it/s]Elaborazione:  70%|██████▉   | 281/402 [01:26<00:34,  3.55it/s]Elaborazione:  70%|███████   | 282/402 [01:26<00:34,  3.52it/s]Elaborazione:  70%|███████   | 283/402 [01:26<00:33,  3.51it/s]Elaborazione:  71%|███████   | 284/402 [01:27<00:34,  3.46it/s]Elaborazione:  71%|███████   | 285/402 [01:27<00:34,  3.42it/s]Elaborazione:  71%|███████   | 286/402 [01:27<00:33,  3.42it/s]Elaborazione:  71%|███████▏  | 287/402 [01:27<00:33,  3.44it/s]Elaborazione:  72%|███████▏  | 288/402 [01:28<00:32,  3.46it/s]Elaborazione:  72%|███████▏  | 289/402 [01:28<00:32,  3.50it/s]Elaborazione:  72%|███████▏  | 290/402 [01:28<00:32,  3.48it/s]Elaborazione:  72%|███████▏  | 291/402 [01:29<00:32,  3.43it/s]Elaborazione:  73%|███████▎  | 292/402 [01:29<00:31,  3.47it/s]Elaborazione:  73%|███████▎  | 293/402 [01:29<00:31,  3.46it/s]Elaborazione:  73%|███████▎  | 294/402 [01:30<00:32,  3.32it/s]Elaborazione:  73%|███████▎  | 295/402 [01:30<00:32,  3.34it/s]Elaborazione:  74%|███████▎  | 296/402 [01:30<00:31,  3.38it/s]Elaborazione:  74%|███████▍  | 297/402 [01:30<00:30,  3.45it/s]Elaborazione:  74%|███████▍  | 298/402 [01:31<00:29,  3.48it/s]Elaborazione:  74%|███████▍  | 299/402 [01:31<00:29,  3.52it/s]Elaborazione:  75%|███████▍  | 300/402 [01:31<00:28,  3.54it/s]Elaborazione:  75%|███████▍  | 301/402 [01:32<00:28,  3.54it/s]Elaborazione:  75%|███████▌  | 302/402 [01:32<00:28,  3.53it/s]Elaborazione:  75%|███████▌  | 303/402 [01:32<00:27,  3.54it/s]Elaborazione:  76%|███████▌  | 304/402 [01:32<00:27,  3.55it/s]Elaborazione:  76%|███████▌  | 305/402 [01:33<00:27,  3.50it/s]Elaborazione:  76%|███████▌  | 306/402 [01:33<00:27,  3.53it/s]Elaborazione:  76%|███████▋  | 307/402 [01:33<00:26,  3.53it/s]Elaborazione:  77%|███████▋  | 308/402 [01:34<00:26,  3.52it/s]Elaborazione:  77%|███████▋  | 309/402 [01:34<00:26,  3.53it/s]Elaborazione:  77%|███████▋  | 310/402 [01:34<00:26,  3.49it/s]Elaborazione:  77%|███████▋  | 311/402 [01:34<00:25,  3.51it/s]Elaborazione:  78%|███████▊  | 312/402 [01:35<00:25,  3.49it/s]Elaborazione:  78%|███████▊  | 313/402 [01:35<00:25,  3.51it/s]Elaborazione:  78%|███████▊  | 314/402 [01:35<00:24,  3.53it/s]Elaborazione:  78%|███████▊  | 315/402 [01:36<00:24,  3.53it/s]Elaborazione:  79%|███████▊  | 316/402 [01:36<00:24,  3.54it/s]Elaborazione:  79%|███████▉  | 317/402 [01:36<00:24,  3.46it/s]Elaborazione:  79%|███████▉  | 318/402 [01:36<00:24,  3.49it/s]Elaborazione:  79%|███████▉  | 319/402 [01:37<00:24,  3.39it/s]Elaborazione:  80%|███████▉  | 320/402 [01:37<00:23,  3.43it/s]Elaborazione:  80%|███████▉  | 321/402 [01:37<00:23,  3.44it/s]Elaborazione:  80%|████████  | 322/402 [01:38<00:22,  3.48it/s]Elaborazione:  80%|████████  | 323/402 [01:38<00:22,  3.46it/s]Elaborazione:  81%|████████  | 324/402 [01:38<00:22,  3.49it/s]Elaborazione:  81%|████████  | 325/402 [01:38<00:21,  3.50it/s]Elaborazione:  81%|████████  | 326/402 [01:39<00:21,  3.52it/s]Elaborazione:  81%|████████▏ | 327/402 [01:39<00:21,  3.54it/s]Elaborazione:  82%|████████▏ | 328/402 [01:39<00:21,  3.49it/s]Elaborazione:  82%|████████▏ | 329/402 [01:40<00:20,  3.50it/s]Elaborazione:  82%|████████▏ | 330/402 [01:40<00:20,  3.52it/s]Elaborazione:  82%|████████▏ | 331/402 [01:40<00:20,  3.54it/s]Elaborazione:  83%|████████▎ | 332/402 [01:40<00:20,  3.49it/s]Elaborazione:  83%|████████▎ | 333/402 [01:41<00:19,  3.51it/s]Elaborazione:  83%|████████▎ | 334/402 [01:41<00:19,  3.47it/s]Elaborazione:  83%|████████▎ | 335/402 [01:41<00:19,  3.50it/s]Elaborazione:  84%|████████▎ | 336/402 [01:42<00:19,  3.45it/s]Elaborazione:  84%|████████▍ | 337/402 [01:42<00:18,  3.49it/s]Elaborazione:  84%|████████▍ | 338/402 [01:42<00:18,  3.51it/s]Elaborazione:  84%|████████▍ | 339/402 [01:42<00:18,  3.49it/s]Elaborazione:  85%|████████▍ | 340/402 [01:43<00:18,  3.43it/s]Elaborazione:  85%|████████▍ | 341/402 [01:43<00:17,  3.42it/s]Elaborazione:  85%|████████▌ | 342/402 [01:43<00:17,  3.46it/s]Elaborazione:  85%|████████▌ | 343/402 [01:44<00:16,  3.49it/s]Elaborazione:  86%|████████▌ | 344/402 [01:44<00:16,  3.45it/s]Elaborazione:  86%|████████▌ | 345/402 [01:44<00:16,  3.47it/s]Elaborazione:  86%|████████▌ | 346/402 [01:44<00:16,  3.44it/s]Elaborazione:  86%|████████▋ | 347/402 [01:45<00:15,  3.48it/s]Elaborazione:  87%|████████▋ | 348/402 [01:45<00:15,  3.40it/s]Elaborazione:  87%|████████▋ | 349/402 [01:45<00:15,  3.35it/s]Elaborazione:  87%|████████▋ | 350/402 [01:46<00:15,  3.37it/s]Elaborazione:  87%|████████▋ | 351/402 [01:46<00:15,  3.38it/s]Elaborazione:  88%|████████▊ | 352/402 [01:46<00:14,  3.41it/s]Elaborazione:  88%|████████▊ | 353/402 [01:46<00:14,  3.46it/s]Elaborazione:  88%|████████▊ | 354/402 [01:47<00:13,  3.47it/s]Elaborazione:  88%|████████▊ | 355/402 [01:47<00:13,  3.49it/s]Elaborazione:  89%|████████▊ | 356/402 [01:47<00:13,  3.51it/s]Elaborazione:  89%|████████▉ | 357/402 [01:48<00:12,  3.52it/s]Elaborazione:  89%|████████▉ | 358/402 [01:48<00:12,  3.52it/s]Elaborazione:  89%|████████▉ | 359/402 [01:48<00:12,  3.43it/s]Elaborazione:  90%|████████▉ | 360/402 [01:48<00:12,  3.47it/s]Elaborazione:  90%|████████▉ | 361/402 [01:49<00:11,  3.50it/s]Elaborazione:  90%|█████████ | 362/402 [01:49<00:11,  3.43it/s]Elaborazione:  90%|█████████ | 363/402 [01:49<00:11,  3.46it/s]Elaborazione:  91%|█████████ | 364/402 [01:50<00:11,  3.44it/s]Elaborazione:  91%|█████████ | 365/402 [01:50<00:10,  3.43it/s]Elaborazione:  91%|█████████ | 366/402 [01:50<00:10,  3.47it/s]Elaborazione:  91%|█████████▏| 367/402 [01:51<00:10,  3.47it/s]Elaborazione:  92%|█████████▏| 368/402 [01:51<00:09,  3.44it/s]Elaborazione:  92%|█████████▏| 369/402 [01:51<00:09,  3.50it/s]Elaborazione:  92%|█████████▏| 370/402 [01:51<00:09,  3.51it/s]Elaborazione:  92%|█████████▏| 371/402 [01:52<00:08,  3.56it/s]Elaborazione:  93%|█████████▎| 372/402 [01:52<00:08,  3.54it/s]Elaborazione:  93%|█████████▎| 373/402 [01:52<00:08,  3.56it/s]Elaborazione:  93%|█████████▎| 374/402 [01:52<00:07,  3.53it/s]Elaborazione:  93%|█████████▎| 375/402 [01:53<00:07,  3.54it/s]Elaborazione:  94%|█████████▎| 376/402 [01:53<00:07,  3.54it/s]Elaborazione:  94%|█████████▍| 377/402 [01:53<00:07,  3.57it/s]Elaborazione:  94%|█████████▍| 378/402 [01:54<00:06,  3.58it/s]Elaborazione:  94%|█████████▍| 379/402 [01:54<00:06,  3.51it/s]Elaborazione:  95%|█████████▍| 380/402 [01:54<00:06,  3.52it/s]Elaborazione:  95%|█████████▍| 381/402 [01:54<00:05,  3.52it/s]Elaborazione:  95%|█████████▌| 382/402 [01:55<00:05,  3.44it/s]Elaborazione:  95%|█████████▌| 383/402 [01:55<00:05,  3.32it/s]Elaborazione:  96%|█████████▌| 384/402 [01:55<00:05,  3.32it/s]Elaborazione:  96%|█████████▌| 385/402 [01:56<00:05,  3.38it/s]Elaborazione:  96%|█████████▌| 386/402 [01:56<00:04,  3.26it/s]Elaborazione:  96%|█████████▋| 387/402 [01:56<00:04,  3.35it/s]Elaborazione:  97%|█████████▋| 388/402 [01:57<00:04,  3.43it/s]Elaborazione:  97%|█████████▋| 389/402 [01:57<00:03,  3.39it/s]Elaborazione:  97%|█████████▋| 390/402 [01:57<00:03,  3.41it/s]Elaborazione:  97%|█████████▋| 391/402 [01:57<00:03,  3.47it/s]Elaborazione:  98%|█████████▊| 392/402 [01:58<00:02,  3.52it/s]Elaborazione:  98%|█████████▊| 393/402 [01:58<00:02,  3.50it/s]Elaborazione:  98%|█████████▊| 394/402 [01:58<00:02,  3.48it/s]Elaborazione:  98%|█████████▊| 395/402 [01:59<00:01,  3.51it/s]Elaborazione:  99%|█████████▊| 396/402 [01:59<00:01,  3.55it/s]Elaborazione:  99%|█████████▉| 397/402 [01:59<00:01,  3.57it/s]Elaborazione:  99%|█████████▉| 398/402 [01:59<00:01,  3.58it/s]Elaborazione:  99%|█████████▉| 399/402 [02:00<00:00,  3.60it/s]Elaborazione: 100%|█████████▉| 400/402 [02:00<00:00,  3.58it/s]Elaborazione: 100%|█████████▉| 401/402 [02:00<00:00,  3.60it/s]Elaborazione: 100%|██████████| 402/402 [02:01<00:00,  3.56it/s]Elaborazione: 100%|██████████| 402/402 [02:01<00:00,  3.32it/s]
+Elaborazione:   0%|          | 1/402 [00:00<03:51,  1.73it/s]Elaborazione:   0%|          | 2/402 [00:01<03:20,  1.99it/s]Elaborazione:   1%|          | 3/402 [00:01<03:11,  2.08it/s]Elaborazione:   1%|          | 4/402 [00:01<03:09,  2.10it/s]Elaborazione:   1%|          | 5/402 [00:02<03:05,  2.14it/s]Elaborazione:   1%|▏         | 6/402 [00:02<03:04,  2.15it/s]Elaborazione:   2%|▏         | 7/402 [00:03<03:02,  2.16it/s]Elaborazione:   2%|▏         | 8/402 [00:03<03:00,  2.18it/s]Elaborazione:   2%|▏         | 9/402 [00:04<02:59,  2.19it/s]Elaborazione:   2%|▏         | 10/402 [00:04<02:57,  2.20it/s]Elaborazione:   3%|▎         | 11/402 [00:05<02:56,  2.21it/s]Elaborazione:   3%|▎         | 12/402 [00:05<02:56,  2.21it/s]Elaborazione:   3%|▎         | 13/402 [00:06<02:55,  2.22it/s]Elaborazione:   3%|▎         | 14/402 [00:06<02:58,  2.17it/s]Elaborazione:   4%|▎         | 15/402 [00:06<02:56,  2.19it/s]Elaborazione:   4%|▍         | 16/402 [00:07<02:55,  2.20it/s]Elaborazione:   4%|▍         | 17/402 [00:07<02:55,  2.20it/s]Elaborazione:   4%|▍         | 18/402 [00:08<02:55,  2.19it/s]Elaborazione:   5%|▍         | 19/402 [00:08<02:54,  2.20it/s]Elaborazione:   5%|▍         | 20/402 [00:09<02:53,  2.21it/s]Elaborazione:   5%|▌         | 21/402 [00:09<02:52,  2.21it/s]Elaborazione:   5%|▌         | 22/402 [00:10<02:51,  2.21it/s]Elaborazione:   6%|▌         | 23/402 [00:10<02:52,  2.19it/s]Elaborazione:   6%|▌         | 24/402 [00:11<02:52,  2.20it/s]Elaborazione:   6%|▌         | 25/402 [00:11<02:51,  2.20it/s]Elaborazione:   6%|▋         | 26/402 [00:11<02:50,  2.20it/s]Elaborazione:   7%|▋         | 27/402 [00:12<02:49,  2.21it/s]Elaborazione:   7%|▋         | 28/402 [00:12<02:49,  2.21it/s]Elaborazione:   7%|▋         | 29/402 [00:13<02:49,  2.20it/s]Elaborazione:   7%|▋         | 30/402 [00:13<02:48,  2.21it/s]Elaborazione:   8%|▊         | 31/402 [00:14<02:48,  2.20it/s]Elaborazione:   8%|▊         | 32/402 [00:14<02:49,  2.19it/s]Elaborazione:   8%|▊         | 33/402 [00:15<02:48,  2.19it/s]Elaborazione:   8%|▊         | 34/402 [00:15<02:47,  2.20it/s]Elaborazione:   9%|▊         | 35/402 [00:16<02:47,  2.19it/s]Elaborazione:   9%|▉         | 36/402 [00:16<02:46,  2.20it/s]Elaborazione:   9%|▉         | 37/402 [00:16<02:46,  2.19it/s]Elaborazione:   9%|▉         | 38/402 [00:17<02:46,  2.19it/s]Elaborazione:  10%|▉         | 39/402 [00:17<02:46,  2.19it/s]Elaborazione:  10%|▉         | 40/402 [00:18<02:45,  2.18it/s]Elaborazione:  10%|█         | 41/402 [00:18<02:45,  2.18it/s]Elaborazione:  10%|█         | 42/402 [00:19<02:43,  2.20it/s]Elaborazione:  11%|█         | 43/402 [00:19<02:42,  2.20it/s]Elaborazione:  11%|█         | 44/402 [00:20<02:42,  2.20it/s]Elaborazione:  11%|█         | 45/402 [00:20<02:42,  2.19it/s]Elaborazione:  11%|█▏        | 46/402 [00:21<02:42,  2.20it/s]Elaborazione:  12%|█▏        | 47/402 [00:21<02:41,  2.20it/s]Elaborazione:  12%|█▏        | 48/402 [00:21<02:43,  2.17it/s]Elaborazione:  12%|█▏        | 49/402 [00:22<02:41,  2.18it/s]Elaborazione:  12%|█▏        | 50/402 [00:22<02:41,  2.18it/s]Elaborazione:  13%|█▎        | 51/402 [00:23<02:40,  2.19it/s]Elaborazione:  13%|█▎        | 52/402 [00:23<02:40,  2.18it/s]Elaborazione:  13%|█▎        | 53/402 [00:24<02:39,  2.19it/s]Elaborazione:  13%|█▎        | 54/402 [00:24<02:41,  2.16it/s]Elaborazione:  14%|█▎        | 55/402 [00:25<02:40,  2.17it/s]Elaborazione:  14%|█▍        | 56/402 [00:25<02:42,  2.12it/s]Elaborazione:  14%|█▍        | 57/402 [00:26<02:41,  2.14it/s]Elaborazione:  14%|█▍        | 58/402 [00:26<02:39,  2.16it/s]Elaborazione:  15%|█▍        | 59/402 [00:27<02:37,  2.18it/s]Elaborazione:  15%|█▍        | 60/402 [00:27<02:35,  2.20it/s]Elaborazione:  15%|█▌        | 61/402 [00:27<02:35,  2.19it/s]Elaborazione:  15%|█▌        | 62/402 [00:28<02:34,  2.20it/s]Elaborazione:  16%|█▌        | 63/402 [00:28<02:33,  2.21it/s]Elaborazione:  16%|█▌        | 64/402 [00:29<02:33,  2.21it/s]Elaborazione:  16%|█▌        | 65/402 [00:29<02:33,  2.19it/s]Elaborazione:  16%|█▋        | 66/402 [00:30<02:33,  2.19it/s]Elaborazione:  17%|█▋        | 67/402 [00:30<02:35,  2.16it/s]Elaborazione:  17%|█▋        | 68/402 [00:31<02:34,  2.16it/s]Elaborazione:  17%|█▋        | 69/402 [00:31<02:32,  2.18it/s]Elaborazione:  17%|█▋        | 70/402 [00:32<02:32,  2.18it/s]Elaborazione:  18%|█▊        | 71/402 [00:32<02:30,  2.19it/s]Elaborazione:  18%|█▊        | 72/402 [00:32<02:29,  2.20it/s]Elaborazione:  18%|█▊        | 73/402 [00:33<02:28,  2.21it/s]Elaborazione:  18%|█▊        | 74/402 [00:33<02:27,  2.22it/s]Elaborazione:  19%|█▊        | 75/402 [00:34<02:28,  2.20it/s]Elaborazione:  19%|█▉        | 76/402 [00:34<02:27,  2.21it/s]Elaborazione:  19%|█▉        | 77/402 [00:35<02:26,  2.21it/s]Elaborazione:  19%|█▉        | 78/402 [00:35<02:25,  2.22it/s]Elaborazione:  20%|█▉        | 79/402 [00:36<02:24,  2.23it/s]Elaborazione:  20%|█▉        | 80/402 [00:36<02:25,  2.21it/s]Elaborazione:  20%|██        | 81/402 [00:37<02:24,  2.22it/s]Elaborazione:  20%|██        | 82/402 [00:37<02:25,  2.21it/s]Elaborazione:  21%|██        | 83/402 [00:37<02:24,  2.21it/s]Elaborazione:  21%|██        | 84/402 [00:38<02:24,  2.20it/s]Elaborazione:  21%|██        | 85/402 [00:38<02:23,  2.21it/s]Elaborazione:  21%|██▏       | 86/402 [00:39<02:22,  2.22it/s]Elaborazione:  22%|██▏       | 87/402 [00:39<02:21,  2.22it/s]Elaborazione:  22%|██▏       | 88/402 [00:40<02:20,  2.23it/s]Elaborazione:  22%|██▏       | 89/402 [00:40<02:20,  2.23it/s]Elaborazione:  22%|██▏       | 90/402 [00:41<02:19,  2.23it/s]Elaborazione:  23%|██▎       | 91/402 [00:41<02:19,  2.23it/s]Elaborazione:  23%|██▎       | 92/402 [00:41<02:18,  2.24it/s]Elaborazione:  23%|██▎       | 93/402 [00:42<02:18,  2.24it/s]Elaborazione:  23%|██▎       | 94/402 [00:42<02:17,  2.24it/s]Elaborazione:  24%|██▎       | 95/402 [00:43<02:17,  2.24it/s]Elaborazione:  24%|██▍       | 96/402 [00:43<02:16,  2.24it/s]Elaborazione:  24%|██▍       | 97/402 [00:44<02:16,  2.24it/s]Elaborazione:  24%|██▍       | 98/402 [00:44<02:17,  2.21it/s]Elaborazione:  25%|██▍       | 99/402 [00:45<02:16,  2.22it/s]Elaborazione:  25%|██▍       | 100/402 [00:45<02:15,  2.23it/s]Elaborazione:  25%|██▌       | 101/402 [00:46<02:14,  2.23it/s]Elaborazione:  25%|██▌       | 102/402 [00:46<02:15,  2.22it/s]Elaborazione:  26%|██▌       | 103/402 [00:46<02:16,  2.20it/s]Elaborazione:  26%|██▌       | 104/402 [00:47<02:15,  2.20it/s]Elaborazione:  26%|██▌       | 105/402 [00:47<02:15,  2.18it/s]Elaborazione:  26%|██▋       | 106/402 [00:48<02:14,  2.20it/s]Elaborazione:  27%|██▋       | 107/402 [00:48<02:13,  2.20it/s]Elaborazione:  27%|██▋       | 108/402 [00:49<02:12,  2.21it/s]Elaborazione:  27%|██▋       | 109/402 [00:49<02:12,  2.20it/s]Elaborazione:  27%|██▋       | 110/402 [00:50<02:13,  2.18it/s]Elaborazione:  28%|██▊       | 111/402 [00:50<02:12,  2.20it/s]Elaborazione:  28%|██▊       | 112/402 [00:51<02:11,  2.20it/s]Elaborazione:  28%|██▊       | 113/402 [00:51<02:12,  2.18it/s]Elaborazione:  28%|██▊       | 114/402 [00:51<02:12,  2.18it/s]Elaborazione:  29%|██▊       | 115/402 [00:52<02:08,  2.23it/s]Elaborazione:  29%|██▉       | 116/402 [00:52<02:05,  2.29it/s]Elaborazione:  29%|██▉       | 117/402 [00:53<02:02,  2.33it/s]Elaborazione:  29%|██▉       | 118/402 [00:53<01:59,  2.37it/s]Elaborazione:  30%|██▉       | 119/402 [00:54<01:58,  2.40it/s]Elaborazione:  30%|██▉       | 120/402 [00:54<01:58,  2.38it/s]Elaborazione:  30%|███       | 121/402 [00:54<01:57,  2.38it/s]Elaborazione:  30%|███       | 122/402 [00:55<01:56,  2.40it/s]Elaborazione:  31%|███       | 123/402 [00:55<01:55,  2.41it/s]Elaborazione:  31%|███       | 124/402 [00:56<01:58,  2.35it/s]Elaborazione:  31%|███       | 125/402 [00:56<01:57,  2.36it/s]Elaborazione:  31%|███▏      | 126/402 [00:56<01:55,  2.39it/s]Elaborazione:  32%|███▏      | 127/402 [00:57<01:56,  2.36it/s]Elaborazione:  32%|███▏      | 128/402 [00:57<01:56,  2.36it/s]Elaborazione:  32%|███▏      | 129/402 [00:58<01:55,  2.36it/s]Elaborazione:  32%|███▏      | 130/402 [00:58<01:53,  2.39it/s]Elaborazione:  33%|███▎      | 131/402 [00:59<01:53,  2.39it/s]Elaborazione:  33%|███▎      | 132/402 [00:59<01:52,  2.41it/s]Elaborazione:  33%|███▎      | 133/402 [00:59<01:52,  2.40it/s]Elaborazione:  33%|███▎      | 134/402 [01:00<01:51,  2.40it/s]Elaborazione:  34%|███▎      | 135/402 [01:00<01:50,  2.41it/s]Elaborazione:  34%|███▍      | 136/402 [01:01<01:50,  2.41it/s]Elaborazione:  34%|███▍      | 137/402 [01:01<01:49,  2.43it/s]Elaborazione:  34%|███▍      | 138/402 [01:01<01:48,  2.44it/s]Elaborazione:  35%|███▍      | 139/402 [01:02<01:49,  2.41it/s]Elaborazione:  35%|███▍      | 140/402 [01:02<01:49,  2.40it/s]Elaborazione:  35%|███▌      | 141/402 [01:03<01:48,  2.41it/s]Elaborazione:  35%|███▌      | 142/402 [01:03<01:47,  2.43it/s]Elaborazione:  36%|███▌      | 143/402 [01:04<01:46,  2.44it/s]Elaborazione:  36%|███▌      | 144/402 [01:04<01:45,  2.45it/s]Elaborazione:  36%|███▌      | 145/402 [01:04<01:45,  2.43it/s]Elaborazione:  36%|███▋      | 146/402 [01:05<01:44,  2.44it/s]Elaborazione:  37%|███▋      | 147/402 [01:05<01:44,  2.44it/s]Elaborazione:  37%|███▋      | 148/402 [01:06<01:44,  2.42it/s]Elaborazione:  37%|███▋      | 149/402 [01:06<01:43,  2.44it/s]Elaborazione:  37%|███▋      | 150/402 [01:06<01:43,  2.44it/s]Elaborazione:  38%|███▊      | 151/402 [01:07<01:42,  2.45it/s]Elaborazione:  38%|███▊      | 152/402 [01:07<01:41,  2.46it/s]Elaborazione:  38%|███▊      | 153/402 [01:08<01:44,  2.39it/s]Elaborazione:  38%|███▊      | 154/402 [01:08<01:46,  2.34it/s]Elaborazione:  39%|███▊      | 155/402 [01:09<01:47,  2.30it/s]Elaborazione:  39%|███▉      | 156/402 [01:09<01:47,  2.29it/s]Elaborazione:  39%|███▉      | 157/402 [01:09<01:47,  2.27it/s]Elaborazione:  39%|███▉      | 158/402 [01:10<01:47,  2.26it/s]Elaborazione:  40%|███▉      | 159/402 [01:10<01:47,  2.26it/s]Elaborazione:  40%|███▉      | 160/402 [01:11<01:51,  2.17it/s]Elaborazione:  40%|████      | 161/402 [01:11<01:50,  2.19it/s]Elaborazione:  40%|████      | 162/402 [01:12<01:48,  2.21it/s]Elaborazione:  41%|████      | 163/402 [01:12<01:48,  2.20it/s]Elaborazione:  41%|████      | 164/402 [01:13<01:48,  2.20it/s]Elaborazione:  41%|████      | 165/402 [01:13<01:47,  2.20it/s]Elaborazione:  41%|████▏     | 166/402 [01:14<01:46,  2.21it/s]Elaborazione:  42%|████▏     | 167/402 [01:14<01:46,  2.21it/s]Elaborazione:  42%|████▏     | 168/402 [01:14<01:45,  2.22it/s]Elaborazione:  42%|████▏     | 169/402 [01:15<01:44,  2.23it/s]Elaborazione:  42%|████▏     | 170/402 [01:15<01:44,  2.22it/s]Elaborazione:  43%|████▎     | 171/402 [01:16<01:44,  2.21it/s]Elaborazione:  43%|████▎     | 172/402 [01:16<01:43,  2.22it/s]Elaborazione:  43%|████▎     | 173/402 [01:17<01:43,  2.22it/s]Elaborazione:  43%|████▎     | 174/402 [01:17<01:42,  2.22it/s]Elaborazione:  44%|████▎     | 175/402 [01:18<01:42,  2.20it/s]Elaborazione:  44%|████▍     | 176/402 [01:18<01:42,  2.21it/s]Elaborazione:  44%|████▍     | 177/402 [01:19<01:41,  2.21it/s]Elaborazione:  44%|████▍     | 178/402 [01:19<01:41,  2.22it/s]Elaborazione:  45%|████▍     | 179/402 [01:19<01:41,  2.19it/s]Elaborazione:  45%|████▍     | 180/402 [01:20<01:41,  2.18it/s]Elaborazione:  45%|████▌     | 181/402 [01:20<01:41,  2.18it/s]Elaborazione:  45%|████▌     | 182/402 [01:21<01:42,  2.15it/s]Elaborazione:  46%|████▌     | 183/402 [01:21<01:40,  2.17it/s]Elaborazione:  46%|████▌     | 184/402 [01:22<01:41,  2.15it/s]Elaborazione:  46%|████▌     | 185/402 [01:22<01:41,  2.13it/s]Elaborazione:  46%|████▋     | 186/402 [01:23<01:40,  2.14it/s]Elaborazione:  47%|████▋     | 187/402 [01:23<01:40,  2.14it/s]Elaborazione:  47%|████▋     | 188/402 [01:24<01:39,  2.15it/s]Elaborazione:  47%|████▋     | 189/402 [01:24<01:38,  2.16it/s]Elaborazione:  47%|████▋     | 190/402 [01:25<01:37,  2.16it/s]Elaborazione:  48%|████▊     | 191/402 [01:25<01:36,  2.18it/s]Elaborazione:  48%|████▊     | 192/402 [01:25<01:38,  2.14it/s]Elaborazione:  48%|████▊     | 193/402 [01:26<01:37,  2.15it/s]Elaborazione:  48%|████▊     | 194/402 [01:26<01:36,  2.16it/s]Elaborazione:  49%|████▊     | 195/402 [01:27<01:35,  2.17it/s]Elaborazione:  49%|████▉     | 196/402 [01:27<01:36,  2.15it/s]Elaborazione:  49%|████▉     | 197/402 [01:28<01:34,  2.17it/s]Elaborazione:  49%|████▉     | 198/402 [01:28<01:33,  2.18it/s]Elaborazione:  50%|████▉     | 199/402 [01:29<01:33,  2.18it/s]Elaborazione:  50%|████▉     | 200/402 [01:29<01:32,  2.18it/s]Elaborazione:  50%|█████     | 201/402 [01:30<01:32,  2.18it/s]Elaborazione:  50%|█████     | 202/402 [01:30<01:31,  2.18it/s]Elaborazione:  50%|█████     | 203/402 [01:31<01:31,  2.16it/s]Elaborazione:  51%|█████     | 204/402 [01:31<01:30,  2.18it/s]Elaborazione:  51%|█████     | 205/402 [01:31<01:29,  2.19it/s]Elaborazione:  51%|█████     | 206/402 [01:32<01:29,  2.20it/s]Elaborazione:  51%|█████▏    | 207/402 [01:32<01:28,  2.21it/s]Elaborazione:  52%|█████▏    | 208/402 [01:33<01:27,  2.21it/s]Elaborazione:  52%|█████▏    | 209/402 [01:33<01:26,  2.22it/s]Elaborazione:  52%|█████▏    | 210/402 [01:34<01:26,  2.22it/s]Elaborazione:  52%|█████▏    | 211/402 [01:34<01:25,  2.23it/s]Elaborazione:  53%|█████▎    | 212/402 [01:35<01:25,  2.23it/s]Elaborazione:  53%|█████▎    | 213/402 [01:35<01:24,  2.22it/s]Elaborazione:  53%|█████▎    | 214/402 [01:35<01:24,  2.23it/s]Elaborazione:  53%|█████▎    | 215/402 [01:36<01:24,  2.21it/s]Elaborazione:  54%|█████▎    | 216/402 [01:36<01:23,  2.22it/s]Elaborazione:  54%|█████▍    | 217/402 [01:37<01:24,  2.18it/s]Elaborazione:  54%|█████▍    | 218/402 [01:37<01:24,  2.18it/s]Elaborazione:  54%|█████▍    | 219/402 [01:38<01:23,  2.19it/s]Elaborazione:  55%|█████▍    | 220/402 [01:38<01:23,  2.18it/s]Elaborazione:  55%|█████▍    | 221/402 [01:39<01:23,  2.17it/s]Elaborazione:  55%|█████▌    | 222/402 [01:39<01:22,  2.19it/s]Elaborazione:  55%|█████▌    | 223/402 [01:40<01:21,  2.19it/s]Elaborazione:  56%|█████▌    | 224/402 [01:40<01:21,  2.20it/s]Elaborazione:  56%|█████▌    | 225/402 [01:41<01:20,  2.19it/s]Elaborazione:  56%|█████▌    | 226/402 [01:41<01:19,  2.20it/s]Elaborazione:  56%|█████▋    | 227/402 [01:41<01:19,  2.20it/s]Elaborazione:  57%|█████▋    | 228/402 [01:42<01:20,  2.17it/s]Elaborazione:  57%|█████▋    | 229/402 [01:42<01:20,  2.15it/s]Elaborazione:  57%|█████▋    | 230/402 [01:43<01:20,  2.15it/s]Elaborazione:  57%|█████▋    | 231/402 [01:43<01:20,  2.12it/s]Elaborazione:  58%|█████▊    | 232/402 [01:44<01:20,  2.12it/s]Elaborazione:  58%|█████▊    | 233/402 [01:44<01:20,  2.11it/s]Elaborazione:  58%|█████▊    | 234/402 [01:45<01:19,  2.11it/s]Elaborazione:  58%|█████▊    | 235/402 [01:45<01:19,  2.10it/s]Elaborazione:  59%|█████▊    | 236/402 [01:46<01:18,  2.11it/s]Elaborazione:  59%|█████▉    | 237/402 [01:46<01:19,  2.09it/s]Elaborazione:  59%|█████▉    | 238/402 [01:47<01:18,  2.09it/s]Elaborazione:  59%|█████▉    | 239/402 [01:47<01:18,  2.09it/s]Elaborazione:  60%|█████▉    | 240/402 [01:48<01:17,  2.08it/s]Elaborazione:  60%|█████▉    | 241/402 [01:48<01:17,  2.09it/s]Elaborazione:  60%|██████    | 242/402 [01:49<01:16,  2.09it/s]Elaborazione:  60%|██████    | 243/402 [01:49<01:15,  2.10it/s]Elaborazione:  61%|██████    | 244/402 [01:50<01:15,  2.10it/s]Elaborazione:  61%|██████    | 245/402 [01:50<01:14,  2.10it/s]Elaborazione:  61%|██████    | 246/402 [01:50<01:14,  2.11it/s]Elaborazione:  61%|██████▏   | 247/402 [01:51<01:13,  2.11it/s]Elaborazione:  62%|██████▏   | 248/402 [01:51<01:13,  2.10it/s]Elaborazione:  62%|██████▏   | 249/402 [01:52<01:13,  2.09it/s]Elaborazione:  62%|██████▏   | 250/402 [01:52<01:12,  2.10it/s]Elaborazione:  62%|██████▏   | 251/402 [01:53<01:11,  2.11it/s]Elaborazione:  63%|██████▎   | 252/402 [01:53<01:11,  2.11it/s]Elaborazione:  63%|██████▎   | 253/402 [01:54<01:12,  2.05it/s]Elaborazione:  63%|██████▎   | 254/402 [01:54<01:12,  2.05it/s]Elaborazione:  63%|██████▎   | 255/402 [01:55<01:11,  2.06it/s]Elaborazione:  64%|██████▎   | 256/402 [01:55<01:10,  2.08it/s]Elaborazione:  64%|██████▍   | 257/402 [01:56<01:09,  2.09it/s]Elaborazione:  64%|██████▍   | 258/402 [01:56<01:09,  2.08it/s]Elaborazione:  64%|██████▍   | 259/402 [01:57<01:09,  2.07it/s]Elaborazione:  65%|██████▍   | 260/402 [01:57<01:09,  2.06it/s]Elaborazione:  65%|██████▍   | 261/402 [01:58<01:08,  2.06it/s]Elaborazione:  65%|██████▌   | 262/402 [01:58<01:09,  2.03it/s]Elaborazione:  65%|██████▌   | 263/402 [01:59<01:07,  2.05it/s]Elaborazione:  66%|██████▌   | 264/402 [01:59<01:07,  2.05it/s]Elaborazione:  66%|██████▌   | 265/402 [02:00<01:06,  2.07it/s]Elaborazione:  66%|██████▌   | 266/402 [02:00<01:05,  2.07it/s]Elaborazione:  66%|██████▋   | 267/402 [02:01<01:02,  2.15it/s]Elaborazione:  67%|██████▋   | 268/402 [02:01<01:00,  2.20it/s]Elaborazione:  67%|██████▋   | 269/402 [02:01<00:59,  2.24it/s]Elaborazione:  67%|██████▋   | 270/402 [02:02<00:58,  2.26it/s]Elaborazione:  67%|██████▋   | 271/402 [02:02<00:57,  2.28it/s]Elaborazione:  68%|██████▊   | 272/402 [02:03<00:56,  2.28it/s]Elaborazione:  68%|██████▊   | 273/402 [02:03<00:56,  2.30it/s]Elaborazione:  68%|██████▊   | 274/402 [02:04<00:55,  2.31it/s]Elaborazione:  68%|██████▊   | 275/402 [02:04<00:54,  2.32it/s]Elaborazione:  69%|██████▊   | 276/402 [02:04<00:54,  2.33it/s]Elaborazione:  69%|██████▉   | 277/402 [02:05<00:53,  2.33it/s]Elaborazione:  69%|██████▉   | 278/402 [02:05<00:53,  2.31it/s]Elaborazione:  69%|██████▉   | 279/402 [02:06<00:52,  2.32it/s]Elaborazione:  70%|██████▉   | 280/402 [02:06<00:52,  2.32it/s]Elaborazione:  70%|██████▉   | 281/402 [02:07<00:51,  2.33it/s]Elaborazione:  70%|███████   | 282/402 [02:07<00:51,  2.33it/s]Elaborazione:  70%|███████   | 283/402 [02:07<00:51,  2.32it/s]Elaborazione:  71%|███████   | 284/402 [02:08<00:50,  2.33it/s]Elaborazione:  71%|███████   | 285/402 [02:08<00:50,  2.31it/s]Elaborazione:  71%|███████   | 286/402 [02:09<00:50,  2.31it/s]Elaborazione:  71%|███████▏  | 287/402 [02:09<00:49,  2.33it/s]Elaborazione:  72%|███████▏  | 288/402 [02:10<00:48,  2.34it/s]Elaborazione:  72%|███████▏  | 289/402 [02:10<00:48,  2.34it/s]Elaborazione:  72%|███████▏  | 290/402 [02:10<00:47,  2.34it/s]Elaborazione:  72%|███████▏  | 291/402 [02:11<00:47,  2.34it/s]Elaborazione:  73%|███████▎  | 292/402 [02:11<00:46,  2.34it/s]Elaborazione:  73%|███████▎  | 293/402 [02:12<00:46,  2.34it/s]Elaborazione:  73%|███████▎  | 294/402 [02:12<00:46,  2.34it/s]Elaborazione:  73%|███████▎  | 295/402 [02:13<00:45,  2.34it/s]Elaborazione:  74%|███████▎  | 296/402 [02:13<00:45,  2.34it/s]Elaborazione:  74%|███████▍  | 297/402 [02:13<00:44,  2.34it/s]Elaborazione:  74%|███████▍  | 298/402 [02:14<00:44,  2.34it/s]Elaborazione:  74%|███████▍  | 299/402 [02:14<00:43,  2.34it/s]Elaborazione:  75%|███████▍  | 300/402 [02:15<00:43,  2.32it/s]Elaborazione:  75%|███████▍  | 301/402 [02:15<00:43,  2.32it/s]Elaborazione:  75%|███████▌  | 302/402 [02:16<00:43,  2.29it/s]Elaborazione:  75%|███████▌  | 303/402 [02:16<00:43,  2.30it/s]Elaborazione:  76%|███████▌  | 304/402 [02:16<00:42,  2.30it/s]Elaborazione:  76%|███████▌  | 305/402 [02:17<00:42,  2.30it/s]Elaborazione:  76%|███████▌  | 306/402 [02:17<00:41,  2.29it/s]Elaborazione:  76%|███████▋  | 307/402 [02:18<00:41,  2.30it/s]Elaborazione:  77%|███████▋  | 308/402 [02:18<00:40,  2.30it/s]Elaborazione:  77%|███████▋  | 309/402 [02:19<00:40,  2.31it/s]Elaborazione:  77%|███████▋  | 310/402 [02:19<00:39,  2.31it/s]Elaborazione:  77%|███████▋  | 311/402 [02:19<00:39,  2.32it/s]Elaborazione:  78%|███████▊  | 312/402 [02:20<00:39,  2.27it/s]Elaborazione:  78%|███████▊  | 313/402 [02:20<00:38,  2.28it/s]Elaborazione:  78%|███████▊  | 314/402 [02:21<00:38,  2.29it/s]Elaborazione:  78%|███████▊  | 315/402 [02:21<00:38,  2.27it/s]Elaborazione:  79%|███████▊  | 316/402 [02:22<00:38,  2.22it/s]Elaborazione:  79%|███████▉  | 317/402 [02:22<00:37,  2.24it/s]Elaborazione:  79%|███████▉  | 318/402 [02:23<00:37,  2.22it/s]Elaborazione:  79%|███████▉  | 319/402 [02:23<00:37,  2.23it/s]Elaborazione:  80%|███████▉  | 320/402 [02:24<00:36,  2.24it/s]Elaborazione:  80%|███████▉  | 321/402 [02:24<00:35,  2.25it/s]Elaborazione:  80%|████████  | 322/402 [02:24<00:35,  2.28it/s]Elaborazione:  80%|████████  | 323/402 [02:25<00:35,  2.23it/s]Elaborazione:  81%|████████  | 324/402 [02:25<00:35,  2.17it/s]Elaborazione:  81%|████████  | 325/402 [02:26<00:34,  2.21it/s]Elaborazione:  81%|████████  | 326/402 [02:26<00:33,  2.25it/s]Elaborazione:  81%|████████▏ | 327/402 [02:27<00:33,  2.26it/s]Elaborazione:  82%|████████▏ | 328/402 [02:27<00:32,  2.27it/s]Elaborazione:  82%|████████▏ | 329/402 [02:28<00:31,  2.29it/s]Elaborazione:  82%|████████▏ | 330/402 [02:28<00:31,  2.27it/s]Elaborazione:  82%|████████▏ | 331/402 [02:28<00:31,  2.29it/s]Elaborazione:  83%|████████▎ | 332/402 [02:29<00:30,  2.28it/s]Elaborazione:  83%|████████▎ | 333/402 [02:29<00:30,  2.30it/s]Elaborazione:  83%|████████▎ | 334/402 [02:30<00:30,  2.24it/s]Elaborazione:  83%|████████▎ | 335/402 [02:30<00:29,  2.26it/s]Elaborazione:  84%|████████▎ | 336/402 [02:31<00:28,  2.28it/s]Elaborazione:  84%|████████▍ | 337/402 [02:31<00:28,  2.29it/s]Elaborazione:  84%|████████▍ | 338/402 [02:31<00:27,  2.30it/s]Elaborazione:  84%|████████▍ | 339/402 [02:32<00:27,  2.30it/s]Elaborazione:  85%|████████▍ | 340/402 [02:32<00:26,  2.31it/s]Elaborazione:  85%|████████▍ | 341/402 [02:33<00:26,  2.31it/s]Elaborazione:  85%|████████▌ | 342/402 [02:33<00:25,  2.32it/s]Elaborazione:  85%|████████▌ | 343/402 [02:34<00:25,  2.32it/s]Elaborazione:  86%|████████▌ | 344/402 [02:34<00:24,  2.32it/s]Elaborazione:  86%|████████▌ | 345/402 [02:34<00:24,  2.32it/s]Elaborazione:  86%|████████▌ | 346/402 [02:35<00:24,  2.32it/s]Elaborazione:  86%|████████▋ | 347/402 [02:35<00:23,  2.33it/s]Elaborazione:  87%|████████▋ | 348/402 [02:36<00:23,  2.33it/s]Elaborazione:  87%|████████▋ | 349/402 [02:36<00:22,  2.32it/s]Elaborazione:  87%|████████▋ | 350/402 [02:37<00:22,  2.33it/s]Elaborazione:  87%|████████▋ | 351/402 [02:37<00:22,  2.31it/s]Elaborazione:  88%|████████▊ | 352/402 [02:37<00:21,  2.32it/s]Elaborazione:  88%|████████▊ | 353/402 [02:38<00:21,  2.32it/s]Elaborazione:  88%|████████▊ | 354/402 [02:38<00:20,  2.32it/s]Elaborazione:  88%|████████▊ | 355/402 [02:39<00:20,  2.32it/s]Elaborazione:  89%|████████▊ | 356/402 [02:39<00:19,  2.32it/s]Elaborazione:  89%|████████▉ | 357/402 [02:40<00:19,  2.31it/s]Elaborazione:  89%|████████▉ | 358/402 [02:40<00:19,  2.31it/s]Elaborazione:  89%|████████▉ | 359/402 [02:41<00:18,  2.30it/s]Elaborazione:  90%|████████▉ | 360/402 [02:41<00:18,  2.31it/s]Elaborazione:  90%|████████▉ | 361/402 [02:41<00:17,  2.31it/s]Elaborazione:  90%|█████████ | 362/402 [02:42<00:17,  2.30it/s]Elaborazione:  90%|█████████ | 363/402 [02:42<00:16,  2.31it/s]Elaborazione:  91%|█████████ | 364/402 [02:43<00:16,  2.32it/s]Elaborazione:  91%|█████████ | 365/402 [02:43<00:15,  2.32it/s]Elaborazione:  91%|█████████ | 366/402 [02:44<00:15,  2.30it/s]Elaborazione:  91%|█████████▏| 367/402 [02:44<00:15,  2.31it/s]Elaborazione:  92%|█████████▏| 368/402 [02:44<00:14,  2.31it/s]Elaborazione:  92%|█████████▏| 369/402 [02:45<00:14,  2.33it/s]Elaborazione:  92%|█████████▏| 370/402 [02:45<00:13,  2.33it/s]Elaborazione:  92%|█████████▏| 371/402 [02:46<00:13,  2.33it/s]Elaborazione:  93%|█████████▎| 372/402 [02:46<00:12,  2.33it/s]Elaborazione:  93%|█████████▎| 373/402 [02:47<00:12,  2.33it/s]Elaborazione:  93%|█████████▎| 374/402 [02:47<00:12,  2.31it/s]Elaborazione:  93%|█████████▎| 375/402 [02:47<00:11,  2.31it/s]Elaborazione:  94%|█████████▎| 376/402 [02:48<00:11,  2.31it/s]Elaborazione:  94%|█████████▍| 377/402 [02:48<00:10,  2.32it/s]Elaborazione:  94%|█████████▍| 378/402 [02:49<00:10,  2.33it/s]Elaborazione:  94%|█████████▍| 379/402 [02:49<00:09,  2.34it/s]Elaborazione:  95%|█████████▍| 380/402 [02:50<00:09,  2.29it/s]Elaborazione:  95%|█████████▍| 381/402 [02:50<00:09,  2.32it/s]Elaborazione:  95%|█████████▌| 382/402 [02:50<00:08,  2.32it/s]Elaborazione:  95%|█████████▌| 383/402 [02:51<00:08,  2.34it/s]Elaborazione:  96%|█████████▌| 384/402 [02:51<00:07,  2.34it/s]Elaborazione:  96%|█████████▌| 385/402 [02:52<00:07,  2.33it/s]Elaborazione:  96%|█████████▌| 386/402 [02:52<00:06,  2.32it/s]Elaborazione:  96%|█████████▋| 387/402 [02:53<00:06,  2.29it/s]Elaborazione:  97%|█████████▋| 388/402 [02:53<00:06,  2.29it/s]Elaborazione:  97%|█████████▋| 389/402 [02:53<00:05,  2.31it/s]Elaborazione:  97%|█████████▋| 390/402 [02:54<00:05,  2.31it/s]Elaborazione:  97%|█████████▋| 391/402 [02:54<00:04,  2.31it/s]Elaborazione:  98%|█████████▊| 392/402 [02:55<00:04,  2.31it/s]Elaborazione:  98%|█████████▊| 393/402 [02:55<00:03,  2.29it/s]Elaborazione:  98%|█████████▊| 394/402 [02:56<00:03,  2.29it/s]Elaborazione:  98%|█████████▊| 395/402 [02:56<00:03,  2.31it/s]Elaborazione:  99%|█████████▊| 396/402 [02:57<00:02,  2.30it/s]Elaborazione:  99%|█████████▉| 397/402 [02:57<00:02,  2.28it/s]Elaborazione:  99%|█████████▉| 398/402 [02:57<00:01,  2.30it/s]Elaborazione:  99%|█████████▉| 399/402 [02:58<00:01,  2.28it/s]Elaborazione: 100%|█████████▉| 400/402 [02:58<00:00,  2.29it/s]Elaborazione: 100%|█████████▉| 401/402 [02:59<00:00,  2.30it/s]Elaborazione: 100%|██████████| 402/402 [02:59<00:00,  2.32it/s]Elaborazione: 100%|██████████| 402/402 [02:59<00:00,  2.24it/s]
  Connessione MongoDB...
  Database: football_simulator_db
    Teams: 212
@@ -902,8 +903,6 @@ INIZIO AGGIORNAMENTO NOTTURNO: 10/12/2025  4:00:03,04
    ✅ Aggiunte 210 partite future (Serie C).
 
 🏁 CALENDARIO COMPLETATO.
-C:\Progetti\simulatore-calcio-backend\ai_engine\Aggiornamenti\frequenti\scraper_odds_oddsmath.py:69: DeprecationWarning: The 'text' argument to find()-type methods is deprecated. Use 'string' instead.
-  if t.find('td', text='1') or "odds" in str(t) or len(t.find_all('tr')) > 10:
  Connessione MongoDB...
  Database: football_simulator_db
    Teams: 212
@@ -911,33 +910,33 @@ C:\Progetti\simulatore-calcio-backend\ai_engine\Aggiornamenti\frequenti\scraper_
 💰 AVVIO SCRAPER ODDSMATH (FIXED & CONNECTED)...
 
 🌍 Serie A
-   ✅ Aggiornate quote per 18 partite.
+   ❌ Errore HTTP 500
 
 🌍 Serie B
-   ✅ Aggiornate quote per 9 partite.
+   ❌ Errore HTTP 500
 
 🌍 Serie C (Lega Pro)
-   ✅ Aggiornate quote per 22 partite.
+   ❌ Errore HTTP 500
 
 🌍 Premier League
-   ✅ Aggiornate quote per 19 partite.
+   ❌ Errore HTTP 500
 
 🌍 La Liga
-   ✅ Aggiornate quote per 18 partite.
+   ❌ Errore HTTP 500
 
 🌍 Bundesliga
-   ✅ Aggiornate quote per 8 partite.
+   ❌ Errore HTTP 500
 
 🌍 Ligue 1
-   ✅ Aggiornate quote per 17 partite.
+   ❌ Errore HTTP 500
 
 🌍 Eredivisie
-   ✅ Aggiornate quote per 15 partite.
+   ❌ Errore HTTP 500
 
 🌍 Liga Portugal
-   ✅ Aggiornate quote per 8 partite.
+   ❌ Errore HTTP 500
 
-🏁 FINITO. Totale quote salvate: 134
+🏁 FINITO. Totale quote salvate: 0
  Connessione MongoDB...
  Database: football_simulator_db
    Teams: 212
@@ -972,14 +971,14 @@ C:\Progetti\simulatore-calcio-backend\ai_engine\Aggiornamenti\frequenti\scraper_
    🔄 Ligue 1 G.15... ✅ Aggiornate 5 quote.
    🔄 Ligue 1 G.16... ✅ Aggiornate 6 quote.
    🔄 Ligue 1 G.17... ✅ Aggiornate 5 quote.
-   🔄 Eredivisie G.15... (Nessuna variazione)
-   🔄 Eredivisie G.16... (Nessuna variazione)
-   🔄 Eredivisie G.17... (Nessuna variazione)
-   🔄 Liga Portugal G.13... (Nessuna variazione)
-   🔄 Liga Portugal G.14... (Nessuna variazione)
+   🔄 Eredivisie G.15... ✅ Aggiornate 8 quote.
+   🔄 Eredivisie G.16... ✅ Aggiornate 8 quote.
+   🔄 Eredivisie G.17... ✅ Aggiornate 8 quote.
+   🔄 Liga Portugal G.13... ✅ Aggiornate 6 quote.
+   🔄 Liga Portugal G.14... ✅ Aggiornate 4 quote.
    🔄 Liga Portugal G.15... (Nessuna variazione)
 
-🏁 FINE. Totale Aggiornati: 120
+🏁 FINE. Totale Aggiornati: 154
 
 ================================================================================
 🎩 DIRETTORE D'ORCHESTRA 3.3: CON CRONOMETRO & DIAGNOSTICA
@@ -987,85 +986,85 @@ C:\Progetti\simulatore-calcio-backend\ai_engine\Aggiornamenti\frequenti\scraper_
 
 ----------------------------------------------------------------------
 ▶ 📊 [1/13] Risultati & xG (FBref)
-   ✅ COMPLETATO in 130.31s
+   ✅ COMPLETATO in 154.62s
 
 ----------------------------------------------------------------------
 ▶ 🔥 [2/13] Lucifero & Serie C (BetExplorer)
-   ✅ COMPLETATO in 154.00s
+   ✅ COMPLETATO in 158.62s
 
 ----------------------------------------------------------------------
 ▶ 💰 [3/13] Quote Storiche
-   ✅ COMPLETATO in 105.60s
+   ✅ COMPLETATO in 108.87s
 
 ----------------------------------------------------------------------
 ▶ 🏆 [4/13] Classifica & Gol
-   ✅ COMPLETATO in 16.37s
+   ✅ COMPLETATO in 20.26s
 
 ----------------------------------------------------------------------
 ▶ ⚽ [5/13] Stats Attaccanti
-   ✅ COMPLETATO in 457.79s
+   ✅ COMPLETATO in 467.24s
 
 ----------------------------------------------------------------------
 ▶ 🧠 [6/13] Stats Centrocampisti
-   ✅ COMPLETATO in 356.88s
+   ✅ COMPLETATO in 364.04s
 
 ----------------------------------------------------------------------
 ▶ 🛡️ [7/13] Stats Difensori
-   ✅ COMPLETATO in 270.16s
+   ✅ COMPLETATO in 279.78s
 
 ----------------------------------------------------------------------
 ▶ 🧤 [8/13] Stats Portieri
-   ✅ COMPLETATO in 79.06s
+   ✅ COMPLETATO in 90.93s
 
 ----------------------------------------------------------------------
 ▶ 🚑 [9/13] Infortuni (TM)
-   ✅ COMPLETATO in 103.21s
+   ✅ COMPLETATO in 69.06s
 
 ----------------------------------------------------------------------
 ▶ 📅 [10/13] Calendario H2H
-   ✅ COMPLETATO in 75.43s
+   ✅ COMPLETATO in 86.04s
 
 ----------------------------------------------------------------------
 ▶ 🧠 [11/13] Elaborazione H2H Pro
-   ✅ COMPLETATO in 123.01s
+   ✅ COMPLETATO in 181.92s
 
 ----------------------------------------------------------------------
 ▶ 📆 [12/13] Partite Future
-   ✅ COMPLETATO in 140.43s
+   ✅ COMPLETATO in 171.98s
 
 ----------------------------------------------------------------------
 ▶ 💎 [13/13] Quote Future
-   ✅ COMPLETATO in 50.60s
+   ✅ COMPLETATO in 44.19s
 
 ----------------------------------------------------------------------
 ▶ 🚀 [14/14] Quote H2H Arricchite (NowGoal)
-   ✅ COMPLETATO in 158.06s
+   ✅ COMPLETATO in 187.42s
 
 
 ====================================================================================================
-📊 REPORT AGGIORNAMENTO - DURATA TOTALE: 0:37:28
+📊 REPORT AGGIORNAMENTO - DURATA TOTALE: 0:40:12
 ====================================================================================================
 STATO  | DURATA     | FILE (Script)                       | IMPATTO (Se fallisce)
 ----------------------------------------------------------------------------------------------------
-✅ OK   | 130.3s     | scraper_results_fbref.py            | Mancano risultati recenti e xG
-✅ OK   | 154.0s     | scrape_lucifero_betexplorer_safe.py | Il Lucifero non funziona senza questo
-✅ OK   | 105.6s     | scraper_quote_storiche_betexplorer.py | Calcolo Affidabilità/BVS impossibile
-✅ OK   | 16.4s      | scraper_soccerstats_ranking_unified.py | Calcolo Forza Attacco/Difesa sballato
-✅ OK   | 457.8s     | fbref_scraper_att.py                | Analisi attacco imprecisa
-✅ OK   | 356.9s     | fbref_scraper_mid.py                | Analisi centrocampo imprecisa
-✅ OK   | 270.2s     | fbref_scraper_def.py                | Analisi difesa imprecisa
-✅ OK   | 79.1s      | scraper_gk_fbref.py                 | Analisi portieri imprecisa
-✅ OK   | 103.2s     | scraper_tm_multi_campionato.py      | Si rischia di puntare su assenti
-✅ OK   | 75.4s      | scraper_calendario_h2h_TF_completo.py | Analisi scontri diretti incompleta
-✅ OK   | 123.0s     | calculate_h2h_v2.py                 | Mancano medie gol e punteggi storici
-✅ OK   | 140.4s     | scraper_fixtures.py                 | Il motore non saprà cosa simulare
-✅ OK   | 50.6s      | scraper_odds_oddsmath.py            | Manca confronto con bookmaker
-✅ OK   | 158.1s     | nowgoal_scraper.py                  | Mancano le quote precise nel CSV
+✅ OK   | 154.6s     | scraper_results_fbref.py            | Mancano risultati recenti e xG
+✅ OK   | 158.6s     | scrape_lucifero_betexplorer_safe.py | Il Lucifero non funziona senza questo
+✅ OK   | 108.9s     | scraper_quote_storiche_betexplorer.py | Calcolo Affidabilità/BVS impossibile
+✅ OK   | 20.3s      | scraper_soccerstats_ranking_unified.py | Calcolo Forza Attacco/Difesa sballato
+✅ OK   | 467.2s     | fbref_scraper_att.py                | Analisi attacco imprecisa
+✅ OK   | 364.0s     | fbref_scraper_mid.py                | Analisi centrocampo imprecisa
+✅ OK   | 279.8s     | fbref_scraper_def.py                | Analisi difesa imprecisa
+✅ OK   | 90.9s      | scraper_gk_fbref.py                 | Analisi portieri imprecisa
+✅ OK   | 69.1s      | scraper_tm_multi_campionato.py      | Si rischia di puntare su assenti
+✅ OK   | 86.0s      | scraper_calendario_h2h_TF_completo.py | Analisi scontri diretti incompleta
+✅ OK   | 181.9s     | calculate_h2h_v2.py                 | Mancano medie gol e punteggi storici
+✅ OK   | 172.0s     | scraper_fixtures.py                 | Il motore non saprà cosa simulare
+✅ OK   | 44.2s      | scraper_odds_oddsmath.py            | Manca confronto con bookmaker
+✅ OK   | 187.4s     | nowgoal_scraper.py                  | Mancano le quote precise nel CSV
 
-✨ SISTEMA PERFETTAMENTE AGGIORNATO IN 0:37:28!
+✨ SISTEMA PERFETTAMENTE AGGIORNATO IN 0:40:12!
 
 
  
 ========================================== 
-FINE AGGIORNAMENTO: 10/12/2025  4:37:32,08 
+FINE AGGIORNAMENTO: 11/12/2025  4:40:15,92 
 ========================================== 

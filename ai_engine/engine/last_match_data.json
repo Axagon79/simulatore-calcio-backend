@@ -1,54 +1,5 @@
 {
-    "MATCH": "Dortmund vs Hoffenheim",
-    "CASA": {
-        "Squadra": "Dortmund",
-        "Modulo": "4-2-3-1",
-        "Rating": "18.53/25",
-        "1_TITOLARI": [
-            "GK - Gregor Kobel (7.3)",
-            "DIF - Waldemar Anton (7.2)",
-            "DIF - Daniel Svensson (6.4)",
-            "DIF - Nico Schlotterbeck (7.7)",
-            "DIF - Ramy Bensebaini (7.5)",
-            "MID - Felix Nmecha (7.3)",
-            "MID - Marcel Sabitzer (6.5)",
-            "MID - Pascal Gro\u00df (6.9)",
-            "MID - Jobe Bellingham (7.3)",
-            "ATT - Serhou Guirassy (6.7)"
-        ],
-        "2_PANCHINA": [
-            "DIF - Julian Ryerson (6.9)",
-            "DIF - Yan Couto (7.1)",
-            "MID (da DIF) - Aaron Anselmino (8.8)",
-            "MID (da DIF) - Emre Can (5.4)",
-            "ATT - Karim Adeyemi (7.6)",
-            "ATT - Maximilian Beier (6.9)"
-        ]
-    },
-    "OSPITE": {
-        "Squadra": "Hoffenheim",
-        "Modulo": "4-2-3-1",
-        "Rating": "18.64/25",
-        "1_TITOLARI": [
-            "GK - Oliver Baumann (6.4)",
-            "DIF - Vladim\u00edr Coufal (7.2)",
-            "DIF - Bernardo (8.2)",
-            "DIF - Robin Hran\u00e1\u010d (6.6)",
-            "DIF - Albian Hajdari (8.2)",
-            "MID - Leon Avdullahu (7.3)",
-            "MID - Wouter Burger (7.6)",
-            "MID - Grischa Pr\u00f6mel (7.9)",
-            "MID - Umut Tohumcu (6.0)",
-            "MID - Adam Hlo\u017eek (6.0)",
-            "ATT - Bazoumana Tour\u00e9 (6.4)"
-        ],
-        "2_PANCHINA": [
-            "DIF - Arthur Chaves (9.0)",
-            "DIF - Ozan Kabak (6.9)",
-            "MID (da DIF) - Koki Machida (7.6)",
-            "MID (da DIF) - Kevin Akpoguma (8.2)",
-            "ATT - Fisnik Asllani (7.3)",
-            "ATT - Tim Lemperle (6.7)"
-        ]
-    }
+    "MATCH": "Carpi vs Vis Pesaro",
+    "CASA": "N/A",
+    "OSPITE": "N/A"
 }

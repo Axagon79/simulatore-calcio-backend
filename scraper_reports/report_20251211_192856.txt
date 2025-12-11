@@ -1,0 +1,91 @@
+================================================================================
+REPORT SCRAPER QUOTE CALCIO
+================================================================================
+
+Data: 2025-12-11 19:27:06
+Partite totali: 315
+Partite aggiornate: 226
+Successo: 71.7%
+
+================================================================================
+PROBLEMI RISCONTRATI
+================================================================================
+
+
+PARTITA_TROVATA_MA_SENZA_QUOTE (48 partite)
+--------------------------------------------------------------------------------
+  • Napoli vs Parma
+    Lega: Serie A - Giornata: 16
+  • Inter vs Lecce
+    Lega: Serie A - Giornata: 16
+  • Verona vs Bologna
+    Lega: Serie A - Giornata: 16
+  • Como vs Milan
+    Lega: Serie A - Giornata: 16
+  • Bari vs Catanzaro
+    Lega: Serie B - Giornata: 17
+  • Cesena vs Juve Stabia
+    Lega: Serie B - Giornata: 17
+  • Frosinone vs Spezia
+    Lega: Serie B - Giornata: 17
+  • Modena vs Venezia
+    Lega: Serie B - Giornata: 17
+  • Monza vs Carrarese
+    Lega: Serie B - Giornata: 17
+  • Padova vs Sampdoria
+    Lega: Serie B - Giornata: 17
+  ... e altre 38 partite
+
+SOLO_TRASFERTA_TROVATA (18 partite)
+--------------------------------------------------------------------------------
+  • Juve Next Gen vs Pianese
+    Lega: Serie C - Girone B - Giornata: 18
+  • Forlì vs Carpi
+    Lega: Serie C - Girone B - Giornata: 18
+  • Guidonia vs Ascoli
+    Lega: Serie C - Girone B - Giornata: 18
+  • West Ham Utd. vs Aston Villa
+    Lega: Premier League - Giornata: 16
+  • Manchester Utd. vs Bournemouth
+    Lega: Premier League - Giornata: 16
+  • RCD Mallorca vs Elche
+    Lega: La Liga - Giornata: 16
+  • CA Osasuna vs Levante
+    Lega: La Liga - Giornata: 15
+  • CA Osasuna vs Alavés
+    Lega: La Liga - Giornata: 17
+  • Bor. M'gladbach vs Wolfsburg
+    Lega: Bundesliga - Giornata: 14
+  • Angers SCO vs FC Nantes
+    Lega: Ligue 1 - Giornata: 16
+  ... e altre 8 partite
+
+NESSUNA_SQUADRA_TROVATA (1 partite)
+--------------------------------------------------------------------------------
+  • Guidonia vs Juve Next Gen
+    Lega: Serie C - Girone B - Giornata: 17
+    Nota: Nessuna delle due squadre trovata sul sito
+
+SOLO_CASA_TROVATA (22 partite)
+--------------------------------------------------------------------------------
+  • Ascoli vs Forlì
+    Lega: Serie C - Girone B - Giornata: 17
+  • Carpi vs Guidonia
+    Lega: Serie C - Girone B - Giornata: 19
+  • Bra vs Juve Next Gen
+    Lega: Serie C - Girone B - Giornata: 19
+  • Perugia vs Forlì
+    Lega: Serie C - Girone B - Giornata: 19
+  • Brighton vs West Ham Utd.
+    Lega: Premier League - Giornata: 15
+  • Wolverhampton vs Manchester Utd.
+    Lega: Premier League - Giornata: 15
+  • Man City vs West Ham Utd.
+    Lega: Premier League - Giornata: 17
+  • Aston Villa vs Manchester Utd.
+    Lega: Premier League - Giornata: 17
+  • Barcellona vs CA Osasuna
+    Lega: La Liga - Giornata: 16
+  • Real Oviedo vs RCD Mallorca
+    Lega: La Liga - Giornata: 15
+  ... e altre 12 partite
