@@ -2,7 +2,7 @@
 REPORT SCRAPER QUOTE CALCIO
 ================================================================================
 
-Data: 2025-12-11 22:19:51
+Data: 2025-12-12 04:37:43
 Partite totali: 315
 Partite aggiornate: 263
 Successo: 83.5%

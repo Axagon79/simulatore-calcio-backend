@@ -1,0 +1,82 @@
+{
+    "GLOBAL": {
+        "PESO_RATING_ROSA": {
+            "valore": 1.0
+        },
+        "PESO_FORMA_RECENTE": {
+            "valore": 1.0
+        },
+        "PESO_MOTIVAZIONE": {
+            "valore": 1.0
+        },
+        "PESO_FATTORE_CAMPO": {
+            "valore": 3.0
+        },
+        "PESO_STORIA_H2H": {
+            "valore": 0.5
+        },
+        "PESO_BVS_QUOTE": {
+            "valore": 1.0
+        },
+        "PESO_AFFIDABILITA": {
+            "valore": 1.0
+        },
+        "PESO_VALORE_ROSA": {
+            "valore": 1.0
+        },
+        "DIVISORE_MEDIA_GOL": {
+            "valore": 2.0
+        },
+        "POTENZA_FAVORITA_WINSHIFT": {
+            "valore": 0.5
+        },
+        "IMPATTO_DIFESA_TATTICA": {
+            "valore": 15.0
+        },
+        "TETTO_MAX_GOL_ATTESI": {
+            "valore": 3.8
+        },
+        "THR_1X2_RED": {
+            "valore": 40.0
+        },
+        "THR_1X2_GREEN": {
+            "valore": 60.0
+        },
+        "THR_UO_RED": {
+            "valore": 40.0
+        },
+        "THR_UO_GREEN": {
+            "valore": 60.0
+        },
+        "THR_GG_RED": {
+            "valore": 40.0
+        },
+        "THR_GG_GREEN": {
+            "valore": 60.0
+        }
+    },
+    "ALGO_1": {
+        "descrizione": "Statistica Pura - Override",
+        "PESO_RATING_ROSA": {
+            "valore": 2.0
+        },
+        "PESO_STORIA_H2H": {
+            "valore": 0.5
+        }
+    },
+    "ALGO_2": {
+        "descrizione": "Dinamico Base - Override"
+    },
+    "ALGO_3": {
+        "descrizione": "Complesso Tattico - Override",
+        "IMPATTO_DIFESA_TATTICA": {
+            "valore": 15.0
+        }
+    },
+    "ALGO_4": {
+        "descrizione": "Caos Estremo - Override",
+        "PESO_AFFIDABILITA": {
+            "valore": -1.0
+        }
+    }
+}

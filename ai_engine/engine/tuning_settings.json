@@ -1,122 +1,133 @@
 {
-    "PESO_RATING_ROSA": {
-        "valore": 3.0,
-        "influenza": "1X2 + GOL",
-        "impatto_1x2": 0.8,
-        "impatto_gol": 0.3,
-        "descrizione": "Quanto conta la forza teorica della rosa (rating 5–25) nel punteggio totale.",
-        "nota": "Se troppo alto, le big vincono quasi sempre."
+    "GLOBAL": {
+        "PESO_RATING_ROSA": {
+            "valore": 3.0
+        },
+        "PESO_FORMA_RECENTE": {
+            "valore": 3.5
+        },
+        "PESO_MOTIVAZIONE": {
+            "valore": 1.3
+        },
+        "PESO_FATTORE_CAMPO": {
+            "valore": 1.0
+        },
+        "PESO_STORIA_H2H": {
+            "valore": 0.3
+        },
+        "PESO_BVS_QUOTE": {
+            "valore": 1.3
+        },
+        "PESO_AFFIDABILITA": {
+            "valore": 0.0
+        },
+        "PESO_VALORE_ROSA": {
+            "valore": 0.5
+        },
+        "DIVISORE_MEDIA_GOL": {
+            "valore": 1.8
+        },
+        "POTENZA_FAVORITA_WINSHIFT": {
+            "valore": 0.4
+        },
+        "IMPATTO_DIFESA_TATTICA": {
+            "valore": 20.0
+        },
+        "TETTO_MAX_GOL_ATTESI": {
+            "valore": 5.0
+        },
+        "THR_1X2_RED": {
+            "valore": 40.0
+        },
+        "THR_1X2_GREEN": {
+            "valore": 60.0
+        },
+        "THR_UO_RED": {
+            "valore": 40.0
+        },
+        "THR_UO_GREEN": {
+            "valore": 60.0
+        },
+        "THR_GG_RED": {
+            "valore": 40.0
+        },
+        "THR_GG_GREEN": {
+            "valore": 60.0
+        }
     },
-    "PESO_FORMA_RECENTE": {
-        "valore": 3.5,
-        "influenza": "1X2 + GOL",
-        "impatto_1x2": 0.7,
-        "impatto_gol": 0.4,
-        "descrizione": "Quanto pesa lo stato di forma (Lucifero, ultime 6 partite).",
-        "nota": "Se troppo alto, poche partite recenti cambiano troppo il pronostico."
+    "ALGO_1": {
+        "descrizione": "Statistica Pura - Override",
+        "PESO_RATING_ROSA": {
+            "valore": 2.0
+        },
+        "PESO_STORIA_H2H": {
+            "valore": 0.5
+        }
     },
-    "PESO_MOTIVAZIONE": {
-        "valore": 1.3,
-        "influenza": "1X2 + GOL",
-        "impatto_1x2": 0.6,
-        "impatto_gol": 0.35,
-        "descrizione": "Quanto influiscono obiettivi di classifica e urgenza di punti.",
-        "nota": ""
+    "ALGO_2": {
+        "descrizione": "Dinamico Base - Override"
     },
-    "PESO_FATTORE_CAMPO": {
-        "valore": 1.0,
-        "influenza": "1X2 + GOL",
-        "impatto_1x2": 0.65,
-        "impatto_gol": 0.25,
-        "descrizione": "Quanto il giocare in casa spinge la squadra di casa.",
-        "nota": "Se troppo alto, il segno 1 diventa troppo frequente."
+    "ALGO_3": {
+        "descrizione": "Complesso Tattico - Override",
+        "IMPATTO_DIFESA_TATTICA": {
+            "valore": 20.0
+        },
+        "PESO_RATING_ROSA": {
+            "valore": 3.0
+        },
+        "PESO_FORMA_RECENTE": {
+            "valore": 3.5
+        },
+        "PESO_MOTIVAZIONE": {
+            "valore": 1.3
+        },
+        "PESO_FATTORE_CAMPO": {
+            "valore": 1.0
+        },
+        "PESO_STORIA_H2H": {
+            "valore": 0.3
+        },
+        "PESO_BVS_QUOTE": {
+            "valore": 1.3
+        },
+        "PESO_AFFIDABILITA": {
+            "valore": 0.0
+        },
+        "PESO_VALORE_ROSA": {
+            "valore": 0.5
+        },
+        "DIVISORE_MEDIA_GOL": {
+            "valore": 1.8
+        },
+        "POTENZA_FAVORITA_WINSHIFT": {
+            "valore": 0.4
+        },
+        "TETTO_MAX_GOL_ATTESI": {
+            "valore": 5.0
+        },
+        "THR_1X2_RED": {
+            "valore": 40.0
+        },
+        "THR_1X2_GREEN": {
+            "valore": 60.0
+        },
+        "THR_UO_RED": {
+            "valore": 40.0
+        },
+        "THR_UO_GREEN": {
+            "valore": 60.0
+        },
+        "THR_GG_RED": {
+            "valore": 40.0
+        },
+        "THR_GG_GREEN": {
+            "valore": 60.0
+        }
     },
-    "PESO_STORIA_H2H": {
-        "valore": 0.3,
-        "influenza": "1X2 + GOL",
-        "impatto_1x2": 0.45,
-        "impatto_gol": 0.2,
-        "descrizione": "Quanto contano i precedenti diretti (H2H) tra le due squadre.",
-        "nota": "Meglio tenerlo moderato: gli H2H sono spesso pochi e rumorosi."
-    },
-    "PESO_BVS_QUOTE": {
-        "valore": 1.3,
-        "influenza": "1X2 + GOL",
-        "impatto_1x2": 0.55,
-        "impatto_gol": 0.25,
-        "descrizione": "Quanto il motore si allinea alle quote dei bookmaker (BVS).",
-        "nota": "Se molto alto ti avvicini molto ai book e hai meno spazio di value."
-    },
-    "PESO_AFFIDABILITA": {
-        "valore": 0.0,
-        "influenza": "quasi solo 1X2",
-        "impatto_1x2": 0.4,
-        "impatto_gol": 0.1,
-        "descrizione": "Quanto premia le squadre storicamente prevedibili rispetto alle quote.",
-        "nota": "⚠️ Più alto = premia squadre prevedibili. Troppo alto penalizza le sorprese."
-    },
-    "PESO_VALORE_ROSA": {
-        "valore": 0.5,
-        "influenza": "1X2 + GOL",
-        "impatto_1x2": 0.55,
-        "impatto_gol": 0.25,
-        "descrizione": "Quanto influisce il valore economico/qualitativo della rosa.",
-        "nota": "Se alzato insieme al PESO_RATING_ROSA schiaccia molto le piccole."
-    },
-    "DIVISORE_MEDIA_GOL": {
-        "valore": 1.8,
-        "influenza": "quasi solo GOL",
-        "impatto_1x2": 0.2,
-        "impatto_gol": 0.8,
-        "descrizione": "Divisore in base_lambda = vol / X: regola la media gol generale.",
-        "nota": "⚠️ Più alto = meno gol in generale. Troppo basso genera partite con troppi gol."
-    },
-    "POTENZA_FAVORITA_WINSHIFT": {
-        "valore": 0.4,
-        "influenza": "1X2 + GOL",
-        "impatto_1x2": 0.75,
-        "impatto_gol": 0.35,
-        "descrizione": "Moltiplicatore del win_shift che sposta i gol verso la squadra più forte.",
-        "nota": "⚠️ Più alto = favorita segna molto di più. Troppo alto sbilancia troppo il risultato."
-    },
-    "IMPATTO_DIFESA_TATTICA": {
-        "valore": 20.0,
-        "influenza": "soprattutto GOL",
-        "impatto_1x2": 0.3,
-        "impatto_gol": 0.7,
-        "descrizione": "Denominatore nel fattore (5.0 - difesa)/X che decide quanto le difese comprimono/aprono i gol.",
-        "nota": "Più basso = più 0-0/1-0; più alto = più partite aperte."
-    },
-    "TETTO_MAX_GOL_ATTESI": {
-        "valore": 5.0,
-        "influenza": "GOL (forma risultati)",
-        "impatto_1x2": 0.15,
-        "impatto_gol": 0.7,
-        "descrizione": "Limite massimo dell'aspettativa di gol (cap sulle goleade).",
-        "nota": "Alzando molto questo valore aumentano goleade e risultati estremi."
-    },
-    "THR_1X2_RED": {
-        "valore": 40.0,
-        "descrizione": "Soglia Rossa per 1X2"
-    },
-    "THR_1X2_GREEN": {
-        "valore": 60.0,
-        "descrizione": "Soglia Verde per 1X2"
-    },
-    "THR_UO_RED": {
-        "valore": 40.0,
-        "descrizione": "Soglia Rossa per U/O"
-    },
-    "THR_UO_GREEN": {
-        "valore": 60.0,
-        "descrizione": "Soglia Verde per U/O"
-    },
-    "THR_GG_RED": {
-        "valore": 50.0,
-        "descrizione": "Soglia Rossa per GG"
-    },
-    "THR_GG_GREEN": {
-        "valore": 70.0,
-        "descrizione": "Soglia Verde per GG"
+    "ALGO_4": {
+        "descrizione": "Caos Estremo - Override",
+        "PESO_AFFIDABILITA": {
+            "valore": -1.0
+        }
     }
 }

@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-12-11 22:19:51",
+  "timestamp": "2025-12-12 04:37:43",
   "summary": {
     "total_matches": 315,
     "updated": 263,
@@ -68,7 +68,7 @@
       "partita": "Napoli vs Parma",
       "lega": "Serie A",
       "giornata": 16,
-      "timestamp": "2025-12-11T22:20:06.091846",
+      "timestamp": "2025-12-12T04:37:59.590419",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],
@@ -81,7 +81,7 @@
       "partita": "Inter vs Lecce",
       "lega": "Serie A",
       "giornata": 16,
-      "timestamp": "2025-12-11T22:20:06.139661",
+      "timestamp": "2025-12-12T04:37:59.643152",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],
@@ -94,7 +94,7 @@
       "partita": "Verona vs Bologna",
       "lega": "Serie A",
       "giornata": 16,
-      "timestamp": "2025-12-11T22:20:06.211073",
+      "timestamp": "2025-12-12T04:37:59.721795",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],
@@ -107,7 +107,7 @@
       "partita": "Como vs Milan",
       "lega": "Serie A",
       "giornata": 16,
-      "timestamp": "2025-12-11T22:20:06.282659",
+      "timestamp": "2025-12-12T04:37:59.800717",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],
@@ -120,7 +120,7 @@
       "partita": "Bari vs Catanzaro",
       "lega": "Serie B",
       "giornata": 17,
-      "timestamp": "2025-12-11T22:20:15.103775",
+      "timestamp": "2025-12-12T04:38:08.714111",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],
@@ -133,7 +133,7 @@
       "partita": "Cesena vs Juve Stabia",
       "lega": "Serie B",
       "giornata": 17,
-      "timestamp": "2025-12-11T22:20:15.159664",
+      "timestamp": "2025-12-12T04:38:08.767568",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],
@@ -146,7 +146,7 @@
       "partita": "Frosinone vs Spezia",
       "lega": "Serie B",
       "giornata": 17,
-      "timestamp": "2025-12-11T22:20:15.207955",
+      "timestamp": "2025-12-12T04:38:08.821505",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],
@@ -159,7 +159,7 @@
       "partita": "Modena vs Venezia",
       "lega": "Serie B",
       "giornata": 17,
-      "timestamp": "2025-12-11T22:20:15.264076",
+      "timestamp": "2025-12-12T04:38:08.875852",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],
@@ -172,7 +172,7 @@
       "partita": "Monza vs Carrarese",
       "lega": "Serie B",
       "giornata": 17,
-      "timestamp": "2025-12-11T22:20:15.325491",
+      "timestamp": "2025-12-12T04:38:08.929711",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],
@@ -185,7 +185,7 @@
       "partita": "Padova vs Sampdoria",
       "lega": "Serie B",
       "giornata": 17,
-      "timestamp": "2025-12-11T22:20:15.373698",
+      "timestamp": "2025-12-12T04:38:08.983494",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],
@@ -198,7 +198,7 @@
       "partita": "Avellino vs Palermo",
       "lega": "Serie B",
       "giornata": 17,
-      "timestamp": "2025-12-11T22:20:15.421832",
+      "timestamp": "2025-12-12T04:38:09.037404",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],
@@ -211,7 +211,7 @@
       "partita": "Pescara vs Reggiana",
       "lega": "Serie B",
       "giornata": 17,
-      "timestamp": "2025-12-11T22:20:15.469741",
+      "timestamp": "2025-12-12T04:38:09.091093",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],
@@ -224,7 +224,7 @@
       "partita": "Virtus Entella vs Südtirol",
       "lega": "Serie B",
       "giornata": 17,
-      "timestamp": "2025-12-11T22:20:15.565916",
+      "timestamp": "2025-12-12T04:38:09.198185",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],
@@ -237,7 +237,7 @@
       "partita": "Mantova vs Empoli",
       "lega": "Serie B",
       "giornata": 17,
-      "timestamp": "2025-12-11T22:20:15.613124",
+      "timestamp": "2025-12-12T04:38:09.259285",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],
@@ -250,7 +250,7 @@
       "partita": "AlbinoLeffe vs Alcione",
       "lega": "Serie C - Girone A",
       "giornata": 19,
-      "timestamp": "2025-12-11T22:20:24.338403",
+      "timestamp": "2025-12-12T04:38:18.206455",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],
@@ -263,7 +263,7 @@
       "partita": "Trento vs Dolomiti",
       "lega": "Serie C - Girone A",
       "giornata": 19,
-      "timestamp": "2025-12-11T22:20:24.434929",
+      "timestamp": "2025-12-12T04:38:18.313721",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],
@@ -276,7 +276,7 @@
       "partita": "Pro Patria vs Renate",
       "lega": "Serie C - Girone A",
       "giornata": 19,
-      "timestamp": "2025-12-11T22:20:24.482706",
+      "timestamp": "2025-12-12T04:38:18.367556",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],
@@ -289,7 +289,7 @@
       "partita": "Virtus Verona vs Lumezzane",
       "lega": "Serie C - Girone A",
       "giornata": 19,
-      "timestamp": "2025-12-11T22:20:24.530416",
+      "timestamp": "2025-12-12T04:38:18.421304",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],
@@ -302,7 +302,7 @@
       "partita": "Vicenza vs Triestina",
       "lega": "Serie C - Girone A",
       "giornata": 19,
-      "timestamp": "2025-12-11T22:20:24.578450",
+      "timestamp": "2025-12-12T04:38:18.475192",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],
@@ -315,7 +315,7 @@
       "partita": "Pro Vercelli vs Arzignano",
       "lega": "Serie C - Girone A",
       "giornata": 19,
-      "timestamp": "2025-12-11T22:20:24.626430",
+      "timestamp": "2025-12-12T04:38:18.529390",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],
@@ -328,7 +328,7 @@
       "partita": "Giana Erminio vs Cittadella",
       "lega": "Serie C - Girone A",
       "giornata": 19,
-      "timestamp": "2025-12-11T22:20:24.674258",
+      "timestamp": "2025-12-12T04:38:18.583135",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],
@@ -341,7 +341,7 @@
       "partita": "Lecco vs Pergolettese",
       "lega": "Serie C - Girone A",
       "giornata": 19,
-      "timestamp": "2025-12-11T22:20:24.722387",
+      "timestamp": "2025-12-12T04:38:18.636713",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],
@@ -354,7 +354,7 @@
       "partita": "Novara vs Ospitaletto",
       "lega": "Serie C - Girone A",
       "giornata": 19,
-      "timestamp": "2025-12-11T22:20:24.770230",
+      "timestamp": "2025-12-12T04:38:18.690642",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],
@@ -367,7 +367,7 @@
       "partita": "Union Brescia vs Inter U23",
       "lega": "Serie C - Girone A",
       "giornata": 19,
-      "timestamp": "2025-12-11T22:20:24.818207",
+      "timestamp": "2025-12-12T04:38:18.759144",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],
@@ -380,7 +380,7 @@
       "partita": "Carpi vs Guidonia",
       "lega": "Serie C - Girone B",
       "giornata": 19,
-      "timestamp": "2025-12-11T22:20:33.566831",
+      "timestamp": "2025-12-12T04:38:27.768962",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],
@@ -393,7 +393,7 @@
       "partita": "Torres vs Arezzo",
       "lega": "Serie C - Girone B",
       "giornata": 19,
-      "timestamp": "2025-12-11T22:20:33.621825",
+      "timestamp": "2025-12-12T04:38:27.822750",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],
@@ -406,7 +406,7 @@
       "partita": "Livorno vs Pontedera",
       "lega": "Serie C - Girone B",
       "giornata": 19,
-      "timestamp": "2025-12-11T22:20:33.670022",
+      "timestamp": "2025-12-12T04:38:27.876432",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],
@@ -419,7 +419,7 @@
       "partita": "Pineto vs Gubbio",
       "lega": "Serie C - Girone B",
       "giornata": 19,
-      "timestamp": "2025-12-11T22:20:33.718099",
+      "timestamp": "2025-12-12T04:38:27.929929",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],
@@ -432,7 +432,7 @@
       "partita": "Sambenedettese vs Vis Pesaro",
       "lega": "Serie C - Girone B",
       "giornata": 19,
-      "timestamp": "2025-12-11T22:20:33.766832",
+      "timestamp": "2025-12-12T04:38:27.983738",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],
@@ -445,7 +445,7 @@
       "partita": "Ascoli vs Campobasso",
       "lega": "Serie C - Girone B",
       "giornata": 19,
-      "timestamp": "2025-12-11T22:20:33.814447",
+      "timestamp": "2025-12-12T04:38:28.037492",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],
@@ -458,7 +458,7 @@
       "partita": "Bra vs Juve Next Gen",
       "lega": "Serie C - Girone B",
       "giornata": 19,
-      "timestamp": "2025-12-11T22:20:33.909910",
+      "timestamp": "2025-12-12T04:38:28.144556",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],
@@ -471,7 +471,7 @@
       "partita": "Pianese vs Ternana",
       "lega": "Serie C - Girone B",
       "giornata": 19,
-      "timestamp": "2025-12-11T22:20:33.957736",
+      "timestamp": "2025-12-12T04:38:28.198472",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],
@@ -484,7 +484,7 @@
       "partita": "Perugia vs Forlì",
       "lega": "Serie C - Girone B",
       "giornata": 19,
-      "timestamp": "2025-12-11T22:20:34.029771",
+      "timestamp": "2025-12-12T04:38:28.278894",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],
@@ -497,7 +497,7 @@
       "partita": "Cosenza vs Cavese",
       "lega": "Serie C - Girone C",
       "giornata": 19,
-      "timestamp": "2025-12-11T22:20:43.006660",
+      "timestamp": "2025-12-12T04:38:37.257392",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],
@@ -510,7 +510,7 @@
       "partita": "Giugliano vs Casertana",
       "lega": "Serie C - Girone C",
       "giornata": 19,
-      "timestamp": "2025-12-11T22:20:43.055413",
+      "timestamp": "2025-12-12T04:38:37.310800",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],
@@ -523,7 +523,7 @@
       "partita": "Salernitana vs Foggia",
       "lega": "Serie C - Girone C",
       "giornata": 19,
-      "timestamp": "2025-12-11T22:20:43.103196",
+      "timestamp": "2025-12-12T04:38:37.365021",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],
@@ -536,7 +536,7 @@
       "partita": "Sorrento vs Picerno",
       "lega": "Serie C - Girone C",
       "giornata": 19,
-      "timestamp": "2025-12-11T22:20:43.151361",
+      "timestamp": "2025-12-12T04:38:37.418644",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],
@@ -549,7 +549,7 @@
       "partita": "Catania vs Atalanta U23",
       "lega": "Serie C - Girone C",
       "giornata": 19,
-      "timestamp": "2025-12-11T22:20:43.260914",
+      "timestamp": "2025-12-12T04:38:37.525863",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],
@@ -562,7 +562,7 @@
       "partita": "Latina vs Crotone",
       "lega": "Serie C - Girone C",
       "giornata": 19,
-      "timestamp": "2025-12-11T22:20:43.309361",
+      "timestamp": "2025-12-12T04:38:37.579620",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],
@@ -575,7 +575,7 @@
       "partita": "Monopoli vs Potenza",
       "lega": "Serie C - Girone C",
       "giornata": 19,
-      "timestamp": "2025-12-11T22:20:43.357347",
+      "timestamp": "2025-12-12T04:38:37.633292",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],
@@ -588,7 +588,7 @@
       "partita": "Casarano vs Team Altamura",
       "lega": "Serie C - Girone C",
       "giornata": 19,
-      "timestamp": "2025-12-11T22:20:43.428861",
+      "timestamp": "2025-12-12T04:38:37.713550",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],
@@ -601,7 +601,7 @@
       "partita": "Siracusa vs Trapani",
       "lega": "Serie C - Girone C",
       "giornata": 19,
-      "timestamp": "2025-12-11T22:20:43.476963",
+      "timestamp": "2025-12-12T04:38:37.767315",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],
@@ -614,7 +614,7 @@
       "partita": "Cerignola vs Benevento",
       "lega": "Serie C - Girone C",
       "giornata": 19,
-      "timestamp": "2025-12-11T22:20:43.549346",
+      "timestamp": "2025-12-12T04:38:37.847861",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],
@@ -627,7 +627,7 @@
       "partita": "Estoril vs SC Braga",
       "lega": "Liga Portugal",
       "giornata": 15,
-      "timestamp": "2025-12-11T22:21:38.881593",
+      "timestamp": "2025-12-12T04:39:34.791798",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],
@@ -640,7 +640,7 @@
       "partita": "Gil Vicente vs Rio Ave",
       "lega": "Liga Portugal",
       "giornata": 15,
-      "timestamp": "2025-12-11T22:21:38.930559",
+      "timestamp": "2025-12-12T04:39:34.848512",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],
@@ -653,7 +653,7 @@
       "partita": "Estrela Amadora vs Moreirense",
       "lega": "Liga Portugal",
       "giornata": 15,
-      "timestamp": "2025-12-11T22:21:38.978755",
+      "timestamp": "2025-12-12T04:39:34.902306",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],
@@ -666,7 +666,7 @@
       "partita": "Avs FS vs Nacional",
       "lega": "Liga Portugal",
       "giornata": 15,
-      "timestamp": "2025-12-11T22:21:39.050989",
+      "timestamp": "2025-12-12T04:39:34.983123",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],
@@ -679,7 +679,7 @@
       "partita": "Tondela vs Casa Pia",
       "lega": "Liga Portugal",
       "giornata": 15,
-      "timestamp": "2025-12-11T22:21:39.099627",
+      "timestamp": "2025-12-12T04:39:35.037038",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],
@@ -692,7 +692,7 @@
       "partita": "Santa Clara vs Arouca",
       "lega": "Liga Portugal",
       "giornata": 15,
-      "timestamp": "2025-12-11T22:21:39.148116",
+      "timestamp": "2025-12-12T04:39:35.090899",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],
@@ -705,7 +705,7 @@
       "partita": "Alverca vs FC Porto",
       "lega": "Liga Portugal",
       "giornata": 15,
-      "timestamp": "2025-12-11T22:21:39.196233",
+      "timestamp": "2025-12-12T04:39:35.144575",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],
@@ -718,7 +718,7 @@
       "partita": "Benfica vs Famalicão",
       "lega": "Liga Portugal",
       "giornata": 15,
-      "timestamp": "2025-12-11T22:21:39.268520",
+      "timestamp": "2025-12-12T04:39:35.225321",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],
@@ -731,7 +731,7 @@
       "partita": "Vit. Guimarães vs Sporting",
       "lega": "Liga Portugal",
       "giornata": 15,
-      "timestamp": "2025-12-11T22:21:39.364632",
+      "timestamp": "2025-12-12T04:39:35.332924",
       "motivi": [
         "PARTITA_TROVATA_SENZA_QUOTE"
       ],

@@ -11,17 +11,52 @@ import json
 # --- 0. CONFIGURAZIONE TUNING MIXER ---
 TUNING_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tuning_settings.json")
 
-def load_tuning():
+def load_tuning(algo_mode=5):
+    """
+    Carica i settaggi dal file JSON strutturato.
+    Fonde i parametri 'global' con quelli dell'algoritmo specifico richiesto.
+    """
     try:
-        with open(TUNING_FILE, "r", encoding="utf-8") as f:
-            data = json.load(f)
-            # Restituisce un dizionario pulito {CHIAVE: valore}
-            return {k: v["valore"] for k, v in data.items()}
-    except:
-        return {} # Fallback se manca il file
+        if not os.path.exists(TUNING_FILE):
+            return {}
 
-# Carica i settaggi una volta all'avvio
-S = load_tuning()
+        with open(TUNING_FILE, "r", encoding="utf-8") as f:
+            full_data = json.load(f)
+        
+        # Mappa numerica -> chiave json
+        # (Se non trova l'algo richiesto, usa il 5 come fallback)
+        algo_map = {
+            1: "algo_1_conservative",
+            2: "algo_2_balanced",
+            3: "algo_3_aggressive",
+            4: "algo_4_goals",
+            5: "algo_5_yolo"
+        }
+        
+        target_key = algo_map.get(algo_mode, "algo_5_yolo")
+        
+        # 1. Estraiamo i globali (es. soglie)
+        merged_settings = {}
+        if "global" in full_data:
+            for k, v_obj in full_data["global"].items():
+                if isinstance(v_obj, dict) and "valore" in v_obj:
+                    merged_settings[k] = v_obj["valore"]
+        
+        # 2. Sovrascriviamo con quelli specifici dell'algoritmo
+        if target_key in full_data:
+            for k, v_obj in full_data[target_key].items():
+                if isinstance(v_obj, dict) and "valore" in v_obj:
+                    merged_settings[k] = v_obj["valore"]
+        
+        return merged_settings
+
+    except Exception as e:
+        print(f"⚠️ Errore caricamento tuning: {e}")
+        return {} 
+
+# Carichiamo i settaggi di default (Useremo l'Algo 5 YOLO come base iniziale)
+S = load_tuning(algo_mode=5)
+
 
 # Se i settaggi mancano, usa questi default di sicurezza
 S.setdefault("DIVISORE_MEDIA_GOL", 2.0)
@@ -103,9 +138,22 @@ def calculate_goals_from_engine(home_score, away_score, home_data, away_data, al
     Parametri:
     - home_score/away_score: Punteggi grezzi dal motore principale (H2H points)
     - home_data/away_data: Dizionari completi con tutti i pesi (Rating, Lucifero, Motivation...)
-    """
+        """
+
+    # ⚡ CARICAMENTO DINAMICO DEI PESI ⚡
+    # Ricarichiamo i pesi specifici per l'algoritmo richiesto (algo_mode)
+    # Questa variabile 'S' oscurerà quella globale solo dentro questa funzione.
+    S = load_tuning(algo_mode)
+
+    # Assicuriamoci che ci siano i valori di default critici se mancano nel file
+    S.setdefault("DIVISORE_MEDIA_GOL", 2.0)
+    S.setdefault("POTENZA_FAVORITA_WINSHIFT", 0.40)
+    S.setdefault("IMPATTO_DIFESA_TATTICA", 15.0)
+    S.setdefault("TETTO_MAX_GOL_ATTESI", 3.8)
+    S.setdefault("PESO_RATING_ROSA", 1.0) # Default per i pesi motore se mancano
 
     # --- A. ESTRAZIONE DATI COMPLETI ---
+
     
     # Rating (Forza Rosa 5-25)
     h_rat = home_data.get('rating', 12.5)
