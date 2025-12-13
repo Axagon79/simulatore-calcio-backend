@@ -145,6 +145,15 @@ def calculate_goals_from_engine(home_score, away_score, home_data, away_data, al
     # Questa variabile 'S' oscurerà quella globale solo dentro questa funzione.
     S = load_tuning(algo_mode)
 
+
+        # --- INIZIO SPIA DEBUG ---
+    print(f"\n[DEBUG GOALS] Sto usando ALGO: {algo_mode}")
+    print(f"   -> Fattore Campo: {S.get('PESO_FATTORE_CAMPO')}")
+    print(f"   -> Forma Recente: {S.get('PESO_FORMA_RECENTE')}")
+    print(f"   -> Potenza WinShift: {S.get('POTENZA_FAVORITA_WINSHIFT')}")
+    # --- FINE SPIA DEBUG ---
+
+
     # Assicuriamoci che ci siano i valori di default critici se mancano nel file
     S.setdefault("DIVISORE_MEDIA_GOL", 2.0)
     S.setdefault("POTENZA_FAVORITA_WINSHIFT", 0.40)

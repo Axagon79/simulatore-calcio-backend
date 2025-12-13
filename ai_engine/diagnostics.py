@@ -15,7 +15,9 @@ THRESHOLDS = {
 }
 
 def load_thresholds():
-    """Carica le soglie dal file tuning_settings.json"""
+    """Carica le soglie ESCLUSIVAMENTE dalla sezione GLOBAL (maiuscolo)"""
+    global THRESHOLDS 
+    
     potential_paths = [
         "tuning_settings.json", 
         "ai_engine/engine/tuning_settings.json",
@@ -27,33 +29,47 @@ def load_thresholds():
         if os.path.exists(path):
             try:
                 with open(path, "r", encoding="utf-8") as f:
-                    loaded_data = json.load(f)
+                    full_data = json.load(f)
+                
+                # Cerca la sezione GLOBAL (maiuscolo, come nel tuo file)
+                # Fallback a 'global' o root se non esiste
+                global_data = full_data.get("GLOBAL", full_data.get("global", full_data))
+
+                def estrai(chiave, default):
+                    if chiave in global_data:
+                        obj = global_data[chiave]
+                        if isinstance(obj, dict) and "valore" in obj:
+                            return float(obj["valore"])
+                        if isinstance(obj, (int, float)):
+                            return float(obj)
+                    return default
+
+                # Assegnazione valori blindati
+                THRESHOLDS['1X2']['red'] = estrai("THR_1X2_RED", 50.0)
+                THRESHOLDS['1X2']['green'] = estrai("THR_1X2_GREEN", 65.0)
+                
+                THRESHOLDS['UO']['red'] = estrai("THR_UO_RED", 55.0)
+                THRESHOLDS['UO']['green'] = estrai("THR_UO_GREEN", 70.0)
+                
+                THRESHOLDS['GG']['red'] = estrai("THR_GG_RED", 60.0)
+                THRESHOLDS['GG']['green'] = estrai("THR_GG_GREEN", 75.0)
                     
-                if "THR_1X2_RED" in loaded_data: 
-                    THRESHOLDS['1X2']['red'] = loaded_data["THR_1X2_RED"]["valore"]
-                if "THR_1X2_GREEN" in loaded_data: 
-                    THRESHOLDS['1X2']['green'] = loaded_data["THR_1X2_GREEN"]["valore"]
-                if "THR_UO_RED" in loaded_data: 
-                    THRESHOLDS['UO']['red'] = loaded_data["THR_UO_RED"]["valore"]
-                if "THR_UO_GREEN" in loaded_data: 
-                    THRESHOLDS['UO']['green'] = loaded_data["THR_UO_GREEN"]["valore"]
-                if "THR_GG_RED" in loaded_data: 
-                    THRESHOLDS['GG']['red'] = loaded_data["THR_GG_RED"]["valore"]
-                if "THR_GG_GREEN" in loaded_data: 
-                    THRESHOLDS['GG']['green'] = loaded_data["THR_GG_GREEN"]["valore"]
-                    
-                print(f"✅ [DASHBOARD] Soglie caricate da: {path}")
+                print(f"✅ [DASHBOARD] Soglie GLOBAL caricate da: {path}")
                 print(f"   → 1X2: Rosso < {THRESHOLDS['1X2']['red']}% | Verde ≥ {THRESHOLDS['1X2']['green']}%")
                 print(f"   → U/O: Rosso < {THRESHOLDS['UO']['red']}% | Verde ≥ {THRESHOLDS['UO']['green']}%")
-                print(f"   → GG: Rosso < {THRESHOLDS['GG']['red']}% | Verde ≥ {THRESHOLDS['GG']['green']}%")
+                print(f"   → GG:  Rosso < {THRESHOLDS['GG']['red']}% | Verde ≥ {THRESHOLDS['GG']['green']}%")
                 return
+
             except Exception as e:
                 print(f"⚠️ [DASHBOARD] Errore lettura {path}: {e}")
                 continue
     
-    print("⚠️ [DASHBOARD] File tuning non trovato, uso soglie default.")
+    print("⚠️ [DASHBOARD] File tuning non trovato.")
 
+# Esegui il caricamento subito
 load_thresholds()
+
+
 
 def get_thr_color_and_label(market, pct):
     """Restituisce colore bootstrap e etichetta in base alle soglie caricate"""
