@@ -9,24 +9,117 @@ import contextlib
 import random
 import diagnostics
 
+# --- CONFIGURAZIONI ---
+MONTE_CARLO_TOTAL_CYCLES = 5000  # Default, sovrascritto dal menu
+CSV_DELIMITER = ';'
+
+
+# --- FUNZIONE MENU CICLI ---
+def ask_monte_carlo_cycles():
+    """
+    Menu interattivo per scegliere quanti cicli Monte Carlo eseguire.
+    Restituisce il numero totale di cicli (divisibili per 4 algoritmi).
+    """
+    while True:
+        print("\n" + "="*60)
+        print("🎲 CONFIGURAZIONE MONTE CARLO")
+        print("="*60)
+        print("\n📊 PRESET VELOCITÀ (Cicli Totali / Per Algoritmo):\n")
+        print("   [1] ⚡ TURBO       →    400 totali  (100 per algo)    ~10 sec")
+        print("   [2] 🏃 RAPIDO      →  1,000 totali  (250 per algo)    ~20 sec")
+        print("   [3] 🚶 VELOCE      →  2,000 totali  (500 per algo)    ~40 sec")
+        print("   [4] ⚖️  STANDARD    →  5,000 totali  (1,250 per algo)  ~90 sec")
+        print("   [5] 🎯 ACCURATO    → 10,000 totali  (2,500 per algo)  ~3 min")
+        print("   [6] 🔬 PRECISO     → 20,000 totali  (5,000 per algo)  ~6 min")
+        print("   [7] 💎 ULTRA       → 50,000 totali  (12,500 per algo) ~15 min")
+        print("\n   [8] ✏️  PERSONALIZZATO (Inserisci numero manuale)")
+        print("   [99] 🔙 ANNULLA\n")
+        
+        try:
+            choice = int(input("   Scelta: ").strip())
+        except ValueError:
+            print("❌ Input non valido. Inserisci un numero.")
+            continue
+        
+        if choice == 99:
+            return None
+        
+        presets = {
+            1: 400,
+            2: 1000,
+            3: 2000,
+            4: 5000,
+            5: 10000,
+            6: 20000,
+            7: 50000
+        }
+        
+        if choice in presets:
+            total = presets[choice]
+            per_algo = total // 4
+            
+            print(f"\n✅ Selezionato: {total:,} cicli totali ({per_algo:,} per algoritmo)")
+            confirm = input("   Confermi? [S/n]: ").strip().upper()
+            if confirm in ['', 'S', 'Y', 'SI', 'YES']:
+                return total
+            else:
+                continue
+        
+        elif choice == 8:
+            while True:
+                print("\n✏️  MODALITÀ PERSONALIZZATA")
+                print("   Inserisci numero cicli totali (min: 100, max: 100,000)")
+                print("   Nota: Verrà arrotondato al multiplo di 4 più vicino")
+                
+                try:
+                    custom = int(input("\n   Cicli totali: ").strip())
+                except ValueError:
+                    print("❌ Inserisci un numero valido.")
+                    continue
+                
+                if custom < 100:
+                    print("❌ Minimo 100 cicli.")
+                    continue
+                if custom > 100000:
+                    print("❌ Massimo 100,000 cicli.")
+                    continue
+                
+                adjusted = (custom // 4) * 4
+                if adjusted != custom:
+                    print(f"⚠️  Arrotondato a {adjusted:,} (multiplo di 4)")
+                
+                per_algo = adjusted // 4
+                tempo_stimato = adjusted // 60
+                
+                print(f"\n📊 Riepilogo:")
+                print(f"   • Cicli totali:     {adjusted:,}")
+                print(f"   • Per algoritmo:    {per_algo:,}")
+                print(f"   • Tempo stimato:    ~{tempo_stimato} secondi")
+                
+                confirm = input("\n   Confermi? [S/n]: ").strip().upper()
+                if confirm in ['', 'S', 'Y', 'SI', 'YES']:
+                    return adjusted
+                else:
+                    break
+        
+        else:
+            print("❌ Scelta non valida.")
+
 
 # --- HARD FIX PERCORSI ---
 current_script_path = os.path.abspath(__file__)
 ai_engine_dir = os.path.dirname(current_script_path)
 project_root = os.path.dirname(ai_engine_dir)
 
-
 if project_root not in sys.path: sys.path.insert(0, project_root)
 if ai_engine_dir not in sys.path: sys.path.insert(0, ai_engine_dir)
 if os.path.join(ai_engine_dir, 'engine') not in sys.path: sys.path.insert(0, os.path.join(ai_engine_dir, 'engine'))
-
 
 try:
     try: from config import db
     except: 
         sys.path.append(project_root)
         from config import db
-
 
     import engine_core 
     from engine_core import predict_match, preload_match_data
@@ -39,15 +132,9 @@ try:
     except:
         print("⚠️ PredictionManager NON trovato (Salvataggio DB off).")
 
-
 except ImportError as e:
     print(f"❌ ERRORE FATALE IMPORT: {e}")
     sys.exit(1)
-
-
-# --- CONFIGURAZIONI ---
-MONTE_CARLO_TOTAL_CYCLES = 5000
-CSV_DELIMITER = ';'
 
 
 # --- MAPPA NAZIONI ---
@@ -101,7 +188,6 @@ def has_valid_results(round_doc):
     return False
 
 
-# --- NUOVA FUNZIONE ANALISI QUOTE ---
 def analyze_odds(match):
     """Calcola favorita bookmaker e colora quote per HTML"""
     odds = match.get("odds", {})
@@ -114,7 +200,6 @@ def analyze_odds(match):
         min_q = min(q1, qx, q2)
         fav_sign = "1" if q1 == min_q else ("2" if q2 == min_q else "X")
         
-        # Colora la quota più bassa
         s1 = f"<b>{q1:.2f}</b>" if fav_sign == "1" else f"{q1:.2f}"
         sx = f"<b>{qx:.2f}</b>" if fav_sign == "X" else f"{qx:.2f}"
         s2 = f"<b>{q2:.2f}</b>" if fav_sign == "2" else f"{q2:.2f}"
@@ -128,100 +213,196 @@ def analyze_odds(match):
 def run_single_algo(algo_id, preloaded_data):
     s_h, s_a, r_h, r_a = predict_match("", "", mode=algo_id, preloaded_data=preloaded_data)
     if s_h is None: return 0, 0
-    gh, ga, _, _, _ = calculate_goals_from_engine(s_h, s_a, r_h, r_a, algo_mode=algo_id)
+    gh, ga, *_ = calculate_goals_from_engine(s_h, s_a, r_h, r_a, algo_mode=algo_id)
     return gh, ga
 
 
-def run_monte_carlo_verdict_detailed(preloaded_data):
+def run_monte_carlo_verdict_detailed(preloaded_data, home_team, away_team):
     """
-    Versione dettagliata con logica CORRETTA del File 1:
-    - Ogni algoritmo vota solo con i suoi top 3 risultati più frequenti
-    - Elimina il rumore statistico
-    - Ritorna: (gh, ga), stats_per_algo
+    Versione SILENZIOSA con statistiche pesi aggregate.
     """
     nominees = []
-    algos_stats = {}  # Statistiche per algoritmo
-    algos_full_results = {}  # ← NUOVO: Tutti i risultati grezzi
+    algos_stats = {}
+    algos_full_results = {}
+    algos_weights_tracking = {}
+    algos_scontrini_tracking = {}
+    
     algos = [2, 3, 4, 5]
     cycles_per_algo = MONTE_CARLO_TOTAL_CYCLES // 4
     
-    for aid in algos:
-        local_results = []  # ← Lista locale per ogni algoritmo
-        for _ in range(cycles_per_algo): 
-            s_h, s_a, r_h, r_a = predict_match("", "", mode=aid, preloaded_data=preloaded_data)
-            if s_h is None: continue
-            gh, ga, _, _, _ = calculate_goals_from_engine(s_h, s_a, r_h, r_a, algo_mode=aid)
-            local_results.append(f"{gh}-{ga}")
-        
-        if not local_results: continue
-        
-        # ✅ SALVA TUTTI I RISULTATI GREZZI
-        algos_full_results[aid] = local_results.copy()  # ← NUOVO
-        
-        # ✅ PRENDE SOLO I TOP 3 RISULTATI (filtra il rumore)
-        top_3 = Counter(local_results).most_common(3)
-        algos_stats[aid] = top_3  # Salva per output dettagliato
-        
-        # Aggiunge i top 3 al pool finale con peso
-        for sc, freq in top_3:
-            w = int(freq) 
-            nominees.extend([sc] * w)
+    # 📊 STAMPA INFORMATIVA
+    print(f"\n🎲 Monte Carlo: {MONTE_CARLO_TOTAL_CYCLES:,} simulazioni totali")
+    print(f"   ({cycles_per_algo:,} per algoritmo)")
     
-    if not nominees: return (0, 0), algos_stats, []
-    
-    # Scelta finale pesata
-    final_verdict = random.choice(nominees)
-    gh, ga = map(int, final_verdict.split("-"))
-    
-    # Calcola top 3 globale per display
-    global_top3 = Counter(nominees).most_common(3)
-    
-    # ========== SALVATAGGIO DEBUG FILE ========== 
-    import json
-    import os
-    from datetime import datetime
-    
-    debug_data = {
-        'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        'match': preloaded_data.get('match_info', 'Unknown'),  # Se hai info partita
-        'risultato_finale': f"{gh}-{ga}",
-        'algoritmi': {}
-    }
+    tempo_stimato = MONTE_CARLO_TOTAL_CYCLES // 70
+    if tempo_stimato < 60:
+        print(f"   ⏱️  Tempo stimato: ~{tempo_stimato} secondi")
+    else:
+        minuti = tempo_stimato // 60
+        secondi = tempo_stimato % 60
+        print(f"   ⏱️  Tempo stimato: ~{minuti}m {secondi}s")
+    print()
     
     algo_names = {2: 'Dinamico', 3: 'Tattico', 4: 'Caos', 5: 'Master'}
     
     for aid in algos:
-        if aid not in algos_full_results:
-            continue
-            
-        all_results = algos_full_results[aid]
-        freq_counter = Counter(all_results)
+        local_results = []
+        weights_sum = {}
+        params_sum = {}
+        scontrini_sum = {'casa': {}, 'ospite': {}}
+        valid_cycles = 0
         
-        debug_data['algoritmi'][algo_names[aid]] = {
-            'totale_simulazioni': len(all_results),
-            'risultati_completi': all_results,
-            'top_10': freq_counter.most_common(10),
-            'top_3_usati': algos_stats.get(aid, [])
+        print(f"🔄 {algo_names[aid]}...", end=" ", flush=True)
+        
+        for cycle_idx in range(cycles_per_algo):
+            with suppress_stdout():
+                s_h, s_a, r_h, r_a = predict_match(home_team, away_team, mode=aid, preloaded_data=preloaded_data)
+                if s_h is None: continue
+                
+                gh, ga, _, _, _, pesi_dettagliati, parametri, scontrino_casa, scontrino_ospite = calculate_goals_from_engine(
+                    s_h, s_a, r_h, r_a, algo_mode=aid, home_name=home_team, away_name=away_team
+                )
+                
+                score = f"{gh}-{ga}"
+                local_results.append(score)
+                valid_cycles += 1
+                
+                # Accumula pesi (versione SMART)
+                if pesi_dettagliati:
+                    for nome_peso, info in pesi_dettagliati.items():
+                        if nome_peso not in weights_sum:
+                            weights_sum[nome_peso] = {
+                                'base_sum': 0,
+                                'multiplier_sum': 0,
+                                'final_sum': 0,
+                                'disabled_count': 0,
+                                'count': 0
+                            }
+                        
+                        weights_sum[nome_peso]['base_sum'] += info['weight_base']
+                        weights_sum[nome_peso]['multiplier_sum'] += info['multiplier']
+                        weights_sum[nome_peso]['final_sum'] += info['weight_final']
+                        weights_sum[nome_peso]['disabled_count'] += (1 if info['is_disabled'] else 0)
+                        weights_sum[nome_peso]['count'] += 1
+                
+                # Accumula parametri
+                if parametri:
+                    for nome_param, valore in parametri.items():
+                        if nome_param not in params_sum:
+                            params_sum[nome_param] = {'sum': 0, 'count': 0}
+                        params_sum[nome_param]['sum'] += valore
+                        params_sum[nome_param]['count'] += 1
+                
+                # Accumula scontrini
+                if scontrino_casa:
+                    for voce, dati in scontrino_casa.items():
+                        if voce not in scontrini_sum['casa']:
+                            scontrini_sum['casa'][voce] = {'valore_sum': 0, 'peso_sum': 0, 'punti_sum': 0}
+                        scontrini_sum['casa'][voce]['valore_sum'] += dati.get('valore', 0)
+                        scontrini_sum['casa'][voce]['peso_sum'] += dati.get('peso', 0)
+                        scontrini_sum['casa'][voce]['punti_sum'] += dati.get('punti', 0)
+                
+                if scontrino_ospite:
+                    for voce, dati in scontrino_ospite.items():
+                        if voce not in scontrini_sum['ospite']:
+                            scontrini_sum['ospite'][voce] = {'valore_sum': 0, 'peso_sum': 0, 'punti_sum': 0}
+                        scontrini_sum['ospite'][voce]['valore_sum'] += dati.get('valore', 0)
+                        scontrini_sum['ospite'][voce]['peso_sum'] += dati.get('peso', 0)
+                        scontrini_sum['ospite'][voce]['punti_sum'] += dati.get('punti', 0)
+            
+            # Barra progresso
+            if cycle_idx % (cycles_per_algo // 10) == 0 or cycle_idx == cycles_per_algo - 1:
+                pct = (cycle_idx + 1) / cycles_per_algo * 100
+                bar_len = int(pct / 5)
+                bar = "█" * bar_len + "░" * (20 - bar_len)
+                print(f"\r🔄 {algo_names[aid]}... {bar} {pct:.0f}%", end="", flush=True)
+        
+        print(f"  ✅ {valid_cycles} cicli")
+        
+        if not local_results:
+            continue
+        
+        # Calcola medie intelligenti
+        if valid_cycles > 0:
+            weights_avg = {}
+            for nome_peso, dati in weights_sum.items():
+                weights_avg[nome_peso] = {
+                    'base': round(dati['base_sum'] / dati['count'], 3),
+                    'multiplier': round(dati['multiplier_sum'] / dati['count'], 2),
+                    'final': round(dati['final_sum'] / dati['count'], 3),
+                    'disabled_pct': round((dati['disabled_count'] / dati['count']) * 100, 1)
+                }
+            
+            params_avg = {}
+            for nome_param, dati in params_sum.items():
+                params_avg[nome_param] = round(dati['sum'] / dati['count'], 2)
+            
+            algos_weights_tracking[aid] = {'pesi': weights_avg, 'parametri': params_avg}
+            
+            # Calcola medie scontrini
+            scontrini_avg = {'casa': {}, 'ospite': {}}
+            for team in ['casa', 'ospite']:
+                for voce, dati in scontrini_sum[team].items():
+                    scontrini_avg[team][voce] = {
+                        'valore': round(dati['valore_sum'] / valid_cycles, 2),
+                        'peso': round(dati['peso_sum'] / valid_cycles, 2),
+                        'punti': round(dati['punti_sum'] / valid_cycles, 2)
+                    }
+            algos_scontrini_tracking[aid] = scontrini_avg
+        
+        algos_full_results[aid] = local_results.copy()
+        top_3 = Counter(local_results).most_common(3)
+        algos_stats[aid] = top_3
+        
+        preview = ", ".join([f"{sc}({freq})" for sc, freq in top_3[:3]])
+        print(f"   📊 Top 3: {preview}")
+        
+        for sc, freq in top_3:
+            nominees.extend([sc] * freq)
+    
+    if not nominees:
+        return (0, 0), {}, [], {}, {}
+    
+    final_verdict = random.choice(nominees)
+    gh, ga = map(int, final_verdict.split("-"))
+    global_top3 = Counter(nominees).most_common(3)
+    
+    # Salva debug JSON
+    try:
+        import json
+        
+        debug_data = {
+            'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            'match': f"{home_team} vs {away_team}",
+            'risultato_finale': f"{gh}-{ga}",
+            'algoritmi': {}
         }
+        
+        for aid in algos:
+            if aid in algos_full_results:
+                all_results = algos_full_results[aid]
+                freq_counter = Counter(all_results)
+                
+                debug_data['algoritmi'][algo_names[aid]] = {
+                    'totale_simulazioni': len(all_results),
+                    'top_10': freq_counter.most_common(10),
+                    'top_3_usati': algos_stats.get(aid, []),
+                    'pesi_medi': algos_weights_tracking.get(aid, {}),
+                    'scontrino_medio': algos_scontrini_tracking.get(aid, {})
+                }
+        
+        with open("monte_carlo_debug.json", "w", encoding="utf-8") as f:
+            json.dump(debug_data, f, indent=2, ensure_ascii=False)
+    except:
+        pass
     
-    # Salva in JSON
-    debug_file = "monte_carlo_debug_NEW2.json"
-    with open(debug_file, "w", encoding="utf-8") as f:
-        json.dump(debug_data, f, indent=2, ensure_ascii=False)
-    
-    #print(f"\n💾 [DEBUG] Dati Monte Carlo salvati in: {debug_file}")
-    # ============================================
-    
-    return (gh, ga), algos_stats, global_top3
+    return (gh, ga), algos_stats, global_top3, algos_weights_tracking, algos_scontrini_tracking
 
 
 # --- LOGICA NAVIGAZIONE GERARCHICA ---
-
-
 def flow_single_match():
     """Gestisce il flusso Nazione -> Lega -> Giornata -> Partita -> Algoritmo."""
     
-    # 1. LOOP NAZIONE
     while True:
         print("\n🌍 SELEZIONA NAZIONE:")
         nations_list = list(NATION_GROUPS.keys())
@@ -232,11 +413,10 @@ def flow_single_match():
         try: n_sel = int(input("   Scelta: ").strip())
         except: continue
         
-        if n_sel == 99: return None, None
+        if n_sel == 99: return None, None, None
         if n_sel < 1 or n_sel > len(nations_list): continue
         selected_nation = nations_list[n_sel-1]
         
-        # 2. LOOP LEGA
         while True:
             possible_leagues = NATION_GROUPS[selected_nation]
             print(f"\n🏆 SELEZIONA CAMPIONATO ({selected_nation}):")
@@ -250,15 +430,12 @@ def flow_single_match():
             if l_sel < 1 or l_sel > len(possible_leagues): continue
             selected_league_name = possible_leagues[l_sel-1]
 
-
-            # 3. LOOP GIORNATA
             while True:
                 print(f"\n📅 SELEZIONA PERIODO ({selected_league_name}):")
                 print("   [1] GIORNATA PRECEDENTE (Appena finita)")
                 print("   [2] GIORNATA ATTUALE (In corso/Prossima)")
                 print("   [3] GIORNATA SUCCESSIVA (Futura)")
                 print("   [99] INDIETRO (Torna a Campionati)")
-
 
                 try: d_sel = int(input("   Scelta: ").strip())
                 except: continue
@@ -270,7 +447,6 @@ def flow_single_match():
                 elif d_sel == 3: OFFSET = 1
                 else: continue
             
-                # 4. LOOP PARTITE
                 while True:
                     print(f"\n⚽ RECUPERO PARTITE PER: {selected_league_name}...")
                     rounds_cursor = db.h2h_by_round.find({"league": selected_league_name})
@@ -279,10 +455,8 @@ def flow_single_match():
                         print("❌ Nessun dato trovato.")
                         break
 
-
                     rounds_list.sort(key=lambda x: get_round_number(x.get('round_name', '0')))
                     
-                    # Logica Anchor
                     anchor_index = -1
                     for i, r in enumerate(rounds_list):
                         if any(m.get('status') in ['Scheduled', 'Timed'] for m in r.get('matches', [])):
@@ -300,13 +474,11 @@ def flow_single_match():
                         print(f"❌ Nessuna giornata trovata per l'offset selezionato.")
                         break
 
-
                     target_round = rounds_list[target_index]
                     matches = target_round.get('matches', [])
                     if not matches:
                         print("❌ Nessuna partita in questa giornata.")
                         break
-
 
                     print(f"📌 Giornata: {target_round.get('round_name')}")
                     print("\nPARTITE DISPONIBILI:")
@@ -320,21 +492,17 @@ def flow_single_match():
                             q_info = f" [Q:{o1}|{ox}|{o2}]"
                         print(f"   [{i+1}] {m['home']} vs {m['away']} {real}{q_info}")
 
-
                     print("   [99] INDIETRO")
-
 
                     try: m_sel = int(input("   Scegli partita: ").strip())
                     except: continue
                     if m_sel == 99: break
                     if m_sel < 1 or m_sel > len(matches): continue
 
-
                     selected_match = matches[m_sel-1]
                     selected_match['league'] = selected_league_name
                     selected_match['round'] = target_round.get('round_name')
                     
-                    # 5. SCELTA ALGORITMO
                     print("\n🧠 SCELTA ALGORITMO:")
                     print("   [0] TUTTI (Report Completo)")
                     print("   [1] Statistico Puro")
@@ -347,10 +515,19 @@ def flow_single_match():
                     try: algo_sel = int(input("   Scelta: ").strip())
                     except: algo_sel = 0
                     
-                    return [selected_match], algo_sel
+                    monte_carlo_cycles = None
+                    if algo_sel == 6:
+                        monte_carlo_cycles = ask_monte_carlo_cycles()
+                        if monte_carlo_cycles is None:
+                            continue
+                    
+                    return [selected_match], algo_sel, monte_carlo_cycles
+
 
 # --- LOGICA CORE ---
 def run_universal_simulator():
+    global MONTE_CARLO_TOTAL_CYCLES
+    
     while True:
         print(f"\n" + "="*60)
         print(f"🌍 SIMULATORE UNIVERSALE (v6 - Total Edition + SafeGuard)")
@@ -367,19 +544,17 @@ def run_universal_simulator():
         offsets_to_run = []
         MODE_SINGLE = False
         AUTO_ALL_LEAGUES = False
-        ONLY_FINISHED = False  # <--- AGGIUNGI QUESTA RIGA QUI
+        ONLY_FINISHED = False
         selected_algo_id = 0
         
         try: main_choice = int(input("   Scelta: ").strip())
         except: continue
 
-
         if main_choice == 99: sys.exit(0)
         elif main_choice == 0:
-            # 💎 CONFIGURAZIONE SUPER TOTAL (SOLO FINITE)
             offsets_to_run = [-1, 0, 1] 
             AUTO_ALL_LEAGUES = True
-            ONLY_FINISHED = True # <--- ATTIVIAMO IL FILTRO
+            ONLY_FINISHED = True
             print("\n💎 MODALITÀ TOTAL (VERIFICA): Analisi partite CONCLUSE (con risultato) di Ieri, Oggi e Domani.")
         elif main_choice == 1: offsets_to_run = [-1]
         elif main_choice == 2: offsets_to_run = [0]
@@ -388,16 +563,26 @@ def run_universal_simulator():
         else: 
             print("❌ Scelta non valida."); continue
 
-
         matches_to_process = []
 
-
         if MODE_SINGLE:
-            matches_to_process, selected_algo_id = flow_single_match()
-            if not matches_to_process: continue
+            result = flow_single_match()
+            if result is None or len(result) < 2:
+                continue
+            
+            matches_to_process = result[0]
+            selected_algo_id = result[1]
+            
+            if len(result) >= 3 and result[2] is not None:
+                MONTE_CARLO_TOTAL_CYCLES = result[2]
+                print(f"\n⚙️  Configurato: {MONTE_CARLO_TOTAL_CYCLES:,} cicli Monte Carlo")
+            else:
+                MONTE_CARLO_TOTAL_CYCLES = 5000
+            
+            if not matches_to_process: 
+                continue
         
         else:
-            # --- FLUSSO MASSIVO INTELLIGENTE ---
             selected_leagues_names = []
             
             if AUTO_ALL_LEAGUES:
@@ -425,18 +610,34 @@ def run_universal_simulator():
                     except: continue
 
                 if not selected_leagues_names: continue
-
-
-            print(f"\n🔍 Recupero partite (Periodi: {offsets_to_run})...")
             
-            # --- LOOP INTELLIGENTE SU LEGHE E OFFSETS ---
+            if not MODE_SINGLE:
+                will_use_montecarlo = False
+                
+                if selected_algo_id == 0:
+                    will_use_montecarlo = True
+                elif selected_algo_id == 6:
+                    will_use_montecarlo = True
+                
+                if will_use_montecarlo:
+                    print("\n⚠️  Stai per simulare MOLTE partite con Monte Carlo.")
+                    print("    Si consiglia modalità RAPIDA (1000 cicli) o VELOCE (2000 cicli)\n")
+                    
+                    mc_cycles = ask_monte_carlo_cycles()
+                    if mc_cycles is None:
+                        print("❌ Operazione annullata.")
+                        continue
+                    
+                    MONTE_CARLO_TOTAL_CYCLES = mc_cycles
+                    print(f"\n⚙️  Configurato: {MONTE_CARLO_TOTAL_CYCLES:,} cicli Monte Carlo")
+                    print(f"\n🔍 Recupero partite (Periodi: {offsets_to_run})...")
+            
             for league_name in selected_leagues_names:
                 rounds_cursor = db.h2h_by_round.find({"league": league_name})
                 rounds_list = list(rounds_cursor)
                 if not rounds_list: continue
                 rounds_list.sort(key=lambda x: get_round_number(x.get('round_name', '0')))
                 
-                # Trova Anchor
                 anchor_index = -1
                 for i, r in enumerate(rounds_list):
                     if any(m.get('status') in ['Scheduled', 'Timed'] for m in r.get('matches', [])):
@@ -446,7 +647,6 @@ def run_universal_simulator():
                             if has_valid_results(rounds_list[i]): 
                                 anchor_index = i; break
                 
-                # Cicla su tutti gli offsets richiesti (Super Total o singolo)
                 for off in offsets_to_run:
                     target_index = anchor_index + off
                     if 0 <= target_index < len(rounds_list):
@@ -455,27 +655,20 @@ def run_universal_simulator():
                         
                         for m in target_round.get('matches', []):
                             
-                            # --- MODIFICA: FILTRO SOLO PARTITE FINITE ---
-                            # Se siamo in modalità Total/Verifica, prendiamo SOLO quelle con risultato reale
                             if ONLY_FINISHED:
                                 s = m.get('real_score')
-                                # Se il risultato è nullo, vuoto o non ha il formato "X:Y", SALTA la partita
                                 if not (s and isinstance(s, str) and ":" in s and s != "null"):
                                     continue
-                            # --------------------------------------------
 
                             m_copy = m.copy()
                             m_copy['league'] = league_name
                             m_copy['round'] = r_name
                             matches_to_process.append(m_copy)
 
-
         if not matches_to_process:
             print("❌ Nessuna partita trovata (o nessuna partita conclusa, se in modalità Verifica).")
             continue
 
-
-        # --- FORMATTAZIONE DATI ---
         final_matches_list = []
         for m in matches_to_process:
             real_s = m.get('real_score'); has_real = False; rh, ra = 0, 0
@@ -485,7 +678,6 @@ def run_universal_simulator():
             
             d_obj = m.get('date_obj')
             d_str = d_obj.strftime("%d/%m %H:%M") if d_obj else "Data N/D"
-            # Importante per Anti-Duplicati: data normalizzata ISO
             d_iso = d_obj.strftime("%Y-%m-%d") if d_obj else str(datetime.now().date())
             
             final_matches_list.append({
@@ -497,8 +689,6 @@ def run_universal_simulator():
                 "status": m.get('status', 'Unknown'), "odds": m.get('odds', {}) 
             })
 
-
-        # --- ANTEPRIMA ---
         if not MODE_SINGLE:
             print(f"\n📋 ANTEPRIMA ({len(final_matches_list)} partite):")
             limit_prev = 10 if not AUTO_ALL_LEAGUES else 5
@@ -508,8 +698,6 @@ def run_universal_simulator():
             if len(final_matches_list) > limit_prev:
                 print(f"   ... e altre {len(final_matches_list)-limit_prev} partite")
 
-
-        # --- BLOCCO DI CONTROLLO RIGIDO 🛡️ ---
         proceed_with_simulation = False
         save_to_db = False
         manager = None
@@ -535,7 +723,6 @@ def run_universal_simulator():
                 save_to_db = True
                 proceed_with_simulation = True
                 
-                # Se è Total, forza Sandbox per sicurezza, altrimenti chiedi
                 if AUTO_ALL_LEAGUES:
                     print("   (Total Mode: Salvataggio automatico su SANDBOX)")
                     choice = '1'
@@ -555,20 +742,16 @@ def run_universal_simulator():
             print("🔙 Operazione annullata. Ritorno al menu...")
             continue
 
-
-        # --- ELABORAZIONE ---
         filename = "simulation_report.csv" if not AUTO_ALL_LEAGUES else "total_simulation_report.csv"
         print(f"\n⏳ Elaborazione in corso... Output: {filename}")
         
         all_algos = ['Stat', 'Din', 'Tat', 'Caos', 'Master', 'MonteCarlo']
         data_by_algo = {name: [] for name in all_algos}
         
-        # Filtra algoritmi da eseguire
         algos_indices = []
         if selected_algo_id == 0: algos_indices = [1, 2, 3, 4, 5, 6]
         elif selected_algo_id == 6: algos_indices = [6]
         else: algos_indices = [selected_algo_id]
-
 
         iterator = tqdm(final_matches_list) if not MODE_SINGLE else final_matches_list
         
@@ -582,7 +765,6 @@ def run_universal_simulator():
             
             algo_preds_db = {}
             
-            # Esegui algoritmi standard (1-5)
             for aid in [i for i in algos_indices if i <= 5]:
                 th, ta = run_single_algo(aid, preloaded)
                 name = all_algos[aid-1]
@@ -592,11 +774,14 @@ def run_universal_simulator():
                 if MODE_SINGLE:
                     print(f"   🔹 {name}: {th}-{ta} ({get_sign(th, ta)})")
 
-
-            # Esegui MonteCarlo (6)
             mh, ma = 0, 0
+            pesi_medi = {}
+            scontrini_medi = {}
+            
             if 6 in algos_indices:
-                (mh, ma), algos_stats, global_top3 = run_monte_carlo_verdict_detailed(preloaded)
+                (mh, ma), algos_stats, global_top3, pesi_medi, scontrini_medi = run_monte_carlo_verdict_detailed(
+                    preloaded, match['home'], match['away']
+                )
                 data_by_algo['MonteCarlo'].append({'match': match, 'pred_gh': mh, 'pred_ga': ma})
                 
                 if MODE_SINGLE:
@@ -610,11 +795,70 @@ def run_universal_simulator():
                     algo_names_map = {2: 'Dinamico', 3: 'Tattico', 4: 'Caos', 5: 'Master'}
                     for aid, top3 in algos_stats.items():
                         print(f"      [{algo_names_map[aid]}] Top 3: {top3}")
+                    
+                    # ✨ STAMPA PESI
+                    if pesi_medi:
+                        print(f"\n   ⚖️  CONFIGURAZIONE PESI PER ALGORITMO:")
+                        for aid, dati in pesi_medi.items():
+                            print(f"\n      [{algo_names_map[aid]}]")
+                            
+                            pesi = dati.get('pesi', {})
+                            parametri = dati.get('parametri', {})
+                            
+                            print(f"      📊 PESI VITTORIA:")
+                            for nome, info in pesi.items():
+                                base = info['base']
+                                mult = info['multiplier']
+                                final = info['final']
+                                disabled = info['disabled_pct']
+                                
+                                if disabled > 0:
+                                    status = f"🔴 DISATTIVATO ({disabled:.0f}%)"
+                                elif mult > 1.5:
+                                    status = f"🟢 AMPLIFICATO (x{mult:.1f})"
+                                elif mult < 0.8:
+                                    status = f"🟡 RIDOTTO (x{mult:.1f})"
+                                else:
+                                    status = f"⚪ NORMALE (x{mult:.1f})"
+                                
+                                print(f"      ├─ {nome:<18} → Base:{base:.2f} × {mult:.1f} = {final:.3f}  {status}")
+                            
+                            print(f"\n      ⚙️  PARAMETRI GOL:")
+                            for nome, valore in parametri.items():
+                                print(f"      ├─ {nome:<18} → {valore:.2f}")
+                    
+                    # ✨ STAMPA SCONTRINO MEDIO
+                    if scontrini_medi:
+                        cycles_per_algo = MONTE_CARLO_TOTAL_CYCLES // 4
+                        print(f"\n   🧾 SCONTRINO MEDIO (Su {cycles_per_algo:,} simulazioni):")
+                        for aid, scontrino in scontrini_medi.items():
+                            print(f"\n   [{algo_names_map[aid]}]")
+                            print(f"   {'VOCE':<15} | {'CASA (V×P=Pt)':<25} | {'OSPITE (V×P=Pt)':<25}")
+                            print("-" * 70)
+                            
+                            voci = set(list(scontrino.get('casa', {}).keys()) + list(scontrino.get('ospite', {}).keys()))
+                            totale_casa = 0
+                            totale_ospite = 0
+                            
+                            for voce in sorted(voci):
+                                casa_data = scontrino.get('casa', {}).get(voce, {'valore': 0, 'peso': 0, 'punti': 0})
+                                ospite_data = scontrino.get('ospite', {}).get(voce, {'valore': 0, 'peso': 0, 'punti': 0})
+                                
+                                casa_str = f"{casa_data['valore']:>5.1f} × {casa_data['peso']:>4.2f} = {casa_data['punti']:>6.2f}"
+                                ospite_str = f"{ospite_data['valore']:>5.1f} × {ospite_data['peso']:>4.2f} = {ospite_data['punti']:>6.2f}"
+                                
+                                print(f"   {voce:<15} | {casa_str:<25} | {ospite_str:<25}")
+                                
+                                totale_casa += casa_data['punti']
+                                totale_ospite += ospite_data['punti']
+                            
+                            print("-" * 70)
+                            print(f"   {'TOTALE':<15} | {totale_casa:>25.2f} | {totale_ospite:>25.2f}")
+                            print(f"   DIFFERENZA: {abs(totale_casa - totale_ospite):.2f} " + 
+                                  f"({'CASA' if totale_casa > totale_ospite else 'OSPITE'} favorita)")
 
-
-            # --- SALVATAGGIO INTELLIGENTE (ANTI-DUPLICATI) ---
             if save_to_db and manager:
-                d_str_iso = match['date_iso'] # Usa formato ISO per DB check
+                d_str_iso = match['date_iso']
                 
                 snap = {
                     "home_att": 0, "away_att": 0,
@@ -623,7 +867,6 @@ def run_universal_simulator():
                 }
                 final_score = f"{mh}-{ma}" if 6 in algos_indices else f"{th}-{ta}"
                 
-                # 1. CHECK ESISTENZA
                 existing_doc = manager.collection.find_one({
                     "home_team": match['home'],
                     "away_team": match['away'],
@@ -631,7 +874,6 @@ def run_universal_simulator():
                 })
                 
                 if existing_doc:
-                    # 2A. AGGIORNA
                     if MODE_SINGLE: print("   ♻️  Previsione già presente. Aggiorno record.")
                     manager.collection.update_one(
                         {"_id": existing_doc["_id"]},
@@ -642,7 +884,6 @@ def run_universal_simulator():
                             "last_updated": datetime.now()
                         }}
                     )
-                    # Gestione verifica se finita
                     if match['has_real']:
                          p_s = get_sign(int(final_score.split("-")[0]), int(final_score.split("-")[1]))
                          r_s = get_sign(match['real_gh'], match['real_ga'])
@@ -655,7 +896,6 @@ def run_universal_simulator():
                             }}
                         )
                 else:
-                    # 2B. INSERISCI NUOVO
                     if MODE_SINGLE: print("   💾 Nuova previsione salvata.")
                     pred_id, _ = manager.save_prediction(
                         home=match['home'], away=match['away'], league=match['league'], date_str=d_str_iso,
@@ -673,8 +913,6 @@ def run_universal_simulator():
                             }}
                         )
 
-
-                # --- CSV EXPORT ---
         with open(filename, 'w', newline='', encoding='utf-8') as csvfile:
             writer = csv.writer(csvfile, delimiter=CSV_DELIMITER)
             headers = ["League", "Match", "Data", "Q1", "QX", "Q2", "Real Score", 
@@ -729,7 +967,6 @@ def run_universal_simulator():
                     writer.writerow(["Nessuna statistica disponibile"])
                 writer.writerow([])
 
-        # --- GENERAZIONE DASHBOARD HTML (Fuori dal blocco CSV) ---
         html_filename = filename.replace(".csv", ".html")
         print(f"\n🎨 Generazione Dashboard HTML: {html_filename}...")
         try:
@@ -746,4 +983,3 @@ def run_universal_simulator():
 
 if __name__ == "__main__":
     run_universal_simulator()
-

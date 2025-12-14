@@ -1,666 +1,816 @@
 
 === ALGORITMO: STAT ===
 League;Match;Data;Q1;QX;Q2;Real Score;Real Sign;PRED Score;PRED Sign;1X2 Outcome;Exact Score;U/O 2.5;GG/NG
-Bundesliga;Magonza vs Bor. M'gladbach;05/12 20:30;-;-;-;0-1;2;1-0;1;LOSS;LOSS;UNDER;NG
-Bundesliga;Stoccarda vs Bayern;06/12 15:30;6.25;4.75;1.44;0-5;2;0-0;X;LOSS;LOSS;UNDER;NG
-Bundesliga;Wolfsburg vs Union Berlino;06/12 15:30;2.25;3.5;2.9;3-1;1;1-0;1;WIN;LOSS;UNDER;NG
-Bundesliga;Augusta vs Leverkusen;06/12 15:30;-;-;-;2-0;1;1-0;1;WIN;LOSS;UNDER;NG
-Bundesliga;Heidenheim vs Friburgo;06/12 15:30;3.7;3.6;1.91;2-1;1;1-0;1;WIN;LOSS;UNDER;NG
-Bundesliga;Colonia vs St. Pauli;06/12 15:30;1.9;3.6;3.8;1-1;X;2-0;1;LOSS;LOSS;UNDER;NG
-Bundesliga;Lipsia vs Eintracht;06/12 18:30;1.9;4.0;3.3;6-0;1;3-0;1;WIN;LOSS;OVER;NG
-Bundesliga;Amburgo vs Werder Brema;07/12 15:30;2.15;3.6;3.0;3-2;1;0-3;2;LOSS;LOSS;OVER;NG
-Bundesliga;Dortmund vs Hoffenheim;07/12 17:30;1.55;4.2;5.0;2-0;1;2-4;2;LOSS;LOSS;OVER;GG
-Eredivisie;Excelsior vs FC Groningen;05/12 20:00;-;-;-;0-2;2;0-0;X;LOSS;LOSS;UNDER;NG
-Eredivisie;Heerenveen vs PSV;06/12 16:30;-;-;-;0-2;2;2-0;1;LOSS;LOSS;UNDER;NG
-Eredivisie;Fortuna Sittard vs Ajax;06/12 18:45;-;-;-;1-3;2;2-1;1;LOSS;LOSS;OVER;GG
-Eredivisie;Heracles Almelo vs Telstar;06/12 20:00;-;-;-;1-1;X;3-1;1;LOSS;LOSS;OVER;GG
-Eredivisie;Feyenoord vs PEC Zwolle;06/12 21:00;-;-;-;6-1;1;5-0;1;WIN;LOSS;OVER;NG
-Eredivisie;FC Utrecht vs FC Twente;07/12 12:15;-;-;-;1-1;X;1-0;1;LOSS;LOSS;UNDER;NG
-Eredivisie;AZ Alkmaar vs Go Ahead Eagles;07/12 14:30;-;-;-;2-2;X;5-1;1;LOSS;LOSS;OVER;GG
-Eredivisie;FC Volendam vs NEC Nijmegen;07/12 14:30;-;-;-;2-3;2;0-1;2;WIN;LOSS;UNDER;NG
-Eredivisie;Sparta R. vs NAC Breda;07/12 16:45;-;-;-;1-0;1;0-1;2;LOSS;LOSS;UNDER;NG
-La Liga;Real Oviedo vs RCD Mallorca;05/12 21:00;-;-;-;0-0;X;0-2;2;LOSS;LOSS;UNDER;NG
-La Liga;Villarreal vs Getafe CF;06/12 14:00;-;-;-;2-0;1;7-0;1;WIN;LOSS;OVER;NG
-La Liga;Alavés vs Real Sociedad;06/12 16:15;-;-;-;1-0;1;0-1;2;LOSS;LOSS;UNDER;NG
-La Liga;Real Betis vs Barcellona;06/12 18:30;4.0;4.1;1.73;3-5;2;1-0;1;LOSS;LOSS;UNDER;NG
-La Liga;Athletic Club vs Atlético;06/12 21:00;-;-;-;1-0;1;0-0;X;LOSS;LOSS;UNDER;NG
-La Liga;Elche vs Girona FC;07/12 14:00;-;-;-;3-0;1;1-0;1;WIN;LOSS;UNDER;NG
-La Liga;Valencia vs Siviglia;07/12 16:15;-;-;-;1-1;X;3-1;1;LOSS;LOSS;OVER;GG
-La Liga;Espanyol vs Rayo Vallecano;07/12 18:30;2.35;3.1;3.0;1-0;1;2-2;X;LOSS;LOSS;OVER;GG
-La Liga;Real Madrid vs Celta de Vigo;07/12 21:00;-;-;-;0-2;2;3-0;1;LOSS;LOSS;OVER;NG
-La Liga;CA Osasuna vs Levante;08/12 21:00;-;-;-;2-0;1;0-2;2;LOSS;LOSS;UNDER;NG
-Liga Portugal;Benfica vs Sporting;05/12 21:15;-;-;-;1-1;X;1-0;1;LOSS;LOSS;UNDER;NG
-Liga Portugal;Santa Clara vs Casa Pia;06/12 16:30;-;-;-;1-0;1;1-1;X;LOSS;LOSS;UNDER;GG
-Liga Portugal;Avs FS vs Rio Ave;06/12 19:00;-;-;-;1-2;2;0-3;2;WIN;LOSS;OVER;NG
-Liga Portugal;Famalicão vs SC Braga;06/12 21:30;-;-;-;1-2;2;0-1;2;WIN;LOSS;UNDER;NG
-Liga Portugal;Estoril vs Moreirense;07/12 16:30;-;-;-;3-3;X;2-1;1;LOSS;LOSS;OVER;GG
-Liga Portugal;Alverca vs Nacional;07/12 19:00;-;-;-;1-0;1;3-1;1;WIN;LOSS;OVER;GG
-Liga Portugal;Estrela Amadora vs Arouca;07/12 19:00;-;-;-;3-1;1;0-0;X;LOSS;LOSS;UNDER;NG
-Liga Portugal;Tondela vs FC Porto;07/12 21:30;-;-;-;0-2;2;0-7;2;WIN;LOSS;OVER;NG
-Liga Portugal;Vit. Guimarães vs Gil Vicente;08/12 21:30;-;-;-;0-0;X;2-3;2;LOSS;LOSS;OVER;GG
+Bundesliga;Magonza vs Bor. M'gladbach;05/12 20:30;2.05;3.6;3.2;0-1;2;1-0;1;LOSS;LOSS;UNDER;NG
+Bundesliga;Stoccarda vs Bayern;06/12 15:30;6.25;4.75;1.44;0-5;2;0-1;2;WIN;LOSS;UNDER;NG
+Bundesliga;Wolfsburg vs Union Berlino;06/12 15:30;2.25;3.5;2.9;3-1;1;0-0;X;LOSS;LOSS;UNDER;NG
+Bundesliga;Augusta vs Leverkusen;06/12 15:30;3.9;3.75;1.83;2-0;1;2-0;1;WIN;WIN;UNDER;NG
+Bundesliga;Heidenheim vs Friburgo;06/12 15:30;3.7;3.6;1.91;2-1;1;0-0;X;LOSS;LOSS;UNDER;NG
+Bundesliga;Colonia vs St. Pauli;06/12 15:30;1.9;3.6;3.8;1-1;X;3-0;1;LOSS;LOSS;OVER;NG
+Bundesliga;Lipsia vs Eintracht;06/12 18:30;1.9;4.0;3.3;6-0;1;2-2;X;LOSS;LOSS;OVER;GG
+Bundesliga;Amburgo vs Werder Brema;07/12 15:30;2.15;3.6;3.0;3-2;1;1-1;X;LOSS;LOSS;UNDER;GG
+Bundesliga;Dortmund vs Hoffenheim;07/12 17:30;1.55;4.2;5.0;2-0;1;2-3;2;LOSS;LOSS;OVER;GG
+Bundesliga;Union Berlino vs Lipsia;12/12 20:30;3.4;3.5;2.0;3-1;1;1-0;1;WIN;LOSS;UNDER;NG
+Bundesliga;Eintracht vs Augusta;13/12 15:30;1.53;4.2;5.75;1-0;1;1-1;X;LOSS;LOSS;UNDER;GG
+Bundesliga;Bor. M'gladbach vs Wolfsburg;13/12 15:30;2.0;3.7;3.3;1-3;2;0-1;2;WIN;LOSS;UNDER;NG
+Bundesliga;St. Pauli vs Heidenheim;13/12 15:30;1.85;3.3;4.2;2-1;1;0-0;X;LOSS;LOSS;UNDER;NG
+Bundesliga;Hoffenheim vs Amburgo;13/12 15:30;1.73;3.9;4.2;4-1;1;1-1;X;LOSS;LOSS;UNDER;GG
+Bundesliga;Leverkusen vs Colonia;13/12 18:30;1.45;4.5;6.0;2-0;1;3-1;1;WIN;LOSS;OVER;GG
+Eredivisie;Excelsior vs FC Groningen;05/12 20:00;2.75;3.4;2.4;0-2;2;0-2;2;WIN;WIN;UNDER;NG
+Eredivisie;Heerenveen vs PSV;06/12 16:30;6.25;4.75;1.4;0-2;2;0-0;X;LOSS;LOSS;UNDER;NG
+Eredivisie;Fortuna Sittard vs Ajax;06/12 18:45;4.75;3.9;1.65;1-3;2;1-0;1;LOSS;LOSS;UNDER;NG
+Eredivisie;Heracles Almelo vs Telstar;06/12 20:00;2.1;3.5;3.2;1-1;X;1-0;1;LOSS;LOSS;UNDER;NG
+Eredivisie;Feyenoord vs PEC Zwolle;06/12 21:00;1.18;6.5;12.0;6-1;1;1-0;1;WIN;LOSS;UNDER;NG
+Eredivisie;FC Utrecht vs FC Twente;07/12 12:15;2.35;3.5;2.75;1-1;X;0-2;2;LOSS;LOSS;UNDER;NG
+Eredivisie;AZ Alkmaar vs Go Ahead Eagles;07/12 14:30;1.44;4.4;6.5;2-2;X;3-0;1;LOSS;LOSS;OVER;NG
+Eredivisie;FC Volendam vs NEC Nijmegen;07/12 14:30;3.6;3.9;1.85;2-3;2;0-0;X;LOSS;LOSS;UNDER;NG
+Eredivisie;Sparta R. vs NAC Breda;07/12 16:45;1.83;3.75;3.8;1-0;1;0-1;2;LOSS;LOSS;UNDER;NG
+Eredivisie;Telstar vs NEC Nijmegen;13/12 16:30;4.2;4.1;1.7;2-2;X;2-1;1;LOSS;LOSS;OVER;GG
+La Liga;Real Oviedo vs RCD Mallorca;05/12 21:00;2.35;3.0;3.2;0-0;X;0-0;X;WIN;WIN;UNDER;NG
+La Liga;Villarreal vs Getafe CF;06/12 14:00;1.53;3.75;6.5;2-0;1;3-0;1;WIN;LOSS;OVER;NG
+La Liga;Alavés vs Real Sociedad;06/12 16:15;2.8;3.0;2.55;1-0;1;0-0;X;LOSS;LOSS;UNDER;NG
+La Liga;Real Betis vs Barcellona;06/12 18:30;4.0;4.1;1.73;3-5;2;0-0;X;LOSS;LOSS;UNDER;NG
+La Liga;Athletic Club vs Atlético;06/12 21:00;3.7;3.25;2.05;1-0;1;0-0;X;LOSS;LOSS;UNDER;NG
+La Liga;Elche vs Girona FC;07/12 14:00;2.25;3.2;3.25;3-0;1;1-1;X;LOSS;LOSS;UNDER;GG
+La Liga;Valencia vs Siviglia;07/12 16:15;2.2;3.2;3.2;1-1;X;1-0;1;LOSS;LOSS;UNDER;NG
+La Liga;Espanyol vs Rayo Vallecano;07/12 18:30;2.35;3.1;3.0;1-0;1;4-0;1;WIN;LOSS;OVER;NG
+La Liga;Real Madrid vs Celta de Vigo;07/12 21:00;1.25;6.0;9.0;0-2;2;0-0;X;LOSS;LOSS;UNDER;NG
+La Liga;CA Osasuna vs Levante;08/12 21:00;1.8;3.4;4.5;2-0;1;0-0;X;LOSS;LOSS;UNDER;NG
+La Liga;Real Sociedad vs Girona FC;12/12 21:00;1.7;3.6;5.0;1-2;2;3-0;1;LOSS;LOSS;OVER;NG
+Liga Portugal;Benfica vs Sporting;05/12 21:15;2.55;3.3;2.55;1-1;X;5-0;1;LOSS;LOSS;OVER;NG
+Liga Portugal;Santa Clara vs Casa Pia;06/12 16:30;1.95;3.0;4.75;1-0;1;1-2;2;LOSS;LOSS;OVER;GG
+Liga Portugal;Avs FS vs Rio Ave;06/12 19:00;2.9;3.2;2.38;1-2;2;0-1;2;WIN;LOSS;UNDER;NG
+Liga Portugal;Famalicão vs SC Braga;06/12 21:30;3.1;3.3;2.25;1-2;2;0-0;X;LOSS;LOSS;UNDER;NG
+Liga Portugal;Estoril vs Moreirense;07/12 16:30;1.91;3.3;3.9;3-3;X;1-0;1;LOSS;LOSS;UNDER;NG
+Liga Portugal;Alverca vs Nacional;07/12 19:00;2.3;3.25;3.1;1-0;1;0-0;X;LOSS;LOSS;UNDER;NG
+Liga Portugal;Estrela Amadora vs Arouca;07/12 19:00;2.38;3.2;2.9;3-1;1;1-0;1;WIN;LOSS;UNDER;NG
+Liga Portugal;Tondela vs FC Porto;07/12 21:30;10.0;4.75;1.29;0-2;2;0-5;2;WIN;LOSS;OVER;NG
+Liga Portugal;Vit. Guimarães vs Gil Vicente;08/12 21:30;2.5;3.1;2.88;0-0;X;0-2;2;LOSS;LOSS;UNDER;NG
+Liga Portugal;Casa Pia vs Gil Vicente;13/12 16:30;3.75;3.1;2.1;1-1;X;1-2;2;LOSS;LOSS;OVER;GG
 Ligue 1;Brest vs Monaco;05/12 19:00;3.4;3.7;2.0;1-0;1;1-0;1;WIN;WIN;UNDER;NG
-Ligue 1;Lille vs Marsiglia;05/12 21:00;2.4;3.5;2.7;1-0;1;1-0;1;WIN;WIN;UNDER;NG
-Ligue 1;FC Nantes vs Lens;06/12 17:00;-;-;-;1-2;2;0-1;2;WIN;LOSS;UNDER;NG
-Ligue 1;Tolosa vs Strasburgo;06/12 19:00;2.3;3.4;3.0;1-0;1;0-2;2;LOSS;LOSS;UNDER;NG
-Ligue 1;PSG vs Stade Rennes;06/12 21:05;-;-;-;5-0;1;3-0;1;WIN;LOSS;OVER;NG
-Ligue 1;Nizza vs Angers SCO;07/12 15:00;-;-;-;0-1;2;1-1;X;LOSS;LOSS;UNDER;GG
-Ligue 1;Le Havre vs Paris FC;07/12 17:15;2.88;3.3;2.3;0-0;X;0-1;2;LOSS;LOSS;UNDER;NG
-Ligue 1;AJ Auxerre vs Metz;07/12 17:15;2.0;3.4;3.5;3-1;1;0-1;2;LOSS;LOSS;UNDER;NG
-Ligue 1;Lorient vs Olymp. Lione;07/12 20:45;-;-;-;1-0;1;3-0;1;WIN;LOSS;OVER;NG
-Premier League;Aston Villa vs Arsenal;06/12 13:30;4.33;3.5;1.8;2-1;1;2-2;X;LOSS;LOSS;OVER;GG
-Premier League;Bournemouth vs Chelsea;06/12 16:00;2.9;3.5;2.25;0-0;X;0-5;2;LOSS;LOSS;OVER;NG
-Premier League;Everton vs Nott'm Forest;06/12 16:00;-;-;-;3-0;1;1-0;1;WIN;LOSS;UNDER;NG
-Premier League;Man City vs Sunderland;06/12 16:00;-;-;-;3-0;1;0-0;X;LOSS;LOSS;UNDER;NG
-Premier League;Newcastle vs Burnley;06/12 16:00;1.27;5.0;11.0;2-1;1;1-0;1;WIN;LOSS;UNDER;NG
-Premier League;Tottenham vs Brentford;06/12 16:00;2.05;3.5;3.4;2-0;1;1-0;1;WIN;LOSS;UNDER;NG
-Premier League;Leeds vs Liverpool;06/12 18:30;4.33;3.75;1.73;3-3;X;0-4;2;LOSS;LOSS;OVER;NG
-Premier League;Brighton vs West Ham Utd.;07/12 15:00;-;-;-;1-1;X;0-0;X;WIN;LOSS;UNDER;NG
-Premier League;FC Fulham vs Crystal Palace;07/12 17:30;-;-;-;1-2;2;0-1;2;WIN;LOSS;UNDER;NG
-Premier League;Wolverhampton vs Manchester Utd.;08/12 21:00;-;-;-;1-4;2;0-1;2;WIN;LOSS;UNDER;NG
-Serie A;Sassuolo vs Fiorentina;06/12 15:00;2.55;3.2;2.7;3-1;1;0-2;2;LOSS;LOSS;UNDER;NG
-Serie A;Inter vs Como;06/12 18:00;1.44;4.1;7.0;4-0;1;2-1;1;WIN;LOSS;OVER;GG
-Serie A;Verona vs Atalanta;06/12 20:45;5.0;3.5;1.75;3-1;1;0-0;X;LOSS;LOSS;UNDER;NG
+Ligue 1;Lille vs Marsiglia;05/12 21:00;2.4;3.5;2.7;1-0;1;0-3;2;LOSS;LOSS;OVER;NG
+Ligue 1;FC Nantes vs Lens;06/12 17:00;5.0;3.7;1.67;1-2;2;0-6;2;WIN;LOSS;OVER;NG
+Ligue 1;Tolosa vs Strasburgo;06/12 19:00;2.3;3.4;3.0;1-0;1;0-1;2;LOSS;LOSS;UNDER;NG
+Ligue 1;PSG vs Stade Rennes;06/12 21:05;1.25;5.5;10.0;5-0;1;3-0;1;WIN;LOSS;OVER;NG
+Ligue 1;Nizza vs Angers SCO;07/12 15:00;1.62;3.7;5.25;0-1;2;1-0;1;LOSS;LOSS;UNDER;NG
+Ligue 1;Le Havre vs Paris FC;07/12 17:15;2.88;3.3;2.3;0-0;X;1-0;1;LOSS;LOSS;UNDER;NG
+Ligue 1;AJ Auxerre vs Metz;07/12 17:15;2.0;3.4;3.5;3-1;1;0-0;X;LOSS;LOSS;UNDER;NG
+Ligue 1;Lorient vs Olymp. Lione;07/12 20:45;3.6;3.4;2.0;1-0;1;2-0;1;WIN;LOSS;UNDER;NG
+Ligue 1;Angers SCO vs FC Nantes;12/12 20:45;2.3;3.1;3.1;4-1;1;0-0;X;LOSS;LOSS;UNDER;NG
+Ligue 1;Stade Rennes vs Brest;13/12 17:00;1.83;3.6;4.0;3-1;1;0-3;2;LOSS;LOSS;OVER;NG
+Premier League;Aston Villa vs Arsenal;06/12 13:30;4.33;3.5;1.8;2-1;1;3-3;X;LOSS;LOSS;OVER;GG
+Premier League;Bournemouth vs Chelsea;06/12 16:00;2.9;3.5;2.25;0-0;X;0-2;2;LOSS;LOSS;UNDER;NG
+Premier League;Everton vs Nott'm Forest;06/12 16:00;2.05;3.25;3.5;3-0;1;3-0;1;WIN;WIN;OVER;NG
+Premier League;Man City vs Sunderland;06/12 16:00;1.25;5.5;11.0;3-0;1;0-2;2;LOSS;LOSS;UNDER;NG
+Premier League;Newcastle vs Burnley;06/12 16:00;1.27;5.0;11.0;2-1;1;0-1;2;LOSS;LOSS;UNDER;NG
+Premier League;Tottenham vs Brentford;06/12 16:00;2.05;3.5;3.4;2-0;1;0-1;2;LOSS;LOSS;UNDER;NG
+Premier League;Leeds vs Liverpool;06/12 18:30;4.33;3.75;1.73;3-3;X;0-2;2;LOSS;LOSS;UNDER;NG
+Premier League;Brighton vs West Ham Utd.;07/12 15:00;1.57;4.0;5.25;1-1;X;1-0;1;LOSS;LOSS;UNDER;NG
+Premier League;FC Fulham vs Crystal Palace;07/12 17:30;2.6;3.25;2.6;1-2;2;0-2;2;WIN;LOSS;UNDER;NG
+Premier League;Wolverhampton vs Manchester Utd.;08/12 21:00;4.75;3.7;1.67;1-4;2;1-0;1;LOSS;LOSS;UNDER;NG
+Premier League;Chelsea vs Everton;13/12 16:00;1.6;3.75;5.5;2-0;1;0-2;2;LOSS;LOSS;UNDER;NG
+Premier League;Liverpool vs Brighton;13/12 16:00;1.7;3.9;4.33;2-0;1;0-3;2;LOSS;LOSS;OVER;NG
+Serie A;Sassuolo vs Fiorentina;06/12 15:00;2.55;3.2;2.7;3-1;1;1-1;X;LOSS;LOSS;UNDER;GG
+Serie A;Inter vs Como;06/12 18:00;1.44;4.1;7.0;4-0;1;0-1;2;LOSS;LOSS;UNDER;NG
+Serie A;Verona vs Atalanta;06/12 20:45;5.0;3.5;1.75;3-1;1;0-2;2;LOSS;LOSS;UNDER;NG
 Serie A;Cremonese vs Lecce;07/12 12:30;2.25;3.0;3.3;2-0;1;1-0;1;WIN;LOSS;UNDER;NG
 Serie A;Cagliari vs Roma;07/12 15:00;5.5;3.3;1.7;1-0;1;1-0;1;WIN;WIN;UNDER;NG
-Serie A;Lazio vs Bologna;07/12 18:00;2.8;3.0;2.6;1-1;X;3-3;X;WIN;LOSS;OVER;GG
-Serie A;Napoli vs Juventus;07/12 20:45;2.3;3.1;3.1;2-1;1;4-1;1;WIN;LOSS;OVER;GG
+Serie A;Lazio vs Bologna;07/12 18:00;2.8;3.0;2.6;1-1;X;1-1;X;WIN;WIN;UNDER;GG
+Serie A;Napoli vs Juventus;07/12 20:45;2.3;3.1;3.1;2-1;1;1-0;1;WIN;LOSS;UNDER;NG
 Serie A;Pisa vs Parma;08/12 15:00;2.4;3.0;3.1;0-1;2;0-0;X;LOSS;LOSS;UNDER;NG
-Serie A;Udinese vs Genoa;08/12 18:00;2.2;3.0;3.5;1-2;2;0-1;2;WIN;LOSS;UNDER;NG
-Serie A;Torino vs Milan;08/12 20:45;5.0;3.4;1.73;2-3;2;1-1;X;LOSS;LOSS;UNDER;GG
-Serie B;Empoli vs Palermo;07/12 17:15;3.05;3.2;2.25;1-3;2;1-0;1;LOSS;LOSS;UNDER;NG
-Serie B;Sampdoria vs Carrarese;07/12 19:30;2.1;3.2;3.5;3-2;1;1-1;X;LOSS;LOSS;UNDER;GG
-Serie B;Modena vs Catanzaro;08/12 12:30;1.68;3.5;5.0;1-2;2;2-0;1;LOSS;LOSS;UNDER;NG
-Serie B;Avellino vs Venezia;08/12 15:00;4.1;3.6;1.79;1-1;X;1-3;2;LOSS;LOSS;OVER;GG
-Serie B;Frosinone vs Juve Stabia;08/12 15:00;1.86;3.3;3.9;3-0;1;4-3;1;WIN;LOSS;OVER;GG
-Serie B;Mantova vs Reggiana;08/12 15:00;1.96;3.4;3.75;0-1;2;1-2;2;WIN;LOSS;OVER;GG
-Serie B;Monza vs Südtirol;08/12 15:00;-;-;-;1-1;X;0-0;X;WIN;LOSS;UNDER;NG
-Serie B;Padova vs Cesena;08/12 15:00;3.25;2.95;2.32;1-1;X;1-1;X;WIN;WIN;UNDER;GG
-Serie B;Bari vs Pescara;08/12 17:15;1.68;3.4;4.5;1-1;X;0-0;X;WIN;LOSS;UNDER;NG
-Serie B;Virtus Entella vs Spezia;08/12 19:30;2.35;3.1;3.2;0-1;2;0-2;2;WIN;LOSS;UNDER;NG
-Serie C - Girone A;Trento vs Cittadella;05/12 20:30;2.8;3.0;2.35;1-0;1;0-0;X;LOSS;LOSS;UNDER;NG
-Serie C - Girone A;Pro Vercelli vs Renate;06/12 14:30;2.15;2.88;3.3;1-1;X;1-1;X;WIN;WIN;UNDER;GG
-Serie C - Girone A;Arzignano vs Inter U23;07/12 12:30;2.9;3.1;2.25;1-1;X;2-0;1;LOSS;LOSS;UNDER;NG
-Serie C - Girone A;Novara vs Vicenza;07/12 14:30;4.5;3.1;1.75;2-2;X;0-2;2;LOSS;LOSS;UNDER;NG
-Serie C - Girone A;Union Brescia vs Lumezzane;07/12 14:30;1.44;3.6;7.0;0-1;2;1-0;1;LOSS;LOSS;UNDER;NG
-Serie C - Girone A;Pro Patria vs Dolomiti;07/12 17:30;2.38;2.9;2.88;0-2;2;0-0;X;LOSS;LOSS;UNDER;NG
-Serie C - Girone A;AlbinoLeffe vs Ospitaletto;08/12 14:30;2.0;3.0;3.5;1-1;X;0-0;X;WIN;LOSS;UNDER;NG
-Serie C - Girone A;Lecco vs Alcione;08/12 14:30;2.15;2.88;3.3;1-0;1;4-1;1;WIN;LOSS;OVER;GG
-Serie C - Girone A;Virtus Verona vs Pergolettese;08/12 14:30;2.15;3.0;3.1;1-1;X;1-0;1;LOSS;LOSS;UNDER;NG
-Serie C - Girone A;Giana Erminio vs Triestina;08/12 15:00;2.3;2.9;3.0;2-1;1;3-0;1;WIN;LOSS;OVER;NG
-Serie C - Girone B;Livorno vs Arezzo;06/12 14:30;4.0;3.2;1.8;2-1;1;1-6;2;LOSS;LOSS;OVER;GG
-Serie C - Girone B;Pianese vs Gubbio;06/12 14:30;2.88;2.9;2.38;1-0;1;3-1;1;WIN;LOSS;OVER;GG
-Serie C - Girone B;Bra vs Campobasso;06/12 17:30;3.0;3.1;2.2;2-0;1;0-0;X;LOSS;LOSS;UNDER;NG
-Serie C - Girone B;Guidonia vs Juve Next Gen;07/12 12:30;-;-;-;1-1;X;1-1;X;WIN;WIN;UNDER;GG
-Serie C - Girone B;Perugia vs Ternana;07/12 14:30;2.5;2.88;2.75;1-2;2;0-2;2;WIN;LOSS;UNDER;NG
-Serie C - Girone B;Torres vs Pineto;07/12 14:30;2.5;2.88;2.75;1-1;X;0-1;2;LOSS;LOSS;UNDER;NG
-Serie C - Girone B;Ravenna vs Pontedera;07/12 17:30;1.53;3.6;5.5;2-1;1;2-1;1;WIN;WIN;OVER;GG
-Serie C - Girone B;Ascoli vs Forlì;08/12 14:30;-;-;-;3-0;1;0-0;X;LOSS;LOSS;UNDER;NG
-Serie C - Girone B;Carpi vs Vis Pesaro;08/12 14:30;2.3;2.9;3.0;1-1;X;0-1;2;LOSS;LOSS;UNDER;NG
+Serie A;Udinese vs Genoa;08/12 18:00;2.2;3.0;3.5;1-2;2;1-5;2;WIN;LOSS;OVER;GG
+Serie A;Torino vs Milan;08/12 20:45;5.0;3.4;1.73;2-3;2;2-0;1;LOSS;LOSS;UNDER;NG
+Serie A;Lecce vs Pisa;12/12 20:45;2.2;3.0;3.5;1-0;1;2-0;1;WIN;LOSS;UNDER;NG
+Serie A;Torino vs Cremonese;13/12 15:00;1.9;3.3;4.1;1-0;1;1-1;X;LOSS;LOSS;UNDER;GG
+Serie A;Parma vs Lazio;13/12 18:00;3.75;3.25;2.0;0-1;2;0-2;2;WIN;LOSS;UNDER;NG
+Serie B;Empoli vs Palermo;07/12 17:15;3.05;3.2;2.25;1-3;2;1-2;2;WIN;LOSS;OVER;GG
+Serie B;Sampdoria vs Carrarese;07/12 19:30;2.1;3.2;3.5;3-2;1;0-0;X;LOSS;LOSS;UNDER;NG
+Serie B;Modena vs Catanzaro;08/12 12:30;1.68;3.5;5.0;1-2;2;0-0;X;LOSS;LOSS;UNDER;NG
+Serie B;Avellino vs Venezia;08/12 15:00;4.1;3.6;1.79;1-1;X;2-1;1;LOSS;LOSS;OVER;GG
+Serie B;Frosinone vs Juve Stabia;08/12 15:00;1.86;3.3;3.9;3-0;1;3-0;1;WIN;WIN;OVER;NG
+Serie B;Mantova vs Reggiana;08/12 15:00;1.96;3.4;3.75;0-1;2;1-3;2;WIN;LOSS;OVER;GG
+Serie B;Monza vs Südtirol;08/12 15:00;1.51;3.75;6.5;1-1;X;2-3;2;LOSS;LOSS;OVER;GG
+Serie B;Padova vs Cesena;08/12 15:00;3.25;2.95;2.32;1-1;X;0-2;2;LOSS;LOSS;UNDER;NG
+Serie B;Bari vs Pescara;08/12 17:15;1.68;3.4;4.5;1-1;X;0-1;2;LOSS;LOSS;UNDER;NG
+Serie B;Virtus Entella vs Spezia;08/12 19:30;2.35;3.1;3.2;0-1;2;0-4;2;WIN;LOSS;OVER;NG
+Serie B;Palermo vs Sampdoria;12/12 20:30;1.62;3.4;5.25;1-0;1;4-0;1;WIN;LOSS;OVER;NG
+Serie B;Juve Stabia vs Empoli;13/12 15:00;2.1;3.05;3.4;2-0;1;1-2;2;LOSS;LOSS;OVER;GG
+Serie B;Reggiana vs Padova;13/12 15:00;2.3;3.05;2.95;1-2;2;1-0;1;LOSS;LOSS;UNDER;NG
+Serie B;Spezia vs Modena;13/12 15:00;3.2;3.05;2.2;0-2;2;2-0;1;LOSS;LOSS;UNDER;NG
+Serie B;Südtirol vs Bari;13/12 15:00;1.91;3.25;3.8;0-0;X;0-1;2;LOSS;LOSS;UNDER;NG
+Serie B;Venezia vs Monza;13/12 15:00;2.32;3.05;2.95;2-0;1;2-2;X;LOSS;LOSS;OVER;GG
+Serie B;Catanzaro vs Avellino;13/12 17:15;1.79;3.4;4.1;1-0;1;1-1;X;LOSS;LOSS;UNDER;GG
+Serie C - Girone A;Trento vs Cittadella;05/12 20:30;2.8;3.0;2.35;1-0;1;1-0;1;WIN;WIN;UNDER;NG
+Serie C - Girone A;Pro Vercelli vs Renate;06/12 14:30;2.15;2.88;3.3;1-1;X;3-0;1;LOSS;LOSS;OVER;NG
+Serie C - Girone A;Arzignano vs Inter U23;07/12 12:30;2.9;3.1;2.25;1-1;X;0-2;2;LOSS;LOSS;UNDER;NG
+Serie C - Girone A;Novara vs Vicenza;07/12 14:30;4.5;3.1;1.75;2-2;X;1-1;X;WIN;LOSS;UNDER;GG
+Serie C - Girone A;Union Brescia vs Lumezzane;07/12 14:30;1.44;3.6;7.0;0-1;2;0-1;2;WIN;WIN;UNDER;NG
+Serie C - Girone A;Pro Patria vs Dolomiti;07/12 17:30;2.38;2.9;2.88;0-2;2;0-1;2;WIN;LOSS;UNDER;NG
+Serie C - Girone A;AlbinoLeffe vs Ospitaletto;08/12 14:30;2.0;3.0;3.5;1-1;X;1-1;X;WIN;WIN;UNDER;GG
+Serie C - Girone A;Lecco vs Alcione;08/12 14:30;2.15;2.88;3.3;1-0;1;2-0;1;WIN;LOSS;UNDER;NG
+Serie C - Girone A;Virtus Verona vs Pergolettese;08/12 14:30;2.15;3.0;3.1;1-1;X;0-1;2;LOSS;LOSS;UNDER;NG
+Serie C - Girone A;Giana Erminio vs Triestina;08/12 15:00;2.3;2.9;3.0;2-1;1;1-0;1;WIN;LOSS;UNDER;NG
+Serie C - Girone A;Lumezzane vs Lecco;13/12 14:30;2.55;3.0;2.55;1-1;X;3-0;1;LOSS;LOSS;OVER;NG
+Serie C - Girone B;Livorno vs Arezzo;06/12 14:30;4.0;3.2;1.8;2-1;1;0-7;2;LOSS;LOSS;OVER;NG
+Serie C - Girone B;Pianese vs Gubbio;06/12 14:30;2.88;2.9;2.38;1-0;1;0-3;2;LOSS;LOSS;OVER;NG
+Serie C - Girone B;Bra vs Campobasso;06/12 17:30;3.0;3.1;2.2;2-0;1;0-3;2;LOSS;LOSS;OVER;NG
+Serie C - Girone B;Guidonia vs Juve Next Gen;07/12 12:30;2.05;3.0;3.3;1-1;X;0-0;X;WIN;LOSS;UNDER;NG
+Serie C - Girone B;Perugia vs Ternana;07/12 14:30;2.5;2.88;2.75;1-2;2;0-1;2;WIN;LOSS;UNDER;NG
+Serie C - Girone B;Torres vs Pineto;07/12 14:30;2.5;2.88;2.75;1-1;X;0-0;X;WIN;LOSS;UNDER;NG
+Serie C - Girone B;Ravenna vs Pontedera;07/12 17:30;1.53;3.6;5.5;2-1;1;2-0;1;WIN;LOSS;UNDER;NG
+Serie C - Girone B;Ascoli vs Forlì;08/12 14:30;1.6;3.3;5.25;3-0;1;3-1;1;WIN;LOSS;OVER;GG
+Serie C - Girone B;Carpi vs Vis Pesaro;08/12 14:30;2.3;2.9;3.0;1-1;X;0-2;2;LOSS;LOSS;UNDER;NG
+Serie C - Girone B;Juve Next Gen vs Pianese;12/12 20:30;2.1;3.1;3.2;0-0;X;0-2;2;LOSS;LOSS;UNDER;NG
 Serie C - Girone C;Catania vs Crotone;05/12 20:30;1.83;3.1;4.0;2-0;1;2-0;1;WIN;WIN;UNDER;NG
-Serie C - Girone C;Casarano vs Latina;06/12 14:30;1.83;3.25;3.9;1-1;X;1-2;2;LOSS;LOSS;OVER;GG
-Serie C - Girone C;Siracusa vs Foggia;06/12 14:30;1.73;3.4;4.2;2-2;X;1-0;1;LOSS;LOSS;UNDER;NG
-Serie C - Girone C;Sorrento vs Potenza;06/12 14:30;2.63;3.2;2.38;2-2;X;0-1;2;LOSS;LOSS;UNDER;NG
-Serie C - Girone C;Giugliano vs Team Altamura;06/12 17:30;1.95;3.25;3.4;0-1;2;0-0;X;LOSS;LOSS;UNDER;NG
+Serie C - Girone C;Casarano vs Latina;06/12 14:30;1.83;3.25;3.9;1-1;X;0-0;X;WIN;LOSS;UNDER;NG
+Serie C - Girone C;Siracusa vs Foggia;06/12 14:30;1.73;3.4;4.2;2-2;X;0-1;2;LOSS;LOSS;UNDER;NG
+Serie C - Girone C;Sorrento vs Potenza;06/12 14:30;2.63;3.2;2.38;2-2;X;1-1;X;WIN;LOSS;UNDER;GG
+Serie C - Girone C;Giugliano vs Team Altamura;06/12 17:30;1.95;3.25;3.4;0-1;2;1-0;1;LOSS;LOSS;UNDER;NG
 Serie C - Girone C;Monopoli vs Atalanta U23;07/12 14:30;2.3;3.2;2.75;1-1;X;0-0;X;WIN;LOSS;UNDER;NG
-Serie C - Girone C;Salernitana vs Trapani;07/12 14:30;1.75;3.3;4.1;1-1;X;1-1;X;WIN;WIN;UNDER;GG
-Serie C - Girone C;Cerignola vs Casertana;07/12 17:30;1.9;3.1;3.7;1-1;X;0-2;2;LOSS;LOSS;UNDER;NG
-Serie C - Girone C;Cavese vs Benevento;07/12 17:30;4.33;3.3;1.75;0-1;2;0-6;2;WIN;LOSS;OVER;NG
-Serie C - Girone C;Cosenza vs Picerno;07/12 17:30;1.44;3.8;6.5;1-0;1;5-2;1;WIN;LOSS;OVER;GG
+Serie C - Girone C;Salernitana vs Trapani;07/12 14:30;1.75;3.3;4.1;1-1;X;0-0;X;WIN;LOSS;UNDER;NG
+Serie C - Girone C;Cerignola vs Casertana;07/12 17:30;1.9;3.1;3.7;1-1;X;0-0;X;WIN;LOSS;UNDER;NG
+Serie C - Girone C;Cavese vs Benevento;07/12 17:30;4.33;3.3;1.75;0-1;2;0-2;2;WIN;LOSS;UNDER;NG
+Serie C - Girone C;Cosenza vs Picerno;07/12 17:30;1.44;3.8;6.5;1-0;1;4-2;1;WIN;LOSS;OVER;GG
 "--- PERCENTUALI ---
-(Su partite finite)";;;;;;;;45.7%;8.6%;;56.2%;;52.4%
+(Su partite finite)";;;;;;;;39.2%;9.2%;;53.1%;;49.2%
 
 
 === ALGORITMO: DIN ===
 League;Match;Data;Q1;QX;Q2;Real Score;Real Sign;PRED Score;PRED Sign;1X2 Outcome;Exact Score;U/O 2.5;GG/NG
-Bundesliga;Magonza vs Bor. M'gladbach;05/12 20:30;-;-;-;0-1;2;0-0;X;LOSS;LOSS;UNDER;NG
-Bundesliga;Stoccarda vs Bayern;06/12 15:30;6.25;4.75;1.44;0-5;2;0-1;2;WIN;LOSS;UNDER;NG
-Bundesliga;Wolfsburg vs Union Berlino;06/12 15:30;2.25;3.5;2.9;3-1;1;2-3;2;LOSS;LOSS;OVER;GG
-Bundesliga;Augusta vs Leverkusen;06/12 15:30;-;-;-;2-0;1;0-1;2;LOSS;LOSS;UNDER;NG
-Bundesliga;Heidenheim vs Friburgo;06/12 15:30;3.7;3.6;1.91;2-1;1;0-0;X;LOSS;LOSS;UNDER;NG
-Bundesliga;Colonia vs St. Pauli;06/12 15:30;1.9;3.6;3.8;1-1;X;2-0;1;LOSS;LOSS;UNDER;NG
-Bundesliga;Lipsia vs Eintracht;06/12 18:30;1.9;4.0;3.3;6-0;1;1-4;2;LOSS;LOSS;OVER;GG
-Bundesliga;Amburgo vs Werder Brema;07/12 15:30;2.15;3.6;3.0;3-2;1;1-1;X;LOSS;LOSS;UNDER;GG
-Bundesliga;Dortmund vs Hoffenheim;07/12 17:30;1.55;4.2;5.0;2-0;1;3-3;X;LOSS;LOSS;OVER;GG
-Eredivisie;Excelsior vs FC Groningen;05/12 20:00;-;-;-;0-2;2;0-0;X;LOSS;LOSS;UNDER;NG
-Eredivisie;Heerenveen vs PSV;06/12 16:30;-;-;-;0-2;2;1-0;1;LOSS;LOSS;UNDER;NG
-Eredivisie;Fortuna Sittard vs Ajax;06/12 18:45;-;-;-;1-3;2;1-0;1;LOSS;LOSS;UNDER;NG
-Eredivisie;Heracles Almelo vs Telstar;06/12 20:00;-;-;-;1-1;X;2-0;1;LOSS;LOSS;UNDER;NG
-Eredivisie;Feyenoord vs PEC Zwolle;06/12 21:00;-;-;-;6-1;1;3-0;1;WIN;LOSS;OVER;NG
-Eredivisie;FC Utrecht vs FC Twente;07/12 12:15;-;-;-;1-1;X;0-0;X;WIN;LOSS;UNDER;NG
-Eredivisie;AZ Alkmaar vs Go Ahead Eagles;07/12 14:30;-;-;-;2-2;X;3-0;1;LOSS;LOSS;OVER;NG
-Eredivisie;FC Volendam vs NEC Nijmegen;07/12 14:30;-;-;-;2-3;2;3-1;1;LOSS;LOSS;OVER;GG
-Eredivisie;Sparta R. vs NAC Breda;07/12 16:45;-;-;-;1-0;1;1-0;1;WIN;WIN;UNDER;NG
-La Liga;Real Oviedo vs RCD Mallorca;05/12 21:00;-;-;-;0-0;X;0-1;2;LOSS;LOSS;UNDER;NG
-La Liga;Villarreal vs Getafe CF;06/12 14:00;-;-;-;2-0;1;5-0;1;WIN;LOSS;OVER;NG
-La Liga;Alavés vs Real Sociedad;06/12 16:15;-;-;-;1-0;1;0-2;2;LOSS;LOSS;UNDER;NG
-La Liga;Real Betis vs Barcellona;06/12 18:30;4.0;4.1;1.73;3-5;2;2-2;X;LOSS;LOSS;OVER;GG
-La Liga;Athletic Club vs Atlético;06/12 21:00;-;-;-;1-0;1;2-0;1;WIN;LOSS;UNDER;NG
-La Liga;Elche vs Girona FC;07/12 14:00;-;-;-;3-0;1;0-0;X;LOSS;LOSS;UNDER;NG
-La Liga;Valencia vs Siviglia;07/12 16:15;-;-;-;1-1;X;2-0;1;LOSS;LOSS;UNDER;NG
-La Liga;Espanyol vs Rayo Vallecano;07/12 18:30;2.35;3.1;3.0;1-0;1;2-0;1;WIN;LOSS;UNDER;NG
-La Liga;Real Madrid vs Celta de Vigo;07/12 21:00;-;-;-;0-2;2;1-0;1;LOSS;LOSS;UNDER;NG
-La Liga;CA Osasuna vs Levante;08/12 21:00;-;-;-;2-0;1;0-1;2;LOSS;LOSS;UNDER;NG
-Liga Portugal;Benfica vs Sporting;05/12 21:15;-;-;-;1-1;X;3-0;1;LOSS;LOSS;OVER;NG
-Liga Portugal;Santa Clara vs Casa Pia;06/12 16:30;-;-;-;1-0;1;0-0;X;LOSS;LOSS;UNDER;NG
-Liga Portugal;Avs FS vs Rio Ave;06/12 19:00;-;-;-;1-2;2;0-2;2;WIN;LOSS;UNDER;NG
-Liga Portugal;Famalicão vs SC Braga;06/12 21:30;-;-;-;1-2;2;1-0;1;LOSS;LOSS;UNDER;NG
-Liga Portugal;Estoril vs Moreirense;07/12 16:30;-;-;-;3-3;X;2-0;1;LOSS;LOSS;UNDER;NG
-Liga Portugal;Alverca vs Nacional;07/12 19:00;-;-;-;1-0;1;1-1;X;LOSS;LOSS;UNDER;GG
-Liga Portugal;Estrela Amadora vs Arouca;07/12 19:00;-;-;-;3-1;1;2-0;1;WIN;LOSS;UNDER;NG
-Liga Portugal;Tondela vs FC Porto;07/12 21:30;-;-;-;0-2;2;0-3;2;WIN;LOSS;OVER;NG
-Liga Portugal;Vit. Guimarães vs Gil Vicente;08/12 21:30;-;-;-;0-0;X;0-3;2;LOSS;LOSS;OVER;NG
-Ligue 1;Brest vs Monaco;05/12 19:00;3.4;3.7;2.0;1-0;1;0-5;2;LOSS;LOSS;OVER;NG
-Ligue 1;Lille vs Marsiglia;05/12 21:00;2.4;3.5;2.7;1-0;1;3-1;1;WIN;LOSS;OVER;GG
-Ligue 1;FC Nantes vs Lens;06/12 17:00;-;-;-;1-2;2;0-6;2;WIN;LOSS;OVER;NG
-Ligue 1;Tolosa vs Strasburgo;06/12 19:00;2.3;3.4;3.0;1-0;1;0-3;2;LOSS;LOSS;OVER;NG
-Ligue 1;PSG vs Stade Rennes;06/12 21:05;-;-;-;5-0;1;3-0;1;WIN;LOSS;OVER;NG
-Ligue 1;Nizza vs Angers SCO;07/12 15:00;-;-;-;0-1;2;0-0;X;LOSS;LOSS;UNDER;NG
-Ligue 1;Le Havre vs Paris FC;07/12 17:15;2.88;3.3;2.3;0-0;X;0-3;2;LOSS;LOSS;OVER;NG
-Ligue 1;AJ Auxerre vs Metz;07/12 17:15;2.0;3.4;3.5;3-1;1;0-1;2;LOSS;LOSS;UNDER;NG
-Ligue 1;Lorient vs Olymp. Lione;07/12 20:45;-;-;-;1-0;1;5-0;1;WIN;LOSS;OVER;NG
-Premier League;Aston Villa vs Arsenal;06/12 13:30;4.33;3.5;1.8;2-1;1;2-3;2;LOSS;LOSS;OVER;GG
-Premier League;Bournemouth vs Chelsea;06/12 16:00;2.9;3.5;2.25;0-0;X;1-3;2;LOSS;LOSS;OVER;GG
-Premier League;Everton vs Nott'm Forest;06/12 16:00;-;-;-;3-0;1;2-0;1;WIN;LOSS;UNDER;NG
-Premier League;Man City vs Sunderland;06/12 16:00;-;-;-;3-0;1;1-1;X;LOSS;LOSS;UNDER;GG
-Premier League;Newcastle vs Burnley;06/12 16:00;1.27;5.0;11.0;2-1;1;0-3;2;LOSS;LOSS;OVER;NG
-Premier League;Tottenham vs Brentford;06/12 16:00;2.05;3.5;3.4;2-0;1;2-0;1;WIN;WIN;UNDER;NG
-Premier League;Leeds vs Liverpool;06/12 18:30;4.33;3.75;1.73;3-3;X;0-2;2;LOSS;LOSS;UNDER;NG
-Premier League;Brighton vs West Ham Utd.;07/12 15:00;-;-;-;1-1;X;1-1;X;WIN;WIN;UNDER;GG
-Premier League;FC Fulham vs Crystal Palace;07/12 17:30;-;-;-;1-2;2;0-3;2;WIN;LOSS;OVER;NG
-Premier League;Wolverhampton vs Manchester Utd.;08/12 21:00;-;-;-;1-4;2;1-0;1;LOSS;LOSS;UNDER;NG
-Serie A;Sassuolo vs Fiorentina;06/12 15:00;2.55;3.2;2.7;3-1;1;2-3;2;LOSS;LOSS;OVER;GG
-Serie A;Inter vs Como;06/12 18:00;1.44;4.1;7.0;4-0;1;5-3;1;WIN;LOSS;OVER;GG
-Serie A;Verona vs Atalanta;06/12 20:45;5.0;3.5;1.75;3-1;1;1-2;2;LOSS;LOSS;OVER;GG
-Serie A;Cremonese vs Lecce;07/12 12:30;2.25;3.0;3.3;2-0;1;4-2;1;WIN;LOSS;OVER;GG
-Serie A;Cagliari vs Roma;07/12 15:00;5.5;3.3;1.7;1-0;1;2-0;1;WIN;LOSS;UNDER;NG
-Serie A;Lazio vs Bologna;07/12 18:00;2.8;3.0;2.6;1-1;X;0-2;2;LOSS;LOSS;UNDER;NG
-Serie A;Napoli vs Juventus;07/12 20:45;2.3;3.1;3.1;2-1;1;2-2;X;LOSS;LOSS;OVER;GG
-Serie A;Pisa vs Parma;08/12 15:00;2.4;3.0;3.1;0-1;2;0-1;2;WIN;WIN;UNDER;NG
-Serie A;Udinese vs Genoa;08/12 18:00;2.2;3.0;3.5;1-2;2;0-4;2;WIN;LOSS;OVER;NG
-Serie A;Torino vs Milan;08/12 20:45;5.0;3.4;1.73;2-3;2;1-0;1;LOSS;LOSS;UNDER;NG
-Serie B;Empoli vs Palermo;07/12 17:15;3.05;3.2;2.25;1-3;2;1-1;X;LOSS;LOSS;UNDER;GG
-Serie B;Sampdoria vs Carrarese;07/12 19:30;2.1;3.2;3.5;3-2;1;0-1;2;LOSS;LOSS;UNDER;NG
+Bundesliga;Magonza vs Bor. M'gladbach;05/12 20:30;2.05;3.6;3.2;0-1;2;2-0;1;LOSS;LOSS;UNDER;NG
+Bundesliga;Stoccarda vs Bayern;06/12 15:30;6.25;4.75;1.44;0-5;2;0-3;2;WIN;LOSS;OVER;NG
+Bundesliga;Wolfsburg vs Union Berlino;06/12 15:30;2.25;3.5;2.9;3-1;1;2-1;1;WIN;LOSS;OVER;GG
+Bundesliga;Augusta vs Leverkusen;06/12 15:30;3.9;3.75;1.83;2-0;1;0-0;X;LOSS;LOSS;UNDER;NG
+Bundesliga;Heidenheim vs Friburgo;06/12 15:30;3.7;3.6;1.91;2-1;1;2-1;1;WIN;WIN;OVER;GG
+Bundesliga;Colonia vs St. Pauli;06/12 15:30;1.9;3.6;3.8;1-1;X;0-0;X;WIN;LOSS;UNDER;NG
+Bundesliga;Lipsia vs Eintracht;06/12 18:30;1.9;4.0;3.3;6-0;1;1-1;X;LOSS;LOSS;UNDER;GG
+Bundesliga;Amburgo vs Werder Brema;07/12 15:30;2.15;3.6;3.0;3-2;1;1-2;2;LOSS;LOSS;OVER;GG
+Bundesliga;Dortmund vs Hoffenheim;07/12 17:30;1.55;4.2;5.0;2-0;1;2-0;1;WIN;WIN;UNDER;NG
+Bundesliga;Union Berlino vs Lipsia;12/12 20:30;3.4;3.5;2.0;3-1;1;0-1;2;LOSS;LOSS;UNDER;NG
+Bundesliga;Eintracht vs Augusta;13/12 15:30;1.53;4.2;5.75;1-0;1;1-1;X;LOSS;LOSS;UNDER;GG
+Bundesliga;Bor. M'gladbach vs Wolfsburg;13/12 15:30;2.0;3.7;3.3;1-3;2;0-1;2;WIN;LOSS;UNDER;NG
+Bundesliga;St. Pauli vs Heidenheim;13/12 15:30;1.85;3.3;4.2;2-1;1;0-3;2;LOSS;LOSS;OVER;NG
+Bundesliga;Hoffenheim vs Amburgo;13/12 15:30;1.73;3.9;4.2;4-1;1;1-3;2;LOSS;LOSS;OVER;GG
+Bundesliga;Leverkusen vs Colonia;13/12 18:30;1.45;4.5;6.0;2-0;1;1-0;1;WIN;LOSS;UNDER;NG
+Eredivisie;Excelsior vs FC Groningen;05/12 20:00;2.75;3.4;2.4;0-2;2;1-2;2;WIN;LOSS;OVER;GG
+Eredivisie;Heerenveen vs PSV;06/12 16:30;6.25;4.75;1.4;0-2;2;1-0;1;LOSS;LOSS;UNDER;NG
+Eredivisie;Fortuna Sittard vs Ajax;06/12 18:45;4.75;3.9;1.65;1-3;2;0-0;X;LOSS;LOSS;UNDER;NG
+Eredivisie;Heracles Almelo vs Telstar;06/12 20:00;2.1;3.5;3.2;1-1;X;0-1;2;LOSS;LOSS;UNDER;NG
+Eredivisie;Feyenoord vs PEC Zwolle;06/12 21:00;1.18;6.5;12.0;6-1;1;5-1;1;WIN;LOSS;OVER;GG
+Eredivisie;FC Utrecht vs FC Twente;07/12 12:15;2.35;3.5;2.75;1-1;X;2-2;X;WIN;LOSS;OVER;GG
+Eredivisie;AZ Alkmaar vs Go Ahead Eagles;07/12 14:30;1.44;4.4;6.5;2-2;X;2-1;1;LOSS;LOSS;OVER;GG
+Eredivisie;FC Volendam vs NEC Nijmegen;07/12 14:30;3.6;3.9;1.85;2-3;2;0-0;X;LOSS;LOSS;UNDER;NG
+Eredivisie;Sparta R. vs NAC Breda;07/12 16:45;1.83;3.75;3.8;1-0;1;0-1;2;LOSS;LOSS;UNDER;NG
+Eredivisie;Telstar vs NEC Nijmegen;13/12 16:30;4.2;4.1;1.7;2-2;X;1-1;X;WIN;LOSS;UNDER;GG
+La Liga;Real Oviedo vs RCD Mallorca;05/12 21:00;2.35;3.0;3.2;0-0;X;0-0;X;WIN;WIN;UNDER;NG
+La Liga;Villarreal vs Getafe CF;06/12 14:00;1.53;3.75;6.5;2-0;1;6-0;1;WIN;LOSS;OVER;NG
+La Liga;Alavés vs Real Sociedad;06/12 16:15;2.8;3.0;2.55;1-0;1;0-0;X;LOSS;LOSS;UNDER;NG
+La Liga;Real Betis vs Barcellona;06/12 18:30;4.0;4.1;1.73;3-5;2;2-3;2;WIN;LOSS;OVER;GG
+La Liga;Athletic Club vs Atlético;06/12 21:00;3.7;3.25;2.05;1-0;1;1-0;1;WIN;WIN;UNDER;NG
+La Liga;Elche vs Girona FC;07/12 14:00;2.25;3.2;3.25;3-0;1;1-1;X;LOSS;LOSS;UNDER;GG
+La Liga;Valencia vs Siviglia;07/12 16:15;2.2;3.2;3.2;1-1;X;0-0;X;WIN;LOSS;UNDER;NG
+La Liga;Espanyol vs Rayo Vallecano;07/12 18:30;2.35;3.1;3.0;1-0;1;1-1;X;LOSS;LOSS;UNDER;GG
+La Liga;Real Madrid vs Celta de Vigo;07/12 21:00;1.25;6.0;9.0;0-2;2;1-1;X;LOSS;LOSS;UNDER;GG
+La Liga;CA Osasuna vs Levante;08/12 21:00;1.8;3.4;4.5;2-0;1;0-1;2;LOSS;LOSS;UNDER;NG
+La Liga;Real Sociedad vs Girona FC;12/12 21:00;1.7;3.6;5.0;1-2;2;0-0;X;LOSS;LOSS;UNDER;NG
+Liga Portugal;Benfica vs Sporting;05/12 21:15;2.55;3.3;2.55;1-1;X;4-0;1;LOSS;LOSS;OVER;NG
+Liga Portugal;Santa Clara vs Casa Pia;06/12 16:30;1.95;3.0;4.75;1-0;1;3-1;1;WIN;LOSS;OVER;GG
+Liga Portugal;Avs FS vs Rio Ave;06/12 19:00;2.9;3.2;2.38;1-2;2;0-0;X;LOSS;LOSS;UNDER;NG
+Liga Portugal;Famalicão vs SC Braga;06/12 21:30;3.1;3.3;2.25;1-2;2;0-0;X;LOSS;LOSS;UNDER;NG
+Liga Portugal;Estoril vs Moreirense;07/12 16:30;1.91;3.3;3.9;3-3;X;1-1;X;WIN;LOSS;UNDER;GG
+Liga Portugal;Alverca vs Nacional;07/12 19:00;2.3;3.25;3.1;1-0;1;2-0;1;WIN;LOSS;UNDER;NG
+Liga Portugal;Estrela Amadora vs Arouca;07/12 19:00;2.38;3.2;2.9;3-1;1;0-1;2;LOSS;LOSS;UNDER;NG
+Liga Portugal;Tondela vs FC Porto;07/12 21:30;10.0;4.75;1.29;0-2;2;0-4;2;WIN;LOSS;OVER;NG
+Liga Portugal;Vit. Guimarães vs Gil Vicente;08/12 21:30;2.5;3.1;2.88;0-0;X;1-1;X;WIN;LOSS;UNDER;GG
+Liga Portugal;Casa Pia vs Gil Vicente;13/12 16:30;3.75;3.1;2.1;1-1;X;0-2;2;LOSS;LOSS;UNDER;NG
+Ligue 1;Brest vs Monaco;05/12 19:00;3.4;3.7;2.0;1-0;1;2-0;1;WIN;LOSS;UNDER;NG
+Ligue 1;Lille vs Marsiglia;05/12 21:00;2.4;3.5;2.7;1-0;1;2-0;1;WIN;LOSS;UNDER;NG
+Ligue 1;FC Nantes vs Lens;06/12 17:00;5.0;3.7;1.67;1-2;2;0-1;2;WIN;LOSS;UNDER;NG
+Ligue 1;Tolosa vs Strasburgo;06/12 19:00;2.3;3.4;3.0;1-0;1;1-0;1;WIN;WIN;UNDER;NG
+Ligue 1;PSG vs Stade Rennes;06/12 21:05;1.25;5.5;10.0;5-0;1;2-0;1;WIN;LOSS;UNDER;NG
+Ligue 1;Nizza vs Angers SCO;07/12 15:00;1.62;3.7;5.25;0-1;2;0-0;X;LOSS;LOSS;UNDER;NG
+Ligue 1;Le Havre vs Paris FC;07/12 17:15;2.88;3.3;2.3;0-0;X;1-0;1;LOSS;LOSS;UNDER;NG
+Ligue 1;AJ Auxerre vs Metz;07/12 17:15;2.0;3.4;3.5;3-1;1;0-2;2;LOSS;LOSS;UNDER;NG
+Ligue 1;Lorient vs Olymp. Lione;07/12 20:45;3.6;3.4;2.0;1-0;1;4-0;1;WIN;LOSS;OVER;NG
+Ligue 1;Angers SCO vs FC Nantes;12/12 20:45;2.3;3.1;3.1;4-1;1;0-1;2;LOSS;LOSS;UNDER;NG
+Ligue 1;Stade Rennes vs Brest;13/12 17:00;1.83;3.6;4.0;3-1;1;0-5;2;LOSS;LOSS;OVER;NG
+Premier League;Aston Villa vs Arsenal;06/12 13:30;4.33;3.5;1.8;2-1;1;1-3;2;LOSS;LOSS;OVER;GG
+Premier League;Bournemouth vs Chelsea;06/12 16:00;2.9;3.5;2.25;0-0;X;0-1;2;LOSS;LOSS;UNDER;NG
+Premier League;Everton vs Nott'm Forest;06/12 16:00;2.05;3.25;3.5;3-0;1;1-0;1;WIN;LOSS;UNDER;NG
+Premier League;Man City vs Sunderland;06/12 16:00;1.25;5.5;11.0;3-0;1;0-1;2;LOSS;LOSS;UNDER;NG
+Premier League;Newcastle vs Burnley;06/12 16:00;1.27;5.0;11.0;2-1;1;0-2;2;LOSS;LOSS;UNDER;NG
+Premier League;Tottenham vs Brentford;06/12 16:00;2.05;3.5;3.4;2-0;1;1-0;1;WIN;LOSS;UNDER;NG
+Premier League;Leeds vs Liverpool;06/12 18:30;4.33;3.75;1.73;3-3;X;0-3;2;LOSS;LOSS;OVER;NG
+Premier League;Brighton vs West Ham Utd.;07/12 15:00;1.57;4.0;5.25;1-1;X;3-0;1;LOSS;LOSS;OVER;NG
+Premier League;FC Fulham vs Crystal Palace;07/12 17:30;2.6;3.25;2.6;1-2;2;0-0;X;LOSS;LOSS;UNDER;NG
+Premier League;Wolverhampton vs Manchester Utd.;08/12 21:00;4.75;3.7;1.67;1-4;2;1-0;1;LOSS;LOSS;UNDER;NG
+Premier League;Chelsea vs Everton;13/12 16:00;1.6;3.75;5.5;2-0;1;0-1;2;LOSS;LOSS;UNDER;NG
+Premier League;Liverpool vs Brighton;13/12 16:00;1.7;3.9;4.33;2-0;1;0-1;2;LOSS;LOSS;UNDER;NG
+Serie A;Sassuolo vs Fiorentina;06/12 15:00;2.55;3.2;2.7;3-1;1;2-1;1;WIN;LOSS;OVER;GG
+Serie A;Inter vs Como;06/12 18:00;1.44;4.1;7.0;4-0;1;3-2;1;WIN;LOSS;OVER;GG
+Serie A;Verona vs Atalanta;06/12 20:45;5.0;3.5;1.75;3-1;1;0-2;2;LOSS;LOSS;UNDER;NG
+Serie A;Cremonese vs Lecce;07/12 12:30;2.25;3.0;3.3;2-0;1;0-4;2;LOSS;LOSS;OVER;NG
+Serie A;Cagliari vs Roma;07/12 15:00;5.5;3.3;1.7;1-0;1;1-0;1;WIN;WIN;UNDER;NG
+Serie A;Lazio vs Bologna;07/12 18:00;2.8;3.0;2.6;1-1;X;3-4;2;LOSS;LOSS;OVER;GG
+Serie A;Napoli vs Juventus;07/12 20:45;2.3;3.1;3.1;2-1;1;3-0;1;WIN;LOSS;OVER;NG
+Serie A;Pisa vs Parma;08/12 15:00;2.4;3.0;3.1;0-1;2;0-0;X;LOSS;LOSS;UNDER;NG
+Serie A;Udinese vs Genoa;08/12 18:00;2.2;3.0;3.5;1-2;2;0-3;2;WIN;LOSS;OVER;NG
+Serie A;Torino vs Milan;08/12 20:45;5.0;3.4;1.73;2-3;2;0-0;X;LOSS;LOSS;UNDER;NG
+Serie A;Lecce vs Pisa;12/12 20:45;2.2;3.0;3.5;1-0;1;0-1;2;LOSS;LOSS;UNDER;NG
+Serie A;Torino vs Cremonese;13/12 15:00;1.9;3.3;4.1;1-0;1;3-0;1;WIN;LOSS;OVER;NG
+Serie A;Parma vs Lazio;13/12 18:00;3.75;3.25;2.0;0-1;2;1-0;1;LOSS;LOSS;UNDER;NG
+Serie B;Empoli vs Palermo;07/12 17:15;3.05;3.2;2.25;1-3;2;2-3;2;WIN;LOSS;OVER;GG
+Serie B;Sampdoria vs Carrarese;07/12 19:30;2.1;3.2;3.5;3-2;1;0-0;X;LOSS;LOSS;UNDER;NG
 Serie B;Modena vs Catanzaro;08/12 12:30;1.68;3.5;5.0;1-2;2;2-2;X;LOSS;LOSS;OVER;GG
-Serie B;Avellino vs Venezia;08/12 15:00;4.1;3.6;1.79;1-1;X;0-6;2;LOSS;LOSS;OVER;NG
-Serie B;Frosinone vs Juve Stabia;08/12 15:00;1.86;3.3;3.9;3-0;1;0-0;X;LOSS;LOSS;UNDER;NG
-Serie B;Mantova vs Reggiana;08/12 15:00;1.96;3.4;3.75;0-1;2;0-2;2;WIN;LOSS;UNDER;NG
-Serie B;Monza vs Südtirol;08/12 15:00;-;-;-;1-1;X;2-0;1;LOSS;LOSS;UNDER;NG
-Serie B;Padova vs Cesena;08/12 15:00;3.25;2.95;2.32;1-1;X;1-0;1;LOSS;LOSS;UNDER;NG
-Serie B;Bari vs Pescara;08/12 17:15;1.68;3.4;4.5;1-1;X;2-2;X;WIN;LOSS;OVER;GG
-Serie B;Virtus Entella vs Spezia;08/12 19:30;2.35;3.1;3.2;0-1;2;0-1;2;WIN;WIN;UNDER;NG
-Serie C - Girone A;Trento vs Cittadella;05/12 20:30;2.8;3.0;2.35;1-0;1;0-1;2;LOSS;LOSS;UNDER;NG
-Serie C - Girone A;Pro Vercelli vs Renate;06/12 14:30;2.15;2.88;3.3;1-1;X;2-0;1;LOSS;LOSS;UNDER;NG
-Serie C - Girone A;Arzignano vs Inter U23;07/12 12:30;2.9;3.1;2.25;1-1;X;2-2;X;WIN;LOSS;OVER;GG
-Serie C - Girone A;Novara vs Vicenza;07/12 14:30;4.5;3.1;1.75;2-2;X;0-0;X;WIN;LOSS;UNDER;NG
-Serie C - Girone A;Union Brescia vs Lumezzane;07/12 14:30;1.44;3.6;7.0;0-1;2;2-2;X;LOSS;LOSS;OVER;GG
+Serie B;Avellino vs Venezia;08/12 15:00;4.1;3.6;1.79;1-1;X;2-1;1;LOSS;LOSS;OVER;GG
+Serie B;Frosinone vs Juve Stabia;08/12 15:00;1.86;3.3;3.9;3-0;1;4-1;1;WIN;LOSS;OVER;GG
+Serie B;Mantova vs Reggiana;08/12 15:00;1.96;3.4;3.75;0-1;2;4-2;1;LOSS;LOSS;OVER;GG
+Serie B;Monza vs Südtirol;08/12 15:00;1.51;3.75;6.5;1-1;X;2-0;1;LOSS;LOSS;UNDER;NG
+Serie B;Padova vs Cesena;08/12 15:00;3.25;2.95;2.32;1-1;X;0-2;2;LOSS;LOSS;UNDER;NG
+Serie B;Bari vs Pescara;08/12 17:15;1.68;3.4;4.5;1-1;X;2-0;1;LOSS;LOSS;UNDER;NG
+Serie B;Virtus Entella vs Spezia;08/12 19:30;2.35;3.1;3.2;0-1;2;0-5;2;WIN;LOSS;OVER;NG
+Serie B;Palermo vs Sampdoria;12/12 20:30;1.62;3.4;5.25;1-0;1;3-1;1;WIN;LOSS;OVER;GG
+Serie B;Juve Stabia vs Empoli;13/12 15:00;2.1;3.05;3.4;2-0;1;1-3;2;LOSS;LOSS;OVER;GG
+Serie B;Reggiana vs Padova;13/12 15:00;2.3;3.05;2.95;1-2;2;0-0;X;LOSS;LOSS;UNDER;NG
+Serie B;Spezia vs Modena;13/12 15:00;3.2;3.05;2.2;0-2;2;1-1;X;LOSS;LOSS;UNDER;GG
+Serie B;Südtirol vs Bari;13/12 15:00;1.91;3.25;3.8;0-0;X;0-2;2;LOSS;LOSS;UNDER;NG
+Serie B;Venezia vs Monza;13/12 15:00;2.32;3.05;2.95;2-0;1;2-2;X;LOSS;LOSS;OVER;GG
+Serie B;Catanzaro vs Avellino;13/12 17:15;1.79;3.4;4.1;1-0;1;3-1;1;WIN;LOSS;OVER;GG
+Serie C - Girone A;Trento vs Cittadella;05/12 20:30;2.8;3.0;2.35;1-0;1;2-1;1;WIN;LOSS;OVER;GG
+Serie C - Girone A;Pro Vercelli vs Renate;06/12 14:30;2.15;2.88;3.3;1-1;X;4-0;1;LOSS;LOSS;OVER;NG
+Serie C - Girone A;Arzignano vs Inter U23;07/12 12:30;2.9;3.1;2.25;1-1;X;2-1;1;LOSS;LOSS;OVER;GG
+Serie C - Girone A;Novara vs Vicenza;07/12 14:30;4.5;3.1;1.75;2-2;X;0-1;2;LOSS;LOSS;UNDER;NG
+Serie C - Girone A;Union Brescia vs Lumezzane;07/12 14:30;1.44;3.6;7.0;0-1;2;1-2;2;WIN;LOSS;OVER;GG
 Serie C - Girone A;Pro Patria vs Dolomiti;07/12 17:30;2.38;2.9;2.88;0-2;2;1-0;1;LOSS;LOSS;UNDER;NG
-Serie C - Girone A;AlbinoLeffe vs Ospitaletto;08/12 14:30;2.0;3.0;3.5;1-1;X;2-0;1;LOSS;LOSS;UNDER;NG
+Serie C - Girone A;AlbinoLeffe vs Ospitaletto;08/12 14:30;2.0;3.0;3.5;1-1;X;1-0;1;LOSS;LOSS;UNDER;NG
 Serie C - Girone A;Lecco vs Alcione;08/12 14:30;2.15;2.88;3.3;1-0;1;0-0;X;LOSS;LOSS;UNDER;NG
-Serie C - Girone A;Virtus Verona vs Pergolettese;08/12 14:30;2.15;3.0;3.1;1-1;X;0-2;2;LOSS;LOSS;UNDER;NG
-Serie C - Girone A;Giana Erminio vs Triestina;08/12 15:00;2.3;2.9;3.0;2-1;1;1-0;1;WIN;LOSS;UNDER;NG
-Serie C - Girone B;Livorno vs Arezzo;06/12 14:30;4.0;3.2;1.8;2-1;1;0-5;2;LOSS;LOSS;OVER;NG
-Serie C - Girone B;Pianese vs Gubbio;06/12 14:30;2.88;2.9;2.38;1-0;1;3-1;1;WIN;LOSS;OVER;GG
-Serie C - Girone B;Bra vs Campobasso;06/12 17:30;3.0;3.1;2.2;2-0;1;1-1;X;LOSS;LOSS;UNDER;GG
-Serie C - Girone B;Guidonia vs Juve Next Gen;07/12 12:30;-;-;-;1-1;X;1-1;X;WIN;WIN;UNDER;GG
-Serie C - Girone B;Perugia vs Ternana;07/12 14:30;2.5;2.88;2.75;1-2;2;0-2;2;WIN;LOSS;UNDER;NG
-Serie C - Girone B;Torres vs Pineto;07/12 14:30;2.5;2.88;2.75;1-1;X;0-0;X;WIN;LOSS;UNDER;NG
-Serie C - Girone B;Ravenna vs Pontedera;07/12 17:30;1.53;3.6;5.5;2-1;1;2-1;1;WIN;WIN;OVER;GG
-Serie C - Girone B;Ascoli vs Forlì;08/12 14:30;-;-;-;3-0;1;2-0;1;WIN;LOSS;UNDER;NG
-Serie C - Girone B;Carpi vs Vis Pesaro;08/12 14:30;2.3;2.9;3.0;1-1;X;0-0;X;WIN;LOSS;UNDER;NG
+Serie C - Girone A;Virtus Verona vs Pergolettese;08/12 14:30;2.15;3.0;3.1;1-1;X;0-1;2;LOSS;LOSS;UNDER;NG
+Serie C - Girone A;Giana Erminio vs Triestina;08/12 15:00;2.3;2.9;3.0;2-1;1;1-2;2;LOSS;LOSS;OVER;GG
+Serie C - Girone A;Lumezzane vs Lecco;13/12 14:30;2.55;3.0;2.55;1-1;X;1-0;1;LOSS;LOSS;UNDER;NG
+Serie C - Girone B;Livorno vs Arezzo;06/12 14:30;4.0;3.2;1.8;2-1;1;2-3;2;LOSS;LOSS;OVER;GG
+Serie C - Girone B;Pianese vs Gubbio;06/12 14:30;2.88;2.9;2.38;1-0;1;0-0;X;LOSS;LOSS;UNDER;NG
+Serie C - Girone B;Bra vs Campobasso;06/12 17:30;3.0;3.1;2.2;2-0;1;1-2;2;LOSS;LOSS;OVER;GG
+Serie C - Girone B;Guidonia vs Juve Next Gen;07/12 12:30;2.05;3.0;3.3;1-1;X;2-0;1;LOSS;LOSS;UNDER;NG
+Serie C - Girone B;Perugia vs Ternana;07/12 14:30;2.5;2.88;2.75;1-2;2;1-0;1;LOSS;LOSS;UNDER;NG
+Serie C - Girone B;Torres vs Pineto;07/12 14:30;2.5;2.88;2.75;1-1;X;1-3;2;LOSS;LOSS;OVER;GG
+Serie C - Girone B;Ravenna vs Pontedera;07/12 17:30;1.53;3.6;5.5;2-1;1;0-1;2;LOSS;LOSS;UNDER;NG
+Serie C - Girone B;Ascoli vs Forlì;08/12 14:30;1.6;3.3;5.25;3-0;1;3-0;1;WIN;WIN;OVER;NG
+Serie C - Girone B;Carpi vs Vis Pesaro;08/12 14:30;2.3;2.9;3.0;1-1;X;0-2;2;LOSS;LOSS;UNDER;NG
+Serie C - Girone B;Juve Next Gen vs Pianese;12/12 20:30;2.1;3.1;3.2;0-0;X;0-2;2;LOSS;LOSS;UNDER;NG
 Serie C - Girone C;Catania vs Crotone;05/12 20:30;1.83;3.1;4.0;2-0;1;3-1;1;WIN;LOSS;OVER;GG
-Serie C - Girone C;Casarano vs Latina;06/12 14:30;1.83;3.25;3.9;1-1;X;1-0;1;LOSS;LOSS;UNDER;NG
-Serie C - Girone C;Siracusa vs Foggia;06/12 14:30;1.73;3.4;4.2;2-2;X;1-0;1;LOSS;LOSS;UNDER;NG
-Serie C - Girone C;Sorrento vs Potenza;06/12 14:30;2.63;3.2;2.38;2-2;X;1-4;2;LOSS;LOSS;OVER;GG
+Serie C - Girone C;Casarano vs Latina;06/12 14:30;1.83;3.25;3.9;1-1;X;1-2;2;LOSS;LOSS;OVER;GG
+Serie C - Girone C;Siracusa vs Foggia;06/12 14:30;1.73;3.4;4.2;2-2;X;0-0;X;WIN;LOSS;UNDER;NG
+Serie C - Girone C;Sorrento vs Potenza;06/12 14:30;2.63;3.2;2.38;2-2;X;0-1;2;LOSS;LOSS;UNDER;NG
 Serie C - Girone C;Giugliano vs Team Altamura;06/12 17:30;1.95;3.25;3.4;0-1;2;0-0;X;LOSS;LOSS;UNDER;NG
 Serie C - Girone C;Monopoli vs Atalanta U23;07/12 14:30;2.3;3.2;2.75;1-1;X;0-0;X;WIN;LOSS;UNDER;NG
-Serie C - Girone C;Salernitana vs Trapani;07/12 14:30;1.75;3.3;4.1;1-1;X;0-0;X;WIN;LOSS;UNDER;NG
-Serie C - Girone C;Cerignola vs Casertana;07/12 17:30;1.9;3.1;3.7;1-1;X;0-0;X;WIN;LOSS;UNDER;NG
-Serie C - Girone C;Cavese vs Benevento;07/12 17:30;4.33;3.3;1.75;0-1;2;0-4;2;WIN;LOSS;OVER;NG
+Serie C - Girone C;Salernitana vs Trapani;07/12 14:30;1.75;3.3;4.1;1-1;X;0-1;2;LOSS;LOSS;UNDER;NG
+Serie C - Girone C;Cerignola vs Casertana;07/12 17:30;1.9;3.1;3.7;1-1;X;0-2;2;LOSS;LOSS;UNDER;NG
+Serie C - Girone C;Cavese vs Benevento;07/12 17:30;4.33;3.3;1.75;0-1;2;0-0;X;LOSS;LOSS;UNDER;NG
 Serie C - Girone C;Cosenza vs Picerno;07/12 17:30;1.44;3.8;6.5;1-0;1;3-0;1;WIN;LOSS;OVER;NG
 "--- PERCENTUALI ---
-(Su partite finite)";;;;;;;;40.0%;6.7%;;59.0%;;50.5%
+(Su partite finite)";;;;;;;;36.2%;5.4%;;56.2%;;49.2%
 
 
 === ALGORITMO: TAT ===
 League;Match;Data;Q1;QX;Q2;Real Score;Real Sign;PRED Score;PRED Sign;1X2 Outcome;Exact Score;U/O 2.5;GG/NG
-Bundesliga;Magonza vs Bor. M'gladbach;05/12 20:30;-;-;-;0-1;2;1-0;1;LOSS;LOSS;UNDER;NG
-Bundesliga;Stoccarda vs Bayern;06/12 15:30;6.25;4.75;1.44;0-5;2;2-2;X;LOSS;LOSS;OVER;GG
-Bundesliga;Wolfsburg vs Union Berlino;06/12 15:30;2.25;3.5;2.9;3-1;1;1-1;X;LOSS;LOSS;UNDER;GG
-Bundesliga;Augusta vs Leverkusen;06/12 15:30;-;-;-;2-0;1;1-2;2;LOSS;LOSS;OVER;GG
-Bundesliga;Heidenheim vs Friburgo;06/12 15:30;3.7;3.6;1.91;2-1;1;2-0;1;WIN;LOSS;UNDER;NG
-Bundesliga;Colonia vs St. Pauli;06/12 15:30;1.9;3.6;3.8;1-1;X;2-0;1;LOSS;LOSS;UNDER;NG
-Bundesliga;Lipsia vs Eintracht;06/12 18:30;1.9;4.0;3.3;6-0;1;0-0;X;LOSS;LOSS;UNDER;NG
-Bundesliga;Amburgo vs Werder Brema;07/12 15:30;2.15;3.6;3.0;3-2;1;1-0;1;WIN;LOSS;UNDER;NG
-Bundesliga;Dortmund vs Hoffenheim;07/12 17:30;1.55;4.2;5.0;2-0;1;2-0;1;WIN;WIN;UNDER;NG
-Eredivisie;Excelsior vs FC Groningen;05/12 20:00;-;-;-;0-2;2;1-0;1;LOSS;LOSS;UNDER;NG
-Eredivisie;Heerenveen vs PSV;06/12 16:30;-;-;-;0-2;2;1-1;X;LOSS;LOSS;UNDER;GG
-Eredivisie;Fortuna Sittard vs Ajax;06/12 18:45;-;-;-;1-3;2;1-0;1;LOSS;LOSS;UNDER;NG
-Eredivisie;Heracles Almelo vs Telstar;06/12 20:00;-;-;-;1-1;X;0-1;2;LOSS;LOSS;UNDER;NG
-Eredivisie;Feyenoord vs PEC Zwolle;06/12 21:00;-;-;-;6-1;1;2-1;1;WIN;LOSS;OVER;GG
-Eredivisie;FC Utrecht vs FC Twente;07/12 12:15;-;-;-;1-1;X;1-1;X;WIN;WIN;UNDER;GG
-Eredivisie;AZ Alkmaar vs Go Ahead Eagles;07/12 14:30;-;-;-;2-2;X;2-1;1;LOSS;LOSS;OVER;GG
-Eredivisie;FC Volendam vs NEC Nijmegen;07/12 14:30;-;-;-;2-3;2;0-2;2;WIN;LOSS;UNDER;NG
-Eredivisie;Sparta R. vs NAC Breda;07/12 16:45;-;-;-;1-0;1;0-1;2;LOSS;LOSS;UNDER;NG
-La Liga;Real Oviedo vs RCD Mallorca;05/12 21:00;-;-;-;0-0;X;0-0;X;WIN;WIN;UNDER;NG
-La Liga;Villarreal vs Getafe CF;06/12 14:00;-;-;-;2-0;1;10-1;1;WIN;LOSS;OVER;GG
-La Liga;Alavés vs Real Sociedad;06/12 16:15;-;-;-;1-0;1;0-1;2;LOSS;LOSS;UNDER;NG
-La Liga;Real Betis vs Barcellona;06/12 18:30;4.0;4.1;1.73;3-5;2;0-1;2;WIN;LOSS;UNDER;NG
-La Liga;Athletic Club vs Atlético;06/12 21:00;-;-;-;1-0;1;1-0;1;WIN;WIN;UNDER;NG
-La Liga;Elche vs Girona FC;07/12 14:00;-;-;-;3-0;1;0-0;X;LOSS;LOSS;UNDER;NG
-La Liga;Valencia vs Siviglia;07/12 16:15;-;-;-;1-1;X;2-1;1;LOSS;LOSS;OVER;GG
-La Liga;Espanyol vs Rayo Vallecano;07/12 18:30;2.35;3.1;3.0;1-0;1;1-1;X;LOSS;LOSS;UNDER;GG
-La Liga;Real Madrid vs Celta de Vigo;07/12 21:00;-;-;-;0-2;2;2-0;1;LOSS;LOSS;UNDER;NG
-La Liga;CA Osasuna vs Levante;08/12 21:00;-;-;-;2-0;1;1-0;1;WIN;LOSS;UNDER;NG
-Liga Portugal;Benfica vs Sporting;05/12 21:15;-;-;-;1-1;X;1-0;1;LOSS;LOSS;UNDER;NG
-Liga Portugal;Santa Clara vs Casa Pia;06/12 16:30;-;-;-;1-0;1;2-1;1;WIN;LOSS;OVER;GG
-Liga Portugal;Avs FS vs Rio Ave;06/12 19:00;-;-;-;1-2;2;0-2;2;WIN;LOSS;UNDER;NG
-Liga Portugal;Famalicão vs SC Braga;06/12 21:30;-;-;-;1-2;2;0-1;2;WIN;LOSS;UNDER;NG
-Liga Portugal;Estoril vs Moreirense;07/12 16:30;-;-;-;3-3;X;2-1;1;LOSS;LOSS;OVER;GG
-Liga Portugal;Alverca vs Nacional;07/12 19:00;-;-;-;1-0;1;2-0;1;WIN;LOSS;UNDER;NG
-Liga Portugal;Estrela Amadora vs Arouca;07/12 19:00;-;-;-;3-1;1;3-2;1;WIN;LOSS;OVER;GG
-Liga Portugal;Tondela vs FC Porto;07/12 21:30;-;-;-;0-2;2;0-4;2;WIN;LOSS;OVER;NG
-Liga Portugal;Vit. Guimarães vs Gil Vicente;08/12 21:30;-;-;-;0-0;X;0-1;2;LOSS;LOSS;UNDER;NG
-Ligue 1;Brest vs Monaco;05/12 19:00;3.4;3.7;2.0;1-0;1;1-2;2;LOSS;LOSS;OVER;GG
-Ligue 1;Lille vs Marsiglia;05/12 21:00;2.4;3.5;2.7;1-0;1;3-0;1;WIN;LOSS;OVER;NG
-Ligue 1;FC Nantes vs Lens;06/12 17:00;-;-;-;1-2;2;0-3;2;WIN;LOSS;OVER;NG
-Ligue 1;Tolosa vs Strasburgo;06/12 19:00;2.3;3.4;3.0;1-0;1;0-0;X;LOSS;LOSS;UNDER;NG
-Ligue 1;PSG vs Stade Rennes;06/12 21:05;-;-;-;5-0;1;4-0;1;WIN;LOSS;OVER;NG
-Ligue 1;Nizza vs Angers SCO;07/12 15:00;-;-;-;0-1;2;0-0;X;LOSS;LOSS;UNDER;NG
-Ligue 1;Le Havre vs Paris FC;07/12 17:15;2.88;3.3;2.3;0-0;X;2-0;1;LOSS;LOSS;UNDER;NG
-Ligue 1;AJ Auxerre vs Metz;07/12 17:15;2.0;3.4;3.5;3-1;1;0-1;2;LOSS;LOSS;UNDER;NG
-Ligue 1;Lorient vs Olymp. Lione;07/12 20:45;-;-;-;1-0;1;1-0;1;WIN;WIN;UNDER;NG
-Premier League;Aston Villa vs Arsenal;06/12 13:30;4.33;3.5;1.8;2-1;1;1-0;1;WIN;LOSS;UNDER;NG
-Premier League;Bournemouth vs Chelsea;06/12 16:00;2.9;3.5;2.25;0-0;X;0-2;2;LOSS;LOSS;UNDER;NG
-Premier League;Everton vs Nott'm Forest;06/12 16:00;-;-;-;3-0;1;4-0;1;WIN;LOSS;OVER;NG
-Premier League;Man City vs Sunderland;06/12 16:00;-;-;-;3-0;1;0-0;X;LOSS;LOSS;UNDER;NG
+Bundesliga;Magonza vs Bor. M'gladbach;05/12 20:30;2.05;3.6;3.2;0-1;2;0-0;X;LOSS;LOSS;UNDER;NG
+Bundesliga;Stoccarda vs Bayern;06/12 15:30;6.25;4.75;1.44;0-5;2;0-2;2;WIN;LOSS;UNDER;NG
+Bundesliga;Wolfsburg vs Union Berlino;06/12 15:30;2.25;3.5;2.9;3-1;1;1-0;1;WIN;LOSS;UNDER;NG
+Bundesliga;Augusta vs Leverkusen;06/12 15:30;3.9;3.75;1.83;2-0;1;0-1;2;LOSS;LOSS;UNDER;NG
+Bundesliga;Heidenheim vs Friburgo;06/12 15:30;3.7;3.6;1.91;2-1;1;0-3;2;LOSS;LOSS;OVER;NG
+Bundesliga;Colonia vs St. Pauli;06/12 15:30;1.9;3.6;3.8;1-1;X;1-0;1;LOSS;LOSS;UNDER;NG
+Bundesliga;Lipsia vs Eintracht;06/12 18:30;1.9;4.0;3.3;6-0;1;1-1;X;LOSS;LOSS;UNDER;GG
+Bundesliga;Amburgo vs Werder Brema;07/12 15:30;2.15;3.6;3.0;3-2;1;0-0;X;LOSS;LOSS;UNDER;NG
+Bundesliga;Dortmund vs Hoffenheim;07/12 17:30;1.55;4.2;5.0;2-0;1;3-3;X;LOSS;LOSS;OVER;GG
+Bundesliga;Union Berlino vs Lipsia;12/12 20:30;3.4;3.5;2.0;3-1;1;1-1;X;LOSS;LOSS;UNDER;GG
+Bundesliga;Eintracht vs Augusta;13/12 15:30;1.53;4.2;5.75;1-0;1;0-1;2;LOSS;LOSS;UNDER;NG
+Bundesliga;Bor. M'gladbach vs Wolfsburg;13/12 15:30;2.0;3.7;3.3;1-3;2;0-1;2;WIN;LOSS;UNDER;NG
+Bundesliga;St. Pauli vs Heidenheim;13/12 15:30;1.85;3.3;4.2;2-1;1;0-2;2;LOSS;LOSS;UNDER;NG
+Bundesliga;Hoffenheim vs Amburgo;13/12 15:30;1.73;3.9;4.2;4-1;1;1-0;1;WIN;LOSS;UNDER;NG
+Bundesliga;Leverkusen vs Colonia;13/12 18:30;1.45;4.5;6.0;2-0;1;0-1;2;LOSS;LOSS;UNDER;NG
+Eredivisie;Excelsior vs FC Groningen;05/12 20:00;2.75;3.4;2.4;0-2;2;0-1;2;WIN;LOSS;UNDER;NG
+Eredivisie;Heerenveen vs PSV;06/12 16:30;6.25;4.75;1.4;0-2;2;0-0;X;LOSS;LOSS;UNDER;NG
+Eredivisie;Fortuna Sittard vs Ajax;06/12 18:45;4.75;3.9;1.65;1-3;2;0-0;X;LOSS;LOSS;UNDER;NG
+Eredivisie;Heracles Almelo vs Telstar;06/12 20:00;2.1;3.5;3.2;1-1;X;0-1;2;LOSS;LOSS;UNDER;NG
+Eredivisie;Feyenoord vs PEC Zwolle;06/12 21:00;1.18;6.5;12.0;6-1;1;6-0;1;WIN;LOSS;OVER;NG
+Eredivisie;FC Utrecht vs FC Twente;07/12 12:15;2.35;3.5;2.75;1-1;X;0-2;2;LOSS;LOSS;UNDER;NG
+Eredivisie;AZ Alkmaar vs Go Ahead Eagles;07/12 14:30;1.44;4.4;6.5;2-2;X;2-1;1;LOSS;LOSS;OVER;GG
+Eredivisie;FC Volendam vs NEC Nijmegen;07/12 14:30;3.6;3.9;1.85;2-3;2;0-4;2;WIN;LOSS;OVER;NG
+Eredivisie;Sparta R. vs NAC Breda;07/12 16:45;1.83;3.75;3.8;1-0;1;0-1;2;LOSS;LOSS;UNDER;NG
+Eredivisie;Telstar vs NEC Nijmegen;13/12 16:30;4.2;4.1;1.7;2-2;X;1-1;X;WIN;LOSS;UNDER;GG
+La Liga;Real Oviedo vs RCD Mallorca;05/12 21:00;2.35;3.0;3.2;0-0;X;0-1;2;LOSS;LOSS;UNDER;NG
+La Liga;Villarreal vs Getafe CF;06/12 14:00;1.53;3.75;6.5;2-0;1;7-0;1;WIN;LOSS;OVER;NG
+La Liga;Alavés vs Real Sociedad;06/12 16:15;2.8;3.0;2.55;1-0;1;0-1;2;LOSS;LOSS;UNDER;NG
+La Liga;Real Betis vs Barcellona;06/12 18:30;4.0;4.1;1.73;3-5;2;0-2;2;WIN;LOSS;UNDER;NG
+La Liga;Athletic Club vs Atlético;06/12 21:00;3.7;3.25;2.05;1-0;1;0-0;X;LOSS;LOSS;UNDER;NG
+La Liga;Elche vs Girona FC;07/12 14:00;2.25;3.2;3.25;3-0;1;0-0;X;LOSS;LOSS;UNDER;NG
+La Liga;Valencia vs Siviglia;07/12 16:15;2.2;3.2;3.2;1-1;X;0-0;X;WIN;LOSS;UNDER;NG
+La Liga;Espanyol vs Rayo Vallecano;07/12 18:30;2.35;3.1;3.0;1-0;1;4-2;1;WIN;LOSS;OVER;GG
+La Liga;Real Madrid vs Celta de Vigo;07/12 21:00;1.25;6.0;9.0;0-2;2;3-0;1;LOSS;LOSS;OVER;NG
+La Liga;CA Osasuna vs Levante;08/12 21:00;1.8;3.4;4.5;2-0;1;0-4;2;LOSS;LOSS;OVER;NG
+La Liga;Real Sociedad vs Girona FC;12/12 21:00;1.7;3.6;5.0;1-2;2;2-0;1;LOSS;LOSS;UNDER;NG
+Liga Portugal;Benfica vs Sporting;05/12 21:15;2.55;3.3;2.55;1-1;X;2-0;1;LOSS;LOSS;UNDER;NG
+Liga Portugal;Santa Clara vs Casa Pia;06/12 16:30;1.95;3.0;4.75;1-0;1;0-0;X;LOSS;LOSS;UNDER;NG
+Liga Portugal;Avs FS vs Rio Ave;06/12 19:00;2.9;3.2;2.38;1-2;2;0-3;2;WIN;LOSS;OVER;NG
+Liga Portugal;Famalicão vs SC Braga;06/12 21:30;3.1;3.3;2.25;1-2;2;2-0;1;LOSS;LOSS;UNDER;NG
+Liga Portugal;Estoril vs Moreirense;07/12 16:30;1.91;3.3;3.9;3-3;X;1-0;1;LOSS;LOSS;UNDER;NG
+Liga Portugal;Alverca vs Nacional;07/12 19:00;2.3;3.25;3.1;1-0;1;0-2;2;LOSS;LOSS;UNDER;NG
+Liga Portugal;Estrela Amadora vs Arouca;07/12 19:00;2.38;3.2;2.9;3-1;1;0-2;2;LOSS;LOSS;UNDER;NG
+Liga Portugal;Tondela vs FC Porto;07/12 21:30;10.0;4.75;1.29;0-2;2;0-1;2;WIN;LOSS;UNDER;NG
+Liga Portugal;Vit. Guimarães vs Gil Vicente;08/12 21:30;2.5;3.1;2.88;0-0;X;0-2;2;LOSS;LOSS;UNDER;NG
+Liga Portugal;Casa Pia vs Gil Vicente;13/12 16:30;3.75;3.1;2.1;1-1;X;1-2;2;LOSS;LOSS;OVER;GG
+Ligue 1;Brest vs Monaco;05/12 19:00;3.4;3.7;2.0;1-0;1;1-1;X;LOSS;LOSS;UNDER;GG
+Ligue 1;Lille vs Marsiglia;05/12 21:00;2.4;3.5;2.7;1-0;1;1-1;X;LOSS;LOSS;UNDER;GG
+Ligue 1;FC Nantes vs Lens;06/12 17:00;5.0;3.7;1.67;1-2;2;0-4;2;WIN;LOSS;OVER;NG
+Ligue 1;Tolosa vs Strasburgo;06/12 19:00;2.3;3.4;3.0;1-0;1;2-0;1;WIN;LOSS;UNDER;NG
+Ligue 1;PSG vs Stade Rennes;06/12 21:05;1.25;5.5;10.0;5-0;1;4-0;1;WIN;LOSS;OVER;NG
+Ligue 1;Nizza vs Angers SCO;07/12 15:00;1.62;3.7;5.25;0-1;2;3-0;1;LOSS;LOSS;OVER;NG
+Ligue 1;Le Havre vs Paris FC;07/12 17:15;2.88;3.3;2.3;0-0;X;0-0;X;WIN;WIN;UNDER;NG
+Ligue 1;AJ Auxerre vs Metz;07/12 17:15;2.0;3.4;3.5;3-1;1;0-2;2;LOSS;LOSS;UNDER;NG
+Ligue 1;Lorient vs Olymp. Lione;07/12 20:45;3.6;3.4;2.0;1-0;1;2-0;1;WIN;LOSS;UNDER;NG
+Ligue 1;Angers SCO vs FC Nantes;12/12 20:45;2.3;3.1;3.1;4-1;1;1-0;1;WIN;LOSS;UNDER;NG
+Ligue 1;Stade Rennes vs Brest;13/12 17:00;1.83;3.6;4.0;3-1;1;0-1;2;LOSS;LOSS;UNDER;NG
+Premier League;Aston Villa vs Arsenal;06/12 13:30;4.33;3.5;1.8;2-1;1;2-2;X;LOSS;LOSS;OVER;GG
+Premier League;Bournemouth vs Chelsea;06/12 16:00;2.9;3.5;2.25;0-0;X;1-2;2;LOSS;LOSS;OVER;GG
+Premier League;Everton vs Nott'm Forest;06/12 16:00;2.05;3.25;3.5;3-0;1;0-0;X;LOSS;LOSS;UNDER;NG
+Premier League;Man City vs Sunderland;06/12 16:00;1.25;5.5;11.0;3-0;1;0-0;X;LOSS;LOSS;UNDER;NG
 Premier League;Newcastle vs Burnley;06/12 16:00;1.27;5.0;11.0;2-1;1;0-0;X;LOSS;LOSS;UNDER;NG
 Premier League;Tottenham vs Brentford;06/12 16:00;2.05;3.5;3.4;2-0;1;1-0;1;WIN;LOSS;UNDER;NG
-Premier League;Leeds vs Liverpool;06/12 18:30;4.33;3.75;1.73;3-3;X;0-2;2;LOSS;LOSS;UNDER;NG
-Premier League;Brighton vs West Ham Utd.;07/12 15:00;-;-;-;1-1;X;3-0;1;LOSS;LOSS;OVER;NG
-Premier League;FC Fulham vs Crystal Palace;07/12 17:30;-;-;-;1-2;2;0-3;2;WIN;LOSS;OVER;NG
-Premier League;Wolverhampton vs Manchester Utd.;08/12 21:00;-;-;-;1-4;2;1-0;1;LOSS;LOSS;UNDER;NG
-Serie A;Sassuolo vs Fiorentina;06/12 15:00;2.55;3.2;2.7;3-1;1;1-0;1;WIN;LOSS;UNDER;NG
-Serie A;Inter vs Como;06/12 18:00;1.44;4.1;7.0;4-0;1;2-2;X;LOSS;LOSS;OVER;GG
-Serie A;Verona vs Atalanta;06/12 20:45;5.0;3.5;1.75;3-1;1;0-2;2;LOSS;LOSS;UNDER;NG
-Serie A;Cremonese vs Lecce;07/12 12:30;2.25;3.0;3.3;2-0;1;1-1;X;LOSS;LOSS;UNDER;GG
-Serie A;Cagliari vs Roma;07/12 15:00;5.5;3.3;1.7;1-0;1;0-0;X;LOSS;LOSS;UNDER;NG
-Serie A;Lazio vs Bologna;07/12 18:00;2.8;3.0;2.6;1-1;X;3-3;X;WIN;LOSS;OVER;GG
-Serie A;Napoli vs Juventus;07/12 20:45;2.3;3.1;3.1;2-1;1;1-2;2;LOSS;LOSS;OVER;GG
+Premier League;Leeds vs Liverpool;06/12 18:30;4.33;3.75;1.73;3-3;X;0-4;2;LOSS;LOSS;OVER;NG
+Premier League;Brighton vs West Ham Utd.;07/12 15:00;1.57;4.0;5.25;1-1;X;2-0;1;LOSS;LOSS;UNDER;NG
+Premier League;FC Fulham vs Crystal Palace;07/12 17:30;2.6;3.25;2.6;1-2;2;1-2;2;WIN;WIN;OVER;GG
+Premier League;Wolverhampton vs Manchester Utd.;08/12 21:00;4.75;3.7;1.67;1-4;2;0-0;X;LOSS;LOSS;UNDER;NG
+Premier League;Chelsea vs Everton;13/12 16:00;1.6;3.75;5.5;2-0;1;2-2;X;LOSS;LOSS;OVER;GG
+Premier League;Liverpool vs Brighton;13/12 16:00;1.7;3.9;4.33;2-0;1;4-1;1;WIN;LOSS;OVER;GG
+Serie A;Sassuolo vs Fiorentina;06/12 15:00;2.55;3.2;2.7;3-1;1;3-2;1;WIN;LOSS;OVER;GG
+Serie A;Inter vs Como;06/12 18:00;1.44;4.1;7.0;4-0;1;3-1;1;WIN;LOSS;OVER;GG
+Serie A;Verona vs Atalanta;06/12 20:45;5.0;3.5;1.75;3-1;1;0-0;X;LOSS;LOSS;UNDER;NG
+Serie A;Cremonese vs Lecce;07/12 12:30;2.25;3.0;3.3;2-0;1;1-0;1;WIN;LOSS;UNDER;NG
+Serie A;Cagliari vs Roma;07/12 15:00;5.5;3.3;1.7;1-0;1;4-0;1;WIN;LOSS;OVER;NG
+Serie A;Lazio vs Bologna;07/12 18:00;2.8;3.0;2.6;1-1;X;3-2;1;LOSS;LOSS;OVER;GG
+Serie A;Napoli vs Juventus;07/12 20:45;2.3;3.1;3.1;2-1;1;2-0;1;WIN;LOSS;UNDER;NG
 Serie A;Pisa vs Parma;08/12 15:00;2.4;3.0;3.1;0-1;2;0-0;X;LOSS;LOSS;UNDER;NG
-Serie A;Udinese vs Genoa;08/12 18:00;2.2;3.0;3.5;1-2;2;0-6;2;WIN;LOSS;OVER;NG
-Serie A;Torino vs Milan;08/12 20:45;5.0;3.4;1.73;2-3;2;1-1;X;LOSS;LOSS;UNDER;GG
-Serie B;Empoli vs Palermo;07/12 17:15;3.05;3.2;2.25;1-3;2;3-3;X;LOSS;LOSS;OVER;GG
-Serie B;Sampdoria vs Carrarese;07/12 19:30;2.1;3.2;3.5;3-2;1;0-2;2;LOSS;LOSS;UNDER;NG
-Serie B;Modena vs Catanzaro;08/12 12:30;1.68;3.5;5.0;1-2;2;1-1;X;LOSS;LOSS;UNDER;GG
-Serie B;Avellino vs Venezia;08/12 15:00;4.1;3.6;1.79;1-1;X;3-1;1;LOSS;LOSS;OVER;GG
-Serie B;Frosinone vs Juve Stabia;08/12 15:00;1.86;3.3;3.9;3-0;1;3-1;1;WIN;LOSS;OVER;GG
-Serie B;Mantova vs Reggiana;08/12 15:00;1.96;3.4;3.75;0-1;2;0-4;2;WIN;LOSS;OVER;NG
-Serie B;Monza vs Südtirol;08/12 15:00;-;-;-;1-1;X;2-0;1;LOSS;LOSS;UNDER;NG
-Serie B;Padova vs Cesena;08/12 15:00;3.25;2.95;2.32;1-1;X;0-3;2;LOSS;LOSS;OVER;NG
-Serie B;Bari vs Pescara;08/12 17:15;1.68;3.4;4.5;1-1;X;0-2;2;LOSS;LOSS;UNDER;NG
-Serie B;Virtus Entella vs Spezia;08/12 19:30;2.35;3.1;3.2;0-1;2;0-3;2;WIN;LOSS;OVER;NG
-Serie C - Girone A;Trento vs Cittadella;05/12 20:30;2.8;3.0;2.35;1-0;1;1-1;X;LOSS;LOSS;UNDER;GG
+Serie A;Udinese vs Genoa;08/12 18:00;2.2;3.0;3.5;1-2;2;3-7;2;WIN;LOSS;OVER;GG
+Serie A;Torino vs Milan;08/12 20:45;5.0;3.4;1.73;2-3;2;2-0;1;LOSS;LOSS;UNDER;NG
+Serie A;Lecce vs Pisa;12/12 20:45;2.2;3.0;3.5;1-0;1;0-1;2;LOSS;LOSS;UNDER;NG
+Serie A;Torino vs Cremonese;13/12 15:00;1.9;3.3;4.1;1-0;1;1-2;2;LOSS;LOSS;OVER;GG
+Serie A;Parma vs Lazio;13/12 18:00;3.75;3.25;2.0;0-1;2;1-1;X;LOSS;LOSS;UNDER;GG
+Serie B;Empoli vs Palermo;07/12 17:15;3.05;3.2;2.25;1-3;2;1-1;X;LOSS;LOSS;UNDER;GG
+Serie B;Sampdoria vs Carrarese;07/12 19:30;2.1;3.2;3.5;3-2;1;0-3;2;LOSS;LOSS;OVER;NG
+Serie B;Modena vs Catanzaro;08/12 12:30;1.68;3.5;5.0;1-2;2;1-2;2;WIN;WIN;OVER;GG
+Serie B;Avellino vs Venezia;08/12 15:00;4.1;3.6;1.79;1-1;X;1-2;2;LOSS;LOSS;OVER;GG
+Serie B;Frosinone vs Juve Stabia;08/12 15:00;1.86;3.3;3.9;3-0;1;1-1;X;LOSS;LOSS;UNDER;GG
+Serie B;Mantova vs Reggiana;08/12 15:00;1.96;3.4;3.75;0-1;2;0-3;2;WIN;LOSS;OVER;NG
+Serie B;Monza vs Südtirol;08/12 15:00;1.51;3.75;6.5;1-1;X;3-0;1;LOSS;LOSS;OVER;NG
+Serie B;Padova vs Cesena;08/12 15:00;3.25;2.95;2.32;1-1;X;2-0;1;LOSS;LOSS;UNDER;NG
+Serie B;Bari vs Pescara;08/12 17:15;1.68;3.4;4.5;1-1;X;2-0;1;LOSS;LOSS;UNDER;NG
+Serie B;Virtus Entella vs Spezia;08/12 19:30;2.35;3.1;3.2;0-1;2;0-2;2;WIN;LOSS;UNDER;NG
+Serie B;Palermo vs Sampdoria;12/12 20:30;1.62;3.4;5.25;1-0;1;1-0;1;WIN;WIN;UNDER;NG
+Serie B;Juve Stabia vs Empoli;13/12 15:00;2.1;3.05;3.4;2-0;1;0-2;2;LOSS;LOSS;UNDER;NG
+Serie B;Reggiana vs Padova;13/12 15:00;2.3;3.05;2.95;1-2;2;2-0;1;LOSS;LOSS;UNDER;NG
+Serie B;Spezia vs Modena;13/12 15:00;3.2;3.05;2.2;0-2;2;0-0;X;LOSS;LOSS;UNDER;NG
+Serie B;Südtirol vs Bari;13/12 15:00;1.91;3.25;3.8;0-0;X;0-0;X;WIN;WIN;UNDER;NG
+Serie B;Venezia vs Monza;13/12 15:00;2.32;3.05;2.95;2-0;1;2-1;1;WIN;LOSS;OVER;GG
+Serie B;Catanzaro vs Avellino;13/12 17:15;1.79;3.4;4.1;1-0;1;0-1;2;LOSS;LOSS;UNDER;NG
+Serie C - Girone A;Trento vs Cittadella;05/12 20:30;2.8;3.0;2.35;1-0;1;2-2;X;LOSS;LOSS;OVER;GG
 Serie C - Girone A;Pro Vercelli vs Renate;06/12 14:30;2.15;2.88;3.3;1-1;X;0-1;2;LOSS;LOSS;UNDER;NG
-Serie C - Girone A;Arzignano vs Inter U23;07/12 12:30;2.9;3.1;2.25;1-1;X;1-5;2;LOSS;LOSS;OVER;GG
+Serie C - Girone A;Arzignano vs Inter U23;07/12 12:30;2.9;3.1;2.25;1-1;X;1-3;2;LOSS;LOSS;OVER;GG
 Serie C - Girone A;Novara vs Vicenza;07/12 14:30;4.5;3.1;1.75;2-2;X;0-0;X;WIN;LOSS;UNDER;NG
-Serie C - Girone A;Union Brescia vs Lumezzane;07/12 14:30;1.44;3.6;7.0;0-1;2;3-0;1;LOSS;LOSS;OVER;NG
-Serie C - Girone A;Pro Patria vs Dolomiti;07/12 17:30;2.38;2.9;2.88;0-2;2;0-0;X;LOSS;LOSS;UNDER;NG
-Serie C - Girone A;AlbinoLeffe vs Ospitaletto;08/12 14:30;2.0;3.0;3.5;1-1;X;1-3;2;LOSS;LOSS;OVER;GG
+Serie C - Girone A;Union Brescia vs Lumezzane;07/12 14:30;1.44;3.6;7.0;0-1;2;1-2;2;WIN;LOSS;OVER;GG
+Serie C - Girone A;Pro Patria vs Dolomiti;07/12 17:30;2.38;2.9;2.88;0-2;2;4-0;1;LOSS;LOSS;OVER;NG
+Serie C - Girone A;AlbinoLeffe vs Ospitaletto;08/12 14:30;2.0;3.0;3.5;1-1;X;0-2;2;LOSS;LOSS;UNDER;NG
 Serie C - Girone A;Lecco vs Alcione;08/12 14:30;2.15;2.88;3.3;1-0;1;1-1;X;LOSS;LOSS;UNDER;GG
 Serie C - Girone A;Virtus Verona vs Pergolettese;08/12 14:30;2.15;3.0;3.1;1-1;X;0-1;2;LOSS;LOSS;UNDER;NG
 Serie C - Girone A;Giana Erminio vs Triestina;08/12 15:00;2.3;2.9;3.0;2-1;1;1-1;X;LOSS;LOSS;UNDER;GG
-Serie C - Girone B;Livorno vs Arezzo;06/12 14:30;4.0;3.2;1.8;2-1;1;2-1;1;WIN;WIN;OVER;GG
-Serie C - Girone B;Pianese vs Gubbio;06/12 14:30;2.88;2.9;2.38;1-0;1;1-3;2;LOSS;LOSS;OVER;GG
-Serie C - Girone B;Bra vs Campobasso;06/12 17:30;3.0;3.1;2.2;2-0;1;0-3;2;LOSS;LOSS;OVER;NG
-Serie C - Girone B;Guidonia vs Juve Next Gen;07/12 12:30;-;-;-;1-1;X;1-0;1;LOSS;LOSS;UNDER;NG
-Serie C - Girone B;Perugia vs Ternana;07/12 14:30;2.5;2.88;2.75;1-2;2;0-0;X;LOSS;LOSS;UNDER;NG
+Serie C - Girone A;Lumezzane vs Lecco;13/12 14:30;2.55;3.0;2.55;1-1;X;1-1;X;WIN;WIN;UNDER;GG
+Serie C - Girone B;Livorno vs Arezzo;06/12 14:30;4.0;3.2;1.8;2-1;1;0-3;2;LOSS;LOSS;OVER;NG
+Serie C - Girone B;Pianese vs Gubbio;06/12 14:30;2.88;2.9;2.38;1-0;1;1-0;1;WIN;WIN;UNDER;NG
+Serie C - Girone B;Bra vs Campobasso;06/12 17:30;3.0;3.1;2.2;2-0;1;0-1;2;LOSS;LOSS;UNDER;NG
+Serie C - Girone B;Guidonia vs Juve Next Gen;07/12 12:30;2.05;3.0;3.3;1-1;X;0-2;2;LOSS;LOSS;UNDER;NG
+Serie C - Girone B;Perugia vs Ternana;07/12 14:30;2.5;2.88;2.75;1-2;2;0-2;2;WIN;LOSS;UNDER;NG
 Serie C - Girone B;Torres vs Pineto;07/12 14:30;2.5;2.88;2.75;1-1;X;0-1;2;LOSS;LOSS;UNDER;NG
-Serie C - Girone B;Ravenna vs Pontedera;07/12 17:30;1.53;3.6;5.5;2-1;1;3-0;1;WIN;LOSS;OVER;NG
-Serie C - Girone B;Ascoli vs Forlì;08/12 14:30;-;-;-;3-0;1;2-0;1;WIN;LOSS;UNDER;NG
-Serie C - Girone B;Carpi vs Vis Pesaro;08/12 14:30;2.3;2.9;3.0;1-1;X;1-2;2;LOSS;LOSS;OVER;GG
-Serie C - Girone C;Catania vs Crotone;05/12 20:30;1.83;3.1;4.0;2-0;1;6-2;1;WIN;LOSS;OVER;GG
-Serie C - Girone C;Casarano vs Latina;06/12 14:30;1.83;3.25;3.9;1-1;X;0-1;2;LOSS;LOSS;UNDER;NG
-Serie C - Girone C;Siracusa vs Foggia;06/12 14:30;1.73;3.4;4.2;2-2;X;1-0;1;LOSS;LOSS;UNDER;NG
-Serie C - Girone C;Sorrento vs Potenza;06/12 14:30;2.63;3.2;2.38;2-2;X;3-3;X;WIN;LOSS;OVER;GG
+Serie C - Girone B;Ravenna vs Pontedera;07/12 17:30;1.53;3.6;5.5;2-1;1;2-1;1;WIN;WIN;OVER;GG
+Serie C - Girone B;Ascoli vs Forlì;08/12 14:30;1.6;3.3;5.25;3-0;1;4-0;1;WIN;LOSS;OVER;NG
+Serie C - Girone B;Carpi vs Vis Pesaro;08/12 14:30;2.3;2.9;3.0;1-1;X;1-1;X;WIN;WIN;UNDER;GG
+Serie C - Girone B;Juve Next Gen vs Pianese;12/12 20:30;2.1;3.1;3.2;0-0;X;0-0;X;WIN;WIN;UNDER;NG
+Serie C - Girone C;Catania vs Crotone;05/12 20:30;1.83;3.1;4.0;2-0;1;4-1;1;WIN;LOSS;OVER;GG
+Serie C - Girone C;Casarano vs Latina;06/12 14:30;1.83;3.25;3.9;1-1;X;1-1;X;WIN;WIN;UNDER;GG
+Serie C - Girone C;Siracusa vs Foggia;06/12 14:30;1.73;3.4;4.2;2-2;X;0-2;2;LOSS;LOSS;UNDER;NG
+Serie C - Girone C;Sorrento vs Potenza;06/12 14:30;2.63;3.2;2.38;2-2;X;0-0;X;WIN;LOSS;UNDER;NG
 Serie C - Girone C;Giugliano vs Team Altamura;06/12 17:30;1.95;3.25;3.4;0-1;2;0-0;X;LOSS;LOSS;UNDER;NG
 Serie C - Girone C;Monopoli vs Atalanta U23;07/12 14:30;2.3;3.2;2.75;1-1;X;2-0;1;LOSS;LOSS;UNDER;NG
-Serie C - Girone C;Salernitana vs Trapani;07/12 14:30;1.75;3.3;4.1;1-1;X;0-2;2;LOSS;LOSS;UNDER;NG
-Serie C - Girone C;Cerignola vs Casertana;07/12 17:30;1.9;3.1;3.7;1-1;X;0-4;2;LOSS;LOSS;OVER;NG
+Serie C - Girone C;Salernitana vs Trapani;07/12 14:30;1.75;3.3;4.1;1-1;X;1-1;X;WIN;WIN;UNDER;GG
+Serie C - Girone C;Cerignola vs Casertana;07/12 17:30;1.9;3.1;3.7;1-1;X;0-3;2;LOSS;LOSS;OVER;NG
 Serie C - Girone C;Cavese vs Benevento;07/12 17:30;4.33;3.3;1.75;0-1;2;0-3;2;WIN;LOSS;OVER;NG
-Serie C - Girone C;Cosenza vs Picerno;07/12 17:30;1.44;3.8;6.5;1-0;1;4-2;1;WIN;LOSS;OVER;GG
+Serie C - Girone C;Cosenza vs Picerno;07/12 17:30;1.44;3.8;6.5;1-0;1;3-0;1;WIN;LOSS;OVER;NG
 "--- PERCENTUALI ---
-(Su partite finite)";;;;;;;;37.1%;5.7%;;53.3%;;50.5%
+(Su partite finite)";;;;;;;;38.5%;9.2%;;54.6%;;50.0%
 
 
 === ALGORITMO: CAOS ===
 League;Match;Data;Q1;QX;Q2;Real Score;Real Sign;PRED Score;PRED Sign;1X2 Outcome;Exact Score;U/O 2.5;GG/NG
-Bundesliga;Magonza vs Bor. M'gladbach;05/12 20:30;-;-;-;0-1;2;0-0;X;LOSS;LOSS;UNDER;NG
-Bundesliga;Stoccarda vs Bayern;06/12 15:30;6.25;4.75;1.44;0-5;2;1-2;2;WIN;LOSS;OVER;GG
-Bundesliga;Wolfsburg vs Union Berlino;06/12 15:30;2.25;3.5;2.9;3-1;1;1-0;1;WIN;LOSS;UNDER;NG
-Bundesliga;Augusta vs Leverkusen;06/12 15:30;-;-;-;2-0;1;0-4;2;LOSS;LOSS;OVER;NG
-Bundesliga;Heidenheim vs Friburgo;06/12 15:30;3.7;3.6;1.91;2-1;1;0-1;2;LOSS;LOSS;UNDER;NG
-Bundesliga;Colonia vs St. Pauli;06/12 15:30;1.9;3.6;3.8;1-1;X;2-1;1;LOSS;LOSS;OVER;GG
-Bundesliga;Lipsia vs Eintracht;06/12 18:30;1.9;4.0;3.3;6-0;1;1-3;2;LOSS;LOSS;OVER;GG
-Bundesliga;Amburgo vs Werder Brema;07/12 15:30;2.15;3.6;3.0;3-2;1;0-0;X;LOSS;LOSS;UNDER;NG
-Bundesliga;Dortmund vs Hoffenheim;07/12 17:30;1.55;4.2;5.0;2-0;1;2-1;1;WIN;LOSS;OVER;GG
-Eredivisie;Excelsior vs FC Groningen;05/12 20:00;-;-;-;0-2;2;1-4;2;WIN;LOSS;OVER;GG
-Eredivisie;Heerenveen vs PSV;06/12 16:30;-;-;-;0-2;2;3-0;1;LOSS;LOSS;OVER;NG
-Eredivisie;Fortuna Sittard vs Ajax;06/12 18:45;-;-;-;1-3;2;0-1;2;WIN;LOSS;UNDER;NG
-Eredivisie;Heracles Almelo vs Telstar;06/12 20:00;-;-;-;1-1;X;2-0;1;LOSS;LOSS;UNDER;NG
-Eredivisie;Feyenoord vs PEC Zwolle;06/12 21:00;-;-;-;6-1;1;4-2;1;WIN;LOSS;OVER;GG
-Eredivisie;FC Utrecht vs FC Twente;07/12 12:15;-;-;-;1-1;X;1-1;X;WIN;WIN;UNDER;GG
-Eredivisie;AZ Alkmaar vs Go Ahead Eagles;07/12 14:30;-;-;-;2-2;X;1-2;2;LOSS;LOSS;OVER;GG
-Eredivisie;FC Volendam vs NEC Nijmegen;07/12 14:30;-;-;-;2-3;2;0-1;2;WIN;LOSS;UNDER;NG
-Eredivisie;Sparta R. vs NAC Breda;07/12 16:45;-;-;-;1-0;1;0-0;X;LOSS;LOSS;UNDER;NG
-La Liga;Real Oviedo vs RCD Mallorca;05/12 21:00;-;-;-;0-0;X;0-0;X;WIN;WIN;UNDER;NG
-La Liga;Villarreal vs Getafe CF;06/12 14:00;-;-;-;2-0;1;1-0;1;WIN;LOSS;UNDER;NG
-La Liga;Alavés vs Real Sociedad;06/12 16:15;-;-;-;1-0;1;0-2;2;LOSS;LOSS;UNDER;NG
+Bundesliga;Magonza vs Bor. M'gladbach;05/12 20:30;2.05;3.6;3.2;0-1;2;0-2;2;WIN;LOSS;UNDER;NG
+Bundesliga;Stoccarda vs Bayern;06/12 15:30;6.25;4.75;1.44;0-5;2;1-1;X;LOSS;LOSS;UNDER;GG
+Bundesliga;Wolfsburg vs Union Berlino;06/12 15:30;2.25;3.5;2.9;3-1;1;0-1;2;LOSS;LOSS;UNDER;NG
+Bundesliga;Augusta vs Leverkusen;06/12 15:30;3.9;3.75;1.83;2-0;1;0-2;2;LOSS;LOSS;UNDER;NG
+Bundesliga;Heidenheim vs Friburgo;06/12 15:30;3.7;3.6;1.91;2-1;1;3-0;1;WIN;LOSS;OVER;NG
+Bundesliga;Colonia vs St. Pauli;06/12 15:30;1.9;3.6;3.8;1-1;X;0-0;X;WIN;LOSS;UNDER;NG
+Bundesliga;Lipsia vs Eintracht;06/12 18:30;1.9;4.0;3.3;6-0;1;3-3;X;LOSS;LOSS;OVER;GG
+Bundesliga;Amburgo vs Werder Brema;07/12 15:30;2.15;3.6;3.0;3-2;1;2-1;1;WIN;LOSS;OVER;GG
+Bundesliga;Dortmund vs Hoffenheim;07/12 17:30;1.55;4.2;5.0;2-0;1;1-4;2;LOSS;LOSS;OVER;GG
+Bundesliga;Union Berlino vs Lipsia;12/12 20:30;3.4;3.5;2.0;3-1;1;0-1;2;LOSS;LOSS;UNDER;NG
+Bundesliga;Eintracht vs Augusta;13/12 15:30;1.53;4.2;5.75;1-0;1;1-0;1;WIN;WIN;UNDER;NG
+Bundesliga;Bor. M'gladbach vs Wolfsburg;13/12 15:30;2.0;3.7;3.3;1-3;2;0-0;X;LOSS;LOSS;UNDER;NG
+Bundesliga;St. Pauli vs Heidenheim;13/12 15:30;1.85;3.3;4.2;2-1;1;0-0;X;LOSS;LOSS;UNDER;NG
+Bundesliga;Hoffenheim vs Amburgo;13/12 15:30;1.73;3.9;4.2;4-1;1;1-0;1;WIN;LOSS;UNDER;NG
+Bundesliga;Leverkusen vs Colonia;13/12 18:30;1.45;4.5;6.0;2-0;1;0-1;2;LOSS;LOSS;UNDER;NG
+Eredivisie;Excelsior vs FC Groningen;05/12 20:00;2.75;3.4;2.4;0-2;2;0-0;X;LOSS;LOSS;UNDER;NG
+Eredivisie;Heerenveen vs PSV;06/12 16:30;6.25;4.75;1.4;0-2;2;1-0;1;LOSS;LOSS;UNDER;NG
+Eredivisie;Fortuna Sittard vs Ajax;06/12 18:45;4.75;3.9;1.65;1-3;2;1-0;1;LOSS;LOSS;UNDER;NG
+Eredivisie;Heracles Almelo vs Telstar;06/12 20:00;2.1;3.5;3.2;1-1;X;1-0;1;LOSS;LOSS;UNDER;NG
+Eredivisie;Feyenoord vs PEC Zwolle;06/12 21:00;1.18;6.5;12.0;6-1;1;2-2;X;LOSS;LOSS;OVER;GG
+Eredivisie;FC Utrecht vs FC Twente;07/12 12:15;2.35;3.5;2.75;1-1;X;0-0;X;WIN;LOSS;UNDER;NG
+Eredivisie;AZ Alkmaar vs Go Ahead Eagles;07/12 14:30;1.44;4.4;6.5;2-2;X;4-2;1;LOSS;LOSS;OVER;GG
+Eredivisie;FC Volendam vs NEC Nijmegen;07/12 14:30;3.6;3.9;1.85;2-3;2;0-2;2;WIN;LOSS;UNDER;NG
+Eredivisie;Sparta R. vs NAC Breda;07/12 16:45;1.83;3.75;3.8;1-0;1;0-1;2;LOSS;LOSS;UNDER;NG
+Eredivisie;Telstar vs NEC Nijmegen;13/12 16:30;4.2;4.1;1.7;2-2;X;0-2;2;LOSS;LOSS;UNDER;NG
+La Liga;Real Oviedo vs RCD Mallorca;05/12 21:00;2.35;3.0;3.2;0-0;X;0-3;2;LOSS;LOSS;OVER;NG
+La Liga;Villarreal vs Getafe CF;06/12 14:00;1.53;3.75;6.5;2-0;1;5-0;1;WIN;LOSS;OVER;NG
+La Liga;Alavés vs Real Sociedad;06/12 16:15;2.8;3.0;2.55;1-0;1;0-1;2;LOSS;LOSS;UNDER;NG
 La Liga;Real Betis vs Barcellona;06/12 18:30;4.0;4.1;1.73;3-5;2;2-0;1;LOSS;LOSS;UNDER;NG
-La Liga;Athletic Club vs Atlético;06/12 21:00;-;-;-;1-0;1;1-0;1;WIN;WIN;UNDER;NG
-La Liga;Elche vs Girona FC;07/12 14:00;-;-;-;3-0;1;3-0;1;WIN;WIN;OVER;NG
-La Liga;Valencia vs Siviglia;07/12 16:15;-;-;-;1-1;X;1-0;1;LOSS;LOSS;UNDER;NG
-La Liga;Espanyol vs Rayo Vallecano;07/12 18:30;2.35;3.1;3.0;1-0;1;3-1;1;WIN;LOSS;OVER;GG
-La Liga;Real Madrid vs Celta de Vigo;07/12 21:00;-;-;-;0-2;2;3-1;1;LOSS;LOSS;OVER;GG
-La Liga;CA Osasuna vs Levante;08/12 21:00;-;-;-;2-0;1;1-1;X;LOSS;LOSS;UNDER;GG
-Liga Portugal;Benfica vs Sporting;05/12 21:15;-;-;-;1-1;X;6-0;1;LOSS;LOSS;OVER;NG
-Liga Portugal;Santa Clara vs Casa Pia;06/12 16:30;-;-;-;1-0;1;2-1;1;WIN;LOSS;OVER;GG
-Liga Portugal;Avs FS vs Rio Ave;06/12 19:00;-;-;-;1-2;2;0-3;2;WIN;LOSS;OVER;NG
-Liga Portugal;Famalicão vs SC Braga;06/12 21:30;-;-;-;1-2;2;0-0;X;LOSS;LOSS;UNDER;NG
-Liga Portugal;Estoril vs Moreirense;07/12 16:30;-;-;-;3-3;X;0-0;X;WIN;LOSS;UNDER;NG
-Liga Portugal;Alverca vs Nacional;07/12 19:00;-;-;-;1-0;1;1-0;1;WIN;WIN;UNDER;NG
-Liga Portugal;Estrela Amadora vs Arouca;07/12 19:00;-;-;-;3-1;1;0-0;X;LOSS;LOSS;UNDER;NG
-Liga Portugal;Tondela vs FC Porto;07/12 21:30;-;-;-;0-2;2;0-3;2;WIN;LOSS;OVER;NG
-Liga Portugal;Vit. Guimarães vs Gil Vicente;08/12 21:30;-;-;-;0-0;X;0-4;2;LOSS;LOSS;OVER;NG
-Ligue 1;Brest vs Monaco;05/12 19:00;3.4;3.7;2.0;1-0;1;0-0;X;LOSS;LOSS;UNDER;NG
-Ligue 1;Lille vs Marsiglia;05/12 21:00;2.4;3.5;2.7;1-0;1;1-1;X;LOSS;LOSS;UNDER;GG
-Ligue 1;FC Nantes vs Lens;06/12 17:00;-;-;-;1-2;2;0-1;2;WIN;LOSS;UNDER;NG
+La Liga;Athletic Club vs Atlético;06/12 21:00;3.7;3.25;2.05;1-0;1;0-0;X;LOSS;LOSS;UNDER;NG
+La Liga;Elche vs Girona FC;07/12 14:00;2.25;3.2;3.25;3-0;1;2-0;1;WIN;LOSS;UNDER;NG
+La Liga;Valencia vs Siviglia;07/12 16:15;2.2;3.2;3.2;1-1;X;3-1;1;LOSS;LOSS;OVER;GG
+La Liga;Espanyol vs Rayo Vallecano;07/12 18:30;2.35;3.1;3.0;1-0;1;2-1;1;WIN;LOSS;OVER;GG
+La Liga;Real Madrid vs Celta de Vigo;07/12 21:00;1.25;6.0;9.0;0-2;2;1-0;1;LOSS;LOSS;UNDER;NG
+La Liga;CA Osasuna vs Levante;08/12 21:00;1.8;3.4;4.5;2-0;1;0-0;X;LOSS;LOSS;UNDER;NG
+La Liga;Real Sociedad vs Girona FC;12/12 21:00;1.7;3.6;5.0;1-2;2;0-0;X;LOSS;LOSS;UNDER;NG
+Liga Portugal;Benfica vs Sporting;05/12 21:15;2.55;3.3;2.55;1-1;X;8-0;1;LOSS;LOSS;OVER;NG
+Liga Portugal;Santa Clara vs Casa Pia;06/12 16:30;1.95;3.0;4.75;1-0;1;0-3;2;LOSS;LOSS;OVER;NG
+Liga Portugal;Avs FS vs Rio Ave;06/12 19:00;2.9;3.2;2.38;1-2;2;0-1;2;WIN;LOSS;UNDER;NG
+Liga Portugal;Famalicão vs SC Braga;06/12 21:30;3.1;3.3;2.25;1-2;2;0-1;2;WIN;LOSS;UNDER;NG
+Liga Portugal;Estoril vs Moreirense;07/12 16:30;1.91;3.3;3.9;3-3;X;1-3;2;LOSS;LOSS;OVER;GG
+Liga Portugal;Alverca vs Nacional;07/12 19:00;2.3;3.25;3.1;1-0;1;1-0;1;WIN;WIN;UNDER;NG
+Liga Portugal;Estrela Amadora vs Arouca;07/12 19:00;2.38;3.2;2.9;3-1;1;0-3;2;LOSS;LOSS;OVER;NG
+Liga Portugal;Tondela vs FC Porto;07/12 21:30;10.0;4.75;1.29;0-2;2;1-6;2;WIN;LOSS;OVER;GG
+Liga Portugal;Vit. Guimarães vs Gil Vicente;08/12 21:30;2.5;3.1;2.88;0-0;X;0-0;X;WIN;WIN;UNDER;NG
+Liga Portugal;Casa Pia vs Gil Vicente;13/12 16:30;3.75;3.1;2.1;1-1;X;0-2;2;LOSS;LOSS;UNDER;NG
+Ligue 1;Brest vs Monaco;05/12 19:00;3.4;3.7;2.0;1-0;1;0-1;2;LOSS;LOSS;UNDER;NG
+Ligue 1;Lille vs Marsiglia;05/12 21:00;2.4;3.5;2.7;1-0;1;3-1;1;WIN;LOSS;OVER;GG
+Ligue 1;FC Nantes vs Lens;06/12 17:00;5.0;3.7;1.67;1-2;2;1-4;2;WIN;LOSS;OVER;GG
 Ligue 1;Tolosa vs Strasburgo;06/12 19:00;2.3;3.4;3.0;1-0;1;1-0;1;WIN;WIN;UNDER;NG
-Ligue 1;PSG vs Stade Rennes;06/12 21:05;-;-;-;5-0;1;2-0;1;WIN;LOSS;UNDER;NG
-Ligue 1;Nizza vs Angers SCO;07/12 15:00;-;-;-;0-1;2;1-0;1;LOSS;LOSS;UNDER;NG
-Ligue 1;Le Havre vs Paris FC;07/12 17:15;2.88;3.3;2.3;0-0;X;0-0;X;WIN;WIN;UNDER;NG
-Ligue 1;AJ Auxerre vs Metz;07/12 17:15;2.0;3.4;3.5;3-1;1;1-3;2;LOSS;LOSS;OVER;GG
-Ligue 1;Lorient vs Olymp. Lione;07/12 20:45;-;-;-;1-0;1;2-0;1;WIN;LOSS;UNDER;NG
-Premier League;Aston Villa vs Arsenal;06/12 13:30;4.33;3.5;1.8;2-1;1;1-4;2;LOSS;LOSS;OVER;GG
-Premier League;Bournemouth vs Chelsea;06/12 16:00;2.9;3.5;2.25;0-0;X;0-3;2;LOSS;LOSS;OVER;NG
-Premier League;Everton vs Nott'm Forest;06/12 16:00;-;-;-;3-0;1;4-0;1;WIN;LOSS;OVER;NG
-Premier League;Man City vs Sunderland;06/12 16:00;-;-;-;3-0;1;1-0;1;WIN;LOSS;UNDER;NG
+Ligue 1;PSG vs Stade Rennes;06/12 21:05;1.25;5.5;10.0;5-0;1;1-1;X;LOSS;LOSS;UNDER;GG
+Ligue 1;Nizza vs Angers SCO;07/12 15:00;1.62;3.7;5.25;0-1;2;0-0;X;LOSS;LOSS;UNDER;NG
+Ligue 1;Le Havre vs Paris FC;07/12 17:15;2.88;3.3;2.3;0-0;X;1-4;2;LOSS;LOSS;OVER;GG
+Ligue 1;AJ Auxerre vs Metz;07/12 17:15;2.0;3.4;3.5;3-1;1;0-1;2;LOSS;LOSS;UNDER;NG
+Ligue 1;Lorient vs Olymp. Lione;07/12 20:45;3.6;3.4;2.0;1-0;1;3-0;1;WIN;LOSS;OVER;NG
+Ligue 1;Angers SCO vs FC Nantes;12/12 20:45;2.3;3.1;3.1;4-1;1;1-1;X;LOSS;LOSS;UNDER;GG
+Ligue 1;Stade Rennes vs Brest;13/12 17:00;1.83;3.6;4.0;3-1;1;0-2;2;LOSS;LOSS;UNDER;NG
+Premier League;Aston Villa vs Arsenal;06/12 13:30;4.33;3.5;1.8;2-1;1;1-2;2;LOSS;LOSS;OVER;GG
+Premier League;Bournemouth vs Chelsea;06/12 16:00;2.9;3.5;2.25;0-0;X;0-1;2;LOSS;LOSS;UNDER;NG
+Premier League;Everton vs Nott'm Forest;06/12 16:00;2.05;3.25;3.5;3-0;1;0-0;X;LOSS;LOSS;UNDER;NG
+Premier League;Man City vs Sunderland;06/12 16:00;1.25;5.5;11.0;3-0;1;0-0;X;LOSS;LOSS;UNDER;NG
 Premier League;Newcastle vs Burnley;06/12 16:00;1.27;5.0;11.0;2-1;1;0-1;2;LOSS;LOSS;UNDER;NG
-Premier League;Tottenham vs Brentford;06/12 16:00;2.05;3.5;3.4;2-0;1;0-1;2;LOSS;LOSS;UNDER;NG
-Premier League;Leeds vs Liverpool;06/12 18:30;4.33;3.75;1.73;3-3;X;1-3;2;LOSS;LOSS;OVER;GG
-Premier League;Brighton vs West Ham Utd.;07/12 15:00;-;-;-;1-1;X;1-0;1;LOSS;LOSS;UNDER;NG
-Premier League;FC Fulham vs Crystal Palace;07/12 17:30;-;-;-;1-2;2;0-2;2;WIN;LOSS;UNDER;NG
-Premier League;Wolverhampton vs Manchester Utd.;08/12 21:00;-;-;-;1-4;2;3-0;1;LOSS;LOSS;OVER;NG
-Serie A;Sassuolo vs Fiorentina;06/12 15:00;2.55;3.2;2.7;3-1;1;3-0;1;WIN;LOSS;OVER;NG
-Serie A;Inter vs Como;06/12 18:00;1.44;4.1;7.0;4-0;1;3-2;1;WIN;LOSS;OVER;GG
-Serie A;Verona vs Atalanta;06/12 20:45;5.0;3.5;1.75;3-1;1;0-3;2;LOSS;LOSS;OVER;NG
-Serie A;Cremonese vs Lecce;07/12 12:30;2.25;3.0;3.3;2-0;1;2-4;2;LOSS;LOSS;OVER;GG
-Serie A;Cagliari vs Roma;07/12 15:00;5.5;3.3;1.7;1-0;1;1-0;1;WIN;WIN;UNDER;NG
-Serie A;Lazio vs Bologna;07/12 18:00;2.8;3.0;2.6;1-1;X;2-0;1;LOSS;LOSS;UNDER;NG
-Serie A;Napoli vs Juventus;07/12 20:45;2.3;3.1;3.1;2-1;1;2-3;2;LOSS;LOSS;OVER;GG
-Serie A;Pisa vs Parma;08/12 15:00;2.4;3.0;3.1;0-1;2;0-1;2;WIN;WIN;UNDER;NG
-Serie A;Udinese vs Genoa;08/12 18:00;2.2;3.0;3.5;1-2;2;0-3;2;WIN;LOSS;OVER;NG
+Premier League;Tottenham vs Brentford;06/12 16:00;2.05;3.5;3.4;2-0;1;3-0;1;WIN;LOSS;OVER;NG
+Premier League;Leeds vs Liverpool;06/12 18:30;4.33;3.75;1.73;3-3;X;0-1;2;LOSS;LOSS;UNDER;NG
+Premier League;Brighton vs West Ham Utd.;07/12 15:00;1.57;4.0;5.25;1-1;X;6-2;1;LOSS;LOSS;OVER;GG
+Premier League;FC Fulham vs Crystal Palace;07/12 17:30;2.6;3.25;2.6;1-2;2;0-3;2;WIN;LOSS;OVER;NG
+Premier League;Wolverhampton vs Manchester Utd.;08/12 21:00;4.75;3.7;1.67;1-4;2;1-0;1;LOSS;LOSS;UNDER;NG
+Premier League;Chelsea vs Everton;13/12 16:00;1.6;3.75;5.5;2-0;1;0-1;2;LOSS;LOSS;UNDER;NG
+Premier League;Liverpool vs Brighton;13/12 16:00;1.7;3.9;4.33;2-0;1;2-2;X;LOSS;LOSS;OVER;GG
+Serie A;Sassuolo vs Fiorentina;06/12 15:00;2.55;3.2;2.7;3-1;1;3-1;1;WIN;WIN;OVER;GG
+Serie A;Inter vs Como;06/12 18:00;1.44;4.1;7.0;4-0;1;1-1;X;LOSS;LOSS;UNDER;GG
+Serie A;Verona vs Atalanta;06/12 20:45;5.0;3.5;1.75;3-1;1;1-3;2;LOSS;LOSS;OVER;GG
+Serie A;Cremonese vs Lecce;07/12 12:30;2.25;3.0;3.3;2-0;1;0-0;X;LOSS;LOSS;UNDER;NG
+Serie A;Cagliari vs Roma;07/12 15:00;5.5;3.3;1.7;1-0;1;2-0;1;WIN;LOSS;UNDER;NG
+Serie A;Lazio vs Bologna;07/12 18:00;2.8;3.0;2.6;1-1;X;1-1;X;WIN;WIN;UNDER;GG
+Serie A;Napoli vs Juventus;07/12 20:45;2.3;3.1;3.1;2-1;1;2-1;1;WIN;WIN;OVER;GG
+Serie A;Pisa vs Parma;08/12 15:00;2.4;3.0;3.1;0-1;2;0-0;X;LOSS;LOSS;UNDER;NG
+Serie A;Udinese vs Genoa;08/12 18:00;2.2;3.0;3.5;1-2;2;0-5;2;WIN;LOSS;OVER;NG
 Serie A;Torino vs Milan;08/12 20:45;5.0;3.4;1.73;2-3;2;0-0;X;LOSS;LOSS;UNDER;NG
-Serie B;Empoli vs Palermo;07/12 17:15;3.05;3.2;2.25;1-3;2;3-1;1;LOSS;LOSS;OVER;GG
-Serie B;Sampdoria vs Carrarese;07/12 19:30;2.1;3.2;3.5;3-2;1;2-1;1;WIN;LOSS;OVER;GG
-Serie B;Modena vs Catanzaro;08/12 12:30;1.68;3.5;5.0;1-2;2;1-0;1;LOSS;LOSS;UNDER;NG
-Serie B;Avellino vs Venezia;08/12 15:00;4.1;3.6;1.79;1-1;X;0-5;2;LOSS;LOSS;OVER;NG
-Serie B;Frosinone vs Juve Stabia;08/12 15:00;1.86;3.3;3.9;3-0;1;3-0;1;WIN;WIN;OVER;NG
-Serie B;Mantova vs Reggiana;08/12 15:00;1.96;3.4;3.75;0-1;2;0-0;X;LOSS;LOSS;UNDER;NG
-Serie B;Monza vs Südtirol;08/12 15:00;-;-;-;1-1;X;2-1;1;LOSS;LOSS;OVER;GG
-Serie B;Padova vs Cesena;08/12 15:00;3.25;2.95;2.32;1-1;X;0-2;2;LOSS;LOSS;UNDER;NG
-Serie B;Bari vs Pescara;08/12 17:15;1.68;3.4;4.5;1-1;X;1-0;1;LOSS;LOSS;UNDER;NG
-Serie B;Virtus Entella vs Spezia;08/12 19:30;2.35;3.1;3.2;0-1;2;0-2;2;WIN;LOSS;UNDER;NG
-Serie C - Girone A;Trento vs Cittadella;05/12 20:30;2.8;3.0;2.35;1-0;1;3-0;1;WIN;LOSS;OVER;NG
-Serie C - Girone A;Pro Vercelli vs Renate;06/12 14:30;2.15;2.88;3.3;1-1;X;2-1;1;LOSS;LOSS;OVER;GG
-Serie C - Girone A;Arzignano vs Inter U23;07/12 12:30;2.9;3.1;2.25;1-1;X;0-4;2;LOSS;LOSS;OVER;NG
-Serie C - Girone A;Novara vs Vicenza;07/12 14:30;4.5;3.1;1.75;2-2;X;0-0;X;WIN;LOSS;UNDER;NG
-Serie C - Girone A;Union Brescia vs Lumezzane;07/12 14:30;1.44;3.6;7.0;0-1;2;0-0;X;LOSS;LOSS;UNDER;NG
+Serie A;Lecce vs Pisa;12/12 20:45;2.2;3.0;3.5;1-0;1;2-0;1;WIN;LOSS;UNDER;NG
+Serie A;Torino vs Cremonese;13/12 15:00;1.9;3.3;4.1;1-0;1;1-0;1;WIN;WIN;UNDER;NG
+Serie A;Parma vs Lazio;13/12 18:00;3.75;3.25;2.0;0-1;2;3-0;1;LOSS;LOSS;OVER;NG
+Serie B;Empoli vs Palermo;07/12 17:15;3.05;3.2;2.25;1-3;2;2-0;1;LOSS;LOSS;UNDER;NG
+Serie B;Sampdoria vs Carrarese;07/12 19:30;2.1;3.2;3.5;3-2;1;0-0;X;LOSS;LOSS;UNDER;NG
+Serie B;Modena vs Catanzaro;08/12 12:30;1.68;3.5;5.0;1-2;2;1-2;2;WIN;WIN;OVER;GG
+Serie B;Avellino vs Venezia;08/12 15:00;4.1;3.6;1.79;1-1;X;0-2;2;LOSS;LOSS;UNDER;NG
+Serie B;Frosinone vs Juve Stabia;08/12 15:00;1.86;3.3;3.9;3-0;1;4-1;1;WIN;LOSS;OVER;GG
+Serie B;Mantova vs Reggiana;08/12 15:00;1.96;3.4;3.75;0-1;2;1-1;X;LOSS;LOSS;UNDER;GG
+Serie B;Monza vs Südtirol;08/12 15:00;1.51;3.75;6.5;1-1;X;3-0;1;LOSS;LOSS;OVER;NG
+Serie B;Padova vs Cesena;08/12 15:00;3.25;2.95;2.32;1-1;X;1-1;X;WIN;WIN;UNDER;GG
+Serie B;Bari vs Pescara;08/12 17:15;1.68;3.4;4.5;1-1;X;1-2;2;LOSS;LOSS;OVER;GG
+Serie B;Virtus Entella vs Spezia;08/12 19:30;2.35;3.1;3.2;0-1;2;2-5;2;WIN;LOSS;OVER;GG
+Serie B;Palermo vs Sampdoria;12/12 20:30;1.62;3.4;5.25;1-0;1;2-1;1;WIN;LOSS;OVER;GG
+Serie B;Juve Stabia vs Empoli;13/12 15:00;2.1;3.05;3.4;2-0;1;0-0;X;LOSS;LOSS;UNDER;NG
+Serie B;Reggiana vs Padova;13/12 15:00;2.3;3.05;2.95;1-2;2;2-0;1;LOSS;LOSS;UNDER;NG
+Serie B;Spezia vs Modena;13/12 15:00;3.2;3.05;2.2;0-2;2;1-2;2;WIN;LOSS;OVER;GG
+Serie B;Südtirol vs Bari;13/12 15:00;1.91;3.25;3.8;0-0;X;0-0;X;WIN;WIN;UNDER;NG
+Serie B;Venezia vs Monza;13/12 15:00;2.32;3.05;2.95;2-0;1;5-3;1;WIN;LOSS;OVER;GG
+Serie B;Catanzaro vs Avellino;13/12 17:15;1.79;3.4;4.1;1-0;1;3-1;1;WIN;LOSS;OVER;GG
+Serie C - Girone A;Trento vs Cittadella;05/12 20:30;2.8;3.0;2.35;1-0;1;1-0;1;WIN;WIN;UNDER;NG
+Serie C - Girone A;Pro Vercelli vs Renate;06/12 14:30;2.15;2.88;3.3;1-1;X;1-2;2;LOSS;LOSS;OVER;GG
+Serie C - Girone A;Arzignano vs Inter U23;07/12 12:30;2.9;3.1;2.25;1-1;X;1-2;2;LOSS;LOSS;OVER;GG
+Serie C - Girone A;Novara vs Vicenza;07/12 14:30;4.5;3.1;1.75;2-2;X;0-2;2;LOSS;LOSS;UNDER;NG
+Serie C - Girone A;Union Brescia vs Lumezzane;07/12 14:30;1.44;3.6;7.0;0-1;2;2-1;1;LOSS;LOSS;OVER;GG
 Serie C - Girone A;Pro Patria vs Dolomiti;07/12 17:30;2.38;2.9;2.88;0-2;2;1-0;1;LOSS;LOSS;UNDER;NG
-Serie C - Girone A;AlbinoLeffe vs Ospitaletto;08/12 14:30;2.0;3.0;3.5;1-1;X;2-0;1;LOSS;LOSS;UNDER;NG
+Serie C - Girone A;AlbinoLeffe vs Ospitaletto;08/12 14:30;2.0;3.0;3.5;1-1;X;0-2;2;LOSS;LOSS;UNDER;NG
 Serie C - Girone A;Lecco vs Alcione;08/12 14:30;2.15;2.88;3.3;1-0;1;2-0;1;WIN;LOSS;UNDER;NG
-Serie C - Girone A;Virtus Verona vs Pergolettese;08/12 14:30;2.15;3.0;3.1;1-1;X;2-1;1;LOSS;LOSS;OVER;GG
-Serie C - Girone A;Giana Erminio vs Triestina;08/12 15:00;2.3;2.9;3.0;2-1;1;3-0;1;WIN;LOSS;OVER;NG
-Serie C - Girone B;Livorno vs Arezzo;06/12 14:30;4.0;3.2;1.8;2-1;1;0-7;2;LOSS;LOSS;OVER;NG
-Serie C - Girone B;Pianese vs Gubbio;06/12 14:30;2.88;2.9;2.38;1-0;1;3-0;1;WIN;LOSS;OVER;NG
-Serie C - Girone B;Bra vs Campobasso;06/12 17:30;3.0;3.1;2.2;2-0;1;2-1;1;WIN;LOSS;OVER;GG
-Serie C - Girone B;Guidonia vs Juve Next Gen;07/12 12:30;-;-;-;1-1;X;1-0;1;LOSS;LOSS;UNDER;NG
-Serie C - Girone B;Perugia vs Ternana;07/12 14:30;2.5;2.88;2.75;1-2;2;1-1;X;LOSS;LOSS;UNDER;GG
-Serie C - Girone B;Torres vs Pineto;07/12 14:30;2.5;2.88;2.75;1-1;X;0-1;2;LOSS;LOSS;UNDER;NG
-Serie C - Girone B;Ravenna vs Pontedera;07/12 17:30;1.53;3.6;5.5;2-1;1;5-0;1;WIN;LOSS;OVER;NG
-Serie C - Girone B;Ascoli vs Forlì;08/12 14:30;-;-;-;3-0;1;5-1;1;WIN;LOSS;OVER;GG
-Serie C - Girone B;Carpi vs Vis Pesaro;08/12 14:30;2.3;2.9;3.0;1-1;X;0-2;2;LOSS;LOSS;UNDER;NG
-Serie C - Girone C;Catania vs Crotone;05/12 20:30;1.83;3.1;4.0;2-0;1;4-0;1;WIN;LOSS;OVER;NG
-Serie C - Girone C;Casarano vs Latina;06/12 14:30;1.83;3.25;3.9;1-1;X;0-0;X;WIN;LOSS;UNDER;NG
-Serie C - Girone C;Siracusa vs Foggia;06/12 14:30;1.73;3.4;4.2;2-2;X;1-3;2;LOSS;LOSS;OVER;GG
-Serie C - Girone C;Sorrento vs Potenza;06/12 14:30;2.63;3.2;2.38;2-2;X;1-3;2;LOSS;LOSS;OVER;GG
+Serie C - Girone A;Virtus Verona vs Pergolettese;08/12 14:30;2.15;3.0;3.1;1-1;X;0-1;2;LOSS;LOSS;UNDER;NG
+Serie C - Girone A;Giana Erminio vs Triestina;08/12 15:00;2.3;2.9;3.0;2-1;1;0-0;X;LOSS;LOSS;UNDER;NG
+Serie C - Girone A;Lumezzane vs Lecco;13/12 14:30;2.55;3.0;2.55;1-1;X;2-1;1;LOSS;LOSS;OVER;GG
+Serie C - Girone B;Livorno vs Arezzo;06/12 14:30;4.0;3.2;1.8;2-1;1;2-2;X;LOSS;LOSS;OVER;GG
+Serie C - Girone B;Pianese vs Gubbio;06/12 14:30;2.88;2.9;2.38;1-0;1;0-0;X;LOSS;LOSS;UNDER;NG
+Serie C - Girone B;Bra vs Campobasso;06/12 17:30;3.0;3.1;2.2;2-0;1;1-1;X;LOSS;LOSS;UNDER;GG
+Serie C - Girone B;Guidonia vs Juve Next Gen;07/12 12:30;2.05;3.0;3.3;1-1;X;1-0;1;LOSS;LOSS;UNDER;NG
+Serie C - Girone B;Perugia vs Ternana;07/12 14:30;2.5;2.88;2.75;1-2;2;0-1;2;WIN;LOSS;UNDER;NG
+Serie C - Girone B;Torres vs Pineto;07/12 14:30;2.5;2.88;2.75;1-1;X;1-1;X;WIN;WIN;UNDER;GG
+Serie C - Girone B;Ravenna vs Pontedera;07/12 17:30;1.53;3.6;5.5;2-1;1;2-0;1;WIN;LOSS;UNDER;NG
+Serie C - Girone B;Ascoli vs Forlì;08/12 14:30;1.6;3.3;5.25;3-0;1;2-0;1;WIN;LOSS;UNDER;NG
+Serie C - Girone B;Carpi vs Vis Pesaro;08/12 14:30;2.3;2.9;3.0;1-1;X;1-2;2;LOSS;LOSS;OVER;GG
+Serie C - Girone B;Juve Next Gen vs Pianese;12/12 20:30;2.1;3.1;3.2;0-0;X;0-1;2;LOSS;LOSS;UNDER;NG
+Serie C - Girone C;Catania vs Crotone;05/12 20:30;1.83;3.1;4.0;2-0;1;1-0;1;WIN;LOSS;UNDER;NG
+Serie C - Girone C;Casarano vs Latina;06/12 14:30;1.83;3.25;3.9;1-1;X;1-0;1;LOSS;LOSS;UNDER;NG
+Serie C - Girone C;Siracusa vs Foggia;06/12 14:30;1.73;3.4;4.2;2-2;X;1-1;X;WIN;LOSS;UNDER;GG
+Serie C - Girone C;Sorrento vs Potenza;06/12 14:30;2.63;3.2;2.38;2-2;X;2-2;X;WIN;WIN;OVER;GG
 Serie C - Girone C;Giugliano vs Team Altamura;06/12 17:30;1.95;3.25;3.4;0-1;2;1-0;1;LOSS;LOSS;UNDER;NG
-Serie C - Girone C;Monopoli vs Atalanta U23;07/12 14:30;2.3;3.2;2.75;1-1;X;2-0;1;LOSS;LOSS;UNDER;NG
-Serie C - Girone C;Salernitana vs Trapani;07/12 14:30;1.75;3.3;4.1;1-1;X;0-0;X;WIN;LOSS;UNDER;NG
-Serie C - Girone C;Cerignola vs Casertana;07/12 17:30;1.9;3.1;3.7;1-1;X;0-2;2;LOSS;LOSS;UNDER;NG
-Serie C - Girone C;Cavese vs Benevento;07/12 17:30;4.33;3.3;1.75;0-1;2;0-3;2;WIN;LOSS;OVER;NG
-Serie C - Girone C;Cosenza vs Picerno;07/12 17:30;1.44;3.8;6.5;1-0;1;2-0;1;WIN;LOSS;UNDER;NG
+Serie C - Girone C;Monopoli vs Atalanta U23;07/12 14:30;2.3;3.2;2.75;1-1;X;2-1;1;LOSS;LOSS;OVER;GG
+Serie C - Girone C;Salernitana vs Trapani;07/12 14:30;1.75;3.3;4.1;1-1;X;1-1;X;WIN;WIN;UNDER;GG
+Serie C - Girone C;Cerignola vs Casertana;07/12 17:30;1.9;3.1;3.7;1-1;X;1-0;1;LOSS;LOSS;UNDER;NG
+Serie C - Girone C;Cavese vs Benevento;07/12 17:30;4.33;3.3;1.75;0-1;2;0-2;2;WIN;LOSS;UNDER;NG
+Serie C - Girone C;Cosenza vs Picerno;07/12 17:30;1.44;3.8;6.5;1-0;1;2-2;X;LOSS;LOSS;OVER;GG
 "--- PERCENTUALI ---
-(Su partite finite)";;;;;;;;44.8%;9.5%;;61.0%;;49.5%
+(Su partite finite)";;;;;;;;37.7%;11.5%;;51.5%;;53.1%
 
 
 === ALGORITMO: MASTER ===
 League;Match;Data;Q1;QX;Q2;Real Score;Real Sign;PRED Score;PRED Sign;1X2 Outcome;Exact Score;U/O 2.5;GG/NG
-Bundesliga;Magonza vs Bor. M'gladbach;05/12 20:30;-;-;-;0-1;2;0-0;X;LOSS;LOSS;UNDER;NG
-Bundesliga;Stoccarda vs Bayern;06/12 15:30;6.25;4.75;1.44;0-5;2;2-1;1;LOSS;LOSS;OVER;GG
-Bundesliga;Wolfsburg vs Union Berlino;06/12 15:30;2.25;3.5;2.9;3-1;1;0-1;2;LOSS;LOSS;UNDER;NG
-Bundesliga;Augusta vs Leverkusen;06/12 15:30;-;-;-;2-0;1;3-4;2;LOSS;LOSS;OVER;GG
-Bundesliga;Heidenheim vs Friburgo;06/12 15:30;3.7;3.6;1.91;2-1;1;0-1;2;LOSS;LOSS;UNDER;NG
-Bundesliga;Colonia vs St. Pauli;06/12 15:30;1.9;3.6;3.8;1-1;X;4-0;1;LOSS;LOSS;OVER;NG
-Bundesliga;Lipsia vs Eintracht;06/12 18:30;1.9;4.0;3.3;6-0;1;3-1;1;WIN;LOSS;OVER;GG
-Bundesliga;Amburgo vs Werder Brema;07/12 15:30;2.15;3.6;3.0;3-2;1;1-2;2;LOSS;LOSS;OVER;GG
-Bundesliga;Dortmund vs Hoffenheim;07/12 17:30;1.55;4.2;5.0;2-0;1;1-1;X;LOSS;LOSS;UNDER;GG
-Eredivisie;Excelsior vs FC Groningen;05/12 20:00;-;-;-;0-2;2;1-0;1;LOSS;LOSS;UNDER;NG
-Eredivisie;Heerenveen vs PSV;06/12 16:30;-;-;-;0-2;2;0-0;X;LOSS;LOSS;UNDER;NG
-Eredivisie;Fortuna Sittard vs Ajax;06/12 18:45;-;-;-;1-3;2;0-0;X;LOSS;LOSS;UNDER;NG
-Eredivisie;Heracles Almelo vs Telstar;06/12 20:00;-;-;-;1-1;X;1-0;1;LOSS;LOSS;UNDER;NG
-Eredivisie;Feyenoord vs PEC Zwolle;06/12 21:00;-;-;-;6-1;1;5-0;1;WIN;LOSS;OVER;NG
-Eredivisie;FC Utrecht vs FC Twente;07/12 12:15;-;-;-;1-1;X;0-1;2;LOSS;LOSS;UNDER;NG
-Eredivisie;AZ Alkmaar vs Go Ahead Eagles;07/12 14:30;-;-;-;2-2;X;2-2;X;WIN;WIN;OVER;GG
-Eredivisie;FC Volendam vs NEC Nijmegen;07/12 14:30;-;-;-;2-3;2;0-0;X;LOSS;LOSS;UNDER;NG
-Eredivisie;Sparta R. vs NAC Breda;07/12 16:45;-;-;-;1-0;1;0-0;X;LOSS;LOSS;UNDER;NG
-La Liga;Real Oviedo vs RCD Mallorca;05/12 21:00;-;-;-;0-0;X;0-0;X;WIN;WIN;UNDER;NG
-La Liga;Villarreal vs Getafe CF;06/12 14:00;-;-;-;2-0;1;3-0;1;WIN;LOSS;OVER;NG
-La Liga;Alavés vs Real Sociedad;06/12 16:15;-;-;-;1-0;1;0-1;2;LOSS;LOSS;UNDER;NG
-La Liga;Real Betis vs Barcellona;06/12 18:30;4.0;4.1;1.73;3-5;2;2-3;2;WIN;LOSS;OVER;GG
-La Liga;Athletic Club vs Atlético;06/12 21:00;-;-;-;1-0;1;0-0;X;LOSS;LOSS;UNDER;NG
-La Liga;Elche vs Girona FC;07/12 14:00;-;-;-;3-0;1;2-0;1;WIN;LOSS;UNDER;NG
-La Liga;Valencia vs Siviglia;07/12 16:15;-;-;-;1-1;X;1-2;2;LOSS;LOSS;OVER;GG
-La Liga;Espanyol vs Rayo Vallecano;07/12 18:30;2.35;3.1;3.0;1-0;1;0-0;X;LOSS;LOSS;UNDER;NG
-La Liga;Real Madrid vs Celta de Vigo;07/12 21:00;-;-;-;0-2;2;2-1;1;LOSS;LOSS;OVER;GG
-La Liga;CA Osasuna vs Levante;08/12 21:00;-;-;-;2-0;1;1-0;1;WIN;LOSS;UNDER;NG
-Liga Portugal;Benfica vs Sporting;05/12 21:15;-;-;-;1-1;X;3-0;1;LOSS;LOSS;OVER;NG
-Liga Portugal;Santa Clara vs Casa Pia;06/12 16:30;-;-;-;1-0;1;3-0;1;WIN;LOSS;OVER;NG
-Liga Portugal;Avs FS vs Rio Ave;06/12 19:00;-;-;-;1-2;2;0-1;2;WIN;LOSS;UNDER;NG
-Liga Portugal;Famalicão vs SC Braga;06/12 21:30;-;-;-;1-2;2;0-0;X;LOSS;LOSS;UNDER;NG
-Liga Portugal;Estoril vs Moreirense;07/12 16:30;-;-;-;3-3;X;0-3;2;LOSS;LOSS;OVER;NG
-Liga Portugal;Alverca vs Nacional;07/12 19:00;-;-;-;1-0;1;2-0;1;WIN;LOSS;UNDER;NG
-Liga Portugal;Estrela Amadora vs Arouca;07/12 19:00;-;-;-;3-1;1;1-0;1;WIN;LOSS;UNDER;NG
-Liga Portugal;Tondela vs FC Porto;07/12 21:30;-;-;-;0-2;2;0-3;2;WIN;LOSS;OVER;NG
-Liga Portugal;Vit. Guimarães vs Gil Vicente;08/12 21:30;-;-;-;0-0;X;0-5;2;LOSS;LOSS;OVER;NG
-Ligue 1;Brest vs Monaco;05/12 19:00;3.4;3.7;2.0;1-0;1;1-0;1;WIN;WIN;UNDER;NG
-Ligue 1;Lille vs Marsiglia;05/12 21:00;2.4;3.5;2.7;1-0;1;2-0;1;WIN;LOSS;UNDER;NG
-Ligue 1;FC Nantes vs Lens;06/12 17:00;-;-;-;1-2;2;0-4;2;WIN;LOSS;OVER;NG
-Ligue 1;Tolosa vs Strasburgo;06/12 19:00;2.3;3.4;3.0;1-0;1;0-1;2;LOSS;LOSS;UNDER;NG
-Ligue 1;PSG vs Stade Rennes;06/12 21:05;-;-;-;5-0;1;3-0;1;WIN;LOSS;OVER;NG
-Ligue 1;Nizza vs Angers SCO;07/12 15:00;-;-;-;0-1;2;1-0;1;LOSS;LOSS;UNDER;NG
-Ligue 1;Le Havre vs Paris FC;07/12 17:15;2.88;3.3;2.3;0-0;X;0-0;X;WIN;WIN;UNDER;NG
-Ligue 1;AJ Auxerre vs Metz;07/12 17:15;2.0;3.4;3.5;3-1;1;0-2;2;LOSS;LOSS;UNDER;NG
-Ligue 1;Lorient vs Olymp. Lione;07/12 20:45;-;-;-;1-0;1;1-0;1;WIN;WIN;UNDER;NG
-Premier League;Aston Villa vs Arsenal;06/12 13:30;4.33;3.5;1.8;2-1;1;2-0;1;WIN;LOSS;UNDER;NG
-Premier League;Bournemouth vs Chelsea;06/12 16:00;2.9;3.5;2.25;0-0;X;1-1;X;WIN;LOSS;UNDER;GG
-Premier League;Everton vs Nott'm Forest;06/12 16:00;-;-;-;3-0;1;2-0;1;WIN;LOSS;UNDER;NG
-Premier League;Man City vs Sunderland;06/12 16:00;-;-;-;3-0;1;0-0;X;LOSS;LOSS;UNDER;NG
-Premier League;Newcastle vs Burnley;06/12 16:00;1.27;5.0;11.0;2-1;1;0-0;X;LOSS;LOSS;UNDER;NG
-Premier League;Tottenham vs Brentford;06/12 16:00;2.05;3.5;3.4;2-0;1;2-0;1;WIN;WIN;UNDER;NG
-Premier League;Leeds vs Liverpool;06/12 18:30;4.33;3.75;1.73;3-3;X;0-3;2;LOSS;LOSS;OVER;NG
-Premier League;Brighton vs West Ham Utd.;07/12 15:00;-;-;-;1-1;X;3-0;1;LOSS;LOSS;OVER;NG
-Premier League;FC Fulham vs Crystal Palace;07/12 17:30;-;-;-;1-2;2;0-3;2;WIN;LOSS;OVER;NG
-Premier League;Wolverhampton vs Manchester Utd.;08/12 21:00;-;-;-;1-4;2;0-0;X;LOSS;LOSS;UNDER;NG
-Serie A;Sassuolo vs Fiorentina;06/12 15:00;2.55;3.2;2.7;3-1;1;1-0;1;WIN;LOSS;UNDER;NG
-Serie A;Inter vs Como;06/12 18:00;1.44;4.1;7.0;4-0;1;6-3;1;WIN;LOSS;OVER;GG
+Bundesliga;Magonza vs Bor. M'gladbach;05/12 20:30;2.05;3.6;3.2;0-1;2;0-0;X;LOSS;LOSS;UNDER;NG
+Bundesliga;Stoccarda vs Bayern;06/12 15:30;6.25;4.75;1.44;0-5;2;0-2;2;WIN;LOSS;UNDER;NG
+Bundesliga;Wolfsburg vs Union Berlino;06/12 15:30;2.25;3.5;2.9;3-1;1;2-0;1;WIN;LOSS;UNDER;NG
+Bundesliga;Augusta vs Leverkusen;06/12 15:30;3.9;3.75;1.83;2-0;1;1-2;2;LOSS;LOSS;OVER;GG
+Bundesliga;Heidenheim vs Friburgo;06/12 15:30;3.7;3.6;1.91;2-1;1;0-2;2;LOSS;LOSS;UNDER;NG
+Bundesliga;Colonia vs St. Pauli;06/12 15:30;1.9;3.6;3.8;1-1;X;0-0;X;WIN;LOSS;UNDER;NG
+Bundesliga;Lipsia vs Eintracht;06/12 18:30;1.9;4.0;3.3;6-0;1;3-0;1;WIN;LOSS;OVER;NG
+Bundesliga;Amburgo vs Werder Brema;07/12 15:30;2.15;3.6;3.0;3-2;1;1-3;2;LOSS;LOSS;OVER;GG
+Bundesliga;Dortmund vs Hoffenheim;07/12 17:30;1.55;4.2;5.0;2-0;1;2-2;X;LOSS;LOSS;OVER;GG
+Bundesliga;Union Berlino vs Lipsia;12/12 20:30;3.4;3.5;2.0;3-1;1;0-2;2;LOSS;LOSS;UNDER;NG
+Bundesliga;Eintracht vs Augusta;13/12 15:30;1.53;4.2;5.75;1-0;1;4-2;1;WIN;LOSS;OVER;GG
+Bundesliga;Bor. M'gladbach vs Wolfsburg;13/12 15:30;2.0;3.7;3.3;1-3;2;0-1;2;WIN;LOSS;UNDER;NG
+Bundesliga;St. Pauli vs Heidenheim;13/12 15:30;1.85;3.3;4.2;2-1;1;0-0;X;LOSS;LOSS;UNDER;NG
+Bundesliga;Hoffenheim vs Amburgo;13/12 15:30;1.73;3.9;4.2;4-1;1;1-0;1;WIN;LOSS;UNDER;NG
+Bundesliga;Leverkusen vs Colonia;13/12 18:30;1.45;4.5;6.0;2-0;1;3-2;1;WIN;LOSS;OVER;GG
+Eredivisie;Excelsior vs FC Groningen;05/12 20:00;2.75;3.4;2.4;0-2;2;1-0;1;LOSS;LOSS;UNDER;NG
+Eredivisie;Heerenveen vs PSV;06/12 16:30;6.25;4.75;1.4;0-2;2;0-0;X;LOSS;LOSS;UNDER;NG
+Eredivisie;Fortuna Sittard vs Ajax;06/12 18:45;4.75;3.9;1.65;1-3;2;1-0;1;LOSS;LOSS;UNDER;NG
+Eredivisie;Heracles Almelo vs Telstar;06/12 20:00;2.1;3.5;3.2;1-1;X;0-0;X;WIN;LOSS;UNDER;NG
+Eredivisie;Feyenoord vs PEC Zwolle;06/12 21:00;1.18;6.5;12.0;6-1;1;3-1;1;WIN;LOSS;OVER;GG
+Eredivisie;FC Utrecht vs FC Twente;07/12 12:15;2.35;3.5;2.75;1-1;X;0-1;2;LOSS;LOSS;UNDER;NG
+Eredivisie;AZ Alkmaar vs Go Ahead Eagles;07/12 14:30;1.44;4.4;6.5;2-2;X;1-0;1;LOSS;LOSS;UNDER;NG
+Eredivisie;FC Volendam vs NEC Nijmegen;07/12 14:30;3.6;3.9;1.85;2-3;2;1-1;X;LOSS;LOSS;UNDER;GG
+Eredivisie;Sparta R. vs NAC Breda;07/12 16:45;1.83;3.75;3.8;1-0;1;2-2;X;LOSS;LOSS;OVER;GG
+Eredivisie;Telstar vs NEC Nijmegen;13/12 16:30;4.2;4.1;1.7;2-2;X;1-0;1;LOSS;LOSS;UNDER;NG
+La Liga;Real Oviedo vs RCD Mallorca;05/12 21:00;2.35;3.0;3.2;0-0;X;1-0;1;LOSS;LOSS;UNDER;NG
+La Liga;Villarreal vs Getafe CF;06/12 14:00;1.53;3.75;6.5;2-0;1;3-0;1;WIN;LOSS;OVER;NG
+La Liga;Alavés vs Real Sociedad;06/12 16:15;2.8;3.0;2.55;1-0;1;0-0;X;LOSS;LOSS;UNDER;NG
+La Liga;Real Betis vs Barcellona;06/12 18:30;4.0;4.1;1.73;3-5;2;0-2;2;WIN;LOSS;UNDER;NG
+La Liga;Athletic Club vs Atlético;06/12 21:00;3.7;3.25;2.05;1-0;1;0-0;X;LOSS;LOSS;UNDER;NG
+La Liga;Elche vs Girona FC;07/12 14:00;2.25;3.2;3.25;3-0;1;2-0;1;WIN;LOSS;UNDER;NG
+La Liga;Valencia vs Siviglia;07/12 16:15;2.2;3.2;3.2;1-1;X;0-0;X;WIN;LOSS;UNDER;NG
+La Liga;Espanyol vs Rayo Vallecano;07/12 18:30;2.35;3.1;3.0;1-0;1;5-2;1;WIN;LOSS;OVER;GG
+La Liga;Real Madrid vs Celta de Vigo;07/12 21:00;1.25;6.0;9.0;0-2;2;4-0;1;LOSS;LOSS;OVER;NG
+La Liga;CA Osasuna vs Levante;08/12 21:00;1.8;3.4;4.5;2-0;1;0-3;2;LOSS;LOSS;OVER;NG
+La Liga;Real Sociedad vs Girona FC;12/12 21:00;1.7;3.6;5.0;1-2;2;2-0;1;LOSS;LOSS;UNDER;NG
+Liga Portugal;Benfica vs Sporting;05/12 21:15;2.55;3.3;2.55;1-1;X;0-0;X;WIN;LOSS;UNDER;NG
+Liga Portugal;Santa Clara vs Casa Pia;06/12 16:30;1.95;3.0;4.75;1-0;1;2-0;1;WIN;LOSS;UNDER;NG
+Liga Portugal;Avs FS vs Rio Ave;06/12 19:00;2.9;3.2;2.38;1-2;2;0-2;2;WIN;LOSS;UNDER;NG
+Liga Portugal;Famalicão vs SC Braga;06/12 21:30;3.1;3.3;2.25;1-2;2;0-0;X;LOSS;LOSS;UNDER;NG
+Liga Portugal;Estoril vs Moreirense;07/12 16:30;1.91;3.3;3.9;3-3;X;3-1;1;LOSS;LOSS;OVER;GG
+Liga Portugal;Alverca vs Nacional;07/12 19:00;2.3;3.25;3.1;1-0;1;2-0;1;WIN;LOSS;UNDER;NG
+Liga Portugal;Estrela Amadora vs Arouca;07/12 19:00;2.38;3.2;2.9;3-1;1;3-2;1;WIN;LOSS;OVER;GG
+Liga Portugal;Tondela vs FC Porto;07/12 21:30;10.0;4.75;1.29;0-2;2;1-2;2;WIN;LOSS;OVER;GG
+Liga Portugal;Vit. Guimarães vs Gil Vicente;08/12 21:30;2.5;3.1;2.88;0-0;X;0-1;2;LOSS;LOSS;UNDER;NG
+Liga Portugal;Casa Pia vs Gil Vicente;13/12 16:30;3.75;3.1;2.1;1-1;X;0-2;2;LOSS;LOSS;UNDER;NG
+Ligue 1;Brest vs Monaco;05/12 19:00;3.4;3.7;2.0;1-0;1;4-2;1;WIN;LOSS;OVER;GG
+Ligue 1;Lille vs Marsiglia;05/12 21:00;2.4;3.5;2.7;1-0;1;3-2;1;WIN;LOSS;OVER;GG
+Ligue 1;FC Nantes vs Lens;06/12 17:00;5.0;3.7;1.67;1-2;2;1-4;2;WIN;LOSS;OVER;GG
+Ligue 1;Tolosa vs Strasburgo;06/12 19:00;2.3;3.4;3.0;1-0;1;1-3;2;LOSS;LOSS;OVER;GG
+Ligue 1;PSG vs Stade Rennes;06/12 21:05;1.25;5.5;10.0;5-0;1;0-0;X;LOSS;LOSS;UNDER;NG
+Ligue 1;Nizza vs Angers SCO;07/12 15:00;1.62;3.7;5.25;0-1;2;1-0;1;LOSS;LOSS;UNDER;NG
+Ligue 1;Le Havre vs Paris FC;07/12 17:15;2.88;3.3;2.3;0-0;X;1-1;X;WIN;LOSS;UNDER;GG
+Ligue 1;AJ Auxerre vs Metz;07/12 17:15;2.0;3.4;3.5;3-1;1;0-0;X;LOSS;LOSS;UNDER;NG
+Ligue 1;Lorient vs Olymp. Lione;07/12 20:45;3.6;3.4;2.0;1-0;1;0-0;X;LOSS;LOSS;UNDER;NG
+Ligue 1;Angers SCO vs FC Nantes;12/12 20:45;2.3;3.1;3.1;4-1;1;0-0;X;LOSS;LOSS;UNDER;NG
+Ligue 1;Stade Rennes vs Brest;13/12 17:00;1.83;3.6;4.0;3-1;1;0-2;2;LOSS;LOSS;UNDER;NG
+Premier League;Aston Villa vs Arsenal;06/12 13:30;4.33;3.5;1.8;2-1;1;0-1;2;LOSS;LOSS;UNDER;NG
+Premier League;Bournemouth vs Chelsea;06/12 16:00;2.9;3.5;2.25;0-0;X;1-5;2;LOSS;LOSS;OVER;GG
+Premier League;Everton vs Nott'm Forest;06/12 16:00;2.05;3.25;3.5;3-0;1;3-0;1;WIN;WIN;OVER;NG
+Premier League;Man City vs Sunderland;06/12 16:00;1.25;5.5;11.0;3-0;1;0-2;2;LOSS;LOSS;UNDER;NG
+Premier League;Newcastle vs Burnley;06/12 16:00;1.27;5.0;11.0;2-1;1;0-1;2;LOSS;LOSS;UNDER;NG
+Premier League;Tottenham vs Brentford;06/12 16:00;2.05;3.5;3.4;2-0;1;1-0;1;WIN;LOSS;UNDER;NG
+Premier League;Leeds vs Liverpool;06/12 18:30;4.33;3.75;1.73;3-3;X;0-2;2;LOSS;LOSS;UNDER;NG
+Premier League;Brighton vs West Ham Utd.;07/12 15:00;1.57;4.0;5.25;1-1;X;3-0;1;LOSS;LOSS;OVER;NG
+Premier League;FC Fulham vs Crystal Palace;07/12 17:30;2.6;3.25;2.6;1-2;2;0-2;2;WIN;LOSS;UNDER;NG
+Premier League;Wolverhampton vs Manchester Utd.;08/12 21:00;4.75;3.7;1.67;1-4;2;1-1;X;LOSS;LOSS;UNDER;GG
+Premier League;Chelsea vs Everton;13/12 16:00;1.6;3.75;5.5;2-0;1;1-2;2;LOSS;LOSS;OVER;GG
+Premier League;Liverpool vs Brighton;13/12 16:00;1.7;3.9;4.33;2-0;1;0-2;2;LOSS;LOSS;UNDER;NG
+Serie A;Sassuolo vs Fiorentina;06/12 15:00;2.55;3.2;2.7;3-1;1;0-1;2;LOSS;LOSS;UNDER;NG
+Serie A;Inter vs Como;06/12 18:00;1.44;4.1;7.0;4-0;1;3-2;1;WIN;LOSS;OVER;GG
 Serie A;Verona vs Atalanta;06/12 20:45;5.0;3.5;1.75;3-1;1;0-2;2;LOSS;LOSS;UNDER;NG
-Serie A;Cremonese vs Lecce;07/12 12:30;2.25;3.0;3.3;2-0;1;0-0;X;LOSS;LOSS;UNDER;NG
+Serie A;Cremonese vs Lecce;07/12 12:30;2.25;3.0;3.3;2-0;1;1-1;X;LOSS;LOSS;UNDER;GG
 Serie A;Cagliari vs Roma;07/12 15:00;5.5;3.3;1.7;1-0;1;2-0;1;WIN;LOSS;UNDER;NG
-Serie A;Lazio vs Bologna;07/12 18:00;2.8;3.0;2.6;1-1;X;0-2;2;LOSS;LOSS;UNDER;NG
-Serie A;Napoli vs Juventus;07/12 20:45;2.3;3.1;3.1;2-1;1;1-1;X;LOSS;LOSS;UNDER;GG
-Serie A;Pisa vs Parma;08/12 15:00;2.4;3.0;3.1;0-1;2;0-0;X;LOSS;LOSS;UNDER;NG
-Serie A;Udinese vs Genoa;08/12 18:00;2.2;3.0;3.5;1-2;2;0-1;2;WIN;LOSS;UNDER;NG
-Serie A;Torino vs Milan;08/12 20:45;5.0;3.4;1.73;2-3;2;2-1;1;LOSS;LOSS;OVER;GG
-Serie B;Empoli vs Palermo;07/12 17:15;3.05;3.2;2.25;1-3;2;2-0;1;LOSS;LOSS;UNDER;NG
-Serie B;Sampdoria vs Carrarese;07/12 19:30;2.1;3.2;3.5;3-2;1;1-2;2;LOSS;LOSS;OVER;GG
-Serie B;Modena vs Catanzaro;08/12 12:30;1.68;3.5;5.0;1-2;2;1-2;2;WIN;WIN;OVER;GG
-Serie B;Avellino vs Venezia;08/12 15:00;4.1;3.6;1.79;1-1;X;2-5;2;LOSS;LOSS;OVER;GG
-Serie B;Frosinone vs Juve Stabia;08/12 15:00;1.86;3.3;3.9;3-0;1;1-0;1;WIN;LOSS;UNDER;NG
-Serie B;Mantova vs Reggiana;08/12 15:00;1.96;3.4;3.75;0-1;2;0-2;2;WIN;LOSS;UNDER;NG
-Serie B;Monza vs Südtirol;08/12 15:00;-;-;-;1-1;X;4-0;1;LOSS;LOSS;OVER;NG
-Serie B;Padova vs Cesena;08/12 15:00;3.25;2.95;2.32;1-1;X;0-2;2;LOSS;LOSS;UNDER;NG
-Serie B;Bari vs Pescara;08/12 17:15;1.68;3.4;4.5;1-1;X;0-1;2;LOSS;LOSS;UNDER;NG
-Serie B;Virtus Entella vs Spezia;08/12 19:30;2.35;3.1;3.2;0-1;2;0-3;2;WIN;LOSS;OVER;NG
-Serie C - Girone A;Trento vs Cittadella;05/12 20:30;2.8;3.0;2.35;1-0;1;0-2;2;LOSS;LOSS;UNDER;NG
-Serie C - Girone A;Pro Vercelli vs Renate;06/12 14:30;2.15;2.88;3.3;1-1;X;0-2;2;LOSS;LOSS;UNDER;NG
-Serie C - Girone A;Arzignano vs Inter U23;07/12 12:30;2.9;3.1;2.25;1-1;X;4-5;2;LOSS;LOSS;OVER;GG
-Serie C - Girone A;Novara vs Vicenza;07/12 14:30;4.5;3.1;1.75;2-2;X;3-0;1;LOSS;LOSS;OVER;NG
-Serie C - Girone A;Union Brescia vs Lumezzane;07/12 14:30;1.44;3.6;7.0;0-1;2;1-1;X;LOSS;LOSS;UNDER;GG
-Serie C - Girone A;Pro Patria vs Dolomiti;07/12 17:30;2.38;2.9;2.88;0-2;2;1-0;1;LOSS;LOSS;UNDER;NG
-Serie C - Girone A;AlbinoLeffe vs Ospitaletto;08/12 14:30;2.0;3.0;3.5;1-1;X;0-0;X;WIN;LOSS;UNDER;NG
-Serie C - Girone A;Lecco vs Alcione;08/12 14:30;2.15;2.88;3.3;1-0;1;4-0;1;WIN;LOSS;OVER;NG
-Serie C - Girone A;Virtus Verona vs Pergolettese;08/12 14:30;2.15;3.0;3.1;1-1;X;0-1;2;LOSS;LOSS;UNDER;NG
+Serie A;Lazio vs Bologna;07/12 18:00;2.8;3.0;2.6;1-1;X;1-2;2;LOSS;LOSS;OVER;GG
+Serie A;Napoli vs Juventus;07/12 20:45;2.3;3.1;3.1;2-1;1;4-0;1;WIN;LOSS;OVER;NG
+Serie A;Pisa vs Parma;08/12 15:00;2.4;3.0;3.1;0-1;2;0-1;2;WIN;WIN;UNDER;NG
+Serie A;Udinese vs Genoa;08/12 18:00;2.2;3.0;3.5;1-2;2;0-4;2;WIN;LOSS;OVER;NG
+Serie A;Torino vs Milan;08/12 20:45;5.0;3.4;1.73;2-3;2;0-0;X;LOSS;LOSS;UNDER;NG
+Serie A;Lecce vs Pisa;12/12 20:45;2.2;3.0;3.5;1-0;1;1-0;1;WIN;WIN;UNDER;NG
+Serie A;Torino vs Cremonese;13/12 15:00;1.9;3.3;4.1;1-0;1;1-1;X;LOSS;LOSS;UNDER;GG
+Serie A;Parma vs Lazio;13/12 18:00;3.75;3.25;2.0;0-1;2;1-0;1;LOSS;LOSS;UNDER;NG
+Serie B;Empoli vs Palermo;07/12 17:15;3.05;3.2;2.25;1-3;2;2-2;X;LOSS;LOSS;OVER;GG
+Serie B;Sampdoria vs Carrarese;07/12 19:30;2.1;3.2;3.5;3-2;1;0-0;X;LOSS;LOSS;UNDER;NG
+Serie B;Modena vs Catanzaro;08/12 12:30;1.68;3.5;5.0;1-2;2;2-2;X;LOSS;LOSS;OVER;GG
+Serie B;Avellino vs Venezia;08/12 15:00;4.1;3.6;1.79;1-1;X;1-2;2;LOSS;LOSS;OVER;GG
+Serie B;Frosinone vs Juve Stabia;08/12 15:00;1.86;3.3;3.9;3-0;1;1-2;2;LOSS;LOSS;OVER;GG
+Serie B;Mantova vs Reggiana;08/12 15:00;1.96;3.4;3.75;0-1;2;1-0;1;LOSS;LOSS;UNDER;NG
+Serie B;Monza vs Südtirol;08/12 15:00;1.51;3.75;6.5;1-1;X;2-0;1;LOSS;LOSS;UNDER;NG
+Serie B;Padova vs Cesena;08/12 15:00;3.25;2.95;2.32;1-1;X;0-1;2;LOSS;LOSS;UNDER;NG
+Serie B;Bari vs Pescara;08/12 17:15;1.68;3.4;4.5;1-1;X;1-0;1;LOSS;LOSS;UNDER;NG
+Serie B;Virtus Entella vs Spezia;08/12 19:30;2.35;3.1;3.2;0-1;2;0-0;X;LOSS;LOSS;UNDER;NG
+Serie B;Palermo vs Sampdoria;12/12 20:30;1.62;3.4;5.25;1-0;1;2-0;1;WIN;LOSS;UNDER;NG
+Serie B;Juve Stabia vs Empoli;13/12 15:00;2.1;3.05;3.4;2-0;1;1-0;1;WIN;LOSS;UNDER;NG
+Serie B;Reggiana vs Padova;13/12 15:00;2.3;3.05;2.95;1-2;2;1-1;X;LOSS;LOSS;UNDER;GG
+Serie B;Spezia vs Modena;13/12 15:00;3.2;3.05;2.2;0-2;2;1-2;2;WIN;LOSS;OVER;GG
+Serie B;Südtirol vs Bari;13/12 15:00;1.91;3.25;3.8;0-0;X;0-1;2;LOSS;LOSS;UNDER;NG
+Serie B;Venezia vs Monza;13/12 15:00;2.32;3.05;2.95;2-0;1;2-1;1;WIN;LOSS;OVER;GG
+Serie B;Catanzaro vs Avellino;13/12 17:15;1.79;3.4;4.1;1-0;1;2-0;1;WIN;LOSS;UNDER;NG
+Serie C - Girone A;Trento vs Cittadella;05/12 20:30;2.8;3.0;2.35;1-0;1;0-1;2;LOSS;LOSS;UNDER;NG
+Serie C - Girone A;Pro Vercelli vs Renate;06/12 14:30;2.15;2.88;3.3;1-1;X;1-1;X;WIN;WIN;UNDER;GG
+Serie C - Girone A;Arzignano vs Inter U23;07/12 12:30;2.9;3.1;2.25;1-1;X;0-2;2;LOSS;LOSS;UNDER;NG
+Serie C - Girone A;Novara vs Vicenza;07/12 14:30;4.5;3.1;1.75;2-2;X;1-0;1;LOSS;LOSS;UNDER;NG
+Serie C - Girone A;Union Brescia vs Lumezzane;07/12 14:30;1.44;3.6;7.0;0-1;2;0-0;X;LOSS;LOSS;UNDER;NG
+Serie C - Girone A;Pro Patria vs Dolomiti;07/12 17:30;2.38;2.9;2.88;0-2;2;0-0;X;LOSS;LOSS;UNDER;NG
+Serie C - Girone A;AlbinoLeffe vs Ospitaletto;08/12 14:30;2.0;3.0;3.5;1-1;X;0-2;2;LOSS;LOSS;UNDER;NG
+Serie C - Girone A;Lecco vs Alcione;08/12 14:30;2.15;2.88;3.3;1-0;1;1-0;1;WIN;WIN;UNDER;NG
+Serie C - Girone A;Virtus Verona vs Pergolettese;08/12 14:30;2.15;3.0;3.1;1-1;X;1-2;2;LOSS;LOSS;OVER;GG
 Serie C - Girone A;Giana Erminio vs Triestina;08/12 15:00;2.3;2.9;3.0;2-1;1;1-0;1;WIN;LOSS;UNDER;NG
-Serie C - Girone B;Livorno vs Arezzo;06/12 14:30;4.0;3.2;1.8;2-1;1;0-5;2;LOSS;LOSS;OVER;NG
-Serie C - Girone B;Pianese vs Gubbio;06/12 14:30;2.88;2.9;2.38;1-0;1;2-1;1;WIN;LOSS;OVER;GG
-Serie C - Girone B;Bra vs Campobasso;06/12 17:30;3.0;3.1;2.2;2-0;1;2-2;X;LOSS;LOSS;OVER;GG
-Serie C - Girone B;Guidonia vs Juve Next Gen;07/12 12:30;-;-;-;1-1;X;0-0;X;WIN;LOSS;UNDER;NG
-Serie C - Girone B;Perugia vs Ternana;07/12 14:30;2.5;2.88;2.75;1-2;2;1-2;2;WIN;WIN;OVER;GG
-Serie C - Girone B;Torres vs Pineto;07/12 14:30;2.5;2.88;2.75;1-1;X;1-1;X;WIN;WIN;UNDER;GG
-Serie C - Girone B;Ravenna vs Pontedera;07/12 17:30;1.53;3.6;5.5;2-1;1;0-0;X;LOSS;LOSS;UNDER;NG
-Serie C - Girone B;Ascoli vs Forlì;08/12 14:30;-;-;-;3-0;1;2-0;1;WIN;LOSS;UNDER;NG
-Serie C - Girone B;Carpi vs Vis Pesaro;08/12 14:30;2.3;2.9;3.0;1-1;X;1-0;1;LOSS;LOSS;UNDER;NG
-Serie C - Girone C;Catania vs Crotone;05/12 20:30;1.83;3.1;4.0;2-0;1;5-1;1;WIN;LOSS;OVER;GG
+Serie C - Girone A;Lumezzane vs Lecco;13/12 14:30;2.55;3.0;2.55;1-1;X;2-1;1;LOSS;LOSS;OVER;GG
+Serie C - Girone B;Livorno vs Arezzo;06/12 14:30;4.0;3.2;1.8;2-1;1;0-4;2;LOSS;LOSS;OVER;NG
+Serie C - Girone B;Pianese vs Gubbio;06/12 14:30;2.88;2.9;2.38;1-0;1;0-0;X;LOSS;LOSS;UNDER;NG
+Serie C - Girone B;Bra vs Campobasso;06/12 17:30;3.0;3.1;2.2;2-0;1;0-1;2;LOSS;LOSS;UNDER;NG
+Serie C - Girone B;Guidonia vs Juve Next Gen;07/12 12:30;2.05;3.0;3.3;1-1;X;1-0;1;LOSS;LOSS;UNDER;NG
+Serie C - Girone B;Perugia vs Ternana;07/12 14:30;2.5;2.88;2.75;1-2;2;1-3;2;WIN;LOSS;OVER;GG
+Serie C - Girone B;Torres vs Pineto;07/12 14:30;2.5;2.88;2.75;1-1;X;0-0;X;WIN;LOSS;UNDER;NG
+Serie C - Girone B;Ravenna vs Pontedera;07/12 17:30;1.53;3.6;5.5;2-1;1;1-2;2;LOSS;LOSS;OVER;GG
+Serie C - Girone B;Ascoli vs Forlì;08/12 14:30;1.6;3.3;5.25;3-0;1;3-0;1;WIN;WIN;OVER;NG
+Serie C - Girone B;Carpi vs Vis Pesaro;08/12 14:30;2.3;2.9;3.0;1-1;X;0-2;2;LOSS;LOSS;UNDER;NG
+Serie C - Girone B;Juve Next Gen vs Pianese;12/12 20:30;2.1;3.1;3.2;0-0;X;0-2;2;LOSS;LOSS;UNDER;NG
+Serie C - Girone C;Catania vs Crotone;05/12 20:30;1.83;3.1;4.0;2-0;1;3-1;1;WIN;LOSS;OVER;GG
 Serie C - Girone C;Casarano vs Latina;06/12 14:30;1.83;3.25;3.9;1-1;X;1-1;X;WIN;WIN;UNDER;GG
-Serie C - Girone C;Siracusa vs Foggia;06/12 14:30;1.73;3.4;4.2;2-2;X;1-3;2;LOSS;LOSS;OVER;GG
-Serie C - Girone C;Sorrento vs Potenza;06/12 14:30;2.63;3.2;2.38;2-2;X;0-3;2;LOSS;LOSS;OVER;NG
-Serie C - Girone C;Giugliano vs Team Altamura;06/12 17:30;1.95;3.25;3.4;0-1;2;2-0;1;LOSS;LOSS;UNDER;NG
-Serie C - Girone C;Monopoli vs Atalanta U23;07/12 14:30;2.3;3.2;2.75;1-1;X;1-1;X;WIN;WIN;UNDER;GG
-Serie C - Girone C;Salernitana vs Trapani;07/12 14:30;1.75;3.3;4.1;1-1;X;0-1;2;LOSS;LOSS;UNDER;NG
-Serie C - Girone C;Cerignola vs Casertana;07/12 17:30;1.9;3.1;3.7;1-1;X;0-0;X;WIN;LOSS;UNDER;NG
-Serie C - Girone C;Cavese vs Benevento;07/12 17:30;4.33;3.3;1.75;0-1;2;1-3;2;WIN;LOSS;OVER;GG
-Serie C - Girone C;Cosenza vs Picerno;07/12 17:30;1.44;3.8;6.5;1-0;1;2-1;1;WIN;LOSS;OVER;GG
+Serie C - Girone C;Siracusa vs Foggia;06/12 14:30;1.73;3.4;4.2;2-2;X;1-0;1;LOSS;LOSS;UNDER;NG
+Serie C - Girone C;Sorrento vs Potenza;06/12 14:30;2.63;3.2;2.38;2-2;X;1-2;2;LOSS;LOSS;OVER;GG
+Serie C - Girone C;Giugliano vs Team Altamura;06/12 17:30;1.95;3.25;3.4;0-1;2;0-0;X;LOSS;LOSS;UNDER;NG
+Serie C - Girone C;Monopoli vs Atalanta U23;07/12 14:30;2.3;3.2;2.75;1-1;X;1-0;1;LOSS;LOSS;UNDER;NG
+Serie C - Girone C;Salernitana vs Trapani;07/12 14:30;1.75;3.3;4.1;1-1;X;0-0;X;WIN;LOSS;UNDER;NG
+Serie C - Girone C;Cerignola vs Casertana;07/12 17:30;1.9;3.1;3.7;1-1;X;0-2;2;LOSS;LOSS;UNDER;NG
+Serie C - Girone C;Cavese vs Benevento;07/12 17:30;4.33;3.3;1.75;0-1;2;0-3;2;WIN;LOSS;OVER;NG
+Serie C - Girone C;Cosenza vs Picerno;07/12 17:30;1.44;3.8;6.5;1-0;1;4-1;1;WIN;LOSS;OVER;GG
 "--- PERCENTUALI ---
-(Su partite finite)";;;;;;;;43.8%;10.5%;;59.0%;;48.6%
+(Su partite finite)";;;;;;;;38.5%;5.4%;;54.6%;;46.9%
 
 
 === ALGORITMO: MONTECARLO ===
 League;Match;Data;Q1;QX;Q2;Real Score;Real Sign;PRED Score;PRED Sign;1X2 Outcome;Exact Score;U/O 2.5;GG/NG
-Bundesliga;Magonza vs Bor. M'gladbach;05/12 20:30;-;-;-;0-1;2;0-0;X;LOSS;LOSS;UNDER;NG
-Bundesliga;Stoccarda vs Bayern;06/12 15:30;6.25;4.75;1.44;0-5;2;0-3;2;WIN;LOSS;OVER;NG
-Bundesliga;Wolfsburg vs Union Berlino;06/12 15:30;2.25;3.5;2.9;3-1;1;0-0;X;LOSS;LOSS;UNDER;NG
-Bundesliga;Augusta vs Leverkusen;06/12 15:30;-;-;-;2-0;1;0-1;2;LOSS;LOSS;UNDER;NG
-Bundesliga;Heidenheim vs Friburgo;06/12 15:30;3.7;3.6;1.91;2-1;1;1-0;1;WIN;LOSS;UNDER;NG
-Bundesliga;Colonia vs St. Pauli;06/12 15:30;1.9;3.6;3.8;1-1;X;0-0;X;WIN;LOSS;UNDER;NG
+Bundesliga;Magonza vs Bor. M'gladbach;05/12 20:30;2.05;3.6;3.2;0-1;2;1-0;1;LOSS;LOSS;UNDER;NG
+Bundesliga;Stoccarda vs Bayern;06/12 15:30;6.25;4.75;1.44;0-5;2;0-1;2;WIN;LOSS;UNDER;NG
+Bundesliga;Wolfsburg vs Union Berlino;06/12 15:30;2.25;3.5;2.9;3-1;1;0-1;2;LOSS;LOSS;UNDER;NG
+Bundesliga;Augusta vs Leverkusen;06/12 15:30;3.9;3.75;1.83;2-0;1;0-2;2;LOSS;LOSS;UNDER;NG
+Bundesliga;Heidenheim vs Friburgo;06/12 15:30;3.7;3.6;1.91;2-1;1;0-0;X;LOSS;LOSS;UNDER;NG
+Bundesliga;Colonia vs St. Pauli;06/12 15:30;1.9;3.6;3.8;1-1;X;2-0;1;LOSS;LOSS;UNDER;NG
 Bundesliga;Lipsia vs Eintracht;06/12 18:30;1.9;4.0;3.3;6-0;1;1-1;X;LOSS;LOSS;UNDER;GG
-Bundesliga;Amburgo vs Werder Brema;07/12 15:30;2.15;3.6;3.0;3-2;1;0-0;X;LOSS;LOSS;UNDER;NG
-Bundesliga;Dortmund vs Hoffenheim;07/12 17:30;1.55;4.2;5.0;2-0;1;1-2;2;LOSS;LOSS;OVER;GG
-Eredivisie;Excelsior vs FC Groningen;05/12 20:00;-;-;-;0-2;2;0-1;2;WIN;LOSS;UNDER;NG
-Eredivisie;Heerenveen vs PSV;06/12 16:30;-;-;-;0-2;2;1-0;1;LOSS;LOSS;UNDER;NG
-Eredivisie;Fortuna Sittard vs Ajax;06/12 18:45;-;-;-;1-3;2;1-0;1;LOSS;LOSS;UNDER;NG
-Eredivisie;Heracles Almelo vs Telstar;06/12 20:00;-;-;-;1-1;X;1-0;1;LOSS;LOSS;UNDER;NG
-Eredivisie;Feyenoord vs PEC Zwolle;06/12 21:00;-;-;-;6-1;1;4-0;1;WIN;LOSS;OVER;NG
-Eredivisie;FC Utrecht vs FC Twente;07/12 12:15;-;-;-;1-1;X;0-1;2;LOSS;LOSS;UNDER;NG
-Eredivisie;AZ Alkmaar vs Go Ahead Eagles;07/12 14:30;-;-;-;2-2;X;1-0;1;LOSS;LOSS;UNDER;NG
-Eredivisie;FC Volendam vs NEC Nijmegen;07/12 14:30;-;-;-;2-3;2;0-0;X;LOSS;LOSS;UNDER;NG
-Eredivisie;Sparta R. vs NAC Breda;07/12 16:45;-;-;-;1-0;1;0-1;2;LOSS;LOSS;UNDER;NG
-La Liga;Real Oviedo vs RCD Mallorca;05/12 21:00;-;-;-;0-0;X;0-0;X;WIN;WIN;UNDER;NG
-La Liga;Villarreal vs Getafe CF;06/12 14:00;-;-;-;2-0;1;4-0;1;WIN;LOSS;OVER;NG
-La Liga;Alavés vs Real Sociedad;06/12 16:15;-;-;-;1-0;1;0-1;2;LOSS;LOSS;UNDER;NG
-La Liga;Real Betis vs Barcellona;06/12 18:30;4.0;4.1;1.73;3-5;2;1-2;2;WIN;LOSS;OVER;GG
-La Liga;Athletic Club vs Atlético;06/12 21:00;-;-;-;1-0;1;2-0;1;WIN;LOSS;UNDER;NG
-La Liga;Elche vs Girona FC;07/12 14:00;-;-;-;3-0;1;2-0;1;WIN;LOSS;UNDER;NG
-La Liga;Valencia vs Siviglia;07/12 16:15;-;-;-;1-1;X;1-0;1;LOSS;LOSS;UNDER;NG
-La Liga;Espanyol vs Rayo Vallecano;07/12 18:30;2.35;3.1;3.0;1-0;1;2-0;1;WIN;LOSS;UNDER;NG
-La Liga;Real Madrid vs Celta de Vigo;07/12 21:00;-;-;-;0-2;2;3-0;1;LOSS;LOSS;OVER;NG
-La Liga;CA Osasuna vs Levante;08/12 21:00;-;-;-;2-0;1;0-0;X;LOSS;LOSS;UNDER;NG
-Liga Portugal;Benfica vs Sporting;05/12 21:15;-;-;-;1-1;X;3-0;1;LOSS;LOSS;OVER;NG
-Liga Portugal;Santa Clara vs Casa Pia;06/12 16:30;-;-;-;1-0;1;0-1;2;LOSS;LOSS;UNDER;NG
-Liga Portugal;Avs FS vs Rio Ave;06/12 19:00;-;-;-;1-2;2;0-3;2;WIN;LOSS;OVER;NG
-Liga Portugal;Famalicão vs SC Braga;06/12 21:30;-;-;-;1-2;2;0-0;X;LOSS;LOSS;UNDER;NG
-Liga Portugal;Estoril vs Moreirense;07/12 16:30;-;-;-;3-3;X;2-0;1;LOSS;LOSS;UNDER;NG
-Liga Portugal;Alverca vs Nacional;07/12 19:00;-;-;-;1-0;1;1-0;1;WIN;WIN;UNDER;NG
-Liga Portugal;Estrela Amadora vs Arouca;07/12 19:00;-;-;-;3-1;1;0-1;2;LOSS;LOSS;UNDER;NG
-Liga Portugal;Tondela vs FC Porto;07/12 21:30;-;-;-;0-2;2;0-5;2;WIN;LOSS;OVER;NG
-Liga Portugal;Vit. Guimarães vs Gil Vicente;08/12 21:30;-;-;-;0-0;X;0-1;2;LOSS;LOSS;UNDER;NG
-Ligue 1;Brest vs Monaco;05/12 19:00;3.4;3.7;2.0;1-0;1;2-1;1;WIN;LOSS;OVER;GG
+Bundesliga;Amburgo vs Werder Brema;07/12 15:30;2.15;3.6;3.0;3-2;1;0-1;2;LOSS;LOSS;UNDER;NG
+Bundesliga;Dortmund vs Hoffenheim;07/12 17:30;1.55;4.2;5.0;2-0;1;1-1;X;LOSS;LOSS;UNDER;GG
+Bundesliga;Union Berlino vs Lipsia;12/12 20:30;3.4;3.5;2.0;3-1;1;0-1;2;LOSS;LOSS;UNDER;NG
+Bundesliga;Eintracht vs Augusta;13/12 15:30;1.53;4.2;5.75;1-0;1;0-1;2;LOSS;LOSS;UNDER;NG
+Bundesliga;Bor. M'gladbach vs Wolfsburg;13/12 15:30;2.0;3.7;3.3;1-3;2;0-1;2;WIN;LOSS;UNDER;NG
+Bundesliga;St. Pauli vs Heidenheim;13/12 15:30;1.85;3.3;4.2;2-1;1;0-2;2;LOSS;LOSS;UNDER;NG
+Bundesliga;Hoffenheim vs Amburgo;13/12 15:30;1.73;3.9;4.2;4-1;1;1-0;1;WIN;LOSS;UNDER;NG
+Bundesliga;Leverkusen vs Colonia;13/12 18:30;1.45;4.5;6.0;2-0;1;0-0;X;LOSS;LOSS;UNDER;NG
+Eredivisie;Excelsior vs FC Groningen;05/12 20:00;2.75;3.4;2.4;0-2;2;0-1;2;WIN;LOSS;UNDER;NG
+Eredivisie;Heerenveen vs PSV;06/12 16:30;6.25;4.75;1.4;0-2;2;1-0;1;LOSS;LOSS;UNDER;NG
+Eredivisie;Fortuna Sittard vs Ajax;06/12 18:45;4.75;3.9;1.65;1-3;2;0-0;X;LOSS;LOSS;UNDER;NG
+Eredivisie;Heracles Almelo vs Telstar;06/12 20:00;2.1;3.5;3.2;1-1;X;0-0;X;WIN;LOSS;UNDER;NG
+Eredivisie;Feyenoord vs PEC Zwolle;06/12 21:00;1.18;6.5;12.0;6-1;1;4-0;1;WIN;LOSS;OVER;NG
+Eredivisie;FC Utrecht vs FC Twente;07/12 12:15;2.35;3.5;2.75;1-1;X;0-0;X;WIN;LOSS;UNDER;NG
+Eredivisie;AZ Alkmaar vs Go Ahead Eagles;07/12 14:30;1.44;4.4;6.5;2-2;X;1-1;X;WIN;LOSS;UNDER;GG
+Eredivisie;FC Volendam vs NEC Nijmegen;07/12 14:30;3.6;3.9;1.85;2-3;2;0-0;X;LOSS;LOSS;UNDER;NG
+Eredivisie;Sparta R. vs NAC Breda;07/12 16:45;1.83;3.75;3.8;1-0;1;0-0;X;LOSS;LOSS;UNDER;NG
+Eredivisie;Telstar vs NEC Nijmegen;13/12 16:30;4.2;4.1;1.7;2-2;X;1-1;X;WIN;LOSS;UNDER;GG
+La Liga;Real Oviedo vs RCD Mallorca;05/12 21:00;2.35;3.0;3.2;0-0;X;0-0;X;WIN;WIN;UNDER;NG
+La Liga;Villarreal vs Getafe CF;06/12 14:00;1.53;3.75;6.5;2-0;1;2-0;1;WIN;WIN;UNDER;NG
+La Liga;Alavés vs Real Sociedad;06/12 16:15;2.8;3.0;2.55;1-0;1;0-1;2;LOSS;LOSS;UNDER;NG
+La Liga;Real Betis vs Barcellona;06/12 18:30;4.0;4.1;1.73;3-5;2;0-2;2;WIN;LOSS;UNDER;NG
+La Liga;Athletic Club vs Atlético;06/12 21:00;3.7;3.25;2.05;1-0;1;0-0;X;LOSS;LOSS;UNDER;NG
+La Liga;Elche vs Girona FC;07/12 14:00;2.25;3.2;3.25;3-0;1;1-0;1;WIN;LOSS;UNDER;NG
+La Liga;Valencia vs Siviglia;07/12 16:15;2.2;3.2;3.2;1-1;X;1-0;1;LOSS;LOSS;UNDER;NG
+La Liga;Espanyol vs Rayo Vallecano;07/12 18:30;2.35;3.1;3.0;1-0;1;2-1;1;WIN;LOSS;OVER;GG
+La Liga;Real Madrid vs Celta de Vigo;07/12 21:00;1.25;6.0;9.0;0-2;2;3-0;1;LOSS;LOSS;OVER;NG
+La Liga;CA Osasuna vs Levante;08/12 21:00;1.8;3.4;4.5;2-0;1;0-1;2;LOSS;LOSS;UNDER;NG
+La Liga;Real Sociedad vs Girona FC;12/12 21:00;1.7;3.6;5.0;1-2;2;1-0;1;LOSS;LOSS;UNDER;NG
+Liga Portugal;Benfica vs Sporting;05/12 21:15;2.55;3.3;2.55;1-1;X;4-0;1;LOSS;LOSS;OVER;NG
+Liga Portugal;Santa Clara vs Casa Pia;06/12 16:30;1.95;3.0;4.75;1-0;1;1-0;1;WIN;WIN;UNDER;NG
+Liga Portugal;Avs FS vs Rio Ave;06/12 19:00;2.9;3.2;2.38;1-2;2;0-2;2;WIN;LOSS;UNDER;NG
+Liga Portugal;Famalicão vs SC Braga;06/12 21:30;3.1;3.3;2.25;1-2;2;0-0;X;LOSS;LOSS;UNDER;NG
+Liga Portugal;Estoril vs Moreirense;07/12 16:30;1.91;3.3;3.9;3-3;X;1-0;1;LOSS;LOSS;UNDER;NG
+Liga Portugal;Alverca vs Nacional;07/12 19:00;2.3;3.25;3.1;1-0;1;0-0;X;LOSS;LOSS;UNDER;NG
+Liga Portugal;Estrela Amadora vs Arouca;07/12 19:00;2.38;3.2;2.9;3-1;1;0-0;X;LOSS;LOSS;UNDER;NG
+Liga Portugal;Tondela vs FC Porto;07/12 21:30;10.0;4.75;1.29;0-2;2;0-2;2;WIN;WIN;UNDER;NG
+Liga Portugal;Vit. Guimarães vs Gil Vicente;08/12 21:30;2.5;3.1;2.88;0-0;X;0-2;2;LOSS;LOSS;UNDER;NG
+Liga Portugal;Casa Pia vs Gil Vicente;13/12 16:30;3.75;3.1;2.1;1-1;X;0-1;2;LOSS;LOSS;UNDER;NG
+Ligue 1;Brest vs Monaco;05/12 19:00;3.4;3.7;2.0;1-0;1;1-1;X;LOSS;LOSS;UNDER;GG
 Ligue 1;Lille vs Marsiglia;05/12 21:00;2.4;3.5;2.7;1-0;1;1-1;X;LOSS;LOSS;UNDER;GG
-Ligue 1;FC Nantes vs Lens;06/12 17:00;-;-;-;1-2;2;0-4;2;WIN;LOSS;OVER;NG
+Ligue 1;FC Nantes vs Lens;06/12 17:00;5.0;3.7;1.67;1-2;2;0-3;2;WIN;LOSS;OVER;NG
 Ligue 1;Tolosa vs Strasburgo;06/12 19:00;2.3;3.4;3.0;1-0;1;1-1;X;LOSS;LOSS;UNDER;GG
-Ligue 1;PSG vs Stade Rennes;06/12 21:05;-;-;-;5-0;1;2-0;1;WIN;LOSS;UNDER;NG
-Ligue 1;Nizza vs Angers SCO;07/12 15:00;-;-;-;0-1;2;1-0;1;LOSS;LOSS;UNDER;NG
-Ligue 1;Le Havre vs Paris FC;07/12 17:15;2.88;3.3;2.3;0-0;X;0-2;2;LOSS;LOSS;UNDER;NG
-Ligue 1;AJ Auxerre vs Metz;07/12 17:15;2.0;3.4;3.5;3-1;1;0-2;2;LOSS;LOSS;UNDER;NG
-Ligue 1;Lorient vs Olymp. Lione;07/12 20:45;-;-;-;1-0;1;2-0;1;WIN;LOSS;UNDER;NG
-Premier League;Aston Villa vs Arsenal;06/12 13:30;4.33;3.5;1.8;2-1;1;1-1;X;LOSS;LOSS;UNDER;GG
-Premier League;Bournemouth vs Chelsea;06/12 16:00;2.9;3.5;2.25;0-0;X;0-1;2;LOSS;LOSS;UNDER;NG
-Premier League;Everton vs Nott'm Forest;06/12 16:00;-;-;-;3-0;1;3-0;1;WIN;WIN;OVER;NG
-Premier League;Man City vs Sunderland;06/12 16:00;-;-;-;3-0;1;0-0;X;LOSS;LOSS;UNDER;NG
-Premier League;Newcastle vs Burnley;06/12 16:00;1.27;5.0;11.0;2-1;1;0-1;2;LOSS;LOSS;UNDER;NG
-Premier League;Tottenham vs Brentford;06/12 16:00;2.05;3.5;3.4;2-0;1;1-0;1;WIN;LOSS;UNDER;NG
+Ligue 1;PSG vs Stade Rennes;06/12 21:05;1.25;5.5;10.0;5-0;1;4-0;1;WIN;LOSS;OVER;NG
+Ligue 1;Nizza vs Angers SCO;07/12 15:00;1.62;3.7;5.25;0-1;2;2-0;1;LOSS;LOSS;UNDER;NG
+Ligue 1;Le Havre vs Paris FC;07/12 17:15;2.88;3.3;2.3;0-0;X;1-0;1;LOSS;LOSS;UNDER;NG
+Ligue 1;AJ Auxerre vs Metz;07/12 17:15;2.0;3.4;3.5;3-1;1;0-1;2;LOSS;LOSS;UNDER;NG
+Ligue 1;Lorient vs Olymp. Lione;07/12 20:45;3.6;3.4;2.0;1-0;1;1-0;1;WIN;WIN;UNDER;NG
+Ligue 1;Angers SCO vs FC Nantes;12/12 20:45;2.3;3.1;3.1;4-1;1;0-0;X;LOSS;LOSS;UNDER;NG
+Ligue 1;Stade Rennes vs Brest;13/12 17:00;1.83;3.6;4.0;3-1;1;0-1;2;LOSS;LOSS;UNDER;NG
+Premier League;Aston Villa vs Arsenal;06/12 13:30;4.33;3.5;1.8;2-1;1;1-0;1;WIN;LOSS;UNDER;NG
+Premier League;Bournemouth vs Chelsea;06/12 16:00;2.9;3.5;2.25;0-0;X;0-2;2;LOSS;LOSS;UNDER;NG
+Premier League;Everton vs Nott'm Forest;06/12 16:00;2.05;3.25;3.5;3-0;1;2-0;1;WIN;LOSS;UNDER;NG
+Premier League;Man City vs Sunderland;06/12 16:00;1.25;5.5;11.0;3-0;1;0-1;2;LOSS;LOSS;UNDER;NG
+Premier League;Newcastle vs Burnley;06/12 16:00;1.27;5.0;11.0;2-1;1;0-2;2;LOSS;LOSS;UNDER;NG
+Premier League;Tottenham vs Brentford;06/12 16:00;2.05;3.5;3.4;2-0;1;0-0;X;LOSS;LOSS;UNDER;NG
 Premier League;Leeds vs Liverpool;06/12 18:30;4.33;3.75;1.73;3-3;X;0-1;2;LOSS;LOSS;UNDER;NG
-Premier League;Brighton vs West Ham Utd.;07/12 15:00;-;-;-;1-1;X;2-0;1;LOSS;LOSS;UNDER;NG
-Premier League;FC Fulham vs Crystal Palace;07/12 17:30;-;-;-;1-2;2;0-1;2;WIN;LOSS;UNDER;NG
-Premier League;Wolverhampton vs Manchester Utd.;08/12 21:00;-;-;-;1-4;2;0-0;X;LOSS;LOSS;UNDER;NG
-Serie A;Sassuolo vs Fiorentina;06/12 15:00;2.55;3.2;2.7;3-1;1;1-0;1;WIN;LOSS;UNDER;NG
-Serie A;Inter vs Como;06/12 18:00;1.44;4.1;7.0;4-0;1;2-1;1;WIN;LOSS;OVER;GG
-Serie A;Verona vs Atalanta;06/12 20:45;5.0;3.5;1.75;3-1;1;0-1;2;LOSS;LOSS;UNDER;NG
-Serie A;Cremonese vs Lecce;07/12 12:30;2.25;3.0;3.3;2-0;1;0-1;2;LOSS;LOSS;UNDER;NG
-Serie A;Cagliari vs Roma;07/12 15:00;5.5;3.3;1.7;1-0;1;0-0;X;LOSS;LOSS;UNDER;NG
+Premier League;Brighton vs West Ham Utd.;07/12 15:00;1.57;4.0;5.25;1-1;X;1-0;1;LOSS;LOSS;UNDER;NG
+Premier League;FC Fulham vs Crystal Palace;07/12 17:30;2.6;3.25;2.6;1-2;2;0-1;2;WIN;LOSS;UNDER;NG
+Premier League;Wolverhampton vs Manchester Utd.;08/12 21:00;4.75;3.7;1.67;1-4;2;0-0;X;LOSS;LOSS;UNDER;NG
+Premier League;Chelsea vs Everton;13/12 16:00;1.6;3.75;5.5;2-0;1;0-0;X;LOSS;LOSS;UNDER;NG
+Premier League;Liverpool vs Brighton;13/12 16:00;1.7;3.9;4.33;2-0;1;1-2;2;LOSS;LOSS;OVER;GG
+Serie A;Sassuolo vs Fiorentina;06/12 15:00;2.55;3.2;2.7;3-1;1;2-0;1;WIN;LOSS;UNDER;NG
+Serie A;Inter vs Como;06/12 18:00;1.44;4.1;7.0;4-0;1;2-0;1;WIN;LOSS;UNDER;NG
+Serie A;Verona vs Atalanta;06/12 20:45;5.0;3.5;1.75;3-1;1;0-2;2;LOSS;LOSS;UNDER;NG
+Serie A;Cremonese vs Lecce;07/12 12:30;2.25;3.0;3.3;2-0;1;1-0;1;WIN;LOSS;UNDER;NG
+Serie A;Cagliari vs Roma;07/12 15:00;5.5;3.3;1.7;1-0;1;1-0;1;WIN;WIN;UNDER;NG
 Serie A;Lazio vs Bologna;07/12 18:00;2.8;3.0;2.6;1-1;X;2-2;X;WIN;LOSS;OVER;GG
-Serie A;Napoli vs Juventus;07/12 20:45;2.3;3.1;3.1;2-1;1;3-0;1;WIN;LOSS;OVER;NG
-Serie A;Pisa vs Parma;08/12 15:00;2.4;3.0;3.1;0-1;2;0-1;2;WIN;WIN;UNDER;NG
-Serie A;Udinese vs Genoa;08/12 18:00;2.2;3.0;3.5;1-2;2;0-3;2;WIN;LOSS;OVER;NG
-Serie A;Torino vs Milan;08/12 20:45;5.0;3.4;1.73;2-3;2;2-0;1;LOSS;LOSS;UNDER;NG
-Serie B;Empoli vs Palermo;07/12 17:15;3.05;3.2;2.25;1-3;2;2-0;1;LOSS;LOSS;UNDER;NG
-Serie B;Sampdoria vs Carrarese;07/12 19:30;2.1;3.2;3.5;3-2;1;1-0;1;WIN;LOSS;UNDER;NG
-Serie B;Modena vs Catanzaro;08/12 12:30;1.68;3.5;5.0;1-2;2;1-2;2;WIN;WIN;OVER;GG
-Serie B;Avellino vs Venezia;08/12 15:00;4.1;3.6;1.79;1-1;X;1-2;2;LOSS;LOSS;OVER;GG
-Serie B;Frosinone vs Juve Stabia;08/12 15:00;1.86;3.3;3.9;3-0;1;2-1;1;WIN;LOSS;OVER;GG
+Serie A;Napoli vs Juventus;07/12 20:45;2.3;3.1;3.1;2-1;1;2-1;1;WIN;WIN;OVER;GG
+Serie A;Pisa vs Parma;08/12 15:00;2.4;3.0;3.1;0-1;2;0-0;X;LOSS;LOSS;UNDER;NG
+Serie A;Udinese vs Genoa;08/12 18:00;2.2;3.0;3.5;1-2;2;1-3;2;WIN;LOSS;OVER;GG
+Serie A;Torino vs Milan;08/12 20:45;5.0;3.4;1.73;2-3;2;0-0;X;LOSS;LOSS;UNDER;NG
+Serie A;Lecce vs Pisa;12/12 20:45;2.2;3.0;3.5;1-0;1;0-0;X;LOSS;LOSS;UNDER;NG
+Serie A;Torino vs Cremonese;13/12 15:00;1.9;3.3;4.1;1-0;1;0-1;2;LOSS;LOSS;UNDER;NG
+Serie A;Parma vs Lazio;13/12 18:00;3.75;3.25;2.0;0-1;2;1-0;1;LOSS;LOSS;UNDER;NG
+Serie B;Empoli vs Palermo;07/12 17:15;3.05;3.2;2.25;1-3;2;2-1;1;LOSS;LOSS;OVER;GG
+Serie B;Sampdoria vs Carrarese;07/12 19:30;2.1;3.2;3.5;3-2;1;0-0;X;LOSS;LOSS;UNDER;NG
+Serie B;Modena vs Catanzaro;08/12 12:30;1.68;3.5;5.0;1-2;2;1-1;X;LOSS;LOSS;UNDER;GG
+Serie B;Avellino vs Venezia;08/12 15:00;4.1;3.6;1.79;1-1;X;0-2;2;LOSS;LOSS;UNDER;NG
+Serie B;Frosinone vs Juve Stabia;08/12 15:00;1.86;3.3;3.9;3-0;1;3-1;1;WIN;LOSS;OVER;GG
 Serie B;Mantova vs Reggiana;08/12 15:00;1.96;3.4;3.75;0-1;2;1-2;2;WIN;LOSS;OVER;GG
-Serie B;Monza vs Südtirol;08/12 15:00;-;-;-;1-1;X;1-0;1;LOSS;LOSS;UNDER;NG
+Serie B;Monza vs Südtirol;08/12 15:00;1.51;3.75;6.5;1-1;X;2-0;1;LOSS;LOSS;UNDER;NG
 Serie B;Padova vs Cesena;08/12 15:00;3.25;2.95;2.32;1-1;X;0-2;2;LOSS;LOSS;UNDER;NG
-Serie B;Bari vs Pescara;08/12 17:15;1.68;3.4;4.5;1-1;X;0-1;2;LOSS;LOSS;UNDER;NG
+Serie B;Bari vs Pescara;08/12 17:15;1.68;3.4;4.5;1-1;X;0-0;X;WIN;LOSS;UNDER;NG
 Serie B;Virtus Entella vs Spezia;08/12 19:30;2.35;3.1;3.2;0-1;2;0-2;2;WIN;LOSS;UNDER;NG
-Serie C - Girone A;Trento vs Cittadella;05/12 20:30;2.8;3.0;2.35;1-0;1;1-1;X;LOSS;LOSS;UNDER;GG
+Serie B;Palermo vs Sampdoria;12/12 20:30;1.62;3.4;5.25;1-0;1;3-0;1;WIN;LOSS;OVER;NG
+Serie B;Juve Stabia vs Empoli;13/12 15:00;2.1;3.05;3.4;2-0;1;0-1;2;LOSS;LOSS;UNDER;NG
+Serie B;Reggiana vs Padova;13/12 15:00;2.3;3.05;2.95;1-2;2;0-1;2;WIN;LOSS;UNDER;NG
+Serie B;Spezia vs Modena;13/12 15:00;3.2;3.05;2.2;0-2;2;0-1;2;WIN;LOSS;UNDER;NG
+Serie B;Südtirol vs Bari;13/12 15:00;1.91;3.25;3.8;0-0;X;0-2;2;LOSS;LOSS;UNDER;NG
+Serie B;Venezia vs Monza;13/12 15:00;2.32;3.05;2.95;2-0;1;2-1;1;WIN;LOSS;OVER;GG
+Serie B;Catanzaro vs Avellino;13/12 17:15;1.79;3.4;4.1;1-0;1;2-1;1;WIN;LOSS;OVER;GG
+Serie C - Girone A;Trento vs Cittadella;05/12 20:30;2.8;3.0;2.35;1-0;1;0-1;2;LOSS;LOSS;UNDER;NG
 Serie C - Girone A;Pro Vercelli vs Renate;06/12 14:30;2.15;2.88;3.3;1-1;X;0-1;2;LOSS;LOSS;UNDER;NG
 Serie C - Girone A;Arzignano vs Inter U23;07/12 12:30;2.9;3.1;2.25;1-1;X;1-2;2;LOSS;LOSS;OVER;GG
 Serie C - Girone A;Novara vs Vicenza;07/12 14:30;4.5;3.1;1.75;2-2;X;1-0;1;LOSS;LOSS;UNDER;NG
-Serie C - Girone A;Union Brescia vs Lumezzane;07/12 14:30;1.44;3.6;7.0;0-1;2;0-0;X;LOSS;LOSS;UNDER;NG
-Serie C - Girone A;Pro Patria vs Dolomiti;07/12 17:30;2.38;2.9;2.88;0-2;2;0-0;X;LOSS;LOSS;UNDER;NG
-Serie C - Girone A;AlbinoLeffe vs Ospitaletto;08/12 14:30;2.0;3.0;3.5;1-1;X;1-0;1;LOSS;LOSS;UNDER;NG
-Serie C - Girone A;Lecco vs Alcione;08/12 14:30;2.15;2.88;3.3;1-0;1;1-1;X;LOSS;LOSS;UNDER;GG
-Serie C - Girone A;Virtus Verona vs Pergolettese;08/12 14:30;2.15;3.0;3.1;1-1;X;0-1;2;LOSS;LOSS;UNDER;NG
-Serie C - Girone A;Giana Erminio vs Triestina;08/12 15:00;2.3;2.9;3.0;2-1;1;1-0;1;WIN;LOSS;UNDER;NG
-Serie C - Girone B;Livorno vs Arezzo;06/12 14:30;4.0;3.2;1.8;2-1;1;0-3;2;LOSS;LOSS;OVER;NG
-Serie C - Girone B;Pianese vs Gubbio;06/12 14:30;2.88;2.9;2.38;1-0;1;2-0;1;WIN;LOSS;UNDER;NG
-Serie C - Girone B;Bra vs Campobasso;06/12 17:30;3.0;3.1;2.2;2-0;1;1-1;X;LOSS;LOSS;UNDER;GG
-Serie C - Girone B;Guidonia vs Juve Next Gen;07/12 12:30;-;-;-;1-1;X;0-0;X;WIN;LOSS;UNDER;NG
-Serie C - Girone B;Perugia vs Ternana;07/12 14:30;2.5;2.88;2.75;1-2;2;0-0;X;LOSS;LOSS;UNDER;NG
-Serie C - Girone B;Torres vs Pineto;07/12 14:30;2.5;2.88;2.75;1-1;X;0-1;2;LOSS;LOSS;UNDER;NG
-Serie C - Girone B;Ravenna vs Pontedera;07/12 17:30;1.53;3.6;5.5;2-1;1;3-0;1;WIN;LOSS;OVER;NG
-Serie C - Girone B;Ascoli vs Forlì;08/12 14:30;-;-;-;3-0;1;1-0;1;WIN;LOSS;UNDER;NG
-Serie C - Girone B;Carpi vs Vis Pesaro;08/12 14:30;2.3;2.9;3.0;1-1;X;0-0;X;WIN;LOSS;UNDER;NG
-Serie C - Girone C;Catania vs Crotone;05/12 20:30;1.83;3.1;4.0;2-0;1;2-1;1;WIN;LOSS;OVER;GG
+Serie C - Girone A;Union Brescia vs Lumezzane;07/12 14:30;1.44;3.6;7.0;0-1;2;0-1;2;WIN;WIN;UNDER;NG
+Serie C - Girone A;Pro Patria vs Dolomiti;07/12 17:30;2.38;2.9;2.88;0-2;2;1-0;1;LOSS;LOSS;UNDER;NG
+Serie C - Girone A;AlbinoLeffe vs Ospitaletto;08/12 14:30;2.0;3.0;3.5;1-1;X;1-1;X;WIN;WIN;UNDER;GG
+Serie C - Girone A;Lecco vs Alcione;08/12 14:30;2.15;2.88;3.3;1-0;1;2-0;1;WIN;LOSS;UNDER;NG
+Serie C - Girone A;Virtus Verona vs Pergolettese;08/12 14:30;2.15;3.0;3.1;1-1;X;0-0;X;WIN;LOSS;UNDER;NG
+Serie C - Girone A;Giana Erminio vs Triestina;08/12 15:00;2.3;2.9;3.0;2-1;1;0-0;X;LOSS;LOSS;UNDER;NG
+Serie C - Girone A;Lumezzane vs Lecco;13/12 14:30;2.55;3.0;2.55;1-1;X;2-0;1;LOSS;LOSS;UNDER;NG
+Serie C - Girone B;Livorno vs Arezzo;06/12 14:30;4.0;3.2;1.8;2-1;1;0-4;2;LOSS;LOSS;OVER;NG
+Serie C - Girone B;Pianese vs Gubbio;06/12 14:30;2.88;2.9;2.38;1-0;1;0-0;X;LOSS;LOSS;UNDER;NG
+Serie C - Girone B;Bra vs Campobasso;06/12 17:30;3.0;3.1;2.2;2-0;1;0-1;2;LOSS;LOSS;UNDER;NG
+Serie C - Girone B;Guidonia vs Juve Next Gen;07/12 12:30;2.05;3.0;3.3;1-1;X;0-0;X;WIN;LOSS;UNDER;NG
+Serie C - Girone B;Perugia vs Ternana;07/12 14:30;2.5;2.88;2.75;1-2;2;1-0;1;LOSS;LOSS;UNDER;NG
+Serie C - Girone B;Torres vs Pineto;07/12 14:30;2.5;2.88;2.75;1-1;X;0-0;X;WIN;LOSS;UNDER;NG
+Serie C - Girone B;Ravenna vs Pontedera;07/12 17:30;1.53;3.6;5.5;2-1;1;2-0;1;WIN;LOSS;UNDER;NG
+Serie C - Girone B;Ascoli vs Forlì;08/12 14:30;1.6;3.3;5.25;3-0;1;4-0;1;WIN;LOSS;OVER;NG
+Serie C - Girone B;Carpi vs Vis Pesaro;08/12 14:30;2.3;2.9;3.0;1-1;X;0-1;2;LOSS;LOSS;UNDER;NG
+Serie C - Girone B;Juve Next Gen vs Pianese;12/12 20:30;2.1;3.1;3.2;0-0;X;0-1;2;LOSS;LOSS;UNDER;NG
+Serie C - Girone C;Catania vs Crotone;05/12 20:30;1.83;3.1;4.0;2-0;1;1-1;X;LOSS;LOSS;UNDER;GG
 Serie C - Girone C;Casarano vs Latina;06/12 14:30;1.83;3.25;3.9;1-1;X;0-0;X;WIN;LOSS;UNDER;NG
-Serie C - Girone C;Siracusa vs Foggia;06/12 14:30;1.73;3.4;4.2;2-2;X;1-1;X;WIN;LOSS;UNDER;GG
-Serie C - Girone C;Sorrento vs Potenza;06/12 14:30;2.63;3.2;2.38;2-2;X;1-2;2;LOSS;LOSS;OVER;GG
-Serie C - Girone C;Giugliano vs Team Altamura;06/12 17:30;1.95;3.25;3.4;0-1;2;1-0;1;LOSS;LOSS;UNDER;NG
-Serie C - Girone C;Monopoli vs Atalanta U23;07/12 14:30;2.3;3.2;2.75;1-1;X;0-0;X;WIN;LOSS;UNDER;NG
-Serie C - Girone C;Salernitana vs Trapani;07/12 14:30;1.75;3.3;4.1;1-1;X;1-0;1;LOSS;LOSS;UNDER;NG
-Serie C - Girone C;Cerignola vs Casertana;07/12 17:30;1.9;3.1;3.7;1-1;X;0-3;2;LOSS;LOSS;OVER;NG
-Serie C - Girone C;Cavese vs Benevento;07/12 17:30;4.33;3.3;1.75;0-1;2;0-3;2;WIN;LOSS;OVER;NG
+Serie C - Girone C;Siracusa vs Foggia;06/12 14:30;1.73;3.4;4.2;2-2;X;0-0;X;WIN;LOSS;UNDER;NG
+Serie C - Girone C;Sorrento vs Potenza;06/12 14:30;2.63;3.2;2.38;2-2;X;0-2;2;LOSS;LOSS;UNDER;NG
+Serie C - Girone C;Giugliano vs Team Altamura;06/12 17:30;1.95;3.25;3.4;0-1;2;2-0;1;LOSS;LOSS;UNDER;NG
+Serie C - Girone C;Monopoli vs Atalanta U23;07/12 14:30;2.3;3.2;2.75;1-1;X;1-0;1;LOSS;LOSS;UNDER;NG
+Serie C - Girone C;Salernitana vs Trapani;07/12 14:30;1.75;3.3;4.1;1-1;X;0-0;X;WIN;LOSS;UNDER;NG
+Serie C - Girone C;Cerignola vs Casertana;07/12 17:30;1.9;3.1;3.7;1-1;X;0-2;2;LOSS;LOSS;UNDER;NG
+Serie C - Girone C;Cavese vs Benevento;07/12 17:30;4.33;3.3;1.75;0-1;2;0-2;2;WIN;LOSS;UNDER;NG
 Serie C - Girone C;Cosenza vs Picerno;07/12 17:30;1.44;3.8;6.5;1-0;1;3-1;1;WIN;LOSS;OVER;GG
 "--- PERCENTUALI ---
-(Su partite finite)";;;;;;;;41.9%;4.8%;;59.0%;;41.9%
+(Su partite finite)";;;;;;;;40.0%;6.9%;;58.5%;;45.4%
 

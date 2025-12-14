@@ -151,9 +151,53 @@ def calculate_base_goals(league_name):
     base_value = ((avg_team / 10) * 2) + (avg_team / 10)
     return round(base_value, 4), avg_total
 
-def get_team_data(db_conn, team_name):
+def get_identity_card(db_conn, input_name):
+    """
+    Risolve l'identità della squadra cercando nel DB Teams.
+    Restituisce un dizionario 'Passaporto' con:
+    - official_name: Nome nel DB Teams (es. 'AC Milan')
+    - aliases: Lista alias (es. ['Milan', 'Milan AC'])
+    - input_name: Il nome usato dall'utente
+    """
+    if db_conn is None: return {"official_name": input_name, "aliases": [], "input_name": input_name}
+    
+    # 1. Cerca per nome esatto (Case insensitive) o Alias
+    try:
+        query = {
+            "$or": [
+                {"name": {"$regex":f"^{input_name}$", "$options": "i"}},
+                {"aliases": {"$regex":f"^{input_name}$", "$options": "i"}}
+            ]
+        }
+        doc = db_conn.teams.find_one(query)
+        
+        if doc:
+            return {
+                "official_name": doc.get("name"),
+                "aliases": doc.get("aliases", []),
+                "input_name": input_name
+            }
+    except Exception as e:
+        print(f"⚠️ Errore ricerca identità {input_name}: {e}")
+    
+    # Fallback: Nessuna corrispondenza trovata
+    return {"official_name": input_name, "aliases": [], "input_name": input_name}
+
+
+def get_team_data(db_conn, team_identity):
+    """
+    Recupera i dati tecnici (stats, scores) usando l'identità risolta.
+    team_identity può essere una stringa (vecchio modo) o un dict (nuovo ID Card).
+    """
     if db_conn is None: return {}
-    team = db_conn.teams.find_one({"name": team_name})
+    
+    # Retro-compatibilità: se passiamo solo il nome stringa
+    target_name = team_identity
+    if isinstance(team_identity, dict):
+        target_name = team_identity.get("official_name")
+        
+    team = db_conn.teams.find_one({"name": target_name})
+    
     if not team: return {}
     
     data = team.get("scores", {})
@@ -162,7 +206,11 @@ def get_team_data(db_conn, team_name):
     data['motivation'] = stats.get("motivation", 10.0)
     data['strength_score'] = stats.get("strengthScore09", 5.0)
     
+    # Recuperiamo anche Rating se salvato
+    data['rating_stored'] = team.get('rating_5_25', None) 
+    
     return data
+
 
 def get_h2h_data_from_db(db_conn, home_team, away_team):
     if db_conn is None: return 0, 0, "Nessun Dato", {}
@@ -315,13 +363,20 @@ def predict_match(home_team, away_team, mode=ALGO_MODE, preloaded_data=None):
     NUOVO PARAMETRO: preloaded_data
     Se passato, SALTA il caricamento DB e usa i dati pronti.
     """
-    
-    # Se non siamo in modalità silenziosa, stampiamo info
+    # --- 1. RISOLUZIONE IDENTITÀ (FIX NOMI) ---
+    # Creiamo subito i 'passaporti' corretti per le squadre
+    h_id = get_identity_card(db, home_team)
+    a_id = get_identity_card(db, away_team)
+
     if not preloaded_data:
         print(f"\n🤖 [ENGINE] Analisi: {home_team} vs {away_team}")
-        print(f"⚙️  Algoritmo: {ALGO_NAMES.get(mode, mode)}")
+        print(f"⚙️ Algoritmo: {ALGO_NAMES.get(mode, mode)}")
+        # Avviso se abbiamo corretto il nome
+        if h_id['official_name'] != home_team: 
+            print(f"   🔍 Identità Risolta: '{home_team}' -> '{h_id['official_name']}'")
+        if a_id['official_name'] != away_team: 
+            print(f"   🔍 Identità Risolta: '{away_team}' -> '{a_id['official_name']}'")
 
-    # --- 1. CARICAMENTO DATI (O USO PRELOAD) ---
     if preloaded_data:
         # FAST TRACK ⚡ (Usiamo i dati passati da fuori)
         home_raw = preloaded_data['home_raw']
@@ -329,22 +384,36 @@ def predict_match(home_team, away_team, mode=ALGO_MODE, preloaded_data=None):
         h2h_h = preloaded_data['h2h_h']
         h2h_a = preloaded_data['h2h_a']
         base_val = preloaded_data['base_val']
+        # Per compatibilità, definiamo H_OFF anche qui (anche se non usati in fast track)
+        H_OFF, A_OFF = h_id['official_name'], a_id['official_name']
     else:
         # SLOW TRACK 🐢 (Caricamento classico dal DB)
         if db is None:
             print("❌ DB non connesso.")
             return
 
-        match = db.matches.find_one({"home_team": home_team, "away_team": away_team})
+        # Definiamo i NOMI UFFICIALI da usare per le ricerche
+        H_OFF = h_id['official_name']
+        A_OFF = a_id['official_name']
+
+        # Cerchiamo il match usando i nomi ufficiali
+        match = db.matches.find_one({"home_team": H_OFF, "away_team": A_OFF})
+        # Tentativo di fallback col nome originale se fallisce
+        if not match: match = db.matches.find_one({"home_team": home_team, "away_team": away_team})
+        
         competition = match.get("competition", "Sconosciuto") if match else "Sconosciuto"
         base_val, _ = calculate_base_goals(competition)
+
+        # Recupero Dati Interni (Passiamo il passaporto intero)
+        h_data = get_team_data(db, h_id)
+        a_data = get_team_data(db, a_id)
+
+        # Rating Live (Usa NOME UFFICIALE)
+        h_rating_val, h_rating_full = get_dynamic_rating(H_OFF)
+        a_rating_val, a_rating_full = get_dynamic_rating(A_OFF)
         
-        h_data = get_team_data(db, home_team)
-        a_data = get_team_data(db, away_team)
-        
-        # Rating Live
-        h_rating_val, h_rating_full = get_dynamic_rating(home_team)
-        a_rating_val, a_rating_full = get_dynamic_rating(away_team)
+    if not preloaded_data:
+
 
         # Salvataggio Flash Cache (Solo in slow track)
         def clean_roster(team_data_full):
@@ -369,24 +438,25 @@ def predict_match(home_team, away_team, mode=ALGO_MODE, preloaded_data=None):
         except Exception as e:
             print(f"⚠️ Errore salvataggio Flash: {e}")
 
-        # Calcoli Extra Librerie
+                # Calcoli Extra Librerie (Usa NOMI UFFICIALI H_OFF/A_OFF)
         if reliability_lib:
-            h_rel = reliability_lib.calculate_reliability(home_team)
-            a_rel = reliability_lib.calculate_reliability(away_team)
+            h_rel = reliability_lib.calculate_reliability(H_OFF)
+            a_rel = reliability_lib.calculate_reliability(A_OFF)
         else: h_rel, a_rel = 5.0, 5.0
 
         if bvs_lib:
-            h_bvs, a_bvs = bvs_lib.get_bvs_score(home_team, away_team)
+            h_bvs, a_bvs = bvs_lib.get_bvs_score(H_OFF, A_OFF)
         else: h_bvs, a_bvs = 0.0, 0.0
-            
+
         if field_lib:
-            h_field, a_field = field_lib.calculate_field_factor(home_team, away_team, competition)
+            h_field, a_field = field_lib.calculate_field_factor(H_OFF, A_OFF, competition)
         else: h_field, a_field = 3.5, 3.5
 
         if lucifero_lib:
-            h_luc = lucifero_lib.get_lucifero_score(home_team)
-            a_luc = lucifero_lib.get_lucifero_score(away_team)
+            h_luc = lucifero_lib.get_lucifero_score(H_OFF)
+            a_luc = lucifero_lib.get_lucifero_score(A_OFF)
         else: h_luc, a_luc = 0.0, 0.0
+
 
         # Creazione Strutture RAW
         home_raw = {
@@ -424,7 +494,8 @@ def predict_match(home_team, away_team, mode=ALGO_MODE, preloaded_data=None):
         print(f"🔥 Lucifero:     {home_team}={h_luc:.2f} | {away_team}={a_luc:.2f}")
         print(f"🔮 BVS Bonus:    {home_team}={h_bvs:+} | {away_team}={a_bvs:+}")
 
-        h2h_h, h2h_a, h2h_msg, h2h_extra = get_h2h_data_from_db(db, home_team, away_team)
+        h2h_h, h2h_a, h2h_msg, h2h_extra = get_h2h_data_from_db(db, H_OFF, A_OFF)
+
         print(f"📜 H2H Info: {h2h_msg} [Bonus: {h2h_h:.2f} - {h2h_a:.2f}]")
         
         home_raw['h2h_avg_goals'] = h2h_extra.get('avg_goals_home', 1.2)
@@ -506,13 +577,80 @@ def preload_match_data(home_team, away_team):
         'base_val': base_val
     }
 
+# --- AREA TEST ESECUZIONE DIRETTA ---
 if __name__ == "__main__":
-    print("\n--- TEST MOTORE V9 (FULL) ---")
+    print("\n--- ⚽ ENGINE CORE V9 - TEST MODE ---")
+    print("1-5: Algoritmi Singoli")
+    print("6:  SIMULAZIONE MONTE CARLO (500 match RAPIDO)")
+    
     try:
-        choice = input("Scegli Algoritmo (1-5): ").strip()
-        mode = int(choice)
-        if mode < 1 or mode > 5: mode = 5
+        raw_input = input("Scegli Opzione (1-6): ").strip()
+        mode = int(raw_input)
     except ValueError:
         mode = 5
 
-    predict_match("Torino", "Napoli", mode=mode)
+    home = "Milan"
+    away = "Inter"
+
+    if mode == 6:
+        print(f"\n🎲 AVVIO MONTE CARLO: {home} vs {away}")
+        print("⏳ Pre-caricamento dati...")
+        
+        try:
+            static_data = preload_match_data(home, away)
+        except Exception as e:
+            print(f"❌ Errore preload: {e}")
+            exit()
+        
+        simulations = 500  # ← RIDOTTO per test veloce
+        
+        results_h = []
+        results_a = []
+        wins_h = wins_a = draws = 0
+        
+        # ✅ BARRA + TRY/EXCEPT + NO DEBUG SPAM
+        print(f"🚀 {simulations} simulazioni...")
+        for i in range(simulations):
+            try:
+                s_h, s_a, _, _ = predict_match(home, away, mode=5, preloaded_data=static_data)
+                if s_h is None: continue
+                
+                results_h.append(s_h)
+                results_a.append(s_a)
+                
+                if s_h > s_a + 0.5: wins_h += 1
+                elif s_a > s_h + 0.5: wins_a += 1
+                else: draws += 1
+                
+                # ✅ BARRA SEMPLICE (ogni 50 cicli)
+                if i % 50 == 0 or i == simulations-1:
+                    pct = (i+1)/simulations*100
+                    print(f"\r🎲 {pct:.0f}% ({i+1}/{simulations}) | {s_h:.1f}-{s_a:.1f}", end="")
+                    
+            except:
+                continue  # Skip errori DB
+        
+        print()  # Nuova riga
+        
+        # Report
+        if results_h:
+            avg_h = sum(results_h) / len(results_h)
+            avg_a = sum(results_a) / len(results_a)
+            
+            print("\n" + "="*50)
+            print(f"📊 MONTE CARLO FINITO ({len(results_h)} iterazioni valide)")
+            print("="*50)
+            print(f"Media Gol Casa:   {avg_h:.2f}")
+            print(f"Media Gol Ospite: {avg_a:.2f}")
+            print("-"*25)
+            print(f"1: {wins_h} ({wins_h/simulations*100:.1f}%)")
+            print(f"X: {draws} ({draws/simulations*100:.1f}%)")
+            print(f"2: {wins_a} ({wins_a/simulations*100:.1f}%)")
+            print("="*50)
+        else:
+            print("❌ Nessun risultato valido!")
+    
+    else:
+        predict_match(home, away, mode=mode)
+
+

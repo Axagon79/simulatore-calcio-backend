@@ -1,5 +1,57 @@
 {
-    "MATCH": "Carpi vs Vis Pesaro",
-    "CASA": "N/A",
-    "OSPITE": "N/A"
+    "MATCH": "Milan vs Sassuolo",
+    "CASA": {
+        "Squadra": "AC Milan",
+        "Modulo": "3-5-2",
+        "Rating": "19.17/25",
+        "1_TITOLARI": [
+            "GK - Mike Maignan (8.2)",
+            "DIF - Matteo Gabbia (5.9)",
+            "DIF - Alexis Saelemaekers (7.5)",
+            "DIF - Strahinja Pavlovi\u0107 (6.9)",
+            "MID - Luka Modri\u0107 (7.2)",
+            "MID - Youssouf Fofana (6.5)",
+            "MID - Adrien Rabiot (7.3)",
+            "MID - Samuele Ricci (7.8)",
+            "MID - Ardon Jashari (7.8)",
+            "ATT - Rafael Le\u00e3o (7.5)",
+            "ATT - Santiago Gim\u00e9nez (4.9)"
+        ],
+        "2_PANCHINA": [
+            "GK - Pietro Terracciano (8.0)",
+            "DIF - Fikayo Tomori (8.1)",
+            "DIF - Davide Bartesaghi (6.7)",
+            "MID (da DIF) - Pervis Estupi\u00f1\u00e1n (6.4)",
+            "MID (da DIF) - Koni De Winter (6.7)",
+            "ATT - Ruben Loftus-Cheek (5.6)",
+            "ATT - Christian Pulisic (9.5)"
+        ]
+    },
+    "OSPITE": {
+        "Squadra": "Sassuolo",
+        "Modulo": "4-3-3",
+        "Rating": "18.1/25",
+        "1_TITOLARI": [
+            "GK - Arijanet Muric (7.9)",
+            "DIF - Jay Idzes (6.4)",
+            "DIF - Sebastian Walukiewicz (6.9)",
+            "DIF - Tarik Muharemovic (7.6)",
+            "DIF - Josh Doig (7.3)",
+            "MID - Nemanja Mati\u0107 (7.0)",
+            "MID - Isma\u00ebl Kon\u00e9 (6.6)",
+            "MID - Kristian Thorstvedt (6.3)",
+            "ATT - Andrea Pinamonti (5.9)",
+            "ATT - Domenico Berardi (6.7)",
+            "ATT - Armand Lauriente (6.0)"
+        ],
+        "2_PANCHINA": [
+            "GK - Stefano Turati (5.5)",
+            "DIF - Fali Cand\u00e9 (6.2)",
+            "DIF - Woyo Coulibaly (6.9)",
+            "MID - Aster Vranckx (5.7)",
+            "MID - Daniel Boloca (7.1)",
+            "ATT - Alieu Fadera (6.1)",
+            "ATT - Cristian Volpato (7.3)"
+        ]
+    }
 }
