@@ -77,6 +77,31 @@ if (GEMINI_API_KEY) {
     app.use('/api', mediaRoutes);
     app.use('/api/posts', postRoutes);
 
+    // NUOVA ROTTA: Le tue 11 competizioni
+app.get('/api/leagues', (req, res) => {
+  const country = req.query.country;
+  
+  const leaguesData = {
+    'Italy': [
+      { id: 'SERIE_A', name: 'Serie A' },
+      { id: 'SERIE_B', name: 'Serie B' },
+      { id: 'SERIE_C_A', name: 'Serie C - Girone A' },
+      { id: 'SERIE_C_B', name: 'Serie C - Girone B' },
+      { id: 'SERIE_C_C', name: 'Serie C - Girone C' }
+    ],
+    'England': [{ id: 'PREMIER_LEAGUE', name: 'Premier League' }],
+    'Spain': [{ id: 'LA_LIGA', name: 'La Liga' }],
+    'Germany': [{ id: 'BUNDESLIGA', name: 'Bundesliga' }],
+    'France': [{ id: 'LIGUE_1', name: 'Ligue 1' }],
+    'Netherlands': [{ id: 'EREDIVISIE', name: 'Eredivisie' }],
+    'Portugal': [{ id: 'LIGA_PORTUGAL', name: 'Liga Portugal' }]
+  };
+
+  const result = leaguesData[country] || [];
+  res.json(result);
+});
+
+
     // Endpoint Vet Assistant
     app.post('/api/vet-assistant', async (req, res) => {
       try {

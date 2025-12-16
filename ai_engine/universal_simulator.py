@@ -68,7 +68,7 @@ def ask_monte_carlo_cycles():
         elif choice == 8:
             while True:
                 print("\n✏️  MODALITÀ PERSONALIZZATA")
-                print("   Inserisci numero cicli totali (min: 100, max: 100,000)")
+                print("   Inserisci numero cicli totali (min: 40, max: 100,000)")
                 print("   Nota: Verrà arrotondato al multiplo di 4 più vicino")
                 
                 try:
@@ -77,8 +77,8 @@ def ask_monte_carlo_cycles():
                     print("❌ Inserisci un numero valido.")
                     continue
                 
-                if custom < 100:
-                    print("❌ Minimo 100 cicli.")
+                if custom < 10:
+                    print("❌ Minimo 40 cicli.")
                     continue
                 if custom > 100000:
                     print("❌ Massimo 100,000 cicli.")
@@ -210,11 +210,18 @@ def analyze_odds(match):
 
 
 # --- MOTORI ---
-def run_single_algo(algo_id, preloaded_data):
+def run_single_algo(algo_id, preloaded_data, home_name="Home", away_name="Away"):
     s_h, s_a, r_h, r_a = predict_match("", "", mode=algo_id, preloaded_data=preloaded_data)
     if s_h is None: return 0, 0
-    gh, ga, *_ = calculate_goals_from_engine(s_h, s_a, r_h, r_a, algo_mode=algo_id)
+
+    gh, ga, *_ = calculate_goals_from_engine(
+        s_h, s_a, r_h, r_a, 
+        algo_mode=algo_id, 
+        home_name=home_name, 
+        away_name=away_name
+    )
     return gh, ga
+
 
 
 def run_monte_carlo_verdict_detailed(preloaded_data, home_team, away_team):
@@ -524,6 +531,354 @@ def flow_single_match():
                     return [selected_match], algo_sel, monte_carlo_cycles
 
 
+def print_massive_summary(matches_data, algo_name="MonteCarlo"):
+    """
+    Riepilogo intelligente con statistiche Monte Carlo reali.
+    """
+    if not matches_data:
+        return
+    
+    print("\n" + "="*95)
+    print(f"📊 RIEPILOGO GIORNATA - ALGORITMO: {algo_name.upper()}")
+    print("="*95)
+    
+    # Raggruppa per campionato
+    by_league = {}
+    for item in matches_data:
+        m = item['match']
+        league = m.get('league', 'Unknown')
+        if league not in by_league:
+            by_league[league] = []
+        by_league[league].append(item)
+    
+    # Stampa per ogni campionato
+    for league, items in by_league.items():
+        print(f"\n🏆 {league}")
+        print("-" * 95)
+        print(f"{'#':<3} {'PARTITA':<28} {'PRONOSTICO':<10} {'SEGNO':<6} {'CONF%':<7} {'U/O':<8} {'GG/NG':<7} {'STATUS':<8}")
+        print("-" * 95)
+        
+        for idx, item in enumerate(items, 1):
+            m = item['match']
+            ph = item['pred_gh']
+            pa = item['pred_ga']
+            
+            # Nome partita
+            match_name = f"{m['home'][:12]} vs {m['away'][:12]}"
+            pred_score = f"{ph}-{pa}"
+            sign = get_sign(ph, pa)
+            
+            # CALCOLA CONFIDENZA REALE (se disponibile top3)
+            confidence = 0
+            if 'top3' in item and item['top3']:
+                top3 = item['top3']
+                total_votes = sum([f for s, f in top3])
+                
+                # Confidenza sul segno previsto
+                votes_for_sign = sum([f for s, f in top3 if get_sign(*map(int, s.split("-"))) == sign])
+                confidence = (votes_for_sign / total_votes * 100) if total_votes > 0 else 0
+            else:
+                # Fallback: stima basica
+                diff = abs(ph - pa)
+                if sign == "X":
+                    confidence = 30
+                elif diff >= 2:
+                    confidence = 65
+                elif diff >= 1:
+                    confidence = 50
+                else:
+                    confidence = 35
+            
+            # Under/Over
+            total = ph + pa
+            uo = "U2.5" if total <= 2.5 else "O2.5"
+            
+            # GG/NG
+            gg = "GG" if (ph > 0 and pa > 0) else "NG"
+            
+            # Status con emoji
+            if confidence >= 55:
+                status = "🟢 OK"
+            elif confidence >= 40:
+                status = "🟡 MID"
+            else:
+                status = "🔴 LOW"
+            
+            # Verifica risultato reale
+            real_icon = ""
+            if m.get('has_real'):
+                pred_sign = sign
+                real_sign = get_sign(m['real_gh'], m['real_ga'])
+                real_icon = "✅" if pred_sign == real_sign else "❌"
+            
+            print(f"{idx:<3} {match_name:<28} {pred_score:<10} {sign:<6} {confidence:>5.1f}%  {uo:<8} {gg:<7} {status:<8} {real_icon}")
+        
+        print("-" * 95)
+        
+        # Statistiche campionato
+        signs_1 = sum(1 for item in items if get_sign(item['pred_gh'], item['pred_ga']) == "1")
+        signs_x = sum(1 for item in items if get_sign(item['pred_gh'], item['pred_ga']) == "X")
+        signs_2 = sum(1 for item in items if get_sign(item['pred_gh'], item['pred_ga']) == "2")
+        
+        under = sum(1 for item in items if (item['pred_gh'] + item['pred_ga']) <= 2.5)
+        over = sum(1 for item in items if (item['pred_gh'] + item['pred_ga']) > 2.5)
+        
+        gg_count = sum(1 for item in items if (item['pred_gh'] > 0 and item['pred_ga'] > 0))
+        ng_count = len(items) - gg_count
+        
+        total_matches = len(items)
+        
+        print(f"📈 STATISTICHE: {total_matches} partite")
+        print(f"   1X2: 1={signs_1} ({signs_1/total_matches*100:.0f}%) | X={signs_x} ({signs_x/total_matches*100:.0f}%) | 2={signs_2} ({signs_2/total_matches*100:.0f}%)")
+        print(f"   U/O: Under={under} ({under/total_matches*100:.0f}%) | Over={over} ({over/total_matches*100:.0f}%)")
+        print(f"   GG/NG: GG={gg_count} ({gg_count/total_matches*100:.0f}%) | NG={ng_count} ({ng_count/total_matches*100:.0f}%)")
+        
+        # Accuracy se disponibile
+        verified = [item for item in items if item['match'].get('has_real')]
+        if verified:
+            correct = sum(1 for item in verified if get_sign(item['pred_gh'], item['pred_ga']) == get_sign(item['match']['real_gh'], item['match']['real_ga']))
+            accuracy = (correct / len(verified)) * 100
+            print(f"   ✅ ACCURATEZZA 1X2: {correct}/{len(verified)} ({accuracy:.1f}%)")
+    
+    print("\n" + "="*95)
+    
+    # ========== SUGGERIMENTI INTELLIGENTI ==========
+    print("\n💡 SUGGERIMENTI INTELLIGENTI (Basati su Monte Carlo):")
+    
+    all_items = [item for items in by_league.values() for item in items]
+    
+    # 1. PARTITE PIÙ SICURE (confidenza >= 55%)
+    safe_bets = []
+    for item in all_items:
+        if 'top3' in item and item['top3']:
+            top3 = item['top3']
+            total_votes = sum([f for s, f in top3])
+            sign = get_sign(item['pred_gh'], item['pred_ga'])
+            votes_for_sign = sum([f for s, f in top3 if get_sign(*map(int, s.split("-"))) == sign])
+            confidence = (votes_for_sign / total_votes * 100) if total_votes > 0 else 0
+            
+            if confidence >= 55:
+                safe_bets.append((item, confidence))
+    
+    if safe_bets:
+        safe_bets.sort(key=lambda x: x[1], reverse=True)  # Ordina per confidenza
+        print(f"\n   🟢 SCOMMESSE 1X2 CONSIGLIATE (Confidenza ≥55%):")
+        for item, conf in safe_bets[:5]:
+            m = item['match']
+            sign = get_sign(item['pred_gh'], item['pred_ga'])
+            winner = m['home'] if sign == "1" else (m['away'] if sign == "2" else "Pareggio")
+            print(f"      • {m['home']} vs {m['away']} → {sign} ({winner}) - {conf:.0f}% confidenza")
+    
+    # 2. UNDER 2.5 CON ALTA CONFIDENZA
+    under_bets = []
+    for item in all_items:
+        if 'top3' in item and item['top3']:
+            top3 = item['top3']
+            total_votes = sum([f for s, f in top3])
+            
+            # Conta voti per under
+            votes_under = sum([f for s, f in top3 if sum(map(int, s.split("-"))) <= 2.5])
+            conf_under = (votes_under / total_votes * 100) if total_votes > 0 else 0
+            
+            if conf_under >= 60:
+                under_bets.append((item, conf_under))
+    
+    if under_bets:
+        under_bets.sort(key=lambda x: x[1], reverse=True)
+        print(f"\n   📉 UNDER 2.5 CONSIGLIATI (Confidenza ≥60%):")
+        for item, conf in under_bets[:5]:
+            m = item['match']
+            total = item['pred_gh'] + item['pred_ga']
+            print(f"      • {m['home']} vs {m['away']} → {item['pred_gh']}-{item['pred_ga']} ({total:.1f} gol) - {conf:.0f}%")
+    
+    # 3. GG CON ALTA CONFIDENZA
+    gg_bets = []
+    for item in all_items:
+        if 'top3' in item and item['top3']:
+            top3 = item['top3']
+            total_votes = sum([f for s, f in top3])
+            
+            # Conta voti per GG
+            votes_gg = sum([f for s, f in top3 if all(int(x) > 0 for x in s.split("-"))])
+            conf_gg = (votes_gg / total_votes * 100) if total_votes > 0 else 0
+            
+            if conf_gg >= 60:
+                gg_bets.append((item, conf_gg))
+    
+    if gg_bets:
+        gg_bets.sort(key=lambda x: x[1], reverse=True)
+        print(f"\n   ⚽ GOL/GOL CONSIGLIATI (Confidenza ≥60%):")
+        for item, conf in gg_bets[:5]:
+            m = item['match']
+            print(f"      • {m['home']} vs {m['away']} → {item['pred_gh']}-{item['pred_ga']} - {conf:.0f}%")
+    
+    # 4. PARTITE DA EVITARE (confidenza bassa)
+    avoid = []
+    for item in all_items:
+        if 'top3' in item and item['top3']:
+            top3 = item['top3']
+            total_votes = sum([f for s, f in top3])
+            sign = get_sign(item['pred_gh'], item['pred_ga'])
+            votes_for_sign = sum([f for s, f in top3 if get_sign(*map(int, s.split("-"))) == sign])
+            confidence = (votes_for_sign / total_votes * 100) if total_votes > 0 else 0
+            
+            if confidence < 40:
+                avoid.append((item, confidence))
+    
+    if avoid:
+        avoid.sort(key=lambda x: x[1])  # Ordina per confidenza crescente
+        print(f"\n   ⚠️  PARTITE DA EVITARE (Confidenza <40%):")
+        for item, conf in avoid[:3]:
+            m = item['match']
+            print(f"      • {m['home']} vs {m['away']} → {item['pred_gh']}-{item['pred_ga']} - {conf:.0f}% (imprevedibile)")
+    
+    print("\n" + "="*95)
+    
+# ========================================
+# REPORT RIEPILOGO GIORNATA MASSIVA
+# ========================================
+    
+def print_massive_summary(matches_data, algo_name="MonteCarlo"):
+    """
+    Stampa un riepilogo compatto di tutte le partite simulate.
+    matches_data: lista di dict con 'match' e predizioni
+    """
+    if not matches_data:
+        return
+    
+    print("\n" + "="*90)
+    print(f"📊 RIEPILOGO GIORNATA - ALGORITMO: {algo_name.upper()}")
+    print("="*90)
+    
+    # Raggruppa per campionato
+    by_league = {}
+    for item in matches_data:
+        m = item['match']
+        league = m.get('league', 'Unknown')
+        if league not in by_league:
+            by_league[league] = []
+        by_league[league].append(item)
+    
+    # Stampa per ogni campionato
+    for league, items in by_league.items():
+        print(f"\n🏆 {league}")
+        print("-" * 90)
+        print(f"{'#':<3} {'PARTITA':<30} {'PRONOSTICO':<12} {'SEGNO':<6} {'U/O':<8} {'GG/NG':<7} {'CONFIDENZA':<10}")
+        print("-" * 90)
+        
+        for idx, item in enumerate(items, 1):
+            m = item['match']
+            ph = item['pred_gh']
+            pa = item['pred_ga']
+            
+            # Nome partita (max 30 char)
+            match_name = f"{m['home'][:13]} vs {m['away'][:13]}"
+            
+            # Pronostico
+            pred_score = f"{ph}-{pa}"
+            
+            # Segno
+            sign = get_sign(ph, pa)
+            
+            # Under/Over
+            total = ph + pa
+            uo = "U2.5" if total <= 2.5 else "O2.5"
+            
+            # GG/NG
+            gg = "GG" if (ph > 0 and pa > 0) else "NG"
+            
+            # Confidenza (stima basata su quanto è netto)
+            diff = abs(ph - pa)
+            if sign == "X":
+                conf = "🟡 MEDIA"
+            elif diff >= 2:
+                conf = "🟢 ALTA"
+            elif diff >= 1:
+                conf = "🟡 MEDIA"
+            else:
+                conf = "🔴 BASSA"
+            
+            # Emoji risultato reale se disponibile
+            real_icon = ""
+            if m.get('has_real'):
+                pred_sign = sign
+                real_sign = get_sign(m['real_gh'], m['real_ga'])
+                real_icon = "✅" if pred_sign == real_sign else "❌"
+            
+            print(f"{idx:<3} {match_name:<30} {pred_score:<12} {sign:<6} {uo:<8} {gg:<7} {conf:<10} {real_icon}")
+        
+        print("-" * 90)
+        
+        # Statistiche campionato
+        signs_1 = sum(1 for item in items if get_sign(item['pred_gh'], item['pred_ga']) == "1")
+        signs_x = sum(1 for item in items if get_sign(item['pred_gh'], item['pred_ga']) == "X")
+        signs_2 = sum(1 for item in items if get_sign(item['pred_gh'], item['pred_ga']) == "2")
+        
+        under = sum(1 for item in items if (item['pred_gh'] + item['pred_ga']) <= 2.5)
+        over = sum(1 for item in items if (item['pred_gh'] + item['pred_ga']) > 2.5)
+        
+        gg_count = sum(1 for item in items if (item['pred_gh'] > 0 and item['pred_ga'] > 0))
+        ng_count = sum(1 for item in items if not (item['pred_gh'] > 0 and item['pred_ga'] > 0))
+        
+        total_matches = len(items)
+        
+        print(f"📈 STATISTICHE: {total_matches} partite")
+        print(f"   1X2: 1={signs_1} ({signs_1/total_matches*100:.0f}%) | X={signs_x} ({signs_x/total_matches*100:.0f}%) | 2={signs_2} ({signs_2/total_matches*100:.0f}%)")
+        print(f"   U/O: Under={under} ({under/total_matches*100:.0f}%) | Over={over} ({over/total_matches*100:.0f}%)")
+        print(f"   GG/NG: GG={gg_count} ({gg_count/total_matches*100:.0f}%) | NG={ng_count} ({ng_count/total_matches*100:.0f}%)")
+        
+        # Se ci sono risultati reali, calcola accuracy
+        verified = [item for item in items if item['match'].get('has_real')]
+        if verified:
+            correct = sum(1 for item in verified if get_sign(item['pred_gh'], item['pred_ga']) == get_sign(item['match']['real_gh'], item['match']['real_ga']))
+            accuracy = (correct / len(verified)) * 100
+            print(f"   ✅ ACCURATEZZA: {correct}/{len(verified)} ({accuracy:.1f}%)")
+    
+    print("\n" + "="*90)
+    
+    # SUGGERIMENTI GIORNATA
+    print("\n💡 SUGGERIMENTI GIORNATA:")
+    
+    all_items = [item for items in by_league.values() for item in items]
+    
+    # Partite più sicure (diff >= 2 gol)
+    safe_bets = [item for item in all_items if abs(item['pred_gh'] - item['pred_ga']) >= 2]
+    if safe_bets:
+        print(f"\n   🟢 PARTITE PIÙ SICURE (diff ≥ 2 gol):")
+        for item in safe_bets[:5]:  # Max 5
+            m = item['match']
+            sign = get_sign(item['pred_gh'], item['pred_ga'])
+            winner = m['home'] if sign == "1" else m['away']
+            print(f"      • {m['home']} vs {m['away']} → {sign} ({winner})")
+    
+    # Partite under consigliati
+    under_bets = [item for item in all_items if (item['pred_gh'] + item['pred_ga']) <= 1.5]
+    if under_bets:
+        print(f"\n   📉 UNDER 2.5 CONSIGLIATI:")
+        for item in under_bets[:5]:
+            m = item['match']
+            total = item['pred_gh'] + item['pred_ga']
+            print(f"      • {m['home']} vs {m['away']} → {item['pred_gh']}-{item['pred_ga']} ({total:.1f} gol)")
+    
+    # Partite GG consigliate
+    gg_bets = [item for item in all_items if (item['pred_gh'] >= 1 and item['pred_ga'] >= 1)]
+    if gg_bets:
+        print(f"\n   ⚽ GOL/GOL CONSIGLIATI:")
+        for item in gg_bets[:5]:
+            m = item['match']
+            print(f"      • {m['home']} vs {m['away']} → {item['pred_gh']}-{item['pred_ga']}")
+    
+    # Partite incerte (evitare)
+    uncertain = [item for item in all_items if get_sign(item['pred_gh'], item['pred_ga']) == "X"]
+    if uncertain:
+        print(f"\n   ⚠️  PARTITE INCERTE (evitare scommesse 1X2):")
+        for item in uncertain[:3]:
+            m = item['match']
+            print(f"      • {m['home']} vs {m['away']} → {item['pred_gh']}-{item['pred_ga']}")
+    
+    print("\n" + "="*90)
+
+
 # --- LOGICA CORE ---
 def run_universal_simulator():
     global MONTE_CARLO_TOTAL_CYCLES
@@ -766,7 +1121,7 @@ def run_universal_simulator():
             algo_preds_db = {}
             
             for aid in [i for i in algos_indices if i <= 5]:
-                th, ta = run_single_algo(aid, preloaded)
+                th, ta = run_single_algo(aid, preloaded, home_name=match['home'], away_name=match['away'])
                 name = all_algos[aid-1]
                 data_by_algo[name].append({'match': match, 'pred_gh': th, 'pred_ga': ta})
                 algo_preds_db[f"Algo_{aid}"] = f"{th}-{ta}"
@@ -782,7 +1137,15 @@ def run_universal_simulator():
                 (mh, ma), algos_stats, global_top3, pesi_medi, scontrini_medi = run_monte_carlo_verdict_detailed(
                     preloaded, match['home'], match['away']
                 )
-                data_by_algo['MonteCarlo'].append({'match': match, 'pred_gh': mh, 'pred_ga': ma})
+                
+                # ✅ SALVA ANCHE LE STATISTICHE PER I SUGGERIMENTI
+                data_by_algo['MonteCarlo'].append({
+                    'match': match, 
+                    'pred_gh': mh, 
+                    'pred_ga': ma,
+                    'top3': global_top3,  # ← NUOVO
+                    'algos_stats': algos_stats  # ← NUOVO
+                })
                 
                 if MODE_SINGLE:
                     print(f"\n   🎲 MONTECARLO: {mh}-{ma} ({get_sign(mh, ma)})")
@@ -833,8 +1196,13 @@ def run_universal_simulator():
                         print(f"\n   🧾 SCONTRINO MEDIO (Su {cycles_per_algo:,} simulazioni):")
                         for aid, scontrino in scontrini_medi.items():
                             print(f"\n   [{algo_names_map[aid]}]")
-                            print(f"   {'VOCE':<15} | {'CASA (V×P=Pt)':<25} | {'OSPITE (V×P=Pt)':<25}")
-                            print("-" * 70)
+                            
+                            # ✅ NOMI CON EMOJI
+                            home_name = f"🏠 {match['home'][:10]}"  # Casa
+                            away_name = f"✈️  {match['away'][:10]}"  # Trasferta
+                            
+                            print(f"   {'VOCE':<15} | {home_name + ' (V×P=Pt)':<28} | {away_name + ' (V×P=Pt)':<28}")
+                            print("-" * 75)
                             
                             voci = set(list(scontrino.get('casa', {}).keys()) + list(scontrino.get('ospite', {}).keys()))
                             totale_casa = 0
@@ -847,16 +1215,15 @@ def run_universal_simulator():
                                 casa_str = f"{casa_data['valore']:>5.1f} × {casa_data['peso']:>4.2f} = {casa_data['punti']:>6.2f}"
                                 ospite_str = f"{ospite_data['valore']:>5.1f} × {ospite_data['peso']:>4.2f} = {ospite_data['punti']:>6.2f}"
                                 
-                                print(f"   {voce:<15} | {casa_str:<25} | {ospite_str:<25}")
+                                print(f"   {voce:<15} | {casa_str:<28} | {ospite_str:<28}")
                                 
                                 totale_casa += casa_data['punti']
                                 totale_ospite += ospite_data['punti']
                             
-                            print("-" * 70)
-                            print(f"   {'TOTALE':<15} | {totale_casa:>25.2f} | {totale_ospite:>25.2f}")
-                            print(f"   DIFFERENZA: {abs(totale_casa - totale_ospite):.2f} " + 
-                                  f"({'CASA' if totale_casa > totale_ospite else 'OSPITE'} favorita)")
-
+                            print("-" * 75)
+                            print(f"   {'TOTALE':<15} | {totale_casa:>28.2f} | {totale_ospite:>28.2f}")
+                            print(f"   DIFFERENZA: {abs(totale_casa - totale_ospite):.2f} ({match['home'] if totale_casa > totale_ospite else match['away']} favorita)")
+                    print_massive_summary(match, mh, ma, global_top3, algos_stats)
             if save_to_db and manager:
                 d_str_iso = match['date_iso']
                 
@@ -966,9 +1333,18 @@ def run_universal_simulator():
                 else: 
                     writer.writerow(["Nessuna statistica disponibile"])
                 writer.writerow([])
+                
+        # ✨ REPORT RIEPILOGO GIORNATA (solo per modalità massive)
+        if not MODE_SINGLE and 6 in algos_indices:
+            print_massive_summary(data_by_algo['MonteCarlo'], "MonteCarlo")
+        elif not MODE_SINGLE and algos_indices:
+            # Se non c'è Monte Carlo, usa il primo algoritmo disponibile
+            first_algo = all_algos[algos_indices[0]-1]
+            print_massive_summary(data_by_algo[first_algo], first_algo)
 
         html_filename = filename.replace(".csv", ".html")
         print(f"\n🎨 Generazione Dashboard HTML: {html_filename}...")
+        
         try:
             diagnostics.generate_html_report(html_filename, algos_indices, all_algos, data_by_algo, final_matches_list)
         except Exception as e:

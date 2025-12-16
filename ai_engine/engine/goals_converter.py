@@ -157,7 +157,7 @@ def calculate_goals_from_engine(home_score, away_score, home_data, away_data, al
 
         # --- INIZIO SPIA DEBUG COMPLETA (SOLO SE RICHIESTO) ---
     if debug_mode:
-        print(f"\n[DEBUG GOALS] Sto usando ALGO: {algo_mode}")
+        print(f"\n Sto usando ALGO: {algo_mode}")
         print(f"   --- MIXER PESI (WIN) ---")
         print(f"   -> Rating Rosa:     {S.get('PESO_RATING_ROSA', 1.0)}")
         print(f"   -> BVS Quote:       {S.get('PESO_BVS_QUOTE', 1.0)}")
