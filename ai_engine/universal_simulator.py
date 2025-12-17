@@ -4,11 +4,11 @@ import csv
 import re
 from datetime import datetime, date
 from collections import Counter
-from tqdm import tqdm
+from tqdm import tqdm  # type: ignore[reportMissingModuleSource]
 import contextlib
 import random
-import diagnostics
-
+from . import diagnostics
+from .deep_analysis import DeepAnalyzer
 # --- CONFIGURAZIONI ---
 MONTE_CARLO_TOTAL_CYCLES = 5000  # Default, sovrascritto dal menu
 CSV_DELIMITER = ';'
@@ -116,25 +116,30 @@ if ai_engine_dir not in sys.path: sys.path.insert(0, ai_engine_dir)
 if os.path.join(ai_engine_dir, 'engine') not in sys.path: sys.path.insert(0, os.path.join(ai_engine_dir, 'engine'))
 
 try:
-    try: from config import db
-    except: 
+    # config.py nella root del progetto (già gestito con project_root)
+    try:
+        from config import db
+    except ImportError:
         sys.path.append(project_root)
         from config import db
 
-    import engine_core 
-    from engine_core import predict_match, preload_match_data
-    from goals_converter import calculate_goals_from_engine
-    
-    PredictionManager = None
+    # Moduli engine dentro ai_engine/engine
+    from .engine import engine_core
+    from .engine.engine_core import predict_match, preload_match_data
+    from .engine.goals_converter import calculate_goals_from_engine
+
+    # PredictionManager nello stesso package ai_engine
     try:
-        from prediction_manager import PredictionManager
+        from .prediction_manager import PredictionManager
         print("✅ [MANAGER] PredictionManager caricato.")
-    except:
+    except ImportError:
+        PredictionManager = None
         print("⚠️ PredictionManager NON trovato (Salvataggio DB off).")
 
 except ImportError as e:
     print(f"❌ ERRORE FATALE IMPORT: {e}")
     sys.exit(1)
+
 
 
 # --- MAPPA NAZIONI ---
@@ -224,7 +229,8 @@ def run_single_algo(algo_id, preloaded_data, home_name="Home", away_name="Away")
 
 
 
-def run_monte_carlo_verdict_detailed(preloaded_data, home_team, away_team):
+def run_monte_carlo_verdict_detailed(preloaded_data, home_team, away_team, analyzer=None):
+    
     """
     Versione SILENZIOSA con statistiche pesi aggregate.
     """
@@ -273,7 +279,9 @@ def run_monte_carlo_verdict_detailed(preloaded_data, home_team, away_team):
                 score = f"{gh}-{ga}"
                 local_results.append(score)
                 valid_cycles += 1
-                
+                # ✨ AGGIUNGI QUESTA RIGA (subito dopo valid_cycles):
+                if analyzer:
+                    analyzer.add_result(algo_id=aid, home_goals=gh, away_goals=ga)
                 # Accumula pesi (versione SMART)
                 if pesi_dettagliati:
                     for nome_peso, info in pesi_dettagliati.items():
@@ -882,7 +890,7 @@ def print_massive_summary(matches_data, algo_name="MonteCarlo"):
 # --- LOGICA CORE ---
 def run_universal_simulator():
     global MONTE_CARLO_TOTAL_CYCLES
-    
+    deep_analyzer = DeepAnalyzer()  # ← NUOVO!
     while True:
         print(f"\n" + "="*60)
         print(f"🌍 SIMULATORE UNIVERSALE (v6 - Total Edition + SafeGuard)")
@@ -1113,6 +1121,13 @@ def run_universal_simulator():
         for match in iterator:
             if MODE_SINGLE: 
                 print(f"\n⚡ ANALISI: {match['home']} vs {match['away']}...")
+            deep_analyzer.start_match(
+                home_team=match['home'],
+                away_team=match['away'],
+                real_result=match.get('real_score_str'),
+                league=match.get('league', 'Unknown'),
+                date_str=match.get('date_iso')
+            )    
             
             with suppress_stdout():
                 try: preloaded = preload_match_data(match['home'], match['away'])
@@ -1125,7 +1140,8 @@ def run_universal_simulator():
                 name = all_algos[aid-1]
                 data_by_algo[name].append({'match': match, 'pred_gh': th, 'pred_ga': ta})
                 algo_preds_db[f"Algo_{aid}"] = f"{th}-{ta}"
-                
+                if deep_analyzer and deep_analyzer.current_match:
+                    deep_analyzer.add_result(algo_id=aid, home_goals=th, away_goals=ta)
                 if MODE_SINGLE:
                     print(f"   🔹 {name}: {th}-{ta} ({get_sign(th, ta)})")
 
@@ -1135,16 +1151,16 @@ def run_universal_simulator():
             
             if 6 in algos_indices:
                 (mh, ma), algos_stats, global_top3, pesi_medi, scontrini_medi = run_monte_carlo_verdict_detailed(
-                    preloaded, match['home'], match['away']
+                    preloaded, match['home'], match['away'], 
+                    analyzer=deep_analyzer
                 )
                 
-                # ✅ SALVA ANCHE LE STATISTICHE PER I SUGGERIMENTI
                 data_by_algo['MonteCarlo'].append({
                     'match': match, 
                     'pred_gh': mh, 
                     'pred_ga': ma,
-                    'top3': global_top3,  # ← NUOVO
-                    'algos_stats': algos_stats  # ← NUOVO
+                    'top3': global_top3,
+                    'algos_stats': algos_stats
                 })
                 
                 if MODE_SINGLE:
@@ -1224,6 +1240,7 @@ def run_universal_simulator():
                             print(f"   {'TOTALE':<15} | {totale_casa:>28.2f} | {totale_ospite:>28.2f}")
                             print(f"   DIFFERENZA: {abs(totale_casa - totale_ospite):.2f} ({match['home'] if totale_casa > totale_ospite else match['away']} favorita)")
                     print_massive_summary(match, mh, ma, global_top3, algos_stats)
+            deep_analyzer.end_match()        
             if save_to_db and manager:
                 d_str_iso = match['date_iso']
                 
@@ -1349,7 +1366,26 @@ def run_universal_simulator():
             diagnostics.generate_html_report(html_filename, algos_indices, all_algos, data_by_algo, final_matches_list)
         except Exception as e:
             print(f"⚠️ Errore creazione HTML: {e}")
+        # ✨ AGGIUNGI QUI IL SALVATAGGIO DEEP ANALYSIS:
+        print(f"\n🔬 Generazione Deep Analysis Report...")
+        try:
+            deep_filename_base = filename.replace("simulation_report", "deep_analysis").replace(".csv", "")
+            deep_analyzer.save_report(
+                csv_path=f"{deep_filename_base}.csv",
+                html_path=f"{deep_filename_base}.html",
+                json_path=f"{deep_filename_base}.json"
+            )
+            print(f"✅ Deep Analysis salvato:")
+            print(f"   📄 CSV:  {deep_filename_base}.csv")
+            print(f"   🌐 HTML: {deep_filename_base}.html")
+            print(f"   📦 JSON: {deep_filename_base}.json")
+        except Exception as e:
+            print(f"⚠️ Errore creazione Deep Analysis: {e}")
 
+        if MODE_SINGLE: 
+            print(f"\n✅ Analisi completata! Risultati salvati in {filename}")
+        else: 
+            print(f"\n✅ REPORT GENERATO: {filename} + {html_filename} + Deep Analysis")
         if MODE_SINGLE: 
             print(f"\n✅ Analisi completata! Risultati salvati in {filename}")
         else: 

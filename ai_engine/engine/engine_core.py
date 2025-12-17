@@ -29,15 +29,15 @@ except ImportError:
         db = None
 
 # --- IMPORT LIBRERIE CALCOLO ---
-try: import calculate_team_rating as rating_lib
+try: import ai_engine.calculators.calculate_team_rating as rating_lib
 except: rating_lib = None
-try: import calculator_affidabilità as reliability_lib
+try: import ai_engine.calculators.calculator_affidabilità as reliability_lib
 except: reliability_lib = None
-try: import calculator_bvs as bvs_lib
+try: import ai_engine.calculators.calculator_bvs as bvs_lib
 except: bvs_lib = None
-try: import calculator_fattore_campo as field_lib
+try: import ai_engine.calculators.calculator_fattore_campo as field_lib
 except: field_lib = None
-try: import calculator_lucifero as lucifero_lib
+try: import ai_engine.calculators.calculator_lucifero as lucifero_lib
 except: lucifero_lib = None
 
 # --- 2. CONFIGURAZIONE LEGHE ---

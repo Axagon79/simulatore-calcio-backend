@@ -1,55 +1,5 @@
 {
-    "MATCH": "Roma vs Como",
-    "CASA": {
-        "Squadra": "AS Roma",
-        "Modulo": "4-3-3",
-        "Rating": "17.76/25",
-        "1_TITOLARI": [
-            "GK - Mile Svilar (8.3)",
-            "DIF - Gianluca Mancini (7.5)",
-            "DIF - Obite N'Dicka (6.5)",
-            "DIF - Wesley (7.2)",
-            "DIF - Zeki \u00c7elik (7.0)",
-            "MID - Manu Kon\u00e9 (7.1)",
-            "MID - Bryan Cristante (6.3)",
-            "MID - Lorenzo Pellegrini (5.1)",
-            "ATT - Mat\u00ecas Soul\u00e9 (7.0)",
-            "ATT - Paulo Dybala (6.3)",
-            "ATT - Evan Ferguson (6.4)"
-        ],
-        "2_PANCHINA": [
-            "DIF - Mario Hermoso (6.5)",
-            "DIF - Angeli\u00f1o (7.2)",
-            "MID - Neil El Aynaoui (7.3)",
-            "MID - Niccol\u00f2 Pisilli (5.2)",
-            "ATT - Tommaso Baldanzi (5.1)",
-            "ATT - Artem Dovbyk (7.6)"
-        ]
-    },
-    "OSPITE": {
-        "Squadra": "Como",
-        "Modulo": "4-3-3",
-        "Rating": "18.56/25",
-        "1_TITOLARI": [
-            "GK - Jean Butez (7.7)",
-            "DIF - Jacobo Ram\u00f3n (8.6)",
-            "DIF - Diego Carlos (7.2)",
-            "DIF - \u00c1lex Valle (7.5)",
-            "DIF - Ivan Smol\u010di\u0107 (8.5)",
-            "MID - Nicol\u00e1s Paz (7.9)",
-            "MID - M\u00e1ximo Perrone (8.3)",
-            "MID - Lucas Da Cunha (6.8)",
-            "ATT - Jesus Rodr\u00edguez (6.1)",
-            "ATT - \u00c1lvaro Morata (5.3)",
-            "ATT - M\u00ebrgim Vojvoda (5.4)"
-        ],
-        "2_PANCHINA": [
-            "DIF - Marc-Oliver Kempf (6.2)",
-            "DIF - Stefan Posch (8.1)",
-            "MID - Sergi Roberto (6.9)",
-            "MID (da DIF) - Alberto Moreno (5.4)",
-            "ATT - Anastasios Douvikas (6.7)",
-            "ATT - Jayden Addai (7.0)"
-        ]
-    }
+    "MATCH": "Arzignano vs Pro Patria",
+    "CASA": "N/A",
+    "OSPITE": "N/A"
 }

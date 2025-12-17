@@ -1,96 +1,96 @@
 
 === ALGORITMO: STAT ===
 League;Match;Data;Q1;QX;Q2;Real Score;Real Sign;PRED Score;PRED Sign;1X2 Outcome;Exact Score;U/O 2.5;GG/NG
-Serie A;Lecce vs Pisa;12/12 20:45;2.2;3.0;3.5;1-0;1;1-1;X;LOSS;LOSS;UNDER;GG
-Serie A;Torino vs Cremonese;13/12 15:00;1.9;3.3;4.1;1-0;1;2-4;2;LOSS;LOSS;OVER;GG
-Serie A;Parma vs Lazio;13/12 18:00;3.75;3.25;2.0;0-1;2;1-1;X;LOSS;LOSS;UNDER;GG
-Serie A;Atalanta vs Cagliari;13/12 20:45;1.36;4.5;8.5;2-1;1;1-1;X;LOSS;LOSS;UNDER;GG
-Serie A;Milan vs Sassuolo;14/12 12:30;1.42;4.2;7.5;2-2;X;4-1;1;LOSS;LOSS;OVER;GG
-Serie A;Fiorentina vs Verona;14/12 15:00;1.7;3.5;5.25;1-2;2;1-0;1;LOSS;LOSS;UNDER;NG
-Serie A;Udinese vs Napoli;14/12 15:00;4.2;3.25;1.9;1-0;1;2-3;2;LOSS;LOSS;OVER;GG
-Serie A;Genoa vs Inter;14/12 18:00;6.25;3.6;1.55;1-2;2;1-2;2;WIN;WIN;OVER;GG
-Serie A;Bologna vs Juventus;14/12 20:45;2.7;3.1;2.6;0-1;2;1-2;2;WIN;LOSS;OVER;GG
-Serie A;Roma vs Como;15/12 20:45;2.05;3.25;3.6;-;-;0-1;2;WAITING;WAITING;UNDER;NG
+Serie C - Girone A;Lumezzane vs Lecco;13/12 14:30;2.55;3.0;2.55;1-1;X;5-4;1;LOSS;LOSS;OVER;GG
+Serie C - Girone A;Alcione vs Virtus Verona;13/12 17:30;1.91;3.1;3.8;0-1;2;1-4;2;WIN;LOSS;OVER;GG
+Serie C - Girone A;Renate vs Trento;13/12 17:30;2.45;2.88;2.7;1-1;X;3-2;1;LOSS;LOSS;OVER;GG
+Serie C - Girone A;Inter U23 vs Giana Erminio;14/12 12:30;2.15;3.0;3.2;0-1;2;0-1;2;WIN;WIN;UNDER;NG
+Serie C - Girone A;Cittadella vs Novara;14/12 14:30;1.65;3.2;5.25;2-2;X;2-3;2;LOSS;LOSS;OVER;GG
+Serie C - Girone A;Dolomiti vs Union Brescia;14/12 14:30;5.0;3.2;1.65;0-1;2;0-5;2;WIN;LOSS;OVER;NG
+Serie C - Girone A;Pergolettese vs Vicenza;14/12 14:30;6.25;3.5;1.48;0-1;2;0-5;2;WIN;LOSS;OVER;NG
+Serie C - Girone A;Ospitaletto vs Pro Vercelli;14/12 17:30;2.75;3.0;2.38;2-0;1;6-2;1;WIN;LOSS;OVER;GG
+Serie C - Girone A;Triestina vs AlbinoLeffe;14/12 17:30;2.05;3.0;3.4;5-2;1;3-3;X;LOSS;LOSS;OVER;GG
+Serie C - Girone A;Arzignano vs Pro Patria;14/12 20:30;1.67;3.2;4.75;2-1;1;1-0;1;WIN;LOSS;UNDER;NG
 "--- PERCENTUALI ---
-(Su partite finite)";;;;;;;;22.2%;11.1%;;44.4%;;33.3%
+(Su partite finite)";;;;;;;;60.0%;10.0%;;30.0%;;70.0%
 
 
 === ALGORITMO: DIN ===
 League;Match;Data;Q1;QX;Q2;Real Score;Real Sign;PRED Score;PRED Sign;1X2 Outcome;Exact Score;U/O 2.5;GG/NG
-Serie A;Lecce vs Pisa;12/12 20:45;2.2;3.0;3.5;1-0;1;0-1;2;LOSS;LOSS;UNDER;NG
-Serie A;Torino vs Cremonese;13/12 15:00;1.9;3.3;4.1;1-0;1;2-0;1;WIN;LOSS;UNDER;NG
-Serie A;Parma vs Lazio;13/12 18:00;3.75;3.25;2.0;0-1;2;0-1;2;WIN;WIN;UNDER;NG
-Serie A;Atalanta vs Cagliari;13/12 20:45;1.36;4.5;8.5;2-1;1;0-1;2;LOSS;LOSS;UNDER;NG
-Serie A;Milan vs Sassuolo;14/12 12:30;1.42;4.2;7.5;2-2;X;2-1;1;LOSS;LOSS;OVER;GG
-Serie A;Fiorentina vs Verona;14/12 15:00;1.7;3.5;5.25;1-2;2;1-1;X;LOSS;LOSS;UNDER;GG
-Serie A;Udinese vs Napoli;14/12 15:00;4.2;3.25;1.9;1-0;1;0-3;2;LOSS;LOSS;OVER;NG
-Serie A;Genoa vs Inter;14/12 18:00;6.25;3.6;1.55;1-2;2;0-3;2;WIN;LOSS;OVER;NG
-Serie A;Bologna vs Juventus;14/12 20:45;2.7;3.1;2.6;0-1;2;2-0;1;LOSS;LOSS;UNDER;NG
-Serie A;Roma vs Como;15/12 20:45;2.05;3.25;3.6;-;-;0-2;2;WAITING;WAITING;UNDER;NG
+Serie C - Girone A;Lumezzane vs Lecco;13/12 14:30;2.55;3.0;2.55;1-1;X;1-2;2;LOSS;LOSS;OVER;GG
+Serie C - Girone A;Alcione vs Virtus Verona;13/12 17:30;1.91;3.1;3.8;0-1;2;1-2;2;WIN;LOSS;OVER;GG
+Serie C - Girone A;Renate vs Trento;13/12 17:30;2.45;2.88;2.7;1-1;X;2-1;1;LOSS;LOSS;OVER;GG
+Serie C - Girone A;Inter U23 vs Giana Erminio;14/12 12:30;2.15;3.0;3.2;0-1;2;0-0;X;LOSS;LOSS;UNDER;NG
+Serie C - Girone A;Cittadella vs Novara;14/12 14:30;1.65;3.2;5.25;2-2;X;0-2;2;LOSS;LOSS;UNDER;NG
+Serie C - Girone A;Dolomiti vs Union Brescia;14/12 14:30;5.0;3.2;1.65;0-1;2;0-1;2;WIN;WIN;UNDER;NG
+Serie C - Girone A;Pergolettese vs Vicenza;14/12 14:30;6.25;3.5;1.48;0-1;2;2-0;1;LOSS;LOSS;UNDER;NG
+Serie C - Girone A;Ospitaletto vs Pro Vercelli;14/12 17:30;2.75;3.0;2.38;2-0;1;3-4;2;LOSS;LOSS;OVER;GG
+Serie C - Girone A;Triestina vs AlbinoLeffe;14/12 17:30;2.05;3.0;3.4;5-2;1;1-1;X;LOSS;LOSS;UNDER;GG
+Serie C - Girone A;Arzignano vs Pro Patria;14/12 20:30;1.67;3.2;4.75;2-1;1;1-0;1;WIN;LOSS;UNDER;NG
 "--- PERCENTUALI ---
-(Su partite finite)";;;;;;;;33.3%;11.1%;;66.7%;;77.8%
+(Su partite finite)";;;;;;;;30.0%;10.0%;;30.0%;;60.0%
 
 
 === ALGORITMO: TAT ===
 League;Match;Data;Q1;QX;Q2;Real Score;Real Sign;PRED Score;PRED Sign;1X2 Outcome;Exact Score;U/O 2.5;GG/NG
-Serie A;Lecce vs Pisa;12/12 20:45;2.2;3.0;3.5;1-0;1;0-3;2;LOSS;LOSS;OVER;NG
-Serie A;Torino vs Cremonese;13/12 15:00;1.9;3.3;4.1;1-0;1;0-2;2;LOSS;LOSS;UNDER;NG
-Serie A;Parma vs Lazio;13/12 18:00;3.75;3.25;2.0;0-1;2;0-0;X;LOSS;LOSS;UNDER;NG
-Serie A;Atalanta vs Cagliari;13/12 20:45;1.36;4.5;8.5;2-1;1;2-0;1;WIN;LOSS;UNDER;NG
-Serie A;Milan vs Sassuolo;14/12 12:30;1.42;4.2;7.5;2-2;X;3-1;1;LOSS;LOSS;OVER;GG
-Serie A;Fiorentina vs Verona;14/12 15:00;1.7;3.5;5.25;1-2;2;0-0;X;LOSS;LOSS;UNDER;NG
-Serie A;Udinese vs Napoli;14/12 15:00;4.2;3.25;1.9;1-0;1;0-4;2;LOSS;LOSS;OVER;NG
-Serie A;Genoa vs Inter;14/12 18:00;6.25;3.6;1.55;1-2;2;0-4;2;WIN;LOSS;OVER;NG
-Serie A;Bologna vs Juventus;14/12 20:45;2.7;3.1;2.6;0-1;2;2-0;1;LOSS;LOSS;UNDER;NG
-Serie A;Roma vs Como;15/12 20:45;2.05;3.25;3.6;-;-;2-3;2;WAITING;WAITING;OVER;GG
+Serie C - Girone A;Lumezzane vs Lecco;13/12 14:30;2.55;3.0;2.55;1-1;X;3-0;1;LOSS;LOSS;OVER;NG
+Serie C - Girone A;Alcione vs Virtus Verona;13/12 17:30;1.91;3.1;3.8;0-1;2;1-1;X;LOSS;LOSS;UNDER;GG
+Serie C - Girone A;Renate vs Trento;13/12 17:30;2.45;2.88;2.7;1-1;X;1-3;2;LOSS;LOSS;OVER;GG
+Serie C - Girone A;Inter U23 vs Giana Erminio;14/12 12:30;2.15;3.0;3.2;0-1;2;0-3;2;WIN;LOSS;OVER;NG
+Serie C - Girone A;Cittadella vs Novara;14/12 14:30;1.65;3.2;5.25;2-2;X;2-2;X;WIN;WIN;OVER;GG
+Serie C - Girone A;Dolomiti vs Union Brescia;14/12 14:30;5.0;3.2;1.65;0-1;2;0-3;2;WIN;LOSS;OVER;NG
+Serie C - Girone A;Pergolettese vs Vicenza;14/12 14:30;6.25;3.5;1.48;0-1;2;1-2;2;WIN;LOSS;OVER;GG
+Serie C - Girone A;Ospitaletto vs Pro Vercelli;14/12 17:30;2.75;3.0;2.38;2-0;1;2-0;1;WIN;WIN;UNDER;NG
+Serie C - Girone A;Triestina vs AlbinoLeffe;14/12 17:30;2.05;3.0;3.4;5-2;1;3-4;2;LOSS;LOSS;OVER;GG
+Serie C - Girone A;Arzignano vs Pro Patria;14/12 20:30;1.67;3.2;4.75;2-1;1;2-1;1;WIN;WIN;OVER;GG
 "--- PERCENTUALI ---
-(Su partite finite)";;;;;;;;22.2%;0.0%;;55.6%;;66.7%
+(Su partite finite)";;;;;;;;60.0%;30.0%;;50.0%;;70.0%
 
 
 === ALGORITMO: CAOS ===
 League;Match;Data;Q1;QX;Q2;Real Score;Real Sign;PRED Score;PRED Sign;1X2 Outcome;Exact Score;U/O 2.5;GG/NG
-Serie A;Lecce vs Pisa;12/12 20:45;2.2;3.0;3.5;1-0;1;0-0;X;LOSS;LOSS;UNDER;NG
-Serie A;Torino vs Cremonese;13/12 15:00;1.9;3.3;4.1;1-0;1;1-2;2;LOSS;LOSS;OVER;GG
-Serie A;Parma vs Lazio;13/12 18:00;3.75;3.25;2.0;0-1;2;2-0;1;LOSS;LOSS;UNDER;NG
-Serie A;Atalanta vs Cagliari;13/12 20:45;1.36;4.5;8.5;2-1;1;5-1;1;WIN;LOSS;OVER;GG
-Serie A;Milan vs Sassuolo;14/12 12:30;1.42;4.2;7.5;2-2;X;1-0;1;LOSS;LOSS;UNDER;NG
-Serie A;Fiorentina vs Verona;14/12 15:00;1.7;3.5;5.25;1-2;2;0-0;X;LOSS;LOSS;UNDER;NG
-Serie A;Udinese vs Napoli;14/12 15:00;4.2;3.25;1.9;1-0;1;0-0;X;LOSS;LOSS;UNDER;NG
-Serie A;Genoa vs Inter;14/12 18:00;6.25;3.6;1.55;1-2;2;0-7;2;WIN;LOSS;OVER;NG
-Serie A;Bologna vs Juventus;14/12 20:45;2.7;3.1;2.6;0-1;2;2-0;1;LOSS;LOSS;UNDER;NG
-Serie A;Roma vs Como;15/12 20:45;2.05;3.25;3.6;-;-;0-1;2;WAITING;WAITING;UNDER;NG
+Serie C - Girone A;Lumezzane vs Lecco;13/12 14:30;2.55;3.0;2.55;1-1;X;3-1;1;LOSS;LOSS;OVER;GG
+Serie C - Girone A;Alcione vs Virtus Verona;13/12 17:30;1.91;3.1;3.8;0-1;2;0-0;X;LOSS;LOSS;UNDER;NG
+Serie C - Girone A;Renate vs Trento;13/12 17:30;2.45;2.88;2.7;1-1;X;0-3;2;LOSS;LOSS;OVER;NG
+Serie C - Girone A;Inter U23 vs Giana Erminio;14/12 12:30;2.15;3.0;3.2;0-1;2;0-2;2;WIN;LOSS;UNDER;NG
+Serie C - Girone A;Cittadella vs Novara;14/12 14:30;1.65;3.2;5.25;2-2;X;4-1;1;LOSS;LOSS;OVER;GG
+Serie C - Girone A;Dolomiti vs Union Brescia;14/12 14:30;5.0;3.2;1.65;0-1;2;0-2;2;WIN;LOSS;UNDER;NG
+Serie C - Girone A;Pergolettese vs Vicenza;14/12 14:30;6.25;3.5;1.48;0-1;2;1-1;X;LOSS;LOSS;UNDER;GG
+Serie C - Girone A;Ospitaletto vs Pro Vercelli;14/12 17:30;2.75;3.0;2.38;2-0;1;1-1;X;LOSS;LOSS;UNDER;GG
+Serie C - Girone A;Triestina vs AlbinoLeffe;14/12 17:30;2.05;3.0;3.4;5-2;1;3-2;1;WIN;LOSS;OVER;GG
+Serie C - Girone A;Arzignano vs Pro Patria;14/12 20:30;1.67;3.2;4.75;2-1;1;4-2;1;WIN;LOSS;OVER;GG
 "--- PERCENTUALI ---
-(Su partite finite)";;;;;;;;22.2%;0.0%;;66.7%;;55.6%
+(Su partite finite)";;;;;;;;40.0%;0.0%;;80.0%;;70.0%
 
 
 === ALGORITMO: MASTER ===
 League;Match;Data;Q1;QX;Q2;Real Score;Real Sign;PRED Score;PRED Sign;1X2 Outcome;Exact Score;U/O 2.5;GG/NG
-Serie A;Lecce vs Pisa;12/12 20:45;2.2;3.0;3.5;1-0;1;1-0;1;WIN;WIN;UNDER;NG
-Serie A;Torino vs Cremonese;13/12 15:00;1.9;3.3;4.1;1-0;1;2-0;1;WIN;LOSS;UNDER;NG
-Serie A;Parma vs Lazio;13/12 18:00;3.75;3.25;2.0;0-1;2;1-1;X;LOSS;LOSS;UNDER;GG
-Serie A;Atalanta vs Cagliari;13/12 20:45;1.36;4.5;8.5;2-1;1;2-0;1;WIN;LOSS;UNDER;NG
-Serie A;Milan vs Sassuolo;14/12 12:30;1.42;4.2;7.5;2-2;X;1-0;1;LOSS;LOSS;UNDER;NG
-Serie A;Fiorentina vs Verona;14/12 15:00;1.7;3.5;5.25;1-2;2;0-0;X;LOSS;LOSS;UNDER;NG
-Serie A;Udinese vs Napoli;14/12 15:00;4.2;3.25;1.9;1-0;1;0-2;2;LOSS;LOSS;UNDER;NG
-Serie A;Genoa vs Inter;14/12 18:00;6.25;3.6;1.55;1-2;2;2-5;2;WIN;LOSS;OVER;GG
-Serie A;Bologna vs Juventus;14/12 20:45;2.7;3.1;2.6;0-1;2;2-2;X;LOSS;LOSS;OVER;GG
-Serie A;Roma vs Como;15/12 20:45;2.05;3.25;3.6;-;-;2-4;2;WAITING;WAITING;OVER;GG
+Serie C - Girone A;Lumezzane vs Lecco;13/12 14:30;2.55;3.0;2.55;1-1;X;4-1;1;LOSS;LOSS;OVER;GG
+Serie C - Girone A;Alcione vs Virtus Verona;13/12 17:30;1.91;3.1;3.8;0-1;2;2-4;2;WIN;LOSS;OVER;GG
+Serie C - Girone A;Renate vs Trento;13/12 17:30;2.45;2.88;2.7;1-1;X;1-2;2;LOSS;LOSS;OVER;GG
+Serie C - Girone A;Inter U23 vs Giana Erminio;14/12 12:30;2.15;3.0;3.2;0-1;2;0-0;X;LOSS;LOSS;UNDER;NG
+Serie C - Girone A;Cittadella vs Novara;14/12 14:30;1.65;3.2;5.25;2-2;X;0-1;2;LOSS;LOSS;UNDER;NG
+Serie C - Girone A;Dolomiti vs Union Brescia;14/12 14:30;5.0;3.2;1.65;0-1;2;0-2;2;WIN;LOSS;UNDER;NG
+Serie C - Girone A;Pergolettese vs Vicenza;14/12 14:30;6.25;3.5;1.48;0-1;2;0-3;2;WIN;LOSS;OVER;NG
+Serie C - Girone A;Ospitaletto vs Pro Vercelli;14/12 17:30;2.75;3.0;2.38;2-0;1;4-4;X;LOSS;LOSS;OVER;GG
+Serie C - Girone A;Triestina vs AlbinoLeffe;14/12 17:30;2.05;3.0;3.4;5-2;1;0-6;2;LOSS;LOSS;OVER;NG
+Serie C - Girone A;Arzignano vs Pro Patria;14/12 20:30;1.67;3.2;4.75;2-1;1;0-2;2;LOSS;LOSS;UNDER;NG
 "--- PERCENTUALI ---
-(Su partite finite)";;;;;;;;44.4%;11.1%;;55.6%;;44.4%
+(Su partite finite)";;;;;;;;30.0%;0.0%;;30.0%;;50.0%
 
 
 === ALGORITMO: MONTECARLO ===
 League;Match;Data;Q1;QX;Q2;Real Score;Real Sign;PRED Score;PRED Sign;1X2 Outcome;Exact Score;U/O 2.5;GG/NG
-Serie A;Lecce vs Pisa;12/12 20:45;2.2;3.0;3.5;1-0;1;0-0;X;LOSS;LOSS;UNDER;NG
-Serie A;Torino vs Cremonese;13/12 15:00;1.9;3.3;4.1;1-0;1;0-1;2;LOSS;LOSS;UNDER;NG
-Serie A;Parma vs Lazio;13/12 18:00;3.75;3.25;2.0;0-1;2;0-0;X;LOSS;LOSS;UNDER;NG
-Serie A;Atalanta vs Cagliari;13/12 20:45;1.36;4.5;8.5;2-1;1;3-0;1;WIN;LOSS;OVER;NG
-Serie A;Milan vs Sassuolo;14/12 12:30;1.42;4.2;7.5;2-2;X;1-1;X;WIN;LOSS;UNDER;GG
-Serie A;Fiorentina vs Verona;14/12 15:00;1.7;3.5;5.25;1-2;2;2-0;1;LOSS;LOSS;UNDER;NG
-Serie A;Udinese vs Napoli;14/12 15:00;4.2;3.25;1.9;1-0;1;0-1;2;LOSS;LOSS;UNDER;NG
-Serie A;Genoa vs Inter;14/12 18:00;6.25;3.6;1.55;1-2;2;0-3;2;WIN;LOSS;OVER;NG
-Serie A;Bologna vs Juventus;14/12 20:45;2.7;3.1;2.6;0-1;2;3-0;1;LOSS;LOSS;OVER;NG
-Serie A;Roma vs Como;15/12 20:45;2.05;3.25;3.6;-;-;0-0;X;WAITING;WAITING;UNDER;NG
+Serie C - Girone A;Lumezzane vs Lecco;13/12 14:30;2.55;3.0;2.55;1-1;X;1-3;2;LOSS;LOSS;OVER;GG
+Serie C - Girone A;Alcione vs Virtus Verona;13/12 17:30;1.91;3.1;3.8;0-1;2;0-2;2;WIN;LOSS;UNDER;NG
+Serie C - Girone A;Renate vs Trento;13/12 17:30;2.45;2.88;2.7;1-1;X;1-4;2;LOSS;LOSS;OVER;GG
+Serie C - Girone A;Inter U23 vs Giana Erminio;14/12 12:30;2.15;3.0;3.2;0-1;2;0-2;2;WIN;LOSS;UNDER;NG
+Serie C - Girone A;Cittadella vs Novara;14/12 14:30;1.65;3.2;5.25;2-2;X;1-2;2;LOSS;LOSS;OVER;GG
+Serie C - Girone A;Dolomiti vs Union Brescia;14/12 14:30;5.0;3.2;1.65;0-1;2;0-2;2;WIN;LOSS;UNDER;NG
+Serie C - Girone A;Pergolettese vs Vicenza;14/12 14:30;6.25;3.5;1.48;0-1;2;1-2;2;WIN;LOSS;OVER;GG
+Serie C - Girone A;Ospitaletto vs Pro Vercelli;14/12 17:30;2.75;3.0;2.38;2-0;1;1-1;X;LOSS;LOSS;UNDER;GG
+Serie C - Girone A;Triestina vs AlbinoLeffe;14/12 17:30;2.05;3.0;3.4;5-2;1;2-2;X;LOSS;LOSS;OVER;GG
+Serie C - Girone A;Arzignano vs Pro Patria;14/12 20:30;1.67;3.2;4.75;2-1;1;4-1;1;WIN;LOSS;OVER;GG
 "--- PERCENTUALI ---
-(Su partite finite)";;;;;;;;33.3%;0.0%;;66.7%;;66.7%
+(Su partite finite)";;;;;;;;50.0%;0.0%;;70.0%;;80.0%
 
