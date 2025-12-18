@@ -1,62 +1,21 @@
 ========================================== 
-INIZIO AGGIORNAMENTO NOTTURNO: 17/12/2025  4:00:02,82 
+INIZIO AGGIORNAMENTO NOTTURNO: 18/12/2025  4:00:03,24 
 ========================================== 
- Connessione MongoDB...
- Database: football_simulator_db
-   Teams: 212
-   Matches: 1707
-🔌 Connesso a MongoDB.
-🚀 AVVIO DOPPIO SCRAPER...
-
-📊 PARTE 1: Aggiornamento Medie Stagionali (xG/90)...
-   🔍 Analizzo Classifica: Serie A
-      ✅ Medie salvate per 20 squadre.
-   🔍 Analizzo Classifica: Serie B
-      ✅ Medie salvate per 20 squadre.
-   🔍 Analizzo Classifica: Premier League
-      ✅ Medie salvate per 20 squadre.
-   🔍 Analizzo Classifica: La Liga
-      ✅ Medie salvate per 20 squadre.
-   🔍 Analizzo Classifica: Bundesliga
-      ✅ Medie salvate per 18 squadre.
-   🔍 Analizzo Classifica: Ligue 1
-      ✅ Medie salvate per 18 squadre.
-   🔍 Analizzo Classifica: Eredivisie
-      ✅ Medie salvate per 18 squadre.
-   🔍 Analizzo Classifica: Liga Portugal
-      ✅ Medie salvate per 18 squadre.
-
-⚽ PARTE 2: Aggiornamento Risultati Partite...
-
-🌍 Calendario: Serie A
-      ✅ Aggiornate 150 partite.
-
-🌍 Calendario: Serie B
-      ✅ Aggiornate 160 partite.
-
-🌍 Calendario: Premier League
-      ✅ Aggiornate 160 partite.
-
-🌍 Calendario: La Liga
-      ✅ Aggiornate 161 partite.
-
-🌍 Calendario: Bundesliga
-      ✅ Aggiornate 126 partite.
-
-🌍 Calendario: Ligue 1
-      ✅ Aggiornate 144 partite.
-
-🌍 Calendario: Eredivisie
-      ✅ Aggiornate 143 partite.
-
-🌍 Calendario: Liga Portugal
-      ✅ Aggiornate 126 partite.
-
-🏁 TUTTO AGGIORNATO.
- Connessione MongoDB...
- Database: football_simulator_db
-   Teams: 212
-   Matches: 2877
+Traceback (most recent call last):
+  File "C:\Progetti\simulatore-calcio-backend\ai_engine\Aggiornamenti\frequenti\scraper_results_fbref.py", line 7, in <module>
+    import cloudscraper
+ModuleNotFoundError: No module named 'cloudscraper'
+🔧 BASE_DIR: C:\Progetti\simulatore-calcio-backend
+🔧 ENV_PATH: C:\Progetti\simulatore-calcio-backend\.env
+✅ .env trovato in: C:\Progetti\simulatore-calcio-backend\.env
+🔗 Connessione MongoDB...
+✅ Connesso a MongoDB: football_simulator_db
+📊 Database: football_simulator_db
+   📦 teams: 212 documenti
+   📦 matches_history: 1707 documenti
+   📦 raw_h2h_data_v2: 1933 documenti
+   📦 h2h_by_round: 402 documenti
+✅ Configurazione completata con successo
 🚀 AVVIO SCRAPER V3 (DATA FIX)...
 
 🌍 Scarico Serie A...
@@ -94,10 +53,17 @@ INIZIO AGGIORNAMENTO NOTTURNO: 17/12/2025  4:00:02,82
 
 🧹 PULIZIA E SALVATAGGIO IN matches_history_betexplorer...
    ✅ Salvate 1707 partite correttamente.
- Connessione MongoDB...
- Database: football_simulator_db
-   Teams: 212
-   Matches: 2877
+🔧 BASE_DIR: C:\Progetti\simulatore-calcio-backend
+🔧 ENV_PATH: C:\Progetti\simulatore-calcio-backend\.env
+✅ .env trovato in: C:\Progetti\simulatore-calcio-backend\.env
+🔗 Connessione MongoDB...
+✅ Connesso a MongoDB: football_simulator_db
+📊 Database: football_simulator_db
+   📦 teams: 212 documenti
+   📦 matches_history: 1707 documenti
+   📦 raw_h2h_data_v2: 1933 documenti
+   📦 h2h_by_round: 402 documenti
+✅ Configurazione completata con successo
 🚀 AVVIO SCRAPER (MODALITÀ TABULA RASA: Sostituzione Totale)...
 
 🌍 Scarico Serie A...
@@ -137,10 +103,17 @@ INIZIO AGGIORNAMENTO NOTTURNO: 17/12/2025  4:00:02,82
    ✅ DB Svuotato.
 💾 SALVO 1707 NUOVE PARTITE...
    ✅ Salvataggio completato! Il DB ora è pulito e aggiornato.
- Connessione MongoDB...
- Database: football_simulator_db
-   Teams: 212
-   Matches: 1707
+🔧 BASE_DIR: C:\Progetti\simulatore-calcio-backend
+🔧 ENV_PATH: C:\Progetti\simulatore-calcio-backend\.env
+✅ .env trovato in: C:\Progetti\simulatore-calcio-backend\.env
+🔗 Connessione MongoDB...
+✅ Connesso a MongoDB: football_simulator_db
+📊 Database: football_simulator_db
+   📦 teams: 212 documenti
+   📦 matches_history: 1707 documenti
+   📦 raw_h2h_data_v2: 1933 documenti
+   📦 h2h_by_round: 402 documenti
+✅ Configurazione completata con successo
 🚀 AVVIO SCRAPER CLASSIFICA UNIFICATO (SMART + GOL)
 
 🌍 Scarico dati per: Serie A...
@@ -175,670 +148,92 @@ INIZIO AGGIORNAMENTO NOTTURNO: 17/12/2025  4:00:02,82
 
 🌍 Scarico dati per: Liga Portugal...
    ✅ Aggiornate 18 squadre.
- Connessione MongoDB...
- Database: football_simulator_db
-   Teams: 212
-   Matches: 1707
-
-========================================
-🏆 LEGA: Serie A (ITA1)
-========================================
-➡️  Scarico STANDARD: https://fbref.com/en/comps/11/stats/Serie-A-Stats
-   ➜ Attaccanti trovati in STANDARD: 143
-➡️  Scarico SHOOTING: https://fbref.com/en/comps/11/shooting/Serie-A-Stats
-   ➜ Dati SHOOTING aggiunti
-➡️  Scarico POSSESSION: https://fbref.com/en/comps/11/possession/Serie-A-Stats
-   ➜ Dati POSSESSION aggiunti
-➡️  Scarico PASSING: https://fbref.com/en/comps/11/passing/Serie-A-Stats
-   ➜ Dati PASSING aggiunti
-➡️  Scarico MISC: https://fbref.com/en/comps/11/misc/Serie-A-Stats
-   ➜ Dati MISC aggiunti
-   💾 Scrivo 143 documenti in Mongo...
-   ➜ upserted: 0, modified: 11
-
-========================================
-🏆 LEGA: Serie B (ITA2)
-========================================
-➡️  Scarico STANDARD: https://fbref.com/en/comps/18/stats/Serie-B-Stats
-   ➜ Attaccanti trovati in STANDARD: 133
-➡️  Scarico SHOOTING: https://fbref.com/en/comps/18/shooting/Serie-B-Stats
-   ➜ Dati SHOOTING aggiunti
-➡️  Scarico POSSESSION: https://fbref.com/en/comps/18/possession/Serie-B-Stats
-   ➜ Dati POSSESSION aggiunti
-➡️  Scarico PASSING: https://fbref.com/en/comps/18/passing/Serie-B-Stats
-   ➜ Dati PASSING aggiunti
-➡️  Scarico MISC: https://fbref.com/en/comps/18/misc/Serie-B-Stats
-   ➜ Dati MISC aggiunti
-   💾 Scrivo 133 documenti in Mongo...
-   ➜ upserted: 0, modified: 5
-
-========================================
-🏆 LEGA: Premier League (ENG1)
-========================================
-➡️  Scarico STANDARD: https://fbref.com/en/comps/9/stats/Premier-League-Stats
-   ➜ Attaccanti trovati in STANDARD: 163
-➡️  Scarico SHOOTING: https://fbref.com/en/comps/9/shooting/Premier-League-Stats
-   ➜ Dati SHOOTING aggiunti
-➡️  Scarico POSSESSION: https://fbref.com/en/comps/9/possession/Premier-League-Stats
-   ➜ Dati POSSESSION aggiunti
-➡️  Scarico PASSING: https://fbref.com/en/comps/9/passing/Premier-League-Stats
-   ➜ Dati PASSING aggiunti
-➡️  Scarico MISC: https://fbref.com/en/comps/9/misc/Premier-League-Stats
-   ➜ Dati MISC aggiunti
-   💾 Scrivo 163 documenti in Mongo...
-   ➜ upserted: 0, modified: 7
-
-========================================
-🏆 LEGA: La Liga (ESP1)
-========================================
-➡️  Scarico STANDARD: https://fbref.com/en/comps/12/stats/La-Liga-Stats
-   ➜ Attaccanti trovati in STANDARD: 171
-➡️  Scarico SHOOTING: https://fbref.com/en/comps/12/shooting/La-Liga-Stats
-   ➜ Dati SHOOTING aggiunti
-➡️  Scarico POSSESSION: https://fbref.com/en/comps/12/possession/La-Liga-Stats
-   ➜ Dati POSSESSION aggiunti
-➡️  Scarico PASSING: https://fbref.com/en/comps/12/passing/La-Liga-Stats
-   ➜ Dati PASSING aggiunti
-➡️  Scarico MISC: https://fbref.com/en/comps/12/misc/La-Liga-Stats
-   ➜ Dati MISC aggiunti
-   💾 Scrivo 171 documenti in Mongo...
-   ➜ upserted: 0, modified: 14
-
-========================================
-🏆 LEGA: Bundesliga (GER1)
-========================================
-➡️  Scarico STANDARD: https://fbref.com/en/comps/20/stats/Bundesliga-Stats
-   ➜ Attaccanti trovati in STANDARD: 142
-➡️  Scarico SHOOTING: https://fbref.com/en/comps/20/shooting/Bundesliga-Stats
-   ➜ Dati SHOOTING aggiunti
-➡️  Scarico POSSESSION: https://fbref.com/en/comps/20/possession/Bundesliga-Stats
-   ➜ Dati POSSESSION aggiunti
-➡️  Scarico PASSING: https://fbref.com/en/comps/20/passing/Bundesliga-Stats
-   ➜ Dati PASSING aggiunti
-➡️  Scarico MISC: https://fbref.com/en/comps/20/misc/Bundesliga-Stats
-   ➜ Dati MISC aggiunti
-   💾 Scrivo 142 documenti in Mongo...
-   ➜ upserted: 0, modified: 0
-
-========================================
-🏆 LEGA: Ligue 1 (FRA1)
-========================================
-➡️  Scarico STANDARD: https://fbref.com/en/comps/13/stats/Ligue-1-Stats
-   ➜ Attaccanti trovati in STANDARD: 151
-➡️  Scarico SHOOTING: https://fbref.com/en/comps/13/shooting/Ligue-1-Stats
-   ➜ Dati SHOOTING aggiunti
-➡️  Scarico POSSESSION: https://fbref.com/en/comps/13/possession/Ligue-1-Stats
-   ➜ Dati POSSESSION aggiunti
-➡️  Scarico PASSING: https://fbref.com/en/comps/13/passing/Ligue-1-Stats
-   ➜ Dati PASSING aggiunti
-➡️  Scarico MISC: https://fbref.com/en/comps/13/misc/Ligue-1-Stats
-   ➜ Dati MISC aggiunti
-   💾 Scrivo 151 documenti in Mongo...
-   ➜ upserted: 0, modified: 0
-
-========================================
-🏆 LEGA: Eredivisie (NED1)
-========================================
-➡️  Scarico STANDARD: https://fbref.com/en/comps/23/stats/Eredivisie-Stats
-   ➜ Attaccanti trovati in STANDARD: 162
-➡️  Scarico SHOOTING: https://fbref.com/en/comps/23/shooting/Eredivisie-Stats
-   ➜ Dati SHOOTING aggiunti
-➡️  Scarico POSSESSION: https://fbref.com/en/comps/23/possession/Eredivisie-Stats
-   ➜ Dati POSSESSION aggiunti
-➡️  Scarico PASSING: https://fbref.com/en/comps/23/passing/Eredivisie-Stats
-   ➜ Dati PASSING aggiunti
-➡️  Scarico MISC: https://fbref.com/en/comps/23/misc/Eredivisie-Stats
-   ➜ Dati MISC aggiunti
-   💾 Scrivo 162 documenti in Mongo...
-   ➜ upserted: 0, modified: 10
-
-========================================
-🏆 LEGA: Liga Portugal (POR1)
-========================================
-➡️  Scarico STANDARD: https://fbref.com/en/comps/32/stats/Primeira-Liga-Stats
-   ➜ Attaccanti trovati in STANDARD: 168
-➡️  Scarico SHOOTING: https://fbref.com/en/comps/32/shooting/Primeira-Liga-Stats
-   ➜ Dati SHOOTING aggiunti
-➡️  Scarico POSSESSION: https://fbref.com/en/comps/32/possession/Primeira-Liga-Stats
-   ➜ Dati POSSESSION aggiunti
-➡️  Scarico PASSING: https://fbref.com/en/comps/32/passing/Primeira-Liga-Stats
-   ➜ Dati PASSING aggiunti
-➡️  Scarico MISC: https://fbref.com/en/comps/32/misc/Primeira-Liga-Stats
-   ➜ Dati MISC aggiunti
-   💾 Scrivo 168 documenti in Mongo...
-   ➜ upserted: 3, modified: 38
-
-✅ SCRAPER ATTACCANTI FBREF COMPLETATO.
- Connessione MongoDB...
- Database: football_simulator_db
-   Teams: 212
-   Matches: 1707
-
-========================================
-🏆 LEGA: Serie A (ITA1)
-========================================
-➡️  Scarico STANDARD: https://fbref.com/en/comps/11/stats/Serie-A-Stats
-   ➜ Centrocampisti trovati in STANDARD: 126
-➡️  Scarico PASSING: https://fbref.com/en/comps/11/passing/Serie-A-Stats
-   ➜ Dati PASSING aggiunti
-➡️  Scarico DEFENSE: https://fbref.com/en/comps/11/defense/Serie-A-Stats
-   ➜ Dati DEFENSE aggiunti
-➡️  Scarico MISC: https://fbref.com/en/comps/11/misc/Serie-A-Stats
-   ➜ Dati MISC aggiunti
-   💾 Scrivo 126 documenti in Mongo...
-   ➜ upserted: 0, modified: 5
-
-========================================
-🏆 LEGA: Serie B (ITA2)
-========================================
-➡️  Scarico STANDARD: https://fbref.com/en/comps/18/stats/Serie-B-Stats
-   ➜ Centrocampisti trovati in STANDARD: 133
-➡️  Scarico PASSING: https://fbref.com/en/comps/18/passing/Serie-B-Stats
-   ➜ Dati PASSING aggiunti
-➡️  Scarico DEFENSE: https://fbref.com/en/comps/18/defense/Serie-B-Stats
-   ➜ Dati DEFENSE aggiunti
-➡️  Scarico MISC: https://fbref.com/en/comps/18/misc/Serie-B-Stats
-   ➜ Dati MISC aggiunti
-   💾 Scrivo 133 documenti in Mongo...
-   ➜ upserted: 0, modified: 6
-
-========================================
-🏆 LEGA: Premier League (ENG1)
-========================================
-➡️  Scarico STANDARD: https://fbref.com/en/comps/9/stats/Premier-League-Stats
-   ➜ Centrocampisti trovati in STANDARD: 108
-➡️  Scarico PASSING: https://fbref.com/en/comps/9/passing/Premier-League-Stats
-   ➜ Dati PASSING aggiunti
-➡️  Scarico DEFENSE: https://fbref.com/en/comps/9/defense/Premier-League-Stats
-   ➜ Dati DEFENSE aggiunti
-➡️  Scarico MISC: https://fbref.com/en/comps/9/misc/Premier-League-Stats
-   ➜ Dati MISC aggiunti
-   💾 Scrivo 108 documenti in Mongo...
-   ➜ upserted: 0, modified: 8
-
-========================================
-🏆 LEGA: La Liga (ESP1)
-========================================
-➡️  Scarico STANDARD: https://fbref.com/en/comps/12/stats/La-Liga-Stats
-   ➜ Centrocampisti trovati in STANDARD: 126
-➡️  Scarico PASSING: https://fbref.com/en/comps/12/passing/La-Liga-Stats
-   ➜ Dati PASSING aggiunti
-➡️  Scarico DEFENSE: https://fbref.com/en/comps/12/defense/La-Liga-Stats
-   ➜ Dati DEFENSE aggiunti
-➡️  Scarico MISC: https://fbref.com/en/comps/12/misc/La-Liga-Stats
-   ➜ Dati MISC aggiunti
-   💾 Scrivo 126 documenti in Mongo...
-   ➜ upserted: 0, modified: 10
-
-========================================
-🏆 LEGA: Bundesliga (GER1)
-========================================
-➡️  Scarico STANDARD: https://fbref.com/en/comps/20/stats/Bundesliga-Stats
-   ➜ Centrocampisti trovati in STANDARD: 100
-➡️  Scarico PASSING: https://fbref.com/en/comps/20/passing/Bundesliga-Stats
-   ➜ Dati PASSING aggiunti
-➡️  Scarico DEFENSE: https://fbref.com/en/comps/20/defense/Bundesliga-Stats
-   ➜ Dati DEFENSE aggiunti
-➡️  Scarico MISC: https://fbref.com/en/comps/20/misc/Bundesliga-Stats
-   ➜ Dati MISC aggiunti
-   💾 Scrivo 100 documenti in Mongo...
-   ➜ upserted: 0, modified: 0
-
-========================================
-🏆 LEGA: Ligue 1 (FRA1)
-========================================
-➡️  Scarico STANDARD: https://fbref.com/en/comps/13/stats/Ligue-1-Stats
-   ➜ Centrocampisti trovati in STANDARD: 115
-➡️  Scarico PASSING: https://fbref.com/en/comps/13/passing/Ligue-1-Stats
-   ➜ Dati PASSING aggiunti
-➡️  Scarico DEFENSE: https://fbref.com/en/comps/13/defense/Ligue-1-Stats
-   ➜ Dati DEFENSE aggiunti
-➡️  Scarico MISC: https://fbref.com/en/comps/13/misc/Ligue-1-Stats
-   ➜ Dati MISC aggiunti
-   💾 Scrivo 115 documenti in Mongo...
-   ➜ upserted: 0, modified: 0
-
-========================================
-🏆 LEGA: Eredivisie (NED1)
-========================================
-➡️  Scarico STANDARD: https://fbref.com/en/comps/23/stats/Eredivisie-Stats
-   ➜ Centrocampisti trovati in STANDARD: 106
-➡️  Scarico PASSING: https://fbref.com/en/comps/23/passing/Eredivisie-Stats
-   ➜ Dati PASSING aggiunti
-➡️  Scarico DEFENSE: https://fbref.com/en/comps/23/defense/Eredivisie-Stats
-   ➜ Dati DEFENSE aggiunti
-➡️  Scarico MISC: https://fbref.com/en/comps/23/misc/Eredivisie-Stats
-   ➜ Dati MISC aggiunti
-   💾 Scrivo 106 documenti in Mongo...
-   ➜ upserted: 0, modified: 4
-
-========================================
-🏆 LEGA: Liga Portugal (POR1)
-========================================
-➡️  Scarico STANDARD: https://fbref.com/en/comps/32/stats/Primeira-Liga-Stats
-   ➜ Centrocampisti trovati in STANDARD: 117
-➡️  Scarico PASSING: https://fbref.com/en/comps/32/passing/Primeira-Liga-Stats
-   ➜ Dati PASSING aggiunti
-➡️  Scarico DEFENSE: https://fbref.com/en/comps/32/defense/Primeira-Liga-Stats
-   ➜ Dati DEFENSE aggiunti
-➡️  Scarico MISC: https://fbref.com/en/comps/32/misc/Primeira-Liga-Stats
-   ➜ Dati MISC aggiunti
-   💾 Scrivo 117 documenti in Mongo...
-   ➜ upserted: 2, modified: 31
-
-✅ SCRAPER CENTROCAMPISTI FBREF COMPLETATO.
- Connessione MongoDB...
- Database: football_simulator_db
-   Teams: 212
-   Matches: 1707
-
-========================================
-🏆 LEGA: Serie A (ITA1)
-========================================
-➡️  Scarico DEFENSE: https://fbref.com/en/comps/11/defense/Serie-A-Stats
-   ➜ Difensori trovati in DEFENSE: 192
-➡️  Scarico MISC: https://fbref.com/en/comps/11/misc/Serie-A-Stats
-   ➜ Dati MISC aggiunti
-➡️  Scarico PLAYINGTIME: https://fbref.com/en/comps/11/playingtime/Serie-A-Stats
-   ➜ Dati PLAYINGTIME aggiunti
-   💾 Scrivo 192 documenti in Mongo...
-   ➜ upserted: 0, modified: 12
-
-========================================
-🏆 LEGA: Serie B (ITA2)
-========================================
-➡️  Scarico DEFENSE: https://fbref.com/en/comps/18/defense/Serie-B-Stats
-   ➜ Difensori trovati in DEFENSE: 199
-➡️  Scarico MISC: https://fbref.com/en/comps/18/misc/Serie-B-Stats
-   ➜ Dati MISC aggiunti
-➡️  Scarico PLAYINGTIME: https://fbref.com/en/comps/18/playingtime/Serie-B-Stats
-   ➜ Dati PLAYINGTIME aggiunti
-   💾 Scrivo 199 documenti in Mongo...
-   ➜ upserted: 0, modified: 5
-
-========================================
-🏆 LEGA: Premier League (ENG1)
-========================================
-➡️  Scarico DEFENSE: https://fbref.com/en/comps/9/defense/Premier-League-Stats
-   ➜ Difensori trovati in DEFENSE: 167
-➡️  Scarico MISC: https://fbref.com/en/comps/9/misc/Premier-League-Stats
-   ➜ Dati MISC aggiunti
-➡️  Scarico PLAYINGTIME: https://fbref.com/en/comps/9/playingtime/Premier-League-Stats
-   ➜ Dati PLAYINGTIME aggiunti
-   💾 Scrivo 167 documenti in Mongo...
-   ➜ upserted: 0, modified: 12
-
-========================================
-🏆 LEGA: La Liga (ESP1)
-========================================
-➡️  Scarico DEFENSE: https://fbref.com/en/comps/12/defense/La-Liga-Stats
-   ➜ Difensori trovati in DEFENSE: 174
-➡️  Scarico MISC: https://fbref.com/en/comps/12/misc/La-Liga-Stats
-   ➜ Dati MISC aggiunti
-➡️  Scarico PLAYINGTIME: https://fbref.com/en/comps/12/playingtime/La-Liga-Stats
-   ➜ Dati PLAYINGTIME aggiunti
-   💾 Scrivo 174 documenti in Mongo...
-   ➜ upserted: 0, modified: 13
-
-========================================
-🏆 LEGA: Bundesliga (GER1)
-========================================
-➡️  Scarico DEFENSE: https://fbref.com/en/comps/20/defense/Bundesliga-Stats
-   ➜ Difensori trovati in DEFENSE: 162
-➡️  Scarico MISC: https://fbref.com/en/comps/20/misc/Bundesliga-Stats
-   ➜ Dati MISC aggiunti
-➡️  Scarico PLAYINGTIME: https://fbref.com/en/comps/20/playingtime/Bundesliga-Stats
-   ➜ Dati PLAYINGTIME aggiunti
-   💾 Scrivo 162 documenti in Mongo...
-   ➜ upserted: 0, modified: 0
-
-========================================
-🏆 LEGA: Ligue 1 (FRA1)
-========================================
-➡️  Scarico DEFENSE: https://fbref.com/en/comps/13/defense/Ligue-1-Stats
-   ➜ Difensori trovati in DEFENSE: 161
-➡️  Scarico MISC: https://fbref.com/en/comps/13/misc/Ligue-1-Stats
-   ➜ Dati MISC aggiunti
-➡️  Scarico PLAYINGTIME: https://fbref.com/en/comps/13/playingtime/Ligue-1-Stats
-   ➜ Dati PLAYINGTIME aggiunti
-   💾 Scrivo 161 documenti in Mongo...
-   ➜ upserted: 0, modified: 0
-
-========================================
-🏆 LEGA: Eredivisie (NED1)
-========================================
-➡️  Scarico DEFENSE: https://fbref.com/en/comps/23/defense/Eredivisie-Stats
-   ➜ Difensori trovati in DEFENSE: 149
-➡️  Scarico MISC: https://fbref.com/en/comps/23/misc/Eredivisie-Stats
-   ➜ Dati MISC aggiunti
-➡️  Scarico PLAYINGTIME: https://fbref.com/en/comps/23/playingtime/Eredivisie-Stats
-   ➜ Dati PLAYINGTIME aggiunti
-   💾 Scrivo 149 documenti in Mongo...
-   ➜ upserted: 0, modified: 5
-
-========================================
-🏆 LEGA: Liga Portugal (POR1)
-========================================
-➡️  Scarico DEFENSE: https://fbref.com/en/comps/32/defense/Primeira-Liga-Stats
-   ➜ Difensori trovati in DEFENSE: 144
-➡️  Scarico MISC: https://fbref.com/en/comps/32/misc/Primeira-Liga-Stats
-   ➜ Dati MISC aggiunti
-➡️  Scarico PLAYINGTIME: https://fbref.com/en/comps/32/playingtime/Primeira-Liga-Stats
-   ➜ Dati PLAYINGTIME aggiunti
-   💾 Scrivo 144 documenti in Mongo...
-   ➜ upserted: 1, modified: 39
-
-✅ SCRAPER DIFENSORI FBREF COMPLETATO.
- Connessione MongoDB...
- Database: football_simulator_db
-   Teams: 212
-   Matches: 1707
-
-========================================
-🏆 LEGA: Serie A (ITA1)
-========================================
-➡️  Scarico KEEPERS: https://fbref.com/en/comps/11/keepers/Serie-A-Stats
-   Status keepers: 200
-   ➜ Portieri trovati in KEEPERS: 32
-➡️  Scarico KEEPERSADV: https://fbref.com/en/comps/11/keepersadv/Serie-A-Stats
-   Status keepersadv: 200
-   ➜ Portieri trovati in KEEPERSADV: 32
-   💾 Scrivo 32 documenti in Mongo...
-   ➜ upserted: 0, modified: 12
-
-========================================
-🏆 LEGA: Serie B (ITA2)
-========================================
-➡️  Scarico KEEPERS: https://fbref.com/en/comps/18/keepers/Serie-B-Stats
-   Status keepers: 200
-   ➜ Portieri trovati in KEEPERS: 27
-➡️  Scarico KEEPERSADV: https://fbref.com/en/comps/18/keepersadv/Serie-B-Stats
-   Status keepersadv: 200
-   ➜ Portieri trovati in KEEPERSADV: 27
-   💾 Scrivo 27 documenti in Mongo...
-   ➜ upserted: 0, modified: 0
-
-========================================
-🏆 LEGA: Premier League (ENG1)
-========================================
-➡️  Scarico KEEPERS: https://fbref.com/en/comps/9/keepers/Premier-League-Stats
-   Status keepers: 200
-   ➜ Portieri trovati in KEEPERS: 30
-➡️  Scarico KEEPERSADV: https://fbref.com/en/comps/9/keepersadv/Premier-League-Stats
-   Status keepersadv: 200
-   ➜ Portieri trovati in KEEPERSADV: 30
-   💾 Scrivo 30 documenti in Mongo...
-   ➜ upserted: 0, modified: 2
-
-========================================
-🏆 LEGA: La Liga (ESP1)
-========================================
-➡️  Scarico KEEPERS: https://fbref.com/en/comps/12/keepers/La-Liga-Stats
-   Status keepers: 200
-   ➜ Portieri trovati in KEEPERS: 29
-➡️  Scarico KEEPERSADV: https://fbref.com/en/comps/12/keepersadv/La-Liga-Stats
-   Status keepersadv: 200
-   ➜ Portieri trovati in KEEPERSADV: 29
-   💾 Scrivo 29 documenti in Mongo...
-   ➜ upserted: 0, modified: 3
-
-========================================
-🏆 LEGA: Bundesliga (GER1)
-========================================
-➡️  Scarico KEEPERS: https://fbref.com/en/comps/20/keepers/Bundesliga-Stats
-   Status keepers: 200
-   ➜ Portieri trovati in KEEPERS: 23
-➡️  Scarico KEEPERSADV: https://fbref.com/en/comps/20/keepersadv/Bundesliga-Stats
-   Status keepersadv: 200
-   ➜ Portieri trovati in KEEPERSADV: 23
-   💾 Scrivo 23 documenti in Mongo...
-   ➜ upserted: 0, modified: 0
-
-========================================
-🏆 LEGA: Ligue 1 (FRA1)
-========================================
-➡️  Scarico KEEPERS: https://fbref.com/en/comps/13/keepers/Ligue-1-Stats
-   Status keepers: 200
-   ➜ Portieri trovati in KEEPERS: 31
-➡️  Scarico KEEPERSADV: https://fbref.com/en/comps/13/keepersadv/Ligue-1-Stats
-   Status keepersadv: 200
-   ➜ Portieri trovati in KEEPERSADV: 31
-   💾 Scrivo 31 documenti in Mongo...
-   ➜ upserted: 0, modified: 0
-
-========================================
-🏆 LEGA: Eredivisie (NED1)
-========================================
-➡️  Scarico KEEPERS: https://fbref.com/en/comps/23/keepers/Eredivisie-Stats
-   Status keepers: 200
-   ➜ Portieri trovati in KEEPERS: 28
-➡️  Scarico KEEPERSADV: https://fbref.com/en/comps/23/keepersadv/Eredivisie-Stats
-   Status keepersadv: 200
-   ➜ Portieri trovati in KEEPERSADV: 28
-   💾 Scrivo 28 documenti in Mongo...
-   ➜ upserted: 0, modified: 1
-
-========================================
-🏆 LEGA: Liga Portugal (POR1)
-========================================
-➡️  Scarico KEEPERS: https://fbref.com/en/comps/32/keepers/Primeira-Liga-Stats
-   Status keepers: 200
-   ➜ Portieri trovati in KEEPERS: 30
-➡️  Scarico KEEPERSADV: https://fbref.com/en/comps/32/keepersadv/Primeira-Liga-Stats
-   Status keepersadv: 200
-   ➜ Portieri trovati in KEEPERSADV: 30
-   💾 Scrivo 30 documenti in Mongo...
-   ➜ upserted: 0, modified: 8
-
-✅ SCRAPER GK FBREF COMPLETATO.
- Connessione MongoDB...
- Database: football_simulator_db
-   Teams: 212
-   Matches: 1707
-
-================================================================================
-🏆 CAMPIONATO: Serie A (ITA1)
-================================================================================
-   🔎 Leggo startseite: https://www.transfermarkt.it/serie-a/startseite/wettbewerb/IT1
-   ✅ Squadre trovate su TM: 20
-   ✅ Squadre presenti in Mongo: 20
-   ✅ Nessuna squadra mancante in Mongo.
-
-   📊 Verifico avanzamento (partite giocate) per aggiornare solo chi è indietro...
-   📊 Leggo classifica (table): https://www.transfermarkt.it/serie-a/tabelle/wettbewerb/IT1/saison_id/2025
-   ✅ Partite giocate lette per 20 squadre
-
-   🏁 Fine campionato Serie A
-
-
-================================================================================
-🏆 CAMPIONATO: Serie B (ITA2)
-================================================================================
-   🔎 Leggo startseite: https://www.transfermarkt.it/serie-b/startseite/wettbewerb/IT2
-   ✅ Squadre trovate su TM: 20
-   ✅ Squadre presenti in Mongo: 20
-   ✅ Nessuna squadra mancante in Mongo.
-
-   📊 Verifico avanzamento (partite giocate) per aggiornare solo chi è indietro...
-   📊 Leggo classifica (table): https://www.transfermarkt.it/serie-b/tabelle/wettbewerb/IT2/saison_id/2025
-   ✅ Partite giocate lette per 20 squadre
-
-   🏁 Fine campionato Serie B
-
-
-================================================================================
-🏆 CAMPIONATO: Serie C - Girone A (ITA3A)
-================================================================================
-   🔎 Leggo startseite: https://www.transfermarkt.it/serie-c-girone-a/startseite/wettbewerb/IT3A
-   ✅ Squadre trovate su TM: 20
-   ✅ Squadre presenti in Mongo: 20
-   ✅ Nessuna squadra mancante in Mongo.
-
-   📊 Verifico avanzamento (partite giocate) per aggiornare solo chi è indietro...
-   📊 Leggo classifica (table): https://www.transfermarkt.it/serie-c-girone-a/tabelle/wettbewerb/IT3A/saison_id/2025
-   ✅ Partite giocate lette per 20 squadre
-
-   🏁 Fine campionato Serie C - Girone A
-
-
-================================================================================
-🏆 CAMPIONATO: Serie C - Girone B (ITA3B)
-================================================================================
-   🔎 Leggo startseite: https://www.transfermarkt.it/serie-c-girone-b/startseite/wettbewerb/IT3B
-   ✅ Squadre trovate su TM: 19
-   ✅ Squadre presenti in Mongo: 20
-   ✅ Nessuna squadra mancante in Mongo.
-
-   📊 Verifico avanzamento (partite giocate) per aggiornare solo chi è indietro...
-   📊 Leggo classifica (table): https://www.transfermarkt.it/serie-c-girone-b/tabelle/wettbewerb/IT3B/saison_id/2025
-   ✅ Partite giocate lette per 19 squadre
-   🔁 Aggiorno squadra SS Arezzo (team_id=4255) perché max_matches_recorded=16 < matches_played=17
-      → Documenti giocatore salvati: 26, match distinti: 17
-   🔁 Aggiorno squadra Pineto Calcio (team_id=46337) perché max_matches_recorded=16 < matches_played=17
-      → Documenti giocatore salvati: 31, match distinti: 17
-
-   🏁 Fine campionato Serie C - Girone B
-
-
-================================================================================
-🏆 CAMPIONATO: Serie C - Girone C (ITA3C)
-================================================================================
-   🔎 Leggo startseite: https://www.transfermarkt.it/serie-c-girone-c/startseite/wettbewerb/IT3C
-   ✅ Squadre trovate su TM: 20
-   ✅ Squadre presenti in Mongo: 20
-   ✅ Nessuna squadra mancante in Mongo.
-
-   📊 Verifico avanzamento (partite giocate) per aggiornare solo chi è indietro...
-   📊 Leggo classifica (table): https://www.transfermarkt.it/serie-c-girone-c/tabelle/wettbewerb/IT3C/saison_id/2025
-   ✅ Partite giocate lette per 20 squadre
-   🔁 Aggiorno squadra Atalanta U23 (team_id=41110) perché max_matches_recorded=17 < matches_played=18
-      → Documenti giocatore salvati: 42, match distinti: 18
-   🔁 Aggiorno squadra Benevento Calcio (team_id=4171) perché max_matches_recorded=17 < matches_played=18
-      ❌ Timeout/errore ausfallzeiten: HTTPSConnectionPool(host='www.transfermarkt.it', port=443): Read timed out. (read timeout=120)
-      → Documenti giocatore salvati: 0, match distinti: 0
-   🔁 Aggiorno squadra Cosenza Calcio (team_id=4031) perché max_matches_recorded=17 < matches_played=18
-      → Documenti giocatore salvati: 31, match distinti: 18
-   🔁 Aggiorno squadra FC Trapani 1905 (team_id=4331) perché max_matches_recorded=17 < matches_played=18
-      → Documenti giocatore salvati: 29, match distinti: 18
-   🔁 Aggiorno squadra FC Crotone (team_id=4083) perché max_matches_recorded=17 < matches_played=18
-      → Documenti giocatore salvati: 31, match distinti: 18
-   🔁 Aggiorno squadra Casertana FC (team_id=4106) perché max_matches_recorded=17 < matches_played=18
-      → Documenti giocatore salvati: 26, match distinti: 18
-   🔁 Aggiorno squadra Calcio Foggia 1920 (team_id=704) perché max_matches_recorded=17 < matches_played=18
-      → Documenti giocatore salvati: 34, match distinti: 18
-   🔁 Aggiorno squadra Sorrento 1945 (team_id=10118) perché max_matches_recorded=17 < matches_played=18
-      → Documenti giocatore salvati: 29, match distinti: 18
-   🔁 Aggiorno squadra Cavese 1919 (team_id=6266) perché max_matches_recorded=17 < matches_played=18
-      → Documenti giocatore salvati: 28, match distinti: 19
-   🔁 Aggiorno squadra Latina Calcio 1932 (team_id=22045) perché max_matches_recorded=17 < matches_played=18
-      → Documenti giocatore salvati: 30, match distinti: 19
-   🔁 Aggiorno squadra Casarano Calcio (team_id=6089) perché max_matches_recorded=17 < matches_played=18
-      → Documenti giocatore salvati: 26, match distinti: 18
-   🔁 Aggiorno squadra Team Altamura (team_id=22408) perché max_matches_recorded=17 < matches_played=18
-      → Documenti giocatore salvati: 29, match distinti: 19
-
-   🏁 Fine campionato Serie C - Girone C
-
-
-================================================================================
-🏆 CAMPIONATO: Premier League (GB1)
-================================================================================
-   🔎 Leggo startseite: https://www.transfermarkt.com/premier-league/startseite/wettbewerb/GB1
-   ✅ Squadre trovate su TM: 20
-   ✅ Squadre presenti in Mongo: 20
-   ✅ Nessuna squadra mancante in Mongo.
-
-   📊 Verifico avanzamento (partite giocate) per aggiornare solo chi è indietro...
-   📊 Leggo classifica (table): https://www.transfermarkt.com/premier-league/tabelle/wettbewerb/GB1/saison_id/2025
-   ✅ Partite giocate lette per 20 squadre
-
-   🏁 Fine campionato Premier League
-
-
-================================================================================
-🏆 CAMPIONATO: La Liga (ES1)
-================================================================================
-   🔎 Leggo startseite: https://www.transfermarkt.com/la-liga/startseite/wettbewerb/ES1
-   ✅ Squadre trovate su TM: 20
-   ✅ Squadre presenti in Mongo: 20
-   ✅ Nessuna squadra mancante in Mongo.
-
-   📊 Verifico avanzamento (partite giocate) per aggiornare solo chi è indietro...
-   📊 Leggo classifica (table): https://www.transfermarkt.com/la-liga/tabelle/wettbewerb/ES1/saison_id/2025
-   ✅ Partite giocate lette per 20 squadre
-
-   🏁 Fine campionato La Liga
-
-
-================================================================================
-🏆 CAMPIONATO: Eredivisie (NL1)
-================================================================================
-   🔎 Leggo startseite: https://www.transfermarkt.com/eredivisie/startseite/wettbewerb/NL1
-   ✅ Squadre trovate su TM: 18
-   ✅ Squadre presenti in Mongo: 18
-   ✅ Nessuna squadra mancante in Mongo.
-
-   📊 Verifico avanzamento (partite giocate) per aggiornare solo chi è indietro...
-   📊 Leggo classifica (table): https://www.transfermarkt.com/eredivisie/tabelle/wettbewerb/NL1/saison_id/2025
-   ✅ Partite giocate lette per 18 squadre
-
-   🏁 Fine campionato Eredivisie
-
-
-================================================================================
-🏆 CAMPIONATO: Bundesliga (DE1)
-================================================================================
-   🔎 Leggo startseite: https://www.transfermarkt.com/bundesliga/startseite/wettbewerb/L1
-   ✅ Squadre trovate su TM: 18
-   ✅ Squadre presenti in Mongo: 18
-   ✅ Nessuna squadra mancante in Mongo.
-
-   📊 Verifico avanzamento (partite giocate) per aggiornare solo chi è indietro...
-   📊 Leggo classifica (table): https://www.transfermarkt.com/bundesliga/tabelle/wettbewerb/L1/saison_id/2025
-   ✅ Partite giocate lette per 18 squadre
-
-   🏁 Fine campionato Bundesliga
-
-
-================================================================================
-🏆 CAMPIONATO: Ligue 1 (FR1)
-================================================================================
-   🔎 Leggo startseite: https://www.transfermarkt.com/ligue-1/startseite/wettbewerb/FR1
-   ✅ Squadre trovate su TM: 18
-   ✅ Squadre presenti in Mongo: 18
-   ✅ Nessuna squadra mancante in Mongo.
-
-   📊 Verifico avanzamento (partite giocate) per aggiornare solo chi è indietro...
-   📊 Leggo classifica (table): https://www.transfermarkt.com/ligue-1/tabelle/wettbewerb/FR1/saison_id/2025
-   ✅ Partite giocate lette per 18 squadre
-
-   🏁 Fine campionato Ligue 1
-
-
-================================================================================
-🏆 CAMPIONATO: Primeira Liga (PT1)
-================================================================================
-   🔎 Leggo startseite: https://www.transfermarkt.com/liga-nos/startseite/wettbewerb/PO1
-   ✅ Squadre trovate su TM: 18
-   ✅ Squadre presenti in Mongo: 18
-   ✅ Nessuna squadra mancante in Mongo.
-
-   📊 Verifico avanzamento (partite giocate) per aggiornare solo chi è indietro...
-   📊 Leggo classifica (table): https://www.transfermarkt.com/liga-nos/tabelle/wettbewerb/PO1/saison_id/2025
-   ✅ Partite giocate lette per 18 squadre
-
-   🏁 Fine campionato Primeira Liga
-
-
-================================================================================
-🎉 COMPLETATO!
-📊 Totale documenti giocatore salvati/aggiornati: 392
-================================================================================
-
- Connessione MongoDB...
- Database: football_simulator_db
-   Teams: 212
-   Matches: 1707
+🔧 BASE_DIR: C:\Progetti\simulatore-calcio-backend
+🔧 ENV_PATH: C:\Progetti\simulatore-calcio-backend\.env
+✅ .env trovato in: C:\Progetti\simulatore-calcio-backend\.env
+🔗 Connessione MongoDB...
+✅ Connesso a MongoDB: football_simulator_db
+📊 Database: football_simulator_db
+   📦 teams: 212 documenti
+   📦 matches_history: 1707 documenti
+   📦 raw_h2h_data_v2: 1933 documenti
+   📦 h2h_by_round: 402 documenti
+✅ Configurazione completata con successo
+Traceback (most recent call last):
+  File "C:\Progetti\simulatore-calcio-backend\ai_engine\Aggiornamenti\frequenti\fbref_scraper_att.py", line 49, in <module>
+    import cloudscraper
+ModuleNotFoundError: No module named 'cloudscraper'
+🔧 BASE_DIR: C:\Progetti\simulatore-calcio-backend
+🔧 ENV_PATH: C:\Progetti\simulatore-calcio-backend\.env
+✅ .env trovato in: C:\Progetti\simulatore-calcio-backend\.env
+🔗 Connessione MongoDB...
+✅ Connesso a MongoDB: football_simulator_db
+📊 Database: football_simulator_db
+   📦 teams: 212 documenti
+   📦 matches_history: 1707 documenti
+   📦 raw_h2h_data_v2: 1933 documenti
+   📦 h2h_by_round: 402 documenti
+✅ Configurazione completata con successo
+Traceback (most recent call last):
+  File "C:\Progetti\simulatore-calcio-backend\ai_engine\Aggiornamenti\frequenti\fbref_scraper_mid.py", line 47, in <module>
+    import cloudscraper
+ModuleNotFoundError: No module named 'cloudscraper'
+🔧 BASE_DIR: C:\Progetti\simulatore-calcio-backend
+🔧 ENV_PATH: C:\Progetti\simulatore-calcio-backend\.env
+✅ .env trovato in: C:\Progetti\simulatore-calcio-backend\.env
+🔗 Connessione MongoDB...
+✅ Connesso a MongoDB: football_simulator_db
+📊 Database: football_simulator_db
+   📦 teams: 212 documenti
+   📦 matches_history: 1707 documenti
+   📦 raw_h2h_data_v2: 1933 documenti
+   📦 h2h_by_round: 402 documenti
+✅ Configurazione completata con successo
+Traceback (most recent call last):
+  File "C:\Progetti\simulatore-calcio-backend\ai_engine\Aggiornamenti\frequenti\fbref_scraper_def.py", line 47, in <module>
+    import cloudscraper
+ModuleNotFoundError: No module named 'cloudscraper'
+🔧 BASE_DIR: C:\Progetti\simulatore-calcio-backend
+🔧 ENV_PATH: C:\Progetti\simulatore-calcio-backend\.env
+✅ .env trovato in: C:\Progetti\simulatore-calcio-backend\.env
+🔗 Connessione MongoDB...
+✅ Connesso a MongoDB: football_simulator_db
+📊 Database: football_simulator_db
+   📦 teams: 212 documenti
+   📦 matches_history: 1707 documenti
+   📦 raw_h2h_data_v2: 1933 documenti
+   📦 h2h_by_round: 402 documenti
+✅ Configurazione completata con successo
+Traceback (most recent call last):
+  File "C:\Progetti\simulatore-calcio-backend\ai_engine\Aggiornamenti\frequenti\scraper_gk_fbref.py", line 28, in <module>
+    import cloudscraper
+ModuleNotFoundError: No module named 'cloudscraper'
+🔧 BASE_DIR: C:\Progetti\simulatore-calcio-backend
+🔧 ENV_PATH: C:\Progetti\simulatore-calcio-backend\.env
+✅ .env trovato in: C:\Progetti\simulatore-calcio-backend\.env
+🔗 Connessione MongoDB...
+✅ Connesso a MongoDB: football_simulator_db
+📊 Database: football_simulator_db
+   📦 teams: 212 documenti
+   📦 matches_history: 1707 documenti
+   📦 raw_h2h_data_v2: 1933 documenti
+   📦 h2h_by_round: 402 documenti
+✅ Configurazione completata con successo
+Traceback (most recent call last):
+  File "C:\Progetti\simulatore-calcio-backend\ai_engine\Aggiornamenti\frequenti\scraper_tm_multi_campionato.py", line 52, in <module>
+    import cloudscraper
+ModuleNotFoundError: No module named 'cloudscraper'
+🔧 BASE_DIR: C:\Progetti\simulatore-calcio-backend
+🔧 ENV_PATH: C:\Progetti\simulatore-calcio-backend\.env
+✅ .env trovato in: C:\Progetti\simulatore-calcio-backend\.env
+🔗 Connessione MongoDB...
+✅ Connesso a MongoDB: football_simulator_db
+📊 Database: football_simulator_db
+   📦 teams: 212 documenti
+   📦 matches_history: 1707 documenti
+   📦 raw_h2h_data_v2: 1933 documenti
+   📦 h2h_by_round: 402 documenti
+✅ Configurazione completata con successo
 🚀 AVVIO SCRAPER TM V8 (Double Memory Fix) - Stagione 2025
 
 🌍 Lega: Serie A
@@ -884,94 +279,51 @@ INIZIO AGGIORNAMENTO NOTTURNO: 17/12/2025  4:00:02,82
 🌍 Lega: Liga Portugal
    Giornate trovate: 34
    ✅ Salvate 34 giornate.
- Connessione MongoDB...
- Database: football_simulator_db
-   Teams: 212
-   Matches: 1707
+🔧 BASE_DIR: C:\Progetti\simulatore-calcio-backend
+🔧 ENV_PATH: C:\Progetti\simulatore-calcio-backend\.env
+✅ .env trovato in: C:\Progetti\simulatore-calcio-backend\.env
+🔗 Connessione MongoDB...
+✅ Connesso a MongoDB: football_simulator_db
+📊 Database: football_simulator_db
+   📦 teams: 212 documenti
+   📦 matches_history: 1707 documenti
+   📦 raw_h2h_data_v2: 1933 documenti
+   📦 h2h_by_round: 402 documenti
+✅ Configurazione completata con successo
 🧠 CALCOLATORE H2H v2.0 PRO (Formula Dinamica + GOL + FIX NOMI)
 Elaborazione:   0%|          | 0/402 [00:00<?, ?it/s]📥 Caricamento Cache Squadre...
-✅ Cache pronta.
-Elaborazione:   0%|          | 1/402 [00:00<03:08,  2.12it/s]Elaborazione:   0%|          | 2/402 [00:00<02:32,  2.63it/s]Elaborazione:   1%|          | 3/402 [00:01<02:21,  2.82it/s]Elaborazione:   1%|          | 4/402 [00:01<02:15,  2.94it/s]Elaborazione:   1%|          | 5/402 [00:01<02:10,  3.04it/s]Elaborazione:   1%|▏         | 6/402 [00:02<02:07,  3.10it/s]Elaborazione:   2%|▏         | 7/402 [00:02<02:05,  3.14it/s]Elaborazione:   2%|▏         | 8/402 [00:02<02:03,  3.18it/s]Elaborazione:   2%|▏         | 9/402 [00:02<02:03,  3.19it/s]Elaborazione:   2%|▏         | 10/402 [00:03<02:03,  3.18it/s]Elaborazione:   3%|▎         | 11/402 [00:03<02:02,  3.20it/s]Elaborazione:   3%|▎         | 12/402 [00:03<02:01,  3.22it/s]Elaborazione:   3%|▎         | 13/402 [00:04<02:00,  3.23it/s]Elaborazione:   3%|▎         | 14/402 [00:04<02:00,  3.23it/s]Elaborazione:   4%|▎         | 15/402 [00:04<01:59,  3.23it/s]Elaborazione:   4%|▍         | 16/402 [00:05<01:58,  3.24it/s]Elaborazione:   4%|▍         | 17/402 [00:05<01:58,  3.24it/s]Elaborazione:   4%|▍         | 18/402 [00:05<01:58,  3.23it/s]Elaborazione:   5%|▍         | 19/402 [00:06<01:58,  3.24it/s]Elaborazione:   5%|▍         | 20/402 [00:06<01:57,  3.24it/s]Elaborazione:   5%|▌         | 21/402 [00:06<01:59,  3.20it/s]Elaborazione:   5%|▌         | 22/402 [00:07<01:58,  3.20it/s]Elaborazione:   6%|▌         | 23/402 [00:07<01:58,  3.20it/s]Elaborazione:   6%|▌         | 24/402 [00:07<01:59,  3.17it/s]Elaborazione:   6%|▌         | 25/402 [00:07<01:57,  3.20it/s]Elaborazione:   6%|▋         | 26/402 [00:08<01:56,  3.22it/s]Elaborazione:   7%|▋         | 27/402 [00:08<01:56,  3.23it/s]Elaborazione:   7%|▋         | 28/402 [00:08<01:55,  3.23it/s]Elaborazione:   7%|▋         | 29/402 [00:09<01:55,  3.24it/s]Elaborazione:   7%|▋         | 30/402 [00:09<01:54,  3.25it/s]Elaborazione:   8%|▊         | 31/402 [00:09<01:54,  3.25it/s]Elaborazione:   8%|▊         | 32/402 [00:10<01:53,  3.25it/s]Elaborazione:   8%|▊         | 33/402 [00:10<01:53,  3.25it/s]Elaborazione:   8%|▊         | 34/402 [00:10<01:53,  3.25it/s]Elaborazione:   9%|▊         | 35/402 [00:11<01:53,  3.22it/s]Elaborazione:   9%|▉         | 36/402 [00:11<01:53,  3.22it/s]Elaborazione:   9%|▉         | 37/402 [00:11<01:53,  3.22it/s]Elaborazione:   9%|▉         | 38/402 [00:11<01:55,  3.16it/s]Elaborazione:  10%|▉         | 39/402 [00:12<01:53,  3.19it/s]Elaborazione:  10%|▉         | 40/402 [00:12<01:54,  3.17it/s]Elaborazione:  10%|█         | 41/402 [00:12<01:54,  3.15it/s]Elaborazione:  10%|█         | 42/402 [00:13<01:53,  3.18it/s]Elaborazione:  11%|█         | 43/402 [00:13<01:53,  3.17it/s]Elaborazione:  11%|█         | 44/402 [00:13<01:51,  3.20it/s]Elaborazione:  11%|█         | 45/402 [00:14<01:50,  3.22it/s]Elaborazione:  11%|█▏        | 46/402 [00:14<01:49,  3.24it/s]Elaborazione:  12%|█▏        | 47/402 [00:14<01:49,  3.25it/s]Elaborazione:  12%|█▏        | 48/402 [00:15<01:50,  3.22it/s]Elaborazione:  12%|█▏        | 49/402 [00:15<01:49,  3.24it/s]Elaborazione:  12%|█▏        | 50/402 [00:15<01:49,  3.21it/s]Elaborazione:  13%|█▎        | 51/402 [00:16<01:49,  3.20it/s]Elaborazione:  13%|█▎        | 52/402 [00:16<01:50,  3.16it/s]Elaborazione:  13%|█▎        | 53/402 [00:16<01:49,  3.20it/s]Elaborazione:  13%|█▎        | 54/402 [00:16<01:48,  3.21it/s]Elaborazione:  14%|█▎        | 55/402 [00:17<01:48,  3.20it/s]Elaborazione:  14%|█▍        | 56/402 [00:17<01:49,  3.17it/s]Elaborazione:  14%|█▍        | 57/402 [00:17<01:48,  3.19it/s]Elaborazione:  14%|█▍        | 58/402 [00:18<01:49,  3.16it/s]Elaborazione:  15%|█▍        | 59/402 [00:18<01:48,  3.17it/s]Elaborazione:  15%|█▍        | 60/402 [00:18<01:46,  3.20it/s]Elaborazione:  15%|█▌        | 61/402 [00:19<01:46,  3.21it/s]Elaborazione:  15%|█▌        | 62/402 [00:19<01:46,  3.18it/s]Elaborazione:  16%|█▌        | 63/402 [00:19<01:45,  3.21it/s]Elaborazione:  16%|█▌        | 64/402 [00:20<01:46,  3.17it/s]Elaborazione:  16%|█▌        | 65/402 [00:20<01:45,  3.20it/s]Elaborazione:  16%|█▋        | 66/402 [00:20<01:45,  3.19it/s]Elaborazione:  17%|█▋        | 67/402 [00:21<01:45,  3.18it/s]Elaborazione:  17%|█▋        | 68/402 [00:21<01:45,  3.16it/s]Elaborazione:  17%|█▋        | 69/402 [00:21<01:46,  3.14it/s]Elaborazione:  17%|█▋        | 70/402 [00:22<01:46,  3.11it/s]Elaborazione:  18%|█▊        | 71/402 [00:22<01:45,  3.12it/s]Elaborazione:  18%|█▊        | 72/402 [00:22<01:45,  3.13it/s]Elaborazione:  18%|█▊        | 73/402 [00:22<01:45,  3.13it/s]Elaborazione:  18%|█▊        | 74/402 [00:23<01:43,  3.16it/s]Elaborazione:  19%|█▊        | 75/402 [00:23<01:42,  3.18it/s]Elaborazione:  19%|█▉        | 76/402 [00:23<01:41,  3.21it/s]Elaborazione:  19%|█▉        | 77/402 [00:24<01:40,  3.23it/s]Elaborazione:  19%|█▉        | 78/402 [00:24<01:39,  3.25it/s]Elaborazione:  20%|█▉        | 79/402 [00:24<01:39,  3.26it/s]Elaborazione:  20%|█▉        | 80/402 [00:25<01:39,  3.24it/s]Elaborazione:  20%|██        | 81/402 [00:25<01:38,  3.25it/s]Elaborazione:  20%|██        | 82/402 [00:25<01:39,  3.23it/s]Elaborazione:  21%|██        | 83/402 [00:26<01:38,  3.25it/s]Elaborazione:  21%|██        | 84/402 [00:26<01:37,  3.26it/s]Elaborazione:  21%|██        | 85/402 [00:26<01:36,  3.27it/s]Elaborazione:  21%|██▏       | 86/402 [00:26<01:37,  3.24it/s]Elaborazione:  22%|██▏       | 87/402 [00:27<01:36,  3.26it/s]Elaborazione:  22%|██▏       | 88/402 [00:27<01:35,  3.27it/s]Elaborazione:  22%|██▏       | 89/402 [00:27<01:35,  3.27it/s]Elaborazione:  22%|██▏       | 90/402 [00:28<01:35,  3.27it/s]Elaborazione:  23%|██▎       | 91/402 [00:28<01:35,  3.26it/s]Elaborazione:  23%|██▎       | 92/402 [00:28<01:34,  3.27it/s]Elaborazione:  23%|██▎       | 93/402 [00:29<01:34,  3.25it/s]Elaborazione:  23%|██▎       | 94/402 [00:29<01:35,  3.22it/s]Elaborazione:  24%|██▎       | 95/402 [00:29<01:34,  3.24it/s]Elaborazione:  24%|██▍       | 96/402 [00:30<01:34,  3.23it/s]Elaborazione:  24%|██▍       | 97/402 [00:30<01:33,  3.25it/s]Elaborazione:  24%|██▍       | 98/402 [00:30<01:33,  3.24it/s]Elaborazione:  25%|██▍       | 99/402 [00:30<01:34,  3.21it/s]Elaborazione:  25%|██▍       | 100/402 [00:31<01:33,  3.24it/s]Elaborazione:  25%|██▌       | 101/402 [00:31<01:32,  3.25it/s]Elaborazione:  25%|██▌       | 102/402 [00:31<01:31,  3.26it/s]Elaborazione:  26%|██▌       | 103/402 [00:32<01:31,  3.27it/s]Elaborazione:  26%|██▌       | 104/402 [00:32<01:31,  3.27it/s]Elaborazione:  26%|██▌       | 105/402 [00:32<01:31,  3.26it/s]Elaborazione:  26%|██▋       | 106/402 [00:33<01:30,  3.25it/s]Elaborazione:  27%|██▋       | 107/402 [00:33<01:31,  3.24it/s]Elaborazione:  27%|██▋       | 108/402 [00:33<01:30,  3.24it/s]Elaborazione:  27%|██▋       | 109/402 [00:34<01:30,  3.25it/s]Elaborazione:  27%|██▋       | 110/402 [00:34<01:29,  3.26it/s]Elaborazione:  28%|██▊       | 111/402 [00:34<01:28,  3.27it/s]Elaborazione:  28%|██▊       | 112/402 [00:34<01:28,  3.28it/s]Elaborazione:  28%|██▊       | 113/402 [00:35<01:28,  3.28it/s]Elaborazione:  28%|██▊       | 114/402 [00:35<01:27,  3.28it/s]Elaborazione:  29%|██▊       | 115/402 [00:35<01:25,  3.37it/s]Elaborazione:  29%|██▉       | 116/402 [00:36<01:24,  3.40it/s]Elaborazione:  29%|██▉       | 117/402 [00:36<01:23,  3.42it/s]Elaborazione:  29%|██▉       | 118/402 [00:36<01:22,  3.42it/s]Elaborazione:  30%|██▉       | 119/402 [00:36<01:21,  3.47it/s]Elaborazione:  30%|██▉       | 120/402 [00:37<01:21,  3.46it/s]Elaborazione:  30%|███       | 121/402 [00:37<01:20,  3.47it/s]Elaborazione:  30%|███       | 122/402 [00:37<01:21,  3.45it/s]Elaborazione:  31%|███       | 123/402 [00:38<01:19,  3.50it/s]Elaborazione:  31%|███       | 124/402 [00:38<01:18,  3.53it/s]Elaborazione:  31%|███       | 125/402 [00:38<01:19,  3.50it/s]Elaborazione:  31%|███▏      | 126/402 [00:38<01:18,  3.53it/s]Elaborazione:  32%|███▏      | 127/402 [00:39<01:18,  3.51it/s]Elaborazione:  32%|███▏      | 128/402 [00:39<01:17,  3.54it/s]Elaborazione:  32%|███▏      | 129/402 [00:39<01:16,  3.56it/s]Elaborazione:  32%|███▏      | 130/402 [00:40<01:15,  3.58it/s]Elaborazione:  33%|███▎      | 131/402 [00:40<01:16,  3.54it/s]Elaborazione:  33%|███▎      | 132/402 [00:40<01:15,  3.57it/s]Elaborazione:  33%|███▎      | 133/402 [00:40<01:15,  3.58it/s]Elaborazione:  33%|███▎      | 134/402 [00:41<01:15,  3.57it/s]Elaborazione:  34%|███▎      | 135/402 [00:41<01:14,  3.59it/s]Elaborazione:  34%|███▍      | 136/402 [00:41<01:14,  3.59it/s]Elaborazione:  34%|███▍      | 137/402 [00:42<01:14,  3.55it/s]Elaborazione:  34%|███▍      | 138/402 [00:42<01:13,  3.58it/s]Elaborazione:  35%|███▍      | 139/402 [00:42<01:15,  3.48it/s]Elaborazione:  35%|███▍      | 140/402 [00:42<01:14,  3.51it/s]Elaborazione:  35%|███▌      | 141/402 [00:43<01:14,  3.51it/s]Elaborazione:  35%|███▌      | 142/402 [00:43<01:13,  3.52it/s]Elaborazione:  36%|███▌      | 143/402 [00:43<01:12,  3.55it/s]Elaborazione:  36%|███▌      | 144/402 [00:44<01:12,  3.57it/s]Elaborazione:  36%|███▌      | 145/402 [00:44<01:12,  3.57it/s]Elaborazione:  36%|███▋      | 146/402 [00:44<01:12,  3.55it/s]Elaborazione:  37%|███▋      | 147/402 [00:44<01:11,  3.56it/s]Elaborazione:  37%|███▋      | 148/402 [00:45<01:11,  3.55it/s]Elaborazione:  37%|███▋      | 149/402 [00:45<01:10,  3.57it/s]Elaborazione:  37%|███▋      | 150/402 [00:45<01:10,  3.57it/s]Elaborazione:  38%|███▊      | 151/402 [00:46<01:09,  3.59it/s]Elaborazione:  38%|███▊      | 152/402 [00:46<01:10,  3.54it/s]Elaborazione:  38%|███▊      | 153/402 [00:46<01:12,  3.41it/s]Elaborazione:  38%|███▊      | 154/402 [00:46<01:13,  3.37it/s]Elaborazione:  39%|███▊      | 155/402 [00:47<01:13,  3.34it/s]Elaborazione:  39%|███▉      | 156/402 [00:47<01:14,  3.32it/s]Elaborazione:  39%|███▉      | 157/402 [00:47<01:14,  3.31it/s]Elaborazione:  39%|███▉      | 158/402 [00:48<01:13,  3.30it/s]Elaborazione:  40%|███▉      | 159/402 [00:48<01:14,  3.26it/s]Elaborazione:  40%|███▉      | 160/402 [00:48<01:15,  3.22it/s]Elaborazione:  40%|████      | 161/402 [00:49<01:15,  3.20it/s]Elaborazione:  40%|████      | 162/402 [00:49<01:14,  3.23it/s]Elaborazione:  41%|████      | 163/402 [00:49<01:15,  3.18it/s]Elaborazione:  41%|████      | 164/402 [00:50<01:15,  3.15it/s]Elaborazione:  41%|████      | 165/402 [00:50<01:14,  3.17it/s]Elaborazione:  41%|████▏     | 166/402 [00:50<01:13,  3.20it/s]Elaborazione:  42%|████▏     | 167/402 [00:50<01:14,  3.17it/s]Elaborazione:  42%|████▏     | 168/402 [00:51<01:13,  3.20it/s]Elaborazione:  42%|████▏     | 169/402 [00:51<01:13,  3.18it/s]Elaborazione:  42%|████▏     | 170/402 [00:51<01:12,  3.21it/s]Elaborazione:  43%|████▎     | 171/402 [00:52<01:12,  3.19it/s]Elaborazione:  43%|████▎     | 172/402 [00:52<01:11,  3.21it/s]Elaborazione:  43%|████▎     | 173/402 [00:52<01:11,  3.22it/s]Elaborazione:  43%|████▎     | 174/402 [00:53<01:10,  3.24it/s]Elaborazione:  44%|████▎     | 175/402 [00:53<01:10,  3.21it/s]Elaborazione:  44%|████▍     | 176/402 [00:53<01:10,  3.20it/s]Elaborazione:  44%|████▍     | 177/402 [00:54<01:10,  3.18it/s]Elaborazione:  44%|████▍     | 178/402 [00:54<01:10,  3.18it/s]Elaborazione:  45%|████▍     | 179/402 [00:54<01:11,  3.13it/s]Elaborazione:  45%|████▍     | 180/402 [00:55<01:10,  3.15it/s]Elaborazione:  45%|████▌     | 181/402 [00:55<01:09,  3.19it/s]Elaborazione:  45%|████▌     | 182/402 [00:55<01:09,  3.15it/s]Elaborazione:  46%|████▌     | 183/402 [00:56<01:09,  3.15it/s]Elaborazione:  46%|████▌     | 184/402 [00:56<01:08,  3.19it/s]Elaborazione:  46%|████▌     | 185/402 [00:56<01:07,  3.22it/s]Elaborazione:  46%|████▋     | 186/402 [00:56<01:06,  3.24it/s]Elaborazione:  47%|████▋     | 187/402 [00:57<01:07,  3.18it/s]Elaborazione:  47%|████▋     | 188/402 [00:57<01:06,  3.21it/s]Elaborazione:  47%|████▋     | 189/402 [00:57<01:05,  3.23it/s]Elaborazione:  47%|████▋     | 190/402 [00:58<01:05,  3.24it/s]Elaborazione:  48%|████▊     | 191/402 [00:58<01:05,  3.21it/s]Elaborazione:  48%|████▊     | 192/402 [00:58<01:05,  3.19it/s]Elaborazione:  48%|████▊     | 193/402 [00:59<01:05,  3.18it/s]Elaborazione:  48%|████▊     | 194/402 [00:59<01:05,  3.18it/s]Elaborazione:  49%|████▊     | 195/402 [00:59<01:06,  3.11it/s]Elaborazione:  49%|████▉     | 196/402 [01:00<01:05,  3.14it/s]Elaborazione:  49%|████▉     | 197/402 [01:00<01:04,  3.16it/s]Elaborazione:  49%|████▉     | 198/402 [01:00<01:04,  3.14it/s]Elaborazione:  50%|████▉     | 199/402 [01:01<01:05,  3.11it/s]Elaborazione:  50%|████▉     | 200/402 [01:01<01:05,  3.11it/s]Elaborazione:  50%|█████     | 201/402 [01:01<01:03,  3.15it/s]Elaborazione:  50%|█████     | 202/402 [01:01<01:02,  3.17it/s]Elaborazione:  50%|█████     | 203/402 [01:02<01:02,  3.20it/s]Elaborazione:  51%|█████     | 204/402 [01:02<01:01,  3.22it/s]Elaborazione:  51%|█████     | 205/402 [01:02<01:00,  3.24it/s]Elaborazione:  51%|█████     | 206/402 [01:03<01:01,  3.21it/s]Elaborazione:  51%|█████▏    | 207/402 [01:03<01:00,  3.22it/s]Elaborazione:  52%|█████▏    | 208/402 [01:03<01:00,  3.19it/s]Elaborazione:  52%|█████▏    | 209/402 [01:04<01:00,  3.21it/s]Elaborazione:  52%|█████▏    | 210/402 [01:04<00:59,  3.23it/s]Elaborazione:  52%|█████▏    | 211/402 [01:04<00:58,  3.24it/s]Elaborazione:  53%|█████▎    | 212/402 [01:05<00:58,  3.24it/s]Elaborazione:  53%|█████▎    | 213/402 [01:05<00:58,  3.24it/s]Elaborazione:  53%|█████▎    | 214/402 [01:05<00:57,  3.25it/s]Elaborazione:  53%|█████▎    | 215/402 [01:06<00:58,  3.18it/s]Elaborazione:  54%|█████▎    | 216/402 [01:06<00:58,  3.17it/s]Elaborazione:  54%|█████▍    | 217/402 [01:06<00:58,  3.16it/s]Elaborazione:  54%|█████▍    | 218/402 [01:06<00:58,  3.16it/s]Elaborazione:  54%|█████▍    | 219/402 [01:07<00:57,  3.18it/s]Elaborazione:  55%|█████▍    | 220/402 [01:07<00:57,  3.16it/s]Elaborazione:  55%|█████▍    | 221/402 [01:07<00:56,  3.19it/s]Elaborazione:  55%|█████▌    | 222/402 [01:08<00:56,  3.19it/s]Elaborazione:  55%|█████▌    | 223/402 [01:08<00:56,  3.16it/s]Elaborazione:  56%|█████▌    | 224/402 [01:08<00:55,  3.18it/s]Elaborazione:  56%|█████▌    | 225/402 [01:09<00:55,  3.20it/s]Elaborazione:  56%|█████▌    | 226/402 [01:09<00:54,  3.22it/s]Elaborazione:  56%|█████▋    | 227/402 [01:09<00:54,  3.21it/s]Elaborazione:  57%|█████▋    | 228/402 [01:10<00:54,  3.21it/s]Elaborazione:  57%|█████▋    | 229/402 [01:10<00:53,  3.22it/s]Elaborazione:  57%|█████▋    | 230/402 [01:10<00:53,  3.20it/s]Elaborazione:  57%|█████▋    | 231/402 [01:11<00:53,  3.21it/s]Elaborazione:  58%|█████▊    | 232/402 [01:11<00:53,  3.17it/s]Elaborazione:  58%|█████▊    | 233/402 [01:11<00:53,  3.16it/s]Elaborazione:  58%|█████▊    | 234/402 [01:11<00:52,  3.18it/s]Elaborazione:  58%|█████▊    | 235/402 [01:12<00:52,  3.19it/s]Elaborazione:  59%|█████▊    | 236/402 [01:12<00:51,  3.20it/s]Elaborazione:  59%|█████▉    | 237/402 [01:12<00:51,  3.21it/s]Elaborazione:  59%|█████▉    | 238/402 [01:13<00:51,  3.21it/s]Elaborazione:  59%|█████▉    | 239/402 [01:13<00:51,  3.20it/s]Elaborazione:  60%|█████▉    | 240/402 [01:13<00:50,  3.20it/s]Elaborazione:  60%|█████▉    | 241/402 [01:14<00:50,  3.21it/s]Elaborazione:  60%|██████    | 242/402 [01:14<00:49,  3.21it/s]Elaborazione:  60%|██████    | 243/402 [01:14<00:50,  3.17it/s]Elaborazione:  61%|██████    | 244/402 [01:15<00:49,  3.19it/s]Elaborazione:  61%|██████    | 245/402 [01:15<00:49,  3.20it/s]Elaborazione:  61%|██████    | 246/402 [01:15<00:49,  3.18it/s]Elaborazione:  61%|██████▏   | 247/402 [01:16<00:48,  3.19it/s]Elaborazione:  62%|██████▏   | 248/402 [01:16<00:48,  3.21it/s]Elaborazione:  62%|██████▏   | 249/402 [01:16<00:47,  3.20it/s]Elaborazione:  62%|██████▏   | 250/402 [01:17<00:48,  3.14it/s]Elaborazione:  62%|██████▏   | 251/402 [01:17<00:47,  3.17it/s]Elaborazione:  63%|██████▎   | 252/402 [01:17<00:47,  3.14it/s]Elaborazione:  63%|██████▎   | 253/402 [01:17<00:47,  3.17it/s]Elaborazione:  63%|██████▎   | 254/402 [01:18<00:46,  3.18it/s]Elaborazione:  63%|██████▎   | 255/402 [01:18<00:45,  3.20it/s]Elaborazione:  64%|██████▎   | 256/402 [01:18<00:46,  3.17it/s]Elaborazione:  64%|██████▍   | 257/402 [01:19<00:46,  3.10it/s]Elaborazione:  64%|██████▍   | 258/402 [01:19<00:46,  3.13it/s]Elaborazione:  64%|██████▍   | 259/402 [01:19<00:45,  3.12it/s]Elaborazione:  65%|██████▍   | 260/402 [01:20<00:45,  3.09it/s]Elaborazione:  65%|██████▍   | 261/402 [01:20<00:45,  3.10it/s]Elaborazione:  65%|██████▌   | 262/402 [01:20<00:44,  3.12it/s]Elaborazione:  65%|██████▌   | 263/402 [01:21<00:45,  3.08it/s]Elaborazione:  66%|██████▌   | 264/402 [01:21<00:44,  3.08it/s]Elaborazione:  66%|██████▌   | 265/402 [01:21<00:44,  3.09it/s]Elaborazione:  66%|██████▌   | 266/402 [01:22<00:43,  3.11it/s]Elaborazione:  66%|██████▋   | 267/402 [01:22<00:42,  3.18it/s]Elaborazione:  67%|██████▋   | 268/402 [01:22<00:40,  3.28it/s]Elaborazione:  67%|██████▋   | 269/402 [01:23<00:40,  3.32it/s]Elaborazione:  67%|██████▋   | 270/402 [01:23<00:38,  3.40it/s]Elaborazione:  67%|██████▋   | 271/402 [01:23<00:38,  3.42it/s]Elaborazione:  68%|██████▊   | 272/402 [01:23<00:37,  3.46it/s]Elaborazione:  68%|██████▊   | 273/402 [01:24<00:36,  3.49it/s]Elaborazione:  68%|██████▊   | 274/402 [01:24<00:36,  3.52it/s]Elaborazione:  68%|██████▊   | 275/402 [01:24<00:36,  3.48it/s]Elaborazione:  69%|██████▊   | 276/402 [01:24<00:36,  3.48it/s]Elaborazione:  69%|██████▉   | 277/402 [01:25<00:35,  3.50it/s]Elaborazione:  69%|██████▉   | 278/402 [01:25<00:35,  3.52it/s]Elaborazione:  69%|██████▉   | 279/402 [01:25<00:34,  3.54it/s]Elaborazione:  70%|██████▉   | 280/402 [01:26<00:35,  3.44it/s]Elaborazione:  70%|██████▉   | 281/402 [01:26<00:35,  3.45it/s]Elaborazione:  70%|███████   | 282/402 [01:26<00:34,  3.48it/s]Elaborazione:  70%|███████   | 283/402 [01:27<00:34,  3.47it/s]Elaborazione:  71%|███████   | 284/402 [01:27<00:34,  3.46it/s]Elaborazione:  71%|███████   | 285/402 [01:27<00:34,  3.38it/s]Elaborazione:  71%|███████   | 286/402 [01:27<00:33,  3.44it/s]Elaborazione:  71%|███████▏  | 287/402 [01:28<00:33,  3.44it/s]Elaborazione:  72%|███████▏  | 288/402 [01:28<00:32,  3.48it/s]Elaborazione:  72%|███████▏  | 289/402 [01:28<00:32,  3.43it/s]Elaborazione:  72%|███████▏  | 290/402 [01:29<00:32,  3.43it/s]Elaborazione:  72%|███████▏  | 291/402 [01:29<00:32,  3.47it/s]Elaborazione:  73%|███████▎  | 292/402 [01:29<00:31,  3.51it/s]Elaborazione:  73%|███████▎  | 293/402 [01:29<00:31,  3.49it/s]Elaborazione:  73%|███████▎  | 294/402 [01:30<00:30,  3.51it/s]Elaborazione:  73%|███████▎  | 295/402 [01:30<00:30,  3.53it/s]Elaborazione:  74%|███████▎  | 296/402 [01:30<00:29,  3.55it/s]Elaborazione:  74%|███████▍  | 297/402 [01:31<00:29,  3.56it/s]Elaborazione:  74%|███████▍  | 298/402 [01:31<00:29,  3.53it/s]Elaborazione:  74%|███████▍  | 299/402 [01:31<00:29,  3.54it/s]Elaborazione:  75%|███████▍  | 300/402 [01:31<00:28,  3.52it/s]Elaborazione:  75%|███████▍  | 301/402 [01:32<00:28,  3.52it/s]Elaborazione:  75%|███████▌  | 302/402 [01:32<00:28,  3.53it/s]Elaborazione:  75%|███████▌  | 303/402 [01:32<00:28,  3.50it/s]Elaborazione:  76%|███████▌  | 304/402 [01:33<00:28,  3.46it/s]Elaborazione:  76%|███████▌  | 305/402 [01:33<00:29,  3.32it/s]Elaborazione:  76%|███████▌  | 306/402 [01:33<00:28,  3.38it/s]Elaborazione:  76%|███████▋  | 307/402 [01:33<00:27,  3.42it/s]Elaborazione:  77%|███████▋  | 308/402 [01:34<00:27,  3.46it/s]Elaborazione:  77%|███████▋  | 309/402 [01:34<00:26,  3.49it/s]Elaborazione:  77%|███████▋  | 310/402 [01:34<00:26,  3.50it/s]Elaborazione:  77%|███████▋  | 311/402 [01:35<00:25,  3.52it/s]Elaborazione:  78%|███████▊  | 312/402 [01:35<00:25,  3.52it/s]Elaborazione:  78%|███████▊  | 313/402 [01:35<00:25,  3.49it/s]Elaborazione:  78%|███████▊  | 314/402 [01:35<00:25,  3.50it/s]Elaborazione:  78%|███████▊  | 315/402 [01:36<00:24,  3.48it/s]Elaborazione:  79%|███████▊  | 316/402 [01:36<00:24,  3.50it/s]Elaborazione:  79%|███████▉  | 317/402 [01:36<00:24,  3.46it/s]Elaborazione:  79%|███████▉  | 318/402 [01:37<00:24,  3.48it/s]Elaborazione:  79%|███████▉  | 319/402 [01:37<00:24,  3.44it/s]Elaborazione:  80%|███████▉  | 320/402 [01:37<00:23,  3.42it/s]Elaborazione:  80%|███████▉  | 321/402 [01:37<00:23,  3.40it/s]Elaborazione:  80%|████████  | 322/402 [01:38<00:23,  3.41it/s]Elaborazione:  80%|████████  | 323/402 [01:38<00:22,  3.44it/s]Elaborazione:  81%|████████  | 324/402 [01:38<00:22,  3.44it/s]Elaborazione:  81%|████████  | 325/402 [01:39<00:22,  3.43it/s]Elaborazione:  81%|████████  | 326/402 [01:39<00:21,  3.46it/s]Elaborazione:  81%|████████▏ | 327/402 [01:39<00:22,  3.39it/s]Elaborazione:  82%|████████▏ | 328/402 [01:40<00:21,  3.37it/s]Elaborazione:  82%|████████▏ | 329/402 [01:40<00:21,  3.41it/s]Elaborazione:  82%|████████▏ | 330/402 [01:40<00:20,  3.45it/s]Elaborazione:  82%|████████▏ | 331/402 [01:40<00:20,  3.47it/s]Elaborazione:  83%|████████▎ | 332/402 [01:41<00:20,  3.44it/s]Elaborazione:  83%|████████▎ | 333/402 [01:41<00:20,  3.42it/s]Elaborazione:  83%|████████▎ | 334/402 [01:41<00:20,  3.39it/s]Elaborazione:  83%|████████▎ | 335/402 [01:42<00:19,  3.39it/s]Elaborazione:  84%|████████▎ | 336/402 [01:42<00:19,  3.44it/s]Elaborazione:  84%|████████▍ | 337/402 [01:42<00:18,  3.45it/s]Elaborazione:  84%|████████▍ | 338/402 [01:42<00:18,  3.47it/s]Elaborazione:  84%|████████▍ | 339/402 [01:43<00:18,  3.45it/s]Elaborazione:  85%|████████▍ | 340/402 [01:43<00:17,  3.45it/s]Elaborazione:  85%|████████▍ | 341/402 [01:43<00:17,  3.45it/s]Elaborazione:  85%|████████▌ | 342/402 [01:44<00:17,  3.48it/s]Elaborazione:  85%|████████▌ | 343/402 [01:44<00:16,  3.48it/s]Elaborazione:  86%|████████▌ | 344/402 [01:44<00:16,  3.45it/s]Elaborazione:  86%|████████▌ | 345/402 [01:44<00:16,  3.44it/s]Elaborazione:  86%|████████▌ | 346/402 [01:45<00:16,  3.47it/s]Elaborazione:  86%|████████▋ | 347/402 [01:45<00:15,  3.49it/s]Elaborazione:  87%|████████▋ | 348/402 [01:45<00:15,  3.51it/s]Elaborazione:  87%|████████▋ | 349/402 [01:46<00:15,  3.48it/s]Elaborazione:  87%|████████▋ | 350/402 [01:46<00:14,  3.50it/s]Elaborazione:  87%|████████▋ | 351/402 [01:46<00:14,  3.51it/s]Elaborazione:  88%|████████▊ | 352/402 [01:46<00:14,  3.52it/s]Elaborazione:  88%|████████▊ | 353/402 [01:47<00:13,  3.51it/s]Elaborazione:  88%|████████▊ | 354/402 [01:47<00:13,  3.53it/s]Elaborazione:  88%|████████▊ | 355/402 [01:47<00:13,  3.53it/s]Elaborazione:  89%|████████▊ | 356/402 [01:48<00:13,  3.50it/s]Elaborazione:  89%|████████▉ | 357/402 [01:48<00:12,  3.48it/s]Elaborazione:  89%|████████▉ | 358/402 [01:48<00:12,  3.51it/s]Elaborazione:  89%|████████▉ | 359/402 [01:48<00:12,  3.52it/s]Elaborazione:  90%|████████▉ | 360/402 [01:49<00:12,  3.49it/s]Elaborazione:  90%|████████▉ | 361/402 [01:49<00:11,  3.47it/s]Elaborazione:  90%|█████████ | 362/402 [01:49<00:11,  3.49it/s]Elaborazione:  90%|█████████ | 363/402 [01:50<00:11,  3.51it/s]Elaborazione:  91%|█████████ | 364/402 [01:50<00:10,  3.53it/s]Elaborazione:  91%|█████████ | 365/402 [01:50<00:10,  3.48it/s]Elaborazione:  91%|█████████ | 366/402 [01:50<00:10,  3.46it/s]Elaborazione:  91%|█████████▏| 367/402 [01:51<00:10,  3.48it/s]Elaborazione:  92%|█████████▏| 368/402 [01:51<00:09,  3.50it/s]Elaborazione:  92%|█████████▏| 369/402 [01:51<00:09,  3.51it/s]Elaborazione:  92%|█████████▏| 370/402 [01:52<00:09,  3.48it/s]Elaborazione:  92%|█████████▏| 371/402 [01:52<00:09,  3.43it/s]Elaborazione:  93%|█████████▎| 372/402 [01:52<00:08,  3.48it/s]Elaborazione:  93%|█████████▎| 373/402 [01:52<00:08,  3.50it/s]Elaborazione:  93%|█████████▎| 374/402 [01:53<00:08,  3.47it/s]Elaborazione:  93%|█████████▎| 375/402 [01:53<00:08,  3.35it/s]Elaborazione:  94%|█████████▎| 376/402 [01:53<00:07,  3.39it/s]Elaborazione:  94%|█████████▍| 377/402 [01:54<00:07,  3.38it/s]Elaborazione:  94%|█████████▍| 378/402 [01:54<00:07,  3.31it/s]Elaborazione:  94%|█████████▍| 379/402 [01:54<00:06,  3.39it/s]Elaborazione:  95%|█████████▍| 380/402 [01:55<00:06,  3.40it/s]Elaborazione:  95%|█████████▍| 381/402 [01:55<00:06,  3.45it/s]Elaborazione:  95%|█████████▌| 382/402 [01:55<00:05,  3.44it/s]Elaborazione:  95%|█████████▌| 383/402 [01:55<00:05,  3.45it/s]Elaborazione:  96%|█████████▌| 384/402 [01:56<00:05,  3.47it/s]Elaborazione:  96%|█████████▌| 385/402 [01:56<00:04,  3.45it/s]Elaborazione:  96%|█████████▌| 386/402 [01:56<00:04,  3.46it/s]Elaborazione:  96%|█████████▋| 387/402 [01:57<00:04,  3.49it/s]Elaborazione:  97%|█████████▋| 388/402 [01:57<00:04,  3.48it/s]Elaborazione:  97%|█████████▋| 389/402 [01:57<00:03,  3.47it/s]Elaborazione:  97%|█████████▋| 390/402 [01:57<00:03,  3.49it/s]Elaborazione:  97%|█████████▋| 391/402 [01:58<00:03,  3.49it/s]Elaborazione:  98%|█████████▊| 392/402 [01:58<00:02,  3.47it/s]Elaborazione:  98%|█████████▊| 393/402 [01:58<00:02,  3.41it/s]Elaborazione:  98%|█████████▊| 394/402 [01:59<00:02,  3.47it/s]Elaborazione:  98%|█████████▊| 395/402 [01:59<00:02,  3.44it/s]Elaborazione:  99%|█████████▊| 396/402 [01:59<00:01,  3.45it/s]Elaborazione:  99%|█████████▉| 397/402 [01:59<00:01,  3.45it/s]Elaborazione:  99%|█████████▉| 398/402 [02:00<00:01,  3.50it/s]Elaborazione:  99%|█████████▉| 399/402 [02:00<00:00,  3.51it/s]Elaborazione: 100%|█████████▉| 400/402 [02:00<00:00,  3.54it/s]Elaborazione: 100%|█████████▉| 401/402 [02:01<00:00,  3.51it/s]Elaborazione: 100%|██████████| 402/402 [02:01<00:00,  3.54it/s]Elaborazione: 100%|██████████| 402/402 [02:01<00:00,  3.31it/s]
- Connessione MongoDB...
- Database: football_simulator_db
-   Teams: 212
-   Matches: 1707
-🗑️  Calendario pulito. Inizio download...
-
-🌍 [FBRef] Scarico: Serie A
-   ✅ Aggiunte 268 partite future.
-
-🌍 [FBRef] Scarico: Serie B
-   ✅ Aggiunte 258 partite future.
-
-🌍 [FBRef] Scarico: Premier League
-   ✅ Aggiunte 257 partite future.
-
-🌍 [FBRef] Scarico: La Liga
-   ✅ Aggiunte 258 partite future.
-
-🌍 [FBRef] Scarico: Bundesliga
-   ✅ Aggiunte 213 partite future.
-
-🌍 [FBRef] Scarico: Ligue 1
-   ✅ Aggiunte 195 partite future.
-
-🌍 [FBRef] Scarico: Eredivisie
-   ✅ Aggiunte 198 partite future.
-
-🌍 [FBRef] Scarico: Liga Portugal
-   ✅ Aggiunte 216 partite future.
-
-🌍 [SoccerStats] Scarico: Serie C - Girone A
-   ✅ Aggiunte 200 partite future (Serie C).
-
-🌍 [SoccerStats] Scarico: Serie C - Girone B
-   ✅ Aggiunte 181 partite future (Serie C).
-
-🌍 [SoccerStats] Scarico: Serie C - Girone C
-   ✅ Aggiunte 200 partite future (Serie C).
-
-🏁 CALENDARIO COMPLETATO.
-C:\Progetti\simulatore-calcio-backend\ai_engine\Aggiornamenti\frequenti\scraper_odds_oddsmath.py:69: DeprecationWarning: The 'text' argument to find()-type methods is deprecated. Use 'string' instead.
-  if t.find('td', text='1') or "odds" in str(t) or len(t.find_all('tr')) > 10:
- Connessione MongoDB...
- Database: football_simulator_db
-   Teams: 212
-   Matches: 1707
-💰 AVVIO SCRAPER ODDSMATH (FIXED & CONNECTED)...
-
-🌍 Serie A
-   ✅ Aggiornate quote per 21 partite.
-
-🌍 Serie B
-   ✅ Aggiornate quote per 9 partite.
-
-🌍 Serie C (Lega Pro)
-   ✅ Aggiornate quote per 19 partite.
-
-🌍 Premier League
-   ✅ Aggiornate quote per 19 partite.
-
-🌍 La Liga
-   ✅ Aggiornate quote per 18 partite.
-
-🌍 Bundesliga
-   ✅ Aggiornate quote per 8 partite.
-
-🌍 Ligue 1
-   ✅ Aggiornate quote per 8 partite.
-
-🌍 Eredivisie
-   ✅ Aggiornate quote per 17 partite.
-
-🌍 Liga Portugal
-   ✅ Aggiornate quote per 5 partite.
-
-🏁 FINITO. Totale quote salvate: 124
- Connessione MongoDB...
- Database: football_simulator_db
-   Teams: 212
-   Matches: 1707
+✅ Cache pronta con 526 alias.
+Elaborazione:   0%|          | 1/402 [00:00<05:41,  1.17it/s]Elaborazione:   0%|          | 2/402 [00:01<05:28,  1.22it/s]Elaborazione:   1%|          | 3/402 [00:02<05:24,  1.23it/s]Elaborazione:   1%|          | 4/402 [00:03<05:18,  1.25it/s]Elaborazione:   1%|          | 5/402 [00:04<05:15,  1.26it/s]Elaborazione:   1%|▏         | 6/402 [00:04<05:17,  1.25it/s]Elaborazione:   2%|▏         | 7/402 [00:05<05:22,  1.22it/s]Elaborazione:   2%|▏         | 8/402 [00:06<05:24,  1.22it/s]Elaborazione:   2%|▏         | 9/402 [00:07<05:21,  1.22it/s]Elaborazione:   2%|▏         | 10/402 [00:08<05:16,  1.24it/s]Elaborazione:   3%|▎         | 11/402 [00:08<05:12,  1.25it/s]Elaborazione:   3%|▎         | 12/402 [00:09<05:09,  1.26it/s]Elaborazione:   3%|▎         | 13/402 [00:10<05:08,  1.26it/s]Elaborazione:   3%|▎         | 14/402 [00:11<05:06,  1.27it/s]Elaborazione:   4%|▎         | 15/402 [00:12<05:06,  1.26it/s]Elaborazione:   4%|▍         | 16/402 [00:12<05:05,  1.26it/s]Elaborazione:   4%|▍         | 17/402 [00:13<05:03,  1.27it/s]Elaborazione:   4%|▍         | 18/402 [00:14<05:01,  1.27it/s]Elaborazione:   5%|▍         | 19/402 [00:15<05:02,  1.26it/s]Elaborazione:   5%|▍         | 20/402 [00:15<05:00,  1.27it/s]Elaborazione:   5%|▌         | 21/402 [00:16<05:00,  1.27it/s]Elaborazione:   5%|▌         | 22/402 [00:17<04:58,  1.27it/s]Elaborazione:   6%|▌         | 23/402 [00:18<04:57,  1.27it/s]Elaborazione:   6%|▌         | 24/402 [00:19<04:56,  1.27it/s]Elaborazione:   6%|▌         | 25/402 [00:19<04:55,  1.28it/s]Elaborazione:   6%|▋         | 26/402 [00:20<04:54,  1.28it/s]Elaborazione:   7%|▋         | 27/402 [00:21<04:57,  1.26it/s]Elaborazione:   7%|▋         | 28/402 [00:22<04:54,  1.27it/s]Elaborazione:   7%|▋         | 29/402 [00:23<04:54,  1.26it/s]Elaborazione:   7%|▋         | 30/402 [00:23<04:56,  1.25it/s]Elaborazione:   8%|▊         | 31/402 [00:24<04:54,  1.26it/s]Elaborazione:   8%|▊         | 32/402 [00:25<04:52,  1.26it/s]Elaborazione:   8%|▊         | 33/402 [00:26<04:53,  1.26it/s]Elaborazione:   8%|▊         | 34/402 [00:27<04:51,  1.26it/s]Elaborazione:   9%|▊         | 35/402 [00:27<04:49,  1.27it/s]Elaborazione:   9%|▉         | 36/402 [00:28<04:51,  1.26it/s]Elaborazione:   9%|▉         | 37/402 [00:29<04:49,  1.26it/s]Elaborazione:   9%|▉         | 38/402 [00:30<04:51,  1.25it/s]Elaborazione:  10%|▉         | 39/402 [00:31<04:46,  1.27it/s]Elaborazione:  10%|▉         | 40/402 [00:31<04:45,  1.27it/s]Elaborazione:  10%|█         | 41/402 [00:32<04:43,  1.27it/s]Elaborazione:  10%|█         | 42/402 [00:33<04:40,  1.28it/s]Elaborazione:  11%|█         | 43/402 [00:34<04:39,  1.28it/s]Elaborazione:  11%|█         | 44/402 [00:34<04:39,  1.28it/s]Elaborazione:  11%|█         | 45/402 [00:35<04:40,  1.27it/s]Elaborazione:  11%|█▏        | 46/402 [00:36<04:38,  1.28it/s]Elaborazione:  12%|█▏        | 47/402 [00:37<04:37,  1.28it/s]Elaborazione:  12%|█▏        | 48/402 [00:38<04:35,  1.28it/s]Elaborazione:  12%|█▏        | 49/402 [00:38<04:34,  1.29it/s]Elaborazione:  12%|█▏        | 50/402 [00:39<04:33,  1.29it/s]Elaborazione:  13%|█▎        | 51/402 [00:40<04:31,  1.29it/s]Elaborazione:  13%|█▎        | 52/402 [00:41<04:30,  1.29it/s]Elaborazione:  13%|█▎        | 53/402 [00:41<04:30,  1.29it/s]Elaborazione:  13%|█▎        | 54/402 [00:42<04:32,  1.28it/s]Elaborazione:  14%|█▎        | 55/402 [00:43<04:31,  1.28it/s]Elaborazione:  14%|█▍        | 56/402 [00:44<04:30,  1.28it/s]Elaborazione:  14%|█▍        | 57/402 [00:45<04:30,  1.28it/s]Elaborazione:  14%|█▍        | 58/402 [00:45<04:28,  1.28it/s]Elaborazione:  15%|█▍        | 59/402 [00:46<04:27,  1.28it/s]Elaborazione:  15%|█▍        | 60/402 [00:47<04:25,  1.29it/s]Elaborazione:  15%|█▌        | 61/402 [00:48<04:23,  1.30it/s]Elaborazione:  15%|█▌        | 62/402 [00:48<04:21,  1.30it/s]Elaborazione:  16%|█▌        | 63/402 [00:49<04:19,  1.30it/s]Elaborazione:  16%|█▌        | 64/402 [00:50<04:19,  1.30it/s]Elaborazione:  16%|█▌        | 65/402 [00:51<04:19,  1.30it/s]Elaborazione:  16%|█▋        | 66/402 [00:51<04:21,  1.29it/s]Elaborazione:  17%|█▋        | 67/402 [00:52<04:19,  1.29it/s]Elaborazione:  17%|█▋        | 68/402 [00:53<04:18,  1.29it/s]Elaborazione:  17%|█▋        | 69/402 [00:54<04:19,  1.28it/s]Elaborazione:  17%|█▋        | 70/402 [00:55<04:19,  1.28it/s]Elaborazione:  18%|█▊        | 71/402 [00:55<04:18,  1.28it/s]Elaborazione:  18%|█▊        | 72/402 [00:56<04:19,  1.27it/s]Elaborazione:  18%|█▊        | 73/402 [00:57<04:19,  1.27it/s]Elaborazione:  18%|█▊        | 74/402 [00:58<04:17,  1.28it/s]Elaborazione:  19%|█▊        | 75/402 [00:59<04:17,  1.27it/s]Elaborazione:  19%|█▉        | 76/402 [00:59<04:16,  1.27it/s]Elaborazione:  19%|█▉        | 77/402 [01:00<04:12,  1.28it/s]Elaborazione:  19%|█▉        | 78/402 [01:01<04:08,  1.30it/s]Elaborazione:  20%|█▉        | 79/402 [01:02<04:08,  1.30it/s]Elaborazione:  20%|█▉        | 80/402 [01:02<04:06,  1.31it/s]Elaborazione:  20%|██        | 81/402 [01:03<04:03,  1.32it/s]Elaborazione:  20%|██        | 82/402 [01:04<04:03,  1.31it/s]Elaborazione:  21%|██        | 83/402 [01:05<04:01,  1.32it/s]Elaborazione:  21%|██        | 84/402 [01:05<04:03,  1.31it/s]Elaborazione:  21%|██        | 85/402 [01:06<04:00,  1.32it/s]Elaborazione:  21%|██▏       | 86/402 [01:07<03:58,  1.32it/s]Elaborazione:  22%|██▏       | 87/402 [01:08<03:55,  1.34it/s]Elaborazione:  22%|██▏       | 88/402 [01:08<03:53,  1.34it/s]Elaborazione:  22%|██▏       | 89/402 [01:09<03:52,  1.35it/s]Elaborazione:  22%|██▏       | 90/402 [01:10<03:51,  1.35it/s]Elaborazione:  23%|██▎       | 91/402 [01:11<03:50,  1.35it/s]Elaborazione:  23%|██▎       | 92/402 [01:11<03:50,  1.35it/s]Elaborazione:  23%|██▎       | 93/402 [01:12<03:48,  1.35it/s]Elaborazione:  23%|██▎       | 94/402 [01:13<03:47,  1.35it/s]Elaborazione:  24%|██▎       | 95/402 [01:14<03:48,  1.34it/s]Elaborazione:  24%|██▍       | 96/402 [01:14<03:49,  1.34it/s]Elaborazione:  24%|██▍       | 97/402 [01:15<03:49,  1.33it/s]Elaborazione:  24%|██▍       | 98/402 [01:16<03:46,  1.34it/s]Elaborazione:  25%|██▍       | 99/402 [01:17<03:45,  1.35it/s]Elaborazione:  25%|██▍       | 100/402 [01:17<03:43,  1.35it/s]Elaborazione:  25%|██▌       | 101/402 [01:18<03:42,  1.35it/s]Elaborazione:  25%|██▌       | 102/402 [01:19<03:41,  1.36it/s]Elaborazione:  26%|██▌       | 103/402 [01:19<03:40,  1.36it/s]Elaborazione:  26%|██▌       | 104/402 [01:20<03:40,  1.35it/s]Elaborazione:  26%|██▌       | 105/402 [01:21<03:39,  1.35it/s]Elaborazione:  26%|██▋       | 106/402 [01:22<03:38,  1.35it/s]Elaborazione:  27%|██▋       | 107/402 [01:22<03:37,  1.36it/s]Elaborazione:  27%|██▋       | 108/402 [01:23<03:37,  1.35it/s]Elaborazione:  27%|██▋       | 109/402 [01:24<03:37,  1.35it/s]Elaborazione:  27%|██▋       | 110/402 [01:25<03:38,  1.33it/s]Elaborazione:  28%|██▊       | 111/402 [01:25<03:37,  1.34it/s]Elaborazione:  28%|██▊       | 112/402 [01:26<03:37,  1.33it/s]Elaborazione:  28%|██▊       | 113/402 [01:27<03:36,  1.33it/s]Elaborazione:  28%|██▊       | 114/402 [01:28<03:35,  1.33it/s]Elaborazione:  29%|██▊       | 115/402 [01:28<03:29,  1.37it/s]Elaborazione:  29%|██▉       | 116/402 [01:29<03:27,  1.38it/s]Elaborazione:  29%|██▉       | 117/402 [01:30<03:24,  1.40it/s]Elaborazione:  29%|██▉       | 118/402 [01:31<03:22,  1.41it/s]Elaborazione:  30%|██▉       | 119/402 [01:31<03:20,  1.41it/s]Elaborazione:  30%|██▉       | 120/402 [01:32<03:19,  1.41it/s]Elaborazione:  30%|███       | 121/402 [01:33<03:19,  1.41it/s]Elaborazione:  30%|███       | 122/402 [01:33<03:16,  1.43it/s]Elaborazione:  31%|███       | 123/402 [01:34<03:15,  1.43it/s]Elaborazione:  31%|███       | 124/402 [01:35<03:13,  1.44it/s]Elaborazione:  31%|███       | 125/402 [01:35<03:13,  1.43it/s]Elaborazione:  31%|███▏      | 126/402 [01:36<03:15,  1.41it/s]Elaborazione:  32%|███▏      | 127/402 [01:37<03:14,  1.41it/s]Elaborazione:  32%|███▏      | 128/402 [01:38<03:13,  1.41it/s]Elaborazione:  32%|███▏      | 129/402 [01:38<03:12,  1.42it/s]Elaborazione:  32%|███▏      | 130/402 [01:39<03:10,  1.43it/s]Elaborazione:  33%|███▎      | 131/402 [01:40<03:08,  1.44it/s]Elaborazione:  33%|███▎      | 132/402 [01:40<03:07,  1.44it/s]Elaborazione:  33%|███▎      | 133/402 [01:41<03:06,  1.44it/s]Elaborazione:  33%|███▎      | 134/402 [01:42<03:06,  1.44it/s]Elaborazione:  34%|███▎      | 135/402 [01:42<03:07,  1.42it/s]Elaborazione:  34%|███▍      | 136/402 [01:43<03:05,  1.43it/s]Elaborazione:  34%|███▍      | 137/402 [01:44<03:05,  1.43it/s]Elaborazione:  34%|███▍      | 138/402 [01:45<03:05,  1.42it/s]Elaborazione:  35%|███▍      | 139/402 [01:45<03:04,  1.42it/s]Elaborazione:  35%|███▍      | 140/402 [01:46<03:05,  1.41it/s]Elaborazione:  35%|███▌      | 141/402 [01:47<03:05,  1.41it/s]Elaborazione:  35%|███▌      | 142/402 [01:47<03:03,  1.42it/s]Elaborazione:  36%|███▌      | 143/402 [01:48<03:01,  1.42it/s]Elaborazione:  36%|███▌      | 144/402 [01:49<03:01,  1.42it/s]Elaborazione:  36%|███▌      | 145/402 [01:49<02:58,  1.44it/s]Elaborazione:  36%|███▋      | 146/402 [01:50<02:57,  1.44it/s]Elaborazione:  37%|███▋      | 147/402 [01:51<02:57,  1.44it/s]Elaborazione:  37%|███▋      | 148/402 [01:51<02:55,  1.44it/s]Elaborazione:  37%|███▋      | 149/402 [01:52<02:55,  1.44it/s]Elaborazione:  37%|███▋      | 150/402 [01:53<02:56,  1.43it/s]Elaborazione:  38%|███▊      | 151/402 [01:54<02:54,  1.44it/s]Elaborazione:  38%|███▊      | 152/402 [01:54<02:53,  1.44it/s]Elaborazione:  38%|███▊      | 153/402 [01:55<02:58,  1.39it/s]Elaborazione:  38%|███▊      | 154/402 [01:56<03:02,  1.36it/s]Elaborazione:  39%|███▊      | 155/402 [01:57<03:05,  1.33it/s]Elaborazione:  39%|███▉      | 156/402 [01:57<03:06,  1.32it/s]Elaborazione:  39%|███▉      | 157/402 [01:58<03:06,  1.31it/s]Elaborazione:  39%|███▉      | 158/402 [01:59<03:06,  1.31it/s]Elaborazione:  40%|███▉      | 159/402 [02:00<03:05,  1.31it/s]Elaborazione:  40%|███▉      | 160/402 [02:00<03:05,  1.31it/s]Elaborazione:  40%|████      | 161/402 [02:01<03:05,  1.30it/s]Elaborazione:  40%|████      | 162/402 [02:02<03:04,  1.30it/s]Elaborazione:  41%|████      | 163/402 [02:03<03:06,  1.28it/s]Elaborazione:  41%|████      | 164/402 [02:04<03:05,  1.28it/s]Elaborazione:  41%|████      | 165/402 [02:04<03:04,  1.29it/s]Elaborazione:  41%|████▏     | 166/402 [02:05<03:04,  1.28it/s]Elaborazione:  42%|████▏     | 167/402 [02:06<03:02,  1.29it/s]Elaborazione:  42%|████▏     | 168/402 [02:07<03:02,  1.28it/s]Elaborazione:  42%|████▏     | 169/402 [02:07<03:01,  1.28it/s]Elaborazione:  42%|████▏     | 170/402 [02:08<03:00,  1.28it/s]Elaborazione:  43%|████▎     | 171/402 [02:09<02:59,  1.29it/s]Elaborazione:  43%|████▎     | 172/402 [02:10<02:58,  1.29it/s]Elaborazione:  43%|████▎     | 173/402 [02:11<02:57,  1.29it/s]Elaborazione:  43%|████▎     | 174/402 [02:11<02:56,  1.29it/s]Elaborazione:  44%|████▎     | 175/402 [02:12<02:55,  1.29it/s]Elaborazione:  44%|████▍     | 176/402 [02:13<02:54,  1.29it/s]Elaborazione:  44%|████▍     | 177/402 [02:14<02:53,  1.30it/s]Elaborazione:  44%|████▍     | 178/402 [02:14<02:52,  1.30it/s]Elaborazione:  45%|████▍     | 179/402 [02:15<02:52,  1.30it/s]Elaborazione:  45%|████▍     | 180/402 [02:16<02:51,  1.29it/s]Elaborazione:  45%|████▌     | 181/402 [02:17<02:51,  1.29it/s]Elaborazione:  45%|████▌     | 182/402 [02:18<02:49,  1.30it/s]Elaborazione:  46%|████▌     | 183/402 [02:18<02:48,  1.30it/s]Elaborazione:  46%|████▌     | 184/402 [02:19<02:48,  1.30it/s]Elaborazione:  46%|████▌     | 185/402 [02:20<02:47,  1.30it/s]Elaborazione:  46%|████▋     | 186/402 [02:21<02:46,  1.30it/s]Elaborazione:  47%|████▋     | 187/402 [02:21<02:44,  1.30it/s]Elaborazione:  47%|████▋     | 188/402 [02:22<02:45,  1.29it/s]Elaborazione:  47%|████▋     | 189/402 [02:23<02:44,  1.29it/s]Elaborazione:  47%|████▋     | 190/402 [02:24<02:43,  1.30it/s]Elaborazione:  48%|████▊     | 191/402 [02:24<02:44,  1.28it/s]Elaborazione:  48%|████▊     | 192/402 [02:25<02:46,  1.26it/s]Elaborazione:  48%|████▊     | 193/402 [02:26<02:46,  1.25it/s]Elaborazione:  48%|████▊     | 194/402 [02:27<02:45,  1.26it/s]Elaborazione:  49%|████▊     | 195/402 [02:28<02:43,  1.27it/s]Elaborazione:  49%|████▉     | 196/402 [02:28<02:41,  1.28it/s]Elaborazione:  49%|████▉     | 197/402 [02:29<02:40,  1.28it/s]Elaborazione:  49%|████▉     | 198/402 [02:30<02:39,  1.28it/s]Elaborazione:  50%|████▉     | 199/402 [02:31<02:37,  1.29it/s]Elaborazione:  50%|████▉     | 200/402 [02:32<02:35,  1.30it/s]Elaborazione:  50%|█████     | 201/402 [02:32<02:34,  1.30it/s]Elaborazione:  50%|█████     | 202/402 [02:33<02:33,  1.30it/s]Elaborazione:  50%|█████     | 203/402 [02:34<02:33,  1.29it/s]Elaborazione:  51%|█████     | 204/402 [02:35<02:34,  1.28it/s]Elaborazione:  51%|█████     | 205/402 [02:35<02:32,  1.29it/s]Elaborazione:  51%|█████     | 206/402 [02:36<02:31,  1.29it/s]Elaborazione:  51%|█████▏    | 207/402 [02:37<02:30,  1.30it/s]Elaborazione:  52%|█████▏    | 208/402 [02:38<02:30,  1.29it/s]Elaborazione:  52%|█████▏    | 209/402 [02:38<02:28,  1.30it/s]Elaborazione:  52%|█████▏    | 210/402 [02:39<02:27,  1.30it/s]Elaborazione:  52%|█████▏    | 211/402 [02:40<02:25,  1.31it/s]Elaborazione:  53%|█████▎    | 212/402 [02:41<02:26,  1.30it/s]Elaborazione:  53%|█████▎    | 213/402 [02:42<02:25,  1.30it/s]Elaborazione:  53%|█████▎    | 214/402 [02:42<02:25,  1.29it/s]Elaborazione:  53%|█████▎    | 215/402 [02:43<02:26,  1.28it/s]Elaborazione:  54%|█████▎    | 216/402 [02:44<02:24,  1.29it/s]Elaborazione:  54%|█████▍    | 217/402 [02:45<02:23,  1.29it/s]Elaborazione:  54%|█████▍    | 218/402 [02:45<02:23,  1.28it/s]Elaborazione:  54%|█████▍    | 219/402 [02:46<02:21,  1.29it/s]Elaborazione:  55%|█████▍    | 220/402 [02:47<02:22,  1.28it/s]Elaborazione:  55%|█████▍    | 221/402 [02:48<02:20,  1.29it/s]Elaborazione:  55%|█████▌    | 222/402 [02:49<02:18,  1.30it/s]Elaborazione:  55%|█████▌    | 223/402 [02:49<02:17,  1.30it/s]Elaborazione:  56%|█████▌    | 224/402 [02:50<02:17,  1.30it/s]Elaborazione:  56%|█████▌    | 225/402 [02:51<02:15,  1.30it/s]Elaborazione:  56%|█████▌    | 226/402 [02:52<02:16,  1.29it/s]Elaborazione:  56%|█████▋    | 227/402 [02:52<02:15,  1.29it/s]Elaborazione:  57%|█████▋    | 228/402 [02:53<02:15,  1.29it/s]Elaborazione:  57%|█████▋    | 229/402 [02:54<02:14,  1.28it/s]Elaborazione:  57%|█████▋    | 230/402 [02:55<02:14,  1.28it/s]Elaborazione:  57%|█████▋    | 231/402 [02:56<02:14,  1.27it/s]Elaborazione:  58%|█████▊    | 232/402 [02:56<02:14,  1.26it/s]Elaborazione:  58%|█████▊    | 233/402 [02:57<02:15,  1.25it/s]Elaborazione:  58%|█████▊    | 234/402 [02:58<02:13,  1.26it/s]Elaborazione:  58%|█████▊    | 235/402 [02:59<02:12,  1.26it/s]Elaborazione:  59%|█████▊    | 236/402 [03:00<02:12,  1.25it/s]Elaborazione:  59%|█████▉    | 237/402 [03:00<02:11,  1.26it/s]Elaborazione:  59%|█████▉    | 238/402 [03:01<02:11,  1.25it/s]Elaborazione:  59%|█████▉    | 239/402 [03:02<02:10,  1.25it/s]Elaborazione:  60%|█████▉    | 240/402 [03:03<02:09,  1.25it/s]Elaborazione:  60%|█████▉    | 241/402 [03:04<02:09,  1.24it/s]Elaborazione:  60%|██████    | 242/402 [03:04<02:08,  1.24it/s]Elaborazione:  60%|██████    | 243/402 [03:05<02:07,  1.24it/s]Elaborazione:  61%|██████    | 244/402 [03:06<02:08,  1.23it/s]Elaborazione:  61%|██████    | 245/402 [03:07<02:06,  1.24it/s]Elaborazione:  61%|██████    | 246/402 [03:08<02:06,  1.23it/s]Elaborazione:  61%|██████▏   | 247/402 [03:08<02:04,  1.24it/s]Elaborazione:  62%|██████▏   | 248/402 [03:09<02:03,  1.24it/s]Elaborazione:  62%|██████▏   | 249/402 [03:10<02:02,  1.25it/s]Elaborazione:  62%|██████▏   | 250/402 [03:11<02:01,  1.25it/s]Elaborazione:  62%|██████▏   | 251/402 [03:12<01:59,  1.26it/s]Elaborazione:  63%|██████▎   | 252/402 [03:12<01:59,  1.26it/s]Elaborazione:  63%|██████▎   | 253/402 [03:13<01:57,  1.26it/s]Elaborazione:  63%|██████▎   | 254/402 [03:14<01:57,  1.26it/s]Elaborazione:  63%|██████▎   | 255/402 [03:15<01:56,  1.26it/s]Elaborazione:  64%|██████▎   | 256/402 [03:16<01:56,  1.25it/s]Elaborazione:  64%|██████▍   | 257/402 [03:16<01:55,  1.25it/s]Elaborazione:  64%|██████▍   | 258/402 [03:17<01:54,  1.26it/s]Elaborazione:  64%|██████▍   | 259/402 [03:18<01:53,  1.26it/s]Elaborazione:  65%|██████▍   | 260/402 [03:19<01:52,  1.27it/s]Elaborazione:  65%|██████▍   | 261/402 [03:20<01:51,  1.27it/s]Elaborazione:  65%|██████▌   | 262/402 [03:20<01:50,  1.27it/s]Elaborazione:  65%|██████▌   | 263/402 [03:21<01:50,  1.26it/s]Elaborazione:  66%|██████▌   | 264/402 [03:22<01:49,  1.26it/s]Elaborazione:  66%|██████▌   | 265/402 [03:23<01:49,  1.25it/s]Elaborazione:  66%|██████▌   | 266/402 [03:24<01:49,  1.25it/s]Elaborazione:  66%|██████▋   | 267/402 [03:24<01:44,  1.29it/s]Elaborazione:  67%|██████▋   | 268/402 [03:25<01:42,  1.31it/s]Elaborazione:  67%|██████▋   | 269/402 [03:26<01:39,  1.34it/s]Elaborazione:  67%|██████▋   | 270/402 [03:26<01:37,  1.35it/s]Elaborazione:  67%|██████▋   | 271/402 [03:27<01:36,  1.36it/s]Elaborazione:  68%|██████▊   | 272/402 [03:28<01:35,  1.37it/s]Elaborazione:  68%|██████▊   | 273/402 [03:29<01:33,  1.38it/s]Elaborazione:  68%|██████▊   | 274/402 [03:29<01:32,  1.38it/s]Elaborazione:  68%|██████▊   | 275/402 [03:30<01:31,  1.38it/s]Elaborazione:  69%|██████▊   | 276/402 [03:31<01:30,  1.38it/s]Elaborazione:  69%|██████▉   | 277/402 [03:31<01:30,  1.38it/s]Elaborazione:  69%|██████▉   | 278/402 [03:32<01:29,  1.39it/s]Elaborazione:  69%|██████▉   | 279/402 [03:33<01:28,  1.39it/s]Elaborazione:  70%|██████▉   | 280/402 [03:34<01:29,  1.37it/s]Elaborazione:  70%|██████▉   | 281/402 [03:34<01:27,  1.38it/s]Elaborazione:  70%|███████   | 282/402 [03:35<01:27,  1.37it/s]Elaborazione:  70%|███████   | 283/402 [03:36<01:26,  1.37it/s]Elaborazione:  71%|███████   | 284/402 [03:37<01:25,  1.37it/s]Elaborazione:  71%|███████   | 285/402 [03:37<01:25,  1.37it/s]Elaborazione:  71%|███████   | 286/402 [03:38<01:24,  1.37it/s]Elaborazione:  71%|███████▏  | 287/402 [03:39<01:23,  1.37it/s]Elaborazione:  72%|███████▏  | 288/402 [03:39<01:22,  1.38it/s]Elaborazione:  72%|███████▏  | 289/402 [03:40<01:21,  1.39it/s]Elaborazione:  72%|███████▏  | 290/402 [03:41<01:20,  1.39it/s]Elaborazione:  72%|███████▏  | 291/402 [03:42<01:19,  1.40it/s]Elaborazione:  73%|███████▎  | 292/402 [03:42<01:19,  1.39it/s]Elaborazione:  73%|███████▎  | 293/402 [03:43<01:19,  1.37it/s]Elaborazione:  73%|███████▎  | 294/402 [03:44<01:18,  1.37it/s]Elaborazione:  73%|███████▎  | 295/402 [03:45<01:17,  1.38it/s]Elaborazione:  74%|███████▎  | 296/402 [03:45<01:16,  1.38it/s]Elaborazione:  74%|███████▍  | 297/402 [03:46<01:16,  1.38it/s]Elaborazione:  74%|███████▍  | 298/402 [03:47<01:15,  1.38it/s]Elaborazione:  74%|███████▍  | 299/402 [03:47<01:14,  1.38it/s]Elaborazione:  75%|███████▍  | 300/402 [03:48<01:13,  1.39it/s]Elaborazione:  75%|███████▍  | 301/402 [03:49<01:12,  1.40it/s]Elaborazione:  75%|███████▌  | 302/402 [03:50<01:11,  1.40it/s]Elaborazione:  75%|███████▌  | 303/402 [03:50<01:10,  1.40it/s]Elaborazione:  76%|███████▌  | 304/402 [03:51<01:09,  1.40it/s]Elaborazione:  76%|███████▌  | 305/402 [03:52<01:09,  1.40it/s]Elaborazione:  76%|███████▌  | 306/402 [03:52<01:08,  1.41it/s]Elaborazione:  76%|███████▋  | 307/402 [03:53<01:07,  1.40it/s]Elaborazione:  77%|███████▋  | 308/402 [03:54<01:08,  1.38it/s]Elaborazione:  77%|███████▋  | 309/402 [03:55<01:07,  1.39it/s]Elaborazione:  77%|███████▋  | 310/402 [03:55<01:06,  1.38it/s]Elaborazione:  77%|███████▋  | 311/402 [03:56<01:05,  1.38it/s]Elaborazione:  78%|███████▊  | 312/402 [03:57<01:04,  1.39it/s]Elaborazione:  78%|███████▊  | 313/402 [03:57<01:04,  1.38it/s]Elaborazione:  78%|███████▊  | 314/402 [03:58<01:03,  1.38it/s]Elaborazione:  78%|███████▊  | 315/402 [03:59<01:03,  1.37it/s]Elaborazione:  79%|███████▊  | 316/402 [04:00<01:02,  1.38it/s]Elaborazione:  79%|███████▉  | 317/402 [04:00<01:01,  1.38it/s]Elaborazione:  79%|███████▉  | 318/402 [04:01<01:00,  1.39it/s]Elaborazione:  79%|███████▉  | 319/402 [04:02<01:00,  1.37it/s]Elaborazione:  80%|███████▉  | 320/402 [04:03<00:59,  1.38it/s]Elaborazione:  80%|███████▉  | 321/402 [04:03<00:58,  1.38it/s]Elaborazione:  80%|████████  | 322/402 [04:04<00:58,  1.37it/s]Elaborazione:  80%|████████  | 323/402 [04:05<00:57,  1.38it/s]Elaborazione:  81%|████████  | 324/402 [04:05<00:56,  1.39it/s]Elaborazione:  81%|████████  | 325/402 [04:06<00:56,  1.37it/s]Elaborazione:  81%|████████  | 326/402 [04:07<00:54,  1.38it/s]Elaborazione:  81%|████████▏ | 327/402 [04:08<00:54,  1.38it/s]Elaborazione:  82%|████████▏ | 328/402 [04:08<00:53,  1.38it/s]Elaborazione:  82%|████████▏ | 329/402 [04:09<00:52,  1.39it/s]Elaborazione:  82%|████████▏ | 330/402 [04:10<00:51,  1.39it/s]Elaborazione:  82%|████████▏ | 331/402 [04:10<00:50,  1.40it/s]Elaborazione:  83%|████████▎ | 332/402 [04:11<00:51,  1.35it/s]Elaborazione:  83%|████████▎ | 333/402 [04:12<00:50,  1.37it/s]Elaborazione:  83%|████████▎ | 334/402 [04:13<00:49,  1.39it/s]Elaborazione:  83%|████████▎ | 335/402 [04:13<00:48,  1.39it/s]Elaborazione:  84%|████████▎ | 336/402 [04:14<00:47,  1.39it/s]Elaborazione:  84%|████████▍ | 337/402 [04:15<00:47,  1.38it/s]Elaborazione:  84%|████████▍ | 338/402 [04:16<00:46,  1.39it/s]Elaborazione:  84%|████████▍ | 339/402 [04:16<00:45,  1.39it/s]Elaborazione:  85%|████████▍ | 340/402 [04:17<00:44,  1.39it/s]Elaborazione:  85%|████████▍ | 341/402 [04:18<00:43,  1.39it/s]Elaborazione:  85%|████████▌ | 342/402 [04:18<00:43,  1.39it/s]Elaborazione:  85%|████████▌ | 343/402 [04:19<00:42,  1.38it/s]Elaborazione:  86%|████████▌ | 344/402 [04:20<00:42,  1.38it/s]Elaborazione:  86%|████████▌ | 345/402 [04:21<00:41,  1.38it/s]Elaborazione:  86%|████████▌ | 346/402 [04:21<00:40,  1.39it/s]Elaborazione:  86%|████████▋ | 347/402 [04:22<00:39,  1.39it/s]Elaborazione:  87%|████████▋ | 348/402 [04:23<00:39,  1.38it/s]Elaborazione:  87%|████████▋ | 349/402 [04:24<00:38,  1.38it/s]Elaborazione:  87%|████████▋ | 350/402 [04:24<00:37,  1.38it/s]Elaborazione:  87%|████████▋ | 351/402 [04:25<00:36,  1.39it/s]Elaborazione:  88%|████████▊ | 352/402 [04:26<00:36,  1.38it/s]Elaborazione:  88%|████████▊ | 353/402 [04:26<00:35,  1.38it/s]Elaborazione:  88%|████████▊ | 354/402 [04:27<00:34,  1.38it/s]Elaborazione:  88%|████████▊ | 355/402 [04:28<00:34,  1.37it/s]Elaborazione:  89%|████████▊ | 356/402 [04:29<00:33,  1.37it/s]Elaborazione:  89%|████████▉ | 357/402 [04:29<00:32,  1.37it/s]Elaborazione:  89%|████████▉ | 358/402 [04:30<00:32,  1.37it/s]Elaborazione:  89%|████████▉ | 359/402 [04:31<00:31,  1.38it/s]Elaborazione:  90%|████████▉ | 360/402 [04:32<00:30,  1.39it/s]Elaborazione:  90%|████████▉ | 361/402 [04:32<00:29,  1.38it/s]Elaborazione:  90%|█████████ | 362/402 [04:33<00:28,  1.38it/s]Elaborazione:  90%|█████████ | 363/402 [04:34<00:28,  1.39it/s]Elaborazione:  91%|█████████ | 364/402 [04:34<00:27,  1.36it/s]Elaborazione:  91%|█████████ | 365/402 [04:35<00:26,  1.37it/s]Elaborazione:  91%|█████████ | 366/402 [04:36<00:26,  1.38it/s]Elaborazione:  91%|█████████▏| 367/402 [04:37<00:25,  1.36it/s]Elaborazione:  92%|█████████▏| 368/402 [04:37<00:24,  1.37it/s]Elaborazione:  92%|█████████▏| 369/402 [04:38<00:23,  1.40it/s]Elaborazione:  92%|█████████▏| 370/402 [04:39<00:22,  1.42it/s]Elaborazione:  92%|█████████▏| 371/402 [04:39<00:21,  1.43it/s]Elaborazione:  93%|█████████▎| 372/402 [04:40<00:20,  1.43it/s]Elaborazione:  93%|█████████▎| 373/402 [04:41<00:20,  1.43it/s]Elaborazione:  93%|█████████▎| 374/402 [04:41<00:19,  1.44it/s]Elaborazione:  93%|█████████▎| 375/402 [04:42<00:18,  1.44it/s]Elaborazione:  94%|█████████▎| 376/402 [04:43<00:18,  1.43it/s]Elaborazione:  94%|█████████▍| 377/402 [04:44<00:17,  1.43it/s]Elaborazione:  94%|█████████▍| 378/402 [04:44<00:16,  1.43it/s]Elaborazione:  94%|█████████▍| 379/402 [04:45<00:16,  1.44it/s]Elaborazione:  95%|█████████▍| 380/402 [04:46<00:15,  1.44it/s]Elaborazione:  95%|█████████▍| 381/402 [04:46<00:14,  1.44it/s]Elaborazione:  95%|█████████▌| 382/402 [04:47<00:13,  1.44it/s]Elaborazione:  95%|█████████▌| 383/402 [04:48<00:13,  1.45it/s]Elaborazione:  96%|█████████▌| 384/402 [04:48<00:12,  1.46it/s]Elaborazione:  96%|█████████▌| 385/402 [04:49<00:11,  1.47it/s]Elaborazione:  96%|█████████▌| 386/402 [04:50<00:10,  1.48it/s]Elaborazione:  96%|█████████▋| 387/402 [04:50<00:10,  1.48it/s]Elaborazione:  97%|█████████▋| 388/402 [04:51<00:09,  1.48it/s]Elaborazione:  97%|█████████▋| 389/402 [04:52<00:08,  1.47it/s]Elaborazione:  97%|█████████▋| 390/402 [04:52<00:08,  1.47it/s]Elaborazione:  97%|█████████▋| 391/402 [04:53<00:07,  1.47it/s]Elaborazione:  98%|█████████▊| 392/402 [04:54<00:06,  1.47it/s]Elaborazione:  98%|█████████▊| 393/402 [04:55<00:06,  1.46it/s]Elaborazione:  98%|█████████▊| 394/402 [04:55<00:05,  1.47it/s]Elaborazione:  98%|█████████▊| 395/402 [04:56<00:04,  1.44it/s]Elaborazione:  99%|█████████▊| 396/402 [04:57<00:04,  1.45it/s]Elaborazione:  99%|█████████▉| 397/402 [04:57<00:03,  1.46it/s]Elaborazione:  99%|█████████▉| 398/402 [04:58<00:02,  1.46it/s]Elaborazione:  99%|█████████▉| 399/402 [04:59<00:02,  1.44it/s]Elaborazione: 100%|█████████▉| 400/402 [04:59<00:01,  1.45it/s]Elaborazione: 100%|█████████▉| 401/402 [05:00<00:00,  1.46it/s]Elaborazione: 100%|██████████| 402/402 [05:01<00:00,  1.45it/s]Elaborazione: 100%|██████████| 402/402 [05:01<00:00,  1.33it/s]
+🔧 BASE_DIR: C:\Progetti\simulatore-calcio-backend
+🔧 ENV_PATH: C:\Progetti\simulatore-calcio-backend\.env
+✅ .env trovato in: C:\Progetti\simulatore-calcio-backend\.env
+🔗 Connessione MongoDB...
+✅ Connesso a MongoDB: football_simulator_db
+📊 Database: football_simulator_db
+   📦 teams: 212 documenti
+   📦 matches_history: 1707 documenti
+   📦 raw_h2h_data_v2: 1933 documenti
+   📦 h2h_by_round: 402 documenti
+✅ Configurazione completata con successo
+Traceback (most recent call last):
+  File "C:\Progetti\simulatore-calcio-backend\ai_engine\Aggiornamenti\frequenti\scraper_fixtures.py", line 18, in <module>
+    import cloudscraper
+ModuleNotFoundError: No module named 'cloudscraper'
+Traceback (most recent call last):
+  File "C:\Progetti\simulatore-calcio-backend\ai_engine\Aggiornamenti\frequenti\scraper_odds_oddsmath.py", line 3, in <module>
+    import cloudscraper
+ModuleNotFoundError: No module named 'cloudscraper'
+🔧 BASE_DIR: C:\Progetti\simulatore-calcio-backend
+🔧 ENV_PATH: C:\Progetti\simulatore-calcio-backend\.env
+✅ .env trovato in: C:\Progetti\simulatore-calcio-backend\.env
+🔗 Connessione MongoDB...
+✅ Connesso a MongoDB: football_simulator_db
+📊 Database: football_simulator_db
+   📦 teams: 212 documenti
+   📦 matches_history: 1707 documenti
+   📦 raw_h2h_data_v2: 1933 documenti
+   📦 h2h_by_round: 402 documenti
+✅ Configurazione completata con successo
 ✅ DB Connesso: football_simulator_db
 
 🚀 AVVIO SCRAPER (LOGICA STRICT: Aggiorna se diverse o scadute)
@@ -988,7 +340,7 @@ C:\Progetti\simulatore-calcio-backend\ai_engine\Aggiornamenti\frequenti\scraper_
    🔄 Serie C - Girone B G.19... ✅ Aggiornate 7 quote.
    🔄 Serie C - Girone B G.20... (Nessuna variazione)
    🔄 Serie C - Girone C G.18... ✅ Aggiornate 10 quote.
-   🔄 Serie C - Girone C G.19... (Nessuna variazione)
+   🔄 Serie C - Girone C G.19... ✅ Aggiornate 10 quote.
    🔄 Serie C - Girone C G.20... (Nessuna variazione)
    🔄 Premier League G.16... ✅ Aggiornate 5 quote.
    🔄 Premier League G.17... ✅ Aggiornate 7 quote.
@@ -1009,11 +361,18 @@ C:\Progetti\simulatore-calcio-backend\ai_engine\Aggiornamenti\frequenti\scraper_
    🔄 Liga Portugal G.15... ✅ Aggiornate 5 quote.
    🔄 Liga Portugal G.16... (Nessuna variazione)
 
-🏁 FINE. Totale Aggiornati: 182
- Connessione MongoDB...
- Database: football_simulator_db
-   Teams: 212
-   Matches: 1707
+🏁 FINE. Totale Aggiornati: 192
+🔧 BASE_DIR: C:\Progetti\simulatore-calcio-backend
+🔧 ENV_PATH: C:\Progetti\simulatore-calcio-backend\.env
+✅ .env trovato in: C:\Progetti\simulatore-calcio-backend\.env
+🔗 Connessione MongoDB...
+✅ Connesso a MongoDB: football_simulator_db
+📊 Database: football_simulator_db
+   📦 teams: 212 documenti
+   📦 matches_history: 1707 documenti
+   📦 raw_h2h_data_v2: 1933 documenti
+   📦 h2h_by_round: 402 documenti
+✅ Configurazione completata con successo
 ✅ DB Connesso: football_simulator_db
 
 🚀 AVVIO SCRAPER QUOTE CALCIO
@@ -1175,9 +534,9 @@ US Pianese[8]
       📄 Esempio prima riga: 19 19-12
 20:30 Audace Cerignola[9]
 -
-Benevento[1]   ...
-⏳⏳⏳⏳⏳⏳⏳⏳⏳⏳ (0/10)
-      ⏳ 10 partite trovate ma senza quote (normali per partite future)
+Benevento[1]
+3.60 3.10 1.95   ...
+✓✓✓✓✓✓✓✓✓✓ (10/10)
 
    ⚙️ Giornata 18
       ✓ Confermata giornata 18
@@ -1198,7 +557,7 @@ Cosenza Calcio 1914[3]
 18:30 Team Altamura - US Casertana 1908...
 ⏳⏳⏳⏳⏳⏳⏳⏳⏳⏳ (0/10)
       ⏳ 10 partite trovate ma senza quote (normali per partite future)
-   📈 Totale lega: 10/30
+   📈 Totale lega: 20/30
 
 📋 Premier League
 ----------------------------------------
@@ -1418,21 +777,28 @@ Gil Vicente[4]
 📊 RIEPILOGO FINALE
 ================================================================================
 🎯 Partite totali: 315
-✅ Partite aggiornate: 244
-❌ Partite non aggiornate: 71
-📈 Successo: 77.5%
+✅ Partite aggiornate: 254
+❌ Partite non aggiornate: 61
+📈 Successo: 80.6%
 
 📋 DETTAGLIO PARTITE NON AGGIORNATE:
-   ⏳ 71 partite trovate ma senza quote disponibili
+   ⏳ 61 partite trovate ma senza quote disponibili
       → Normale per partite future, riprova più tardi
 
 📄 Report salvato in:
-   • scraper_reports\report_20251217_044650.json
-   • scraper_reports\report_20251217_044650.txt
- Connessione MongoDB...
- Database: football_simulator_db
-   Teams: 212
-   Matches: 1707
+   • scraper_reports\report_20251218_041616.json
+   • scraper_reports\report_20251218_041616.txt
+🔧 BASE_DIR: C:\Progetti\simulatore-calcio-backend
+🔧 ENV_PATH: C:\Progetti\simulatore-calcio-backend\.env
+✅ .env trovato in: C:\Progetti\simulatore-calcio-backend\.env
+🔗 Connessione MongoDB...
+✅ Connesso a MongoDB: football_simulator_db
+📊 Database: football_simulator_db
+   📦 teams: 212 documenti
+   📦 matches_history: 1707 documenti
+   📦 raw_h2h_data_v2: 1933 documenti
+   📦 h2h_by_round: 402 documenti
+✅ Configurazione completata con successo
 ✅ DB Connesso: football_simulator_db
 
 🚀 AGGIORNAMENTO AUTOMATICO – TUTTI I CAMPIONATI
@@ -1468,95 +834,147 @@ Gil Vicente[4]
 
 ----------------------------------------------------------------------
 ▶ 📊 [1/13] Risultati & xG (FBref)
-   ✅ COMPLETATO in 139.59s
+   🔴 ERRORE SCRIPT (Vedi output sopra)
 
 ----------------------------------------------------------------------
 ▶ 🔥 [2/13] Lucifero & Serie C (BetExplorer)
-   ✅ COMPLETATO in 160.12s
+   ✅ COMPLETATO in 158.07s
 
 ----------------------------------------------------------------------
 ▶ 💰 [3/13] Quote Storiche
-   ✅ COMPLETATO in 111.64s
+   ✅ COMPLETATO in 107.94s
 
 ----------------------------------------------------------------------
 ▶ 🏆 [4/13] Classifica & Gol
-   ✅ COMPLETATO in 16.60s
+   ✅ COMPLETATO in 16.43s
 
 ----------------------------------------------------------------------
 ▶ ⚽ [5/13] Stats Attaccanti
-   ✅ COMPLETATO in 463.13s
+   🔴 ERRORE SCRIPT (Vedi output sopra)
 
 ----------------------------------------------------------------------
 ▶ 🧠 [6/13] Stats Centrocampisti
-   ✅ COMPLETATO in 364.65s
+   🔴 ERRORE SCRIPT (Vedi output sopra)
 
 ----------------------------------------------------------------------
 ▶ 🛡️ [7/13] Stats Difensori
-   ✅ COMPLETATO in 280.06s
+   🔴 ERRORE SCRIPT (Vedi output sopra)
 
 ----------------------------------------------------------------------
 ▶ 🧤 [8/13] Stats Portieri
-   ✅ COMPLETATO in 89.65s
+   🔴 ERRORE SCRIPT (Vedi output sopra)
 
 ----------------------------------------------------------------------
 ▶ 🚑 [9/13] Infortuni (TM)
-   ✅ COMPLETATO in 485.52s
+   🔴 ERRORE SCRIPT (Vedi output sopra)
 
 ----------------------------------------------------------------------
 ▶ 📅 [10/13] Calendario H2H
-   ✅ COMPLETATO in 79.74s
+   ✅ COMPLETATO in 75.96s
 
 ----------------------------------------------------------------------
 ▶ 🧠 [11/13] Elaborazione H2H Pro
-   ✅ COMPLETATO in 123.16s
+   ✅ COMPLETATO in 302.98s
 
 ----------------------------------------------------------------------
 ▶ 📆 [12/13] Partite Future
-   ✅ COMPLETATO in 129.75s
+   🔴 ERRORE SCRIPT (Vedi output sopra)
 
 ----------------------------------------------------------------------
 ▶ 💎 [13/13] Quote Future
-   ✅ COMPLETATO in 48.59s
+   🔴 ERRORE SCRIPT (Vedi output sopra)
 
 ----------------------------------------------------------------------
 ▶ 🚀 [14/14] Quote H2H Arricchite (NowGoal)
-   ✅ COMPLETATO in 175.20s
+   ✅ COMPLETATO in 177.89s
 
 ----------------------------------------------------------------------
 ▶ 🚀 [14/14] Fix Quote H2H Debug (NowGoal)
-   ✅ COMPLETATO in 112.83s
+   ✅ COMPLETATO in 112.87s
 
 ----------------------------------------------------------------------
 ▶ 🔄 [15/15] Aggiorna Solo Risultati (Debug)
-   ✅ COMPLETATO in 26.32s
+   ✅ COMPLETATO in 30.96s
 
 
 ====================================================================================================
-📊 REPORT AGGIORNAMENTO - DURATA TOTALE: 0:47:18
+📊 REPORT AGGIORNAMENTO - DURATA TOTALE: 0:16:48
 ====================================================================================================
 STATO  | DURATA     | FILE (Script)                       | IMPATTO (Se fallisce)
 ----------------------------------------------------------------------------------------------------
-✅ OK   | 139.6s     | scraper_results_fbref.py            | Mancano risultati recenti e xG
-✅ OK   | 160.1s     | scrape_lucifero_betexplorer_safe.py | Il Lucifero non funziona senza questo
-✅ OK   | 111.6s     | scraper_quote_storiche_betexplorer.py | Calcolo Affidabilità/BVS impossibile
-✅ OK   | 16.6s      | scraper_soccerstats_ranking_unified.py | Calcolo Forza Attacco/Difesa sballato
-✅ OK   | 463.1s     | fbref_scraper_att.py                | Analisi attacco imprecisa
-✅ OK   | 364.7s     | fbref_scraper_mid.py                | Analisi centrocampo imprecisa
-✅ OK   | 280.1s     | fbref_scraper_def.py                | Analisi difesa imprecisa
-✅ OK   | 89.6s      | scraper_gk_fbref.py                 | Analisi portieri imprecisa
-✅ OK   | 485.5s     | scraper_tm_multi_campionato.py      | Si rischia di puntare su assenti
-✅ OK   | 79.7s      | scraper_calendario_h2h_TF_completo.py | Analisi scontri diretti incompleta
-✅ OK   | 123.2s     | calculate_h2h_v2.py                 | Mancano medie gol e punteggi storici
-✅ OK   | 129.8s     | scraper_fixtures.py                 | Il motore non saprà cosa simulare
-✅ OK   | 48.6s      | scraper_odds_oddsmath.py            | Manca confronto con bookmaker
-✅ OK   | 175.2s     | nowgoal_scraper.py                  | Mancano le quote precise nel CSV
-✅ OK   | 112.8s     | debug_nowgoal_scraper.py            | Mancano le quote precise nel CSV
-✅ OK   | 26.3s      | per_agg_pianificato_update_results_only.py | Aggiorna solo i risultati senza toccare altro
+❌ KO   | 0.3s       | scraper_results_fbref.py            | Mancano risultati recenti e xG
+✅ OK   | 158.1s     | scrape_lucifero_betexplorer_safe.py | Il Lucifero non funziona senza questo
+✅ OK   | 107.9s     | scraper_quote_storiche_betexplorer.py | Calcolo Affidabilità/BVS impossibile
+✅ OK   | 16.4s      | scraper_soccerstats_ranking_unified.py | Calcolo Forza Attacco/Difesa sballato
+❌ KO   | 1.5s       | fbref_scraper_att.py                | Analisi attacco imprecisa
+❌ KO   | 1.6s       | fbref_scraper_mid.py                | Analisi centrocampo imprecisa
+❌ KO   | 1.5s       | fbref_scraper_def.py                | Analisi difesa imprecisa
+❌ KO   | 1.5s       | scraper_gk_fbref.py                 | Analisi portieri imprecisa
+❌ KO   | 1.5s       | scraper_tm_multi_campionato.py      | Si rischia di puntare su assenti
+✅ OK   | 76.0s      | scraper_calendario_h2h_TF_completo.py | Analisi scontri diretti incompleta
+✅ OK   | 303.0s     | calculate_h2h_v2.py                 | Mancano medie gol e punteggi storici
+❌ KO   | 1.5s       | scraper_fixtures.py                 | Il motore non saprà cosa simulare
+❌ KO   | 0.1s       | scraper_odds_oddsmath.py            | Manca confronto con bookmaker
+✅ OK   | 177.9s     | nowgoal_scraper.py                  | Mancano le quote precise nel CSV
+✅ OK   | 112.9s     | debug_nowgoal_scraper.py            | Mancano le quote precise nel CSV
+✅ OK   | 31.0s      | per_agg_pianificato_update_results_only.py | Aggiorna solo i risultati senza toccare altro
 
-✨ SISTEMA PERFETTAMENTE AGGIORNATO IN 0:47:18!
+==========================================================================================
+⚠️  ANALISI FALLIMENTI & SOLUZIONI
+==========================================================================================
+🔴 scraper_results_fbref.py
+   └─ Errore: Script fallito (Exit Code != 0)
+   └─ Conseguenza: Mancano risultati recenti e xG
+   └─ 🔧 SOLUZIONE RAPIDA: Copia e lancia questo comando:
+      python ai_engine\Aggiornamenti\frequenti\scraper_results_fbref.py
+------------------------------------------------------------
+🔴 fbref_scraper_att.py
+   └─ Errore: Script fallito (Exit Code != 0)
+   └─ Conseguenza: Analisi attacco imprecisa
+   └─ 🔧 SOLUZIONE RAPIDA: Copia e lancia questo comando:
+      python ai_engine\Aggiornamenti\frequenti\fbref_scraper_att.py
+------------------------------------------------------------
+🔴 fbref_scraper_mid.py
+   └─ Errore: Script fallito (Exit Code != 0)
+   └─ Conseguenza: Analisi centrocampo imprecisa
+   └─ 🔧 SOLUZIONE RAPIDA: Copia e lancia questo comando:
+      python ai_engine\Aggiornamenti\frequenti\fbref_scraper_mid.py
+------------------------------------------------------------
+🔴 fbref_scraper_def.py
+   └─ Errore: Script fallito (Exit Code != 0)
+   └─ Conseguenza: Analisi difesa imprecisa
+   └─ 🔧 SOLUZIONE RAPIDA: Copia e lancia questo comando:
+      python ai_engine\Aggiornamenti\frequenti\fbref_scraper_def.py
+------------------------------------------------------------
+🔴 scraper_gk_fbref.py
+   └─ Errore: Script fallito (Exit Code != 0)
+   └─ Conseguenza: Analisi portieri imprecisa
+   └─ 🔧 SOLUZIONE RAPIDA: Copia e lancia questo comando:
+      python ai_engine\Aggiornamenti\frequenti\scraper_gk_fbref.py
+------------------------------------------------------------
+🔴 scraper_tm_multi_campionato.py
+   └─ Errore: Script fallito (Exit Code != 0)
+   └─ Conseguenza: Si rischia di puntare su assenti
+   └─ 🔧 SOLUZIONE RAPIDA: Copia e lancia questo comando:
+      python ai_engine\Aggiornamenti\frequenti\scraper_tm_multi_campionato.py
+------------------------------------------------------------
+🔴 scraper_fixtures.py
+   └─ Errore: Script fallito (Exit Code != 0)
+   └─ Conseguenza: Il motore non saprà cosa simulare
+   └─ 🔧 SOLUZIONE RAPIDA: Copia e lancia questo comando:
+      python ai_engine\Aggiornamenti\frequenti\scraper_fixtures.py
+------------------------------------------------------------
+🔴 scraper_odds_oddsmath.py
+   └─ Errore: Script fallito (Exit Code != 0)
+   └─ Conseguenza: Manca confronto con bookmaker
+   └─ 🔧 SOLUZIONE RAPIDA: Copia e lancia questo comando:
+      python ai_engine\Aggiornamenti\frequenti\scraper_odds_oddsmath.py
+------------------------------------------------------------
+
+❌ L'aggiornamento ha avuto dei problemi. Controlla i comandi sopra.
 
 
  
 ========================================== 
-FINE AGGIORNAMENTO: 17/12/2025  4:47:21,49 
+FINE AGGIORNAMENTO: 18/12/2025  4:16:52,08 
 ========================================== 

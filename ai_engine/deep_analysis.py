@@ -113,9 +113,10 @@ class DeepAnalyzer:
         away_goals_list = [ga for gh, ga in results]
         total_goals_list = [gh + ga for gh, ga in results]
 
-        std_home = np.std(home_goals_list)
-        std_away = np.std(away_goals_list)
-        std_total = np.std(total_goals_list)
+        # SAFE NUMPY: evita warning su liste vuote (PRIMA PARTITA)
+        std_home = np.std(home_goals_list) if len(home_goals_list) > 1 else 0.0
+        std_away = np.std(away_goals_list) if len(away_goals_list) > 1 else 0.0
+        std_total = np.std(total_goals_list) if len(total_goals_list) > 1 else 0.0
 
         # Confidence Score (0-100): più bassa la std, più alto il confidence
         confidence_home = max(0, min(100, 100 - (std_home * 25)))

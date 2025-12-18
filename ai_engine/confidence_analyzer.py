@@ -138,10 +138,11 @@ class ConfidenceCalculator:
     def _calculate_gol_metrics(self, home_goals_list, away_goals_list, total_goals_list):
         """Calcola metriche confidence per i gol"""
         
-        # STD DEV
-        std_home = np.std(home_goals_list)
-        std_away = np.std(away_goals_list)
-        std_total = np.std(total_goals_list)
+        # STD DEV (SAFE - evita warning su liste vuote)
+        std_home = np.std(home_goals_list) if len(home_goals_list) > 1 else 0.0
+        std_away = np.std(away_goals_list) if len(away_goals_list) > 1 else 0.0  
+        std_total = np.std(total_goals_list) if len(total_goals_list) > 1 else 0.0
+
         
         # Confidence (inverso della std normalizzata)
         confidence_home = max(0, min(100, 100 - (std_home * 25)))
@@ -414,7 +415,8 @@ class ConfidenceCalculator:
         """Calcola metriche statistiche avanzate"""
         
         # Correlazione
-        correlation = np.corrcoef(home_goals_list, away_goals_list)[0, 1]
+        correlation = np.corrcoef(home_goals_list, away_goals_list)[0, 1] if len(home_goals_list) > 1 and len(away_goals_list) > 1 else 0.0
+
         
         # Skewness
         skew_home = scipy_stats.skew(home_goals_list)

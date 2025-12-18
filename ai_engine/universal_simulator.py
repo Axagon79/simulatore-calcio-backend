@@ -1141,7 +1141,8 @@ def run_universal_simulator():
         iterator = tqdm(final_matches_list) if not MODE_SINGLE else final_matches_list
         
         for match in iterator:
-            print(f"DEBUG B - inizio match: {match['home']} vs {match['away']}")    
+            print()
+            print(f"         INIZIO MATCH: {match['home']} vs {match['away']}")    
             if MODE_SINGLE: 
                 print(f"\n⚡ ANALISI: {match['home']} vs {match['away']}...")
             deep_analyzer.start_match(
@@ -1151,13 +1152,24 @@ def run_universal_simulator():
                 league=match.get('league', 'Unknown'),
                 date_str=match.get('date_iso')
             )    
-            print("DEBUG C - prima di preload_match_data")
+            
             with suppress_stdout():
                 try: preloaded = preload_match_data(match['home'], match['away'])
                 except:
                     print("DEBUG C1 - preload_match_data ha fatto eccezione, passo oltre")
                     continue
-            print("DEBUG D - dopo preload_match_data, prima degli algoritmi normali")
+            
+
+            # 🔍 DEBUG NUMPY: Controlla dati preload_match_data
+            if 'debug_data' in locals():
+                print(f"🔍 preload keys: {list(preloaded.keys())}")
+                for key in ['home_attack', 'away_attack', 'home_defense', 'away_defense']:
+                    data = preloaded.get(key, [])
+                    if not data:
+                        print(f"⚠️ VUOTO: {key} = []")
+                    elif len(data) == 1 or len(set(data)) == 1:
+                        print(f"⚠️ ZERO VARIANZA: {key} = {data[:3]}...")
+
             
             algo_preds_db = {}
             
