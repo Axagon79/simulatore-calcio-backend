@@ -4,6 +4,7 @@ import csv
 import re
 from datetime import datetime, date
 from collections import Counter
+import statistics
 #from tqdm import tqdm  # type: ignore[reportMissingModuleSource]
 def tqdm(x):
     return x
@@ -229,6 +230,44 @@ def run_single_algo(algo_id, preloaded_data, home_name="Home", away_name="Away")
         away_name=away_name
     )
     return gh, ga
+
+def run_single_algo_montecarlo(algo_id, preloaded_data, home_team, away_team, cycles=500, analyzer=None):
+    """MonteCarlo per SINGOLO algoritmo - COPIA LOGICA run_monte_carlo_verdict_detailed"""
+    local_results = []
+    valid_cycles = 0
+    
+    print(f"🔄 Algo{algo_id} x {cycles:,} cicli...", end=" ", flush=True)
+    
+    for cycle_idx in range(cycles):
+        with suppress_stdout():
+            s_h, s_a, r_h, r_a = predict_match(home_team, away_team, mode=algo_id, preloaded_data=preloaded_data)
+            if s_h is None: continue
+            
+            gh, ga, *_ = calculate_goals_from_engine(s_h, s_a, r_h, r_a, algo_mode=algo_id, home_name=home_team, away_name=away_team)
+            score = f"{gh}-{ga}"
+            local_results.append(score)
+            valid_cycles += 1
+            
+            if analyzer:
+                analyzer.add_result(algo_id=algo_id, home_goals=gh, away_goals=ga)
+        
+        # 🔥 BARRA PROGRESSO CON FLUSH
+        if cycle_idx % max(1, cycles // 10) == 0 or cycle_idx == cycles - 1:
+            pct = (cycle_idx + 1) / cycles * 100
+            print(f"\r🔄 Algo{algo_id}: {pct:.0f}% ({valid_cycles} ok)", end="", flush=True)
+    
+    print(f"\r🔄 Algo{algo_id}: ✅ {valid_cycles} cicli completati", flush=True)
+    
+    if not local_results:
+        return 0, 0, []
+    
+    from collections import Counter
+    top3 = Counter(local_results).most_common(3)
+    final_score = top3[0][0]
+    gh, ga = map(int, final_score.split("-"))
+    
+    print(f" 📊 Top 3: {', '.join([f'{sc}({f})' for sc, f in top3])}", flush=True)
+    return gh, ga, top3, local_results  # ← AGGIUNGI local_results
 
 
 
@@ -529,17 +568,671 @@ def flow_single_match():
                     print("   [4] Caos")
                     print("   [5] Master")
                     print("   [6] MonteCarlo (Consigliato)")
-                    
-                    try: algo_sel = int(input("   Scelta: ").strip())
-                    except: algo_sel = 0
-                    
+                    print("   [7] CUSTOM (Algo + Cicli Manuali)")
+
+                    # 🔥 FUNZIONE MENU CICLI (con indentazione corretta)
+                    def show_cycles_menu(algo_name="Algoritmo"):
+                        print(f"\n📊 PRESET VELOCITÀ ({algo_name}):")
+                        presets = [
+                            ("[1] ⚡ TURBO", 100, "~3 sec"),
+                            ("[2] 🏃 RAPIDO", 250, "~6 sec"),
+                            ("[3] 🚶 VELOCE", 500, "~12 sec"),
+                            ("[4] ⚖️ STANDARD", 1250, "~30 sec"),
+                            ("[5] 🎯 ACCURATO", 2500, "~60 sec"),
+                            ("[6] 🔬 PRECISO", 5000, "~2 min"),
+                            ("[7] 💎 ULTRA", 12500, "~5 min")
+                        ]
+                        for label, cycles, time in presets:
+                            print(f"   {label} → {cycles:,} cicli    {time}")
+                        print("   [8] ✏️  PERSONALIZZATO (Inserisci numero manuale)")
+                        print("   [99] 🔙 ANNULLA")
+                        return input("   Scelta: ").strip()
+
+                    algo_names = {1: "Statistico Puro", 2: "Dinamico", 3: "Tattico", 4: "Caos", 5: "Master"}
+
+                    try: 
+                        algo_sel = int(input("   Scelta: ").strip())
+                    except: 
+                        algo_sel = 0
+
                     monte_carlo_cycles = None
                     if algo_sel == 6:
                         monte_carlo_cycles = ask_monte_carlo_cycles()
                         if monte_carlo_cycles is None:
                             continue
+                    elif algo_sel in [1,2,3,4,5]:
+                        algo_name = algo_names.get(algo_sel, "Tattico")
+                        cycle_choice = show_cycles_menu(algo_name)
+                        
+                        if cycle_choice == '99':
+                            continue
+                        elif cycle_choice == '8':
+                            cycles = int(input("Cicli (50-20000) [def=500]: ") or 500)
+                            monte_carlo_cycles = cycles
+                        else:
+                            cycles_map = {'1':100, '2':250, '3':500, '4':1250, '5':2500, '6':5000, '7':12500}
+                            cycles = cycles_map.get(cycle_choice, 500)
+                            monte_carlo_cycles = cycles
+                    elif algo_sel == 7:
+                        print("\n🧠 SCELTA ALGORITMO CUSTOM:")
+                        for i, name in algo_names.items():
+                            print(f"   [{i}] {name}")
+                        try:
+                            custom_algo = int(input("   Algo (1-5): ").strip())
+                        except:
+                            custom_algo = 3  # Default Tattico
+                        algo_name = algo_names.get(custom_algo, "Tattico")
+                        cycle_choice = show_cycles_menu(algo_name)
+                        
+                        if cycle_choice == '99':
+                            continue
+                        elif cycle_choice == '8':
+                            cycles = int(input("Cicli (50-20000) [def=500]: ") or 500)
+                            monte_carlo_cycles = cycles
+                            algo_sel = custom_algo
+                        else:
+                            cycles_map = {'1':100, '2':250, '3':500, '4':1250, '5':2500, '6':5000, '7':12500}
+                            cycles = cycles_map.get(cycle_choice, 500)
+                            monte_carlo_cycles = cycles
+                            algo_sel = custom_algo
+
+                    if 'monte_carlo_cycles' not in locals():
+                        monte_carlo_cycles = None
                     
                     return [selected_match], algo_sel, monte_carlo_cycles
+                
+                
+def analyze_result_dispersion(all_predictions):
+    """
+    Analizza la dispersione dei risultati usando DEVIAZIONE STANDARD.
+    Conta TUTTI i risultati, non solo top3.
+    
+    Returns:
+        dict con analisi dispersione basata su statistica reale
+    """
+    
+    all_results = []  # Lista completa di TUTTI i risultati
+    algo_analysis = {}
+    
+    # Raccogli TUTTI i risultati (non solo top3)
+    for algo_name, pred_data in all_predictions.items():
+        algo_results = None
+        
+        # 🔍 DEBUG: Vediamo cosa arriva
+        print(f"\n🔍 analyze_result_dispersion - {algo_name}:")
+        print(f"   Type pred_data: {type(pred_data)}")
+        if isinstance(pred_data, dict):
+            print(f"   Keys: {pred_data.keys()}")
+        elif isinstance(pred_data, tuple):
+            print(f"   Tuple length: {len(pred_data)}")
+        
+        # Cerca 'all_results' PRIMA di top3
+        if isinstance(pred_data, dict):
+            algo_results = pred_data.get('all_results')
+            print(f"   all_results from dict: {len(algo_results) if algo_results else 'None'}")
+            
+            if not algo_results and 'top3' in pred_data:
+                top3 = pred_data['top3']
+                if top3 and isinstance(top3, list):
+                    algo_results = []
+                    for score, freq in top3:
+                        algo_results.extend([score] * freq)
+                    print(f"   ⚠️ FALLBACK a top3: {len(algo_results)} risultati ricostruiti")
+        
+        elif isinstance(pred_data, tuple):
+            if len(pred_data) >= 4:
+                algo_results = pred_data[3]
+                print(f"   all_results from tuple[3]: {len(algo_results) if algo_results else 'None'}")
+            elif len(pred_data) >= 3:
+                top3 = pred_data[2]
+                if top3 and isinstance(top3, list):
+                    algo_results = []
+                    for score, freq in top3:
+                        algo_results.extend([score] * freq)
+                    print(f"   ⚠️ FALLBACK a tuple top3: {len(algo_results)} risultati ricostruiti")
+        
+        if not algo_results:
+            print(f"   ❌ SKIP: Nessun risultato trovato")
+            continue
+        
+        print(f"   ✅ Processando {len(algo_results)} risultati")
+        
+        signs_count = {'1': 0, 'X': 0, '2': 0}
+        for score in algo_results:
+            sign = get_sign(*map(int, score.split("-")))
+            signs_count[sign] += 1
+        
+        total = len(algo_results)
+        signs_pct = {
+            '1': (signs_count['1'] / total) * 100,
+            'X': (signs_count['X'] / total) * 100,
+            '2': (signs_count['2'] / total) * 100
+        }
+        
+        pct_values = list(signs_pct.values())
+        std_dev = statistics.stdev(pct_values) if len(pct_values) > 1 else 0
+        
+        dominant_sign = max(signs_pct, key=signs_pct.get)
+        dominant_pct = signs_pct[dominant_sign]
+        
+        algo_analysis[algo_name] = {
+            'results': algo_results,
+            'signs_count': signs_count,
+            'signs_pct': signs_pct,
+            'std_dev': std_dev,
+            'dominant_sign': dominant_sign,
+            'dominant_pct': dominant_pct,
+            'total_sims': total
+        }
+        
+        all_results.extend(algo_results)
+    
+    if not all_results:
+        return {
+            'is_dispersed': False,
+            'dispersion_score': 0,
+            'conflicting_signs': False,
+            'recommendation': None,
+            'all_results': []
+        }
+    
+    # Analisi globale
+    global_signs_count = {'1': 0, 'X': 0, '2': 0}
+    for score in all_results:
+        sign = get_sign(*map(int, score.split("-")))
+        global_signs_count[sign] += 1
+    
+    total_sims = len(all_results)
+    global_signs_pct = {
+        '1': (global_signs_count['1'] / total_sims) * 100,
+        'X': (global_signs_count['X'] / total_sims) * 100,
+        '2': (global_signs_count['2'] / total_sims) * 100
+    }
+    
+    # Deviazione standard globale
+    global_std_dev = statistics.stdev(global_signs_pct.values())
+    
+    # Determina segno dominante globale
+    dominant_sign = max(global_signs_pct, key=global_signs_pct.get)
+    dominant_pct = global_signs_pct[dominant_sign]
+    
+    # ========== LOGICA DISPERSIONE ==========
+    
+    # 1. BASSA DISPERSIONE (std_dev < 35): Un segno domina nettamente
+    #    Esempio: 1=80%, X=15%, 2=5% → std=40.4 (concentrato)
+    
+    # 2. MEDIA DISPERSIONE (35 <= std_dev < 45): Due segni vicini
+    #    Esempio: 1=50%, X=30%, 2=20% → std=15.3 (medio)
+    
+    # 3. ALTA DISPERSIONE (std_dev >= 45): Risultati equiprobabili
+    #    Esempio: 1=40%, X=35%, 2=25% → std=7.6 (disperso)
+    
+    # NUOVO CRITERIO: usa std_dev ma considera anche dominanza
+    is_dispersed = False
+    conflicting_signs = False
+    recommendation = None
+    
+    if global_std_dev > 45:
+        # Concentrato su UN segno (es. 100%, 0%, 0%)
+        # STD ALTO = buono!
+        is_dispersed = False
+        recommendation = None
+        
+    elif global_std_dev < 20:
+        # Molto disperso (es. 33%, 33%, 33%)
+        # STD BASSO = cattivo!
+        is_dispersed = True
+        conflicting_signs = True
+        recommendation = "⚠️  ALTA IMPREVEDIBILITÀ - Risultati equiprobabili tra più segni. EVITARE scommesse 1X2."
+        
+    elif global_std_dev < 35:
+        # Medio disperso
+        # Controlla se ci sono 2 segni vicini
+        sorted_pcts = sorted(global_signs_pct.values(), reverse=True)
+        if sorted_pcts[0] - sorted_pcts[1] < 15:  # Top 2 sono vicini
+            is_dispersed = True
+            conflicting_signs = False
+            recommendation = "⚠️  RISULTATI DISPERSI - Due segni competitivi. Considerare Under/Over o GG/NG."
+    
+    # Analisi PER ALGORITMO: controlla conflitti
+    algo_conflicts = []
+    if len(algo_analysis) > 1:
+        # Controlla se algoritmi predicono segni OPPOSTI
+        algo_signs = [data['dominant_sign'] for data in algo_analysis.values()]
+        
+        has_1 = '1' in algo_signs
+        has_2 = '2' in algo_signs
+        
+        if has_1 and has_2:
+            # Conflitto critico: alcuni dicono 1, altri dicono 2
+            algo_conflicts.append("Algoritmi predicono segni opposti (1 vs 2)")
+            conflicting_signs = True
+            is_dispersed = True
+            recommendation = "⚠️  ALGORITMI IN DISACCORDO - Alcuni predicono casa, altri trasferta. EVITARE 1X2."
+    
+    dispersion_score = 100 - (global_std_dev / 0.7)  # Normalizza 0-100
+    dispersion_score = max(0, min(100, dispersion_score))
+    
+    return {
+        'is_dispersed': is_dispersed,
+        'dispersion_score': dispersion_score,
+        'conflicting_signs': conflicting_signs,
+        'recommendation': recommendation,
+        'all_results': all_results,
+        'global_signs_pct': global_signs_pct,
+        'global_std_dev': global_std_dev,
+        'dominant_sign': dominant_sign,
+        'dominant_pct': dominant_pct,
+        'algo_analysis': algo_analysis,
+        'algo_conflicts': algo_conflicts
+    }
+
+
+def print_dispersion_warning(dispersion_analysis):
+    """
+    Stampa warning SOLO se realmente disperso.
+    """
+    if not dispersion_analysis['is_dispersed']:
+        return
+    
+    print("\n" + "⚠️ " * 30)
+    print("⚠️  ATTENZIONE: PARTITA AD ALTA VARIANZA RILEVATA")
+    print("⚠️ " * 30)
+    
+    print(f"\n🔍 ANALISI DISPERSIONE:")
+    print(f"   Deviazione Standard Segni: {dispersion_analysis['global_std_dev']:.1f}")
+    print(f"   Score Imprevedibilità: {dispersion_analysis['dispersion_score']:.0f}/100")
+    
+    # Mostra distribuzione segni
+    signs = dispersion_analysis['global_signs_pct']
+    print(f"\n   📊 DISTRIBUZIONE SEGNI:")
+    print(f"      1 (Casa):     {signs['1']:5.1f}%")
+    print(f"      X (Pareggio): {signs['X']:5.1f}%")
+    print(f"      2 (Trasferta):{signs['2']:5.1f}%")
+    
+    # Conflitti tra algoritmi
+    if dispersion_analysis['algo_conflicts']:
+        print(f"\n   🚨 CONFLITTI RILEVATI:")
+        for conflict in dispersion_analysis['algo_conflicts']:
+            print(f"      • {conflict}")
+        
+        # Dettaglio per algoritmo
+        print(f"\n   🔬 PREDIZIONI PER ALGORITMO:")
+        for algo, data in dispersion_analysis['algo_analysis'].items():
+            dom_sign = data['dominant_sign']
+            dom_pct = data['dominant_pct']
+            print(f"      • {algo}: {dom_sign} ({dom_pct:.0f}%)")
+    
+    print(f"\n💡 RACCOMANDAZIONE:")
+    print(f"   {dispersion_analysis['recommendation']}")
+    if dispersion_analysis['conflicting_signs']:
+        print(f"   ✅ Alternative sicure: UNDER/OVER 2.5 o GOL/NOGOL")
+        print(f"   ❌ EVITARE scommesse 1X2 (troppo rischioso)")
+    
+    print("\n" + "⚠️ " * 30 + "\n")
+
+    # ============================================
+    # NUOVA FUNZIONE: Report per Singola Partita
+    # ============================================
+
+def print_single_match_summary(match, all_predictions, monte_carlo_data=None):
+    """
+    Stampa un report dettagliato per una singola partita.
+    FOCUS: Confidenza basata su simulazioni reali, non su consenso algoritmi.
+    
+    Args:
+        match: dict con dati partita (home, away, league, odds, real_score, ecc)
+        all_predictions: dict {algo_name: (pred_gh, pred_ga, top3_optional)}
+        monte_carlo_data: tuple (mh, ma, global_top3, algos_stats) oppure None
+    """
+    
+    print("\n" + "="*90)
+    print("📋 REPORT DETTAGLIATO PARTITA")
+    print("="*90)
+    
+    # ========== INTESTAZIONE PARTITA ==========
+    print(f"\n🏆 {match.get('league', 'Unknown League')}")
+    print(f"📅 {match.get('date_str', 'Data N/D')}")
+    print(f"⚽ {match['home']} vs {match['away']}")
+    
+    # Mostra risultato reale se disponibile
+    if match.get('has_real'):
+        real_sign = get_sign(match['real_gh'], match['real_ga'])
+        print(f"✅ RISULTATO REALE: {match['real_gh']}-{match['real_ga']} ({real_sign})")
+    else:
+        print(f"⏳ PARTITA DA GIOCARE")
+    
+    # Mostra quote bookmaker
+    book_sign = None
+    book_prob_1x2 = None
+    if match.get('odds') and '1' in match['odds']:
+        try:
+            q1 = float(match['odds'].get('1', 0))
+            qx = float(match['odds'].get('X', 0))
+            q2 = float(match['odds'].get('2', 0))
+            
+            # Calcola probabilità implicite bookmaker
+            prob_1 = (1/q1) * 100 if q1 > 0 else 0
+            prob_x = (1/qx) * 100 if qx > 0 else 0
+            prob_2 = (1/q2) * 100 if q2 > 0 else 0
+            
+            min_q = min(q1, qx, q2)
+            if min_q == q1:
+                book_sign = '1'
+                fav_name = match['home']
+            elif min_q == q2:
+                book_sign = '2'
+                fav_name = match['away']
+            else:
+                book_sign = 'X'
+                fav_name = 'Pareggio'
+            
+            book_prob_1x2 = {'1': prob_1, 'X': prob_x, '2': prob_2}
+            
+            print(f"\n📊 QUOTE BOOKMAKER:")
+            print(f"   1={q1:.2f} ({prob_1:.0f}%) | X={qx:.2f} ({prob_x:.0f}%) | 2={q2:.2f} ({prob_2:.0f}%)")
+            print(f"   💰 FAVORITA: {fav_name} ({book_sign}) - Quota {min_q:.2f}")
+        except:
+            pass
+    
+    print("\n" + "-"*90)
+    
+    # ========== TABELLA PREDIZIONI ==========
+    print("\n🔮 PREDIZIONI PER ALGORITMO:")
+    print("-"*90)
+    print(f"{'ALGORITMO':<15} {'SCORE':<10} {'SEGNO':<8} {'CONFIDENZA':<15} {'SIMULAZIONI':<15} {'MATCH REALE':<12}")
+    print("-"*90)
+    
+    # Raccogli stats globali
+    all_scores = []
+    best_confidence = 0
+    best_algo = None
+    
+    for algo_name, pred_data in all_predictions.items():
+        gh, ga, top3, all_res = None, None, None, None
+        
+        if isinstance(pred_data, dict):
+            gh = pred_data.get('pred_gh')
+            ga = pred_data.get('pred_ga')
+            top3 = pred_data.get('top3')
+            all_res = pred_data.get('all_results')
+        elif isinstance(pred_data, tuple) and len(pred_data) >= 2:
+            gh, ga = pred_data[0], pred_data[1]
+            top3 = pred_data[2] if len(pred_data) >= 3 else None
+            all_res = pred_data[3] if len(pred_data) >= 4 else None
+        
+        if gh is None or ga is None:
+            continue
+        
+        sign = get_sign(gh, ga)
+        
+        # Calcola confidenza REALE dalle simulazioni
+        confidence_str = "-"
+        num_simulations = "-"
+        
+        # ✅ PRIORITÀ: Usa all_res se disponibile, altrimenti fallback a top3
+    if all_res and isinstance(all_res, list):
+        # CASO 1: Abbiamo TUTTI i risultati (500, 1000, ecc.)
+        total_votes = len(all_res)
+        
+        # Conta tutti i segni
+        signs_count = {'1': 0, 'X': 0, '2': 0}
+        for score in all_res:
+            s = get_sign(*map(int, score.split("-")))
+            signs_count[s] += 1
+        
+        # Confidenza sul SEGNO previsto
+        votes_for_sign = signs_count[sign]
+        conf_sign = (votes_for_sign / total_votes * 100) if total_votes > 0 else 0
+        
+        # Confidenza sul RISULTATO ESATTO
+        from collections import Counter
+        exact_counter = Counter(all_res)
+        exact_votes = exact_counter.get(f"{gh}-{ga}", 0)
+        conf_exact = (exact_votes / total_votes * 100) if total_votes > 0 else 0
+        
+        confidence_str = f"{conf_sign:.1f}% (1X2)"
+        num_simulations = f"{total_votes} cicli"
+        
+        # Traccia miglior confidenza
+        if conf_sign > best_confidence:
+            best_confidence = conf_sign
+            best_algo = algo_name
+        
+        # Salva per analisi globale
+        all_scores.extend(all_res)
+    
+    elif top3 and isinstance(top3, list):
+        # CASO 2: Abbiamo solo top3 (fallback per vecchie versioni)
+        total_votes = sum([f for s, f in top3])
+        
+        # Confidenza sul SEGNO previsto
+        votes_for_sign = sum([f for s, f in top3 if get_sign(*map(int, s.split("-"))) == sign])
+        conf_sign = (votes_for_sign / total_votes * 100) if total_votes > 0 else 0
+        
+        # Confidenza sul RISULTATO ESATTO
+        exact_votes = top3[0][1] if top3 and top3[0][0] == f"{gh}-{ga}" else 0
+        conf_exact = (exact_votes / total_votes * 100) if total_votes > 0 else 0
+        
+        confidence_str = f"{conf_sign:.1f}% (top3)"
+        num_simulations = f"~{total_votes} cicli"
+        
+        # Traccia miglior confidenza
+        if conf_sign > best_confidence:
+            best_confidence = conf_sign
+            best_algo = algo_name
+        
+        # Salva per analisi globale (espandi top3)
+        for s, f in top3:
+            all_scores.extend([s] * f)
+            
+            # Traccia miglior confidenza
+            if conf_sign > best_confidence:
+                best_confidence = conf_sign
+                best_algo = algo_name
+            
+            # Salva per analisi globale
+            all_scores.extend([s for s, f in top3 for _ in range(f)])
+        
+        # Verifica vs reale
+        match_real = ""
+        if match.get('has_real'):
+            real_sign = get_sign(match['real_gh'], match['real_ga'])
+            match_real = "✅ OK" if sign == real_sign else "❌ MISS"
+        
+        print(f"{algo_name:<15} {gh}-{ga:<8} {sign:<8} {confidence_str:<15} {num_simulations:<15} {match_real:<12}")
+    
+    print("-"*90)
+    
+    # ========== RILEVAMENTO DISPERSIONE ==========
+    dispersion_analysis = analyze_result_dispersion(all_predictions)
+    if dispersion_analysis['is_dispersed'] or dispersion_analysis['conflicting_signs']:
+        print_dispersion_warning(dispersion_analysis)
+    
+    # ========== ANALISI STATISTICA SIMULAZIONI ==========
+    
+    # Usa i risultati dall'analisi dispersione (che ha già raccolto TUTTO)
+    if dispersion_analysis and dispersion_analysis['all_results']:
+        all_scores = dispersion_analysis['all_results']
+        from collections import Counter
+        scores_counter = Counter(all_scores)
+        total_sims = len(all_scores)
+        
+        print(f"\n📊 ANALISI STATISTICA ({total_sims:,} simulazioni totali):")
+        print("-"*90)
+        
+        # Top 5 risultati più probabili
+        top5_scores = scores_counter.most_common(5)
+        
+        print(f"\n   🎯 TOP 5 RISULTATI PIÙ PROBABILI:")
+        for i, (score, freq) in enumerate(top5_scores, 1):
+            prob = (freq / total_sims) * 100
+            sign = get_sign(*map(int, score.split("-")))
+            bar = "█" * int(prob / 2)
+            print(f"   {i}. {score:<6} ({sign}) → {prob:5.1f}% {bar}")
+        
+        # USA LE PERCENTUALI GIÀ CALCOLATE da dispersion_analysis
+        prob_1 = dispersion_analysis['global_signs_pct']['1']
+        prob_x = dispersion_analysis['global_signs_pct']['X']
+        prob_2 = dispersion_analysis['global_signs_pct']['2']
+        
+        print(f"\n   📈 PROBABILITÀ 1X2 (dalle simulazioni):")
+        print(f"      1 (Vince {match['home']:<12}) → {prob_1:5.1f}%")
+        print(f"      X (Pareggio)            → {prob_x:5.1f}%")
+        print(f"      2 (Vince {match['away']:<12}) → {prob_2:5.1f}%")
+        
+        # Distribuzione Under/Over
+        under_count = sum(freq for score, freq in scores_counter.items() if sum(map(int, score.split("-"))) <= 2.5)
+        over_count = total_sims - under_count
+        
+        prob_under = (under_count / total_sims) * 100
+        prob_over = (over_count / total_sims) * 100
+        
+        print(f"\n   📉 PROBABILITÀ UNDER/OVER 2.5:")
+        print(f"      UNDER 2.5 → {prob_under:5.1f}%")
+        print(f"      OVER 2.5  → {prob_over:5.1f}%")
+        
+        # Distribuzione GG/NG
+        gg_count = sum(freq for score, freq in scores_counter.items() if all(int(x) > 0 for x in score.split("-")))
+        ng_count = total_sims - gg_count
+        
+        prob_gg = (gg_count / total_sims) * 100
+        prob_ng = (ng_count / total_sims) * 100
+        
+        print(f"\n   ⚽ PROBABILITÀ GOL/NOGOL:")
+        print(f"      GG (Goal/Goal)   → {prob_gg:5.1f}%")
+        print(f"      NG (NoGol)       → {prob_ng:5.1f}%")
+        
+        # ========== CONFRONTO CON BOOKMAKER ==========
+        if book_prob_1x2:
+            print(f"\n   💰 CONFRONTO IA vs BOOKMAKER:")
+            print(f"      {'ESITO':<10} {'IA':<12} {'BOOKMAKER':<12} {'DIFFERENZA':<12} {'VALUE BET'}")
+            print(f"      {'-'*60}")
+            
+            diff_1 = prob_1 - book_prob_1x2['1']
+            diff_x = prob_x - book_prob_1x2['X']
+            diff_2 = prob_2 - book_prob_1x2['2']
+            
+            # 1
+            value_1 = "⭐ SÌ" if diff_1 > 10 else ""
+            print(f"      {'1 (Casa)':<10} {prob_1:>5.1f}%      {book_prob_1x2['1']:>5.1f}%      {diff_1:>+5.1f}%       {value_1}")
+            
+            # X
+            value_x = "⭐ SÌ" if diff_x > 10 else ""
+            print(f"      {'X (Pareggio)':<10} {prob_x:>5.1f}%      {book_prob_1x2['X']:>5.1f}%      {diff_x:>+5.1f}%       {value_x}")
+            
+            # 2
+            value_2 = "⭐ SÌ" if diff_2 > 10 else ""
+            print(f"      {'2 (Trasferta)':<10} {prob_2:>5.1f}%      {book_prob_1x2['2']:>5.1f}%      {diff_2:>+5.1f}%       {value_2}")
+            
+            print(f"\n      ℹ️  Value Bet = IA stima probabilità >10% superiore al bookmaker")
+        
+        # ========== SUGGERIMENTI SCOMMESSE ==========
+        print(f"\n" + "="*90)
+        print(f"💡 SUGGERIMENTI SCOMMESSE (basati su {total_sims:,} simulazioni):")
+        print("="*90)
+        
+        # Determina segno consigliato
+        max_prob = max(prob_1, prob_x, prob_2)
+        if max_prob == prob_1:
+            rec_sign = '1'
+            rec_name = match['home']
+            rec_prob = prob_1
+        elif max_prob == prob_2:
+            rec_sign = '2'
+            rec_name = match['away']
+            rec_prob = prob_2
+        else:
+            rec_sign = 'X'
+            rec_name = 'Pareggio'
+            rec_prob = prob_x
+        
+        # SCOMMESSA 1X2 - Check dispersione PRIMA
+        if dispersion_analysis['conflicting_signs']:
+            # Caso CRITICO: algoritmi in conflitto
+            print(f"\n   🔴 SCOMMESSA 1X2: FORTEMENTE SCONSIGLIATA")
+            print(f"      ⚠️  Algoritmi predicono segni opposti")
+            print(f"      ⚠️  Deviazione Standard: {dispersion_analysis['global_std_dev']:.1f}")
+            print(f"      ❌ EVITARE questa scommessa")
+            
+        elif dispersion_analysis['is_dispersed']:
+            # Caso MEDIO: risultati dispersi
+            print(f"\n   🟡 SCOMMESSA 1X2: RISCHIOSA")
+            print(f"      ⚠️  Risultati dispersi (std={dispersion_analysis['global_std_dev']:.1f})")
+            print(f"      Esito: {rec_sign} ({rec_name})")
+            print(f"      Probabilità IA: {rec_prob:.1f}%")
+            print(f"      ⚠️  Procedere con cautela")
+            
+        else:
+            # Caso NORMALE: usa probabilità
+            if rec_prob >= 60:
+                icon = "🟢"
+                level = "CONSIGLIATA"
+                conf_label = "ALTA"
+            elif rec_prob >= 45:
+                icon = "🟡"
+                level = "POSSIBILE"
+                conf_label = "MEDIA"
+            else:
+                icon = "🔴"
+                level = "SCONSIGLIATA"
+                conf_label = "BASSA"
+            
+            print(f"\n   {icon} SCOMMESSA 1X2: {level}")
+            print(f"      Esito: {rec_sign} ({rec_name})")
+            print(f"      Probabilità IA: {rec_prob:.1f}%")
+            print(f"      Confidenza: {conf_label}")
+            print(f"      Deviazione Standard: {dispersion_analysis['global_std_dev']:.1f} (concentrato)")
+        
+        if book_prob_1x2:
+            diff = rec_prob - book_prob_1x2[rec_sign]
+            print(f"      Probabilità Bookmaker: {book_prob_1x2[rec_sign]:.1f}%")
+            if diff > 10:
+                print(f"      ⭐ VALUE BET RILEVATO: +{diff:.1f}% rispetto al bookmaker")
+            elif diff > 5:
+                print(f"      💡 Lieve vantaggio: +{diff:.1f}% rispetto al bookmaker")
+            elif diff < -10:
+                print(f"      ⚠️  Bookmaker più ottimista: {diff:.1f}%")
+        
+        # UNDER/OVER
+        print(f"\n   {'🟢' if prob_under >= 60 or prob_over >= 60 else '🟡'} SCOMMESSA UNDER/OVER 2.5:")
+        if prob_under > prob_over:
+            print(f"      Esito: UNDER 2.5")
+            print(f"      Probabilità: {prob_under:.1f}%")
+            print(f"      Confidenza: {'ALTA' if prob_under >= 60 else 'MEDIA'}")
+        else:
+            print(f"      Esito: OVER 2.5")
+            print(f"      Probabilità: {prob_over:.1f}%")
+            print(f"      Confidenza: {'ALTA' if prob_over >= 60 else 'MEDIA'}")
+        
+        # GOL/NOGOL
+        print(f"\n   {'🟢' if prob_gg >= 60 or prob_ng >= 60 else '🟡'} SCOMMESSA GOL/NOGOL:")
+        if prob_gg > prob_ng:
+            print(f"      Esito: GG (Goal/Goal)")
+            print(f"      Probabilità: {prob_gg:.1f}%")
+            print(f"      Confidenza: {'ALTA' if prob_gg >= 60 else 'MEDIA'}")
+        else:
+            print(f"      Esito: NG (NoGol)")
+            print(f"      Probabilità: {prob_ng:.1f}%")
+            print(f"      Confidenza: {'ALTA' if prob_ng >= 60 else 'MEDIA'}")
+        
+        # RISULTATO ESATTO
+        best_score, best_freq = top5_scores[0]
+        best_exact_prob = (best_freq / total_sims) * 100
+        
+        if best_exact_prob >= 15:
+            print(f"\n   🎯 RISULTATO ESATTO PIÙ PROBABILE:")
+            print(f"      {best_score} → {best_exact_prob:.1f}% probabilità")
+            if best_exact_prob >= 20:
+                print(f"      💎 Probabilità eccezionalmente alta per risultato esatto!")
+    
+    else:
+        # Nessuna simulazione disponibile
+        print(f"\n⚠️  ATTENZIONE: Predizioni basate su calcolo singolo")
+        print(f"   → Esegui algoritmi con cicli multipli (100+) per analisi statistiche")
+        print(f"   → Raccomandato: Monte Carlo con 1000+ simulazioni")
+    
+    print("\n" + "="*90)
 
 
 def print_massive_summary(matches_data, algo_name="MonteCarlo"):
@@ -948,6 +1641,7 @@ def run_universal_simulator():
             print("❌ Scelta non valida."); continue
 
         matches_to_process = []
+        cycles_per_single_algo = None  # ← NUOVO: variabile per cicli custom
 
         if MODE_SINGLE:
             result = flow_single_match()
@@ -957,11 +1651,12 @@ def run_universal_simulator():
             matches_to_process = result[0]
             selected_algo_id = result[1]
             
+            # ✅ MODIFICATO: salva in variabile dedicata
             if len(result) >= 3 and result[2] is not None:
-                MONTE_CARLO_TOTAL_CYCLES = result[2]
-                print(f"\n⚙️  Configurato: {MONTE_CARLO_TOTAL_CYCLES:,} cicli Monte Carlo")
+                cycles_per_single_algo = result[2]  # ← CAMBIATO
+                print(f"\n⚙️ Configurato: {cycles_per_single_algo:,} cicli per algoritmo")
             else:
-                MONTE_CARLO_TOTAL_CYCLES = 5000
+                cycles_per_single_algo = None  # ← CAMBIATO
             
             if not matches_to_process: 
                 continue
@@ -1160,7 +1855,7 @@ def run_universal_simulator():
                     continue
             
 
-            # 🔍 DEBUG NUMPY: Controlla dati preload_match_data
+                            # 🔍 DEBUG NUMPY: Controlla dati preload_match_data
             if 'debug_data' in locals():
                 print(f"🔍 preload keys: {list(preloaded.keys())}")
                 for key in ['home_attack', 'away_attack', 'home_defense', 'away_defense']:
@@ -1170,20 +1865,78 @@ def run_universal_simulator():
                     elif len(data) == 1 or len(set(data)) == 1:
                         print(f"⚠️ ZERO VARIANZA: {key} = {data[:3]}...")
 
-            
+            # 🔥 SEMPRE - INIZIALIZZA PER TUTTI I CASI
             algo_preds_db = {}
-            
             for aid in [i for i in algos_indices if i <= 5]:
-                th, ta = run_single_algo(aid, preloaded, home_name=match['home'], away_name=match['away'])
-                name = all_algos[aid-1]
-                data_by_algo[name].append({'match': match, 'pred_gh': th, 'pred_ga': ta})
+                
+                # ✅ LOGICA CICLI CORRETTA
+                if MODE_SINGLE and cycles_per_single_algo and cycles_per_single_algo > 1:
+                    # Modalità singola con cicli custom
+                    cycles_to_run = cycles_per_single_algo
+                    print(f"🔍 DEBUG: Uso {cycles_to_run} cicli custom per Algo {aid}")
+                elif not MODE_SINGLE and MONTE_CARLO_TOTAL_CYCLES:
+                    # Modalità massiva con Monte Carlo
+                    cycles_to_run = MONTE_CARLO_TOTAL_CYCLES // 4
+                else:
+                    # Default: singola simulazione
+                    cycles_to_run = 1
+                
+                # Esegui la simulazione con i cicli corretti
+                if cycles_to_run > 1:
+                    th, ta, top3, all_results = run_single_algo_montecarlo(
+                        aid, preloaded, match['home'], match['away'], 
+                        cycles=cycles_to_run, analyzer=deep_analyzer
+                    )
+                    
+                    # 🔍 DEBUG: Verifica cosa contiene all_results
+                    print(f"\n🔍 DEBUG all_results:")
+                    print(f"   Tipo: {type(all_results)}")
+                    print(f"   Lunghezza: {len(all_results) if all_results else 'None'}")
+                    if all_results:
+                        print(f"   Primi 5: {all_results[:5]}")
+                        from collections import Counter
+                        debug_counter = Counter(all_results)
+                        print(f"   Segni unici: {len(debug_counter)}")
+                        signs_debug = {'1': 0, 'X': 0, '2': 0}
+                        for score in all_results:
+                            s = get_sign(*map(int, score.split("-")))
+                            signs_debug[s] += 1
+                        print(f"   Distribuzione segni: 1={signs_debug['1']}, X={signs_debug['X']}, 2={signs_debug['2']}")
+                    
+                    data_by_algo[all_algos[aid-1]].append({
+                        'match': match, 
+                        'pred_gh': th, 
+                        'pred_ga': ta, 
+                        'top3': top3,
+                        'all_results': all_results  # ← AGGIUNGI
+                    })
+                else:
+                    th, ta = run_single_algo(
+                        aid, preloaded, 
+                        home_name=match['home'], 
+                        away_name=match['away']
+                    )
+                    data_by_algo[all_algos[aid-1]].append({
+                        'match': match, 
+                        'pred_gh': th, 
+                        'pred_ga': ta
+                    })
+                
                 algo_preds_db[f"Algo_{aid}"] = f"{th}-{ta}"
+                
                 if deep_analyzer and deep_analyzer.current_match:
                     deep_analyzer.add_result(algo_id=aid, home_goals=th, away_goals=ta)
+                
                 if MODE_SINGLE:
-                    print(f"   🔹 {name}: {th}-{ta} ({get_sign(th, ta)})")
+                    name = all_algos[aid-1]
+                    if cycles_to_run > 1:
+                        print(f" 🔹 {name}: {th}-{ta} ({get_sign(th, ta)}) [Media su {cycles_to_run:,} cicli]")
+                    else:
+                        print(f" 🔹 {name}: {th}-{ta} ({get_sign(th, ta)})")
+
 
             mh, ma = 0, 0
+
             pesi_medi = {}
             scontrini_medi = {}
             
@@ -1212,7 +1965,8 @@ def run_universal_simulator():
                     algo_names_map = {2: 'Dinamico', 3: 'Tattico', 4: 'Caos', 5: 'Master'}
                     for aid, top3 in algos_stats.items():
                         print(f"      [{algo_names_map[aid]}] Top 3: {top3}")
-                    
+            
+                        
                     # ✨ STAMPA PESI
                     if pesi_medi:
                         print(f"\n   ⚖️  CONFIGURAZIONE PESI PER ALGORITMO:")
@@ -1277,7 +2031,38 @@ def run_universal_simulator():
                             print("-" * 75)
                             print(f"   {'TOTALE':<15} | {totale_casa:>28.2f} | {totale_ospite:>28.2f}")
                             print(f"   DIFFERENZA: {abs(totale_casa - totale_ospite):.2f} ({match['home'] if totale_casa > totale_ospite else match['away']} favorita)")
-                    #print_massive_summary(match, mh, ma, global_top3, algos_stats)
+            # ========== REPORT DETTAGLIATO PARTITA SINGOLA ==========
+            if MODE_SINGLE:
+                # Raccogli tutte le predizioni
+                single_predictions = {}
+                
+                # Predizioni algoritmi 1-5
+                for aid in algos_indices:
+                    if aid <= 5:
+                        algo_name = all_algos[aid-1]
+                        pred_data = data_by_algo.get(algo_name, [])
+                        if pred_data:
+                            last_pred = pred_data[-1]
+                            gh = last_pred.get('pred_gh', 0)
+                            ga = last_pred.get('pred_ga', 0)
+                            top3 = last_pred.get('top3', None)
+                            all_res = last_pred.get('all_results', None)  # ← AGGIUNGI QUESTA RIGA
+                            
+                            print(f"🔍 {algo_name}: all_results={len(all_res) if all_res else 'None'}")
+                            
+                            single_predictions[algo_name] = (gh, ga, top3, all_res)  # ← 4 VALORI!
+                
+                # Predizione Monte Carlo (se eseguito)
+                mc_data_full = None
+                if 6 in algos_indices and 'mh' in locals() and mh is not None:
+                    single_predictions['MonteCarlo'] = (mh, ma, global_top3)
+                    mc_data_full = (mh, ma, global_top3, algos_stats)
+                
+                # Stampa il report dettagliato
+                if single_predictions:
+                    print_single_match_summary(match, single_predictions, mc_data_full)
+            
+                    
             deep_analyzer.end_match()        
             if save_to_db and manager:
                 d_str_iso = match['date_iso']
