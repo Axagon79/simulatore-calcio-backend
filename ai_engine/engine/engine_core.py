@@ -384,6 +384,9 @@ def predict_match(home_team, away_team, mode=ALGO_MODE, preloaded_data=None):
         h2h_h = preloaded_data['h2h_h']
         h2h_a = preloaded_data['h2h_a']
         base_val = preloaded_data['base_val']
+        # ✅ Salviamo anche il voto H2H puro dentro i RAW
+        home_raw['h2h_score'] = h2h_h
+        away_raw['h2h_score'] = h2h_a
         # Per compatibilità, definiamo H_OFF anche qui (anche se non usati in fast track)
         H_OFF, A_OFF = h_id['official_name'], a_id['official_name']
     else:
@@ -494,7 +497,13 @@ def predict_match(home_team, away_team, mode=ALGO_MODE, preloaded_data=None):
         print(f"🔥 Lucifero:     {home_team}={h_luc:.2f} | {away_team}={a_luc:.2f}")
         print(f"🔮 BVS Bonus:    {home_team}={h_bvs:+} | {away_team}={a_bvs:+}")
 
+
         h2h_h, h2h_a, h2h_msg, h2h_extra = get_h2h_data_from_db(db, H_OFF, A_OFF)
+        print("DEBUG H2H:", H_OFF, A_OFF, "=>", h2h_h, h2h_a)
+
+        # ✅ Salviamo anche il voto H2H puro dentro i RAW
+        home_raw['h2h_score'] = h2h_h
+        away_raw['h2h_score'] = h2h_a
 
         print(f"📜 H2H Info: {h2h_msg} [Bonus: {h2h_h:.2f} - {h2h_a:.2f}]")
         

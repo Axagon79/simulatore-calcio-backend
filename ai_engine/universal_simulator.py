@@ -4,7 +4,10 @@ import csv
 import re
 from datetime import datetime, date
 from collections import Counter
-from tqdm import tqdm  # type: ignore[reportMissingModuleSource]
+#from tqdm import tqdm  # type: ignore[reportMissingModuleSource]
+def tqdm(x):
+    return x
+
 import contextlib
 import random
 from . import diagnostics
@@ -563,8 +566,8 @@ def print_massive_summary(matches_data, algo_name="MonteCarlo"):
     for league, items in by_league.items():
         print(f"\n🏆 {league}")
         print("-" * 95)
-        print(f"{'#':<3} {'PARTITA':<28} {'PRONOSTICO':<10} {'SEGNO':<6} {'CONF%':<7} {'U/O':<8} {'GG/NG':<7} {'STATUS':<8}")
-        print("-" * 95)
+        print(f"{'#':<3} {'PARTITA':<28} {'REALE':<10} {'PRONOSTICO':<10} {'SEGNO':<6} {'CONF%':<7} {'U/O':<8} {'GG/NG':<7} {'STATUS':<8}")
+        print("-" * 110)  # ← Aumenta lunghezza
         
         for idx, item in enumerate(items, 1):
             m = item['match']
@@ -614,14 +617,16 @@ def print_massive_summary(matches_data, algo_name="MonteCarlo"):
             
             # Verifica risultato reale
             real_icon = ""
+            real_score_str = "-:-"  # Default se non disponibile
             if m.get('has_real'):
+                real_score_str = f"{m['real_gh']}-{m['real_ga']}"  # ← AGGIUNGI QUESTO!
                 pred_sign = sign
                 real_sign = get_sign(m['real_gh'], m['real_ga'])
                 real_icon = "✅" if pred_sign == real_sign else "❌"
-            
-            print(f"{idx:<3} {match_name:<28} {pred_score:<10} {sign:<6} {confidence:>5.1f}%  {uo:<8} {gg:<7} {status:<8} {real_icon}")
+
+            print(f"{idx:<3} {match_name:<28} {real_score_str:<10} {pred_score:<10} {sign:<6} {confidence:>5.1f}%  {uo:<8} {gg:<7} {status:<8} {real_icon}")
         
-        print("-" * 95)
+        print("-" * 110)
         
         # Statistiche campionato
         signs_1 = sum(1 for item in items if get_sign(item['pred_gh'], item['pred_ga']) == "1")
@@ -770,23 +775,40 @@ def print_massive_summary(matches_data, algo_name="MonteCarlo"):
     # Stampa per ogni campionato
     for league, items in by_league.items():
         print(f"\n🏆 {league}")
-        print("-" * 90)
-        print(f"{'#':<3} {'PARTITA':<30} {'PRONOSTICO':<12} {'SEGNO':<6} {'U/O':<8} {'GG/NG':<7} {'CONFIDENZA':<10}")
-        print("-" * 90)
+        print("-" * 95)
+        print(f"{'#':<3} {'PARTITA':<28} {'REALE':<10} {'PRONOSTICO':<10} {'SEGNO':<6} {'CONF%':<7} {'U/O':<8} {'GG/NG':<7} {'STATUS':<8}")
+        print("-" * 110)  # ← Aumenta lunghezza
         
         for idx, item in enumerate(items, 1):
             m = item['match']
             ph = item['pred_gh']
             pa = item['pred_ga']
             
-            # Nome partita (max 30 char)
-            match_name = f"{m['home'][:13]} vs {m['away'][:13]}"
-            
-            # Pronostico
+            # Nome partita
+            match_name = f"{m['home'][:12]} vs {m['away'][:12]}"
             pred_score = f"{ph}-{pa}"
-            
-            # Segno
             sign = get_sign(ph, pa)
+            
+            # CALCOLA CONFIDENZA REALE (se disponibile top3)
+            confidence = 0
+            if 'top3' in item and item['top3']:
+                top3 = item['top3']
+                total_votes = sum([f for s, f in top3])
+                
+                # Confidenza sul segno previsto
+                votes_for_sign = sum([f for s, f in top3 if get_sign(*map(int, s.split("-"))) == sign])
+                confidence = (votes_for_sign / total_votes * 100) if total_votes > 0 else 0
+            else:
+                # Fallback: stima basica
+                diff = abs(ph - pa)
+                if sign == "X":
+                    confidence = 30
+                elif diff >= 2:
+                    confidence = 65
+                elif diff >= 1:
+                    confidence = 50
+                else:
+                    confidence = 35
             
             # Under/Over
             total = ph + pa
@@ -795,27 +817,26 @@ def print_massive_summary(matches_data, algo_name="MonteCarlo"):
             # GG/NG
             gg = "GG" if (ph > 0 and pa > 0) else "NG"
             
-            # Confidenza (stima basata su quanto è netto)
-            diff = abs(ph - pa)
-            if sign == "X":
-                conf = "🟡 MEDIA"
-            elif diff >= 2:
-                conf = "🟢 ALTA"
-            elif diff >= 1:
-                conf = "🟡 MEDIA"
+            # Status con emoji
+            if confidence >= 55:
+                status = "🟢 OK"
+            elif confidence >= 40:
+                status = "🟡 MID"
             else:
-                conf = "🔴 BASSA"
+                status = "🔴 LOW"
             
-            # Emoji risultato reale se disponibile
+            # Verifica risultato reale
             real_icon = ""
+            real_score_str = "-:-"  # Default se non disponibile
             if m.get('has_real'):
+                real_score_str = f"{m['real_gh']}-{m['real_ga']}"  # ← AGGIUNGI QUESTO!
                 pred_sign = sign
                 real_sign = get_sign(m['real_gh'], m['real_ga'])
                 real_icon = "✅" if pred_sign == real_sign else "❌"
-            
-            print(f"{idx:<3} {match_name:<30} {pred_score:<12} {sign:<6} {uo:<8} {gg:<7} {conf:<10} {real_icon}")
+
+            print(f"{idx:<3} {match_name:<28} {real_score_str:<10} {pred_score:<10} {sign:<6} {confidence:>5.1f}%  {uo:<8} {gg:<7} {status:<8} {real_icon}")
         
-        print("-" * 90)
+        print("-" * 110)
         
         # Statistiche campionato
         signs_1 = sum(1 for item in items if get_sign(item['pred_gh'], item['pred_ga']) == "1")
@@ -1107,6 +1128,7 @@ def run_universal_simulator():
 
         filename = "simulation_report.csv" if not AUTO_ALL_LEAGUES else "total_simulation_report.csv"
         print(f"\n⏳ Elaborazione in corso... Output: {filename}")
+        print("DEBUG A - dopo messaggio Elaborazione")
         
         all_algos = ['Stat', 'Din', 'Tat', 'Caos', 'Master', 'MonteCarlo']
         data_by_algo = {name: [] for name in all_algos}
@@ -1119,6 +1141,7 @@ def run_universal_simulator():
         iterator = tqdm(final_matches_list) if not MODE_SINGLE else final_matches_list
         
         for match in iterator:
+            print(f"DEBUG B - inizio match: {match['home']} vs {match['away']}")    
             if MODE_SINGLE: 
                 print(f"\n⚡ ANALISI: {match['home']} vs {match['away']}...")
             deep_analyzer.start_match(
@@ -1128,10 +1151,13 @@ def run_universal_simulator():
                 league=match.get('league', 'Unknown'),
                 date_str=match.get('date_iso')
             )    
-            
+            print("DEBUG C - prima di preload_match_data")
             with suppress_stdout():
                 try: preloaded = preload_match_data(match['home'], match['away'])
-                except: continue
+                except:
+                    print("DEBUG C1 - preload_match_data ha fatto eccezione, passo oltre")
+                    continue
+            print("DEBUG D - dopo preload_match_data, prima degli algoritmi normali")
             
             algo_preds_db = {}
             
@@ -1228,8 +1254,8 @@ def run_universal_simulator():
                                 casa_data = scontrino.get('casa', {}).get(voce, {'valore': 0, 'peso': 0, 'punti': 0})
                                 ospite_data = scontrino.get('ospite', {}).get(voce, {'valore': 0, 'peso': 0, 'punti': 0})
                                 
-                                casa_str = f"{casa_data['valore']:>5.1f} × {casa_data['peso']:>4.2f} = {casa_data['punti']:>6.2f}"
-                                ospite_str = f"{ospite_data['valore']:>5.1f} × {ospite_data['peso']:>4.2f} = {ospite_data['punti']:>6.2f}"
+                                casa_str = f"{casa_data['valore']:>5.2f} × {casa_data['peso']:>4.2f} = {casa_data['punti']:>6.2f}"
+                                ospite_str = f"{ospite_data['valore']:>5.2f} × {ospite_data['peso']:>4.2f} = {ospite_data['punti']:>6.2f}"
                                 
                                 print(f"   {voce:<15} | {casa_str:<28} | {ospite_str:<28}")
                                 
@@ -1239,7 +1265,7 @@ def run_universal_simulator():
                             print("-" * 75)
                             print(f"   {'TOTALE':<15} | {totale_casa:>28.2f} | {totale_ospite:>28.2f}")
                             print(f"   DIFFERENZA: {abs(totale_casa - totale_ospite):.2f} ({match['home'] if totale_casa > totale_ospite else match['away']} favorita)")
-                    print_massive_summary(match, mh, ma, global_top3, algos_stats)
+                    #print_massive_summary(match, mh, ma, global_top3, algos_stats)
             deep_analyzer.end_match()        
             if save_to_db and manager:
                 d_str_iso = match['date_iso']

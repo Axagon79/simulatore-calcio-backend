@@ -181,22 +181,39 @@ def run_mass_scraper():
     print(f"🎯 Trovate {len(pairs_list)} coppie uniche.")
     
     skips = 0
-    for home, away in tqdm(pairs_list, desc="Download H2H"):
-        # Controlliamo se esiste già nella NUOVA collezione v2
-        exists = db.raw_h2h_data_v2.find_one({
-            "$or": [
-                {"team_a": home, "team_b": away},
-                {"team_a": away, "team_b": home}
-            ]
-        })
-        
-        if exists:
-            skips += 1
-            continue
-        
-        success, msg = download_and_save_h2h(home, away)
-        if not success:
-            tqdm.write(f"⚠️  Skip {home}-{away}: {msg}")
+    with tqdm(pairs_list, desc="Download H2H") as pbar:
+        for home_raw, away_raw in pbar:
+            # 1. Trova i team ufficiali PRIMA di fare il check
+            home_team = find_team_smart(home_raw)
+            away_team = find_team_smart(away_raw)
+
+            if not home_team or not away_team:
+                pbar.set_postfix_str(f"⚠️ Skip: Squadre non trovate in DB ({home_raw} / {away_raw})")
+                continue
+
+            # Nomi ufficiali dal DB (es. "Famalicao", non "Famalicão")
+            home_official = home_team['name']
+            away_official = away_team['name']
+            
+            # 2. Controlla se esiste usando i nomi UFFICIALI (come vengono salvati)
+            exists = db.raw_h2h_data_v2.find_one({
+                "$or": [
+                    {"team_a": home_official, "team_b": away_official},
+                    {"team_a": away_official, "team_b": home_official}
+                ]
+            })
+            
+            if exists:
+                skips += 1
+                pbar.set_postfix_str(f"⏩ Saltati {skips} (già presenti)")
+                continue
+            
+            # 3. Solo se non esiste, scarica
+            pbar.set_postfix_str(f"📥 Download {home_official}-{away_official}")
+            success, msg = download_and_save_h2h(home_raw, away_raw) # Passiamo ancora i nomi raw
+            if not success:
+                # Non usiamo tqdm.write che sporca la barra, ma il postfix
+                pbar.set_postfix_str(f"❌ Errore {home_official}-{away_official}: {msg}")
 
     print("\n" + "="*60)
     print(f"✅ TUTTO FINITO!")

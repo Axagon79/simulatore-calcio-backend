@@ -1,5 +1,56 @@
 {
-    "MATCH": "Arzignano vs Pro Patria",
-    "CASA": "N/A",
-    "OSPITE": "N/A"
+    "MATCH": "Como vs Milan",
+    "CASA": {
+        "Squadra": "Como",
+        "Modulo": "4-3-3",
+        "Rating": "18.51/25",
+        "1_TITOLARI": [
+            "GK - Jean Butez (7.5)",
+            "DIF - Jacobo Ram\u00f3n (8.7)",
+            "DIF - \u00c1lex Valle (7.4)",
+            "DIF - Diego Carlos (7.2)",
+            "DIF - Ivan Smol\u010di\u0107 (8.1)",
+            "MID - Nicol\u00e1s Paz (7.9)",
+            "MID - M\u00e1ximo Perrone (8.3)",
+            "MID - Lucas Da Cunha (6.7)",
+            "ATT - Jesus Rodr\u00edguez (6.1)",
+            "ATT - Anastasios Douvikas (6.6)",
+            "ATT - \u00c1lvaro Morata (5.3)"
+        ],
+        "2_PANCHINA": [
+            "DIF - Marc-Oliver Kempf (6.1)",
+            "DIF - Stefan Posch (7.9)",
+            "MID - Sergi Roberto (6.9)",
+            "MID (da DIF) - Alberto Moreno (5.4)",
+            "ATT - M\u00ebrgim Vojvoda (5.4)",
+            "ATT - Jayden Addai (6.9)"
+        ]
+    },
+    "OSPITE": {
+        "Squadra": "AC Milan",
+        "Modulo": "3-5-2",
+        "Rating": "18.85/25",
+        "1_TITOLARI": [
+            "GK - Mike Maignan (8.0)",
+            "DIF - Matteo Gabbia (5.9)",
+            "DIF - Alexis Saelemaekers (7.5)",
+            "DIF - Strahinja Pavlovi\u0107 (6.9)",
+            "MID - Luka Modri\u0107 (7.4)",
+            "MID - Youssouf Fofana (6.5)",
+            "MID - Adrien Rabiot (7.3)",
+            "MID - Samuele Ricci (7.9)",
+            "MID - Ardon Jashari (7.8)",
+            "ATT - Rafael Le\u00e3o (7.5)",
+            "ATT - Santiago Gim\u00e9nez (4.9)"
+        ],
+        "2_PANCHINA": [
+            "GK - Pietro Terracciano (8.0)",
+            "DIF - Fikayo Tomori (8.1)",
+            "DIF - Davide Bartesaghi (6.7)",
+            "MID (da DIF) - Pervis Estupi\u00f1\u00e1n (6.4)",
+            "MID (da DIF) - Koni De Winter (6.5)",
+            "ATT - Ruben Loftus-Cheek (5.6)",
+            "ATT - Christopher Nkunku (5.3)"
+        ]
+    }
 }

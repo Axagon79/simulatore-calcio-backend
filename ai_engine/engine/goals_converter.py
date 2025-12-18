@@ -210,8 +210,9 @@ def calculate_goals_from_engine(home_score, away_score, home_data, away_data, al
     a_rosa = float(away_data.get('strength_score', 4.5))
 
     # H2H (Punteggio Vittoria & Media Gol Storica)
-    h_h2h_win = float(home_score) if home_score is not None else 5.0
-    a_h2h_win = float(away_score) if away_score is not None else 5.0
+    # ✅ Usa il voto H2H puro passato dall'engine dentro home_data/away_data
+    h_h2h_win = float(home_data.get('h2h_score', 5.0))
+    a_h2h_win = float(away_data.get('h2h_score', 5.0))
     h_h2h_g = float(home_data.get('h2h_avg_goals', 1.2))
     a_h2h_g = float(away_data.get('h2h_avg_goals', 1.0))
     
@@ -280,8 +281,8 @@ def calculate_goals_from_engine(home_score, away_score, home_data, away_data, al
             pt_h = val_h * weight_val
             pt_a = val_a * weight_val
             # Formattazione: Valore x Peso = Punti
-            str_h = f"{val_h:5.1f} x {weight_val:.2f} = {pt_h:5.2f}"
-            str_a = f"{val_a:5.1f} x {weight_val:.2f} = {pt_a:5.2f}"
+            str_h = f"{val_h:5.2f} x {weight_val:.2f} = {pt_h:5.2f}"
+            str_a = f"{val_a:5.2f} x {weight_val:.2f} = {pt_a:5.2f}"
             print(f"   {label:<15} | {str_h:<28} | {str_a:<28}")
 
         # Stampa delle 9 voci
