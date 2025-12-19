@@ -1,57 +1,55 @@
 {
-    "MATCH": "Milan vs Sassuolo",
+    "MATCH": "Mantova vs Empoli",
     "CASA": {
-        "Squadra": "AC Milan",
-        "Modulo": "3-5-2",
-        "Rating": "18.85/25",
+        "Squadra": "Mantova",
+        "Modulo": "4-3-3",
+        "Rating": "17.34/25",
         "1_TITOLARI": [
-            "GK - Mike Maignan (8.0)",
-            "DIF - Matteo Gabbia (5.9)",
-            "DIF - Alexis Saelemaekers (7.5)",
-            "DIF - Strahinja Pavlovi\u0107 (6.9)",
-            "MID - Luka Modri\u0107 (7.4)",
-            "MID - Youssouf Fofana (6.5)",
-            "MID - Adrien Rabiot (7.3)",
-            "MID - Samuele Ricci (7.9)",
-            "MID - Ardon Jashari (7.8)",
-            "ATT - Rafael Le\u00e3o (7.5)",
-            "ATT - Santiago Gim\u00e9nez (4.9)"
+            "GK - Marco Festa (6.9)",
+            "DIF - Stefano Cella (6.2)",
+            "DIF - Alessio Castellini (7.0)",
+            "DIF - Cristiano Bani (6.4)",
+            "DIF - Nicol\u00f2 Radaelli (6.4)",
+            "MID - Simone Trimboli (6.9)",
+            "MID - Federico Artioli (6.8)",
+            "MID - David Wieser (6.9)",
+            "ATT - Leonardo Mancuso (6.3)",
+            "ATT - Francesco Ruocco (8.0)",
+            "ATT - Nicholas Bonfanti (5.3)"
         ],
         "2_PANCHINA": [
-            "GK - Pietro Terracciano (8.0)",
-            "DIF - Fikayo Tomori (8.1)",
-            "DIF - Davide Bartesaghi (6.7)",
-            "MID (da DIF) - Pervis Estupi\u00f1\u00e1n (6.4)",
-            "MID (da DIF) - Koni De Winter (6.5)",
-            "ATT - Ruben Loftus-Cheek (5.6)",
-            "ATT - Christopher Nkunku (5.3)"
+            "DIF - Tommaso Maggioni (5.9)",
+            "DIF - Valerio Mantovani (5.6)",
+            "MID - Flavio Paoletti (5.8)",
+            "MID - \u017dan Majer (6.5)",
+            "ATT - Davide Bragantini (5.6)",
+            "ATT - Maat Daniel Caprini (5.3)"
         ]
     },
     "OSPITE": {
-        "Squadra": "Sassuolo",
+        "Squadra": "Empoli",
         "Modulo": "4-3-3",
-        "Rating": "18.08/25",
+        "Rating": "18.03/25",
         "1_TITOLARI": [
-            "GK - Arijanet Muric (7.5)",
-            "DIF - Jay Idzes (6.5)",
-            "DIF - Sebastian Walukiewicz (6.8)",
-            "DIF - Tarik Muharemovic (7.4)",
-            "DIF - Josh Doig (7.3)",
-            "MID - Nemanja Mati\u0107 (7.0)",
-            "MID - Isma\u00ebl Kon\u00e9 (6.7)",
-            "MID - Kristian Thorstvedt (6.0)",
-            "ATT - Andrea Pinamonti (6.0)",
-            "ATT - Domenico Berardi (6.7)",
-            "ATT - Armand Lauriente (6.4)"
+            "GK - Andrea Fulignati (7.0)",
+            "DIF - Matteo Lovato (7.4)",
+            "DIF - Nosa Edward Obaretin (7.0)",
+            "DIF - Salvatore Elia (7.4)",
+            "DIF - Gabriele Guarino (7.6)",
+            "MID - Gerard Yepes (6.1)",
+            "MID - Andrea Ghion (6.9)",
+            "MID - Joseph Ceesay (5.4)",
+            "ATT - Steven Shpendi (7.0)",
+            "ATT - Rare\u015f Ilie (5.5)",
+            "ATT - Edoardo Saporiti (6.2)"
         ],
         "2_PANCHINA": [
-            "GK - Stefano Turati (5.5)",
-            "DIF - Fali Cand\u00e9 (6.6)",
-            "DIF - Woyo Coulibaly (6.9)",
-            "MID - Aster Vranckx (5.7)",
-            "MID - Daniel Boloca (7.1)",
-            "ATT - Alieu Fadera (6.0)",
-            "ATT - Cristian Volpato (6.9)"
+            "DIF - Franco Carboni (6.8)",
+            "DIF - Brando Moruzzi (7.2)",
+            "MID - Lorenzo Ignacchiti (6.1)",
+            "MID - Duccio Degl'Innocenti (6.9)",
+            "ATT - Bohdan Popov (8.2)",
+            "ATT - Pietro Pellegri (8.0)"
         ]
     }
 }

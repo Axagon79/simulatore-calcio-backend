@@ -1730,48 +1730,168 @@ def run_universal_simulator():
                 selected_leagues_names = sorted(db.h2h_by_round.distinct("league"))
                 print(f"📦 Caricamento automatico di {len(selected_leagues_names)} campionati...")
             else:
+                # ========== MENU GERARCHICO NAZIONE → CAMPIONATO ==========
                 while True:
-                    print("\n🏆 SELEZIONE CAMPIONATI (Massivo):")
+                    print("\n🌍 SELEZIONA NAZIONE (Massivo):")
                     print("   [0] TUTTI I CAMPIONATI")
-                    all_leagues = sorted(db.h2h_by_round.distinct("league"))
-                    for i, l in enumerate(all_leagues): 
-                        print(f"   [{i+1}] {l}")
+                    nations_list = list(NATION_GROUPS.keys())
+                    for i, n in enumerate(nations_list, 1):
+                        print(f"   [{i}] {n}")
                     print("   [99] INDIETRO (Menu Principale)")
                     
                     try:
-                        l_choice = int(input("   Scelta: ").strip())
-                        if l_choice == 99: break
-                        if l_choice == 0: 
-                            selected_leagues_names = all_leagues
-                            break
-                        elif 1 <= l_choice <= len(all_leagues): 
-                            selected_leagues_names = [all_leagues[l_choice-1]]
-                            break
-                        else: continue
-                    except: continue
-
-                if not selected_leagues_names: continue
-            
-            if not MODE_SINGLE:
-                will_use_montecarlo = False
-                
-                if selected_algo_id == 0:
-                    will_use_montecarlo = True
-                elif selected_algo_id == 6:
-                    will_use_montecarlo = True
-                
-                if will_use_montecarlo:
-                    print("\n⚠️  Stai per simulare MOLTE partite con Monte Carlo.")
-                    print("    Si consiglia modalità RAPIDA (1000 cicli) o VELOCE (2000 cicli)\n")
-                    
-                    mc_cycles = ask_monte_carlo_cycles()
-                    if mc_cycles is None:
-                        print("❌ Operazione annullata.")
+                        n_choice = int(input("   Scelta: ").strip())
+                    except:
                         continue
                     
-                    MONTE_CARLO_TOTAL_CYCLES = mc_cycles
-                    print(f"\n⚙️  Configurato: {MONTE_CARLO_TOTAL_CYCLES:,} cicli Monte Carlo")
-                    print(f"\n🔍 Recupero partite (Periodi: {offsets_to_run})...")
+                    if n_choice == 99:
+                        break
+                    
+                    # Opzione TUTTI I CAMPIONATI
+                    if n_choice == 0:
+                        selected_leagues_names = sorted(db.h2h_by_round.distinct("league"))
+                        print(f"\n📦 Selezionati TUTTI i {len(selected_leagues_names)} campionati disponibili")
+                        break
+                    
+                    # Selezione Nazione
+                    if 1 <= n_choice <= len(nations_list):
+                        selected_nation = nations_list[n_choice - 1]
+                        possible_leagues = NATION_GROUPS[selected_nation]
+                        
+                        # Menu Campionati della nazione
+                        while True:
+                            print(f"\n🏆 SELEZIONA CAMPIONATO ({selected_nation}):")
+                            print("   [0] TUTTI I CAMPIONATI DI QUESTA NAZIONE")
+                            for i, l in enumerate(possible_leagues, 1):
+                                print(f"   [{i}] {l}")
+                            print("   [99] INDIETRO (Torna a Nazioni)")
+                            
+                            try:
+                                l_choice = int(input("   Scelta: ").strip())
+                            except:
+                                continue
+                            
+                            if l_choice == 99:
+                                break  # Torna al menu nazioni
+                            
+                            if l_choice == 0:
+                                # Tutti i campionati della nazione
+                                selected_leagues_names = possible_leagues.copy()
+                                print(f"\n📦 Selezionati tutti i {len(selected_leagues_names)} campionati di {selected_nation}")
+                                break
+                            
+                            if 1 <= l_choice <= len(possible_leagues):
+                                # Singolo campionato
+                                selected_leagues_names = [possible_leagues[l_choice - 1]]
+                                print(f"\n✅ Selezionato: {selected_leagues_names[0]}")
+                                break
+                        
+                        # Se ha scelto un campionato, esci dal loop nazioni
+                        if selected_leagues_names:
+                            break
+                
+                if not selected_leagues_names:
+                    continue
+            
+            # ========== MENU SCELTA ALGORITMO (DOPO SCELTA CAMPIONATO) ==========
+            print("\n🧠 SCELTA ALGORITMO PER SIMULAZIONE MASSIVA:")
+            print("   [0] TUTTI (Report Completo)")
+            print("   [1] Statistico Puro")
+            print("   [2] Dinamico")
+            print("   [3] Tattico")
+            print("   [4] Caos")
+            print("   [5] Master")
+            print("   [6] MonteCarlo (Consigliato)")
+            
+            try:
+                selected_algo_id = int(input("   Scelta: ").strip())
+            except:
+                selected_algo_id = 6
+            
+            if selected_algo_id not in [0, 1, 2, 3, 4, 5, 6]:
+                print("❌ Scelta non valida. Uso MonteCarlo.")
+                selected_algo_id = 6
+            
+            # ========== MENU CICLI ==========
+            cycles_per_single_algo = None
+            algo_names = {1: "Statistico Puro", 2: "Dinamico", 3: "Tattico", 4: "Caos", 5: "Master"}
+            
+            # Algoritmo singolo (1-5)
+            if selected_algo_id in [1, 2, 3, 4, 5]:
+                algo_name = algo_names[selected_algo_id]
+                
+                print(f"\n📊 PRESET VELOCITÀ ({algo_name}):")
+                print("   [1] ⚡ TURBO       →     100 cicli    ~3 sec/partita")
+                print("   [2] 🏃 RAPIDO      →     250 cicli    ~6 sec/partita")
+                print("   [3] 🚶 VELOCE      →     500 cicli    ~12 sec/partita")
+                print("   [4] ⚖️  STANDARD   →   1,250 cicli    ~30 sec/partita")
+                print("   [5] 🎯 ACCURATO    →   2,500 cicli    ~60 sec/partita")
+                print("   [6] 🔬 PRECISO     →   5,000 cicli    ~2 min/partita")
+                print("   [7] 💎 ULTRA       →  12,500 cicli    ~5 min/partita")
+                print("   [8] ✏️  PERSONALIZZATO (Inserisci numero manuale)")
+                print("   [99] 🔙 ANNULLA")
+                
+                try:
+                    cycle_choice = int(input("   Scelta: ").strip())
+                except:
+                    cycle_choice = 3
+                
+                if cycle_choice == 99:
+                    continue
+                
+                # Gestione cicli
+                if cycle_choice == 8:
+                    # PERSONALIZZATO
+                    while True:
+                        print("\n✏️  MODALITÀ PERSONALIZZATA")
+                        print("   Inserisci numero cicli (min: 50, max: 20,000)")
+                        
+                        try:
+                            custom_cycles = int(input("\n   Cicli: ").strip())
+                        except ValueError:
+                            print("❌ Inserisci un numero valido.")
+                            continue
+                        
+                        if custom_cycles < 50:
+                            print("❌ Minimo 50 cicli.")
+                            continue
+                        if custom_cycles > 20000:
+                            print("❌ Massimo 20,000 cicli.")
+                            continue
+                        
+                        cycles_per_single_algo = custom_cycles
+                        tempo_stimato = custom_cycles // 50
+                        
+                        print(f"\n📊 Riepilogo:")
+                        print(f"   • Cicli: {cycles_per_single_algo:,}")
+                        print(f"   • Tempo stimato: ~{tempo_stimato} sec/partita")
+                        break
+                else:
+                    # PRESET
+                    cycles_map = {1: 100, 2: 250, 3: 500, 4: 1250, 5: 2500, 6: 5000, 7: 12500}
+                    cycles_per_single_algo = cycles_map.get(cycle_choice, 500)
+                
+                print(f"\n✅ Selezionato: {cycles_per_single_algo:,} cicli per algoritmo {algo_name}")
+                confirm = input("   Confermi? [S/n]: ").strip().upper()
+                if confirm not in ['', 'S', 'Y', 'SI', 'YES']:
+                    print("❌ Operazione annullata.")
+                    continue
+                
+                print(f"\n⚙️  Configurato: {cycles_per_single_algo:,} cicli per {algo_name}")
+            
+            # Monte Carlo o TUTTI (0, 6)
+            elif selected_algo_id in [0, 6]:
+                print("\n⚠️  Stai per simulare MOLTE partite con Monte Carlo.")
+                print("    Si consiglia modalità RAPIDA (1000 cicli) o VELOCE (2000 cicli)\n")
+                
+                mc_cycles = ask_monte_carlo_cycles()
+                if mc_cycles is None:
+                    print("❌ Operazione annullata.")
+                    continue
+                
+                MONTE_CARLO_TOTAL_CYCLES = mc_cycles
+                print(f"\n⚙️  Configurato: {MONTE_CARLO_TOTAL_CYCLES:,} cicli Monte Carlo")    
+            print(f"\n🔍 Recupero partite (Periodi: {offsets_to_run})...")
             
             for league_name in selected_leagues_names:
                 rounds_cursor = db.h2h_by_round.find({"league": league_name})
@@ -1931,11 +2051,12 @@ def run_universal_simulator():
             algo_preds_db = {}
             for aid in [i for i in algos_indices if i <= 5]:
                 
-                # ✅ LOGICA CICLI CORRETTA
-                if MODE_SINGLE and cycles_per_single_algo and cycles_per_single_algo > 1:
-                    # Modalità singola con cicli custom
+                # ✅ LOGICA CICLI CORRETTA (SINGOLA E MASSIVA)
+                if cycles_per_single_algo and cycles_per_single_algo > 1:
+                    # Sia modalità singola CHE massiva con algoritmo specifico
                     cycles_to_run = cycles_per_single_algo
-                    print(f"🔍 DEBUG: Uso {cycles_to_run} cicli custom per Algo {aid}")
+                    if MODE_SINGLE:
+                        print(f"🔍 DEBUG: Uso {cycles_to_run} cicli custom per Algo {aid}")
                 elif not MODE_SINGLE and MONTE_CARLO_TOTAL_CYCLES:
                     # Modalità massiva con Monte Carlo
                     cycles_to_run = MONTE_CARLO_TOTAL_CYCLES // 4

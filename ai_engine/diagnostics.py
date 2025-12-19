@@ -64,7 +64,7 @@ def load_thresholds():
                 print(f"⚠️ [DASHBOARD] Errore lettura {path}: {e}")
                 continue
     
-    print("⚠️ [DASHBOARD] File tuning non trovato.")
+    print(" [DASHBOARD] File tuning non trovato.")
 
 # Esegui il caricamento subito
 load_thresholds()

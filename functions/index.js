@@ -5,6 +5,8 @@ const { MongoClient } = require('mongodb');
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
+const simulationRoutes = require('./routes/simulationRoutes');
+
 const app = express();
 app.use(cors({ origin: true }));
 app.use(express.json());
@@ -246,6 +248,10 @@ app.get('/leagues', (req, res) => {
   };
   res.json(leaguesData[country] || []);
 });
+
+
+app.use('/simulation', simulationRoutes);
+
 
 // ============================================
 // ROOT
