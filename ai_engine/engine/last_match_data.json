@@ -1,30 +1,57 @@
 {
-    "MATCH": "Juventus vs Roma",
-    "CASA": "N/A",
-    "OSPITE": {
-        "Squadra": "AS Roma",
-        "Modulo": "4-3-3",
-        "Rating": "17.75/25",
+    "MATCH": "Milan vs Sassuolo",
+    "CASA": {
+        "Squadra": "AC Milan",
+        "Modulo": "3-5-2",
+        "Rating": "18.85/25",
         "1_TITOLARI": [
-            "GK - Mile Svilar (8.3)",
-            "DIF - Gianluca Mancini (7.5)",
-            "DIF - Obite N'Dicka (6.6)",
-            "DIF - Wesley (7.4)",
-            "DIF - Zeki \u00c7elik (7.0)",
-            "MID - Manu Kon\u00e9 (7.0)",
-            "MID - Bryan Cristante (6.3)",
-            "MID - Lorenzo Pellegrini (5.2)",
-            "ATT - Mat\u00ecas Soul\u00e9 (7.0)",
-            "ATT - Paulo Dybala (6.3)",
-            "ATT - Evan Ferguson (6.2)"
+            "GK - Mike Maignan (8.0)",
+            "DIF - Matteo Gabbia (5.9)",
+            "DIF - Alexis Saelemaekers (7.5)",
+            "DIF - Strahinja Pavlovi\u0107 (6.9)",
+            "MID - Luka Modri\u0107 (7.4)",
+            "MID - Youssouf Fofana (6.5)",
+            "MID - Adrien Rabiot (7.3)",
+            "MID - Samuele Ricci (7.9)",
+            "MID - Ardon Jashari (7.8)",
+            "ATT - Rafael Le\u00e3o (7.5)",
+            "ATT - Santiago Gim\u00e9nez (4.9)"
         ],
         "2_PANCHINA": [
-            "DIF - Mario Hermoso (6.5)",
-            "DIF - Angeli\u00f1o (7.2)",
-            "MID - Neil El Aynaoui (7.3)",
-            "MID - Niccol\u00f2 Pisilli (5.2)",
-            "ATT - Tommaso Baldanzi (5.1)",
-            "ATT - Artem Dovbyk (7.6)"
+            "GK - Pietro Terracciano (8.0)",
+            "DIF - Fikayo Tomori (8.1)",
+            "DIF - Davide Bartesaghi (6.7)",
+            "MID (da DIF) - Pervis Estupi\u00f1\u00e1n (6.4)",
+            "MID (da DIF) - Koni De Winter (6.5)",
+            "ATT - Ruben Loftus-Cheek (5.6)",
+            "ATT - Christopher Nkunku (5.3)"
+        ]
+    },
+    "OSPITE": {
+        "Squadra": "Sassuolo",
+        "Modulo": "4-3-3",
+        "Rating": "18.08/25",
+        "1_TITOLARI": [
+            "GK - Arijanet Muric (7.5)",
+            "DIF - Jay Idzes (6.5)",
+            "DIF - Sebastian Walukiewicz (6.8)",
+            "DIF - Tarik Muharemovic (7.4)",
+            "DIF - Josh Doig (7.3)",
+            "MID - Nemanja Mati\u0107 (7.0)",
+            "MID - Isma\u00ebl Kon\u00e9 (6.7)",
+            "MID - Kristian Thorstvedt (6.0)",
+            "ATT - Andrea Pinamonti (6.0)",
+            "ATT - Domenico Berardi (6.7)",
+            "ATT - Armand Lauriente (6.4)"
+        ],
+        "2_PANCHINA": [
+            "GK - Stefano Turati (5.5)",
+            "DIF - Fali Cand\u00e9 (6.6)",
+            "DIF - Woyo Coulibaly (6.9)",
+            "MID - Aster Vranckx (5.7)",
+            "MID - Daniel Boloca (7.1)",
+            "ATT - Alieu Fadera (6.0)",
+            "ATT - Cristian Volpato (6.9)"
         ]
     }
 }

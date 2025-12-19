@@ -1,6 +1,7 @@
 
-=== ALGORITMO: DIN ===
+=== ALGORITMO: CAOS ===
 League;Match;Data;Q1;QX;Q2;Real Score;Real Sign;PRED Score;PRED Sign;1X2 Outcome;Exact Score;U/O 2.5;GG/NG
-Serie A;Juventus vs Roma;20/12 20:45;2.05;3.25;3.9;-;-;0-1;2;WAITING;WAITING;UNDER;NG
-Nessuna statistica disponibile
+Serie A;Milan vs Sassuolo;14/12 12:30;1.42;4.2;7.5;2-2;X;1-1;X;WIN;LOSS;UNDER;GG
+"--- PERCENTUALI ---
+(Su partite finite)";;;;;;;;100.0%;0.0%;;0.0%;;100.0%
 

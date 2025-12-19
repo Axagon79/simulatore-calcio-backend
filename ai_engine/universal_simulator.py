@@ -658,42 +658,37 @@ def analyze_result_dispersion(all_predictions):
     for algo_name, pred_data in all_predictions.items():
         algo_results = None
         
-        # 🔍 DEBUG: Vediamo cosa arriva
-        print(f"\n🔍 analyze_result_dispersion - {algo_name}:")
-        print(f"   Type pred_data: {type(pred_data)}")
-        if isinstance(pred_data, dict):
-            print(f"   Keys: {pred_data.keys()}")
-        elif isinstance(pred_data, tuple):
-            print(f"   Tuple length: {len(pred_data)}")
-        
+        # (tolte le print di debug su type/keys/tuple)
+
         # Cerca 'all_results' PRIMA di top3
         if isinstance(pred_data, dict):
             algo_results = pred_data.get('all_results')
-            print(f"   all_results from dict: {len(algo_results) if algo_results else 'None'}")
-            
+            # (tolta la print su all_results)
+
             if not algo_results and 'top3' in pred_data:
                 top3 = pred_data['top3']
                 if top3 and isinstance(top3, list):
                     algo_results = []
                     for score, freq in top3:
                         algo_results.extend([score] * freq)
-                    print(f"   ⚠️ FALLBACK a top3: {len(algo_results)} risultati ricostruiti")
-        
+                    # (tolta la print di FALLBACK)
+
         elif isinstance(pred_data, tuple):
             if len(pred_data) >= 4:
                 algo_results = pred_data[3]
-                print(f"   all_results from tuple[3]: {len(algo_results) if algo_results else 'None'}")
+                # (tolta la print su all_results da tuple)
             elif len(pred_data) >= 3:
                 top3 = pred_data[2]
                 if top3 and isinstance(top3, list):
                     algo_results = []
                     for score, freq in top3:
                         algo_results.extend([score] * freq)
-                    print(f"   ⚠️ FALLBACK a tuple top3: {len(algo_results)} risultati ricostruiti")
-        
+                    # (tolta la print di FALLBACK da tuple)
+
         if not algo_results:
-            print(f"   ❌ SKIP: Nessun risultato trovato")
+            # (tolta la print "SKIP")
             continue
+
         
         print(f"   ✅ Processando {len(algo_results)} risultati")
         
@@ -931,6 +926,7 @@ def print_single_match_summary(match, all_predictions, monte_carlo_data=None):
             
             print(f"\n📊 QUOTE BOOKMAKER:")
             print(f"   1={q1:.2f} ({prob_1:.0f}%) | X={qx:.2f} ({prob_x:.0f}%) | 2={q2:.2f} ({prob_2:.0f}%)")
+            print( )
             print(f"   💰 FAVORITA: {fav_name} ({book_sign}) - Quota {min_q:.2f}")
         except:
             pass
@@ -940,7 +936,7 @@ def print_single_match_summary(match, all_predictions, monte_carlo_data=None):
     # ========== TABELLA PREDIZIONI ==========
     print("\n🔮 PREDIZIONI PER ALGORITMO:")
     print("-"*90)
-    print(f"{'ALGORITMO':<15} {'SCORE':<10} {'SEGNO':<8} {'CONFIDENZA':<15} {'SIMULAZIONI':<15} {'MATCH REALE':<12}")
+    print(f"{'ALGORITMO':^15} {'SCORE':^10} {'SEGNO':^8} {'CONFIDENZA':^15} {'SIMULAZIONI':^15} {'MATCH REALE':^12}")
     print("-"*90)
     
     # Raccogli stats globali
@@ -956,14 +952,18 @@ def print_single_match_summary(match, all_predictions, monte_carlo_data=None):
             ga = pred_data.get('pred_ga')
             top3 = pred_data.get('top3')
             all_res = pred_data.get('all_results')
+            
         elif isinstance(pred_data, tuple) and len(pred_data) >= 2:
             gh, ga = pred_data[0], pred_data[1]
             top3 = pred_data[2] if len(pred_data) >= 3 else None
             all_res = pred_data[3] if len(pred_data) >= 4 else None
+            
         
         if gh is None or ga is None:
+            print(f"   ❌ SKIP: gh o ga sono None!")
             continue
         
+        # ✅ CALCOLA SIGN SUBITO!
         sign = get_sign(gh, ga)
         
         # Calcola confidenza REALE dalle simulazioni
@@ -971,68 +971,51 @@ def print_single_match_summary(match, all_predictions, monte_carlo_data=None):
         num_simulations = "-"
         
         # ✅ PRIORITÀ: Usa all_res se disponibile, altrimenti fallback a top3
-    if all_res and isinstance(all_res, list):
-        # CASO 1: Abbiamo TUTTI i risultati (500, 1000, ecc.)
-        total_votes = len(all_res)
-        
-        # Conta tutti i segni
-        signs_count = {'1': 0, 'X': 0, '2': 0}
-        for score in all_res:
-            s = get_sign(*map(int, score.split("-")))
-            signs_count[s] += 1
-        
-        # Confidenza sul SEGNO previsto
-        votes_for_sign = signs_count[sign]
-        conf_sign = (votes_for_sign / total_votes * 100) if total_votes > 0 else 0
-        
-        # Confidenza sul RISULTATO ESATTO
-        from collections import Counter
-        exact_counter = Counter(all_res)
-        exact_votes = exact_counter.get(f"{gh}-{ga}", 0)
-        conf_exact = (exact_votes / total_votes * 100) if total_votes > 0 else 0
-        
-        confidence_str = f"{conf_sign:.1f}% (1X2)"
-        num_simulations = f"{total_votes} cicli"
-        
-        # Traccia miglior confidenza
-        if conf_sign > best_confidence:
-            best_confidence = conf_sign
-            best_algo = algo_name
-        
-        # Salva per analisi globale
-        all_scores.extend(all_res)
-    
-    elif top3 and isinstance(top3, list):
-        # CASO 2: Abbiamo solo top3 (fallback per vecchie versioni)
-        total_votes = sum([f for s, f in top3])
-        
-        # Confidenza sul SEGNO previsto
-        votes_for_sign = sum([f for s, f in top3 if get_sign(*map(int, s.split("-"))) == sign])
-        conf_sign = (votes_for_sign / total_votes * 100) if total_votes > 0 else 0
-        
-        # Confidenza sul RISULTATO ESATTO
-        exact_votes = top3[0][1] if top3 and top3[0][0] == f"{gh}-{ga}" else 0
-        conf_exact = (exact_votes / total_votes * 100) if total_votes > 0 else 0
-        
-        confidence_str = f"{conf_sign:.1f}% (top3)"
-        num_simulations = f"~{total_votes} cicli"
-        
-        # Traccia miglior confidenza
-        if conf_sign > best_confidence:
-            best_confidence = conf_sign
-            best_algo = algo_name
-        
-        # Salva per analisi globale (espandi top3)
-        for s, f in top3:
-            all_scores.extend([s] * f)
+        if all_res and isinstance(all_res, list):
+            # CASO 1: Abbiamo TUTTI i risultati
+            total_votes = len(all_res)
             
-            # Traccia miglior confidenza
+            signs_count = {'1': 0, 'X': 0, '2': 0}
+            for score in all_res:
+                s = get_sign(*map(int, score.split("-")))
+                signs_count[s] += 1
+            
+            votes_for_sign = signs_count[sign]
+            conf_sign = (votes_for_sign / total_votes * 100) if total_votes > 0 else 0
+            
+            from collections import Counter
+            exact_counter = Counter(all_res)
+            exact_votes = exact_counter.get(f"{gh}-{ga}", 0)
+            conf_exact = (exact_votes / total_votes * 100) if total_votes > 0 else 0
+            
+            confidence_str = f"{conf_sign:.1f}% (1X2)"
+            num_simulations = f"{total_votes} cicli"
+            
             if conf_sign > best_confidence:
                 best_confidence = conf_sign
                 best_algo = algo_name
             
-            # Salva per analisi globale
-            all_scores.extend([s for s, f in top3 for _ in range(f)])
+            all_scores.extend(all_res)
+        
+        elif top3 and isinstance(top3, list):
+            # CASO 2: Solo top3 (fallback)
+            total_votes = sum([f for s, f in top3])
+            
+            votes_for_sign = sum([f for s, f in top3 if get_sign(*map(int, s.split("-"))) == sign])
+            conf_sign = (votes_for_sign / total_votes * 100) if total_votes > 0 else 0
+            
+            exact_votes = top3[0][1] if top3 and top3[0][0] == f"{gh}-{ga}" else 0
+            conf_exact = (exact_votes / total_votes * 100) if total_votes > 0 else 0
+            
+            confidence_str = f"{conf_sign:.1f}% (top3)"
+            num_simulations = f"~{total_votes} cicli"
+            
+            if conf_sign > best_confidence:
+                best_confidence = conf_sign
+                best_algo = algo_name
+            
+            for s, f in top3:
+                all_scores.extend([s] * f)
         
         # Verifica vs reale
         match_real = ""
@@ -1040,9 +1023,16 @@ def print_single_match_summary(match, all_predictions, monte_carlo_data=None):
             real_sign = get_sign(match['real_gh'], match['real_ga'])
             match_real = "✅ OK" if sign == real_sign else "❌ MISS"
         
-        print(f"{algo_name:<15} {gh}-{ga:<8} {sign:<8} {confidence_str:<15} {num_simulations:<15} {match_real:<12}")
-    
-    print("-"*90)
+       # Riga dati (DENTRO il loop)
+        print(
+            f"{algo_name:^15} "
+            f"{f'{gh}-{ga}':^10} "
+            f"{sign:^8} "
+            f"{confidence_str:^15} "
+            f"{num_simulations:^15} "
+            f"{match_real:^12}"
+        )
+        print("-"*90)
     
     # ========== RILEVAMENTO DISPERSIONE ==========
     dispersion_analysis = analyze_result_dispersion(all_predictions)
@@ -1063,13 +1053,85 @@ def print_single_match_summary(match, all_predictions, monte_carlo_data=None):
         
         # Top 5 risultati più probabili
         top5_scores = scores_counter.most_common(5)
-        
+        GREEN = "\033[92m"
+        YELLOW = "\033[93m"
+        RED = "\033[91m"
+        RESET = "\033[0m"
+
+        # 🎨 NUOVO ALGORITMO COLORI
+        first_result, first_freq = top5_scores[0]
+        first_pct = (first_freq / total_sims) * 100
+        first_sign = get_sign(*map(int, first_result.split("-")))
+
+        top5_sum = sum(freq for _, freq in top5_scores)
+        top5_sum_pct = (top5_sum / total_sims) * 100
+
+        first_sign_pct = 0
+        opposition_pct = 0
+        for score, freq in top5_scores:
+            sign = get_sign(*map(int, score.split("-")))
+            pct = (freq / total_sims) * 100
+            if sign == first_sign:
+                first_sign_pct += pct
+            else:
+                opposition_pct += pct
+
+        # COLORE PRIMO risultato
+        if first_pct >= 20:
+            primo_color = GREEN + "🟢" + RESET
+        elif (first_pct >= 15 and top5_sum_pct >= 55 and opposition_pct <= 35):
+            primo_color = GREEN + "🟢" + RESET
+        elif first_pct >= 8 or top5_sum_pct >= 35:
+            primo_color = YELLOW + "🟡" + RESET
+        else:
+            primo_color = RED + "🔴" + RESET
+
         print(f"\n   🎯 TOP 5 RISULTATI PIÙ PROBABILI:")
+        # Calcola % per OGNI segno DENTRO i top5 (rispetto ai soli top5!)
+        top5_total_freq = sum(freq for _, freq in top5_scores)
+        segno1_pct = sum((freq/top5_total_freq*100) for score, freq in top5_scores if get_sign(*map(int, score.split("-"))) == '1')
+        segnoX_pct = sum((freq/top5_total_freq*100) for score, freq in top5_scores if get_sign(*map(int, score.split("-"))) == 'X')
+        segno2_pct = sum((freq/top5_total_freq*100) for score, freq in top5_scores if get_sign(*map(int, score.split("-"))) == '2')
+
+
+        print(f"   📊 Primo: {primo_color} {first_pct:.1f}% | Top5: {top5_sum_pct:.1f}% | Opp: {opposition_pct:.1f}%")
+        print(f"   📊 Segni TOP5: 1={segno1_pct:.0f}% | X={segnoX_pct:.0f}% | 2={segno2_pct:.0f}%")
+        # 🔍 LOGICA SEGNO DOMINANTE INTELLIGENTE
+        dominant_sign = max([('1', segno1_pct), ('X', segnoX_pct), ('2', segno2_pct)], key=lambda x: x[1])[0]
+        dominant_pct = max(segno1_pct, segnoX_pct, segno2_pct)
+
+        if dominant_pct >= 66:
+            # Calcola primo risultato % RISPETTO al SUO segno dominante
+            first_sign_results = sum(freq for score, freq in top5_scores 
+                                if get_sign(*map(int, score.split("-"))) == first_sign)
+            first_dominance = (first_freq / first_sign_results * 100) if first_sign_results > 0 else 0
+            
+            if first_dominance >= 25:
+                primo_color = GREEN + "🟢⭐" + RESET
+                print(f"   ⭐ {dominant_sign} DOMINA ({dominant_pct:.0f}%) + Primo leader ({first_dominance:.0f}%)!")
+            else:
+                print(f"   ⚠️ {dominant_sign} domina ({dominant_pct:.0f}%) MA primo debole ({first_dominance:.0f}%)")
+
+        # NUOVA REGOLA: segno dominante ≥66% → VERDE
+        if max(segno1_pct, segnoX_pct, segno2_pct) >= 66:
+            primo_color = GREEN + "🟢⭐" + RESET  # Stelletta per "segno dominante"
+            print(f"   ⭐ SEGNALE DOMINANTE RILEVATO!")
+
+
         for i, (score, freq) in enumerate(top5_scores, 1):
             prob = (freq / total_sims) * 100
             sign = get_sign(*map(int, score.split("-")))
-            bar = "█" * int(prob / 2)
-            print(f"   {i}. {score:<6} ({sign}) → {prob:5.1f}% {bar}")
+            bar_len = int(prob // 2)
+            bar = "█" * bar_len
+            
+            if prob >= 15: color = GREEN
+            elif prob >= 8: color = YELLOW
+            else: color = RED
+            bar = color + bar + RESET
+            
+            print(f"   {i}. {score:<6} ({sign}) → {prob:5.2f}% {bar}")
+
+
         
         # USA LE PERCENTUALI GIÀ CALCOLATE da dispersion_analysis
         prob_1 = dispersion_analysis['global_signs_pct']['1']
@@ -1888,8 +1950,6 @@ def run_universal_simulator():
                         cycles=cycles_to_run, analyzer=deep_analyzer
                     )
                     
-                    # 🔍 DEBUG: Verifica cosa contiene all_results
-                    print(f"\n🔍 DEBUG all_results:")
                     print(f"   Tipo: {type(all_results)}")
                     print(f"   Lunghezza: {len(all_results) if all_results else 'None'}")
                     if all_results:
@@ -2060,7 +2120,21 @@ def run_universal_simulator():
                 
                 # Stampa il report dettagliato
                 if single_predictions:
-                    print_single_match_summary(match, single_predictions, mc_data_full)
+                # 🔥 POPOLA all_predictions DAI DATI REALI (NOME GIUSTO)
+                    all_predictions = {}
+                    algo_map_name = {1: 'Statistico', 2: 'Dinamico', 3: 'Tattico', 4: 'Caos', 5: 'Master'}
+
+                    for aid in algos_indices:
+                        if aid <= 5:
+                            internal_key = all_algos[aid-1]  # 'dynamic_balance', 'tactical_pattern', ecc.
+                            if internal_key in data_by_algo and data_by_algo[internal_key]:
+                                last_pred = data_by_algo[internal_key][-1]
+                                display_name = algo_map_name[aid]
+                                all_predictions[display_name] = last_pred  # 'Dinamico', 'Tattico' per la tabella
+
+                    print_single_match_summary(match, all_predictions, mc_data_full)
+
+
             
                     
             deep_analyzer.end_match()        
