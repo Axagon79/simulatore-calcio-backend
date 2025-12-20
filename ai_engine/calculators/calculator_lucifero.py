@@ -101,5 +101,5 @@ def get_lucifero_score(team_name):
 
 if __name__ == "__main__":
     # Test
-    get_lucifero_score("Pergolettese")
-    get_lucifero_score("Vicenza")
+    get_lucifero_score("Juventus")
+    get_lucifero_score("Roma")

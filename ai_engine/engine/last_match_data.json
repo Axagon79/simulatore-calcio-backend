@@ -1,55 +1,31 @@
 {
-    "MATCH": "Mantova vs Empoli",
+    "MATCH": "Pisa vs Juventus",
     "CASA": {
-        "Squadra": "Mantova",
+        "Squadra": "Pisa",
         "Modulo": "4-3-3",
-        "Rating": "17.34/25",
+        "Rating": "17.53/25",
         "1_TITOLARI": [
-            "GK - Marco Festa (6.9)",
-            "DIF - Stefano Cella (6.2)",
-            "DIF - Alessio Castellini (7.0)",
-            "DIF - Cristiano Bani (6.4)",
-            "DIF - Nicol\u00f2 Radaelli (6.4)",
-            "MID - Simone Trimboli (6.9)",
-            "MID - Federico Artioli (6.8)",
-            "MID - David Wieser (6.9)",
-            "ATT - Leonardo Mancuso (6.3)",
-            "ATT - Francesco Ruocco (8.0)",
-            "ATT - Nicholas Bonfanti (5.3)"
+            "GK - Adrian \u0160emper (6.7)",
+            "DIF - Simone Canestrelli (6.9)",
+            "DIF - Antonio Caracciolo (7.7)",
+            "DIF - Idrissa Tour\u00e9 (7.3)",
+            "DIF - Mehdi L\u00e9ris (8.3)",
+            "MID - Michel Aebischer (6.7)",
+            "MID - Ebenezer Akinsanmiro (7.1)",
+            "MID - Marius Marin (5.8)",
+            "ATT - M'Bala Nzola (5.9)",
+            "ATT - Henrik Meister (5.1)",
+            "ATT - Matt\u00e9o Tramoni (4.9)"
         ],
         "2_PANCHINA": [
-            "DIF - Tommaso Maggioni (5.9)",
-            "DIF - Valerio Mantovani (5.6)",
-            "MID - Flavio Paoletti (5.8)",
-            "MID - \u017dan Majer (6.5)",
-            "ATT - Davide Bragantini (5.6)",
-            "ATT - Maat Daniel Caprini (5.3)"
+            "GK - Simone Scuffet (5.4)",
+            "DIF - Samuele Angori (6.5)",
+            "DIF - Arturo Calabresi (6.2)",
+            "MID - \u0130sak Vural (5.8)",
+            "MID - Gabriele Piccinini (5.3)",
+            "ATT - Stefano Moreo (5.9)",
+            "ATT - Louis Buffon (4.8)"
         ]
     },
-    "OSPITE": {
-        "Squadra": "Empoli",
-        "Modulo": "4-3-3",
-        "Rating": "18.03/25",
-        "1_TITOLARI": [
-            "GK - Andrea Fulignati (7.0)",
-            "DIF - Matteo Lovato (7.4)",
-            "DIF - Nosa Edward Obaretin (7.0)",
-            "DIF - Salvatore Elia (7.4)",
-            "DIF - Gabriele Guarino (7.6)",
-            "MID - Gerard Yepes (6.1)",
-            "MID - Andrea Ghion (6.9)",
-            "MID - Joseph Ceesay (5.4)",
-            "ATT - Steven Shpendi (7.0)",
-            "ATT - Rare\u015f Ilie (5.5)",
-            "ATT - Edoardo Saporiti (6.2)"
-        ],
-        "2_PANCHINA": [
-            "DIF - Franco Carboni (6.8)",
-            "DIF - Brando Moruzzi (7.2)",
-            "MID - Lorenzo Ignacchiti (6.1)",
-            "MID - Duccio Degl'Innocenti (6.9)",
-            "ATT - Bohdan Popov (8.2)",
-            "ATT - Pietro Pellegri (8.0)"
-        ]
-    }
+    "OSPITE": "N/A"
 }
