@@ -1,0 +1,24 @@
+@echo off
+cd /d "C:\Progetti\simulatore-calcio-backend"
+
+:: QUESTA RIGA SERVE PER EVITARE BLOCCHI SUI CARATTERI STRANI
+set PYTHONIOENCODING=utf-8
+
+:: Scrive data e ora di inizio nel log
+echo ========================================== > log_aggiornamento.txt
+echo INIZIO AGGIORNAMENTO NOTTURNO: %date% %time% >> log_aggiornamento.txt
+echo ========================================== >> log_aggiornamento.txt
+
+:: Attiva Python e lancia lo script, salvando TUTTO l'output nel file log
+call .venv\Scripts\activate.bat
+python ai_engine\update_manager.py >> log_aggiornamento.txt 2>&1
+
+:: Scrive data e ora di fine
+echo. >> log_aggiornamento.txt
+echo ========================================== >> log_aggiornamento.txt
+echo FINE AGGIORNAMENTO: %date% %time% >> log_aggiornamento.txt
+echo ========================================== >> log_aggiornamento.txt
+
+:: Apre il file di log automaticamente sul desktop (o blocco note)
+start notepad log_aggiornamento.txt
+

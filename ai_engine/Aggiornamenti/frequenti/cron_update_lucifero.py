@@ -9,8 +9,8 @@ import dateutil.parser
 # Scrivi qui i nomi delle squadre per testare una partita specifica.
 # Lascia vuoto ("") per l'uso automatico notturno.
 # ==========================================
-TEST_HOME = "Juventus"    
-TEST_AWAY = "Roma"  
+TEST_HOME = ""    
+TEST_AWAY = ""  
 # ==========================================
 
 

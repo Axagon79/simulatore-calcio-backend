@@ -1,28 +1,31 @@
 ========================================== 
-INIZIO AGGIORNAMENTO NOTTURNO: 19/12/2025  4:00:03,17 
+INIZIO AGGIORNAMENTO NOTTURNO: 20/12/2025  4:00:02,89 
 ========================================== 
 Traceback (most recent call last):
   File "C:\Progetti\simulatore-calcio-backend\ai_engine\Aggiornamenti\frequenti\scraper_results_fbref.py", line 7, in <module>
     import cloudscraper
 ModuleNotFoundError: No module named 'cloudscraper'
-🔧 BASE_DIR: C:\Progetti\simulatore-calcio-backend
-🔧 ENV_PATH: C:\Progetti\simulatore-calcio-backend\.env
-✅ .env trovato in: C:\Progetti\simulatore-calcio-backend\.env
-🔗 Connessione MongoDB...
-✅ Connesso a MongoDB: football_simulator_db
-📊 Database: football_simulator_db
-   📦 teams: 212 documenti
-   📦 matches_history: 1707 documenti
-   📦 raw_h2h_data_v2: 1933 documenti
-   📦 h2h_by_round: 402 documenti
-✅ Configurazione completata con successo
+ config.py eseguito da: C:\Progetti\simulatore-calcio-backend\config.py
+ Directory corrente: C:\Progetti\simulatore-calcio-backend
+ Python path: ['C:\\Progetti\\simulatore-calcio-backend\\ai_engine\\Aggiornamenti\\frequenti', 'C:\\Users\\lollo\\AppData\\Local\\Programs\\Python\\Python313\\python313.zip', 'C:\\Users\\lollo\\AppData\\Local\\Programs\\Python\\Python313\\DLLs']
+ BASE_DIR: C:\Progetti\simulatore-calcio-backend
+ ENV_PATH: C:\Progetti\simulatore-calcio-backend\.env
+ .env trovato in: C:\Progetti\simulatore-calcio-backend\.env
+ Connessione MongoDB...
+ Connesso a MongoDB: football_simulator_db
+ Database: football_simulator_db
+    teams: 212 documenti
+    matches_history: 1707 documenti
+    raw_h2h_data_v2: 1933 documenti
+    h2h_by_round: 402 documenti
+ Configurazione completata con successo
 🚀 AVVIO SCRAPER V3 (DATA FIX)...
 
 🌍 Scarico Serie A...
    📦 Trovate: 150 partite.
 
 🌍 Scarico Serie B...
-   📦 Trovate: 160 partite.
+   📦 Trovate: 161 partite.
 
 🌍 Scarico Serie C - Girone A...
    📦 Trovate: 180 partite.
@@ -31,16 +34,16 @@ ModuleNotFoundError: No module named 'cloudscraper'
    📦 Trovate: 177 partite.
 
 🌍 Scarico Serie C - Girone C...
-   📦 Trovate: 180 partite.
+   📦 Trovate: 183 partite.
 
 🌍 Scarico Premier League...
    📦 Trovate: 160 partite.
 
 🌍 Scarico La Liga...
-   📦 Trovate: 161 partite.
+   📦 Trovate: 162 partite.
 
 🌍 Scarico Bundesliga...
-   📦 Trovate: 126 partite.
+   📦 Trovate: 127 partite.
 
 🌍 Scarico Ligue 1...
    📦 Trovate: 144 partite.
@@ -49,28 +52,31 @@ ModuleNotFoundError: No module named 'cloudscraper'
    📦 Trovate: 143 partite.
 
 🌍 Scarico Liga Portugal...
-   📦 Trovate: 126 partite.
+   📦 Trovate: 127 partite.
 
 🧹 PULIZIA E SALVATAGGIO IN matches_history_betexplorer...
-   ✅ Salvate 1707 partite correttamente.
-🔧 BASE_DIR: C:\Progetti\simulatore-calcio-backend
-🔧 ENV_PATH: C:\Progetti\simulatore-calcio-backend\.env
-✅ .env trovato in: C:\Progetti\simulatore-calcio-backend\.env
-🔗 Connessione MongoDB...
-✅ Connesso a MongoDB: football_simulator_db
-📊 Database: football_simulator_db
-   📦 teams: 212 documenti
-   📦 matches_history: 1707 documenti
-   📦 raw_h2h_data_v2: 1933 documenti
-   📦 h2h_by_round: 402 documenti
-✅ Configurazione completata con successo
+   ✅ Salvate 1714 partite correttamente.
+ config.py eseguito da: C:\Progetti\simulatore-calcio-backend\config.py
+ Directory corrente: C:\Progetti\simulatore-calcio-backend
+ Python path: ['C:\\Progetti\\simulatore-calcio-backend\\ai_engine\\Aggiornamenti\\frequenti', 'C:\\Users\\lollo\\AppData\\Local\\Programs\\Python\\Python313\\python313.zip', 'C:\\Users\\lollo\\AppData\\Local\\Programs\\Python\\Python313\\DLLs']
+ BASE_DIR: C:\Progetti\simulatore-calcio-backend
+ ENV_PATH: C:\Progetti\simulatore-calcio-backend\.env
+ .env trovato in: C:\Progetti\simulatore-calcio-backend\.env
+ Connessione MongoDB...
+ Connesso a MongoDB: football_simulator_db
+ Database: football_simulator_db
+    teams: 212 documenti
+    matches_history: 1707 documenti
+    raw_h2h_data_v2: 1933 documenti
+    h2h_by_round: 402 documenti
+ Configurazione completata con successo
 🚀 AVVIO SCRAPER (MODALITÀ TABULA RASA: Sostituzione Totale)...
 
 🌍 Scarico Serie A...
    📦 In buffer: 150 partite.
 
 🌍 Scarico Serie B...
-   📦 In buffer: 160 partite.
+   📦 In buffer: 161 partite.
 
 🌍 Scarico Serie C - Girone A...
    📦 In buffer: 180 partite.
@@ -79,16 +85,16 @@ ModuleNotFoundError: No module named 'cloudscraper'
    📦 In buffer: 177 partite.
 
 🌍 Scarico Serie C - Girone C...
-   📦 In buffer: 180 partite.
+   📦 In buffer: 183 partite.
 
 🌍 Scarico Premier League...
    📦 In buffer: 160 partite.
 
 🌍 Scarico La Liga...
-   📦 In buffer: 161 partite.
+   📦 In buffer: 162 partite.
 
 🌍 Scarico Bundesliga...
-   📦 In buffer: 126 partite.
+   📦 In buffer: 127 partite.
 
 🌍 Scarico Ligue 1...
    📦 In buffer: 144 partite.
@@ -97,23 +103,26 @@ ModuleNotFoundError: No module named 'cloudscraper'
    📦 In buffer: 143 partite.
 
 🌍 Scarico Liga Portugal...
-   📦 In buffer: 126 partite.
+   📦 In buffer: 127 partite.
 
 🧹 SVUOTO DB VECCHIO...
    ✅ DB Svuotato.
-💾 SALVO 1707 NUOVE PARTITE...
+💾 SALVO 1714 NUOVE PARTITE...
    ✅ Salvataggio completato! Il DB ora è pulito e aggiornato.
-🔧 BASE_DIR: C:\Progetti\simulatore-calcio-backend
-🔧 ENV_PATH: C:\Progetti\simulatore-calcio-backend\.env
-✅ .env trovato in: C:\Progetti\simulatore-calcio-backend\.env
-🔗 Connessione MongoDB...
-✅ Connesso a MongoDB: football_simulator_db
-📊 Database: football_simulator_db
-   📦 teams: 212 documenti
-   📦 matches_history: 1707 documenti
-   📦 raw_h2h_data_v2: 1933 documenti
-   📦 h2h_by_round: 402 documenti
-✅ Configurazione completata con successo
+ config.py eseguito da: C:\Progetti\simulatore-calcio-backend\config.py
+ Directory corrente: C:\Progetti\simulatore-calcio-backend
+ Python path: ['C:\\Progetti\\simulatore-calcio-backend\\ai_engine\\Aggiornamenti\\frequenti', 'C:\\Users\\lollo\\AppData\\Local\\Programs\\Python\\Python313\\python313.zip', 'C:\\Users\\lollo\\AppData\\Local\\Programs\\Python\\Python313\\DLLs']
+ BASE_DIR: C:\Progetti\simulatore-calcio-backend
+ ENV_PATH: C:\Progetti\simulatore-calcio-backend\.env
+ .env trovato in: C:\Progetti\simulatore-calcio-backend\.env
+ Connessione MongoDB...
+ Connesso a MongoDB: football_simulator_db
+ Database: football_simulator_db
+    teams: 212 documenti
+    matches_history: 1714 documenti
+    raw_h2h_data_v2: 1933 documenti
+    h2h_by_round: 402 documenti
+ Configurazione completata con successo
 🚀 AVVIO SCRAPER CLASSIFICA UNIFICATO (SMART + GOL)
 
 🌍 Scarico dati per: Serie A...
@@ -148,92 +157,110 @@ ModuleNotFoundError: No module named 'cloudscraper'
 
 🌍 Scarico dati per: Liga Portugal...
    ✅ Aggiornate 18 squadre.
-🔧 BASE_DIR: C:\Progetti\simulatore-calcio-backend
-🔧 ENV_PATH: C:\Progetti\simulatore-calcio-backend\.env
-✅ .env trovato in: C:\Progetti\simulatore-calcio-backend\.env
-🔗 Connessione MongoDB...
-✅ Connesso a MongoDB: football_simulator_db
-📊 Database: football_simulator_db
-   📦 teams: 212 documenti
-   📦 matches_history: 1707 documenti
-   📦 raw_h2h_data_v2: 1933 documenti
-   📦 h2h_by_round: 402 documenti
-✅ Configurazione completata con successo
+ config.py eseguito da: C:\Progetti\simulatore-calcio-backend\config.py
+ Directory corrente: C:\Progetti\simulatore-calcio-backend
+ Python path: ['C:\\Progetti\\simulatore-calcio-backend\\ai_engine\\Aggiornamenti\\frequenti', 'C:\\Users\\lollo\\AppData\\Local\\Programs\\Python\\Python313\\python313.zip', 'C:\\Users\\lollo\\AppData\\Local\\Programs\\Python\\Python313\\DLLs']
+ BASE_DIR: C:\Progetti\simulatore-calcio-backend
+ ENV_PATH: C:\Progetti\simulatore-calcio-backend\.env
+ .env trovato in: C:\Progetti\simulatore-calcio-backend\.env
+ Connessione MongoDB...
+ Connesso a MongoDB: football_simulator_db
+ Database: football_simulator_db
+    teams: 212 documenti
+    matches_history: 1714 documenti
+    raw_h2h_data_v2: 1933 documenti
+    h2h_by_round: 402 documenti
+ Configurazione completata con successo
 Traceback (most recent call last):
   File "C:\Progetti\simulatore-calcio-backend\ai_engine\Aggiornamenti\frequenti\fbref_scraper_att.py", line 49, in <module>
     import cloudscraper
 ModuleNotFoundError: No module named 'cloudscraper'
-🔧 BASE_DIR: C:\Progetti\simulatore-calcio-backend
-🔧 ENV_PATH: C:\Progetti\simulatore-calcio-backend\.env
-✅ .env trovato in: C:\Progetti\simulatore-calcio-backend\.env
-🔗 Connessione MongoDB...
-✅ Connesso a MongoDB: football_simulator_db
-📊 Database: football_simulator_db
-   📦 teams: 212 documenti
-   📦 matches_history: 1707 documenti
-   📦 raw_h2h_data_v2: 1933 documenti
-   📦 h2h_by_round: 402 documenti
-✅ Configurazione completata con successo
+ config.py eseguito da: C:\Progetti\simulatore-calcio-backend\config.py
+ Directory corrente: C:\Progetti\simulatore-calcio-backend
+ Python path: ['C:\\Progetti\\simulatore-calcio-backend\\ai_engine\\Aggiornamenti\\frequenti', 'C:\\Users\\lollo\\AppData\\Local\\Programs\\Python\\Python313\\python313.zip', 'C:\\Users\\lollo\\AppData\\Local\\Programs\\Python\\Python313\\DLLs']
+ BASE_DIR: C:\Progetti\simulatore-calcio-backend
+ ENV_PATH: C:\Progetti\simulatore-calcio-backend\.env
+ .env trovato in: C:\Progetti\simulatore-calcio-backend\.env
+ Connessione MongoDB...
+ Connesso a MongoDB: football_simulator_db
+ Database: football_simulator_db
+    teams: 212 documenti
+    matches_history: 1714 documenti
+    raw_h2h_data_v2: 1933 documenti
+    h2h_by_round: 402 documenti
+ Configurazione completata con successo
 Traceback (most recent call last):
   File "C:\Progetti\simulatore-calcio-backend\ai_engine\Aggiornamenti\frequenti\fbref_scraper_mid.py", line 47, in <module>
     import cloudscraper
 ModuleNotFoundError: No module named 'cloudscraper'
-🔧 BASE_DIR: C:\Progetti\simulatore-calcio-backend
-🔧 ENV_PATH: C:\Progetti\simulatore-calcio-backend\.env
-✅ .env trovato in: C:\Progetti\simulatore-calcio-backend\.env
-🔗 Connessione MongoDB...
-✅ Connesso a MongoDB: football_simulator_db
-📊 Database: football_simulator_db
-   📦 teams: 212 documenti
-   📦 matches_history: 1707 documenti
-   📦 raw_h2h_data_v2: 1933 documenti
-   📦 h2h_by_round: 402 documenti
-✅ Configurazione completata con successo
+ config.py eseguito da: C:\Progetti\simulatore-calcio-backend\config.py
+ Directory corrente: C:\Progetti\simulatore-calcio-backend
+ Python path: ['C:\\Progetti\\simulatore-calcio-backend\\ai_engine\\Aggiornamenti\\frequenti', 'C:\\Users\\lollo\\AppData\\Local\\Programs\\Python\\Python313\\python313.zip', 'C:\\Users\\lollo\\AppData\\Local\\Programs\\Python\\Python313\\DLLs']
+ BASE_DIR: C:\Progetti\simulatore-calcio-backend
+ ENV_PATH: C:\Progetti\simulatore-calcio-backend\.env
+ .env trovato in: C:\Progetti\simulatore-calcio-backend\.env
+ Connessione MongoDB...
+ Connesso a MongoDB: football_simulator_db
+ Database: football_simulator_db
+    teams: 212 documenti
+    matches_history: 1714 documenti
+    raw_h2h_data_v2: 1933 documenti
+    h2h_by_round: 402 documenti
+ Configurazione completata con successo
 Traceback (most recent call last):
   File "C:\Progetti\simulatore-calcio-backend\ai_engine\Aggiornamenti\frequenti\fbref_scraper_def.py", line 47, in <module>
     import cloudscraper
 ModuleNotFoundError: No module named 'cloudscraper'
-🔧 BASE_DIR: C:\Progetti\simulatore-calcio-backend
-🔧 ENV_PATH: C:\Progetti\simulatore-calcio-backend\.env
-✅ .env trovato in: C:\Progetti\simulatore-calcio-backend\.env
-🔗 Connessione MongoDB...
-✅ Connesso a MongoDB: football_simulator_db
-📊 Database: football_simulator_db
-   📦 teams: 212 documenti
-   📦 matches_history: 1707 documenti
-   📦 raw_h2h_data_v2: 1933 documenti
-   📦 h2h_by_round: 402 documenti
-✅ Configurazione completata con successo
+ config.py eseguito da: C:\Progetti\simulatore-calcio-backend\config.py
+ Directory corrente: C:\Progetti\simulatore-calcio-backend
+ Python path: ['C:\\Progetti\\simulatore-calcio-backend\\ai_engine\\Aggiornamenti\\frequenti', 'C:\\Users\\lollo\\AppData\\Local\\Programs\\Python\\Python313\\python313.zip', 'C:\\Users\\lollo\\AppData\\Local\\Programs\\Python\\Python313\\DLLs']
+ BASE_DIR: C:\Progetti\simulatore-calcio-backend
+ ENV_PATH: C:\Progetti\simulatore-calcio-backend\.env
+ .env trovato in: C:\Progetti\simulatore-calcio-backend\.env
+ Connessione MongoDB...
+ Connesso a MongoDB: football_simulator_db
+ Database: football_simulator_db
+    teams: 212 documenti
+    matches_history: 1714 documenti
+    raw_h2h_data_v2: 1933 documenti
+    h2h_by_round: 402 documenti
+ Configurazione completata con successo
 Traceback (most recent call last):
   File "C:\Progetti\simulatore-calcio-backend\ai_engine\Aggiornamenti\frequenti\scraper_gk_fbref.py", line 28, in <module>
     import cloudscraper
 ModuleNotFoundError: No module named 'cloudscraper'
-🔧 BASE_DIR: C:\Progetti\simulatore-calcio-backend
-🔧 ENV_PATH: C:\Progetti\simulatore-calcio-backend\.env
-✅ .env trovato in: C:\Progetti\simulatore-calcio-backend\.env
-🔗 Connessione MongoDB...
-✅ Connesso a MongoDB: football_simulator_db
-📊 Database: football_simulator_db
-   📦 teams: 212 documenti
-   📦 matches_history: 1707 documenti
-   📦 raw_h2h_data_v2: 1933 documenti
-   📦 h2h_by_round: 402 documenti
-✅ Configurazione completata con successo
+ config.py eseguito da: C:\Progetti\simulatore-calcio-backend\config.py
+ Directory corrente: C:\Progetti\simulatore-calcio-backend
+ Python path: ['C:\\Progetti\\simulatore-calcio-backend\\ai_engine\\Aggiornamenti\\frequenti', 'C:\\Users\\lollo\\AppData\\Local\\Programs\\Python\\Python313\\python313.zip', 'C:\\Users\\lollo\\AppData\\Local\\Programs\\Python\\Python313\\DLLs']
+ BASE_DIR: C:\Progetti\simulatore-calcio-backend
+ ENV_PATH: C:\Progetti\simulatore-calcio-backend\.env
+ .env trovato in: C:\Progetti\simulatore-calcio-backend\.env
+ Connessione MongoDB...
+ Connesso a MongoDB: football_simulator_db
+ Database: football_simulator_db
+    teams: 212 documenti
+    matches_history: 1714 documenti
+    raw_h2h_data_v2: 1933 documenti
+    h2h_by_round: 402 documenti
+ Configurazione completata con successo
 Traceback (most recent call last):
   File "C:\Progetti\simulatore-calcio-backend\ai_engine\Aggiornamenti\frequenti\scraper_tm_multi_campionato.py", line 52, in <module>
     import cloudscraper
 ModuleNotFoundError: No module named 'cloudscraper'
-🔧 BASE_DIR: C:\Progetti\simulatore-calcio-backend
-🔧 ENV_PATH: C:\Progetti\simulatore-calcio-backend\.env
-✅ .env trovato in: C:\Progetti\simulatore-calcio-backend\.env
-🔗 Connessione MongoDB...
-✅ Connesso a MongoDB: football_simulator_db
-📊 Database: football_simulator_db
-   📦 teams: 212 documenti
-   📦 matches_history: 1707 documenti
-   📦 raw_h2h_data_v2: 1933 documenti
-   📦 h2h_by_round: 402 documenti
-✅ Configurazione completata con successo
+ config.py eseguito da: C:\Progetti\simulatore-calcio-backend\config.py
+ Directory corrente: C:\Progetti\simulatore-calcio-backend
+ Python path: ['C:\\Progetti\\simulatore-calcio-backend\\ai_engine\\Aggiornamenti\\frequenti', 'C:\\Users\\lollo\\AppData\\Local\\Programs\\Python\\Python313\\python313.zip', 'C:\\Users\\lollo\\AppData\\Local\\Programs\\Python\\Python313\\DLLs']
+ BASE_DIR: C:\Progetti\simulatore-calcio-backend
+ ENV_PATH: C:\Progetti\simulatore-calcio-backend\.env
+ .env trovato in: C:\Progetti\simulatore-calcio-backend\.env
+ Connessione MongoDB...
+ Connesso a MongoDB: football_simulator_db
+ Database: football_simulator_db
+    teams: 212 documenti
+    matches_history: 1714 documenti
+    raw_h2h_data_v2: 1933 documenti
+    h2h_by_round: 402 documenti
+ Configurazione completata con successo
 🚀 AVVIO SCRAPER TM V8 (Double Memory Fix) - Stagione 2025
 
 🌍 Lega: Serie A
@@ -279,32 +306,38 @@ ModuleNotFoundError: No module named 'cloudscraper'
 🌍 Lega: Liga Portugal
    Giornate trovate: 34
    ✅ Salvate 34 giornate.
-🔧 BASE_DIR: C:\Progetti\simulatore-calcio-backend
-🔧 ENV_PATH: C:\Progetti\simulatore-calcio-backend\.env
-✅ .env trovato in: C:\Progetti\simulatore-calcio-backend\.env
-🔗 Connessione MongoDB...
-✅ Connesso a MongoDB: football_simulator_db
-📊 Database: football_simulator_db
-   📦 teams: 212 documenti
-   📦 matches_history: 1707 documenti
-   📦 raw_h2h_data_v2: 1933 documenti
-   📦 h2h_by_round: 402 documenti
-✅ Configurazione completata con successo
+ config.py eseguito da: C:\Progetti\simulatore-calcio-backend\config.py
+ Directory corrente: C:\Progetti\simulatore-calcio-backend
+ Python path: ['C:\\Progetti\\simulatore-calcio-backend\\ai_engine\\calculators', 'C:\\Progetti\\simulatore-calcio-backend\\ai_engine', 'C:\\Progetti\\simulatore-calcio-backend']
+ BASE_DIR: C:\Progetti\simulatore-calcio-backend
+ ENV_PATH: C:\Progetti\simulatore-calcio-backend\.env
+ .env trovato in: C:\Progetti\simulatore-calcio-backend\.env
+ Connessione MongoDB...
+ Connesso a MongoDB: football_simulator_db
+ Database: football_simulator_db
+    teams: 212 documenti
+    matches_history: 1714 documenti
+    raw_h2h_data_v2: 1933 documenti
+    h2h_by_round: 402 documenti
+ Configurazione completata con successo
 🧠 CALCOLATORE H2H v2.0 PRO (Formula Dinamica + GOL + FIX NOMI)
 Elaborazione:   0%|          | 0/402 [00:00<?, ?it/s]📥 Caricamento Cache Squadre...
 ✅ Cache pronta con 526 alias.
-Elaborazione:   0%|          | 1/402 [00:00<05:49,  1.15it/s]Elaborazione:   0%|          | 2/402 [00:01<05:38,  1.18it/s]Elaborazione:   1%|          | 3/402 [00:02<05:40,  1.17it/s]Elaborazione:   1%|          | 4/402 [00:03<05:34,  1.19it/s]Elaborazione:   1%|          | 5/402 [00:04<05:32,  1.19it/s]Elaborazione:   1%|▏         | 6/402 [00:05<05:34,  1.19it/s]Elaborazione:   2%|▏         | 7/402 [00:05<05:29,  1.20it/s]Elaborazione:   2%|▏         | 8/402 [00:06<05:27,  1.20it/s]Elaborazione:   2%|▏         | 9/402 [00:07<05:24,  1.21it/s]Elaborazione:   2%|▏         | 10/402 [00:08<05:22,  1.22it/s]Elaborazione:   3%|▎         | 11/402 [00:09<05:20,  1.22it/s]Elaborazione:   3%|▎         | 12/402 [00:09<05:17,  1.23it/s]Elaborazione:   3%|▎         | 13/402 [00:10<05:18,  1.22it/s]Elaborazione:   3%|▎         | 14/402 [00:11<05:16,  1.23it/s]Elaborazione:   4%|▎         | 15/402 [00:12<05:17,  1.22it/s]Elaborazione:   4%|▍         | 16/402 [00:13<05:15,  1.22it/s]Elaborazione:   4%|▍         | 17/402 [00:14<05:14,  1.23it/s]Elaborazione:   4%|▍         | 18/402 [00:14<05:12,  1.23it/s]Elaborazione:   5%|▍         | 19/402 [00:15<05:11,  1.23it/s]Elaborazione:   5%|▍         | 20/402 [00:16<05:11,  1.23it/s]Elaborazione:   5%|▌         | 21/402 [00:17<05:09,  1.23it/s]Elaborazione:   5%|▌         | 22/402 [00:18<05:08,  1.23it/s]Elaborazione:   6%|▌         | 23/402 [00:18<05:10,  1.22it/s]Elaborazione:   6%|▌         | 24/402 [00:19<05:08,  1.22it/s]Elaborazione:   6%|▌         | 25/402 [00:20<05:06,  1.23it/s]Elaborazione:   6%|▋         | 26/402 [00:21<05:05,  1.23it/s]Elaborazione:   7%|▋         | 27/402 [00:22<05:05,  1.23it/s]Elaborazione:   7%|▋         | 28/402 [00:23<05:07,  1.22it/s]Elaborazione:   7%|▋         | 29/402 [00:23<05:07,  1.21it/s]Elaborazione:   7%|▋         | 30/402 [00:24<05:10,  1.20it/s]Elaborazione:   8%|▊         | 31/402 [00:25<05:06,  1.21it/s]Elaborazione:   8%|▊         | 32/402 [00:26<05:06,  1.21it/s]Elaborazione:   8%|▊         | 33/402 [00:27<05:09,  1.19it/s]Elaborazione:   8%|▊         | 34/402 [00:28<05:07,  1.20it/s]Elaborazione:   9%|▊         | 35/402 [00:28<05:05,  1.20it/s]Elaborazione:   9%|▉         | 36/402 [00:29<05:02,  1.21it/s]Elaborazione:   9%|▉         | 37/402 [00:30<05:01,  1.21it/s]Elaborazione:   9%|▉         | 38/402 [00:31<05:00,  1.21it/s]Elaborazione:  10%|▉         | 39/402 [00:32<04:57,  1.22it/s]Elaborazione:  10%|▉         | 40/402 [00:32<04:57,  1.22it/s]Elaborazione:  10%|█         | 41/402 [00:33<04:57,  1.21it/s]Elaborazione:  10%|█         | 42/402 [00:34<04:58,  1.21it/s]Elaborazione:  11%|█         | 43/402 [00:35<04:59,  1.20it/s]Elaborazione:  11%|█         | 44/402 [00:36<04:57,  1.20it/s]Elaborazione:  11%|█         | 45/402 [00:37<04:54,  1.21it/s]Elaborazione:  11%|█▏        | 46/402 [00:37<04:53,  1.21it/s]Elaborazione:  12%|█▏        | 47/402 [00:38<04:49,  1.23it/s]Elaborazione:  12%|█▏        | 48/402 [00:39<04:47,  1.23it/s]Elaborazione:  12%|█▏        | 49/402 [00:40<04:44,  1.24it/s]Elaborazione:  12%|█▏        | 50/402 [00:41<04:43,  1.24it/s]Elaborazione:  13%|█▎        | 51/402 [00:41<04:43,  1.24it/s]Elaborazione:  13%|█▎        | 52/402 [00:42<04:44,  1.23it/s]Elaborazione:  13%|█▎        | 53/402 [00:43<04:43,  1.23it/s]Elaborazione:  13%|█▎        | 54/402 [00:44<04:41,  1.24it/s]Elaborazione:  14%|█▎        | 55/402 [00:45<04:38,  1.24it/s]Elaborazione:  14%|█▍        | 56/402 [00:45<04:36,  1.25it/s]Elaborazione:  14%|█▍        | 57/402 [00:46<04:35,  1.25it/s]Elaborazione:  14%|█▍        | 58/402 [00:47<04:33,  1.26it/s]Elaborazione:  15%|█▍        | 59/402 [00:48<04:34,  1.25it/s]Elaborazione:  15%|█▍        | 60/402 [00:49<04:33,  1.25it/s]Elaborazione:  15%|█▌        | 61/402 [00:49<04:32,  1.25it/s]Elaborazione:  15%|█▌        | 62/402 [00:50<04:32,  1.25it/s]Elaborazione:  16%|█▌        | 63/402 [00:51<04:30,  1.25it/s]Elaborazione:  16%|█▌        | 64/402 [00:52<04:30,  1.25it/s]Elaborazione:  16%|█▌        | 65/402 [00:53<04:32,  1.24it/s]Elaborazione:  16%|█▋        | 66/402 [00:54<04:33,  1.23it/s]Elaborazione:  17%|█▋        | 67/402 [00:54<04:31,  1.23it/s]Elaborazione:  17%|█▋        | 68/402 [00:55<04:32,  1.23it/s]Elaborazione:  17%|█▋        | 69/402 [00:56<04:33,  1.22it/s]Elaborazione:  17%|█▋        | 70/402 [00:57<04:31,  1.22it/s]Elaborazione:  18%|█▊        | 71/402 [00:58<04:30,  1.22it/s]Elaborazione:  18%|█▊        | 72/402 [00:58<04:32,  1.21it/s]Elaborazione:  18%|█▊        | 73/402 [00:59<04:28,  1.23it/s]Elaborazione:  18%|█▊        | 74/402 [01:00<04:29,  1.22it/s]Elaborazione:  19%|█▊        | 75/402 [01:01<04:28,  1.22it/s]Elaborazione:  19%|█▉        | 76/402 [01:02<04:25,  1.23it/s]Elaborazione:  19%|█▉        | 77/402 [01:02<04:22,  1.24it/s]Elaborazione:  19%|█▉        | 78/402 [01:03<04:22,  1.23it/s]Elaborazione:  20%|█▉        | 79/402 [01:04<04:20,  1.24it/s]Elaborazione:  20%|█▉        | 80/402 [01:05<04:17,  1.25it/s]Elaborazione:  20%|██        | 81/402 [01:06<04:14,  1.26it/s]Elaborazione:  20%|██        | 82/402 [01:06<04:11,  1.27it/s]Elaborazione:  21%|██        | 83/402 [01:07<04:10,  1.27it/s]Elaborazione:  21%|██        | 84/402 [01:08<04:08,  1.28it/s]Elaborazione:  21%|██        | 85/402 [01:09<04:06,  1.29it/s]Elaborazione:  21%|██▏       | 86/402 [01:10<04:04,  1.29it/s]Elaborazione:  22%|██▏       | 87/402 [01:10<04:03,  1.29it/s]Elaborazione:  22%|██▏       | 88/402 [01:11<04:02,  1.30it/s]Elaborazione:  22%|██▏       | 89/402 [01:12<04:02,  1.29it/s]Elaborazione:  22%|██▏       | 90/402 [01:13<04:03,  1.28it/s]Elaborazione:  23%|██▎       | 91/402 [01:13<04:01,  1.29it/s]Elaborazione:  23%|██▎       | 92/402 [01:14<04:00,  1.29it/s]Elaborazione:  23%|██▎       | 93/402 [01:15<03:58,  1.30it/s]Elaborazione:  23%|██▎       | 94/402 [01:16<03:56,  1.30it/s]Elaborazione:  24%|██▎       | 95/402 [01:16<03:56,  1.30it/s]Elaborazione:  24%|██▍       | 96/402 [01:17<03:55,  1.30it/s]Elaborazione:  24%|██▍       | 97/402 [01:18<03:54,  1.30it/s]Elaborazione:  24%|██▍       | 98/402 [01:19<03:53,  1.30it/s]Elaborazione:  25%|██▍       | 99/402 [01:20<03:53,  1.30it/s]Elaborazione:  25%|██▍       | 100/402 [01:20<03:52,  1.30it/s]Elaborazione:  25%|██▌       | 101/402 [01:21<03:52,  1.29it/s]Elaborazione:  25%|██▌       | 102/402 [01:22<03:53,  1.28it/s]Elaborazione:  26%|██▌       | 103/402 [01:23<03:53,  1.28it/s]Elaborazione:  26%|██▌       | 104/402 [01:23<03:54,  1.27it/s]Elaborazione:  26%|██▌       | 105/402 [01:24<03:55,  1.26it/s]Elaborazione:  26%|██▋       | 106/402 [01:25<03:53,  1.27it/s]Elaborazione:  27%|██▋       | 107/402 [01:26<03:50,  1.28it/s]Elaborazione:  27%|██▋       | 108/402 [01:27<03:53,  1.26it/s]Elaborazione:  27%|██▋       | 109/402 [01:27<03:51,  1.27it/s]Elaborazione:  27%|██▋       | 110/402 [01:28<03:49,  1.27it/s]Elaborazione:  28%|██▊       | 111/402 [01:29<03:49,  1.27it/s]Elaborazione:  28%|██▊       | 112/402 [01:30<03:47,  1.28it/s]Elaborazione:  28%|██▊       | 113/402 [01:31<03:45,  1.28it/s]Elaborazione:  28%|██▊       | 114/402 [01:31<03:46,  1.27it/s]Elaborazione:  29%|██▊       | 115/402 [01:32<03:40,  1.30it/s]Elaborazione:  29%|██▉       | 116/402 [01:33<03:38,  1.31it/s]Elaborazione:  29%|██▉       | 117/402 [01:34<03:34,  1.33it/s]Elaborazione:  29%|██▉       | 118/402 [01:34<03:32,  1.34it/s]Elaborazione:  30%|██▉       | 119/402 [01:35<03:33,  1.33it/s]Elaborazione:  30%|██▉       | 120/402 [01:36<03:31,  1.33it/s]Elaborazione:  30%|███       | 121/402 [01:37<03:28,  1.35it/s]Elaborazione:  30%|███       | 122/402 [01:37<03:25,  1.36it/s]Elaborazione:  31%|███       | 123/402 [01:38<03:23,  1.37it/s]Elaborazione:  31%|███       | 124/402 [01:39<03:21,  1.38it/s]Elaborazione:  31%|███       | 125/402 [01:39<03:20,  1.38it/s]Elaborazione:  31%|███▏      | 126/402 [01:40<03:20,  1.38it/s]Elaborazione:  32%|███▏      | 127/402 [01:41<03:18,  1.39it/s]Elaborazione:  32%|███▏      | 128/402 [01:42<03:17,  1.39it/s]Elaborazione:  32%|███▏      | 129/402 [01:42<03:16,  1.39it/s]Elaborazione:  32%|███▏      | 130/402 [01:43<03:17,  1.38it/s]Elaborazione:  33%|███▎      | 131/402 [01:44<03:17,  1.37it/s]Elaborazione:  33%|███▎      | 132/402 [01:44<03:15,  1.38it/s]Elaborazione:  33%|███▎      | 133/402 [01:45<03:15,  1.38it/s]Elaborazione:  33%|███▎      | 134/402 [01:46<03:13,  1.39it/s]Elaborazione:  34%|███▎      | 135/402 [01:47<03:11,  1.39it/s]Elaborazione:  34%|███▍      | 136/402 [01:47<03:11,  1.39it/s]Elaborazione:  34%|███▍      | 137/402 [01:48<03:10,  1.39it/s]Elaborazione:  34%|███▍      | 138/402 [01:49<03:09,  1.39it/s]Elaborazione:  35%|███▍      | 139/402 [01:49<03:08,  1.39it/s]Elaborazione:  35%|███▍      | 140/402 [01:50<03:08,  1.39it/s]Elaborazione:  35%|███▌      | 141/402 [01:51<03:08,  1.39it/s]Elaborazione:  35%|███▌      | 142/402 [01:52<03:08,  1.38it/s]Elaborazione:  36%|███▌      | 143/402 [01:52<03:07,  1.38it/s]Elaborazione:  36%|███▌      | 144/402 [01:53<03:06,  1.38it/s]Elaborazione:  36%|███▌      | 145/402 [01:54<03:07,  1.37it/s]Elaborazione:  36%|███▋      | 146/402 [01:55<03:06,  1.37it/s]Elaborazione:  37%|███▋      | 147/402 [01:55<03:06,  1.37it/s]Elaborazione:  37%|███▋      | 148/402 [01:56<03:04,  1.38it/s]Elaborazione:  37%|███▋      | 149/402 [01:57<03:02,  1.39it/s]Elaborazione:  37%|███▋      | 150/402 [01:57<03:03,  1.38it/s]Elaborazione:  38%|███▊      | 151/402 [01:58<03:02,  1.37it/s]Elaborazione:  38%|███▊      | 152/402 [01:59<03:02,  1.37it/s]Elaborazione:  38%|███▊      | 153/402 [02:00<03:06,  1.34it/s]Elaborazione:  38%|███▊      | 154/402 [02:01<03:09,  1.31it/s]Elaborazione:  39%|███▊      | 155/402 [02:01<03:12,  1.28it/s]Elaborazione:  39%|███▉      | 156/402 [02:02<03:12,  1.28it/s]Elaborazione:  39%|███▉      | 157/402 [02:03<03:13,  1.26it/s]Elaborazione:  39%|███▉      | 158/402 [02:04<03:14,  1.26it/s]Elaborazione:  40%|███▉      | 159/402 [02:05<03:13,  1.25it/s]Elaborazione:  40%|███▉      | 160/402 [02:05<03:14,  1.25it/s]Elaborazione:  40%|████      | 161/402 [02:06<03:13,  1.25it/s]Elaborazione:  40%|████      | 162/402 [02:07<03:12,  1.25it/s]Elaborazione:  41%|████      | 163/402 [02:08<03:11,  1.25it/s]Elaborazione:  41%|████      | 164/402 [02:09<03:09,  1.25it/s]Elaborazione:  41%|████      | 165/402 [02:09<03:08,  1.26it/s]Elaborazione:  41%|████▏     | 166/402 [02:10<03:07,  1.26it/s]Elaborazione:  42%|████▏     | 167/402 [02:11<03:07,  1.25it/s]Elaborazione:  42%|████▏     | 168/402 [02:12<03:06,  1.25it/s]Elaborazione:  42%|████▏     | 169/402 [02:13<03:05,  1.26it/s]Elaborazione:  42%|████▏     | 170/402 [02:13<03:05,  1.25it/s]Elaborazione:  43%|████▎     | 171/402 [02:14<03:05,  1.25it/s]Elaborazione:  43%|████▎     | 172/402 [02:15<03:04,  1.24it/s]Elaborazione:  43%|████▎     | 173/402 [02:16<03:04,  1.24it/s]Elaborazione:  43%|████▎     | 174/402 [02:17<03:02,  1.25it/s]Elaborazione:  44%|████▎     | 175/402 [02:17<03:01,  1.25it/s]Elaborazione:  44%|████▍     | 176/402 [02:18<03:01,  1.24it/s]Elaborazione:  44%|████▍     | 177/402 [02:19<03:00,  1.25it/s]Elaborazione:  44%|████▍     | 178/402 [02:20<02:59,  1.25it/s]Elaborazione:  45%|████▍     | 179/402 [02:21<02:58,  1.25it/s]Elaborazione:  45%|████▍     | 180/402 [02:21<02:57,  1.25it/s]Elaborazione:  45%|████▌     | 181/402 [02:22<02:56,  1.25it/s]Elaborazione:  45%|████▌     | 182/402 [02:23<02:55,  1.25it/s]Elaborazione:  46%|████▌     | 183/402 [02:24<02:56,  1.24it/s]Elaborazione:  46%|████▌     | 184/402 [02:25<02:56,  1.24it/s]Elaborazione:  46%|████▌     | 185/402 [02:25<02:57,  1.23it/s]Elaborazione:  46%|████▋     | 186/402 [02:26<02:55,  1.23it/s]Elaborazione:  47%|████▋     | 187/402 [02:27<02:54,  1.23it/s]Elaborazione:  47%|████▋     | 188/402 [02:28<02:53,  1.23it/s]Elaborazione:  47%|████▋     | 189/402 [02:29<02:56,  1.21it/s]Elaborazione:  47%|████▋     | 190/402 [02:30<02:56,  1.20it/s]Elaborazione:  48%|████▊     | 191/402 [02:30<02:53,  1.22it/s]Elaborazione:  48%|████▊     | 192/402 [02:31<02:50,  1.23it/s]Elaborazione:  48%|████▊     | 193/402 [02:32<02:48,  1.24it/s]Elaborazione:  48%|████▊     | 194/402 [02:33<02:48,  1.23it/s]Elaborazione:  49%|████▊     | 195/402 [02:34<02:48,  1.23it/s]Elaborazione:  49%|████▉     | 196/402 [02:34<02:48,  1.22it/s]Elaborazione:  49%|████▉     | 197/402 [02:35<02:45,  1.24it/s]Elaborazione:  49%|████▉     | 198/402 [02:36<02:44,  1.24it/s]Elaborazione:  50%|████▉     | 199/402 [02:37<02:45,  1.23it/s]Elaborazione:  50%|████▉     | 200/402 [02:38<02:42,  1.24it/s]Elaborazione:  50%|█████     | 201/402 [02:38<02:40,  1.25it/s]Elaborazione:  50%|█████     | 202/402 [02:39<02:40,  1.25it/s]Elaborazione:  50%|█████     | 203/402 [02:40<02:38,  1.25it/s]Elaborazione:  51%|█████     | 204/402 [02:41<02:38,  1.25it/s]Elaborazione:  51%|█████     | 205/402 [02:42<02:37,  1.25it/s]Elaborazione:  51%|█████     | 206/402 [02:42<02:36,  1.25it/s]Elaborazione:  51%|█████▏    | 207/402 [02:43<02:37,  1.24it/s]Elaborazione:  52%|█████▏    | 208/402 [02:44<02:36,  1.24it/s]Elaborazione:  52%|█████▏    | 209/402 [02:45<02:34,  1.25it/s]Elaborazione:  52%|█████▏    | 210/402 [02:46<02:32,  1.26it/s]Elaborazione:  52%|█████▏    | 211/402 [02:46<02:30,  1.27it/s]Elaborazione:  53%|█████▎    | 212/402 [02:47<02:29,  1.27it/s]Elaborazione:  53%|█████▎    | 213/402 [02:48<02:28,  1.27it/s]Elaborazione:  53%|█████▎    | 214/402 [02:49<02:27,  1.27it/s]Elaborazione:  53%|█████▎    | 215/402 [02:50<02:27,  1.27it/s]Elaborazione:  54%|█████▎    | 216/402 [02:50<02:27,  1.26it/s]Elaborazione:  54%|█████▍    | 217/402 [02:51<02:29,  1.24it/s]Elaborazione:  54%|█████▍    | 218/402 [02:52<02:29,  1.23it/s]Elaborazione:  54%|█████▍    | 219/402 [02:53<02:28,  1.23it/s]Elaborazione:  55%|█████▍    | 220/402 [02:54<02:26,  1.24it/s]Elaborazione:  55%|█████▍    | 221/402 [02:54<02:26,  1.23it/s]Elaborazione:  55%|█████▌    | 222/402 [02:55<02:25,  1.23it/s]Elaborazione:  55%|█████▌    | 223/402 [02:56<02:25,  1.23it/s]Elaborazione:  56%|█████▌    | 224/402 [02:57<02:23,  1.24it/s]Elaborazione:  56%|█████▌    | 225/402 [02:58<02:24,  1.23it/s]Elaborazione:  56%|█████▌    | 226/402 [02:58<02:22,  1.23it/s]Elaborazione:  56%|█████▋    | 227/402 [02:59<02:20,  1.24it/s]Elaborazione:  57%|█████▋    | 228/402 [03:00<02:20,  1.24it/s]Elaborazione:  57%|█████▋    | 229/402 [03:01<02:20,  1.23it/s]Elaborazione:  57%|█████▋    | 230/402 [03:02<02:21,  1.22it/s]Elaborazione:  57%|█████▋    | 231/402 [03:03<02:20,  1.22it/s]Elaborazione:  58%|█████▊    | 232/402 [03:03<02:19,  1.22it/s]Elaborazione:  58%|█████▊    | 233/402 [03:04<02:19,  1.21it/s]Elaborazione:  58%|█████▊    | 234/402 [03:05<02:19,  1.21it/s]Elaborazione:  58%|█████▊    | 235/402 [03:06<02:18,  1.21it/s]Elaborazione:  59%|█████▊    | 236/402 [03:07<02:18,  1.20it/s]Elaborazione:  59%|█████▉    | 237/402 [03:08<02:16,  1.21it/s]Elaborazione:  59%|█████▉    | 238/402 [03:08<02:15,  1.21it/s]Elaborazione:  59%|█████▉    | 239/402 [03:09<02:13,  1.22it/s]Elaborazione:  60%|█████▉    | 240/402 [03:10<02:13,  1.22it/s]Elaborazione:  60%|█████▉    | 241/402 [03:11<02:12,  1.21it/s]Elaborazione:  60%|██████    | 242/402 [03:12<02:11,  1.21it/s]Elaborazione:  60%|██████    | 243/402 [03:12<02:10,  1.22it/s]Elaborazione:  61%|██████    | 244/402 [03:13<02:10,  1.22it/s]Elaborazione:  61%|██████    | 245/402 [03:14<02:09,  1.21it/s]Elaborazione:  61%|██████    | 246/402 [03:15<02:08,  1.21it/s]Elaborazione:  61%|██████▏   | 247/402 [03:16<02:07,  1.22it/s]Elaborazione:  62%|██████▏   | 248/402 [03:17<02:06,  1.22it/s]Elaborazione:  62%|██████▏   | 249/402 [03:17<02:05,  1.22it/s]Elaborazione:  62%|██████▏   | 250/402 [03:18<02:04,  1.22it/s]Elaborazione:  62%|██████▏   | 251/402 [03:19<02:03,  1.22it/s]Elaborazione:  63%|██████▎   | 252/402 [03:20<02:02,  1.22it/s]Elaborazione:  63%|██████▎   | 253/402 [03:21<02:01,  1.22it/s]Elaborazione:  63%|██████▎   | 254/402 [03:21<02:01,  1.22it/s]Elaborazione:  63%|██████▎   | 255/402 [03:22<02:00,  1.22it/s]Elaborazione:  64%|██████▎   | 256/402 [03:23<02:01,  1.20it/s]Elaborazione:  64%|██████▍   | 257/402 [03:24<02:00,  1.21it/s]Elaborazione:  64%|██████▍   | 258/402 [03:25<02:00,  1.20it/s]Elaborazione:  64%|██████▍   | 259/402 [03:26<02:00,  1.19it/s]Elaborazione:  65%|██████▍   | 260/402 [03:27<01:59,  1.19it/s]Elaborazione:  65%|██████▍   | 261/402 [03:27<01:57,  1.20it/s]Elaborazione:  65%|██████▌   | 262/402 [03:28<01:57,  1.19it/s]Elaborazione:  65%|██████▌   | 263/402 [03:29<01:57,  1.19it/s]Elaborazione:  66%|██████▌   | 264/402 [03:30<01:56,  1.19it/s]Elaborazione:  66%|██████▌   | 265/402 [03:31<01:55,  1.19it/s]Elaborazione:  66%|██████▌   | 266/402 [03:32<01:53,  1.20it/s]Elaborazione:  66%|██████▋   | 267/402 [03:32<01:49,  1.24it/s]Elaborazione:  67%|██████▋   | 268/402 [03:33<01:46,  1.26it/s]Elaborazione:  67%|██████▋   | 269/402 [03:34<01:44,  1.27it/s]Elaborazione:  67%|██████▋   | 270/402 [03:35<01:42,  1.29it/s]Elaborazione:  67%|██████▋   | 271/402 [03:35<01:40,  1.30it/s]Elaborazione:  68%|██████▊   | 272/402 [03:36<01:38,  1.31it/s]Elaborazione:  68%|██████▊   | 273/402 [03:37<01:38,  1.32it/s]Elaborazione:  68%|██████▊   | 274/402 [03:38<01:37,  1.32it/s]Elaborazione:  68%|██████▊   | 275/402 [03:38<01:35,  1.33it/s]Elaborazione:  69%|██████▊   | 276/402 [03:39<01:34,  1.34it/s]Elaborazione:  69%|██████▉   | 277/402 [03:40<01:32,  1.35it/s]Elaborazione:  69%|██████▉   | 278/402 [03:41<01:32,  1.35it/s]Elaborazione:  69%|██████▉   | 279/402 [03:41<01:31,  1.34it/s]Elaborazione:  70%|██████▉   | 280/402 [03:42<01:32,  1.32it/s]Elaborazione:  70%|██████▉   | 281/402 [03:43<01:31,  1.32it/s]Elaborazione:  70%|███████   | 282/402 [03:44<01:31,  1.31it/s]Elaborazione:  70%|███████   | 283/402 [03:44<01:32,  1.29it/s]Elaborazione:  71%|███████   | 284/402 [03:45<01:29,  1.31it/s]Elaborazione:  71%|███████   | 285/402 [03:46<01:28,  1.33it/s]Elaborazione:  71%|███████   | 286/402 [03:47<01:26,  1.34it/s]Elaborazione:  71%|███████▏  | 287/402 [03:47<01:25,  1.34it/s]Elaborazione:  72%|███████▏  | 288/402 [03:48<01:25,  1.34it/s]Elaborazione:  72%|███████▏  | 289/402 [03:49<01:23,  1.35it/s]Elaborazione:  72%|███████▏  | 290/402 [03:50<01:22,  1.35it/s]Elaborazione:  72%|███████▏  | 291/402 [03:50<01:22,  1.35it/s]Elaborazione:  73%|███████▎  | 292/402 [03:51<01:21,  1.35it/s]Elaborazione:  73%|███████▎  | 293/402 [03:52<01:20,  1.35it/s]Elaborazione:  73%|███████▎  | 294/402 [03:53<01:20,  1.34it/s]Elaborazione:  73%|███████▎  | 295/402 [03:53<01:19,  1.34it/s]Elaborazione:  74%|███████▎  | 296/402 [03:54<01:18,  1.35it/s]Elaborazione:  74%|███████▍  | 297/402 [03:55<01:18,  1.34it/s]Elaborazione:  74%|███████▍  | 298/402 [03:56<01:17,  1.34it/s]Elaborazione:  74%|███████▍  | 299/402 [03:56<01:16,  1.35it/s]Elaborazione:  75%|███████▍  | 300/402 [03:57<01:15,  1.35it/s]Elaborazione:  75%|███████▍  | 301/402 [03:58<01:15,  1.35it/s]Elaborazione:  75%|███████▌  | 302/402 [03:59<01:14,  1.34it/s]Elaborazione:  75%|███████▌  | 303/402 [03:59<01:14,  1.33it/s]Elaborazione:  76%|███████▌  | 304/402 [04:00<01:12,  1.34it/s]Elaborazione:  76%|███████▌  | 305/402 [04:01<01:12,  1.34it/s]Elaborazione:  76%|███████▌  | 306/402 [04:01<01:11,  1.34it/s]Elaborazione:  76%|███████▋  | 307/402 [04:02<01:10,  1.35it/s]Elaborazione:  77%|███████▋  | 308/402 [04:03<01:09,  1.35it/s]Elaborazione:  77%|███████▋  | 309/402 [04:04<01:08,  1.35it/s]Elaborazione:  77%|███████▋  | 310/402 [04:04<01:08,  1.35it/s]Elaborazione:  77%|███████▋  | 311/402 [04:05<01:07,  1.35it/s]Elaborazione:  78%|███████▊  | 312/402 [04:06<01:06,  1.34it/s]Elaborazione:  78%|███████▊  | 313/402 [04:07<01:06,  1.34it/s]Elaborazione:  78%|███████▊  | 314/402 [04:07<01:05,  1.35it/s]Elaborazione:  78%|███████▊  | 315/402 [04:08<01:04,  1.35it/s]Elaborazione:  79%|███████▊  | 316/402 [04:09<01:03,  1.35it/s]Elaborazione:  79%|███████▉  | 317/402 [04:10<01:02,  1.36it/s]Elaborazione:  79%|███████▉  | 318/402 [04:10<01:02,  1.35it/s]Elaborazione:  79%|███████▉  | 319/402 [04:11<01:01,  1.35it/s]Elaborazione:  80%|███████▉  | 320/402 [04:12<01:00,  1.36it/s]Elaborazione:  80%|███████▉  | 321/402 [04:13<00:59,  1.36it/s]Elaborazione:  80%|████████  | 322/402 [04:13<00:59,  1.35it/s]Elaborazione:  80%|████████  | 323/402 [04:14<00:58,  1.35it/s]Elaborazione:  81%|████████  | 324/402 [04:15<00:57,  1.36it/s]Elaborazione:  81%|████████  | 325/402 [04:16<00:56,  1.35it/s]Elaborazione:  81%|████████  | 326/402 [04:16<00:56,  1.35it/s]Elaborazione:  81%|████████▏ | 327/402 [04:17<00:55,  1.35it/s]Elaborazione:  82%|████████▏ | 328/402 [04:18<00:54,  1.35it/s]Elaborazione:  82%|████████▏ | 329/402 [04:18<00:53,  1.36it/s]Elaborazione:  82%|████████▏ | 330/402 [04:19<00:53,  1.35it/s]Elaborazione:  82%|████████▏ | 331/402 [04:20<00:52,  1.35it/s]Elaborazione:  83%|████████▎ | 332/402 [04:21<00:52,  1.33it/s]Elaborazione:  83%|████████▎ | 333/402 [04:21<00:51,  1.34it/s]Elaborazione:  83%|████████▎ | 334/402 [04:22<00:50,  1.35it/s]Elaborazione:  83%|████████▎ | 335/402 [04:23<00:49,  1.35it/s]Elaborazione:  84%|████████▎ | 336/402 [04:24<00:48,  1.35it/s]Elaborazione:  84%|████████▍ | 337/402 [04:24<00:49,  1.33it/s]Elaborazione:  84%|████████▍ | 338/402 [04:25<00:47,  1.33it/s]Elaborazione:  84%|████████▍ | 339/402 [04:26<00:47,  1.32it/s]Elaborazione:  85%|████████▍ | 340/402 [04:27<00:47,  1.31it/s]Elaborazione:  85%|████████▍ | 341/402 [04:28<00:46,  1.32it/s]Elaborazione:  85%|████████▌ | 342/402 [04:28<00:45,  1.33it/s]Elaborazione:  85%|████████▌ | 343/402 [04:29<00:44,  1.34it/s]Elaborazione:  86%|████████▌ | 344/402 [04:30<00:43,  1.33it/s]Elaborazione:  86%|████████▌ | 345/402 [04:31<00:42,  1.33it/s]Elaborazione:  86%|████████▌ | 346/402 [04:31<00:42,  1.33it/s]Elaborazione:  86%|████████▋ | 347/402 [04:32<00:41,  1.33it/s]Elaborazione:  87%|████████▋ | 348/402 [04:33<00:40,  1.33it/s]Elaborazione:  87%|████████▋ | 349/402 [04:34<00:39,  1.33it/s]Elaborazione:  87%|████████▋ | 350/402 [04:34<00:39,  1.33it/s]Elaborazione:  87%|████████▋ | 351/402 [04:35<00:38,  1.33it/s]Elaborazione:  88%|████████▊ | 352/402 [04:36<00:37,  1.33it/s]Elaborazione:  88%|████████▊ | 353/402 [04:37<00:36,  1.33it/s]Elaborazione:  88%|████████▊ | 354/402 [04:37<00:36,  1.32it/s]Elaborazione:  88%|████████▊ | 355/402 [04:38<00:35,  1.33it/s]Elaborazione:  89%|████████▊ | 356/402 [04:39<00:34,  1.33it/s]Elaborazione:  89%|████████▉ | 357/402 [04:40<00:33,  1.34it/s]Elaborazione:  89%|████████▉ | 358/402 [04:40<00:32,  1.34it/s]Elaborazione:  89%|████████▉ | 359/402 [04:41<00:32,  1.32it/s]Elaborazione:  90%|████████▉ | 360/402 [04:42<00:31,  1.33it/s]Elaborazione:  90%|████████▉ | 361/402 [04:43<00:31,  1.32it/s]Elaborazione:  90%|█████████ | 362/402 [04:43<00:30,  1.32it/s]Elaborazione:  90%|█████████ | 363/402 [04:44<00:29,  1.33it/s]Elaborazione:  91%|█████████ | 364/402 [04:45<00:28,  1.33it/s]Elaborazione:  91%|█████████ | 365/402 [04:46<00:27,  1.33it/s]Elaborazione:  91%|█████████ | 366/402 [04:46<00:26,  1.34it/s]Elaborazione:  91%|█████████▏| 367/402 [04:47<00:26,  1.34it/s]Elaborazione:  92%|█████████▏| 368/402 [04:48<00:25,  1.35it/s]Elaborazione:  92%|█████████▏| 369/402 [04:48<00:24,  1.37it/s]Elaborazione:  92%|█████████▏| 370/402 [04:49<00:23,  1.39it/s]Elaborazione:  92%|█████████▏| 371/402 [04:50<00:22,  1.40it/s]Elaborazione:  93%|█████████▎| 372/402 [04:51<00:21,  1.41it/s]Elaborazione:  93%|█████████▎| 373/402 [04:51<00:20,  1.41it/s]Elaborazione:  93%|█████████▎| 374/402 [04:52<00:19,  1.42it/s]Elaborazione:  93%|█████████▎| 375/402 [04:53<00:18,  1.42it/s]Elaborazione:  94%|█████████▎| 376/402 [04:53<00:18,  1.42it/s]Elaborazione:  94%|█████████▍| 377/402 [04:54<00:17,  1.43it/s]Elaborazione:  94%|█████████▍| 378/402 [04:55<00:16,  1.43it/s]Elaborazione:  94%|█████████▍| 379/402 [04:55<00:16,  1.43it/s]Elaborazione:  95%|█████████▍| 380/402 [04:56<00:15,  1.42it/s]Elaborazione:  95%|█████████▍| 381/402 [04:57<00:14,  1.41it/s]Elaborazione:  95%|█████████▌| 382/402 [04:58<00:14,  1.42it/s]Elaborazione:  95%|█████████▌| 383/402 [04:58<00:13,  1.42it/s]Elaborazione:  96%|█████████▌| 384/402 [04:59<00:12,  1.41it/s]Elaborazione:  96%|█████████▌| 385/402 [05:00<00:12,  1.41it/s]Elaborazione:  96%|█████████▌| 386/402 [05:00<00:11,  1.41it/s]Elaborazione:  96%|█████████▋| 387/402 [05:01<00:10,  1.40it/s]Elaborazione:  97%|█████████▋| 388/402 [05:02<00:09,  1.40it/s]Elaborazione:  97%|█████████▋| 389/402 [05:03<00:09,  1.40it/s]Elaborazione:  97%|█████████▋| 390/402 [05:03<00:08,  1.41it/s]Elaborazione:  97%|█████████▋| 391/402 [05:04<00:07,  1.39it/s]Elaborazione:  98%|█████████▊| 392/402 [05:05<00:07,  1.39it/s]Elaborazione:  98%|█████████▊| 393/402 [05:05<00:06,  1.40it/s]Elaborazione:  98%|█████████▊| 394/402 [05:06<00:05,  1.39it/s]Elaborazione:  98%|█████████▊| 395/402 [05:07<00:05,  1.40it/s]Elaborazione:  99%|█████████▊| 396/402 [05:08<00:04,  1.40it/s]Elaborazione:  99%|█████████▉| 397/402 [05:08<00:03,  1.41it/s]Elaborazione:  99%|█████████▉| 398/402 [05:09<00:02,  1.42it/s]Elaborazione:  99%|█████████▉| 399/402 [05:10<00:02,  1.43it/s]Elaborazione: 100%|█████████▉| 400/402 [05:10<00:01,  1.43it/s]Elaborazione: 100%|█████████▉| 401/402 [05:11<00:00,  1.42it/s]Elaborazione: 100%|██████████| 402/402 [05:12<00:00,  1.42it/s]Elaborazione: 100%|██████████| 402/402 [05:12<00:00,  1.29it/s]
-🔧 BASE_DIR: C:\Progetti\simulatore-calcio-backend
-🔧 ENV_PATH: C:\Progetti\simulatore-calcio-backend\.env
-✅ .env trovato in: C:\Progetti\simulatore-calcio-backend\.env
-🔗 Connessione MongoDB...
-✅ Connesso a MongoDB: football_simulator_db
-📊 Database: football_simulator_db
-   📦 teams: 212 documenti
-   📦 matches_history: 1707 documenti
-   📦 raw_h2h_data_v2: 1933 documenti
-   📦 h2h_by_round: 402 documenti
-✅ Configurazione completata con successo
+Elaborazione:   0%|          | 1/402 [00:00<05:41,  1.18it/s]Elaborazione:   0%|          | 2/402 [00:01<05:23,  1.23it/s]Elaborazione:   1%|          | 3/402 [00:02<05:18,  1.25it/s]Elaborazione:   1%|          | 4/402 [00:03<05:15,  1.26it/s]Elaborazione:   1%|          | 5/402 [00:03<05:13,  1.27it/s]Elaborazione:   1%|▏         | 6/402 [00:04<05:15,  1.25it/s]Elaborazione:   2%|▏         | 7/402 [00:05<05:13,  1.26it/s]Elaborazione:   2%|▏         | 8/402 [00:06<05:11,  1.26it/s]Elaborazione:   2%|▏         | 9/402 [00:07<05:09,  1.27it/s]Elaborazione:   2%|▏         | 10/402 [00:07<05:10,  1.26it/s]Elaborazione:   3%|▎         | 11/402 [00:08<05:12,  1.25it/s]Elaborazione:   3%|▎         | 12/402 [00:09<05:11,  1.25it/s]Elaborazione:   3%|▎         | 13/402 [00:10<05:10,  1.25it/s]Elaborazione:   3%|▎         | 14/402 [00:11<05:10,  1.25it/s]Elaborazione:   4%|▎         | 15/402 [00:11<05:10,  1.25it/s]Elaborazione:   4%|▍         | 16/402 [00:12<05:07,  1.26it/s]Elaborazione:   4%|▍         | 17/402 [00:13<05:09,  1.25it/s]Elaborazione:   4%|▍         | 18/402 [00:14<05:07,  1.25it/s]Elaborazione:   5%|▍         | 19/402 [00:15<05:07,  1.24it/s]Elaborazione:   5%|▍         | 20/402 [00:15<05:06,  1.25it/s]Elaborazione:   5%|▌         | 21/402 [00:16<05:06,  1.24it/s]Elaborazione:   5%|▌         | 22/402 [00:17<05:04,  1.25it/s]Elaborazione:   6%|▌         | 23/402 [00:18<05:03,  1.25it/s]Elaborazione:   6%|▌         | 24/402 [00:19<05:03,  1.25it/s]Elaborazione:   6%|▌         | 25/402 [00:19<05:01,  1.25it/s]Elaborazione:   6%|▋         | 26/402 [00:20<05:02,  1.24it/s]Elaborazione:   7%|▋         | 27/402 [00:21<05:00,  1.25it/s]Elaborazione:   7%|▋         | 28/402 [00:22<05:03,  1.23it/s]Elaborazione:   7%|▋         | 29/402 [00:23<05:00,  1.24it/s]Elaborazione:   7%|▋         | 30/402 [00:24<04:59,  1.24it/s]Elaborazione:   8%|▊         | 31/402 [00:24<05:01,  1.23it/s]Elaborazione:   8%|▊         | 32/402 [00:25<04:59,  1.24it/s]Elaborazione:   8%|▊         | 33/402 [00:26<05:00,  1.23it/s]Elaborazione:   8%|▊         | 34/402 [00:27<04:57,  1.24it/s]Elaborazione:   9%|▊         | 35/402 [00:28<04:57,  1.23it/s]Elaborazione:   9%|▉         | 36/402 [00:28<04:55,  1.24it/s]Elaborazione:   9%|▉         | 37/402 [00:29<04:54,  1.24it/s]Elaborazione:   9%|▉         | 38/402 [00:30<04:50,  1.25it/s]Elaborazione:  10%|▉         | 39/402 [00:31<04:46,  1.27it/s]Elaborazione:  10%|▉         | 40/402 [00:32<04:43,  1.28it/s]Elaborazione:  10%|█         | 41/402 [00:32<04:42,  1.28it/s]Elaborazione:  10%|█         | 42/402 [00:33<04:41,  1.28it/s]Elaborazione:  11%|█         | 43/402 [00:34<04:40,  1.28it/s]Elaborazione:  11%|█         | 44/402 [00:35<04:39,  1.28it/s]Elaborazione:  11%|█         | 45/402 [00:35<04:37,  1.29it/s]Elaborazione:  11%|█▏        | 46/402 [00:36<04:36,  1.29it/s]Elaborazione:  12%|█▏        | 47/402 [00:37<04:36,  1.28it/s]Elaborazione:  12%|█▏        | 48/402 [00:38<04:34,  1.29it/s]Elaborazione:  12%|█▏        | 49/402 [00:39<04:33,  1.29it/s]Elaborazione:  12%|█▏        | 50/402 [00:39<04:32,  1.29it/s]Elaborazione:  13%|█▎        | 51/402 [00:40<04:31,  1.29it/s]Elaborazione:  13%|█▎        | 52/402 [00:41<04:31,  1.29it/s]Elaborazione:  13%|█▎        | 53/402 [00:42<04:30,  1.29it/s]Elaborazione:  13%|█▎        | 54/402 [00:42<04:32,  1.28it/s]Elaborazione:  14%|█▎        | 55/402 [00:43<04:33,  1.27it/s]Elaborazione:  14%|█▍        | 56/402 [00:44<04:33,  1.26it/s]Elaborazione:  14%|█▍        | 57/402 [00:45<04:33,  1.26it/s]Elaborazione:  14%|█▍        | 58/402 [00:46<04:30,  1.27it/s]Elaborazione:  15%|█▍        | 59/402 [00:46<04:28,  1.28it/s]Elaborazione:  15%|█▍        | 60/402 [00:47<04:26,  1.28it/s]Elaborazione:  15%|█▌        | 61/402 [00:48<04:25,  1.29it/s]Elaborazione:  15%|█▌        | 62/402 [00:49<04:25,  1.28it/s]Elaborazione:  16%|█▌        | 63/402 [00:49<04:24,  1.28it/s]Elaborazione:  16%|█▌        | 64/402 [00:50<04:23,  1.28it/s]Elaborazione:  16%|█▌        | 65/402 [00:51<04:22,  1.29it/s]Elaborazione:  16%|█▋        | 66/402 [00:52<04:21,  1.28it/s]Elaborazione:  17%|█▋        | 67/402 [00:53<04:20,  1.29it/s]Elaborazione:  17%|█▋        | 68/402 [00:53<04:20,  1.28it/s]Elaborazione:  17%|█▋        | 69/402 [00:54<04:22,  1.27it/s]Elaborazione:  17%|█▋        | 70/402 [00:55<04:20,  1.27it/s]Elaborazione:  18%|█▊        | 71/402 [00:56<04:19,  1.28it/s]Elaborazione:  18%|█▊        | 72/402 [00:57<04:22,  1.26it/s]Elaborazione:  18%|█▊        | 73/402 [00:57<04:19,  1.27it/s]Elaborazione:  18%|█▊        | 74/402 [00:58<04:17,  1.28it/s]Elaborazione:  19%|█▊        | 75/402 [00:59<04:15,  1.28it/s]Elaborazione:  19%|█▉        | 76/402 [01:00<04:13,  1.29it/s]Elaborazione:  19%|█▉        | 77/402 [01:00<04:08,  1.31it/s]Elaborazione:  19%|█▉        | 78/402 [01:01<04:05,  1.32it/s]Elaborazione:  20%|█▉        | 79/402 [01:02<04:02,  1.33it/s]Elaborazione:  20%|█▉        | 80/402 [01:03<04:04,  1.32it/s]Elaborazione:  20%|██        | 81/402 [01:03<04:01,  1.33it/s]Elaborazione:  20%|██        | 82/402 [01:04<03:59,  1.33it/s]Elaborazione:  21%|██        | 83/402 [01:05<04:00,  1.33it/s]Elaborazione:  21%|██        | 84/402 [01:06<04:00,  1.32it/s]Elaborazione:  21%|██        | 85/402 [01:06<03:59,  1.32it/s]Elaborazione:  21%|██▏       | 86/402 [01:07<03:57,  1.33it/s]Elaborazione:  22%|██▏       | 87/402 [01:08<03:57,  1.33it/s]Elaborazione:  22%|██▏       | 88/402 [01:09<03:55,  1.33it/s]Elaborazione:  22%|██▏       | 89/402 [01:09<03:56,  1.32it/s]Elaborazione:  22%|██▏       | 90/402 [01:10<03:55,  1.33it/s]Elaborazione:  23%|██▎       | 91/402 [01:11<03:53,  1.33it/s]Elaborazione:  23%|██▎       | 92/402 [01:12<03:54,  1.32it/s]Elaborazione:  23%|██▎       | 93/402 [01:12<03:53,  1.32it/s]Elaborazione:  23%|██▎       | 94/402 [01:13<03:53,  1.32it/s]Elaborazione:  24%|██▎       | 95/402 [01:14<03:52,  1.32it/s]Elaborazione:  24%|██▍       | 96/402 [01:15<03:52,  1.31it/s]Elaborazione:  24%|██▍       | 97/402 [01:15<03:51,  1.32it/s]Elaborazione:  24%|██▍       | 98/402 [01:16<03:49,  1.32it/s]Elaborazione:  25%|██▍       | 99/402 [01:17<03:52,  1.31it/s]Elaborazione:  25%|██▍       | 100/402 [01:18<03:48,  1.32it/s]Elaborazione:  25%|██▌       | 101/402 [01:18<03:48,  1.32it/s]Elaborazione:  25%|██▌       | 102/402 [01:19<03:49,  1.31it/s]Elaborazione:  26%|██▌       | 103/402 [01:20<03:47,  1.31it/s]Elaborazione:  26%|██▌       | 104/402 [01:21<03:45,  1.32it/s]Elaborazione:  26%|██▌       | 105/402 [01:22<03:44,  1.32it/s]Elaborazione:  26%|██▋       | 106/402 [01:22<03:44,  1.32it/s]Elaborazione:  27%|██▋       | 107/402 [01:23<03:45,  1.31it/s]Elaborazione:  27%|██▋       | 108/402 [01:24<03:42,  1.32it/s]Elaborazione:  27%|██▋       | 109/402 [01:25<03:43,  1.31it/s]Elaborazione:  27%|██▋       | 110/402 [01:25<03:41,  1.32it/s]Elaborazione:  28%|██▊       | 111/402 [01:26<03:40,  1.32it/s]Elaborazione:  28%|██▊       | 112/402 [01:27<03:42,  1.30it/s]Elaborazione:  28%|██▊       | 113/402 [01:28<03:42,  1.30it/s]Elaborazione:  28%|██▊       | 114/402 [01:28<03:42,  1.30it/s]Elaborazione:  29%|██▊       | 115/402 [01:29<03:36,  1.33it/s]Elaborazione:  29%|██▉       | 116/402 [01:30<03:30,  1.36it/s]Elaborazione:  29%|██▉       | 117/402 [01:31<03:26,  1.38it/s]Elaborazione:  29%|██▉       | 118/402 [01:31<03:23,  1.40it/s]Elaborazione:  30%|██▉       | 119/402 [01:32<03:21,  1.41it/s]Elaborazione:  30%|██▉       | 120/402 [01:33<03:19,  1.41it/s]Elaborazione:  30%|███       | 121/402 [01:33<03:20,  1.40it/s]Elaborazione:  30%|███       | 122/402 [01:34<03:19,  1.40it/s]Elaborazione:  31%|███       | 123/402 [01:35<03:17,  1.41it/s]Elaborazione:  31%|███       | 124/402 [01:35<03:15,  1.42it/s]Elaborazione:  31%|███       | 125/402 [01:36<03:16,  1.41it/s]Elaborazione:  31%|███▏      | 126/402 [01:37<03:13,  1.42it/s]Elaborazione:  32%|███▏      | 127/402 [01:38<03:12,  1.43it/s]Elaborazione:  32%|███▏      | 128/402 [01:38<03:11,  1.43it/s]Elaborazione:  32%|███▏      | 129/402 [01:39<03:09,  1.44it/s]Elaborazione:  32%|███▏      | 130/402 [01:40<03:08,  1.44it/s]Elaborazione:  33%|███▎      | 131/402 [01:40<03:07,  1.45it/s]Elaborazione:  33%|███▎      | 132/402 [01:41<03:07,  1.44it/s]Elaborazione:  33%|███▎      | 133/402 [01:42<03:07,  1.43it/s]Elaborazione:  33%|███▎      | 134/402 [01:42<03:06,  1.44it/s]Elaborazione:  34%|███▎      | 135/402 [01:43<03:07,  1.42it/s]Elaborazione:  34%|███▍      | 136/402 [01:44<03:06,  1.42it/s]Elaborazione:  34%|███▍      | 137/402 [01:45<03:06,  1.42it/s]Elaborazione:  34%|███▍      | 138/402 [01:45<03:06,  1.42it/s]Elaborazione:  35%|███▍      | 139/402 [01:46<03:07,  1.41it/s]Elaborazione:  35%|███▍      | 140/402 [01:47<03:06,  1.41it/s]Elaborazione:  35%|███▌      | 141/402 [01:47<03:05,  1.41it/s]Elaborazione:  35%|███▌      | 142/402 [01:48<03:04,  1.41it/s]Elaborazione:  36%|███▌      | 143/402 [01:49<03:02,  1.42it/s]Elaborazione:  36%|███▌      | 144/402 [01:49<03:01,  1.42it/s]Elaborazione:  36%|███▌      | 145/402 [01:50<02:59,  1.43it/s]Elaborazione:  36%|███▋      | 146/402 [01:51<02:58,  1.43it/s]Elaborazione:  37%|███▋      | 147/402 [01:52<02:57,  1.43it/s]Elaborazione:  37%|███▋      | 148/402 [01:52<02:58,  1.42it/s]Elaborazione:  37%|███▋      | 149/402 [01:53<02:57,  1.42it/s]Elaborazione:  37%|███▋      | 150/402 [01:54<02:58,  1.42it/s]Elaborazione:  38%|███▊      | 151/402 [01:54<02:57,  1.42it/s]Elaborazione:  38%|███▊      | 152/402 [01:55<02:56,  1.42it/s]Elaborazione:  38%|███▊      | 153/402 [01:56<03:02,  1.36it/s]Elaborazione:  38%|███▊      | 154/402 [01:57<03:07,  1.32it/s]Elaborazione:  39%|███▊      | 155/402 [01:58<03:11,  1.29it/s]Elaborazione:  39%|███▉      | 156/402 [01:58<03:10,  1.29it/s]Elaborazione:  39%|███▉      | 157/402 [01:59<03:09,  1.29it/s]Elaborazione:  39%|███▉      | 158/402 [02:00<03:08,  1.29it/s]Elaborazione:  40%|███▉      | 159/402 [02:01<03:07,  1.30it/s]Elaborazione:  40%|███▉      | 160/402 [02:01<03:06,  1.30it/s]Elaborazione:  40%|████      | 161/402 [02:02<03:05,  1.30it/s]Elaborazione:  40%|████      | 162/402 [02:03<03:05,  1.30it/s]Elaborazione:  41%|████      | 163/402 [02:04<03:03,  1.30it/s]Elaborazione:  41%|████      | 164/402 [02:04<03:03,  1.30it/s]Elaborazione:  41%|████      | 165/402 [02:05<03:05,  1.28it/s]Elaborazione:  41%|████▏     | 166/402 [02:06<03:04,  1.28it/s]Elaborazione:  42%|████▏     | 167/402 [02:07<03:02,  1.29it/s]Elaborazione:  42%|████▏     | 168/402 [02:08<03:01,  1.29it/s]Elaborazione:  42%|████▏     | 169/402 [02:08<03:01,  1.28it/s]Elaborazione:  42%|████▏     | 170/402 [02:09<03:02,  1.27it/s]Elaborazione:  43%|████▎     | 171/402 [02:10<03:00,  1.28it/s]Elaborazione:  43%|████▎     | 172/402 [02:11<02:59,  1.28it/s]Elaborazione:  43%|████▎     | 173/402 [02:12<02:58,  1.28it/s]Elaborazione:  43%|████▎     | 174/402 [02:12<02:57,  1.28it/s]Elaborazione:  44%|████▎     | 175/402 [02:13<02:58,  1.27it/s]Elaborazione:  44%|████▍     | 176/402 [02:14<02:57,  1.27it/s]Elaborazione:  44%|████▍     | 177/402 [02:15<02:57,  1.26it/s]Elaborazione:  44%|████▍     | 178/402 [02:15<02:56,  1.27it/s]Elaborazione:  45%|████▍     | 179/402 [02:16<02:55,  1.27it/s]Elaborazione:  45%|████▍     | 180/402 [02:17<02:55,  1.26it/s]Elaborazione:  45%|████▌     | 181/402 [02:18<02:54,  1.27it/s]Elaborazione:  45%|████▌     | 182/402 [02:19<02:54,  1.26it/s]Elaborazione:  46%|████▌     | 183/402 [02:19<02:54,  1.25it/s]Elaborazione:  46%|████▌     | 184/402 [02:20<02:54,  1.25it/s]Elaborazione:  46%|████▌     | 185/402 [02:21<02:51,  1.27it/s]Elaborazione:  46%|████▋     | 186/402 [02:22<02:50,  1.27it/s]Elaborazione:  47%|████▋     | 187/402 [02:23<02:49,  1.27it/s]Elaborazione:  47%|████▋     | 188/402 [02:23<02:47,  1.28it/s]Elaborazione:  47%|████▋     | 189/402 [02:24<02:46,  1.28it/s]Elaborazione:  47%|████▋     | 190/402 [02:25<02:49,  1.25it/s]Elaborazione:  48%|████▊     | 191/402 [02:26<02:46,  1.27it/s]Elaborazione:  48%|████▊     | 192/402 [02:27<02:44,  1.27it/s]Elaborazione:  48%|████▊     | 193/402 [02:27<02:44,  1.27it/s]Elaborazione:  48%|████▊     | 194/402 [02:28<02:44,  1.27it/s]Elaborazione:  49%|████▊     | 195/402 [02:29<02:42,  1.27it/s]Elaborazione:  49%|████▉     | 196/402 [02:30<02:40,  1.28it/s]Elaborazione:  49%|████▉     | 197/402 [02:30<02:38,  1.29it/s]Elaborazione:  49%|████▉     | 198/402 [02:31<02:37,  1.30it/s]Elaborazione:  50%|████▉     | 199/402 [02:32<02:35,  1.30it/s]Elaborazione:  50%|████▉     | 200/402 [02:33<02:37,  1.28it/s]Elaborazione:  50%|█████     | 201/402 [02:34<02:36,  1.28it/s]Elaborazione:  50%|█████     | 202/402 [02:34<02:36,  1.28it/s]Elaborazione:  50%|█████     | 203/402 [02:35<02:34,  1.29it/s]Elaborazione:  51%|█████     | 204/402 [02:36<02:33,  1.29it/s]Elaborazione:  51%|█████     | 205/402 [02:37<02:32,  1.29it/s]Elaborazione:  51%|█████     | 206/402 [02:37<02:31,  1.30it/s]Elaborazione:  51%|█████▏    | 207/402 [02:38<02:30,  1.30it/s]Elaborazione:  52%|█████▏    | 208/402 [02:39<02:29,  1.30it/s]Elaborazione:  52%|█████▏    | 209/402 [02:40<02:28,  1.30it/s]Elaborazione:  52%|█████▏    | 210/402 [02:40<02:27,  1.30it/s]Elaborazione:  52%|█████▏    | 211/402 [02:41<02:26,  1.31it/s]Elaborazione:  53%|█████▎    | 212/402 [02:42<02:25,  1.31it/s]Elaborazione:  53%|█████▎    | 213/402 [02:43<02:25,  1.30it/s]Elaborazione:  53%|█████▎    | 214/402 [02:44<02:26,  1.29it/s]Elaborazione:  53%|█████▎    | 215/402 [02:44<02:25,  1.28it/s]Elaborazione:  54%|█████▎    | 216/402 [02:45<02:24,  1.29it/s]Elaborazione:  54%|█████▍    | 217/402 [02:46<02:23,  1.29it/s]Elaborazione:  54%|█████▍    | 218/402 [02:47<02:23,  1.28it/s]Elaborazione:  54%|█████▍    | 219/402 [02:47<02:23,  1.27it/s]Elaborazione:  55%|█████▍    | 220/402 [02:48<02:22,  1.28it/s]Elaborazione:  55%|█████▍    | 221/402 [02:49<02:20,  1.29it/s]Elaborazione:  55%|█████▌    | 222/402 [02:50<02:19,  1.29it/s]Elaborazione:  55%|█████▌    | 223/402 [02:51<02:18,  1.29it/s]Elaborazione:  56%|█████▌    | 224/402 [02:51<02:17,  1.29it/s]Elaborazione:  56%|█████▌    | 225/402 [02:52<02:16,  1.30it/s]Elaborazione:  56%|█████▌    | 226/402 [02:53<02:16,  1.29it/s]Elaborazione:  56%|█████▋    | 227/402 [02:54<02:14,  1.30it/s]Elaborazione:  57%|█████▋    | 228/402 [02:54<02:14,  1.30it/s]Elaborazione:  57%|█████▋    | 229/402 [02:55<02:15,  1.27it/s]Elaborazione:  57%|█████▋    | 230/402 [02:56<02:15,  1.27it/s]Elaborazione:  57%|█████▋    | 231/402 [02:57<02:15,  1.26it/s]Elaborazione:  58%|█████▊    | 232/402 [02:58<02:15,  1.26it/s]Elaborazione:  58%|█████▊    | 233/402 [02:58<02:15,  1.25it/s]Elaborazione:  58%|█████▊    | 234/402 [02:59<02:13,  1.26it/s]Elaborazione:  58%|█████▊    | 235/402 [03:00<02:12,  1.26it/s]Elaborazione:  59%|█████▊    | 236/402 [03:01<02:11,  1.26it/s]Elaborazione:  59%|█████▉    | 237/402 [03:02<02:10,  1.26it/s]Elaborazione:  59%|█████▉    | 238/402 [03:02<02:10,  1.26it/s]Elaborazione:  59%|█████▉    | 239/402 [03:03<02:10,  1.25it/s]Elaborazione:  60%|█████▉    | 240/402 [03:04<02:09,  1.26it/s]Elaborazione:  60%|█████▉    | 241/402 [03:05<02:08,  1.25it/s]Elaborazione:  60%|██████    | 242/402 [03:06<02:07,  1.25it/s]Elaborazione:  60%|██████    | 243/402 [03:06<02:07,  1.25it/s]Elaborazione:  61%|██████    | 244/402 [03:07<02:07,  1.24it/s]Elaborazione:  61%|██████    | 245/402 [03:08<02:05,  1.25it/s]Elaborazione:  61%|██████    | 246/402 [03:09<02:06,  1.24it/s]Elaborazione:  61%|██████▏   | 247/402 [03:10<02:05,  1.23it/s]Elaborazione:  62%|██████▏   | 248/402 [03:10<02:03,  1.24it/s]Elaborazione:  62%|██████▏   | 249/402 [03:11<02:03,  1.24it/s]Elaborazione:  62%|██████▏   | 250/402 [03:12<02:03,  1.23it/s]Elaborazione:  62%|██████▏   | 251/402 [03:13<02:03,  1.22it/s]Elaborazione:  63%|██████▎   | 252/402 [03:14<02:02,  1.22it/s]Elaborazione:  63%|██████▎   | 253/402 [03:15<02:02,  1.22it/s]Elaborazione:  63%|██████▎   | 254/402 [03:15<02:02,  1.21it/s]Elaborazione:  63%|██████▎   | 255/402 [03:16<01:59,  1.23it/s]Elaborazione:  64%|██████▎   | 256/402 [03:17<01:58,  1.23it/s]Elaborazione:  64%|██████▍   | 257/402 [03:18<01:57,  1.23it/s]Elaborazione:  64%|██████▍   | 258/402 [03:19<01:56,  1.24it/s]Elaborazione:  64%|██████▍   | 259/402 [03:19<01:54,  1.24it/s]Elaborazione:  65%|██████▍   | 260/402 [03:20<01:55,  1.23it/s]Elaborazione:  65%|██████▍   | 261/402 [03:21<01:53,  1.24it/s]Elaborazione:  65%|██████▌   | 262/402 [03:22<01:53,  1.24it/s]Elaborazione:  65%|██████▌   | 263/402 [03:23<01:52,  1.24it/s]Elaborazione:  66%|██████▌   | 264/402 [03:23<01:51,  1.23it/s]Elaborazione:  66%|██████▌   | 265/402 [03:24<01:50,  1.24it/s]Elaborazione:  66%|██████▌   | 266/402 [03:25<01:49,  1.24it/s]Elaborazione:  66%|██████▋   | 267/402 [03:26<01:45,  1.28it/s]Elaborazione:  67%|██████▋   | 268/402 [03:27<01:42,  1.31it/s]Elaborazione:  67%|██████▋   | 269/402 [03:27<01:39,  1.33it/s]Elaborazione:  67%|██████▋   | 270/402 [03:28<01:39,  1.33it/s]Elaborazione:  67%|██████▋   | 271/402 [03:29<01:37,  1.34it/s]Elaborazione:  68%|██████▊   | 272/402 [03:29<01:35,  1.36it/s]Elaborazione:  68%|██████▊   | 273/402 [03:30<01:33,  1.37it/s]Elaborazione:  68%|██████▊   | 274/402 [03:31<01:33,  1.37it/s]Elaborazione:  68%|██████▊   | 275/402 [03:32<01:31,  1.38it/s]Elaborazione:  69%|██████▊   | 276/402 [03:32<01:30,  1.39it/s]Elaborazione:  69%|██████▉   | 277/402 [03:33<01:30,  1.39it/s]Elaborazione:  69%|██████▉   | 278/402 [03:34<01:29,  1.39it/s]Elaborazione:  69%|██████▉   | 279/402 [03:34<01:29,  1.38it/s]Elaborazione:  70%|██████▉   | 280/402 [03:35<01:28,  1.38it/s]Elaborazione:  70%|██████▉   | 281/402 [03:36<01:27,  1.39it/s]Elaborazione:  70%|███████   | 282/402 [03:37<01:26,  1.39it/s]Elaborazione:  70%|███████   | 283/402 [03:37<01:25,  1.39it/s]Elaborazione:  71%|███████   | 284/402 [03:38<01:25,  1.38it/s]Elaborazione:  71%|███████   | 285/402 [03:39<01:24,  1.38it/s]Elaborazione:  71%|███████   | 286/402 [03:39<01:23,  1.39it/s]Elaborazione:  71%|███████▏  | 287/402 [03:40<01:22,  1.39it/s]Elaborazione:  72%|███████▏  | 288/402 [03:41<01:21,  1.40it/s]Elaborazione:  72%|███████▏  | 289/402 [03:42<01:20,  1.40it/s]Elaborazione:  72%|███████▏  | 290/402 [03:42<01:20,  1.39it/s]Elaborazione:  72%|███████▏  | 291/402 [03:43<01:19,  1.39it/s]Elaborazione:  73%|███████▎  | 292/402 [03:44<01:19,  1.38it/s]Elaborazione:  73%|███████▎  | 293/402 [03:45<01:19,  1.38it/s]Elaborazione:  73%|███████▎  | 294/402 [03:45<01:18,  1.38it/s]Elaborazione:  73%|███████▎  | 295/402 [03:46<01:17,  1.38it/s]Elaborazione:  74%|███████▎  | 296/402 [03:47<01:16,  1.38it/s]Elaborazione:  74%|███████▍  | 297/402 [03:47<01:15,  1.39it/s]Elaborazione:  74%|███████▍  | 298/402 [03:48<01:15,  1.38it/s]Elaborazione:  74%|███████▍  | 299/402 [03:49<01:14,  1.39it/s]Elaborazione:  75%|███████▍  | 300/402 [03:50<01:14,  1.37it/s]Elaborazione:  75%|███████▍  | 301/402 [03:50<01:13,  1.38it/s]Elaborazione:  75%|███████▌  | 302/402 [03:51<01:12,  1.38it/s]Elaborazione:  75%|███████▌  | 303/402 [03:52<01:11,  1.38it/s]Elaborazione:  76%|███████▌  | 304/402 [03:53<01:11,  1.37it/s]Elaborazione:  76%|███████▌  | 305/402 [03:53<01:10,  1.37it/s]Elaborazione:  76%|███████▌  | 306/402 [03:54<01:10,  1.36it/s]Elaborazione:  76%|███████▋  | 307/402 [03:55<01:09,  1.37it/s]Elaborazione:  77%|███████▋  | 308/402 [03:55<01:08,  1.37it/s]Elaborazione:  77%|███████▋  | 309/402 [03:56<01:07,  1.38it/s]Elaborazione:  77%|███████▋  | 310/402 [03:57<01:06,  1.37it/s]Elaborazione:  77%|███████▋  | 311/402 [03:58<01:06,  1.38it/s]Elaborazione:  78%|███████▊  | 312/402 [03:58<01:05,  1.38it/s]Elaborazione:  78%|███████▊  | 313/402 [03:59<01:04,  1.38it/s]Elaborazione:  78%|███████▊  | 314/402 [04:00<01:03,  1.39it/s]Elaborazione:  78%|███████▊  | 315/402 [04:00<01:02,  1.40it/s]Elaborazione:  79%|███████▊  | 316/402 [04:01<01:01,  1.40it/s]Elaborazione:  79%|███████▉  | 317/402 [04:02<01:00,  1.40it/s]Elaborazione:  79%|███████▉  | 318/402 [04:03<00:59,  1.40it/s]Elaborazione:  79%|███████▉  | 319/402 [04:03<00:59,  1.39it/s]Elaborazione:  80%|███████▉  | 320/402 [04:04<00:58,  1.40it/s]Elaborazione:  80%|███████▉  | 321/402 [04:05<00:57,  1.40it/s]Elaborazione:  80%|████████  | 322/402 [04:06<00:58,  1.38it/s]Elaborazione:  80%|████████  | 323/402 [04:06<00:57,  1.38it/s]Elaborazione:  81%|████████  | 324/402 [04:07<00:56,  1.38it/s]Elaborazione:  81%|████████  | 325/402 [04:08<00:55,  1.38it/s]Elaborazione:  81%|████████  | 326/402 [04:08<00:54,  1.39it/s]Elaborazione:  81%|████████▏ | 327/402 [04:09<00:54,  1.37it/s]Elaborazione:  82%|████████▏ | 328/402 [04:10<00:53,  1.37it/s]Elaborazione:  82%|████████▏ | 329/402 [04:11<00:55,  1.33it/s]Elaborazione:  82%|████████▏ | 330/402 [04:11<00:53,  1.34it/s]Elaborazione:  82%|████████▏ | 331/402 [04:12<00:52,  1.35it/s]Elaborazione:  83%|████████▎ | 332/402 [04:13<00:51,  1.36it/s]Elaborazione:  83%|████████▎ | 333/402 [04:14<00:50,  1.37it/s]Elaborazione:  83%|████████▎ | 334/402 [04:14<00:49,  1.37it/s]Elaborazione:  83%|████████▎ | 335/402 [04:15<00:48,  1.38it/s]Elaborazione:  84%|████████▎ | 336/402 [04:16<00:48,  1.37it/s]Elaborazione:  84%|████████▍ | 337/402 [04:17<00:47,  1.36it/s]Elaborazione:  84%|████████▍ | 338/402 [04:17<00:46,  1.36it/s]Elaborazione:  84%|████████▍ | 339/402 [04:18<00:46,  1.36it/s]Elaborazione:  85%|████████▍ | 340/402 [04:19<00:46,  1.33it/s]Elaborazione:  85%|████████▍ | 341/402 [04:20<00:45,  1.34it/s]Elaborazione:  85%|████████▌ | 342/402 [04:20<00:44,  1.35it/s]Elaborazione:  85%|████████▌ | 343/402 [04:21<00:43,  1.36it/s]Elaborazione:  86%|████████▌ | 344/402 [04:22<00:42,  1.36it/s]Elaborazione:  86%|████████▌ | 345/402 [04:22<00:41,  1.36it/s]Elaborazione:  86%|████████▌ | 346/402 [04:23<00:41,  1.36it/s]Elaborazione:  86%|████████▋ | 347/402 [04:24<00:40,  1.37it/s]Elaborazione:  87%|████████▋ | 348/402 [04:25<00:39,  1.37it/s]Elaborazione:  87%|████████▋ | 349/402 [04:25<00:38,  1.37it/s]Elaborazione:  87%|████████▋ | 350/402 [04:26<00:38,  1.36it/s]Elaborazione:  87%|████████▋ | 351/402 [04:27<00:38,  1.32it/s]Elaborazione:  88%|████████▊ | 352/402 [04:28<00:37,  1.33it/s]Elaborazione:  88%|████████▊ | 353/402 [04:28<00:36,  1.35it/s]Elaborazione:  88%|████████▊ | 354/402 [04:29<00:35,  1.35it/s]Elaborazione:  88%|████████▊ | 355/402 [04:30<00:34,  1.36it/s]Elaborazione:  89%|████████▊ | 356/402 [04:31<00:33,  1.37it/s]Elaborazione:  89%|████████▉ | 357/402 [04:31<00:32,  1.37it/s]Elaborazione:  89%|████████▉ | 358/402 [04:32<00:32,  1.37it/s]Elaborazione:  89%|████████▉ | 359/402 [04:33<00:31,  1.37it/s]Elaborazione:  90%|████████▉ | 360/402 [04:33<00:30,  1.37it/s]Elaborazione:  90%|████████▉ | 361/402 [04:34<00:29,  1.37it/s]Elaborazione:  90%|█████████ | 362/402 [04:35<00:29,  1.38it/s]Elaborazione:  90%|█████████ | 363/402 [04:36<00:28,  1.39it/s]Elaborazione:  91%|█████████ | 364/402 [04:36<00:27,  1.38it/s]Elaborazione:  91%|█████████ | 365/402 [04:37<00:26,  1.38it/s]Elaborazione:  91%|█████████ | 366/402 [04:38<00:26,  1.38it/s]Elaborazione:  91%|█████████▏| 367/402 [04:38<00:25,  1.39it/s]Elaborazione:  92%|█████████▏| 368/402 [04:39<00:24,  1.38it/s]Elaborazione:  92%|█████████▏| 369/402 [04:40<00:23,  1.41it/s]Elaborazione:  92%|█████████▏| 370/402 [04:41<00:22,  1.42it/s]Elaborazione:  92%|█████████▏| 371/402 [04:41<00:21,  1.44it/s]Elaborazione:  93%|█████████▎| 372/402 [04:42<00:20,  1.44it/s]Elaborazione:  93%|█████████▎| 373/402 [04:43<00:20,  1.44it/s]Elaborazione:  93%|█████████▎| 374/402 [04:43<00:19,  1.45it/s]Elaborazione:  93%|█████████▎| 375/402 [04:44<00:18,  1.43it/s]Elaborazione:  94%|█████████▎| 376/402 [04:45<00:18,  1.44it/s]Elaborazione:  94%|█████████▍| 377/402 [04:45<00:17,  1.43it/s]Elaborazione:  94%|█████████▍| 378/402 [04:46<00:16,  1.44it/s]Elaborazione:  94%|█████████▍| 379/402 [04:47<00:16,  1.44it/s]Elaborazione:  95%|█████████▍| 380/402 [04:48<00:15,  1.44it/s]Elaborazione:  95%|█████████▍| 381/402 [04:48<00:14,  1.44it/s]Elaborazione:  95%|█████████▌| 382/402 [04:49<00:13,  1.44it/s]Elaborazione:  95%|█████████▌| 383/402 [04:50<00:13,  1.43it/s]Elaborazione:  96%|█████████▌| 384/402 [04:50<00:12,  1.43it/s]Elaborazione:  96%|█████████▌| 385/402 [04:51<00:11,  1.44it/s]Elaborazione:  96%|█████████▌| 386/402 [04:52<00:11,  1.45it/s]Elaborazione:  96%|█████████▋| 387/402 [04:52<00:10,  1.45it/s]Elaborazione:  97%|█████████▋| 388/402 [04:53<00:09,  1.44it/s]Elaborazione:  97%|█████████▋| 389/402 [04:54<00:09,  1.44it/s]Elaborazione:  97%|█████████▋| 390/402 [04:54<00:08,  1.43it/s]Elaborazione:  97%|█████████▋| 391/402 [04:55<00:07,  1.44it/s]Elaborazione:  98%|█████████▊| 392/402 [04:56<00:06,  1.44it/s]Elaborazione:  98%|█████████▊| 393/402 [04:57<00:06,  1.42it/s]Elaborazione:  98%|█████████▊| 394/402 [04:57<00:05,  1.44it/s]Elaborazione:  98%|█████████▊| 395/402 [04:58<00:04,  1.43it/s]Elaborazione:  99%|█████████▊| 396/402 [04:59<00:04,  1.45it/s]Elaborazione:  99%|█████████▉| 397/402 [04:59<00:03,  1.46it/s]Elaborazione:  99%|█████████▉| 398/402 [05:00<00:02,  1.46it/s]Elaborazione:  99%|█████████▉| 399/402 [05:01<00:02,  1.47it/s]Elaborazione: 100%|█████████▉| 400/402 [05:01<00:01,  1.48it/s]Elaborazione: 100%|█████████▉| 401/402 [05:02<00:00,  1.47it/s]Elaborazione: 100%|██████████| 402/402 [05:03<00:00,  1.47it/s]Elaborazione: 100%|██████████| 402/402 [05:03<00:00,  1.33it/s]
+ config.py eseguito da: C:\Progetti\simulatore-calcio-backend\config.py
+ Directory corrente: C:\Progetti\simulatore-calcio-backend
+ Python path: ['C:\\Progetti\\simulatore-calcio-backend\\ai_engine\\Aggiornamenti\\frequenti', 'C:\\Users\\lollo\\AppData\\Local\\Programs\\Python\\Python313\\python313.zip', 'C:\\Users\\lollo\\AppData\\Local\\Programs\\Python\\Python313\\DLLs']
+ BASE_DIR: C:\Progetti\simulatore-calcio-backend
+ ENV_PATH: C:\Progetti\simulatore-calcio-backend\.env
+ .env trovato in: C:\Progetti\simulatore-calcio-backend\.env
+ Connessione MongoDB...
+ Connesso a MongoDB: football_simulator_db
+ Database: football_simulator_db
+    teams: 212 documenti
+    matches_history: 1714 documenti
+    raw_h2h_data_v2: 1933 documenti
+    h2h_by_round: 402 documenti
+ Configurazione completata con successo
 Traceback (most recent call last):
   File "C:\Progetti\simulatore-calcio-backend\ai_engine\Aggiornamenti\frequenti\scraper_fixtures.py", line 18, in <module>
     import cloudscraper
@@ -313,17 +346,20 @@ Traceback (most recent call last):
   File "C:\Progetti\simulatore-calcio-backend\ai_engine\Aggiornamenti\frequenti\scraper_odds_oddsmath.py", line 3, in <module>
     import cloudscraper
 ModuleNotFoundError: No module named 'cloudscraper'
-🔧 BASE_DIR: C:\Progetti\simulatore-calcio-backend
-🔧 ENV_PATH: C:\Progetti\simulatore-calcio-backend\.env
-✅ .env trovato in: C:\Progetti\simulatore-calcio-backend\.env
-🔗 Connessione MongoDB...
-✅ Connesso a MongoDB: football_simulator_db
-📊 Database: football_simulator_db
-   📦 teams: 212 documenti
-   📦 matches_history: 1707 documenti
-   📦 raw_h2h_data_v2: 1933 documenti
-   📦 h2h_by_round: 402 documenti
-✅ Configurazione completata con successo
+ config.py eseguito da: C:\Progetti\simulatore-calcio-backend\config.py
+ Directory corrente: C:\Progetti\simulatore-calcio-backend
+ Python path: ['C:\\Progetti\\simulatore-calcio-backend', 'C:\\Progetti\\simulatore-calcio-backend\\ai_engine', 'C:\\Progetti\\simulatore-calcio-backend\\ai_engine\\Aggiornamenti\\frequenti']
+ BASE_DIR: C:\Progetti\simulatore-calcio-backend
+ ENV_PATH: C:\Progetti\simulatore-calcio-backend\.env
+ .env trovato in: C:\Progetti\simulatore-calcio-backend\.env
+ Connessione MongoDB...
+ Connesso a MongoDB: football_simulator_db
+ Database: football_simulator_db
+    teams: 212 documenti
+    matches_history: 1714 documenti
+    raw_h2h_data_v2: 1933 documenti
+    h2h_by_round: 402 documenti
+ Configurazione completata con successo
 ✅ DB Connesso: football_simulator_db
 
 🚀 AVVIO SCRAPER (LOGICA STRICT: Aggiorna se diverse o scadute)
@@ -362,17 +398,20 @@ ModuleNotFoundError: No module named 'cloudscraper'
    🔄 Liga Portugal G.16... (Nessuna variazione)
 
 🏁 FINE. Totale Aggiornati: 192
-🔧 BASE_DIR: C:\Progetti\simulatore-calcio-backend
-🔧 ENV_PATH: C:\Progetti\simulatore-calcio-backend\.env
-✅ .env trovato in: C:\Progetti\simulatore-calcio-backend\.env
-🔗 Connessione MongoDB...
-✅ Connesso a MongoDB: football_simulator_db
-📊 Database: football_simulator_db
-   📦 teams: 212 documenti
-   📦 matches_history: 1707 documenti
-   📦 raw_h2h_data_v2: 1933 documenti
-   📦 h2h_by_round: 402 documenti
-✅ Configurazione completata con successo
+ config.py eseguito da: C:\Progetti\simulatore-calcio-backend\config.py
+ Directory corrente: C:\Progetti\simulatore-calcio-backend
+ Python path: ['C:\\Progetti\\simulatore-calcio-backend', 'C:\\Progetti\\simulatore-calcio-backend\\ai_engine', 'C:\\Progetti\\simulatore-calcio-backend\\ai_engine\\Aggiornamenti\\frequenti']
+ BASE_DIR: C:\Progetti\simulatore-calcio-backend
+ ENV_PATH: C:\Progetti\simulatore-calcio-backend\.env
+ .env trovato in: C:\Progetti\simulatore-calcio-backend\.env
+ Connessione MongoDB...
+ Connesso a MongoDB: football_simulator_db
+ Database: football_simulator_db
+    teams: 212 documenti
+    matches_history: 1714 documenti
+    raw_h2h_data_v2: 1933 documenti
+    h2h_by_round: 402 documenti
+ Configurazione completata con successo
 ✅ DB Connesso: football_simulator_db
 
 🚀 AVVIO SCRAPER QUOTE CALCIO
@@ -425,9 +464,9 @@ Pisa[18]
       🔍 Righe trovate sul sito: 10
       📄 Esempio prima riga: 17 19-12
 20:30 Bari[14]
--
+1-2
 Catanzaro[7]
-2.70 3.20 2.45   ...
+2.70 3.20 2.45    0-1...
 ✓✓✓✓✓✓✓✓✓✓ (10/10)
 
    ⚙️ Giornata 16
@@ -446,7 +485,9 @@ Sampdoria[19]
       📊 10 partite da processare
       🔍 Righe trovate sul sito: 10
       📄 Esempio prima riga: 18 26-12
-17:15 Modena - Monza...
+17:15 Modena[6]
+-
+Monza[2]   ...
 ⏳⏳⏳⏳⏳⏳⏳⏳⏳⏳ (0/10)
       ⏳ 10 partite trovate ma senza quote (normali per partite future)
    📈 Totale lega: 20/30
@@ -533,9 +574,9 @@ US Pianese[8]
       🔍 Righe trovate sul sito: 10
       📄 Esempio prima riga: 19 19-12
 20:30 Audace Cerignola[9]
--
+0-4
 Benevento[1]
-3.60 3.10 1.95   ...
+3.60 3.10 1.95    0-3...
 ✓✓✓✓✓✓✓✓✓✓ (10/10)
 
    ⚙️ Giornata 18
@@ -586,8 +627,16 @@ Everton[7]
 ✓✓✓✓✓✓✓✓✓✓ (10/10)
 
    ⚙️ Giornata 18
-      ⚠️ Click non riuscito: sulla giornata 16 invece di 18
-   📈 Totale lega: 20/20
+      ✓ Confermata giornata 18
+      📊 10 partite da processare
+      🔍 Righe trovate sul sito: 10
+      📄 Esempio prima riga: 18 26-12
+21:00 Manchester United[6]
+-
+Newcastle United[12]
+2.15 3.50 3.00   ...
+✓✓✓✓✓✓✓✓✓✓ (10/10)
+   📈 Totale lega: 30/30
 
 📋 La Liga
 ----------------------------------------
@@ -599,9 +648,9 @@ Everton[7]
       🔍 Righe trovate sul sito: 10
       📄 Esempio prima riga: 17 19-12
 21:00 Valencia[17]
--
+1-1
 Mallorca[14]
-1.95 3.20 4.10   ...
+1.95 3.20 4.10    0-1...
 ✓✓✓✓✓✓✓✓✓✓ (10/10)
 
    ⚙️ Giornata 16
@@ -635,9 +684,9 @@ Girona[18]
       🔍 Righe trovate sul sito: 9
       📄 Esempio prima riga: 15 19-12
 20:30 Borussia Dortmund[3]
--
+2-0
 Borussia Monchengladbach[11]
-1.48 4.50 5.7...
+1.48 4.50 5...
 ✓✓✓✓✓✓✓✓✓ (9/9)
 
    ⚙️ Giornata 14
@@ -711,25 +760,14 @@ SC Heerenveen[9]
 ✓✓✓✓✓✓✓✓✓ (9/9)
 
    ⚙️ Giornata 16
-      ✓ Confermata giornata 16
-      📊 9 partite da processare
-      🔍 Righe trovate sul sito: 9
-      📄 Esempio prima riga: 16 13-12
-16:30 SC Telstar[18]
-2-2
-NEC Nijmegen[3]
-4.20 4.10 1.70    1-1...
-✓✓✓✓✓✓✓✓✓ (9/9)
+      ⚠️ Click non riuscito: sulla giornata 17 invece di 16
 
    ⚙️ Giornata 18
       ✓ Confermata giornata 18
       📊 9 partite da processare
-      🔍 Righe trovate sul sito: 9
-      📄 Esempio prima riga: 18 09-01
-20:00 NEC Nijmegen - FC Utrecht
-2.10 3.60 3.10...
-✓✓✓✓✓✓✓✓✓ (9/9)
-   📈 Totale lega: 27/27
+      🔍 Righe trovate sul sito: 0
+      ⚠️ Nessuna riga trovata sul sito
+   📈 Totale lega: 9/9
 
 📋 Liga Portugal
 ----------------------------------------
@@ -741,9 +779,9 @@ NEC Nijmegen[3]
       🔍 Righe trovate sul sito: 9
       📄 Esempio prima riga: 15 19-12
 21:15 Estoril[13]
--
+1-0
 Sporting Braga[4]
-5.00 3.80 1.61   ...
+5.00 3.80 1.61    1-0...
 ✓✓✓✓✓✓✓✓✓ (9/9)
 
    ⚙️ Giornata 14
@@ -770,29 +808,32 @@ Gil Vicente[4]
 ================================================================================
 📊 RIEPILOGO FINALE
 ================================================================================
-🎯 Partite totali: 305
-✅ Partite aggiornate: 244
+🎯 Partite totali: 297
+✅ Partite aggiornate: 236
 ❌ Partite non aggiornate: 61
-📈 Successo: 80.0%
+📈 Successo: 79.5%
 
 📋 DETTAGLIO PARTITE NON AGGIORNATE:
    ⏳ 61 partite trovate ma senza quote disponibili
       → Normale per partite future, riprova più tardi
 
 📄 Report salvato in:
-   • scraper_reports\report_20251219_041626.json
-   • scraper_reports\report_20251219_041626.txt
-🔧 BASE_DIR: C:\Progetti\simulatore-calcio-backend
-🔧 ENV_PATH: C:\Progetti\simulatore-calcio-backend\.env
-✅ .env trovato in: C:\Progetti\simulatore-calcio-backend\.env
-🔗 Connessione MongoDB...
-✅ Connesso a MongoDB: football_simulator_db
-📊 Database: football_simulator_db
-   📦 teams: 212 documenti
-   📦 matches_history: 1707 documenti
-   📦 raw_h2h_data_v2: 1933 documenti
-   📦 h2h_by_round: 402 documenti
-✅ Configurazione completata con successo
+   • scraper_reports\report_20251220_041629.json
+   • scraper_reports\report_20251220_041629.txt
+ config.py eseguito da: C:\Progetti\simulatore-calcio-backend\config.py
+ Directory corrente: C:\Progetti\simulatore-calcio-backend
+ Python path: ['C:\\Progetti\\simulatore-calcio-backend', 'C:\\Progetti\\simulatore-calcio-backend\\ai_engine', 'C:\\Progetti\\simulatore-calcio-backend\\ai_engine\\Aggiornamenti\\frequenti']
+ BASE_DIR: C:\Progetti\simulatore-calcio-backend
+ ENV_PATH: C:\Progetti\simulatore-calcio-backend\.env
+ .env trovato in: C:\Progetti\simulatore-calcio-backend\.env
+ Connessione MongoDB...
+ Connesso a MongoDB: football_simulator_db
+ Database: football_simulator_db
+    teams: 212 documenti
+    matches_history: 1714 documenti
+    raw_h2h_data_v2: 1933 documenti
+    h2h_by_round: 402 documenti
+ Configurazione completata con successo
 ✅ DB Connesso: football_simulator_db
 
 🚀 AGGIORNAMENTO AUTOMATICO – TUTTI I CAMPIONATI
@@ -832,15 +873,15 @@ Gil Vicente[4]
 
 ----------------------------------------------------------------------
 ▶ 🔥 [2/13] Lucifero & Serie C (BetExplorer)
-   ✅ COMPLETATO in 159.36s
+   ✅ COMPLETATO in 161.38s
 
 ----------------------------------------------------------------------
 ▶ 💰 [3/13] Quote Storiche
-   ✅ COMPLETATO in 107.72s
+   ✅ COMPLETATO in 112.28s
 
 ----------------------------------------------------------------------
 ▶ 🏆 [4/13] Classifica & Gol
-   ✅ COMPLETATO in 15.00s
+   ✅ COMPLETATO in 16.05s
 
 ----------------------------------------------------------------------
 ▶ ⚽ [5/13] Stats Attaccanti
@@ -864,11 +905,11 @@ Gil Vicente[4]
 
 ----------------------------------------------------------------------
 ▶ 📅 [10/13] Calendario H2H
-   ✅ COMPLETATO in 77.40s
+   ✅ COMPLETATO in 78.29s
 
 ----------------------------------------------------------------------
 ▶ 🧠 [11/13] Elaborazione H2H Pro
-   ✅ COMPLETATO in 313.96s
+   ✅ COMPLETATO in 304.94s
 
 ----------------------------------------------------------------------
 ▶ 📆 [12/13] Partite Future
@@ -880,38 +921,38 @@ Gil Vicente[4]
 
 ----------------------------------------------------------------------
 ▶ 🚀 [14/14] Quote H2H Arricchite (NowGoal)
-   ✅ COMPLETATO in 177.71s
+   ✅ COMPLETATO in 179.27s
 
 ----------------------------------------------------------------------
 ▶ 🚀 [14/14] Fix Quote H2H Debug (NowGoal)
-   ✅ COMPLETATO in 111.89s
+   ✅ COMPLETATO in 113.82s
 
 ----------------------------------------------------------------------
 ▶ 🔄 [15/15] Aggiorna Solo Risultati (Debug)
-   ✅ COMPLETATO in 27.38s
+   ✅ COMPLETATO in 30.96s
 
 
 ====================================================================================================
-📊 REPORT AGGIORNAMENTO - DURATA TOTALE: 0:16:55
+📊 REPORT AGGIORNAMENTO - DURATA TOTALE: 0:17:02
 ====================================================================================================
 STATO  | DURATA     | FILE (Script)                       | IMPATTO (Se fallisce)
 ----------------------------------------------------------------------------------------------------
 ❌ KO   | 0.2s       | scraper_results_fbref.py            | Mancano risultati recenti e xG
-✅ OK   | 159.4s     | scrape_lucifero_betexplorer_safe.py | Il Lucifero non funziona senza questo
-✅ OK   | 107.7s     | scraper_quote_storiche_betexplorer.py | Calcolo Affidabilità/BVS impossibile
-✅ OK   | 15.0s      | scraper_soccerstats_ranking_unified.py | Calcolo Forza Attacco/Difesa sballato
-❌ KO   | 1.4s       | fbref_scraper_att.py                | Analisi attacco imprecisa
-❌ KO   | 1.4s       | fbref_scraper_mid.py                | Analisi centrocampo imprecisa
+✅ OK   | 161.4s     | scrape_lucifero_betexplorer_safe.py | Il Lucifero non funziona senza questo
+✅ OK   | 112.3s     | scraper_quote_storiche_betexplorer.py | Calcolo Affidabilità/BVS impossibile
+✅ OK   | 16.1s      | scraper_soccerstats_ranking_unified.py | Calcolo Forza Attacco/Difesa sballato
+❌ KO   | 1.5s       | fbref_scraper_att.py                | Analisi attacco imprecisa
+❌ KO   | 1.5s       | fbref_scraper_mid.py                | Analisi centrocampo imprecisa
 ❌ KO   | 1.5s       | fbref_scraper_def.py                | Analisi difesa imprecisa
-❌ KO   | 1.4s       | scraper_gk_fbref.py                 | Analisi portieri imprecisa
-❌ KO   | 1.4s       | scraper_tm_multi_campionato.py      | Si rischia di puntare su assenti
-✅ OK   | 77.4s      | scraper_calendario_h2h_TF_completo.py | Analisi scontri diretti incompleta
-✅ OK   | 314.0s     | calculate_h2h_v2.py                 | Mancano medie gol e punteggi storici
-❌ KO   | 1.4s       | scraper_fixtures.py                 | Il motore non saprà cosa simulare
+❌ KO   | 1.5s       | scraper_gk_fbref.py                 | Analisi portieri imprecisa
+❌ KO   | 1.5s       | scraper_tm_multi_campionato.py      | Si rischia di puntare su assenti
+✅ OK   | 78.3s      | scraper_calendario_h2h_TF_completo.py | Analisi scontri diretti incompleta
+✅ OK   | 304.9s     | calculate_h2h_v2.py                 | Mancano medie gol e punteggi storici
+❌ KO   | 1.5s       | scraper_fixtures.py                 | Il motore non saprà cosa simulare
 ❌ KO   | 0.1s       | scraper_odds_oddsmath.py            | Manca confronto con bookmaker
-✅ OK   | 177.7s     | nowgoal_scraper.py                  | Mancano le quote precise nel CSV
-✅ OK   | 111.9s     | debug_nowgoal_scraper.py            | Mancano le quote precise nel CSV
-✅ OK   | 27.4s      | per_agg_pianificato_update_results_only.py | Aggiorna solo i risultati senza toccare altro
+✅ OK   | 179.3s     | nowgoal_scraper.py                  | Mancano le quote precise nel CSV
+✅ OK   | 113.8s     | debug_nowgoal_scraper.py            | Mancano le quote precise nel CSV
+✅ OK   | 31.0s      | per_agg_pianificato_update_results_only.py | Aggiorna solo i risultati senza toccare altro
 
 ==========================================================================================
 ⚠️  ANALISI FALLIMENTI & SOLUZIONI
@@ -970,5 +1011,5 @@ STATO  | DURATA     | FILE (Script)                       | IMPATTO (Se fallisce
 
  
 ========================================== 
-FINE AGGIORNAMENTO: 19/12/2025  4:16:58,68 
+FINE AGGIORNAMENTO: 20/12/2025  4:17:05,24 
 ========================================== 

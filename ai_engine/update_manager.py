@@ -57,6 +57,9 @@ SCRAPER_SEQUENCE = [
       
       # ⭐ NUOVO SCRIPT DI DEBUG PER AGGIORNARE SOLO I RISULTATI
       ("per_agg_pianificato_update_results_only.py", "🔄 [15/15] Aggiorna Solo Risultati (Debug)", "Aggiorna solo i risultati senza toccare altro", FREQUENT_DIR),
+      
+      # NUOVO SCRIPT DI DEBUG PER AGGIORNARE SOLO IL LUCIFERO
+      ("cron_update_lucifero.py", "🔥 [16/16] Aggiorna Solo Lucifero (Debug)", "Aggiorna solo il punteggio Lucifero", FREQUENT_DIR),
 ]
 
 
