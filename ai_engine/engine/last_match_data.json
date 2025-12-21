@@ -1,31 +1,55 @@
 {
-    "MATCH": "Pisa vs Juventus",
+    "MATCH": "Alav\u00e9s vs Real Madrid",
     "CASA": {
-        "Squadra": "Pisa",
-        "Modulo": "4-3-3",
-        "Rating": "17.53/25",
+        "Squadra": "Alaves",
+        "Modulo": "4-2-3-1",
+        "Rating": "17.71/25",
         "1_TITOLARI": [
-            "GK - Adrian \u0160emper (6.7)",
-            "DIF - Simone Canestrelli (6.9)",
-            "DIF - Antonio Caracciolo (7.7)",
-            "DIF - Idrissa Tour\u00e9 (7.3)",
-            "DIF - Mehdi L\u00e9ris (8.3)",
-            "MID - Michel Aebischer (6.7)",
-            "MID - Ebenezer Akinsanmiro (7.1)",
-            "MID - Marius Marin (5.8)",
-            "ATT - M'Bala Nzola (5.9)",
-            "ATT - Henrik Meister (5.1)",
-            "ATT - Matt\u00e9o Tramoni (4.9)"
+            "GK - Antonio Sivera (6.7)",
+            "DIF - Jonny Castro (7.7)",
+            "DIF - Nahuel Tenaglia (7.1)",
+            "DIF - Jon Pacheco (7.8)",
+            "DIF - Victor Parada (5.9)",
+            "MID - Antonio Blanco (7.0)",
+            "MID - Pablo Ib\u00e1\u00f1ez (6.4)",
+            "MID - Denis Su\u00e1rez (6.8)",
+            "MID - Abde Rebbach (5.5)",
+            "MID - Calebe (7.2)",
+            "ATT - Toni Mart\u00ednez (5.5)"
         ],
         "2_PANCHINA": [
-            "GK - Simone Scuffet (5.4)",
-            "DIF - Samuele Angori (6.5)",
-            "DIF - Arturo Calabresi (6.2)",
-            "MID - \u0130sak Vural (5.8)",
-            "MID - Gabriele Piccinini (5.3)",
-            "ATT - Stefano Moreo (5.9)",
-            "ATT - Louis Buffon (4.8)"
+            "DIF - Youssef Lekhedim (6.7)",
+            "DIF - Facundo Garc\u00e9s (7.1)",
+            "MID - Ander Guevara (6.3)",
+            "MID - Carlos Benav\u00eddez (5.5)",
+            "ATT - Lucas Boy\u00e9 (6.2)",
+            "ATT - Carlos Vicente (6.6)"
         ]
     },
-    "OSPITE": "N/A"
+    "OSPITE": {
+        "Squadra": "Real Madrid",
+        "Modulo": "3-4-3",
+        "Rating": "19.08/25",
+        "1_TITOLARI": [
+            "GK - Thibaut Courtois (6.5)",
+            "DIF - \u00c1lvaro Carreras (6.9)",
+            "DIF - \u00c9der Milit\u00e3o (7.5)",
+            "DIF - Dean Huijsen (7.0)",
+            "MID - Federico Valverde (8.0)",
+            "MID - Aur\u00e9lien Tchouam\u00e9ni (7.3)",
+            "MID - Arda G\u00fcler (8.0)",
+            "MID - Jude Bellingham (8.9)",
+            "ATT - Kylian Mbapp\u00e9 (9.2)",
+            "ATT - Vinicius J\u00fanior (7.4)",
+            "ATT - Arda G\u00fcler (6.9)"
+        ],
+        "2_PANCHINA": [
+            "DIF - Ra\u00fal Asencio (6.4)",
+            "DIF - Antonio R\u00fcdiger (6.6)",
+            "MID - Eduardo Camavinga (7.8)",
+            "MID - Dani Ceballos (7.3)",
+            "ATT - Franco Mastantuono (6.1)",
+            "ATT - Rodrygo (6.3)"
+        ]
+    }
 }
