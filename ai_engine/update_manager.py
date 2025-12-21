@@ -60,6 +60,9 @@ SCRAPER_SEQUENCE = [
       
       # NUOVO SCRIPT DI DEBUG PER AGGIORNARE SOLO IL LUCIFERO
       ("cron_update_lucifero.py", "🔥 [16/16] Aggiorna Solo Lucifero (Debug)", "Aggiorna solo il punteggio Lucifero", FREQUENT_DIR),
+      
+      # NUOVO SCRIPT DI DEBUG PER AGGIORNARE SOLO IL BVS
+      ("db_updater_bvs.py", "💎 [17/17] Aggiorna Solo BVS (Debug)", "Aggiorna solo il punteggio BVS", FREQUENT_DIR),
 ]
 
 

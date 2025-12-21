@@ -398,4 +398,4 @@ def get_bvs_score(home_team, away_team):
 
 if __name__ == "__main__":
     # Test
-    get_bvs_score("Bologna", "Juventus")
+    get_bvs_score("Cagliari", "Pisa")
