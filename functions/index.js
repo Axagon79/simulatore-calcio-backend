@@ -202,18 +202,12 @@ app.get('/matches', async (req, res) => {
 
     if (docs.length === 0) return res.json([]);
 
-    // Estrai tutte le partite dal documento trovato
+    // Estrai tutte le partite includendo TUTTI i dati presenti nel database
     const matches = docs.flatMap(doc => 
       (doc.matches || []).map((m, i) => ({
-        id: `${doc._id}_${i}`,
-        home: m.home,
-        away: m.away,
-        real_score: m.real_score,
-        score: m.score,
-        status: m.status || 'Finished',
-        match_time: m.match_time,
-        date_obj: m.date_obj,
-        h2h_data: m.h2h_data
+        ...m,                  // <--- Questa è la "magia": prende TUTTO quello che c'è nel DB (inclusi odds e altro)
+        id: `${doc._id}_${i}`, // Mantiene l'ID che avevi creato
+        status: m.status || 'Finished' // Mantiene il default per lo status
       }))
     );
 
