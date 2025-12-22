@@ -1,0 +1,200 @@
+
+🕵️  AVVIO VERIFICA INTEGRITÀ ID (READ-ONLY)
+📅 Data: 2025-12-22 15:41:19.048231
+==================================================
+
+🌍 VERIFICA: Serie A...
+   ❌ ERRORE ID [SerieA_1Giornata]: Inter vs Torino
+      -> ID DB: 41119 - 416
+      -> ID TM: 46 - 416 (Corretti)
+      -> AZIONE: Correggi manualmente gli ID nel DB!
+   ❌ ERRORE ID [SerieA_2Giornata]: Inter vs Udinese
+      -> ID DB: 41119 - 410
+      -> ID TM: 46 - 410 (Corretti)
+      -> AZIONE: Correggi manualmente gli ID nel DB!
+   ❌ ERRORE ID [SerieA_3Giornata]: Juventus vs Inter
+      -> ID DB: 506 - 41119
+      -> ID TM: 506 - 46 (Corretti)
+      -> AZIONE: Correggi manualmente gli ID nel DB!
+   ❌ ERRORE ID [SerieA_4Giornata]: Inter vs Sassuolo
+      -> ID DB: 41119 - 6574
+      -> ID TM: 46 - 6574 (Corretti)
+      -> AZIONE: Correggi manualmente gli ID nel DB!
+   ❌ ERRORE ID [SerieA_5Giornata]: Cagliari vs Inter
+      -> ID DB: 1390 - 41119
+      -> ID TM: 1390 - 46 (Corretti)
+      -> AZIONE: Correggi manualmente gli ID nel DB!
+   ❌ ERRORE ID [SerieA_6Giornata]: Inter vs Cremonese
+      -> ID DB: 41119 - 2239
+      -> ID TM: 46 - 2239 (Corretti)
+      -> AZIONE: Correggi manualmente gli ID nel DB!
+   ❌ ERRORE ID [SerieA_7Giornata]: Roma vs Inter
+      -> ID DB: 12 - 41119
+      -> ID TM: 12 - 46 (Corretti)
+      -> AZIONE: Correggi manualmente gli ID nel DB!
+   ❌ ERRORE ID [SerieA_8Giornata]: Napoli vs Inter
+      -> ID DB: 6195 - 41119
+      -> ID TM: 6195 - 46 (Corretti)
+      -> AZIONE: Correggi manualmente gli ID nel DB!
+   ❌ ERRORE ID [SerieA_9Giornata]: Inter vs Fiorentina
+      -> ID DB: 41119 - 430
+      -> ID TM: 46 - 430 (Corretti)
+      -> AZIONE: Correggi manualmente gli ID nel DB!
+   ❌ ERRORE ID [SerieA_10Giornata]: Verona vs Inter
+      -> ID DB: 276 - 41119
+      -> ID TM: 276 - 46 (Corretti)
+      -> AZIONE: Correggi manualmente gli ID nel DB!
+   ❌ ERRORE ID [SerieA_11Giornata]: Inter vs Lazio
+      -> ID DB: 41119 - 398
+      -> ID TM: 46 - 398 (Corretti)
+      -> AZIONE: Correggi manualmente gli ID nel DB!
+   ❌ ERRORE ID [SerieA_12Giornata]: Inter vs Milan
+      -> ID DB: 41119 - 5
+      -> ID TM: 46 - 5 (Corretti)
+      -> AZIONE: Correggi manualmente gli ID nel DB!
+   ❌ ERRORE ID [SerieA_13Giornata]: Pisa vs Inter
+      -> ID DB: 4172 - 41119
+      -> ID TM: 4172 - 46 (Corretti)
+      -> AZIONE: Correggi manualmente gli ID nel DB!
+   ❌ ERRORE ID [SerieA_14Giornata]: Inter vs Como
+      -> ID DB: 41119 - 1047
+      -> ID TM: 46 - 1047 (Corretti)
+      -> AZIONE: Correggi manualmente gli ID nel DB!
+   ❌ ERRORE ID [SerieA_15Giornata]: Genoa vs Inter
+      -> ID DB: 252 - 41119
+      -> ID TM: 252 - 46 (Corretti)
+      -> AZIONE: Correggi manualmente gli ID nel DB!
+   ❌ ERRORE ID [SerieA_16Giornata]: Inter vs Lecce
+      -> ID DB: 41119 - 1005
+      -> ID TM: 46 - 1005 (Corretti)
+      -> AZIONE: Correggi manualmente gli ID nel DB!
+   ❌ ERRORE ID [SerieA_17Giornata]: Atalanta vs Inter
+      -> ID DB: 800 - 41119
+      -> ID TM: 800 - 46 (Corretti)
+      -> AZIONE: Correggi manualmente gli ID nel DB!
+   ❌ ERRORE ID [SerieA_18Giornata]: Inter vs Bologna
+      -> ID DB: 41119 - 1025
+      -> ID TM: 46 - 1025 (Corretti)
+      -> AZIONE: Correggi manualmente gli ID nel DB!
+   ❌ ERRORE ID [SerieA_19Giornata]: Parma vs Inter
+      -> ID DB: 130 - 41119
+      -> ID TM: 130 - 46 (Corretti)
+      -> AZIONE: Correggi manualmente gli ID nel DB!
+   ❌ ERRORE ID [SerieA_20Giornata]: Inter vs Napoli
+      -> ID DB: 41119 - 6195
+      -> ID TM: 46 - 6195 (Corretti)
+      -> AZIONE: Correggi manualmente gli ID nel DB!
+   ❌ ERRORE ID [SerieA_21Giornata]: Udinese vs Inter
+      -> ID DB: 410 - 41119
+      -> ID TM: 410 - 46 (Corretti)
+      -> AZIONE: Correggi manualmente gli ID nel DB!
+   ❌ ERRORE ID [SerieA_22Giornata]: Inter vs Pisa
+      -> ID DB: 41119 - 4172
+      -> ID TM: 46 - 4172 (Corretti)
+      -> AZIONE: Correggi manualmente gli ID nel DB!
+   ❌ ERRORE ID [SerieA_23Giornata]: Cremonese vs Inter
+      -> ID DB: 2239 - 41119
+      -> ID TM: 2239 - 46 (Corretti)
+      -> AZIONE: Correggi manualmente gli ID nel DB!
+   ❌ ERRORE ID [SerieA_24Giornata]: Sassuolo vs Inter
+      -> ID DB: 6574 - 41119
+      -> ID TM: 6574 - 46 (Corretti)
+      -> AZIONE: Correggi manualmente gli ID nel DB!
+   ❌ ERRORE ID [SerieA_25Giornata]: Inter vs Juventus
+      -> ID DB: 41119 - 506
+      -> ID TM: 46 - 506 (Corretti)
+      -> AZIONE: Correggi manualmente gli ID nel DB!
+   ❌ ERRORE ID [SerieA_26Giornata]: Lecce vs Inter
+      -> ID DB: 1005 - 41119
+      -> ID TM: 1005 - 46 (Corretti)
+      -> AZIONE: Correggi manualmente gli ID nel DB!
+   ❌ ERRORE ID [SerieA_27Giornata]: Inter vs Genoa
+      -> ID DB: 41119 - 252
+      -> ID TM: 46 - 252 (Corretti)
+      -> AZIONE: Correggi manualmente gli ID nel DB!
+   ❌ ERRORE ID [SerieA_28Giornata]: Milan vs Inter
+      -> ID DB: 5 - 41119
+      -> ID TM: 5 - 46 (Corretti)
+      -> AZIONE: Correggi manualmente gli ID nel DB!
+   ❌ ERRORE ID [SerieA_29Giornata]: Inter vs Atalanta
+      -> ID DB: 41119 - 800
+      -> ID TM: 46 - 800 (Corretti)
+      -> AZIONE: Correggi manualmente gli ID nel DB!
+   ❌ ERRORE ID [SerieA_30Giornata]: Fiorentina vs Inter
+      -> ID DB: 430 - 41119
+      -> ID TM: 430 - 46 (Corretti)
+      -> AZIONE: Correggi manualmente gli ID nel DB!
+   ❌ ERRORE ID [SerieA_31Giornata]: Inter vs Roma
+      -> ID DB: 41119 - 12
+      -> ID TM: 46 - 12 (Corretti)
+      -> AZIONE: Correggi manualmente gli ID nel DB!
+   ❌ ERRORE ID [SerieA_32Giornata]: Como vs Inter
+      -> ID DB: 1047 - 41119
+      -> ID TM: 1047 - 46 (Corretti)
+      -> AZIONE: Correggi manualmente gli ID nel DB!
+   ❌ ERRORE ID [SerieA_33Giornata]: Inter vs Cagliari
+      -> ID DB: 41119 - 1390
+      -> ID TM: 46 - 1390 (Corretti)
+      -> AZIONE: Correggi manualmente gli ID nel DB!
+   ❌ ERRORE ID [SerieA_34Giornata]: Torino vs Inter
+      -> ID DB: 416 - 41119
+      -> ID TM: 416 - 46 (Corretti)
+      -> AZIONE: Correggi manualmente gli ID nel DB!
+   ❌ ERRORE ID [SerieA_35Giornata]: Inter vs Parma
+      -> ID DB: 41119 - 130
+      -> ID TM: 46 - 130 (Corretti)
+      -> AZIONE: Correggi manualmente gli ID nel DB!
+   ❌ ERRORE ID [SerieA_36Giornata]: Lazio vs Inter
+      -> ID DB: 398 - 41119
+      -> ID TM: 398 - 46 (Corretti)
+      -> AZIONE: Correggi manualmente gli ID nel DB!
+   ❌ ERRORE ID [SerieA_37Giornata]: Inter vs Verona
+      -> ID DB: 41119 - 276
+      -> ID TM: 46 - 276 (Corretti)
+      -> AZIONE: Correggi manualmente gli ID nel DB!
+   ❌ ERRORE ID [SerieA_38Giornata]: Bologna vs Inter
+      -> ID DB: 1025 - 41119
+      -> ID TM: 1025 - 46 (Corretti)
+      -> AZIONE: Correggi manualmente gli ID nel DB!
+   🏁 Serie A: Controllati 342 | OK 342 | ERRORI ID 38
+--------------------------------------------------
+
+🌍 VERIFICA: Serie B...
+   🏁 Serie B: Controllati 380 | OK 380 | ERRORI ID 0
+--------------------------------------------------
+
+🌍 VERIFICA: Serie C - Girone A...
+   🏁 Serie C - Girone A: Controllati 380 | OK 380 | ERRORI ID 0
+--------------------------------------------------
+
+🌍 VERIFICA: Serie C - Girone B...
+   🏁 Serie C - Girone B: Controllati 342 | OK 342 | ERRORI ID 0
+--------------------------------------------------
+
+🌍 VERIFICA: Serie C - Girone C...
+   🏁 Serie C - Girone C: Controllati 380 | OK 380 | ERRORI ID 0
+--------------------------------------------------
+
+🌍 VERIFICA: Premier League...
+   🏁 Premier League: Controllati 380 | OK 380 | ERRORI ID 0
+--------------------------------------------------
+
+🌍 VERIFICA: La Liga...
+   🏁 La Liga: Controllati 380 | OK 380 | ERRORI ID 0
+--------------------------------------------------
+
+🌍 VERIFICA: Bundesliga...
+   🏁 Bundesliga: Controllati 306 | OK 306 | ERRORI ID 0
+--------------------------------------------------
+
+🌍 VERIFICA: Ligue 1...
+   🏁 Ligue 1: Controllati 306 | OK 306 | ERRORI ID 0
+--------------------------------------------------
+
+🌍 VERIFICA: Eredivisie...
+   🏁 Eredivisie: Controllati 306 | OK 306 | ERRORI ID 0
+--------------------------------------------------
+
+🌍 VERIFICA: Liga Portugal...
+   🏁 Liga Portugal: Controllati 306 | OK 306 | ERRORI ID 0
+--------------------------------------------------

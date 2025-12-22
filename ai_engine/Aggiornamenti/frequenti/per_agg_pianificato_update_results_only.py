@@ -35,7 +35,6 @@ HEADERS = {
     )
 }
 
-# Lista Campionati
 LEAGUES_TM = [
     {"name": "Serie A", "url": f"https://www.transfermarkt.it/serie-a/gesamtspielplan/wettbewerb/IT1/saison_id/{TARGET_SEASON}"},
     {"name": "Serie B", "url": f"https://www.transfermarkt.it/serie-b/gesamtspielplan/wettbewerb/IT2/saison_id/{TARGET_SEASON}"},
@@ -50,82 +49,100 @@ LEAGUES_TM = [
     {"name": "Liga Portugal", "url": f"https://www.transfermarkt.it/liga-nos/gesamtspielplan/wettbewerb/PO1/saison_id/{TARGET_SEASON}"}
 ]
 
-def normalize_key(name):
-    if not name:
-        return ""
-    return name.lower().strip().replace(" ", "").replace("-", "")
+# --- UTILS ---
+def extract_tm_id(url):
+    """Estrae l'ID numerico dal link (es. /verein/1234)."""
+    if not url: return None
+    match = re.search(r'/verein/(\d+)', url)
+    return match.group(1) if match else None
+
+def extract_round_number(text):
+    """Estrae solo il numero dalla giornata (es. '19. Giornata' -> '19')."""
+    if not text: return None
+    match = re.search(r'(\d+)', text)
+    return match.group(1) if match else None
 
 def process_league(col, league):
     print(f"\n🌍 Elaborazione: {league['name']}...")
     updated_count = 0
-
+    
     try:
         resp = requests.get(league['url'], headers=HEADERS, timeout=15)
         soup = BeautifulSoup(resp.content, "html.parser")
-
         headers = soup.find_all("div", class_="content-box-headline")
 
         for header in headers:
             round_name_tm = header.get_text(strip=True)
-            if "Giornata" not in round_name_tm and "Turno" not in round_name_tm:
-                continue
+            round_num = extract_round_number(round_name_tm)
+            if not round_num: continue
 
-            safe_round = round_name_tm.replace(".", "").replace(" ", "")
             safe_league = league['name'].replace(" ", "")
-            doc_id = f"{safe_league}_{safe_round}"
+            doc_id = f"{safe_league}_{round_num}Giornata"
 
-            # Recupero documento esistente
             db_doc = col.find_one({"_id": doc_id})
-            if not db_doc:
-                continue
+            if not db_doc: continue
 
             db_matches = db_doc.get("matches", [])
             modified_doc = False
 
             table = header.find_next("table")
-            if not table:
-                continue
-
+            if not table: continue
             rows = table.find_all("tr")
 
             for row in rows:
                 cells = row.find_all("td")
-                if len(cells) < 5:
-                    continue
+                if len(cells) < 5: continue
 
-                res_link = row.find("a", class_="ergebnis-link")
-                if not res_link:
-                    continue
-
-                score_text = res_link.get_text(strip=True)
-                if ":" not in score_text:
-                    continue
-
+                # Estrarre i link per gli ID (Fondamentale per la precisione)
                 team_links = [
-                    a.get_text(strip=True)
-                    for a in row.find_all("a")
-                    if a.get("title") and "spielbericht" not in a.get("href", "")
+                    a for a in row.find_all("a")
+                    if a.get("title") and "spielbericht" not in a.get("href", "") and "verein" in a.get("href", "")
                 ]
+                if len(team_links) < 2: continue
 
-                if len(team_links) < 2:
+                home_id_tm = extract_tm_id(team_links[0]['href'])
+                away_id_tm = extract_tm_id(team_links[-1]['href'])
+                if not home_id_tm or not away_id_tm: continue
+
+                # --- NUOVA LOGICA POSIZIONALE ---
+                final_score = None
+                
+                # 1. Prendiamo tutto il testo della riga
+                full_text = row.get_text(" ", strip=True)
+                
+                # 2. Cerchiamo tutti i pattern "X:Y" (Orari O Risultati)
+                candidates = re.findall(r'(\d+:\d+)', full_text)
+                
+                if not candidates:
+                    continue # Nessun orario e nessun risultato -> Partita non giocata o rinviata senza data
+
+                # 3. APPLICAZIONE REGOLA UTENTE:
+                # - Se c'è solo 1 elemento (es. ['2:1']) -> È il risultato.
+                # - Se ce ne sono 2 o più (es. ['14:30', '2:1']) -> L'ULTIMO è il risultato.
+                candidate_score = candidates[-1]
+
+                # 4. Controllo di sicurezza finale (Anti-Orario Singolo)
+                # Se per caso c'è SOLO l'orario (es. partita futura '20:30'), dobbiamo evitare di prenderlo.
+                # Usiamo il filtro lunghezza come paracadute: un risultato vero non supera mai 4 caratteri (es. '10:0').
+                # Un orario '20:30' è 5 caratteri.
+                if len(candidate_score) <= 4:
+                    final_score = candidate_score
+                else:
+                    # Se l'ultimo elemento è lungo (es. 20:30), allora è solo un orario e la partita non è finita.
                     continue
 
-                home_tm = team_links[0]
-                away_tm = team_links[-1]
-
+                # --- AGGIORNAMENTO DB ---
                 for m in db_matches:
-                    h_db = normalize_key(m['home'])
-                    a_db = normalize_key(m['away'])
-                    h_tm = normalize_key(home_tm)
-                    a_tm = normalize_key(away_tm)
+                    db_h_id = str(m.get('home_tm_id', ''))
+                    db_a_id = str(m.get('away_tm_id', ''))
 
-                    if (h_tm in h_db or h_db in h_tm) and (a_tm in a_db or a_db in a_tm):
-                        if m.get('real_score') != score_text:
-                            m['real_score'] = score_text
+                    if db_h_id == home_id_tm and db_a_id == away_id_tm:
+                        if m.get('real_score') != final_score:
+                            m['real_score'] = final_score
                             m['status'] = "Finished"
                             modified_doc = True
                             updated_count += 1
-                            print(f"   ✅ {m['home']} - {m['away']} -> {score_text}")
+                            print(f"   ✅ {m['home']} - {m['away']} -> {final_score}")
                         break
 
             if modified_doc:
@@ -135,20 +152,19 @@ def process_league(col, league):
                 )
 
     except Exception as e:
-        print(f"   ❌ Errore: {e}")
+        print(f"   ❌ Errore in {league['name']}: {e}")
 
     return updated_count
 
 def run_auto_update():
-    print("\n🚀 AGGIORNAMENTO AUTOMATICO – TUTTI I CAMPIONATI")
+    print("\n🚀 AGGIORNAMENTO AUTOMATICO (LOGICA POSIZIONALE)")
     col = db[COLLECTION_NAME]
-
+    
     total = 0
     for league in LEAGUES_TM:
         total += process_league(col, league)
 
-    print(f"\n🏁 FINE AGGIORNAMENTO AUTOMATICO")
-    print(f"📊 Totale Partite Aggiornate: {total}")
+    print(f"\n🏁 FINE. Partite aggiornate: {total}")
 
 if __name__ == "__main__":
     run_auto_update()

@@ -264,7 +264,7 @@ def update_bvs_system():
                              if qt_fav < 1.65 and gap_reale >= 15.0:
                                  tip_m = f"OPPORTUNITÀ NETTA: {fav_sign} (GAP TECNICO +{gap_reale:.0f}%)"
                              else:
-                                 tip_m = f"CONSIGLIO TECNICO: {fav_sign} CON COPERTURA (DC)"
+                                 tip_m = f" {fav_sign} CON COPERTURA (DC)"
                         
                         # B. Fascia Alta (> 2.20)
                         elif q_reale_fav > 2.20:
@@ -280,7 +280,7 @@ def update_bvs_system():
                             if gap_reale > 0: tip_m = f"VANTAGGIO TECNICO: {fav_sign} (GAP +{gap_reale:.0f}%)"
                             else: tip_m = f"RENDIMENTO BASSO: {fav_sign} (GAP {gap_reale:.0f}%)"
                         else:
-                            tip_m = f"CONSIGLIO TECNICO: SEGNO {fav_sign}" 
+                            tip_m = f"SEGNO {fav_sign}" 
                         
                         # Gestione Tip Sign
                         if "CON COPERTURA" in tip_m or "RISCHIO ECCESSIVO" in tip_m:
@@ -292,7 +292,7 @@ def update_bvs_system():
                         tip_m = "NO BET 1X2 -> VALUTARE GOL/OVER"
                         tip_s = "---"
                     else: # SEMI
-                        tip_m = f"CONSIGLIO TECNICO: SEGNO {fav_sign} O DC"
+                        tip_m = f"SEGNO {fav_sign} O DC"
                         tip_s = fav_sign
 
                     if TEST_MODE:

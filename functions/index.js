@@ -99,18 +99,50 @@ app.get('/rounds', async (req, res) => {
       return getRoundNumber(a.round_name) - getRoundNumber(b.round_name);
     });
 
-    // TROVA L'ANCHOR (giornata di riferimento)
+    // TROVA L'ANCHOR (giornata di riferimento) - Logica blindata: scarta passate e recuperi lontani
     let anchorIndex = -1;
+    const oggi = new Date();
 
-    // STEP 1: Cerca la prima giornata con partite "Scheduled"
     for (let i = 0; i < sortedRounds.length; i++) {
-      if (hasScheduledMatches(sortedRounds[i])) {
-        anchorIndex = i;
-        break;
+      const currentRound = sortedRounds[i];
+      const nextRound = sortedRounds[i + 1];
+
+      // Cerchiamo una partita programmata che sia VALIDA
+      const validScheduledMatch = (currentRound.matches || []).find(m => {
+        const isScheduled = m.status === 'Scheduled' || m.status === 'Timed';
+        if (!isScheduled) return false;
+
+        const matchDate = new Date(m.date_obj);
+
+        // TUA LOGICA: Una partita NON è valida se la sua data è inferiore a oggi (scartiamo sospese/rinviate)
+        if (matchDate < oggi) {
+          return false; 
+        }
+
+        return true;
+      });
+
+      if (validScheduledMatch) {
+        // Se abbiamo trovato una partita futura o odierna, verifichiamo il confine con la giornata successiva
+        if (nextRound && nextRound.matches && nextRound.matches.length > 0) {
+          const nextRoundStart = new Date(nextRound.matches[0].date_obj);
+          const currentMatchDate = new Date(validScheduledMatch.date_obj);
+
+          // Se la data è inferiore all'inizio della giornata successiva, questa è l'ATTUALE.
+          // Se è maggiore o uguale, è un recupero (es. gennaio) e passiamo alla giornata dopo.
+          if (currentMatchDate < nextRoundStart) {
+            anchorIndex = i;
+            break;
+          }
+        } else {
+          // Se non c'è una giornata successiva, questa è l'ultima disponibile
+          anchorIndex = i;
+          break;
+        }
       }
     }
 
-    // STEP 2: Se non trova Scheduled, prende l'ultima con "Finished"
+    // STEP DI RISERVA: Se tutte le partite sono "scadute" o finite, prendiamo l'ultima con risultati
     if (anchorIndex === -1) {
       for (let i = sortedRounds.length - 1; i >= 0; i--) {
         if (hasFinishedMatches(sortedRounds[i])) {
