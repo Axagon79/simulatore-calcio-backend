@@ -103,42 +103,43 @@ app.get('/rounds', async (req, res) => {
     let anchorIndex = -1;
     const oggi = new Date();
 
+    // --- TUA LOGICA CORRETTA: CONTROLLO SUI POSTICIPI ---
     for (let i = 0; i < sortedRounds.length; i++) {
       const currentRound = sortedRounds[i];
-      const nextRound = sortedRounds[i + 1];
+      const matches = currentRound.matches || [];
+      
+      // 1. Identifichiamo le partite NON terminate (senza risultato)
+      const openMatches = matches.filter(m => m.status === 'Scheduled' || m.status === 'Timed');
 
-      // Cerchiamo una partita programmata che sia VALIDA
-      const validScheduledMatch = (currentRound.matches || []).find(m => {
-        const isScheduled = m.status === 'Scheduled' || m.status === 'Timed';
-        if (!isScheduled) return false;
+      // Se sono tutte finite, passiamo alla prossima giornata
+      if (openMatches.length === 0) continue;
 
-        const matchDate = new Date(m.date_obj);
+      // 2. Identifichiamo le partite già FINITE per trovare il "fine turno regolare"
+      const finishedMatches = matches.filter(m => m.status === 'Finished');
+      
+      if (finishedMatches.length > 0) {
+        const finishedDates = finishedMatches.map(m => new Date(m.date_obj).getTime());
+        const lastRegularDate = new Date(Math.max(...finishedDates));
 
-        // TUA LOGICA: Una partita NON è valida se la sua data è inferiore a oggi (scartiamo sospese/rinviate)
-        if (matchDate < oggi) {
-          return false; 
-        }
+        // 3. Creiamo il limite di 7 giorni dalla fine delle partite regolari
+        const limitDate = new Date(lastRegularDate);
+        limitDate.setDate(limitDate.getDate() + 7);
 
-        return true;
-      });
+        // 4. Verifichiamo se tra le partite NON terminate ce n'è almeno una "attuale" (entro 7gg)
+        const hasValidUpcomingMatch = openMatches.some(m => {
+          const matchDate = new Date(m.date_obj);
+          return matchDate >= oggi && matchDate <= limitDate;
+        });
 
-      if (validScheduledMatch) {
-        // Se abbiamo trovato una partita futura o odierna, verifichiamo il confine con la giornata successiva
-        if (nextRound && nextRound.matches && nextRound.matches.length > 0) {
-          const nextRoundStart = new Date(nextRound.matches[0].date_obj);
-          const currentMatchDate = new Date(validScheduledMatch.date_obj);
-
-          // Se la data è inferiore all'inizio della giornata successiva, questa è l'ATTUALE.
-          // Se è maggiore o uguale, è un recupero (es. gennaio) e passiamo alla giornata dopo.
-          if (currentMatchDate < nextRoundStart) {
-            anchorIndex = i;
-            break;
-          }
-        } else {
-          // Se non c'è una giornata successiva, questa è l'ultima disponibile
+        if (hasValidUpcomingMatch) {
           anchorIndex = i;
-          break;
+          break; 
         }
+        // Se le partite non terminate sono tutte oltre i 7gg, il ciclo prosegue alla giornata dopo
+      } else {
+        // Se non è finita nemmeno una partita (giornata totalmente futura), la prendiamo come attuale
+        anchorIndex = i;
+        break;
       }
     }
 

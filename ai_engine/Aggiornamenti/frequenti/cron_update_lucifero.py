@@ -1,7 +1,7 @@
 import sys
 import os
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 import dateutil.parser 
 
 # ==========================================
@@ -9,8 +9,8 @@ import dateutil.parser
 # Scrivi qui i nomi delle squadre per testare una partita specifica.
 # Lascia vuoto ("") per l'uso automatico notturno.
 # ==========================================
-TEST_HOME = ""    
-TEST_AWAY = ""  
+TEST_HOME = "Rayo Vallecano"    
+TEST_AWAY = "Getafe CF"  
 # ==========================================
 
 
@@ -42,7 +42,7 @@ def get_date_object(match):
         except: pass
     return datetime(1900, 1, 1)
 
-def calcola_forma_rigorosa(team_name):
+def calcola_forma_rigorosa(team_name, prima_di_data=None, debug=False):
     """Calcola Lucifero (0-25) usando le ultime 6 partite ordinate per data"""
     all_matches = []
     
@@ -51,6 +51,10 @@ def calcola_forma_rigorosa(team_name):
         for m in round_doc.get('matches', []):
             if m.get('status') == 'Finished' and ':' in m.get('real_score', ''):
                 if m.get('home') == team_name or m.get('away') == team_name:
+                    # IMPLEMENTAZIONE COERENZA STORICA:
+                    # Filtriamo solo le partite giocate PRIMA del match che stiamo analizzando
+                    if prima_di_data and get_date_object(m) >= prima_di_data:
+                        continue
                     all_matches.append(m)
     
     if not all_matches: return 0.0
@@ -65,6 +69,10 @@ def calcola_forma_rigorosa(team_name):
     max_p = 0
     limit = min(len(last_6), 6)
     
+    # IMPLEMENTAZIONE OUTPUT TEST DETTAGLIATO:
+    if debug:
+        print(f"\n🔥 ANALISI LUCIFERO: {team_name}")
+    
     for i in range(limit):
         m = last_6[i]
         w = weights[i]
@@ -72,14 +80,32 @@ def calcola_forma_rigorosa(team_name):
         try:
             gh, ga = map(int, m['real_score'].split(':'))
             is_home = (m['home'] == team_name)
+            avversario = m['away'] if is_home else m['home']
+            
             punti = 0
-            if gh == ga: punti = 1
-            elif (is_home and gh > ga) or (not is_home and ga > gh): punti = 3
-            total += (punti * w)
+            ris_label = "S"
+            if gh == ga: 
+                punti = 1
+                ris_label = "P"
+            elif (is_home and gh > ga) or (not is_home and ga > gh): 
+                punti = 3
+                ris_label = "V"
+                
+            subtotale = punti * w
+            total += subtotale
+            
+            if debug:
+                data_str = get_date_object(m).strftime("%Y-%m-%d %H:%M:%S")
+                print(f"   {i+1}° ({data_str}) vs {avversario}: {ris_label} ({m['real_score']}) -> {punti}pt x {w} = {subtotale}")
         except: continue
 
     if max_p == 0: return 0.0
-    return round((total / max_p) * 25.0, 2)
+    res = round((total / max_p) * 25.0, 2)
+    
+    if debug:
+        print(f" ⚡ POTENZA LUCIFERO: {res:.2f}/25.0")
+        
+    return res
 
 def genera_trend_lucifero(team_name, all_matches_sorted):
     """
@@ -142,24 +168,36 @@ def esegui_aggiornamento():
             print(" (Nessuna giornata)")
             continue
 
-        # Trova la giornata attuale
-        current_index = -1
+        # --- IMPLEMENTAZIONE LOGICA ANCHOR (7 GIORNI) ---
+        anchor_index = -1
+        oggi = datetime.now()
+
         for i, r in enumerate(rounds_lega):
             matches = r.get('matches', [])
-            if any(m.get('status') != 'Finished' for m in matches):
-                current_index = i
+            open_matches = [m for m in matches if m.get('status') in ['Scheduled', 'Timed']]
+            if not open_matches: continue
+
+            finished_matches = [m for m in matches if m.get('status') == 'Finished']
+            if finished_matches:
+                last_regular_date = max([get_date_object(m) for m in finished_matches])
+                limit_date = last_regular_date + timedelta(days=7)
+                if any(get_date_object(m) >= oggi and get_date_object(m) <= limit_date for m in open_matches):
+                    anchor_index = i
+                    break
+            else:
+                anchor_index = i
                 break
         
-        if current_index == -1: current_index = len(rounds_lega) - 1
+        if anchor_index == -1: anchor_index = len(rounds_lega) - 1
 
-        # Definisci il range
-        start = max(0, current_index - 1)
-        end = min(len(rounds_lega), current_index + 2)
+        # Feedback visivo sulla giornata attiva (Sincronizzata con anchor_index)
+        giornata_nome = rounds_lega[anchor_index].get('round_name', 'N/D') if anchor_index < len(rounds_lega) else 'Fine'
+        print(f"-> Attuale (Sincronizzata): {giornata_nome}")
+
+        # Definiamo il range di aggiornamento (PRECEDENTE, ATTUALE, SUCCESSIVA)
+        start = max(0, anchor_index - 1)
+        end = min(len(rounds_lega), anchor_index + 2)
         target = rounds_lega[start:end]
-        
-        # Feedback visivo sulla giornata attiva
-        giornata_nome = rounds_lega[current_index].get('round_name', 'N/D') if current_index < len(rounds_lega) else 'Fine'
-        print(f"-> Attuale: {giornata_nome}")
 
         for r in target:
             matches = r.get('matches', [])
@@ -167,10 +205,16 @@ def esegui_aggiornamento():
             for m in matches:
                 
                 if m.get('home') and m.get('away'):
+                    
+                    # DATA DEL MATCH ANALIZZATO (Per filtro coerenza storico)
+                    match_date = get_date_object(m)
+                    
+                    # CONTROLLO DEBUG TEST
+                    is_test = (TEST_HOME and TEST_AWAY and m['home'] == TEST_HOME and m['away'] == TEST_AWAY)
 
-                    # 1. Calcolo valori base attuali
-                    v_h = calcola_forma_rigorosa(m['home'])
-                    v_a = calcola_forma_rigorosa(m['away'])
+                    # 1. Calcolo valori base (Filtrati per data del match)
+                    v_h = calcola_forma_rigorosa(m['home'], prima_di_data=match_date, debug=is_test)
+                    v_a = calcola_forma_rigorosa(m['away'], prima_di_data=match_date, debug=is_test)
                     
                     if 'h2h_data' not in m or m['h2h_data'] is None: m['h2h_data'] = {}
                     
@@ -181,15 +225,17 @@ def esegui_aggiornamento():
                     old_trend_h = m['h2h_data'].get('lucifero_trend_home', [])
                     old_trend_a = m['h2h_data'].get('lucifero_trend_away', [])
 
-                    # 3. Generazione NUOVI Trend potenziali
+                    # 3. Generazione NUOVI Trend potenziali (Filtrati per data del match)
                     storia_home = sorted([match for round_doc in ALL_DOCS for match in round_doc.get('matches', []) 
                                         if (match.get('home') == m['home'] or match.get('away') == m['home']) 
-                                        and match.get('status') == 'Finished'], 
+                                        and match.get('status') == 'Finished'
+                                        and get_date_object(match) < match_date], 
                                         key=get_date_object, reverse=True)
 
                     storia_away = sorted([match for round_doc in ALL_DOCS for match in round_doc.get('matches', []) 
                                         if (match.get('home') == m['away'] or match.get('away') == m['away']) 
-                                        and match.get('status') == 'Finished'], 
+                                        and match.get('status') == 'Finished'
+                                        and get_date_object(match) < match_date], 
                                         key=get_date_object, reverse=True)
 
                     new_trend_h = genera_trend_lucifero(m['home'], storia_home)
@@ -204,31 +250,11 @@ def esegui_aggiornamento():
                         m['h2h_data']['lucifero_trend_home'] = new_trend_h
                         m['h2h_data']['lucifero_trend_away'] = new_trend_a
 
-                        if TEST_HOME:
-                            print("\n" + "="*50)
-                            print(f"📊 AGGIORNAMENTO RILEVATO PER {m['home']} vs {m['away']}:")
-                            print(f"   🏠 Trend: {new_trend_h}")
-                            print(f"   ✈️ Trend: {new_trend_a}")
-                            print("="*50 + "\n")
-
                         mod = True
                         tot_updates += 1
 
-                    # --- DEBUG PER L'UTENTE (Con formattazione .2f) ---
-                    if TEST_HOME and TEST_AWAY:
-                        if m['home'] == TEST_HOME and m['away'] == TEST_AWAY:
-                            print("\n" + "="*50)
-                            print(f"🧐 VERIFICA PARTITA TROVATA: {TEST_HOME} vs {TEST_AWAY}")
-                            print(f"   📅 Giornata: {r.get('round_name')}")
-                            # Qui usiamo :.2f per forzare due decimali (es. 13.10)
-                            print(f"   🏠 {TEST_HOME}: {v_h:.2f} / 25.00")
-                            print(f"   ✈️ {TEST_AWAY}: {v_a:.2f} / 25.00")
-                            print("="*50 + "\n")
-                    # --------------------------
-
             if mod:
                 db.h2h_by_round.update_one({'_id': r['_id']}, {'$set': {'matches': matches}})
-                # print(f"      ✅ Aggiornata: {r.get('round_name')}") # Decommenta se vuoi vedere ogni singola giornata
 
     print(f"\n✅ Aggiornamento completato. Partite modificate: {tot_updates}")
 
