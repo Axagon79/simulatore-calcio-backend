@@ -63,6 +63,9 @@ SCRAPER_SEQUENCE = [
       
       # NUOVO SCRIPT DI DEBUG PER AGGIORNARE SOLO IL BVS
       ("db_updater_bvs.py", "💎 [17/17] Aggiorna Solo BVS (Debug)", "Aggiorna solo il punteggio BVS", FREQUENT_DIR),
+      
+      # NUOVO SCRIPT DI DEBUG PER AGGIORNARE SOLO LE CLASSIFICHE
+      ("scraper_classifiche_standings.py", "🏆 [18/18] Aggiorna Solo Classifiche (Debug)", "Aggiorna solo le classifiche", FREQUENT_DIR),
 ]
 
 
