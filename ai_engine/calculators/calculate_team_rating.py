@@ -559,7 +559,7 @@ if __name__ == "__main__":
         print("❌ Correggi rating anomali!\n")
         exit(1)
     
-    test_teams = ["Inter", "Torino"]
+    test_teams = ["Lecce", "Como"]
     
     print("\n" + "="*70)
     print("🧪 TEST RATING SQUADRE")

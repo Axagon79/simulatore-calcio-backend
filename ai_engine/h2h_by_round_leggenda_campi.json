@@ -1,0 +1,81 @@
+{
+    "document_info": {
+      "collection": "h2h_by_round",
+      "description": "Dizionario Tecnico della struttura dati per Round e Match",
+      "last_analysis_date": "2025-12-25"
+    },
+    "levels": {
+      "level_1_root": {
+        "description": "Contenitore principale della giornata di campionato",
+        "fields": {
+          "_id": {
+            "meaning": "Identificativo unico (es. SerieA_17Giornata)",
+            "origin_file": "scraper_calendario_h2h_TF_completo.py",
+            "logic": "Concatenazione safe_league + _ + safe_round"
+          },
+          "league": {
+            "meaning": "Nome leggibile della competizione",
+            "origin_file": "scraper_calendario_h2h_TF_completo.py",
+            "logic": "Valore mappato nella lista LEAGUES_TM"
+          },
+          "round_name": {
+            "meaning": "Etichetta della giornata (es. 17.Giornata)",
+            "origin_file": "scraper_calendario_h2h_TF_completo.py",
+            "logic": "Testo estratto dal box-headline di Transfermarkt"
+          },
+          "season": {
+            "meaning": "Stagione sportiva di riferimento",
+            "origin_file": "scraper_calendario_h2h_TF_completo.py",
+            "logic": "Costante TARGET_SEASON definita nel file"
+          },
+          "last_updated": {
+            "meaning": "Data ultimo salvataggio del documento",
+            "origin_file": "scraper_calendario_h2h_TF_completo.py",
+            "logic": "Funzione datetime.now() all'esecuzione dell'update"
+          }
+        }
+      },
+      "level_2_matches_array": {
+        "description": "Array contenente i singoli oggetti partita",
+        "fields": {
+          "matches": {
+            "meaning": "Lista di 10 oggetti (Object)",
+            "origin_file": "scraper_calendario_h2h_TF_completo.py",
+            "logic": "Ciclo for che itera sulle righe della tabella calendario"
+          }
+        }
+      },
+      "level_3_match_object": {
+        "description": "Dati anagrafici e tecnici della singola partita",
+        "fields": {
+          "home": { "meaning": "Squadra in casa", "origin_file": "scraper_calendario_h2h_TF_completo.py" },
+          "away": { "meaning": "Squadra ospite", "origin_file": "scraper_calendario_h2h_TF_completo.py" },
+          "status": { "meaning": "Stato (Scheduled/Finished)", "origin_file": "scraper_calendario_h2h_TF_completo.py" },
+          "real_score": { "meaning": "Risultato reale", "origin_file": "scraper_calendario_h2h_TF_completo.py" },
+          "date_obj": { "meaning": "Data ISO per calcoli", "origin_file": "scraper_calendario_h2h_TF_completo.py" },
+          "match_time": { "meaning": "Orario inizio", "origin_file": "scraper_calendario_h2h_TF_completo.py" },
+          "home_tm_id": { "meaning": "ID Transfermarkt Casa", "origin_file": "scraper_calendario_... (Merge logic)" },
+          "away_tm_id": { "meaning": "ID Transfermarkt Ospite", "origin_file": "scraper_calendario_... (Merge logic)" },
+          "h2h_last_updated": { "meaning": "Timestamp calcolo statistiche", "origin_file": "calculate_h2h_v2.py" }
+        }
+      },
+      "level_4_h2h_data": {
+        "description": "Dati statistici avanzati e AI",
+        "fields": {
+          "home_score": { "meaning": "Rating forza storica Casa", "origin_file": "calculate_h2h_v2.py" },
+          "avg_goals_total": { "meaning": "Media gol prevista", "origin_file": "calculate_h2h_v2.py" },
+          "lucifero_home": { "meaning": "Potenza offensiva attuale", "origin_file": "engine_lucifero.py (Preservato via Merge)" },
+          "bvs_match_index": { "meaning": "Rating coerenza (-7 a +7)", "origin_file": "bvs_calculator.py (Preservato via Merge)" },
+          "home_rank": { "meaning": "Posizione Classifica reale", "origin_file": "injector_standings.py (Preservato via Merge)" }
+        }
+      },
+      "level_4_1_odds": {
+        "description": "Dati mercato quote",
+        "fields": {
+          "1_X_2": { "meaning": "Quote decimali 1X2", "origin_file": "scraper_calendario_... (Merge logic)" },
+          "src": { "meaning": "Sorgente (es. NowGoal)", "origin_file": "Preservato via Merge" },
+          "ts": { "meaning": "Timestamp prelievo quote", "origin_file": "Preservato via Merge" }
+        }
+      }
+    }
+  }

@@ -184,16 +184,15 @@ def scrape_transfermarkt():
 
                     # --- 4. RICERCA NEL TUO DB (Nome -> ID) ---
                     # Cerchiamo il nome scaricato dentro 'teams' per ottenere i TUOI dati
-                    tm_id_from_db, internal_id = find_db_data(team_name)
+                    tm_id_from_db, _ = find_db_data(team_name) # Usiamo _ perché internal_id non ci serve più
                     
-                    if internal_id:
+                    if tm_id_from_db:
                         found_ids_count += 1
 
                     team_data = {
                         "rank": rank,
                         "team": team_name,                 # Nome scaricato
-                        "transfermarkt_id": tm_id_from_db, # Il numeretto preso dal TUO DB teams
-                        "team_id": internal_id,            # Il tuo ID interno
+                        "transfermarkt_id": tm_id_from_db, # Il numeretto preso dal TUO DB teams           # Il tuo ID interno
                         "points": points,
                         "played": played
                     }

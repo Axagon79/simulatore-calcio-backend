@@ -66,6 +66,9 @@ SCRAPER_SEQUENCE = [
       
       # NUOVO SCRIPT DI DEBUG PER AGGIORNARE SOLO LE CLASSIFICHE
       ("scraper_classifiche_standings.py", "🏆 [18/18] Aggiorna Solo Classifiche (Debug)", "Aggiorna solo le classifiche", FREQUENT_DIR),
+      
+      # NUOVO SCRIPT DI DEBUG PER AGGIORNARE IL DNA System (ATT/DEF/TEC/VAL) e le FORMAZIONI
+      ("run_all_injectors.py", "🎩 [19/19] Aggiorna DNA System Completo (Debug)", "Aggiorna ATT/DEF/TEC/VAL e FORMAZIONI", FREQUENT_DIR),
 ]
 
 
