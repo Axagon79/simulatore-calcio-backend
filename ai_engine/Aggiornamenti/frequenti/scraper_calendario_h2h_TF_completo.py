@@ -21,6 +21,11 @@ from config import db
 COLLECTION_NAME = "h2h_by_round"
 TARGET_SEASON = "2025"
 
+# ⚠️ IMPOSTAZIONE DI SICUREZZA ⚠️
+# True = SOLO SIMULAZIONE (Stampa a video TUTTI I DATI, NON scrive nel DB)
+# False = SCRITTURA REALE (Modifica il DB)
+DRY_RUN = False 
+
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
 }
@@ -50,7 +55,9 @@ def parse_tm_date(date_str):
     return None
 
 def scrape_tm_calendar_v8():
-    print(f"🚀 AVVIO SCRAPER TM V8 (Double Memory Fix) - Stagione {TARGET_SEASON}")
+    print(f"🚀 AVVIO SCRAPER TM V8 (FIX MERGE H2H & FULL DEBUG) - Stagione {TARGET_SEASON}")
+    print(f"🛠️  MODALITÀ DRY_RUN: {'ATTIVA (Nessuna scrittura)' if DRY_RUN else 'DISATTIVA (Scrittura su DB)'}")
+    
     col = db[COLLECTION_NAME]
     
     for league in LEAGUES_TM:
@@ -95,12 +102,9 @@ def scrape_tm_calendar_v8():
                     
                     match_time = "00:00"
                     if time_found:
-                        # Se troviamo un orario, aggiorniamo la memoria
                         match_time = time_found.group(1)
                         last_seen_time_str = match_time
                     else:
-                        # Se è vuoto, usiamo l'ultimo orario visto
-                        # (Ma solo se abbiamo una data valida, per sicurezza)
                         if last_seen_date_str:
                             match_time = last_seen_time_str
 
@@ -164,7 +168,7 @@ def scrape_tm_calendar_v8():
                     save_round(col, league['name'], round_name, matches)
                     saved_count += 1
             
-            print(f"   ✅ Salvate {saved_count} giornate.")
+            print(f"   ✅ Processate {saved_count} giornate.")
 
         except Exception as e:
             print(f"   ❌ Errore: {e}")
@@ -174,10 +178,93 @@ def save_round(col, league, round_name, matches):
     safe_league = league.replace(" ", "")
     doc_id = f"{safe_league}_{safe_round}"
     
+    # 1. Recupero il documento esistente per fare il MERGE
+    existing_doc = col.find_one({"_id": doc_id})
+    
+    # 2. Logica di Merge Intelligente (per NOME SQUADRE)
+    if existing_doc:
+        old_matches_map = {
+            f"{m['home'].strip()} vs {m['away'].strip()}": m 
+            for m in existing_doc.get("matches", [])
+        }
+
+        for new_match in matches:
+            match_key = f"{new_match['home'].strip()} vs {new_match['away'].strip()}"
+            
+            if match_key in old_matches_map:
+                old_match = old_matches_map[match_key]
+                # Copiamo i dati vecchi preziosi nel nuovo oggetto
+                for key in old_match:
+                    # FIX: h2h_data NON è nella lista nera, quindi viene copiato (preservando Lucifero)
+                    if key not in ["home", "away", "status", "real_score", "date_obj", "match_time"]:
+                        new_match[key] = old_match[key]
+
+    # 3. BLOCCO DRY RUN (CON VERIFICA COMPLETA DI TUTTI I CAMPI)
+    if DRY_RUN:
+        print(f"\n   [DRY RUN 🛡️] Documento: {doc_id}")
+        print(f"   [DRY RUN 🛡️] Match trovati: {len(matches)}")
+        
+        # Mostra un match di esempio COMPLETO
+        if matches:
+            m = matches[0]
+            print(f"\n   [DRY RUN] CONTROLLO CAMPI PRIMO MATCH ({m.get('home')} vs {m.get('away')}):")
+            
+            # Helper per cercare i dati sia alla radice che dentro h2h_data
+            h2h_obj = m.get('h2h_data') if isinstance(m.get('h2h_data'), dict) else {}
+            
+            def check_field(field_name):
+                # Cerca prima nella root
+                val = m.get(field_name)
+                # Se non c'è, cerca dentro h2h_data
+                if val is None:
+                    val = h2h_obj.get(field_name)
+                return f"{val} {'✅' if val is not None else '❌'}"
+
+            # --- CAMPI BASE (Scraper) ---
+            print(f"      home: {m.get('home')} ✅")
+            print(f"      away: {m.get('away')} ✅")
+            print(f"      real_score: {m.get('real_score')} ✅")
+            print(f"      h2h_data (Oggetto): {type(m.get('h2h_data'))} {'✅' if m.get('h2h_data') else '❌'}")
+            
+            # --- CAMPI PRESERVATI (Merge) - LISTA COMPLETA ---
+            print(f"\n      --- DATI RECUPERATI (Lucifero, BVS, Classifica) ---")
+            print(f"      home_tm_id: {check_field('home_tm_id')}")
+            print(f"      away_tm_id: {check_field('away_tm_id')}")
+            print(f"      h2h_last_updated: {check_field('h2h_last_updated')}")
+            print(f"      lucifero_home: {check_field('lucifero_home')}")
+            print(f"      lucifero_away: {check_field('lucifero_away')}")
+            print(f"      lucifero_trend_home: {check_field('lucifero_trend_home')}")
+            print(f"      lucifero_trend_away: {check_field('lucifero_trend_away')}")
+            print(f"      bvs_advice: {check_field('bvs_advice')}")
+            print(f"      bvs_index: {check_field('bvs_index')}")
+            print(f"      bvs_away: {check_field('bvs_away')}")
+            print(f"      bvs_match_index: {check_field('bvs_match_index')}")
+            print(f"      classification: {check_field('classification')}")
+            print(f"      is_linear: {check_field('is_linear')}")
+            print(f"      diff_perc: {check_field('diff_perc')}")
+            print(f"      gap_reale: {check_field('gap_reale')}")
+            print(f"      tip_sign: {check_field('tip_sign')}")
+            print(f"      tip_market: {check_field('tip_market')}")
+            print(f"      trust_home_letter: {check_field('trust_home_letter')}")
+            print(f"      trust_away_letter: {check_field('trust_away_letter')}")
+            print(f"      last_bvs_update: {check_field('last_bvs_update')}")
+            print(f"      home_rank: {check_field('home_rank')}")
+            print(f"      home_points: {check_field('home_points')}")
+            print(f"      away_rank: {check_field('away_rank')}")
+            print(f"      away_points: {check_field('away_points')}")
+            print(f"      odds: {check_field('odds')}")
+        
+        # 🛑 STOP! NON PROCEDERE ALLA SCRITTURA 🛑
+        return 
+
+    # 4. SALVATAGGIO REALE (Solo se DRY_RUN = False)
     col.update_one({"_id": doc_id}, {
         "$set": {
-            "league": league, "round_name": round_name, "season": TARGET_SEASON,
-            "matches": matches, "last_updated": datetime.now()
+            "league": league, 
+            "round_name": round_name, 
+            "season": TARGET_SEASON,
+            "matches": matches, 
+            "last_updated": datetime.now()
         }
     }, upsert=True)
 

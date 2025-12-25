@@ -1,55 +1,56 @@
 {
-    "MATCH": "Alav\u00e9s vs Real Madrid",
+    "MATCH": "Fiorentina vs Udinese",
     "CASA": {
-        "Squadra": "Alaves",
+        "Squadra": "Fiorentina",
         "Modulo": "4-2-3-1",
-        "Rating": "17.71/25",
+        "Rating": "16.93/25",
         "1_TITOLARI": [
-            "GK - Antonio Sivera (6.7)",
-            "DIF - Jonny Castro (7.7)",
-            "DIF - Nahuel Tenaglia (7.1)",
-            "DIF - Jon Pacheco (7.8)",
-            "DIF - Victor Parada (5.9)",
-            "MID - Antonio Blanco (7.0)",
-            "MID - Pablo Ib\u00e1\u00f1ez (6.4)",
-            "MID - Denis Su\u00e1rez (6.8)",
-            "MID - Abde Rebbach (5.5)",
-            "MID - Calebe (7.2)",
-            "ATT - Toni Mart\u00ednez (5.5)"
+            "GK - David de Gea (5.8)",
+            "DIF - Dod\u00f4 (5.4)",
+            "DIF - Marin Pongra\u010di\u0107 (6.0)",
+            "DIF - Luca Ranieri (6.7)",
+            "DIF - Pablo Mar\u00ed (7.2)",
+            "MID - Rolando Mandragora (6.2)",
+            "MID - Nicol\u00f2 Fagioli (7.2)",
+            "MID - Simon Sohm (6.6)",
+            "MID - Hans Nicolussi Caviglia (7.0)",
+            "MID - Cher Ndour (5.9)",
+            "ATT - Moise Kean (6.0)"
         ],
         "2_PANCHINA": [
-            "DIF - Youssef Lekhedim (6.7)",
-            "DIF - Facundo Garc\u00e9s (7.1)",
-            "MID - Ander Guevara (6.3)",
-            "MID - Carlos Benav\u00eddez (5.5)",
-            "ATT - Lucas Boy\u00e9 (6.2)",
-            "ATT - Carlos Vicente (6.6)"
+            "DIF - Robin Gosens (6.2)",
+            "DIF - Pietro Comuzzo (7.4)",
+            "MID - Amir Richardson (4.9)",
+            "MID - Tariq Lamptey (5.6)",
+            "ATT - Albert Gu\u00f0mundsson (5.7)",
+            "ATT - Roberto Piccoli (5.7)"
         ]
     },
     "OSPITE": {
-        "Squadra": "Real Madrid",
-        "Modulo": "3-4-3",
-        "Rating": "19.08/25",
+        "Squadra": "Udinese",
+        "Modulo": "3-5-2",
+        "Rating": "17.95/25",
         "1_TITOLARI": [
-            "GK - Thibaut Courtois (6.5)",
-            "DIF - \u00c1lvaro Carreras (6.9)",
-            "DIF - \u00c9der Milit\u00e3o (7.5)",
-            "DIF - Dean Huijsen (7.0)",
-            "MID - Federico Valverde (8.0)",
-            "MID - Aur\u00e9lien Tchouam\u00e9ni (7.3)",
-            "MID - Arda G\u00fcler (8.0)",
-            "MID - Jude Bellingham (8.9)",
-            "ATT - Kylian Mbapp\u00e9 (9.2)",
-            "ATT - Vinicius J\u00fanior (7.4)",
-            "ATT - Arda G\u00fcler (6.9)"
+            "GK - Maduka Okoye (6.8)",
+            "DIF - Oumar Solet (7.6)",
+            "DIF - Nicol\u00f2 Bertola (7.8)",
+            "DIF - Christian Kabasele (6.0)",
+            "MID - Jesper Karlstr\u00f6m (6.4)",
+            "MID - Arthur Atta (6.4)",
+            "MID - Jakub Piotrowski (7.0)",
+            "MID - Jurgen Ekkelenkamp (5.6)",
+            "MID - Oier Zarraga (6.8)",
+            "ATT - Nicol\u00f2 Zaniolo (6.8)",
+            "ATT - Keinan Davis (6.8)"
         ],
         "2_PANCHINA": [
-            "DIF - Ra\u00fal Asencio (6.4)",
-            "DIF - Antonio R\u00fcdiger (6.6)",
-            "MID - Eduardo Camavinga (7.8)",
-            "MID - Dani Ceballos (7.3)",
-            "ATT - Franco Mastantuono (6.1)",
-            "ATT - Rodrygo (6.3)"
+            "GK - Razvan Sava (5.3)",
+            "DIF - Alessandro Zanoli (6.9)",
+            "DIF - Hassane Kamara (6.9)",
+            "MID - Sandi Lovri\u0107 (7.2)",
+            "MID - Lennon Miller (5.1)",
+            "ATT - Adam Buksa (5.6)",
+            "ATT - Vakoun Bayo (5.0)"
         ]
     }
 }

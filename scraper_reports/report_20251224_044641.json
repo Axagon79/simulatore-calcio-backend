@@ -1,0 +1,1173 @@
+{
+  "timestamp": "2025-12-24 04:44:49",
+  "summary": {
+    "total_matches": 315,
+    "updated": 230,
+    "not_updated": 85,
+    "success_rate": 73.01587301587301
+  },
+  "leagues": [
+    {
+      "name": "Serie A",
+      "processed": 30,
+      "updated": 26
+    },
+    {
+      "name": "Serie B",
+      "processed": 30,
+      "updated": 20
+    },
+    {
+      "name": "Serie C - Girone A",
+      "processed": 30,
+      "updated": 10
+    },
+    {
+      "name": "Serie C - Girone B",
+      "processed": 27,
+      "updated": 9
+    },
+    {
+      "name": "Serie C - Girone C",
+      "processed": 30,
+      "updated": 10
+    },
+    {
+      "name": "Premier League",
+      "processed": 30,
+      "updated": 30
+    },
+    {
+      "name": "La Liga",
+      "processed": 30,
+      "updated": 30
+    },
+    {
+      "name": "Bundesliga",
+      "processed": 27,
+      "updated": 27
+    },
+    {
+      "name": "Ligue 1",
+      "processed": 27,
+      "updated": 27
+    },
+    {
+      "name": "Eredivisie",
+      "processed": 27,
+      "updated": 27
+    },
+    {
+      "name": "Liga Portugal",
+      "processed": 27,
+      "updated": 14
+    }
+  ],
+  "issues": [
+    {
+      "partita": "Napoli vs Parma",
+      "lega": "Serie A",
+      "giornata": 16,
+      "timestamp": "2025-12-24T04:45:03.543723",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "16 14-01\n18:30 Napoli - Parma"
+      }
+    },
+    {
+      "partita": "Inter vs Lecce",
+      "lega": "Serie A",
+      "giornata": 16,
+      "timestamp": "2025-12-24T04:45:03.593838",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "16 14-01\n20:45 Inter Milan - Lecce"
+      }
+    },
+    {
+      "partita": "Verona vs Bologna",
+      "lega": "Serie A",
+      "giornata": 16,
+      "timestamp": "2025-12-24T04:45:03.668070",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "16 15-01\n18:30 Verona - Bologna"
+      }
+    },
+    {
+      "partita": "Como vs Milan",
+      "lega": "Serie A",
+      "giornata": 16,
+      "timestamp": "2025-12-24T04:45:03.742516",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "16 15-01\n20:45 Como - AC Milan"
+      }
+    },
+    {
+      "partita": "Avellino vs Sampdoria",
+      "lega": "Serie B",
+      "giornata": 19,
+      "timestamp": "2025-12-24T04:45:14.603915",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "19 10-01\n15:00 Avellino - Sampdoria"
+      }
+    },
+    {
+      "partita": "Carrarese vs Bari",
+      "lega": "Serie B",
+      "giornata": 19,
+      "timestamp": "2025-12-24T04:45:14.654011",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "19 10-01\n15:00 Carrarese - Bari"
+      }
+    },
+    {
+      "partita": "Frosinone vs Catanzaro",
+      "lega": "Serie B",
+      "giornata": 19,
+      "timestamp": "2025-12-24T04:45:14.703926",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "19 10-01\n15:00 Frosinone - Catanzaro"
+      }
+    },
+    {
+      "partita": "Reggiana vs Venezia",
+      "lega": "Serie B",
+      "giornata": 19,
+      "timestamp": "2025-12-24T04:45:14.755144",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "19 10-01\n15:00 A.C. Reggiana 1919 - Venezia"
+      }
+    },
+    {
+      "partita": "Südtirol vs Spezia",
+      "lega": "Serie B",
+      "giornata": 19,
+      "timestamp": "2025-12-24T04:45:14.830075",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "19 10-01\n15:00 SudTirol - Spezia"
+      }
+    },
+    {
+      "partita": "Virtus Entella vs Monza",
+      "lega": "Serie B",
+      "giornata": 19,
+      "timestamp": "2025-12-24T04:45:14.904821",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "19 10-01\n15:00 ACD Virtus Entella - Monza"
+      }
+    },
+    {
+      "partita": "Juve Stabia vs Pescara",
+      "lega": "Serie B",
+      "giornata": 19,
+      "timestamp": "2025-12-24T04:45:14.955261",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "19 10-01\n17:15 Juve Stabia - Pescara"
+      }
+    },
+    {
+      "partita": "Cesena vs Empoli",
+      "lega": "Serie B",
+      "giornata": 19,
+      "timestamp": "2025-12-24T04:45:15.006648",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "19 10-01\n19:30 Cesena - Empoli"
+      }
+    },
+    {
+      "partita": "Mantova vs Palermo",
+      "lega": "Serie B",
+      "giornata": 19,
+      "timestamp": "2025-12-24T04:45:15.056977",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "19 11-01\n15:00 Mantova - Palermo"
+      }
+    },
+    {
+      "partita": "Padova vs Modena",
+      "lega": "Serie B",
+      "giornata": 19,
+      "timestamp": "2025-12-24T04:45:15.112820",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "19 11-01\n17:15 Padova - Modena"
+      }
+    },
+    {
+      "partita": "Trento vs Giana Erminio",
+      "lega": "Serie C - Girone A",
+      "giornata": 20,
+      "timestamp": "2025-12-24T04:45:20.114013",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "20 04-01\n18:30 Trento - Giana"
+      }
+    },
+    {
+      "partita": "Cittadella vs Virtus Verona",
+      "lega": "Serie C - Girone A",
+      "giornata": 20,
+      "timestamp": "2025-12-24T04:45:20.168715",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "20 04-01\n18:30 Cittadella - USD Virtus Verona"
+      }
+    },
+    {
+      "partita": "Ospitaletto vs Lecco",
+      "lega": "Serie C - Girone A",
+      "giornata": 20,
+      "timestamp": "2025-12-24T04:45:20.218677",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "20 04-01\n18:30 A.C. Ospitaletto - Lecco"
+      }
+    },
+    {
+      "partita": "Renate vs Pergolettese",
+      "lega": "Serie C - Girone A",
+      "giornata": 20,
+      "timestamp": "2025-12-24T04:45:20.268587",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "20 04-01\n18:30 Renate AC - US Pergolettese 1932"
+      }
+    },
+    {
+      "partita": "Pro Vercelli vs Pro Patria",
+      "lega": "Serie C - Girone A",
+      "giornata": 20,
+      "timestamp": "2025-12-24T04:45:20.318733",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "20 04-01\n18:30 Pro Vercelli - Pro Patria"
+      }
+    },
+    {
+      "partita": "Lumezzane vs Vicenza",
+      "lega": "Serie C - Girone A",
+      "giornata": 20,
+      "timestamp": "2025-12-24T04:45:20.368728",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "20 04-01\n18:30 Lumezzane - Vicenza"
+      }
+    },
+    {
+      "partita": "Inter U23 vs Novara",
+      "lega": "Serie C - Girone A",
+      "giornata": 20,
+      "timestamp": "2025-12-24T04:45:20.418647",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "20 04-01\n18:30 Inter Milan U23 - Novara"
+      }
+    },
+    {
+      "partita": "Arzignano vs Union Brescia",
+      "lega": "Serie C - Girone A",
+      "giornata": 20,
+      "timestamp": "2025-12-24T04:45:20.474145",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "20 04-01\n18:30 Arzignano Valchiampo - Brescia"
+      }
+    },
+    {
+      "partita": "Dolomiti vs AlbinoLeffe",
+      "lega": "Serie C - Girone A",
+      "giornata": 20,
+      "timestamp": "2025-12-24T04:45:20.548711",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "20 04-01\n18:30 AC Dolomiti Bellunesi - Albinoleffe"
+      }
+    },
+    {
+      "partita": "Triestina vs Alcione",
+      "lega": "Serie C - Girone A",
+      "giornata": 20,
+      "timestamp": "2025-12-24T04:45:20.598769",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "20 04-01\n18:30 Triestina - ASD Alcione"
+      }
+    },
+    {
+      "partita": "Vicenza vs Ospitaletto",
+      "lega": "Serie C - Girone A",
+      "giornata": 21,
+      "timestamp": "2025-12-24T04:45:23.819899",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 11-01\n18:30 Vicenza - A.C. Ospitaletto"
+      }
+    },
+    {
+      "partita": "AlbinoLeffe vs Pro Vercelli",
+      "lega": "Serie C - Girone A",
+      "giornata": 21,
+      "timestamp": "2025-12-24T04:45:23.869537",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 11-01\n18:30 Albinoleffe - Pro Vercelli"
+      }
+    },
+    {
+      "partita": "Giana Erminio vs Renate",
+      "lega": "Serie C - Girone A",
+      "giornata": 21,
+      "timestamp": "2025-12-24T04:45:23.919505",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 11-01\n18:30 Giana - Renate AC"
+      }
+    },
+    {
+      "partita": "Union Brescia vs Trento",
+      "lega": "Serie C - Girone A",
+      "giornata": 21,
+      "timestamp": "2025-12-24T04:45:23.969709",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 11-01\n18:30 Brescia - Trento"
+      }
+    },
+    {
+      "partita": "Pro Patria vs Inter U23",
+      "lega": "Serie C - Girone A",
+      "giornata": 21,
+      "timestamp": "2025-12-24T04:45:24.020261",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 11-01\n18:30 Pro Patria - Inter Milan U23"
+      }
+    },
+    {
+      "partita": "Pergolettese vs Lumezzane",
+      "lega": "Serie C - Girone A",
+      "giornata": 21,
+      "timestamp": "2025-12-24T04:45:24.070253",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 11-01\n18:30 US Pergolettese 1932 - Lumezzane"
+      }
+    },
+    {
+      "partita": "Virtus Verona vs Arzignano",
+      "lega": "Serie C - Girone A",
+      "giornata": 21,
+      "timestamp": "2025-12-24T04:45:24.120706",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 11-01\n18:30 USD Virtus Verona - Arzignano Valchiampo"
+      }
+    },
+    {
+      "partita": "Alcione vs Cittadella",
+      "lega": "Serie C - Girone A",
+      "giornata": 21,
+      "timestamp": "2025-12-24T04:45:24.170799",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 11-01\n18:30 ASD Alcione - Cittadella"
+      }
+    },
+    {
+      "partita": "Novara vs Dolomiti",
+      "lega": "Serie C - Girone A",
+      "giornata": 21,
+      "timestamp": "2025-12-24T04:45:24.245730",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 11-01\n18:30 Novara - AC Dolomiti Bellunesi"
+      }
+    },
+    {
+      "partita": "Lecco vs Triestina",
+      "lega": "Serie C - Girone A",
+      "giornata": 21,
+      "timestamp": "2025-12-24T04:45:24.295992",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 11-01\n18:30 Lecco - Triestina"
+      }
+    },
+    {
+      "partita": "Pianese vs Ascoli",
+      "lega": "Serie C - Girone B",
+      "giornata": 20,
+      "timestamp": "2025-12-24T04:45:29.277120",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "20 04-01\n18:30 US Pianese - Ascoli"
+      }
+    },
+    {
+      "partita": "Juve Next Gen vs Carpi",
+      "lega": "Serie C - Girone B",
+      "giornata": 20,
+      "timestamp": "2025-12-24T04:45:29.376510",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "20 04-01\n18:30 JuventusU23 - Athletic Carpi"
+      }
+    },
+    {
+      "partita": "Guidonia vs Perugia",
+      "lega": "Serie C - Girone B",
+      "giornata": 20,
+      "timestamp": "2025-12-24T04:45:29.426589",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "20 04-01\n18:30 Nuova Monterosi - Perugia"
+      }
+    },
+    {
+      "partita": "Pontedera vs Torres",
+      "lega": "Serie C - Girone B",
+      "giornata": 20,
+      "timestamp": "2025-12-24T04:45:29.476425",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "20 04-01\n18:30 Pontedera - Sassari Torres"
+      }
+    },
+    {
+      "partita": "Forlì vs Arezzo",
+      "lega": "Serie C - Girone B",
+      "giornata": 20,
+      "timestamp": "2025-12-24T04:45:29.551156",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "20 04-01\n18:30 Forli - Arezzo"
+      }
+    },
+    {
+      "partita": "Vis Pesaro vs Pineto",
+      "lega": "Serie C - Girone B",
+      "giornata": 20,
+      "timestamp": "2025-12-24T04:45:29.600949",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "20 04-01\n18:30 Vis Pesaro - Asd Pineto Calcio"
+      }
+    },
+    {
+      "partita": "Campobasso vs Ravenna",
+      "lega": "Serie C - Girone B",
+      "giornata": 20,
+      "timestamp": "2025-12-24T04:45:29.651002",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "20 04-01\n18:30 Nuovo Campobasso - Ravenna"
+      }
+    },
+    {
+      "partita": "Bra vs Sambenedettese",
+      "lega": "Serie C - Girone B",
+      "giornata": 20,
+      "timestamp": "2025-12-24T04:45:29.700978",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "20 04-01\n18:30 A.S.D. Bra - Sambenedettese"
+      }
+    },
+    {
+      "partita": "Ternana vs Livorno",
+      "lega": "Serie C - Girone B",
+      "giornata": 20,
+      "timestamp": "2025-12-24T04:45:29.751317",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "20 04-01\n18:30 Ternana - Livorno"
+      }
+    },
+    {
+      "partita": "Ascoli vs Ternana",
+      "lega": "Serie C - Girone B",
+      "giornata": 21,
+      "timestamp": "2025-12-24T04:45:32.980635",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 11-01\n18:30 Ascoli - Ternana"
+      }
+    },
+    {
+      "partita": "Torres vs Campobasso",
+      "lega": "Serie C - Girone B",
+      "giornata": 21,
+      "timestamp": "2025-12-24T04:45:33.030889",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 11-01\n18:30 Sassari Torres - Nuovo Campobasso"
+      }
+    },
+    {
+      "partita": "Ravenna vs Forlì",
+      "lega": "Serie C - Girone B",
+      "giornata": 21,
+      "timestamp": "2025-12-24T04:45:33.112057",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 11-01\n18:30 Ravenna - Forli"
+      }
+    },
+    {
+      "partita": "Sambenedettese vs Gubbio",
+      "lega": "Serie C - Girone B",
+      "giornata": 21,
+      "timestamp": "2025-12-24T04:45:33.162536",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 11-01\n18:30 Sambenedettese - Gubbio"
+      }
+    },
+    {
+      "partita": "Livorno vs Juve Next Gen",
+      "lega": "Serie C - Girone B",
+      "giornata": 21,
+      "timestamp": "2025-12-24T04:45:33.237591",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 11-01\n18:30 Livorno - JuventusU23"
+      }
+    },
+    {
+      "partita": "Carpi vs Pianese",
+      "lega": "Serie C - Girone B",
+      "giornata": 21,
+      "timestamp": "2025-12-24T04:45:33.312490",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 11-01\n18:30 Athletic Carpi - US Pianese"
+      }
+    },
+    {
+      "partita": "Perugia vs Bra",
+      "lega": "Serie C - Girone B",
+      "giornata": 21,
+      "timestamp": "2025-12-24T04:45:33.362129",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 11-01\n18:30 Perugia - A.S.D. Bra"
+      }
+    },
+    {
+      "partita": "Arezzo vs Pontedera",
+      "lega": "Serie C - Girone B",
+      "giornata": 21,
+      "timestamp": "2025-12-24T04:45:33.412258",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 11-01\n18:30 Arezzo - Pontedera"
+      }
+    },
+    {
+      "partita": "Pineto vs Guidonia",
+      "lega": "Serie C - Girone B",
+      "giornata": 21,
+      "timestamp": "2025-12-24T04:45:33.461998",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 11-01\n18:30 Asd Pineto Calcio - Nuova Monterosi"
+      }
+    },
+    {
+      "partita": "Picerno vs Cerignola",
+      "lega": "Serie C - Girone C",
+      "giornata": 20,
+      "timestamp": "2025-12-24T04:45:38.449142",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "20 04-01\n18:30 AZ Picerno ASD - Audace Cerignola"
+      }
+    },
+    {
+      "partita": "Cavese vs Sorrento",
+      "lega": "Serie C - Girone C",
+      "giornata": 20,
+      "timestamp": "2025-12-24T04:45:38.499190",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "20 04-01\n18:30 Cavese - AS Sorrento Calcio"
+      }
+    },
+    {
+      "partita": "Foggia vs Catania",
+      "lega": "Serie C - Girone C",
+      "giornata": 20,
+      "timestamp": "2025-12-24T04:45:38.549200",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "20 04-01\n18:30 Foggia - Catania"
+      }
+    },
+    {
+      "partita": "Atalanta U23 vs Latina",
+      "lega": "Serie C - Girone C",
+      "giornata": 20,
+      "timestamp": "2025-12-24T04:45:38.649149",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "20 04-01\n18:30 Atalanta U23 - Latina"
+      }
+    },
+    {
+      "partita": "Potenza vs Giugliano",
+      "lega": "Serie C - Girone C",
+      "giornata": 20,
+      "timestamp": "2025-12-24T04:45:38.699089",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "20 04-01\n18:30 Potenza - Giugliano"
+      }
+    },
+    {
+      "partita": "Siracusa vs Salernitana",
+      "lega": "Serie C - Girone C",
+      "giornata": 20,
+      "timestamp": "2025-12-24T04:45:38.755342",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "20 04-01\n18:30 US Siracusa - Salernitana"
+      }
+    },
+    {
+      "partita": "Trapani vs Casarano",
+      "lega": "Serie C - Girone C",
+      "giornata": 20,
+      "timestamp": "2025-12-24T04:45:38.805098",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "20 04-01\n18:30 Trapani - Casarano"
+      }
+    },
+    {
+      "partita": "Team Altamura vs Casertana",
+      "lega": "Serie C - Girone C",
+      "giornata": 20,
+      "timestamp": "2025-12-24T04:45:38.880035",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "20 04-01\n18:30 Team Altamura - US Casertana 1908"
+      }
+    },
+    {
+      "partita": "Benevento vs Crotone",
+      "lega": "Serie C - Girone C",
+      "giornata": 20,
+      "timestamp": "2025-12-24T04:45:38.930236",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "20 04-01\n18:30 Benevento - Crotone"
+      }
+    },
+    {
+      "partita": "Cosenza vs Monopoli",
+      "lega": "Serie C - Girone C",
+      "giornata": 20,
+      "timestamp": "2025-12-24T04:45:38.980781",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "20 04-01\n18:30 Cosenza Calcio 1914 - AC Monopoli"
+      }
+    },
+    {
+      "partita": "Cerignola vs Potenza",
+      "lega": "Serie C - Girone C",
+      "giornata": 21,
+      "timestamp": "2025-12-24T04:45:42.262506",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 11-01\n18:30 Audace Cerignola - Potenza"
+      }
+    },
+    {
+      "partita": "Latina vs Trapani",
+      "lega": "Serie C - Girone C",
+      "giornata": 21,
+      "timestamp": "2025-12-24T04:45:42.312598",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 11-01\n18:30 Latina - Trapani"
+      }
+    },
+    {
+      "partita": "Sorrento vs Foggia",
+      "lega": "Serie C - Girone C",
+      "giornata": 21,
+      "timestamp": "2025-12-24T04:45:42.373006",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 11-01\n18:30 AS Sorrento Calcio - Foggia"
+      }
+    },
+    {
+      "partita": "Crotone vs Team Altamura",
+      "lega": "Serie C - Girone C",
+      "giornata": 21,
+      "timestamp": "2025-12-24T04:45:42.447836",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 11-01\n18:30 Crotone - Team Altamura"
+      }
+    },
+    {
+      "partita": "Casarano vs Atalanta U23",
+      "lega": "Serie C - Girone C",
+      "giornata": 21,
+      "timestamp": "2025-12-24T04:45:42.547732",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 11-01\n18:30 Casarano - Atalanta U23"
+      }
+    },
+    {
+      "partita": "Catania vs Cavese",
+      "lega": "Serie C - Girone C",
+      "giornata": 21,
+      "timestamp": "2025-12-24T04:45:42.597915",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 11-01\n18:30 Catania - Cavese"
+      }
+    },
+    {
+      "partita": "Monopoli vs Siracusa",
+      "lega": "Serie C - Girone C",
+      "giornata": 21,
+      "timestamp": "2025-12-24T04:45:42.648175",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 11-01\n18:30 AC Monopoli - US Siracusa"
+      }
+    },
+    {
+      "partita": "Casertana vs Benevento",
+      "lega": "Serie C - Girone C",
+      "giornata": 21,
+      "timestamp": "2025-12-24T04:45:42.697766",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 11-01\n18:30 US Casertana 1908 - Benevento"
+      }
+    },
+    {
+      "partita": "Giugliano vs Picerno",
+      "lega": "Serie C - Girone C",
+      "giornata": 21,
+      "timestamp": "2025-12-24T04:45:42.747789",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 11-01\n18:30 Giugliano - AZ Picerno ASD"
+      }
+    },
+    {
+      "partita": "Salernitana vs Cosenza",
+      "lega": "Serie C - Girone C",
+      "giornata": 21,
+      "timestamp": "2025-12-24T04:45:42.797677",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 11-01\n18:30 Salernitana - Cosenza Calcio 1914"
+      }
+    },
+    {
+      "partita": "Casa Pia vs Vit. Guimarães",
+      "lega": "Liga Portugal",
+      "giornata": 16,
+      "timestamp": "2025-12-24T04:46:34.922547",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "16 28-12\n16:30 Casa Pia AC[15]\n-\nVitoria Guimaraes[8]   "
+      }
+    },
+    {
+      "partita": "Sporting vs Rio Ave",
+      "lega": "Liga Portugal",
+      "giornata": 16,
+      "timestamp": "2025-12-24T04:46:35.122312",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "16 28-12\n21:30 Sporting CP[2]\n-\nRio Ave[10]   "
+      }
+    },
+    {
+      "partita": "Nacional vs Santa Clara",
+      "lega": "Liga Portugal",
+      "giornata": 16,
+      "timestamp": "2025-12-24T04:46:35.297275",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "16 11-01\n16:30 Nacional da Madeira - Santa Clara"
+      }
+    },
+    {
+      "partita": "Moreirense vs Tondela",
+      "lega": "Liga Portugal",
+      "giornata": 16,
+      "timestamp": "2025-12-24T04:46:35.347418",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "16 11-01\n19:00 Moreirense - CD Tondela"
+      }
+    },
+    {
+      "partita": "Gil Vicente vs Sporting",
+      "lega": "Liga Portugal",
+      "giornata": 17,
+      "timestamp": "2025-12-24T04:46:38.623679",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "17 02-01\n19:45 Gil Vicente - Sporting CP"
+      }
+    },
+    {
+      "partita": "Vit. Guimarães vs Nacional",
+      "lega": "Liga Portugal",
+      "giornata": 17,
+      "timestamp": "2025-12-24T04:46:38.698520",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "17 02-01\n21:45 Vitoria Guimaraes - Nacional da Madeira"
+      }
+    },
+    {
+      "partita": "Tondela vs Arouca",
+      "lega": "Liga Portugal",
+      "giornata": 17,
+      "timestamp": "2025-12-24T04:46:38.748545",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "17 03-01\n16:30 CD Tondela - FC Arouca"
+      }
+    },
+    {
+      "partita": "Benfica vs Estoril",
+      "lega": "Liga Portugal",
+      "giornata": 17,
+      "timestamp": "2025-12-24T04:46:38.801264",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "17 03-01\n19:00 Benfica - Estoril"
+      }
+    },
+    {
+      "partita": "Estrela Amadora vs SC Braga",
+      "lega": "Liga Portugal",
+      "giornata": 17,
+      "timestamp": "2025-12-24T04:46:38.876824",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "17 03-01\n19:00 Estrela da Amadora - Sporting Braga"
+      }
+    },
+    {
+      "partita": "Avs FS vs Moreirense",
+      "lega": "Liga Portugal",
+      "giornata": 17,
+      "timestamp": "2025-12-24T04:46:38.951699",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "17 03-01\n21:30 AVS Futebol SAD - Moreirense"
+      }
+    },
+    {
+      "partita": "Rio Ave vs Casa Pia",
+      "lega": "Liga Portugal",
+      "giornata": 17,
+      "timestamp": "2025-12-24T04:46:39.002013",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "17 04-01\n16:30 Rio Ave - Casa Pia AC"
+      }
+    },
+    {
+      "partita": "Santa Clara vs FC Porto",
+      "lega": "Liga Portugal",
+      "giornata": 17,
+      "timestamp": "2025-12-24T04:46:39.052603",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "17 04-01\n19:00 Santa Clara - FC Porto"
+      }
+    },
+    {
+      "partita": "Alverca vs Famalicão",
+      "lega": "Liga Portugal",
+      "giornata": 17,
+      "timestamp": "2025-12-24T04:46:39.132256",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "17 04-01\n21:30 Alverca - FC Famalicao"
+      }
+    }
+  ]
+}
