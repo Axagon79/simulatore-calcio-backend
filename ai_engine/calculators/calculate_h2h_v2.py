@@ -1,6 +1,7 @@
 import sys
 import os
 import json
+import math # <--- AGGIUNGI QUESTO IN CIMA CON GLI ALTRI IMPORT
 from datetime import datetime, timedelta
 from tqdm import tqdm
 from colorama import Fore, Style, init
@@ -436,15 +437,26 @@ def get_h2h_score_v2(home_name, away_name, h_canon, a_canon):
     # Più punti accumulati negli scontri diretti = punteggio più alto
     # Mantiene tutta la logica esistente: peso temporale + difficoltà vittoria
 
-    # Massimo teorico: ~10 vittorie difficili = 10 * 4.5 punti = 45
-    MAX_THEORETICAL_SCORE = 45.0
+    # --- NUOVA LOGICA: CURVA A RADICE (NO CAP, LIMIT 10 SAFE) ---
+    
+    # Manteniamo il massimale teorico "divino" per sicurezza assoluta.
+    # Così siamo certi che nessuno potrà MAI superare matematicamente il 10.
+    MAX_THEORETICAL_SCORE = 112.5 
 
     raw_h = w_score_h
     raw_a = w_score_a
 
-    # Converti punti raw in scala 0-10 assoluta
-    norm_h = min(10.0, (raw_h / MAX_THEORETICAL_SCORE) * 10)
-    norm_a = min(10.0, (raw_a / MAX_THEORETICAL_SCORE) * 10)
+    # FORMULA A RADICE QUADRATA
+    # Spinge verso l'alto i punteggi medi, ma frena dolcemente verso il 10.
+    # Non serve nessun min() o tappo, perché la radice di (X / Max) non può superare 1 se X <= Max.
+    
+    # Math: Radice(Punti / Max) * 10
+    
+    norm_h = math.sqrt(raw_h / MAX_THEORETICAL_SCORE) * 10 if raw_h > 0 else 0
+    norm_a = math.sqrt(raw_a / MAX_THEORETICAL_SCORE) * 10 if raw_a > 0 else 0
+    
+    # Arrotondamento a 1 decimale o 2 come preferisci (qui metto 2 per precisione interna)
+    # Nota: Rimuoviamo il min(10.0) perché è matematicamente superfluo ora.
 
     # Se non ci sono dati, punteggio neutro
     if raw_h == 0 and raw_a == 0:
@@ -476,7 +488,7 @@ def get_h2h_score_v2(home_name, away_name, h_canon, a_canon):
 
 
 def run_calculator():
-    print(f"{Fore.CYAN}🧠 CALCOLATORE H2H v2.0 PRO (Formula Dinamica + GOL + FIX NOMI){Style.RESET_ALL}")
+    print(f"{Fore.CYAN}🧠 CALCOLATORE H2H v2.0 PRO (Modalità Chirurgica - No Data Loss){Style.RESET_ALL}")
     
     rounds = list(db[TARGET_COLLECTION].find({}))
     count = 0
@@ -484,17 +496,45 @@ def run_calculator():
     for r in tqdm(rounds, desc="Elaborazione"):
         modified = False
         for m in r.get("matches", []):
+            # 1. Calcola i NUOVI dati (quelli elencati da te: home_score, avg_goals, ecc.)
             res = get_h2h_score_v2(m["home"], m["away"], m.get("home_canonical"), m.get("away_canonical"))
+            
             if res:
-                m["h2h_data"] = res
+                # --- FASE CHIRURGICA ---
+                
+                # A. Prendi quello che c'era prima (preserviamo i tuoi campi extra!)
+                existing_data = m.get("h2h_data", {})
+                
+                # Protezione: se per caso non era un dizionario (o era None), creane uno vuoto
+                if not isinstance(existing_data, dict): 
+                    existing_data = {}
+
+                # B. AGGIORNAMENTO MIRATO
+                # Questo comando dice: "Prendi existing_data e cambia SOLO le chiavi presenti in res".
+                # Se in existing_data c'era "mio_campo_segreto": "X", questo RIMANE intatto.
+                existing_data.update(res)
+                
+                # C. Rimetti l'oggetto completo al suo posto
+                m["h2h_data"] = existing_data
+                
+                # -----------------------
+
                 m["h2h_last_updated"] = datetime.now()
                 modified = True
                 count += 1
             else:
-                m["h2h_data"] = {"status": "No Data", "h2h_weight": 0.0}
+                # Anche nel caso "No Data", preserviamo i campi esistenti
+                existing_data = m.get("h2h_data", {})
+                if not isinstance(existing_data, dict): existing_data = {}
+                
+                # Aggiorniamo solo lo status, senza cancellare il resto
+                existing_data.update({"status": "No Data", "h2h_weight": 0.0})
+                m["h2h_data"] = existing_data
+                
                 modified = True
         
         if modified:
+            # Salvataggio finale
             db[TARGET_COLLECTION].update_one({"_id": r["_id"]}, {"$set": {"matches": r["matches"]}})
 
 
@@ -512,8 +552,8 @@ def test_manuale(squadra_casa, squadra_trasferta):
 
 if __name__ == "__main__":
     # --- MODALITÀ TEST (DISATTIVATA PER PRODUZIONE) ---
-    #test_manuale("Famalicão", "Estoril")  # ← Attiva questa
+    #test_manuale("Atalanta", "Inter")  # ← Attiva questa
     
     # --- MODALITÀ PRODUZIONE (ATTIVA) ---
     # Questo lancia l'aggiornamento di TUTTE le partite nel database.
-      run_calculator()
+    run_calculator()
