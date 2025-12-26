@@ -8,7 +8,9 @@ const app = express();
 app.use(cors({ origin: true }));
 app.use(express.json());
 
-const MONGO_URI = process.env.MONGO_URI;
+// Invece di: const MONGO_URI = process.env.MONGO_URI;
+const MONGO_URI="mongodb+srv://Database_User:LPmYAZkzEVxjSaAd@pup-pals-cluster.y1h2r.mongodb.net/football_simulator_db?retryWrites=true&w=majority&appName=pup-pals-cluster"
+
 let client;
 let db;
 
