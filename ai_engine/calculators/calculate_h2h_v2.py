@@ -516,4 +516,4 @@ if __name__ == "__main__":
     
     # --- MODALITÀ PRODUZIONE (ATTIVA) ---
     # Questo lancia l'aggiornamento di TUTTE le partite nel database.
-     run_calculator()
+      run_calculator()
