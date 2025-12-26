@@ -1,43 +1,39 @@
-const functions = require('firebase-functions');
+const { onRequest } = require("firebase-functions/v2/https");
+const simulationRoutes = require('./routes/simulationRoutes');
 const express = require('express');
 const cors = require('cors');
 const { MongoClient } = require('mongodb');
-const path = require('path');
-require('dotenv').config({ path: path.join(__dirname, '../.env') });
-
-const simulationRoutes = require('./routes/simulationRoutes');
 
 const app = express();
 app.use(cors({ origin: true }));
 app.use(express.json());
 
-let dbReady = false;
+const MONGO_URI = process.env.MONGO_URI;
+let client;
 let db;
 
-// Connetti e ASPETTA
-const MONGO_URI = process.env.MONGO_URI;
-const client = new MongoClient(MONGO_URI);
-
-async function connectDB() {
-  try {
+// Funzione per ottenere il database (si connette solo se necessario)
+async function getDatabase() {
+  if (db) return db;
+  if (!client) {
+    client = new MongoClient(MONGO_URI);
     await client.connect();
-    const db_name = MONGO_URI.split('/').pop()?.split('?')[0] || 'football_simulator_db';
-    db = client.db(db_name);
-    dbReady = true;
-    console.log(`✅ DB connesso: ${db_name}`);
-  } catch (err) {
-    console.error('❌ Mongo errore:', err);
   }
+  const db_name = MONGO_URI.split('/').pop()?.split('?')[0] || 'football_simulator_db';
+  db = client.db(db_name);
+  console.log(`✅ DB connesso: ${db_name}`);
+  return db;
 }
 
-connectDB();
-
-// Aspetta DB pronto
-app.use((req, res, next) => {
-  if (!dbReady) {
-    return res.status(503).json({ error: 'DB non pronto, riprova tra 2 secondi' });
+// Middleware: invece di dare errore 503, aspetta la connessione
+app.use(async (req, res, next) => {
+  try {
+    req.db = await getDatabase();
+    next();
+  } catch (err) {
+    console.error('❌ Errore connessione DB:', err);
+    res.status(500).send("Errore di connessione al database");
   }
-  next();
 });
 
 // ============================================
@@ -281,11 +277,18 @@ app.use('/simulation', simulationRoutes);
 
 
 // ============================================
-// ROOT
+// ROOT E ESPORTAZIONE
 // ============================================
 
 app.get('/', (req, res) => {
   res.send('Simulatore Calcio API is running... ⚽');
 });
 
-exports.api = functions.https.onRequest(app);
+// NON ri-dichiarare onRequest qui! È già dichiarata alla riga 1.
+exports.api = onRequest({
+  region: "us-central1",
+  memory: "256MiB",
+  timeoutSeconds: 60,
+  cors: true,
+  invoker: 'public'
+}, app);
