@@ -124,31 +124,42 @@ def calculate_reliability(team_name, specific_league=None):
             lost = ga < gh
             draw = gh == ga
 
-        # --- LOGICA PUNTEGGIO (IDENTICA ALLA VECCHIA) ---
+        # --- LOGICA PUNTEGGIO "ALTO CONTRASTO" (Separazione Netta) ---
+        # Assegniamo voti pesanti per staccare le squadre in classifica.
+        
         colpo = 0.0
-        # 1. SQUADRA FAVORITA (Quota < 2.00)
-        if my_odds <= 2.00:
-            if won:
-                colpo = 0.8
-            elif draw:
-                colpo = -0.5
-            elif lost:
-                colpo = -1.2
 
-        # 2. SQUADRA SFAVORITA (Quota > 3.00)
+        # --- LOGICA "PUGNO DI FERRO" (Severità Massima) ---
+        colpo = 0.0
+
+        # 1. SQUADRA FAVORITA (Quota <= 2.00)
+        # Se sei favorito DEVI vincere. Se perdi, sei inaffidabile al massimo.
+        if my_odds <= 2.00:
+            if won: 
+                colpo = 1.5       # Premio alto per la costanza
+            elif draw: 
+                colpo = -2.0      # Pareggiare da favorita è grave (-2.0)
+            elif lost: 
+                colpo = -3.5      # Sconfitta da favorita = CROLLO VERTICALE (-3.5)
+
+        # 2. SQUADRA SFAVORITA (Quota >= 3.00)
+        # L'affidabilità qui è perdere. Se vinci, sei una "mina vagante" (inaffidabile).
         elif my_odds >= 3.00:
-            if lost:
-                colpo = 0.2
-            elif won:
-                colpo = -0.5
-            elif draw:
-                colpo = -0.3
+            if lost: 
+                colpo = 0.5       # "Affidabile" perché prevedibile (sconfitta attesa)
+            elif won: 
+                colpo = -1.5      # Sorpresa "sgradita" per il pronostico (inaffidabile)
+            elif draw: 
+                colpo = -0.5      # Sorpresa minore
 
         # 3. PARTITA EQUILIBRATA (2.00 < Quota < 3.00)
         else:
-            if won: colpo = 0.7
-            if draw: colpo = -0.70
-            if lost: colpo = -1.40
+            if won: 
+                colpo = 1.2       # Vittoria di carattere (+1.2)
+            elif draw: 
+                colpo = -0.5      # Pareggio accettabile
+            elif lost: 
+                colpo = -2.5      # Perdere scontro diretto è segno di debolezza (-2.5)
 
         scores_list.append(colpo)
         valid_matches += 1
@@ -160,26 +171,33 @@ def calculate_reliability(team_name, specific_league=None):
             if not scores_list:
                 return 5.0
 
-    # --- NUOVA NORMALIZZAZIONE LINEARE (Media + Deviazione Standard) ---
+    # --- CALCOLO MATEMATICO ADATTIVO (Versione Equa) ---
     # 1. Media dei colpi
     avg_score = sum(scores_list) / len(scores_list)
     
-    # 2. Deviazione standard (misura irregolarità)
+    # 2. Deviazione standard (misura l'irregolarità)
     variance = sum((x - avg_score) ** 2 for x in scores_list) / len(scores_list)
     std_dev = math.sqrt(variance)
     
-    # 3. Formula lineare finale
-    # Base 5.0 + effetto media (x4) - penalità irregolarità (x1.2)
-    final_score = 5.0 + (avg_score * 4.0) - (std_dev * 1.2)
+    # 3. DETERMINAZIONE MOLTIPLICATORE (Ultra-Gain / Massima Reattività)
+    # Sensibilità estrema: il voto scatta verso il 10 o lo 0 molto velocemente.
+    # - Positivo: 10.0 (Basta una media di +0.5 per avere 10)
+    # - Negativo: 5.5 (Basta una media di -0.9 per avere 0)
+    multiplier = 10.0 if avg_score >= 0 else 5.5
 
-    # Cap 0-10
-    if final_score > 10: final_score = 10.0
-    if final_score < 0: final_score = 0.0
+    # 4. FORMULA FINALE
+    # Penalità irregolarità alzata a 2.0 per filtrare chi ha media alta solo per fortuna
+    final_score = 5.0 + (avg_score * multiplier) - (std_dev * 2.0)
 
-    # Correzione per poche partite (Regressione verso la media) - IDENTICA ALLA VECCHIA
-    if valid_matches < 5:
-        # Regressione proporzionale ai match
-        weight = valid_matches / 5.0  # 0-1
+    # Cap Assoluto 0-10
+    if final_score > 10.0: final_score = 10.0
+    if final_score < 0.0: final_score = 0.0
+
+    # Correzione per poche partite (Regressione verso la media)
+    # Alziamo la soglia minima a 10 partite per avere un dato statistico serio
+    min_threshold = 10
+    if valid_matches < min_threshold:
+        weight = valid_matches / float(min_threshold)
         final_score = final_score * weight + 5.0 * (1 - weight)
 
     return round(final_score, 2)
@@ -189,7 +207,7 @@ def calculate_reliability(team_name, specific_league=None):
 if __name__ == "__main__":
     from config import db # Assicuriamoci di avere il db
     
-    t_name = "Inter" # O metti la squadra che stai cercando di testare
+    t_name = "Manchester City" # O metti la squadra che stai cercando di testare
     
     print(f"\n🔍 DIAGNOSTICA PER: '{t_name}'")
     

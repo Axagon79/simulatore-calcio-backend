@@ -126,4 +126,4 @@ def calculate_field_factor(home_team_name, away_team_name, league_name=None):
 
 if __name__ == "__main__":
     # Test
-    calculate_field_factor("Trento", "Cittadella")
+    calculate_field_factor("Juventus U23", "Dolomiti")
