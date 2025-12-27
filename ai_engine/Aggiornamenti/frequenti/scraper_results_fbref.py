@@ -209,7 +209,7 @@ def main():
     scrape_team_stats(scraper)
     
     # 2. Scarica i risultati
-    scrape_match_results(scraper)
+   # scrape_match_results(scraper)
     
     print("\n🏁 TUTTO AGGIORNATO.")
 

@@ -81,7 +81,7 @@ except Exception as e:
 # Conta documenti nelle collezioni principali (solo se esistono)
 print(f" Database: {db_name}")
 
-collections_to_check = ['teams', 'matches_history', 'raw_h2h_data_v2', 'h2h_by_round']
+collections_to_check = ['teams', 'matches_history_betexplorer', 'raw_h2h_data_v2', 'h2h_by_round']
 for collection in collections_to_check:
     if collection in db.list_collection_names():
         count = db[collection].count_documents({})

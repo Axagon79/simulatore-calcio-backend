@@ -32,9 +32,9 @@ CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 SCRAPER_SEQUENCE = [
       ("scraper_results_fbref.py", "📊 [1/13] Risultati & xG (FBref)", "Mancano risultati recenti e xG", FREQUENT_DIR),
       
-      ("scrape_lucifero_betexplorer_safe.py", "🔥 [2/13] Lucifero & Serie C (BetExplorer)", "Il Lucifero non funziona senza questo", FREQUENT_DIR),
+      ("scrape_lucifero_betexplorer_safe.py", "🔥 [2/13] Affidabilità squadre (BetExplorer)", FREQUENT_DIR),
       
-      ("scraper_quote_storiche_betexplorer.py", "💰 [3/13] Quote Storiche", "Calcolo Affidabilità/BVS impossibile", FREQUENT_DIR),
+    # ("scraper_quote_storiche_betexplorer.py", "💰 [3/13] Quote Storiche", "Calcolo Affidabilità/BVS impossibile", FREQUENT_DIR),
       ("scraper_soccerstats_ranking_unified.py", "🏆 [4/13] Classifica & Gol", "Calcolo Forza Attacco/Difesa sballato", FREQUENT_DIR),
     
       ("fbref_scraper_att.py", "⚽ [5/13] Stats Attaccanti", "Analisi attacco imprecisa", FREQUENT_DIR),
@@ -48,10 +48,13 @@ SCRAPER_SEQUENCE = [
       # ⭐ Questo sta nella cartella calculators
       ("calculate_h2h_v2.py", "🧠 [11/13] Elaborazione H2H Pro", "Mancano medie gol e punteggi storici", CALCULATORS_DIR),
     
-      ("scraper_fixtures.py", "📆 [12/13] Partite Future", "Il motore non saprà cosa simulare", FREQUENT_DIR),
-      ("scraper_odds_oddsmath.py", "💎 [13/13] Quote Future", "Manca confronto con bookmaker", FREQUENT_DIR),
+    # ("scraper_fixtures.py", "📆 [12/13] Partite Future", "Il motore non saprà cosa simulare", FREQUENT_DIR),
+    
+    # ("scraper_odds_oddsmath.py", "💎 [13/13] Quote Future", "Manca confronto con bookmaker", FREQUENT_DIR),
+      
       # ⭐ NUOVO SCRIPT AGGIUNTO QUI ALLA FINE NELLA CARTELLA FREQUENTI
       ("nowgoal_scraper.py", "🚀 [14/14] Quote H2H Arricchite (NowGoal)", "Mancano le quote precise nel CSV", FREQUENT_DIR),
+      
       # ⭐ NUOVO SCRIPT DI DEBUG PER FIX MATCHING QUOTE NOWGOAL
       ("debug_nowgoal_scraper.py", "🚀 [14/14] Fix Quote H2H Debug (NowGoal)", "Mancano le quote precise nel CSV", FREQUENT_DIR),
       
@@ -72,6 +75,9 @@ SCRAPER_SEQUENCE = [
       
       # NUOVO SCRIPT DI DEBUG PER AGGIORNARE IL FATT. CAMPO
       ("update_fattore_campo.py", "🏟️ [20/20] Aggiorna Fattore Campo (Debug)", "Aggiorna il fattore campo per tutte le partite", FREQUENT_DIR),
+      
+      # NUOVO SCRIPT DI DEBUG PER AGGIORNARE L'AFFIDABILITÀ
+      ("update_affidabilità.py", "🔥 [21/21] Aggiorna Affidabilità (Debug)", "Aggiorna l'affidabilità delle squadre", FREQUENT_DIR),
 ]
 
 

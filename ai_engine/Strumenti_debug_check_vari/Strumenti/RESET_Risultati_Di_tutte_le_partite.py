@@ -1,32 +1,56 @@
 import os
 import sys
-from config import db  # Assicurati che config sia nel path
 
-# --- CONFIGURAZIONE ---
-rankings_collection = db['classifiche']
+# Aggiungiamo il percorso del progetto per trovare config.py
+# Risaliamo di 3 livelli: Strumenti -> Strumenti_debug... -> ai_engine -> Progetto
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+sys.path.append(BASE_DIR)
 
-def remove_team_id_field():
-    print("🧹 AVVIO PULIZIA: Rimozione del campo 'team_id' dalle classifiche...")
+try:
+    from config import db
+    print("✅ Connessione al database caricata correttamente da config.py")
+except ImportError:
+    print("❌ Errore: Non trovo config.py. Assicurati che i percorsi siano corretti.")
+    sys.exit(1)
+
+def svuota_numeretti_affidabilità():
+    # Usiamo la collezione corretta
+    h2h_collection = db['h2h_by_round']
     
+    # Verifichiamo se il database risponde
     try:
-        # L'operazione deve agire su ogni elemento dell'array 'table'
-        # Usiamo il posizionale '$[]' per colpire tutti gli oggetti dentro l'array
-        result = rankings_collection.update_many(
-            {}, 
-            {"$unset": {"table.$[].team_id": ""}}
-        )
-        
-        print(f"✅ OPERAZIONE COMPLETATA")
-        print(f"📊 Documenti (campionati) modificati: {result.modified_count}")
-        print(f"💡 Il campo 'team_id' è stato rimosso da tutte le squadre.")
-
+        documents = list(h2h_collection.find({}))
     except Exception as e:
-        print(f"❌ Errore durante la pulizia: {e}")
+        print(f"❌ Errore di connessione: {e}")
+        return
+
+    print(f"🧹 Inizio svuotamento numeretti su {len(documents)} giornate...")
+
+    count = 0
+    for doc in documents:
+        matches_array = doc.get('matches', [])
+        modificato = False
+        
+        for index, match in enumerate(matches_array):
+            h2h = match.get('h2h_data', {})
+            
+            # Se esiste la sezione affidabilità, svuotiamo solo i numeretti
+            if h2h and 'affidabilità' in h2h:
+                h2h['affidabilità']['affidabilità_casa'] = None
+                h2h['affidabilità']['affidabilità_trasferta'] = None
+                h2h['affidabilità']['last_update'] = "Resettato"
+                
+                modificato = True
+                count += 1
+
+        # Salviamo la giornata con i campi svuotati
+        if modificato:
+            h2h_collection.update_one(
+                {"_id": doc['_id']},
+                {"$set": {"matches": matches_array}}
+            )
+
+    print(f"✅ Reset completato! Svuotati {count} match.")
 
 if __name__ == "__main__":
-    # Chiediamo conferma prima di procedere dato che è un'azione distruttiva
-    conferma = input("⚠️ Sei sicuro di voler cancellare 'team_id' da tutte le classifiche? (s/n): ")
-    if conferma.lower() == 's':
-        remove_team_id_field()
-    else:
-        print("Operazione annullata.")
+    svuota_numeretti_affidabilità()

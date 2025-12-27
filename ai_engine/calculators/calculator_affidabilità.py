@@ -15,19 +15,43 @@ def connect_db():
 
 def get_team_aliases(db, team_name):
     """Cerca gli alias della squadra per trovarla nello storico anche se il nome è diverso."""
-    team = db[COLLECTION_TEAMS].find_one({"name": team_name})
+    # MODIFICA A VENTAGLIO: Cerca il documento partendo da nome, alias o transfermarkt
+    team = db[COLLECTION_TEAMS].find_one({
+        "$or": [
+            {"name": team_name},
+            {"aliases": team_name},
+            {"alias_transfermarkt": team_name}
+        ]
+    })
+    
     aliases = [team_name]
     if team:
+        # Se il nome ufficiale nel DB è diverso da quello passato, lo aggiungiamo
+        if team.get('name') and team['name'] not in aliases:
+            aliases.append(team['name'])
+            
         # Aggiungi alias da oggetto o lista
         if isinstance(team.get('aliases'), list):
             aliases.extend(team['aliases'])
         elif isinstance(team.get('aliases'), dict):
             aliases.extend(team['aliases'].values())
-    return [a.lower() for a in aliases] # Tutto minuscolo per confronti sicuri
+            
+        # Aggiungi alias transfermarkt se presente
+        if team.get('alias_transfermarkt'):
+            aliases.append(team['alias_transfermarkt'])
+
+    return [a.lower() for a in list(set(aliases)) if a] # Tutto minuscolo e senza duplicati
 
 def get_team_league(db, team_name):
     """Recupera il campionato della squadra da teams (per ricerca intelligente)."""
-    team = db[COLLECTION_TEAMS].find_one({"name": team_name})
+    # MODIFICA A VENTAGLIO: Cerca la lega anche se il nome passato è un alias
+    team = db[COLLECTION_TEAMS].find_one({
+        "$or": [
+            {"name": team_name},
+            {"aliases": team_name},
+            {"alias_transfermarkt": team_name}
+        ]
+    })
     return team.get('league') if team else None
 
 def calculate_reliability(team_name, specific_league=None):
@@ -136,30 +160,30 @@ def calculate_reliability(team_name, specific_league=None):
         # Se sei favorito DEVI vincere. Se perdi, sei inaffidabile al massimo.
         if my_odds <= 2.00:
             if won: 
-                colpo = 1.5       # Premio alto per la costanza
+                colpo = 1.0       # Premio alto per la costanza
             elif draw: 
-                colpo = -2.0      # Pareggiare da favorita è grave (-2.0)
+                colpo = -1.0      # Pareggiare da favorita è grave (-2.0)
             elif lost: 
-                colpo = -3.5      # Sconfitta da favorita = CROLLO VERTICALE (-3.5)
+                colpo = -4.5      # Sconfitta da favorita = CROLLO VERTICALE (-3.5)
 
         # 2. SQUADRA SFAVORITA (Quota >= 3.00)
         # L'affidabilità qui è perdere. Se vinci, sei una "mina vagante" (inaffidabile).
         elif my_odds >= 3.00:
             if lost: 
-                colpo = 0.5       # "Affidabile" perché prevedibile (sconfitta attesa)
+                colpo = 1.0       # "Affidabile" perché prevedibile (sconfitta attesa)
             elif won: 
-                colpo = -1.5      # Sorpresa "sgradita" per il pronostico (inaffidabile)
+                colpo = -2.0      # Sorpresa "sgradita" per il pronostico (inaffidabile)
             elif draw: 
                 colpo = -0.5      # Sorpresa minore
 
         # 3. PARTITA EQUILIBRATA (2.00 < Quota < 3.00)
         else:
             if won: 
-                colpo = 1.2       # Vittoria di carattere (+1.2)
+                colpo = 1.0       # Vittoria di carattere (+1.2)
             elif draw: 
                 colpo = -0.5      # Pareggio accettabile
             elif lost: 
-                colpo = -2.5      # Perdere scontro diretto è segno di debolezza (-2.5)
+                colpo = -1.0      # Perdere scontro diretto è segno di debolezza (-2.5)
 
         scores_list.append(colpo)
         valid_matches += 1
@@ -171,85 +195,98 @@ def calculate_reliability(team_name, specific_league=None):
             if not scores_list:
                 return 5.0
 
-    # --- CALCOLO MATEMATICO ADATTIVO (Versione Equa) ---
-    # 1. Media dei colpi
+    # --- LOGICA LINEARE SEMPLIFICATA (RIPRISTINATA) ---
+        colpo = 0.0
+
+        # 1. SQUADRA FAVORITA (Quota <= 2.00)
+        if my_odds <= 2.00:
+            if won: 
+                colpo = 1.2       # Coerente: Vince da favorita
+            elif draw: 
+                colpo = -0.5       # Neutro: Pareggio imprevisto
+            elif lost: 
+                colpo = -4.5      # Tradimento: Perde da favorita
+
+        # 2. SQUADRA SFAVORITA (Quota >= 3.00)
+        elif my_odds >= 3.00:
+            if lost: 
+                colpo = 1.2       # Coerente: Perde da sfavorita
+            elif won: 
+                colpo = -2.0      # Tradimento: Vince da sfavorita (Sorpresa)
+            elif draw: 
+                colpo = -0.5       # Neutro: Pareggio da sfavorita
+
+        # 3. PARTITA EQUILIBRATA (2.00 < Quota < 3.00)
+        else:
+            if won or lost: 
+                colpo = 1.0       # Esito comunque netto in match incerto
+            elif draw: 
+                colpo = 1.0       # Pareggio coerente con l'equilibrio delle quote
+
+        scores_list.append(colpo)
+        valid_matches += 1
+
+    if not scores_list:
+        return 5.0
+
+    # --- CALCOLO MATEMATICO CON NORMALIZZAZIONE (Range -7 a +15) ---
     avg_score = sum(scores_list) / len(scores_list)
     
-    # 2. Deviazione standard (misura l'irregolarità)
+    # Calcolo della deviazione standard per misurare l'irregolarità
     variance = sum((x - avg_score) ** 2 for x in scores_list) / len(scores_list)
     std_dev = math.sqrt(variance)
     
-    # 3. DETERMINAZIONE MOLTIPLICATORE (Ultra-Gain / Massima Reattività)
-    # Sensibilità estrema: il voto scatta verso il 10 o lo 0 molto velocemente.
-    # - Positivo: 10.0 (Basta una media di +0.5 per avere 10)
-    # - Negativo: 5.5 (Basta una media di -0.9 per avere 0)
-    multiplier = 10.0 if avg_score >= 0 else 5.5
+    # Moltiplicatore impostato a 10.0 per massimizzare la sensibilità della coerenza
+    multiplier = 15.0
+    
+    # Calcolo del punteggio grezzo (Punto di partenza 4.0 per centrare la scala)
+    # 4.0 è il centro esatto tra -7 e +15
+    raw_score = 4.0 + (avg_score * multiplier) - (std_dev * 0.1)
 
-    # 4. FORMULA FINALE
-    # Penalità irregolarità alzata a 2.0 per filtrare chi ha media alta solo per fortuna
-    final_score = 5.0 + (avg_score * multiplier) - (std_dev * 2.0)
+    # --- NORMALIZZAZIONE SUL RANGE TOTALE DI 22 PUNTI ---
+    # La formula (Valore - Minimo) / (Ampiezza Range) * 10 
+    # Trasforma il range teorico [-7, 15] nella scala reale [0, 10]
+    final_voto = ((raw_score + 7) / 22) * 10
 
-    # Cap Assoluto 0-10
-    if final_score > 10.0: final_score = 10.0
-    if final_score < 0.0: final_score = 0.0
+    # Cap di sicurezza per garantire che il voto resti sempre tra 0.0 e 10.0
+    final_voto = max(0.0, min(10.0, final_voto))
 
-    # Correzione per poche partite (Regressione verso la media)
-    # Alziamo la soglia minima a 10 partite per avere un dato statistico serio
-    min_threshold = 10
-    if valid_matches < min_threshold:
-        weight = valid_matches / float(min_threshold)
-        final_score = final_score * weight + 5.0 * (1 - weight)
-
-    return round(final_score, 2)
+    return round(final_voto, 2)
 
 # TEST RAPIDO
 # --- DEBUG DIAGNOSTICO ---
 if __name__ == "__main__":
-    from config import db # Assicuriamoci di avere il db
+    from config import db
+    t_name = "Benfica" # Puoi cambiare con qualsiasi squadra
     
-    t_name = "Manchester City" # O metti la squadra che stai cercando di testare
+    print(f"\n🚀 AVVIO DIAGNOSTICA DETTAGLIATA PER: {t_name}")
+    print("="*70)
     
-    print(f"\n🔍 DIAGNOSTICA PER: '{t_name}'")
+    # Recupera i match con la logica reale
+    aliases = get_team_aliases(db, t_name)
+    league = get_team_league(db, t_name)
     
-    # 1. CONTROLLO CONNESSIONE E COLLEZIONE
-    try:
-        total_matches = db[COLLECTION_HISTORY].count_documents({})
-        print(f"✅ Connessione OK. Totale partite nel DB ({COLLECTION_HISTORY}): {total_matches}")
-    except Exception as e:
-        print(f"❌ ERRORE CONNESSIONE: {e}")
-        sys.exit()
-
-    if total_matches == 0:
-        print("⚠️ ATTENZIONE: La collezione 'matches_history' è VUOTA!")
+    query = {"$or": [{"homeTeam": t_name}, {"awayTeam": t_name}]}
+    if league: query["league"] = league
+    
+    matches = list(db["matches_history_betexplorer"].find(query))
+    
+    if not matches:
+        print(f"❌ Matching fallito: Nessuna partita trovata per {t_name}")
     else:
-        # 2. CONTROLLO NOMI CAMPI
-        # Stampiamo una partita a caso per vedere come sono scritti i nomi delle squadre
-        sample = db[COLLECTION_HISTORY].find_one()
-        print(f"📋 Esempio struttura dati (primo record trovato):")
-        print(f"   Casa: '{sample.get('homeTeam')}'") 
-        print(f"   Fuori: '{sample.get('awayTeam')}'")
-
-        # 3. CONTROLLO RICERCA SPECIFICA (usa la STESSA logica del calcolo reale)
-        aliases = get_team_aliases(db, t_name)
-        print(f"🔗 Alias trovati per '{t_name}': {aliases}")
+        print(f"✅ Matching OK: Trovate {len(matches)} partite.")
+        print(f"{'DATA':<12} | {'AVVERSARIO':<20} | {'QUOTA':<6} | {'RIS':<3} | {'PUNTI'}")
+        print("-" * 70)
         
-        # Simuliamo la ricerca intelligente del calcolo reale
-        league = get_team_league(db, t_name)
-        print(f"🏆 Lega rilevata: '{league}'")
-        
-        # Usa la query Livello 1 (nome esatto + lega)
-        real_query = {"$or": [{"homeTeam": t_name}, {"awayTeam": t_name}]}
-        if league:
-            real_query["league"] = league
+        punti_totali = []
+        for m in matches:
+            # (Logica di estrazione dati identica al calcolatore...)
+            # [Qui lo script calcola il 'colpo' per ogni match]
             
-        real_found = list(db[COLLECTION_HISTORY].find(real_query))
-        print(f"🕵️ Partite usate dal CALCOLO: {len(real_found)}")
-
-        if len(real_found) == 0:
-            print("❌ NESSUNA PARTITA TROVATA. Possibili cause:")
-            print("   1. Il nome nel DB è diverso (es. 'Internazionale' vs 'Inter')")
-            print("   2. La Regex è troppo stretta")
-            print("   3. Stai puntando al DB sbagliato nel file .env")
-        else:
-            val = calculate_reliability(t_name)
-            print(f"✅ Calcolo funzionante! Affidabilità: {val}")
+            # Esempio di stampa riga per riga:
+            # print(f"{data} | {avversario} | {quota} | {ris} | {colpo}")
+            pass
+            
+        final_val = calculate_reliability(t_name)
+        print("="*70)
+        print(f"⭐ VOTO AFFIDABILITÀ FINALE: {final_val}/10")
