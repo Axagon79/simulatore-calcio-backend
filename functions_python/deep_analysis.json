@@ -1,0 +1,792 @@
+{
+  "generated_at": "2025-12-28T20:16:12.823383",
+  "total_matches": 1,
+  "matches": [
+    {
+      "home_team": "Lazio",
+      "away_team": "Cremonese",
+      "league": "Serie A",
+      "date": "2025-12-20",
+      "real_result": "0-0",
+      "real_gh": 0,
+      "real_ga": 0,
+      "algorithms": {
+        "4": {
+          "results": [
+            [
+              2,
+              5
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              8,
+              0
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              1,
+              3
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              4
+            ],
+            [
+              4,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              7,
+              0
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              4,
+              1
+            ],
+            [
+              0,
+              2
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              4,
+              1
+            ],
+            [
+              0,
+              2
+            ],
+            [
+              6,
+              2
+            ],
+            [
+              3,
+              0
+            ],
+            [
+              6,
+              2
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              3
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              4,
+              4
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              4,
+              4
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              7,
+              1
+            ],
+            [
+              3,
+              2
+            ],
+            [
+              3,
+              2
+            ],
+            [
+              4,
+              0
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              3,
+              3
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              1,
+              3
+            ],
+            [
+              5,
+              0
+            ],
+            [
+              3,
+              3
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              0
+            ],
+            [
+              9,
+              1
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              4,
+              4
+            ],
+            [
+              3,
+              3
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              3,
+              0
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              0
+            ],
+            [
+              3,
+              2
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              4,
+              4
+            ],
+            [
+              3,
+              2
+            ],
+            [
+              6,
+              0
+            ],
+            [
+              4,
+              3
+            ],
+            [
+              5,
+              2
+            ],
+            [
+              5,
+              1
+            ],
+            [
+              3,
+              0
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              5,
+              2
+            ],
+            [
+              5,
+              1
+            ],
+            [
+              5,
+              1
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              4,
+              0
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              4,
+              1
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              3,
+              2
+            ],
+            [
+              7,
+              1
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              3,
+              0
+            ],
+            [
+              3,
+              0
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              5,
+              1
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              3,
+              1
+            ]
+          ],
+          "total_simulations": 101,
+          "stats": {
+            "total_simulations": 101,
+            "home_goals_distribution": {
+              "0": 5,
+              "1": 15,
+              "2": 26,
+              "3": 29,
+              "4": 11,
+              "5": 7,
+              "6": 3,
+              "7": 3,
+              "8": 1,
+              "9": 1
+            },
+            "away_goals_distribution": {
+              "0": 23,
+              "1": 40,
+              "2": 21,
+              "3": 11,
+              "4": 5,
+              "5": 1
+            },
+            "exact_scores": {
+              "2-5": 1,
+              "3-1": 13,
+              "1-1": 7,
+              "8-0": 1,
+              "2-2": 8,
+              "2-0": 5,
+              "1-3": 2,
+              "2-4": 1,
+              "4-1": 4,
+              "2-1": 7,
+              "7-0": 1,
+              "0-2": 2,
+              "6-2": 2,
+              "3-0": 7,
+              "3-3": 4,
+              "2-3": 4,
+              "4-4": 4,
+              "0-1": 2,
+              "7-1": 2,
+              "3-2": 5,
+              "4-0": 2,
+              "1-0": 4,
+              "5-0": 1,
+              "9-1": 1,
+              "1-2": 2,
+              "6-0": 1,
+              "4-3": 1,
+              "5-2": 2,
+              "5-1": 4,
+              "0-0": 1
+            },
+            "top_10_scores": [
+              [
+                "3-1",
+                13
+              ],
+              [
+                "2-2",
+                8
+              ],
+              [
+                "1-1",
+                7
+              ],
+              [
+                "2-1",
+                7
+              ],
+              [
+                "3-0",
+                7
+              ],
+              [
+                "2-0",
+                5
+              ],
+              [
+                "3-2",
+                5
+              ],
+              [
+                "4-1",
+                4
+              ],
+              [
+                "3-3",
+                4
+              ],
+              [
+                "2-3",
+                4
+              ]
+            ],
+            "sign_1": {
+              "count": 63,
+              "pct": 62.38
+            },
+            "sign_x": {
+              "count": 24,
+              "pct": 23.76
+            },
+            "sign_2": {
+              "count": 14,
+              "pct": 13.86
+            },
+            "gg": {
+              "count": 74,
+              "pct": 73.27
+            },
+            "ng": {
+              "count": 27,
+              "pct": 26.73
+            },
+            "under_over": {
+              "U0.5": {
+                "count": 1,
+                "pct": 0.99
+              },
+              "O0.5": {
+                "count": 100,
+                "pct": 99.01
+              },
+              "U1.5": {
+                "count": 7,
+                "pct": 6.93
+              },
+              "O1.5": {
+                "count": 94,
+                "pct": 93.07
+              },
+              "U2.5": {
+                "count": 21,
+                "pct": 20.79
+              },
+              "O2.5": {
+                "count": 80,
+                "pct": 79.21
+              },
+              "U3.5": {
+                "count": 37,
+                "pct": 36.63
+              },
+              "O3.5": {
+                "count": 64,
+                "pct": 63.37
+              },
+              "U4.5": {
+                "count": 62,
+                "pct": 61.39
+              },
+              "O4.5": {
+                "count": 39,
+                "pct": 38.61
+              },
+              "U5.5": {
+                "count": 76,
+                "pct": 75.25
+              },
+              "O5.5": {
+                "count": 25,
+                "pct": 24.75
+              },
+              "U6.5": {
+                "count": 86,
+                "pct": 85.15
+              },
+              "O6.5": {
+                "count": 15,
+                "pct": 14.85
+              }
+            },
+            "home_scored": {
+              "count": 96,
+              "pct": 95.05
+            },
+            "home_not_scored": {
+              "count": 5,
+              "pct": 4.95
+            },
+            "home_avg_goals": 2.861,
+            "away_scored": {
+              "count": 78,
+              "pct": 77.23
+            },
+            "away_not_scored": {
+              "count": 23,
+              "pct": 22.77
+            },
+            "away_avg_goals": 1.386,
+            "confidence": {
+              "gol": {
+                "home": {
+                  "std": 1.735,
+                  "confidence": 56.6
+                },
+                "away": {
+                  "std": 1.152,
+                  "confidence": 71.2
+                },
+                "total": {
+                  "std": 2.027,
+                  "confidence": 69.6
+                },
+                "variance_ratio": 2.27,
+                "variance_comparison": "Casa > Ospite",
+                "category_confidence": 65.8
+              },
+              "segni": {
+                "sign_1": {
+                  "percentage": 62.4,
+                  "confidence": 87.6
+                },
+                "sign_x": {
+                  "percentage": 23.8,
+                  "confidence": 73.8
+                },
+                "sign_2": {
+                  "percentage": 13.9,
+                  "confidence": 63.9
+                },
+                "most_probable": "1",
+                "most_probable_confidence": 62.4,
+                "margins": {
+                  "home_wins_avg": 2.7,
+                  "away_wins_avg": 1.5
+                },
+                "top10_distribution": {
+                  "sign_1_count": 6,
+                  "sign_x_count": 3,
+                  "sign_2_count": 1,
+                  "sign_1_positions": [
+                    1,
+                    4,
+                    5,
+                    6,
+                    7,
+                    8
+                  ],
+                  "sign_x_positions": [
+                    2,
+                    3,
+                    9
+                  ],
+                  "sign_2_positions": [
+                    10
+                  ],
+                  "dominance_pct": 60.0
+                },
+                "anomaly": {
+                  "detected": false,
+                  "message": ""
+                },
+                "category_confidence": 75.1
+              },
+              "gg_ng": {
+                "confidence": 55.7,
+                "std": 0.443,
+                "prob_gg": 73.3
+              },
+              "under_over": {
+                "U/O0.5": {
+                  "confidence": 90.1,
+                  "std": 0.099
+                },
+                "U/O1.5": {
+                  "confidence": 74.6,
+                  "std": 0.254
+                },
+                "U/O2.5": {
+                  "confidence": 59.4,
+                  "std": 0.406
+                },
+                "U/O3.5": {
+                  "confidence": 51.8,
+                  "std": 0.482
+                }
+              },
+              "most_reliable_uo": {
+                "threshold": "U/O0.5",
+                "confidence": 90.1
+              },
+              "multigol": {
+                "home": {
+                  "range": "1-3",
+                  "occurrences": 70,
+                  "confidence": 69.3
+                },
+                "away": {
+                  "range": "0-2",
+                  "occurrences": 84,
+                  "confidence": 83.2
+                },
+                "category_confidence": 76.2
+              },
+              "exact_scores_analysis": {
+                "concentration_top3": 27.7,
+                "entropy": 4.5
+              },
+              "exotic": {
+                "pari_dispari": {
+                  "confidence": 50.9,
+                  "std": 0.491,
+                  "pct_dispari": 40.6
+                },
+                "clean_sheet": {
+                  "confidence": 58.1,
+                  "home_pct": 21.8,
+                  "away_pct": 4.0
+                }
+              },
+              "advanced": {
+                "correlation_home_away": -0.057,
+                "skewness": {
+                  "home": 1.0,
+                  "away": 0.8
+                },
+                "kurtosis": {
+                  "home": 1.35,
+                  "away": 0.19
+                },
+                "variance": {
+                  "home": 3.01,
+                  "away": 1.326,
+                  "ratio": 2.27
+                }
+              },
+              "categories": {
+                "gol": 65.8,
+                "segni": 75.1,
+                "gg_ng": 55.7,
+                "under_over": 69.0,
+                "multigol": 76.2
+              },
+              "global_confidence": 65.8,
+              "most_reliable_market": {
+                "name": "MULTIGOL",
+                "confidence": 76.2
+              },
+              "least_reliable_market": {
+                "name": "GG_NG",
+                "confidence": 55.7
+              },
+              "home_std": 1.735,
+              "away_std": 1.152,
+              "total_std": 2.027,
+              "home_confidence": 56.6,
+              "away_confidence": 71.2,
+              "total_confidence": 69.6
+            },
+            "accuracy": {
+              "predicted_score": "3-1",
+              "real_score": "0-0",
+              "exact_match": false,
+              "sign_correct": false,
+              "home_goals_correct": false,
+              "away_goals_correct": false,
+              "gg_ng_correct": false,
+              "u25_correct": false,
+              "real_score_count": 1,
+              "real_score_pct": 0.99,
+              "real_score_rank": 30
+            }
+          }
+        }
+      }
+    }
+  ]
+}

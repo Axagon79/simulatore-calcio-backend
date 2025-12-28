@@ -1,0 +1,55 @@
+{
+    "MATCH": "Lazio vs Cremonese",
+    "CASA": {
+        "Squadra": "Lazio",
+        "Modulo": "4-3-3",
+        "Rating": "18.01/25",
+        "1_TITOLARI": [
+            "GK - Ivan Provedel (8.2)",
+            "DIF - Mario Gila (7.2)",
+            "DIF - Adam Maru\u0161i\u0107 (6.8)",
+            "DIF - Alessio Romagnoli (6.9)",
+            "DIF - Luca Pellegrini (6.6)",
+            "MID - Matt\u00e9o Guendouzi (7.1)",
+            "MID - Danilo Cataldi (6.9)",
+            "MID - Toma Ba\u0161i\u0107 (7.2)",
+            "ATT - Mattia Zaccagni (6.2)",
+            "ATT - Boulaye Dia (5.2)",
+            "ATT - Matteo Cancellieri (6.7)"
+        ],
+        "2_PANCHINA": [
+            "DIF - Nuno Tavares (6.6)",
+            "DIF - Manuel Lazzari (6.5)",
+            "MID - Mat\u00edas Vecino (7.3)",
+            "MID - Reda Belahyane (8.0)",
+            "ATT - Valent\u00edn Castellanos (6.7)",
+            "ATT - Gustav Isaksen (6.6)"
+        ]
+    },
+    "OSPITE": {
+        "Squadra": "Cremonese",
+        "Modulo": "3-5-2",
+        "Rating": "17.52/25",
+        "1_TITOLARI": [
+            "GK - Emil Audero (7.5)",
+            "DIF - Federico Baschirotto (6.4)",
+            "DIF - Filippo Terracciano (6.3)",
+            "DIF - Matteo Bianchetti (7.5)",
+            "MID - Warren Bondo (6.4)",
+            "MID - Jari Vandeputte (6.3)",
+            "MID - Mart\u00edn Payero (5.6)",
+            "MID - Alberto Grassi (6.5)",
+            "MID - Michele Collocolo (6.0)",
+            "ATT - Jamie Vardy (6.2)",
+            "ATT - Federico Bonazzoli (6.9)"
+        ],
+        "2_PANCHINA": [
+            "GK - Marco Silvestri (6.9)",
+            "DIF - Giuseppe Pezzella (6.4)",
+            "DIF - Tommaso Barbieri (8.2)",
+            "MID - Dachi Lordkipanidze (5.1)",
+            "MID (da DIF) - Alessio Zerbin (7.7)",
+            "ATT - Antonio Sanabria (6.3)"
+        ]
+    }
+}

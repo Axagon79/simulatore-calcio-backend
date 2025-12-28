@@ -1,0 +1,68 @@
+{
+    "Serie A": {
+        "avg_goals": 2.56,
+        "season_start": "23 Aug",
+        "next_update_check": "2026-08-08",
+        "last_updated": "2025-12-05"
+    },
+    "Serie B": {
+        "avg_goals": 2.47,
+        "season_start": "22 Aug",
+        "next_update_check": "2026-08-07",
+        "last_updated": "2025-12-05"
+    },
+    "Serie C - Girone A": {
+        "avg_goals": 2.3,
+        "season_start": "23 Aug",
+        "next_update_check": "2026-08-08",
+        "last_updated": "2025-12-05"
+    },
+    "Serie C - Girone B": {
+        "avg_goals": 2.36,
+        "season_start": "22 Aug",
+        "next_update_check": "2026-08-07",
+        "last_updated": "2025-12-05"
+    },
+    "Serie C - Girone C": {
+        "avg_goals": 2.46,
+        "season_start": "24 Aug",
+        "next_update_check": "2026-08-09",
+        "last_updated": "2025-12-05"
+    },
+    "Premier League": {
+        "avg_goals": 2.93,
+        "season_start": "15 Aug",
+        "next_update_check": "2026-07-31",
+        "last_updated": "2025-12-05"
+    },
+    "La Liga": {
+        "avg_goals": 2.62,
+        "season_start": "15 Aug",
+        "next_update_check": "2026-07-31",
+        "last_updated": "2025-12-05"
+    },
+    "Bundesliga": {
+        "avg_goals": 3.13,
+        "season_start": "22 Aug",
+        "next_update_check": "2026-08-07",
+        "last_updated": "2025-12-05"
+    },
+    "Ligue 1": {
+        "avg_goals": 2.98,
+        "season_start": "15 Aug",
+        "next_update_check": "2026-07-31",
+        "last_updated": "2025-12-05"
+    },
+    "Eredivisie": {
+        "avg_goals": 2.99,
+        "season_start": "8 Aug",
+        "next_update_check": "2026-07-24",
+        "last_updated": "2025-12-05"
+    },
+    "Liga Portugal": {
+        "avg_goals": 2.57,
+        "season_start": "8 Aug",
+        "next_update_check": "2026-07-24",
+        "last_updated": "2025-12-05"
+    }
+}

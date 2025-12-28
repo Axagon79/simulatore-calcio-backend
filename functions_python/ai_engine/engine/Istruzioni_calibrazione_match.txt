@@ -1,0 +1,96 @@
+| OBIETTIVO                  | COSA CERCARE (Codice)       | COSA MODIFICARE       | EFFETTO                                                           |
+| -------------------------- | --------------------------- | --------------------- | ----------------------------------------------------------------- |
+| AUMENTARE GOL (Generale)   | base_lambda_h = vol_h / 2.0 | Cambia / 2.0 in / 1.5 | La media gol sale (es. da 2.5 a 3.3). Più Over 2.5.               |
+| DIMINUIRE GOL (Generale)   | base_lambda_h = vol_h / 2.0 | Cambia / 2.0 in / 2.5 | La media gol scende (es. da 2.5 a 2.0). Più Under 2.5.            |
+| CALCIO FOLLE (Goleade)     | base_lambda_h = vol_h / 2.0 | Cambia / 2.0 in * 2.0 | Risultati tennistici (6-4, 5-5). Media gol esplosiva.             |
+| SBLOCCARE LIMITI (Max Gol) | min(3.8, final_lambda_h)    | Cambia 3.8 in 10.0    | Permette risultati estremi (es. 7-0) che prima venivano bloccati. |
+
+| OBIETTIVO                         | COSA CERCARE (Codice)  | COSA MODIFICARE      | EFFETTO                                                                |
+| --------------------------------- | ---------------------- | -------------------- | ---------------------------------------------------------------------- |
+| DITTATURA DEI FORTI (No Sorprese) | (h_rat * 0.25)         | Cambia 0.25 in 5.0   | La squadra con Rating più alto vince SEMPRE (90%+), in casa o fuori.   |
+| EQUILIBRIO TOTALE (Molti Pareggi) | (h_rat * 0.25)         | Cambia 0.25 in 0.05  | La forza conta pochissimo. Partite sempre in bilico (X frequente).     |
+| SUPER FATTORE CAMPO (Casa vince)  | (h_fld * 0.10)         | Cambia 0.10 in 3.0   | Giocare in casa diventa un vantaggio enorme. Segno 1 quasi automatico. |
+| FORZARE VITTORIE (No Pareggi)     | win_shift = ... * 0.55 | Cambia 0.55 in 0.95  | Se c'è una minima differenza, la partita si spacca. Pareggi rarissimi. |
+| FORZARE PAREGGI (X Fissa)         | diff_dominio / 25.0    | Cambia 25.0 in 100.0 | Appiattisce le differenze. Il sistema vede le squadre sempre uguali.   |
+
+| OBIETTIVO                 | COSA CERCARE (Codice) | COSA MODIFICARE    | EFFETTO                                                                  |
+| ------------------------- | --------------------- | ------------------ | ------------------------------------------------------------------------ |
+| DIFESE MURO (0-0 Tattici) | (5.0 - a_def)/15.0    | Cambia 15.0 in 8.0 | Le difese forti annullano completamente l'attacco avversario.            |
+| FORMA RECENTE (Lucifero)  | (h_luc * 0.15)        | Cambia 0.15 in 1.0 | Chi è in forma vince, anche se è una squadra debole sulla carta.         |
+| STORIA (H2H Dominante)    | (h_h2h_win * 0.15)    | Cambia 0.15 in 2.0 | Se la Juve batte sempre il Toro, continuerà a farlo per inerzia storica. |
+
+## 🔍 COSA FA IL NUOVO `goals_converter.py`
+
+Il nuovo file è il **cervello decisionale** che trasforma i dati grezzi in risultati. A differenza di prima, ora usa **due motori separati** che lavorano in parallelo ma si influenzano a vicenda.
+
+### 1. MOTORE WIN (Il "Giudice")
+**Scopo:** Decide chi *merita* di vincere (probabilità 1-X-2).
+**Come funziona:** Somma tutti i pesi di forza (Rating, Forma, Campo, Motivazione...).
+**Output:** Produce il `win_shift` (spostamento dell'inerzia).
+- Se il Napoli è molto più forte, il `win_shift` sarà positivo (es. +0.40).
+- Questo dice al sistema: *"Qualsiasi cosa succeda, favorisci i gol del Napoli e ostacola quelli della Juve".*
+
+### 2. MOTORE GOL (Il "Regista")
+**Scopo:** Decide quanti gol *potenziali* ci sono nell'aria.
+**Come funziona:** Parte dalla statistica pura (xG FBRef) e la modifica in base a:
+- **Tattica:** Difese forti abbassano i gol.
+- **Lucifero:** Squadre in forma segnano di più.
+- **H2H:** Se storicamente fanno 0-0, abbassa le aspettative.
+**Output:** Produce il `raw_lambda` (aspettativa gol pura).
+
+### 3. FUSIONE (Il Risultato)
+Alla fine, il `win_shift` piega il `raw_lambda`.
+- Gol Napoli = `raw_lambda` * (1 + `win_shift`)
+- Gol Juve = `raw_lambda` * (1 - `win_shift`)
+
+***
+
+## 🔧 DOVE TOCCARE I NUMERI (Guida Pratica)
+
+Se in futuro vuoi cambiare il comportamento, ecco le righe esatte da modificare nel file:
+
+### 1. VOGLIO PIÙ/MENO GOL IN TOTALE (Generale)
+Vai alla **Riga ~160** (sezione `Motore Gol`).
+Cerca:
+```python
+# 1. Base statistica (Volume FBRef diviso 2 per squadra)
+base_lambda_h = vol_h / 2.0
+base_lambda_a = vol_a / 2.0
+```
+**Modifica:** Cambia il divisore.
+- **Più gol:** `vol_h / 1.8`
+- **Meno gol:** `vol_h / 2.2`
+
+### 2. VOGLIO CHE LA SQUADRA FORTE VINCA PIÙ SPESSO
+Vai alla **Riga ~145** (sezione `Win Shift`).
+Cerca:
+```python
+win_shift = np.tanh(diff_dominio / 25.0) * 0.55
+```
+**Modifica:** Aumenta il moltiplicatore finale.
+- **Più vittorie favorite:** `* 0.65` (o `0.70`)
+- **Più sorprese:** `* 0.40`
+
+### 3. VOGLIO CHE LE DIFESE CONTEGGIANO DI PIÙ (Più 0-0 tattici)
+Vai alla **Riga ~177** (sezione `Fattore Tattico`).
+Cerca:
+```python
+tactical_h = (h_att / 7.5) * (1 + (5.0 - a_def)/15.0)
+```
+**Modifica:** Riduci il divisore finale (15.0).
+- **Difese muro:** `(5.0 - a_def)/10.0` (Impatto più forte)
+- **Difese burro:** `(5.0 - a_def)/20.0` (Impatto più leggero)
+
+### 4. VOGLIO PIÙ GOLEADE "PAZZE" (Risultati tipo 4-3, 5-2)
+Vai alla **Riga ~195** (sezione `Safety Cap`).
+Cerca:
+```python
+final_lambda_h = max(0.15, min(3.8, final_lambda_h))
+```
+**Modifica:** Alza il tetto massimo (`min`).
+- **Goleade:** `min(4.5, final_lambda_h)`
+- **Calcio anni '80:** `min(2.5, final_lambda_h)`
+
+***
+
+Salvati questa mini-guida! Ti permette di bilanciare il motore senza rompere la logica di base. 🎯

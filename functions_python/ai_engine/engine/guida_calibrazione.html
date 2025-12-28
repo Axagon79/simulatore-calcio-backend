@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guida Calibrazione Motore AI ⚽ v2 (Originale)</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome per le icone -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; color: #333; }
+        .hero-section { background: linear-gradient(135deg, #2c3e50 0%, #4ca1af 100%); color: white; padding: 50px 0; margin-bottom: 40px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); }
+        .card { border: none; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); margin-bottom: 25px; transition: all 0.3s ease; }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.12); }
+        .card-header { font-weight: 700; padding: 15px 20px; font-size: 1.1rem; border-top-left-radius: 12px !important; border-top-right-radius: 12px !important; }
+        .code-block { background-color: #1e1e1e; color: #d4d4d4; padding: 12px 18px; border-radius: 6px; font-family: 'Consolas', monospace; font-size: 0.95rem; margin: 15px 0; border-left: 5px solid #ffc107; overflow-x: auto; }
+        .highlight-change { color: #f48fb1; font-weight: bold; border-bottom: 1px dashed #f48fb1; } /* Rosa acceso per modifiche */
+        .line-num { color: #6c757d; font-size: 0.8rem; margin-right: 10px; user-select: none; }
+        .badge-effect { font-size: 0.85rem; padding: 6px 12px; border-radius: 20px; font-weight: 500; }
+        
+        /* Stili per il Ricettario */
+        .recipe-card { border-left: 5px solid transparent; }
+        .recipe-goal { border-left-color: #198754; }
+        .recipe-win { border-left-color: #0d6efd; }
+        .recipe-chaos { border-left-color: #dc3545; }
+        
+        .nav-pills .nav-link.active { background-color: #4ca1af; }
+        .nav-pills .nav-link { color: #2c3e50; font-weight: 600; }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <div class="hero-section text-center">
+        <div class="container">
+            <h1 class="display-4 fw-bold"><i class="fas fa-cogs me-3"></i>Manuale di Tuning AI</h1>
+            <p class="lead">Configura il cervello di <code>goals_converter.py</code> come un ingegnere di F1</p>
+            <div class="mt-4">
+                <a href="#ricettario" class="btn btn-warning btn-lg fw-bold shadow-sm"><i class="fas fa-book-open me-2"></i> Vai al Ricettario Pratico</a>
+                <a href="#teoria" class="btn btn-outline-light btn-lg ms-2"><i class="fas fa-graduation-cap me-2"></i> Capire la Logica</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        
+        <!-- SEZIONE 1: RICETTARIO PRATICO -->
+        <div id="ricettario" class="mb-5">
+            <h2 class="text-center mb-4 text-secondary fw-bold">📖 Ricettario Pratico: "Voglio ottenere..."</h2>
+            <div class="row">
+                
+                <!-- Ricetta 1: Più Gol (Premier League Style) -->
+                <div class="col-lg-6">
+                    <div class="card recipe-card recipe-goal">
+                        <div class="card-header bg-white text-success">
+                            <i class="fas fa-arrow-up me-2"></i> VOGLIO PIÙ GOL (Stile Premier League)
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text text-muted">Aumenta la media gol totale. Ideale se vedi troppi 0-0 o 1-0.</p>
+                            <div class="alert alert-light border">
+                                <strong>Cerca (Riga ~150):</strong>
+                                <div class="code-block">
+base_lambda_h = vol_h / <span class="highlight-change">2.0</span>
+                                </div>
+                                <strong>Sostituisci con:</strong>
+                                <div class="code-block">
+base_lambda_h = vol_h / <span class="highlight-change">1.7</span>
+                                </div>
+                            </div>
+                            <small class="text-success"><i class="fas fa-check-circle me-1"></i> Effetto: Media gol sale da 2.5 a ~3.1</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ricetta 2: Meno Gol (Serie C Tattica) -->
+                <div class="col-lg-6">
+                    <div class="card recipe-card recipe-goal">
+                        <div class="card-header bg-white text-secondary">
+                            <i class="fas fa-arrow-down me-2"></i> VOGLIO MENO GOL (Stile Serie C)
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text text-muted">Rende le partite più chiuse e tattiche. Più Under 2.5.</p>
+                            <div class="alert alert-light border">
+                                <strong>Cerca (Riga ~150):</strong>
+                                <div class="code-block">
+base_lambda_h = vol_h / <span class="highlight-change">2.0</span>
+                                </div>
+                                <strong>Sostituisci con:</strong>
+                                <div class="code-block">
+base_lambda_h = vol_h / <span class="highlight-change">2.3</span>
+                                </div>
+                            </div>
+                            <small class="text-secondary"><i class="fas fa-shield-alt me-1"></i> Effetto: Media gol scende a ~2.1</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ricetta 3: Dittatura dei Forti -->
+                <div class="col-lg-6">
+                    <div class="card recipe-card recipe-win">
+                        <div class="card-header bg-white text-primary">
+                            <i class="fas fa-crown me-2"></i> DITTATURA DEI FORTI (No Sorprese)
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text text-muted">La squadra con Rating più alto deve vincere quasi sempre.</p>
+                            <div class="alert alert-light border">
+                                <strong>Cerca (Riga ~140):</strong>
+                                <div class="code-block">
+np.tanh(diff_dominio / 25.0) * <span class="highlight-change">0.40</span>
+                                </div>
+                                <strong>Sostituisci con:</strong>
+                                <div class="code-block">
+np.tanh(diff_dominio / 25.0) * <span class="highlight-change">0.80</span>
+                                </div>
+                            </div>
+                            <small class="text-primary"><i class="fas fa-bolt me-1"></i> Effetto: Real Madrid non perde mai col Getafe.</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ricetta 4: Fattore Campo Insuperabile -->
+                <div class="col-lg-6">
+                    <div class="card recipe-card recipe-win">
+                        <div class="card-header bg-white text-dark">
+                            <i class="fas fa-home me-2"></i> FATTORE CAMPO ESTREMO
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text text-muted">Giocare in casa diventa un vantaggio decisivo.</p>
+                            <div class="alert alert-light border">
+                                <strong>Cerca (Riga ~110):</strong>
+                                <div class="code-block">
+val_dominio += (h_fld * <span class="highlight-change">0.10</span>)
+                                </div>
+                                <strong>Sostituisci con:</strong>
+                                <div class="code-block">
+val_dominio += (h_fld * <span class="highlight-change">0.30</span>)
+                                </div>
+                            </div>
+                            <small class="text-dark"><i class="fas fa-building me-1"></i> Effetto: Segno 1 molto più frequente.</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ricetta 5: Caos Totale (Risultati Pazzi) -->
+                <div class="col-lg-6">
+                    <div class="card recipe-card recipe-chaos">
+                        <div class="card-header bg-white text-danger">
+                            <i class="fas fa-bomb me-2"></i> MODALITÀ CAOS (Goleade & Ribaltoni)
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text text-muted">Aumenta la varianza. Risultati come 4-4, 5-3, 6-2.</p>
+                            <div class="alert alert-light border">
+                                <strong>Cerca (Riga ~180):</strong>
+                                <div class="code-block">
+final_lambda_h = max(0.15, min(<span class="highlight-change">3.8</span>, final_lambda_h))
+                                </div>
+                                <strong>Sostituisci con:</strong>
+                                <div class="code-block">
+final_lambda_h = max(0.15, min(<span class="highlight-change">10.0</span>, final_lambda_h))
+                                </div>
+                            </div>
+                            <small class="text-danger"><i class="fas fa-exclamation-triangle me-1"></i> Effetto: Sblocca limiti massimi di gol.</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ricetta 6: Difese di Ferro -->
+                <div class="col-lg-6">
+                    <div class="card recipe-card recipe-goal">
+                        <div class="card-header bg-white text-info">
+                            <i class="fas fa-shield-virus me-2"></i> DIFESE DI FERRO (Impatto Tattico)
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text text-muted">Se una squadra ha una difesa forte, l'avversario NON segna.</p>
+                            <div class="alert alert-light border">
+                                <strong>Cerca (Riga ~165):</strong>
+                                <div class="code-block">
+(1 + (5.0 - a_def)/<span class="highlight-change">15.0</span>)
+                                </div>
+                                <strong>Sostituisci con:</strong>
+                                <div class="code-block">
+(1 + (5.0 - a_def)/<span class="highlight-change">8.0</span>)
+                                </div>
+                            </div>
+                            <small class="text-info"><i class="fas fa-lock me-1"></i> Effetto: Difese forti abbassano drasticamente i gol subiti.</small>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- SEZIONE 2: TABELLA COMPLETA PARAMETRI -->
+        <div id="teoria" class="card shadow">
+            <div class="card-header bg-dark text-white">
+                <i class="fas fa-table me-2"></i> Tabella di Riferimento Rapido (Per Esperti)
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Parametro</th>
+                                <th>Codice Originale</th>
+                                <th>Cosa Fa</th>
+                                <th>Direzione Modifica</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Peso Rating</strong></td>
+                                <td><code>h_rat * 0.25</code></td>
+                                <td>Decide quanto conta la forza "sulla carta".</td>
+                                <td><span class="text-success">↑ Aumenta</span> per meno sorprese.<br><span class="text-danger">↓ Diminuisci</span> per più random.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Forma (Lucifero)</strong></td>
+                                <td><code>h_luc * 0.15</code></td>
+                                <td>Quanto conta il momento di forma attuale.</td>
+                                <td><span class="text-success">↑ Aumenta</span> per premiare chi sta bene ora.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Win Shift (Inerzia)</strong></td>
+                                <td><code>* 0.40</code></td>
+                                <td>Quanto la squadra più forte "ruba" gol all'altra.</td>
+                                <td><span class="text-success">↑ Aumenta (es. 0.80)</span> per vittorie nette.<br><span class="text-danger">↓ Diminuisci (es. 0.20)</span> per partite equilibrate.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Divisore Base Gol</strong></td>
+                                <td><code>vol_h / 2.0</code></td>
+                                <td>Il rubinetto principale dei gol.</td>
+                                <td><span class="text-danger">↓ Abbassa (es. 1.5)</span> per PIÙ gol.<br><span class="text-success">↑ Alza (es. 2.5)</span> per MENO gol.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

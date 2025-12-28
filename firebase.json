@@ -3,20 +3,34 @@
     "rules": "firestore.rules",
     "indexes": "firestore.indexes.json"
   },
-  "functions": {
-    "source": "functions",
-    "codebase": "default",
-    "ignore": [
-      "node_modules",
-      ".git",
-      "firebase-debug.log",
-      "firebase-debug.*.log",
-      "*.local"
-    ],
-    "include": [
-      ".env"
-    ]
-  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "nodejs",
+      "runtime": "nodejs20",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ],
+      "include": [
+        ".env"
+      ]
+    },
+    {
+      "source": "functions_python",
+      "codebase": "python",
+      "runtime": "python312",
+      "ignore": [
+        "venv",
+        ".venv",
+        "__pycache__",
+        ".git"
+      ]
+    }
+  ],
   "emulators": {
     "functions": {
       "port": 5001

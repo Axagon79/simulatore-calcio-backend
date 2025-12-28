@@ -1,0 +1,338 @@
+{
+    "GLOBAL": {
+        "PESO_RATING_ROSA": {
+            "valore": 1.2
+        },
+        "PESO_FORMA_RECENTE": {
+            "valore": 1.8
+        },
+        "PESO_MOTIVAZIONE": {
+            "valore": 1.5
+        },
+        "PESO_FATTORE_CAMPO": {
+            "valore": 1.2
+        },
+        "PESO_STORIA_H2H": {
+            "valore": 0.8
+        },
+        "PESO_BVS_QUOTE": {
+            "valore": 1.3
+        },
+        "PESO_AFFIDABILITA": {
+            "valore": 0.8
+        },
+        "PESO_VALORE_ROSA": {
+            "valore": 1.0
+        },
+        "DIVISORE_MEDIA_GOL": {
+            "valore": 1.4
+        },
+        "POTENZA_FAVORITA_WINSHIFT": {
+            "valore": -1.05
+        },
+        "IMPATTO_DIFESA_TATTICA": {
+            "valore": 22.5
+        },
+        "TETTO_MAX_GOL_ATTESI": {
+            "valore": 4.6
+        },
+        "THR_1X2_RED": {
+            "valore": 40.0
+        },
+        "THR_1X2_GREEN": {
+            "valore": 60.0
+        },
+        "THR_UO_RED": {
+            "valore": 40.0
+        },
+        "THR_UO_GREEN": {
+            "valore": 60.0
+        },
+        "THR_GG_RED": {
+            "valore": 40.0
+        },
+        "THR_GG_GREEN": {
+            "valore": 60.0
+        }
+    },
+    "ALGO_1": {
+        "PESO_RATING_ROSA": {
+            "valore": 1.2
+        },
+        "PESO_FORMA_RECENTE": {
+            "valore": 2.6
+        },
+        "PESO_MOTIVAZIONE": {
+            "valore": 2.1
+        },
+        "PESO_FATTORE_CAMPO": {
+            "valore": 1.4
+        },
+        "PESO_STORIA_H2H": {
+            "valore": 0.8
+        },
+        "PESO_BVS_QUOTE": {
+            "valore": 1.3
+        },
+        "PESO_AFFIDABILITA": {
+            "valore": 0.8
+        },
+        "PESO_VALORE_ROSA": {
+            "valore": 1.0
+        },
+        "DIVISORE_MEDIA_GOL": {
+            "valore": 1.4
+        },
+        "POTENZA_FAVORITA_WINSHIFT": {
+            "valore": -1.05
+        },
+        "IMPATTO_DIFESA_TATTICA": {
+            "valore": 22.5
+        },
+        "TETTO_MAX_GOL_ATTESI": {
+            "valore": 4.6
+        },
+        "THR_1X2_RED": {
+            "valore": 40.0
+        },
+        "THR_1X2_GREEN": {
+            "valore": 60.0
+        },
+        "THR_UO_RED": {
+            "valore": 40.0
+        },
+        "THR_UO_GREEN": {
+            "valore": 60.0
+        },
+        "THR_GG_RED": {
+            "valore": 40.0
+        },
+        "THR_GG_GREEN": {
+            "valore": 60.0
+        }
+    },
+    "ALGO_2": {
+        "PESO_RATING_ROSA": {
+            "valore": 1.2
+        },
+        "PESO_FORMA_RECENTE": {
+            "valore": 2.3
+        },
+        "PESO_MOTIVAZIONE": {
+            "valore": 1.8
+        },
+        "PESO_FATTORE_CAMPO": {
+            "valore": 1.3
+        },
+        "PESO_STORIA_H2H": {
+            "valore": 1.2
+        },
+        "PESO_BVS_QUOTE": {
+            "valore": 2.4
+        },
+        "PESO_AFFIDABILITA": {
+            "valore": 1.1
+        },
+        "PESO_VALORE_ROSA": {
+            "valore": 0.9
+        },
+        "DIVISORE_MEDIA_GOL": {
+            "valore": 0.8
+        },
+        "POTENZA_FAVORITA_WINSHIFT": {
+            "valore": -2.05
+        },
+        "IMPATTO_DIFESA_TATTICA": {
+            "valore": 18.7
+        },
+        "TETTO_MAX_GOL_ATTESI": {
+            "valore": 4.6
+        },
+        "THR_1X2_RED": {
+            "valore": 40.0
+        },
+        "THR_1X2_GREEN": {
+            "valore": 60.0
+        },
+        "THR_UO_RED": {
+            "valore": 40.0
+        },
+        "THR_UO_GREEN": {
+            "valore": 60.0
+        },
+        "THR_GG_RED": {
+            "valore": 40.0
+        },
+        "THR_GG_GREEN": {
+            "valore": 60.0
+        }
+    },
+    "ALGO_3": {
+        "PESO_RATING_ROSA": {
+            "valore": 0.8
+        },
+        "PESO_FORMA_RECENTE": {
+            "valore": 1.4
+        },
+        "PESO_MOTIVAZIONE": {
+            "valore": 0.6
+        },
+        "PESO_FATTORE_CAMPO": {
+            "valore": 1.0
+        },
+        "PESO_STORIA_H2H": {
+            "valore": 0.5
+        },
+        "PESO_BVS_QUOTE": {
+            "valore": 1.5
+        },
+        "PESO_AFFIDABILITA": {
+            "valore": 1.5
+        },
+        "PESO_VALORE_ROSA": {
+            "valore": 1.0
+        },
+        "DIVISORE_MEDIA_GOL": {
+            "valore": 2.0
+        },
+        "POTENZA_FAVORITA_WINSHIFT": {
+            "valore": 0.15
+        },
+        "IMPATTO_DIFESA_TATTICA": {
+            "valore": 22.5
+        },
+        "TETTO_MAX_GOL_ATTESI": {
+            "valore": 4.5
+        },
+        "THR_1X2_RED": {
+            "valore": 40.0
+        },
+        "THR_1X2_GREEN": {
+            "valore": 60.0
+        },
+        "THR_UO_RED": {
+            "valore": 40.0
+        },
+        "THR_UO_GREEN": {
+            "valore": 60.0
+        },
+        "THR_GG_RED": {
+            "valore": 40.0
+        },
+        "THR_GG_GREEN": {
+            "valore": 60.0
+        }
+    },
+    "ALGO_4": {
+        "PESO_RATING_ROSA": {
+            "valore": -2.0
+        },
+        "PESO_FORMA_RECENTE": {
+            "valore": 5.0
+        },
+        "PESO_MOTIVAZIONE": {
+            "valore": 4.2
+        },
+        "PESO_FATTORE_CAMPO": {
+            "valore": -0.1
+        },
+        "PESO_STORIA_H2H": {
+            "valore": 2.1
+        },
+        "PESO_BVS_QUOTE": {
+            "valore": 2.9
+        },
+        "PESO_AFFIDABILITA": {
+            "valore": 2.8
+        },
+        "PESO_VALORE_ROSA": {
+            "valore": 0.4
+        },
+        "DIVISORE_MEDIA_GOL": {
+            "valore": 1.2
+        },
+        "POTENZA_FAVORITA_WINSHIFT": {
+            "valore": 0.25
+        },
+        "IMPATTO_DIFESA_TATTICA": {
+            "valore": 18.0
+        },
+        "TETTO_MAX_GOL_ATTESI": {
+            "valore": 4.0
+        },
+        "THR_1X2_RED": {
+            "valore": 40.0
+        },
+        "THR_1X2_GREEN": {
+            "valore": 60.0
+        },
+        "THR_UO_RED": {
+            "valore": 40.0
+        },
+        "THR_UO_GREEN": {
+            "valore": 60.0
+        },
+        "THR_GG_RED": {
+            "valore": 40.0
+        },
+        "THR_GG_GREEN": {
+            "valore": 60.0
+        }
+    },
+    "ALGO_5": {
+        "PESO_RATING_ROSA": {
+            "valore": 1.2
+        },
+        "PESO_FORMA_RECENTE": {
+            "valore": 1.8
+        },
+        "PESO_MOTIVAZIONE": {
+            "valore": 1.5
+        },
+        "PESO_FATTORE_CAMPO": {
+            "valore": 1.2
+        },
+        "PESO_STORIA_H2H": {
+            "valore": 0.8
+        },
+        "PESO_BVS_QUOTE": {
+            "valore": 1.3
+        },
+        "PESO_AFFIDABILITA": {
+            "valore": 0.8
+        },
+        "PESO_VALORE_ROSA": {
+            "valore": 1.0
+        },
+        "DIVISORE_MEDIA_GOL": {
+            "valore": 1.4
+        },
+        "POTENZA_FAVORITA_WINSHIFT": {
+            "valore": -1.05
+        },
+        "IMPATTO_DIFESA_TATTICA": {
+            "valore": 22.5
+        },
+        "TETTO_MAX_GOL_ATTESI": {
+            "valore": 4.6
+        },
+        "THR_1X2_RED": {
+            "valore": 40.0
+        },
+        "THR_1X2_GREEN": {
+            "valore": 60.0
+        },
+        "THR_UO_RED": {
+            "valore": 40.0
+        },
+        "THR_UO_GREEN": {
+            "valore": 60.0
+        },
+        "THR_GG_RED": {
+            "valore": 40.0
+        },
+        "THR_GG_GREEN": {
+            "valore": 60.0
+        }
+    }
+}

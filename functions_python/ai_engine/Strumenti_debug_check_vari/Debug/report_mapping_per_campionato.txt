@@ -1,0 +1,61 @@
+REPORT DIAGNOSTICA PER CAMPIONATO (Generato il 25/12/2025 18:16)
+=====================================================================================
+Leghe totali rilevate su FBref GK: 8
+=====================================================================================
+
+🏆 CAMPIONATO: Bundesliga
+----------------------------------------
+📊 Statistiche: 18 squadre totali | ✅ 18 OK | ❌ 0 Mancanti
+✅ Tutte le squadre di questo campionato sono correttamente mappate.
+
+.....................................................................................
+
+🏆 CAMPIONATO: Eredivisie
+----------------------------------------
+📊 Statistiche: 18 squadre totali | ✅ 18 OK | ❌ 0 Mancanti
+✅ Tutte le squadre di questo campionato sono correttamente mappate.
+
+.....................................................................................
+
+🏆 CAMPIONATO: La Liga
+----------------------------------------
+📊 Statistiche: 20 squadre totali | ✅ 20 OK | ❌ 0 Mancanti
+✅ Tutte le squadre di questo campionato sono correttamente mappate.
+
+.....................................................................................
+
+🏆 CAMPIONATO: Liga Portugal
+----------------------------------------
+📊 Statistiche: 18 squadre totali | ✅ 18 OK | ❌ 0 Mancanti
+✅ Tutte le squadre di questo campionato sono correttamente mappate.
+
+.....................................................................................
+
+🏆 CAMPIONATO: Ligue 1
+----------------------------------------
+📊 Statistiche: 18 squadre totali | ✅ 18 OK | ❌ 0 Mancanti
+✅ Tutte le squadre di questo campionato sono correttamente mappate.
+
+.....................................................................................
+
+🏆 CAMPIONATO: Premier League
+----------------------------------------
+📊 Statistiche: 20 squadre totali | ✅ 20 OK | ❌ 0 Mancanti
+✅ Tutte le squadre di questo campionato sono correttamente mappate.
+
+.....................................................................................
+
+🏆 CAMPIONATO: Serie A
+----------------------------------------
+📊 Statistiche: 20 squadre totali | ✅ 20 OK | ❌ 0 Mancanti
+✅ Tutte le squadre di questo campionato sono correttamente mappate.
+
+.....................................................................................
+
+🏆 CAMPIONATO: Serie B
+----------------------------------------
+📊 Statistiche: 20 squadre totali | ✅ 20 OK | ❌ 0 Mancanti
+✅ Tutte le squadre di questo campionato sono correttamente mappate.
+
+.....................................................................................
+
