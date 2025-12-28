@@ -12,6 +12,8 @@ def align_ids():
     teams_col = db['teams']
 
     print(f"   🔍 Scansione {source_col.name} per trovare team_id...")
+    
+    
 
     # Mappa: Nome Squadra -> ID Transfermarkt
     name_to_id = {}
