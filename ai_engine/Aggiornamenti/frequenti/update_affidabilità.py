@@ -10,7 +10,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__fil
 sys.path.append(os.path.join(BASE_DIR, "calculators"))
 
 try:
-    from calculator_affidabilità import calculate_reliability  
+    from calculator_affidabilità import calculate_reliability  # type: ignore
     print("✅ Modulo 'calculator_affidabilità' caricato con successo.")
 except ImportError as e:
     print(f"❌ Errore critico: Impossibile caricare il calcolatore. {e}")
@@ -30,77 +30,119 @@ def get_round_num(r):
 def run_update_affidabilità():
     h2h_collection = db['h2h_by_round']
     
-    # Prendiamo tutte le leghe per analizzarle una ad una
     leghe = h2h_collection.distinct("league")
-    print(f"🚀 Avvio Aggiornamento Mirato su {len(leghe)} campionati...")
+    print(f"\n{'='*60}")
+    print(f"🚀 AVVIO AGGIORNAMENTO TOTALE SU {len(leghe)} CAMPIONATI")
+    print(f"{'='*60}")
 
-    count = 0
-    oggi = datetime.now()
+    count_total = 0
+    oggi = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
 
     for lega in leghe:
-        # 1. Carichiamo tutti i round della lega e li ordiniamo
         rounds_lega = list(h2h_collection.find({"league": lega}))
         rounds_lega.sort(key=get_round_num)
         
         if not rounds_lega: continue
 
-        # 2. Identificazione Giornata "Anchor" (Attuale)
+        # --- LOGICA "ANCHOR" INTELLIGENTE ---
         anchor_index = -1
         for i, r in enumerate(rounds_lega):
             matches = r.get('matches', [])
-            # Se c'è almeno un match Scheduled, questa è la nostra zona operativa
-            if any(m.get('status') in ['Scheduled', 'Timed'] for m in matches):
+            open_matches = [m for m in matches if m.get('status') in ['Scheduled', 'Timed']]
+            finished_matches = [m for m in matches if m.get('status') == 'Finished']
+            if not open_matches: continue
+            if finished_matches:
+                dates = []
+                for m in finished_matches:
+                    d_raw = m.get('date_obj') or m.get('utcDate')
+                    if d_raw:
+                        if isinstance(d_raw, str):
+                            try: dates.append(datetime.strptime(d_raw[:10], "%Y-%m-%d"))
+                            except: pass
+                        elif isinstance(d_raw, datetime): dates.append(d_raw)
+                if dates:
+                    last_regular_date = max(dates)
+                    limit_date = last_regular_date + timedelta(days=7)
+                    has_valid_upcoming = False
+                    for m in open_matches:
+                        d_raw = m.get('date_obj') or m.get('utcDate')
+                        match_date = None
+                        if d_raw:
+                            if isinstance(d_raw, str):
+                                try: match_date = datetime.strptime(d_raw[:10], "%Y-%m-%d")
+                                except: pass
+                            elif isinstance(d_raw, datetime): match_date = d_raw
+                        if match_date and match_date >= oggi and match_date <= limit_date:
+                            has_valid_upcoming = True
+                            break
+                    if has_valid_upcoming:
+                        anchor_index = i
+                        break
+            else:
                 anchor_index = i
                 break
         
-        # Se non troviamo match futuri, prendiamo l'ultima giornata disponibile
+        if anchor_index == -1:
+             for i in range(len(rounds_lega) - 1, -1, -1):
+                 r = rounds_lega[i]
+                 if any(m.get('status') == 'Finished' for m in r.get('matches', [])):
+                     anchor_index = i
+                     break
         if anchor_index == -1: anchor_index = len(rounds_lega) - 1
 
-        # Definiamo il range di aggiornamento (2 PRECEDENTI, ATTUALE, 2 SUCCESSIVE)
+        # Range: 2 Prima, Attuale, 2 Dopo
         start = max(0, anchor_index - 2)
-        end = min(len(rounds_lega), anchor_index + 3) # +3 perché il limite superiore è escluso
+        end = min(len(rounds_lega), anchor_index + 3)
         target_rounds = rounds_lega[start:end]
 
-        print(f"🏆 {lega}: Analizzo range AMPIO giornate {start+1} -> {end}")
+        print(f"\n\n🏆 CAMPIONATO: {lega}")
+        print(f"📍 Anchor rilevata: {rounds_lega[anchor_index].get('round_name', 'N/D')}")
+        print(f"{'-'*60}")
 
         for doc in target_rounds:
+            round_name = doc.get('round_name', 'Senza Nome')
             matches_array = doc.get('matches', [])
-            modificato = False
             
+            # STAMPA INTESTAZIONE GIORNATA
+            print(f"\n📅 {round_name.upper()} ({len(matches_array)} partite)")
+            print(f"   {'Status':<12} | {'Incontro':<40} | {'Esito'}")
+            print(f"   {'-'*65}")
+
+            modificato = False
             for index, match in enumerate(matches_array):
-                # AGGIORNA SOLO SE: Il match è da giocare o non ha ancora un risultato verificato
-                if match.get('status') in ['Scheduled', 'Timed'] or match.get('real_score') is None:
-                    
-                    home_team = match.get('home_team') or match.get('homeTeam') or match.get('home')
-                    away_team = match.get('away_team') or match.get('awayTeam') or match.get('away')
-                    
-                    if home_team and away_team:
-                        # Logica a ventaglio
-                        voto_h = calculate_reliability(home_team)
-                        voto_a = calculate_reliability(away_team)
+                home_team = match.get('home_team') or match.get('homeTeam') or match.get('home')
+                away_team = match.get('away_team') or match.get('awayTeam') or match.get('away')
+                status = match.get('status', 'Unknown')
+                
+                if home_team and away_team:
+                    voto_h = calculate_reliability(home_team)
+                    voto_a = calculate_reliability(away_team)
 
-                        # Iniezione chirurgica nell'oggetto h2h_data del match
-                        if 'h2h_data' not in match or match['h2h_data'] is None:
-                            match['h2h_data'] = {}
-                        
-                        match['h2h_data']['affidabilità'] = {
-                            "affidabilità_casa": voto_h,
-                            "affidabilità_trasferta": voto_a,
-                            "last_update": oggi.strftime("%Y-%m-%d %H:%M")
-                        }
-                        
-                        modificato = True
-                        count += 1
-                        print(f"   ⚡ [{doc['_id']}] {home_team} vs {away_team} -> Calcolato")
+                    if 'h2h_data' not in match or match['h2h_data'] is None:
+                        match['h2h_data'] = {}
+                    
+                    match['h2h_data']['affidabilità'] = {
+                        "affidabilità_casa": voto_h,
+                        "affidabilità_trasferta": voto_a,
+                        "last_update": datetime.now().strftime("%Y-%m-%d %H:%M")
+                    }
+                    
+                    modificato = True
+                    count_total += 1
+                    
+                    # STAMPA RIGA PARTITA ALLINEATA
+                    match_str = f"{home_team} vs {away_team}"
+                    print(f"   ⚡ [{status:<10}] | {match_str:<40} | ✅ OK")
 
-            # Salviamo la giornata solo se abbiamo apportato modifiche
             if modificato:
                 h2h_collection.update_one(
                     {"_id": doc['_id']},
                     {"$set": {"matches": matches_array}}
                 )
 
-    print(f"\n✨ Operazione conclusa! Aggiornati {count} match critici.")
+    print(f"\n{'='*60}")
+    print(f"✨ FINE OPERAZIONE! Totale partite processate: {count_total}")
+    print(f"{'='*60}\n")
 
 if __name__ == "__main__":
     run_update_affidabilità()

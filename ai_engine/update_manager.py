@@ -32,7 +32,7 @@ CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 SCRAPER_SEQUENCE = [
       ("scraper_results_fbref.py", "📊 [1/13] Risultati & xG (FBref)", "Mancano risultati recenti e xG", FREQUENT_DIR),
       
-      ("scrape_lucifero_betexplorer_safe.py", "🔥 [2/13] Affidabilità squadre (BetExplorer)", FREQUENT_DIR),
+      ("scrape_lucifero_betexplorer_safe.py", "🔥 [2/13] Affidabilità squadre (BetExplorer)", "Affidabilità assente", FREQUENT_DIR),
       
     # ("scraper_quote_storiche_betexplorer.py", "💰 [3/13] Quote Storiche", "Calcolo Affidabilità/BVS impossibile", FREQUENT_DIR),
       ("scraper_soccerstats_ranking_unified.py", "🏆 [4/13] Classifica & Gol", "Calcolo Forza Attacco/Difesa sballato", FREQUENT_DIR),

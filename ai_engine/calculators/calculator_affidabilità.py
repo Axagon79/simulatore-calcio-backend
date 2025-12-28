@@ -257,7 +257,7 @@ def calculate_reliability(team_name, specific_league=None):
 # --- DEBUG DIAGNOSTICO ---
 if __name__ == "__main__":
     from config import db
-    t_name = "Benfica" # Puoi cambiare con qualsiasi squadra
+    t_name = "Espanyol" # Puoi cambiare con qualsiasi squadra
     
     print(f"\n🚀 AVVIO DIAGNOSTICA DETTAGLIATA PER: {t_name}")
     print("="*70)

@@ -1,56 +1,55 @@
 {
-    "MATCH": "Atalanta vs Inter",
+    "MATCH": "Lecce vs Como",
     "CASA": {
-        "Squadra": "Atalanta",
-        "Modulo": "3-4-2-1",
-        "Rating": "17.89/25",
+        "Squadra": "Lecce",
+        "Modulo": "4-3-3",
+        "Rating": "17.37/25",
         "1_TITOLARI": [
-            "GK - Marco Carnesecchi (7.0)",
-            "DIF - Isak Hien (7.4)",
-            "DIF - Berat Djimsiti (7.0)",
-            "DIF - Davide Zappacosta (5.4)",
-            "MID - Mario Pa\u0161ali\u0107 (7.4)",
-            "MID - Marten de Roon (6.4)",
-            "MID - \u00c9derson (6.8)",
-            "MID - Lazar Samardzic (6.3)",
-            "ATT - Charles De Ketelaere (6.4)",
-            "ATT - Ademola Lookman (6.2)",
-            "ATT - Gianluca Scamacca (7.6)"
+            "GK - Wladimiro Falcone (7.4)",
+            "DIF - Kialonda (6.6)",
+            "DIF - Tiago Gabriel (8.3)",
+            "DIF - Antonino Gallo (7.4)",
+            "DIF - Danilo Veiga (8.3)",
+            "MID - Ylber Ramadani (6.6)",
+            "MID - Lassana Coulibaly (6.2)",
+            "MID - Medon Berisha (7.2)",
+            "ATT - Nikola \u0160tuli\u0107 (5.1)",
+            "ATT - Santiago Pierotti (4.8)",
+            "ATT - Tete Morente (4.8)"
         ],
         "2_PANCHINA": [
-            "DIF - Raoul Bellanova (5.9)",
-            "DIF - Odilon Kossounou (7.0)",
-            "MID - Kamaldeen Sulemana (7.4)",
-            "MID - Daniel Maldini (6.0)",
-            "ATT - Nikola Krstovi\u0107 (6.8)",
-            "ATT (da MID) - Marco Brescianini (7.8)"
+            "DIF - Christ-Owen Kouassi (8.5)",
+            "DIF - Corrie Ndaba (6.6)",
+            "MID - \u00c1lex Sala (6.8)",
+            "MID - \u00de\u00f3rir J\u00f3hann Helgason (5.0)",
+            "ATT - Lameck Banda (6.0)",
+            "ATT - Francesco Camarda (5.2)"
         ]
     },
     "OSPITE": {
-        "Squadra": "Inter",
-        "Modulo": "3-5-2",
-        "Rating": "19.34/25",
+        "Squadra": "Como",
+        "Modulo": "4-3-3",
+        "Rating": "18.51/25",
         "1_TITOLARI": [
-            "GK - Yann Sommer (6.3)",
-            "DIF - Alessandro Bastoni (7.8)",
-            "DIF - Manuel Akanji (6.7)",
-            "DIF - Federico Dimarco (6.6)",
-            "MID - Nicol\u00f2 Barella (7.6)",
-            "MID - Hakan \u00c7alhano\u011flu (8.0)",
-            "MID - Petar Sucic (7.5)",
-            "MID - Henrikh Mkhitaryan (6.7)",
-            "MID - Piotr Zieli\u0144ski (7.9)",
-            "ATT - Lautaro Mart\u00ednez (7.6)",
-            "ATT - Marcus Thuram (7.7)"
+            "GK - Jean Butez (7.5)",
+            "DIF - Jacobo Ram\u00f3n (8.7)",
+            "DIF - \u00c1lex Valle (7.4)",
+            "DIF - Diego Carlos (7.2)",
+            "DIF - Ivan Smol\u010di\u0107 (8.1)",
+            "MID - Nicol\u00e1s Paz (7.9)",
+            "MID - M\u00e1ximo Perrone (8.3)",
+            "MID - Lucas Da Cunha (6.7)",
+            "ATT - Jesus Rodr\u00edguez (6.1)",
+            "ATT - Anastasios Douvikas (6.6)",
+            "ATT - \u00c1lvaro Morata (5.3)"
         ],
         "2_PANCHINA": [
-            "GK - Josep Martinez (7.8)",
-            "DIF - Francesco Acerbi (6.7)",
-            "DIF - Denzel Dumfries (6.4)",
-            "MID - Andy Diouf (6.7)",
-            "MID (da DIF) - Carlos Augusto (7.2)",
-            "ATT - Francesco Esposito (6.2)",
-            "ATT - Ange-Yoan Bonny (8.7)"
+            "DIF - Marc-Oliver Kempf (6.1)",
+            "DIF - Stefan Posch (7.9)",
+            "MID - Sergi Roberto (6.9)",
+            "MID (da DIF) - Alberto Moreno (5.4)",
+            "ATT - M\u00ebrgim Vojvoda (5.4)",
+            "ATT - Jayden Addai (6.9)"
         ]
     }
 }
