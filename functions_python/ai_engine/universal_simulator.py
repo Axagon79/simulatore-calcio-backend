@@ -285,7 +285,7 @@ def run_single_algo_montecarlo(algo_id, preloaded_data, home_team, away_team, cy
 
 
 
-def run_monte_carlo_verdict_detailed(preloaded_data, home_team, away_team, analyzer=None):
+def run_monte_carlo_verdict_detailed(preloaded_data, home_team, away_team, analyzer=None, **kwargs):
     
     """
     Versione SILENZIOSA con statistiche pesi aggregate.

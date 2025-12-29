@@ -2,7 +2,7 @@ import sys
 import os
 import json
 import subprocess
-from firebase_functions import https_fn, options  # <--- IMPORTANTE
+from firebase_functions import https_fn, options
 from firebase_admin import initialize_app
 
 # Inizializza Firebase
@@ -13,20 +13,32 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, current_dir)
 
 @https_fn.on_request(
-    memory=options.MemoryOption.GB_1,  # <--- 1GB di RAM
-    timeout_sec=300,                   # <--- 5 Minuti di tempo
+    memory=options.MemoryOption.GB_1,    # <--- 1GB RAM
+    timeout_sec=300,                     # <--- 5 Minuti Tempo
     region="us-central1"
 )
 def run_simulation(request: https_fn.Request) -> https_fn.Response:
     """ 
     Unified Entry Point: Lancia script Python come moduli (-m)
-    per garantire la corretta gestione degli import e dei path.
+    Gestisce CORS per permettere chiamate dal Frontend React.
     """
+    
+    # --- GESTIONE CORS (Permessi Frontend) ---
+    headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Content-Type': 'application/json'
+    }
+
+    # Se è una richiesta di controllo (OPTIONS), rispondiamo OK subito
+    if request.method == 'OPTIONS':
+        return https_fn.Response('', status=204, headers=headers)
+
     try:
         # --- FIX ROBUSTO PER TEST LOCALI vs FIREBASE ---
         if hasattr(request, 'get_json'):
             payload = request.get_json(silent=True) or {}
-            # Fallback se get_json è vuoto ma ci sono query args
             if not payload and hasattr(request, 'args'):
                 payload = request.args
         elif isinstance(request, dict):
@@ -40,8 +52,6 @@ def run_simulation(request: https_fn.Request) -> https_fn.Response:
         # ---------------------------------------------------------
         if payload and (payload.get('home') or payload.get('match_id') or payload.get('main_mode')):
             
-            # Argomenti per web_simulator_A.py (ordine rigoroso!)
-            # main_mode, nation, league, home, away, round, algoid, cycles, savedb
             script_args = [
                 str(payload.get('main_mode', 4)),
                 payload.get('nation', 'ITALIA'),
@@ -54,7 +64,6 @@ def run_simulation(request: https_fn.Request) -> https_fn.Response:
                 str(payload.get('save_db', False)).lower()
             ]
 
-            # Eseguiamo come MODULO (-m) per evitare errori di import relativi
             cmd = [sys.executable, "-m", "ai_engine.web_simulator_A"] + script_args
             
             result_proc = subprocess.run(
@@ -62,21 +71,17 @@ def run_simulation(request: https_fn.Request) -> https_fn.Response:
                 cwd=current_dir,
                 capture_output=True,
                 text=True,
-                encoding='utf-8',       # <--- QUESTA È LA CHIAVE!
-                errors='replace',       # <--- Evita crash se trova caratteri strani
+                encoding='utf-8',       
+                errors='replace',      
                 timeout=120
             )
 
-
-            # Il simulatore stampa il JSON come ultima riga dell'output
             output_lines = result_proc.stdout.strip().split('\n')
             last_line = output_lines[-1] if output_lines else "{}"
             
             try:
-                # Tentiamo di parsare l'ultima riga come JSON
                 json_response = json.loads(last_line)
             except json.JSONDecodeError:
-                # Se fallisce, restituiamo l'errore grezzo per debug
                 json_response = {
                     "success": False, 
                     "error": "JSON Decode Error", 
@@ -84,34 +89,33 @@ def run_simulation(request: https_fn.Request) -> https_fn.Response:
                     "stderr": result_proc.stderr
                 }
 
-            # Restituiamo direttamente la risposta del simulatore
+            # Restituiamo la risposta con gli HEADER CORS
             return https_fn.Response(
                 json.dumps(json_response, ensure_ascii=False),
                 mimetype="application/json",
-                headers={'Access-Control-Allow-Origin': '*'}
+                headers=headers  # <--- IMPORTANTE
             )
 
         # ---------------------------------------------------------
         # 2. CASO MENU (Get vuota o payload vuoto)
         # ---------------------------------------------------------
         else:
-            print("🚀 AVVIO MENU INTERATTIVO (Modulo Universal Simulator)...")
-            
-            # Eseguiamo il menu come modulo
+            print("🚀 AVVIO MENU INTERATTIVO...")
             subprocess.run(
                 [sys.executable, "-m", "ai_engine.universal_simulator"],
                 cwd=current_dir
-                # capture_output=False così vedi il menu nella console locale!
             )
             
             return https_fn.Response(
                 json.dumps({"success": True, "message": "Menu chiuso."}),
-                mimetype="application/json"
+                mimetype="application/json",
+                headers=headers
             )
 
     except Exception as e:
         return https_fn.Response(
             json.dumps({"success": False, "error": str(e)}),
             status=500,
-            mimetype="application/json"
+            mimetype="application/json",
+            headers=headers
         )

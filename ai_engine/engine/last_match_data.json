@@ -1,55 +1,55 @@
 {
-    "MATCH": "Lecce vs Como",
+    "MATCH": "Lazio vs Cremonese",
     "CASA": {
-        "Squadra": "Lecce",
+        "Squadra": "Lazio",
         "Modulo": "4-3-3",
-        "Rating": "17.37/25",
+        "Rating": "18.01/25",
         "1_TITOLARI": [
-            "GK - Wladimiro Falcone (7.4)",
-            "DIF - Kialonda (6.6)",
-            "DIF - Tiago Gabriel (8.3)",
-            "DIF - Antonino Gallo (7.4)",
-            "DIF - Danilo Veiga (8.3)",
-            "MID - Ylber Ramadani (6.6)",
-            "MID - Lassana Coulibaly (6.2)",
-            "MID - Medon Berisha (7.2)",
-            "ATT - Nikola \u0160tuli\u0107 (5.1)",
-            "ATT - Santiago Pierotti (4.8)",
-            "ATT - Tete Morente (4.8)"
+            "GK - Ivan Provedel (8.2)",
+            "DIF - Mario Gila (7.2)",
+            "DIF - Adam Maru\u0161i\u0107 (6.8)",
+            "DIF - Alessio Romagnoli (6.9)",
+            "DIF - Luca Pellegrini (6.6)",
+            "MID - Matt\u00e9o Guendouzi (7.1)",
+            "MID - Danilo Cataldi (6.9)",
+            "MID - Toma Ba\u0161i\u0107 (7.2)",
+            "ATT - Mattia Zaccagni (6.2)",
+            "ATT - Boulaye Dia (5.2)",
+            "ATT - Matteo Cancellieri (6.7)"
         ],
         "2_PANCHINA": [
-            "DIF - Christ-Owen Kouassi (8.5)",
-            "DIF - Corrie Ndaba (6.6)",
-            "MID - \u00c1lex Sala (6.8)",
-            "MID - \u00de\u00f3rir J\u00f3hann Helgason (5.0)",
-            "ATT - Lameck Banda (6.0)",
-            "ATT - Francesco Camarda (5.2)"
+            "DIF - Nuno Tavares (6.6)",
+            "DIF - Manuel Lazzari (6.5)",
+            "MID - Mat\u00edas Vecino (7.3)",
+            "MID - Reda Belahyane (8.0)",
+            "ATT - Valent\u00edn Castellanos (6.7)",
+            "ATT - Gustav Isaksen (6.6)"
         ]
     },
     "OSPITE": {
-        "Squadra": "Como",
-        "Modulo": "4-3-3",
-        "Rating": "18.51/25",
+        "Squadra": "Cremonese",
+        "Modulo": "3-5-2",
+        "Rating": "17.52/25",
         "1_TITOLARI": [
-            "GK - Jean Butez (7.5)",
-            "DIF - Jacobo Ram\u00f3n (8.7)",
-            "DIF - \u00c1lex Valle (7.4)",
-            "DIF - Diego Carlos (7.2)",
-            "DIF - Ivan Smol\u010di\u0107 (8.1)",
-            "MID - Nicol\u00e1s Paz (7.9)",
-            "MID - M\u00e1ximo Perrone (8.3)",
-            "MID - Lucas Da Cunha (6.7)",
-            "ATT - Jesus Rodr\u00edguez (6.1)",
-            "ATT - Anastasios Douvikas (6.6)",
-            "ATT - \u00c1lvaro Morata (5.3)"
+            "GK - Emil Audero (7.5)",
+            "DIF - Federico Baschirotto (6.4)",
+            "DIF - Filippo Terracciano (6.3)",
+            "DIF - Matteo Bianchetti (7.5)",
+            "MID - Warren Bondo (6.4)",
+            "MID - Jari Vandeputte (6.3)",
+            "MID - Mart\u00edn Payero (5.6)",
+            "MID - Alberto Grassi (6.5)",
+            "MID - Michele Collocolo (6.0)",
+            "ATT - Jamie Vardy (6.2)",
+            "ATT - Federico Bonazzoli (6.9)"
         ],
         "2_PANCHINA": [
-            "DIF - Marc-Oliver Kempf (6.1)",
-            "DIF - Stefan Posch (7.9)",
-            "MID - Sergi Roberto (6.9)",
-            "MID (da DIF) - Alberto Moreno (5.4)",
-            "ATT - M\u00ebrgim Vojvoda (5.4)",
-            "ATT - Jayden Addai (6.9)"
+            "GK - Marco Silvestri (6.9)",
+            "DIF - Giuseppe Pezzella (6.4)",
+            "DIF - Tommaso Barbieri (8.2)",
+            "MID - Dachi Lordkipanidze (5.1)",
+            "MID (da DIF) - Alessio Zerbin (7.7)",
+            "ATT - Antonio Sanabria (6.3)"
         ]
     }
 }
