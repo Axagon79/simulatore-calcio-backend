@@ -1,56 +1,69 @@
 import os
 import sys
+from datetime import datetime
 
-# Aggiungiamo il percorso del progetto per trovare config.py
-# Risaliamo di 3 livelli: Strumenti -> Strumenti_debug... -> ai_engine -> Progetto
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-sys.path.append(BASE_DIR)
+# --- CONFIGURAZIONE PERCORSI (Uguale al tuo script) ---
+current_dir = os.path.dirname(os.path.abspath(__file__))
+ai_engine_dir = os.path.dirname(os.path.dirname(current_dir))
+project_root = os.path.dirname(ai_engine_dir)
+
+if ai_engine_dir not in sys.path:
+    sys.path.insert(0, ai_engine_dir)
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
 
 try:
     from config import db
-    print("✅ Connessione al database caricata correttamente da config.py")
+    print(f"✅ DB Connesso: {db.name}")
 except ImportError:
-    print("❌ Errore: Non trovo config.py. Assicurati che i percorsi siano corretti.")
+    print("❌ Errore Import Config")
     sys.exit(1)
 
-def svuota_numeretti_affidabilità():
-    # Usiamo la collezione corretta
-    h2h_collection = db['h2h_by_round']
+# --- CONFIGURAZIONE ---
+COLLECTION_NAME = "h2h_by_round"
+
+def reset_all_results():
+    """Cancella tutti i risultati (real_score) senza toccare i documenti."""
+    print("\n🧹 RESET RISULTATI IN CORSO...")
     
-    # Verifichiamo se il database risponde
-    try:
-        documents = list(h2h_collection.find({}))
-    except Exception as e:
-        print(f"❌ Errore di connessione: {e}")
-        return
-
-    print(f"🧹 Inizio svuotamento numeretti su {len(documents)} giornate...")
-
-    count = 0
-    for doc in documents:
-        matches_array = doc.get('matches', [])
-        modificato = False
+    col = db[COLLECTION_NAME]
+    total_matches_reset = 0
+    total_docs_modified = 0
+    
+    # Prendiamo tutti i documenti
+    all_docs = col.find({})
+    
+    for doc in all_docs:
+        doc_id = doc.get("_id")
+        matches = doc.get("matches", [])
+        modified = False
         
-        for index, match in enumerate(matches_array):
-            h2h = match.get('h2h_data', {})
-            
-            # Se esiste la sezione affidabilità, svuotiamo solo i numeretti
-            if h2h and 'affidabilità' in h2h:
-                h2h['affidabilità']['affidabilità_casa'] = None
-                h2h['affidabilità']['affidabilità_trasferta'] = None
-                h2h['affidabilità']['last_update'] = "Resettato"
-                
-                modificato = True
-                count += 1
-
-        # Salviamo la giornata con i campi svuotati
-        if modificato:
-            h2h_collection.update_one(
-                {"_id": doc['_id']},
-                {"$set": {"matches": matches_array}}
+        for match in matches:
+            # Se la partita ha un risultato, lo resettiamo
+            if match.get('real_score') is not None:
+                match['real_score'] = None
+                match['status'] = "Scheduled"  # Torniamo allo stato "non giocata"
+                modified = True
+                total_matches_reset += 1
+        
+        # Aggiorniamo il documento solo se abbiamo modificato qualcosa
+        if modified:
+            col.update_one(
+                {"_id": doc_id},
+                {"$set": {"matches": matches, "last_updated": datetime.now()}}
             )
-
-    print(f"✅ Reset completato! Svuotati {count} match.")
+            total_docs_modified += 1
+            print(f"   ✅ {doc_id}: resettate le partite")
+    
+    print(f"\n🏁 COMPLETATO!")
+    print(f"   📄 Documenti modificati: {total_docs_modified}")
+    print(f"   ⚽ Partite resettate: {total_matches_reset}")
 
 if __name__ == "__main__":
-    svuota_numeretti_affidabilità()
+    # Chiediamo conferma prima di procedere (sicurezza)
+    risposta = input("\n⚠️  Vuoi RESETTARE tutti i risultati? (scrivi SI per confermare): ")
+    
+    if risposta.strip().upper() == "SI":
+        reset_all_results()
+    else:
+        print("❌ Operazione annullata.")

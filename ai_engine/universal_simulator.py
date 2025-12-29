@@ -607,7 +607,7 @@ def flow_single_match():
                         if cycle_choice == '99':
                             continue
                         elif cycle_choice == '8':
-                            cycles = int(input("Cicli (50-20000) [def=500]: ") or 500)
+                            cycles = int(input("Cicli (5-20000) [def=500]: ") or 500)
                             monte_carlo_cycles = cycles
                         else:
                             cycles_map = {'1':100, '2':250, '3':500, '4':1250, '5':2500, '6':5000, '7':12500}
@@ -627,7 +627,7 @@ def flow_single_match():
                         if cycle_choice == '99':
                             continue
                         elif cycle_choice == '8':
-                            cycles = int(input("Cicli (50-20000) [def=500]: ") or 500)
+                            cycles = int(input("Cicli (5-20000) [def=500]: ") or 500)
                             monte_carlo_cycles = cycles
                             algo_sel = custom_algo
                         else:
@@ -1844,7 +1844,7 @@ def run_universal_simulator():
                     # PERSONALIZZATO
                     while True:
                         print("\n✏️  MODALITÀ PERSONALIZZATA")
-                        print("   Inserisci numero cicli (min: 50, max: 20,000)")
+                        print("   Inserisci numero cicli (min: 5, max: 20,000)")
                         
                         try:
                             custom_cycles = int(input("\n   Cicli: ").strip())
@@ -1852,15 +1852,15 @@ def run_universal_simulator():
                             print("❌ Inserisci un numero valido.")
                             continue
                         
-                        if custom_cycles < 50:
-                            print("❌ Minimo 50 cicli.")
+                        if custom_cycles < 5:
+                            print("❌ Minimo 5 cicli.")
                             continue
                         if custom_cycles > 20000:
                             print("❌ Massimo 20,000 cicli.")
                             continue
                         
                         cycles_per_single_algo = custom_cycles
-                        tempo_stimato = custom_cycles // 50
+                        tempo_stimato = custom_cycles // 5
                         
                         print(f"\n📊 Riepilogo:")
                         print(f"   • Cicli: {cycles_per_single_algo:,}")
