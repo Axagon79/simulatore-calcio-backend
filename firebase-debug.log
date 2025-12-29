@@ -2540,3 +2540,630 @@ Issues? Report them at https://github.com/firebase/firebase-tools/issues and att
 [debug] [2025-12-29T20:19:10.822Z] Finishing up request with event=finish {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=finish"}}
 [debug] [2025-12-29T20:19:10.822Z] Finishing up request with event=close {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=close"}}
 [debug] [2025-12-29T20:19:10.822Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":[],"workRunningCount":0}
+[debug] [2025-12-29T20:30:53.350Z] [work-queue] {"queuedWork":["/puppals-456c7/us-central1/api/leagues-2025-12-29T20:30:53.350Z"],"queueLength":1,"runningWork":[],"workRunningCount":0}
+[debug] [2025-12-29T20:30:53.351Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":["/puppals-456c7/us-central1/api/leagues-2025-12-29T20:30:53.350Z"],"workRunningCount":1}
+[debug] [2025-12-29T20:30:53.351Z] Accepted request GET /puppals-456c7/us-central1/api/leagues?country=Italy --> us-central1-api
+[debug] [2025-12-29T20:30:53.354Z] [functions] Runtime ready! Sending request! {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Runtime ready! Sending request!"}}
+[debug] [2025-12-29T20:30:53.354Z] [functions] Got req.url=/puppals-456c7/us-central1/api/leagues?country=Italy, mapping to path=/leagues?country=Italy {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Got req.url=/puppals-456c7/us-central1/api/leagues?country=Italy, mapping to path=/leagues?country=Italy"}}
+[debug] [2025-12-29T20:30:53.355Z] [worker-pool] submitRequest(triggerId=us-central1-api) {"metadata":{"emulator":{"name":"functions"},"message":"[worker-pool] submitRequest(triggerId=us-central1-api)"}}
+[info] i  functions: Beginning execution of "us-central1-api" {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Beginning execution of \"us-central1-api\""}}
+[debug] [2025-12-29T20:30:53.355Z] [worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: BUSY {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: BUSY"}}
+[debug] [2025-12-29T20:30:53.356Z] [work-queue] {"queuedWork":["/puppals-456c7/us-central1/api/rounds-2025-12-29T20:30:53.356Z"],"queueLength":1,"runningWork":["/puppals-456c7/us-central1/api/leagues-2025-12-29T20:30:53.350Z"],"workRunningCount":1}
+[debug] [2025-12-29T20:30:53.357Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":["/puppals-456c7/us-central1/api/leagues-2025-12-29T20:30:53.350Z","/puppals-456c7/us-central1/api/rounds-2025-12-29T20:30:53.356Z"],"workRunningCount":2}
+[debug] [2025-12-29T20:30:53.357Z] Accepted request GET /puppals-456c7/us-central1/api/rounds?league=SERIE_A --> us-central1-api
+[debug] [2025-12-29T20:30:53.358Z] [functions] Runtime ready! Sending request! {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Runtime ready! Sending request!"}}
+[debug] [2025-12-29T20:30:53.358Z] [functions] Got req.url=/puppals-456c7/us-central1/api/rounds?league=SERIE_A, mapping to path=/rounds?league=SERIE_A {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Got req.url=/puppals-456c7/us-central1/api/rounds?league=SERIE_A, mapping to path=/rounds?league=SERIE_A"}}
+[debug] [2025-12-29T20:30:53.358Z] [worker-pool] submitRequest(triggerId=us-central1-api) {"metadata":{"emulator":{"name":"functions"},"message":"[worker-pool] submitRequest(triggerId=us-central1-api)"}}
+[info] i  functions: Beginning execution of "us-central1-api" {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Beginning execution of \"us-central1-api\""}}
+[debug] [2025-12-29T20:30:53.359Z] [worker-us-central1-api-7f4730f5-cba7-4d20-a200-854ddd33ce77]: BUSY {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-7f4730f5-cba7-4d20-a200-854ddd33ce77]: BUSY"}}
+[debug] [2025-12-29T20:30:53.386Z] [work-queue] {"queuedWork":["/puppals-456c7/us-central1/api/matches-2025-12-29T20:30:53.386Z"],"queueLength":1,"runningWork":["/puppals-456c7/us-central1/api/leagues-2025-12-29T20:30:53.350Z","/puppals-456c7/us-central1/api/rounds-2025-12-29T20:30:53.356Z"],"workRunningCount":2}
+[debug] [2025-12-29T20:30:53.386Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":["/puppals-456c7/us-central1/api/leagues-2025-12-29T20:30:53.350Z","/puppals-456c7/us-central1/api/rounds-2025-12-29T20:30:53.356Z","/puppals-456c7/us-central1/api/matches-2025-12-29T20:30:53.386Z"],"workRunningCount":3}
+[debug] [2025-12-29T20:30:53.386Z] Accepted request GET /puppals-456c7/us-central1/api/matches?league=SERIE_A&round=18.Giornata --> us-central1-api
+[debug] [2025-12-29T20:30:53.388Z] [functions] Runtime ready! Sending request! {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Runtime ready! Sending request!"}}
+[debug] [2025-12-29T20:30:53.388Z] [functions] Got req.url=/puppals-456c7/us-central1/api/matches?league=SERIE_A&round=18.Giornata, mapping to path=/matches?league=SERIE_A&round=18.Giornata {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Got req.url=/puppals-456c7/us-central1/api/matches?league=SERIE_A&round=18.Giornata, mapping to path=/matches?league=SERIE_A&round=18.Giornata"}}
+[debug] [2025-12-29T20:30:53.388Z] [worker-pool] submitRequest(triggerId=us-central1-api) {"metadata":{"emulator":{"name":"functions"},"message":"[worker-pool] submitRequest(triggerId=us-central1-api)"}}
+[info] i  functions: Beginning execution of "us-central1-api" {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Beginning execution of \"us-central1-api\""}}
+[debug] [2025-12-29T20:30:53.389Z] [worker-us-central1-api-54d4d1c4-859c-41bb-b8d3-5f4244685a53]: BUSY {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-54d4d1c4-859c-41bb-b8d3-5f4244685a53]: BUSY"}}
+[debug] [2025-12-29T20:30:53.390Z] Finishing up request with event=pause {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=pause"}}
+[info] i  functions: Finished "us-central1-api" in 35.2616ms {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finished \"us-central1-api\" in 35.2616ms"}}
+[debug] [2025-12-29T20:30:53.391Z] [worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: IDLE {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: IDLE"}}
+[debug] [2025-12-29T20:30:53.391Z] Finishing up request with event=finish {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=finish"}}
+[debug] [2025-12-29T20:30:53.391Z] Finishing up request with event=close {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=close"}}
+[debug] [2025-12-29T20:30:53.391Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":["/puppals-456c7/us-central1/api/rounds-2025-12-29T20:30:53.356Z","/puppals-456c7/us-central1/api/matches-2025-12-29T20:30:53.386Z"],"workRunningCount":2}
+[info] >  ✅ Matches SERIE_A 18.Giornata: 10 partite {"user":"✅ Matches SERIE_A 18.Giornata: 10 partite","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"\u001b[90m> \u001b[39m ✅ Matches SERIE_A 18.Giornata: 10 partite"}}
+[debug] [2025-12-29T20:30:53.471Z] Finishing up request with event=pause {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=pause"}}
+[info] i  functions: Finished "us-central1-api" in 82.3634ms {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finished \"us-central1-api\" in 82.3634ms"}}
+[debug] [2025-12-29T20:30:53.472Z] [worker-us-central1-api-54d4d1c4-859c-41bb-b8d3-5f4244685a53]: IDLE {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-54d4d1c4-859c-41bb-b8d3-5f4244685a53]: IDLE"}}
+[debug] [2025-12-29T20:30:53.472Z] Finishing up request with event=finish {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=finish"}}
+[debug] [2025-12-29T20:30:53.472Z] Finishing up request with event=close {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=close"}}
+[debug] [2025-12-29T20:30:53.472Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":["/puppals-456c7/us-central1/api/rounds-2025-12-29T20:30:53.356Z"],"workRunningCount":1}
+[info] >  ✅ Rounds SERIE_A: anchor=17.Giornata, count=3 {"user":"✅ Rounds SERIE_A: anchor=17.Giornata, count=3","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"\u001b[90m> \u001b[39m ✅ Rounds SERIE_A: anchor=17.Giornata, count=3"}}
+[debug] [2025-12-29T20:30:53.657Z] Finishing up request with event=pause {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=pause"}}
+[info] i  functions: Finished "us-central1-api" in 297.5378ms {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finished \"us-central1-api\" in 297.5378ms"}}
+[debug] [2025-12-29T20:30:53.657Z] [worker-us-central1-api-7f4730f5-cba7-4d20-a200-854ddd33ce77]: IDLE {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-7f4730f5-cba7-4d20-a200-854ddd33ce77]: IDLE"}}
+[debug] [2025-12-29T20:30:53.657Z] Finishing up request with event=finish {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=finish"}}
+[debug] [2025-12-29T20:30:53.657Z] Finishing up request with event=close {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=close"}}
+[debug] [2025-12-29T20:30:53.657Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":[],"workRunningCount":0}
+[debug] [2025-12-29T20:30:53.674Z] [work-queue] {"queuedWork":["/puppals-456c7/us-central1/api/matches-2025-12-29T20:30:53.674Z"],"queueLength":1,"runningWork":[],"workRunningCount":0}
+[debug] [2025-12-29T20:30:53.674Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":["/puppals-456c7/us-central1/api/matches-2025-12-29T20:30:53.674Z"],"workRunningCount":1}
+[debug] [2025-12-29T20:30:53.674Z] Accepted request GET /puppals-456c7/us-central1/api/matches?league=SERIE_A&round=17.Giornata --> us-central1-api
+[debug] [2025-12-29T20:30:53.675Z] [functions] Runtime ready! Sending request! {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Runtime ready! Sending request!"}}
+[debug] [2025-12-29T20:30:53.675Z] [functions] Got req.url=/puppals-456c7/us-central1/api/matches?league=SERIE_A&round=17.Giornata, mapping to path=/matches?league=SERIE_A&round=17.Giornata {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Got req.url=/puppals-456c7/us-central1/api/matches?league=SERIE_A&round=17.Giornata, mapping to path=/matches?league=SERIE_A&round=17.Giornata"}}
+[debug] [2025-12-29T20:30:53.675Z] [worker-pool] submitRequest(triggerId=us-central1-api) {"metadata":{"emulator":{"name":"functions"},"message":"[worker-pool] submitRequest(triggerId=us-central1-api)"}}
+[info] i  functions: Beginning execution of "us-central1-api" {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Beginning execution of \"us-central1-api\""}}
+[debug] [2025-12-29T20:30:53.675Z] [worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: BUSY {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: BUSY"}}
+[info] >  ✅ Matches SERIE_A 17.Giornata: 10 partite {"user":"✅ Matches SERIE_A 17.Giornata: 10 partite","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"\u001b[90m> \u001b[39m ✅ Matches SERIE_A 17.Giornata: 10 partite"}}
+[debug] [2025-12-29T20:30:53.758Z] Finishing up request with event=pause {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=pause"}}
+[info] i  functions: Finished "us-central1-api" in 82.7894ms {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finished \"us-central1-api\" in 82.7894ms"}}
+[debug] [2025-12-29T20:30:53.759Z] [worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: IDLE {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: IDLE"}}
+[debug] [2025-12-29T20:30:53.759Z] Finishing up request with event=finish {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=finish"}}
+[debug] [2025-12-29T20:30:53.759Z] Finishing up request with event=close {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=close"}}
+[debug] [2025-12-29T20:30:53.759Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":[],"workRunningCount":0}
+[debug] [2025-12-29T20:30:54.926Z] [work-queue] {"queuedWork":["/puppals-456c7/us-central1/api/rounds-2025-12-29T20:30:54.926Z"],"queueLength":1,"runningWork":[],"workRunningCount":0}
+[debug] [2025-12-29T20:30:54.926Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":["/puppals-456c7/us-central1/api/rounds-2025-12-29T20:30:54.926Z"],"workRunningCount":1}
+[debug] [2025-12-29T20:30:54.926Z] Accepted request GET /puppals-456c7/us-central1/api/rounds?league=SERIE_C_A --> us-central1-api
+[debug] [2025-12-29T20:30:54.926Z] [functions] Runtime ready! Sending request! {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Runtime ready! Sending request!"}}
+[debug] [2025-12-29T20:30:54.927Z] [functions] Got req.url=/puppals-456c7/us-central1/api/rounds?league=SERIE_C_A, mapping to path=/rounds?league=SERIE_C_A {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Got req.url=/puppals-456c7/us-central1/api/rounds?league=SERIE_C_A, mapping to path=/rounds?league=SERIE_C_A"}}
+[debug] [2025-12-29T20:30:54.927Z] [worker-pool] submitRequest(triggerId=us-central1-api) {"metadata":{"emulator":{"name":"functions"},"message":"[worker-pool] submitRequest(triggerId=us-central1-api)"}}
+[info] i  functions: Beginning execution of "us-central1-api" {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Beginning execution of \"us-central1-api\""}}
+[debug] [2025-12-29T20:30:54.927Z] [worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: BUSY {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: BUSY"}}
+[debug] [2025-12-29T20:30:54.928Z] [work-queue] {"queuedWork":["/puppals-456c7/us-central1/api/matches-2025-12-29T20:30:54.928Z"],"queueLength":1,"runningWork":["/puppals-456c7/us-central1/api/rounds-2025-12-29T20:30:54.926Z"],"workRunningCount":1}
+[debug] [2025-12-29T20:30:54.928Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":["/puppals-456c7/us-central1/api/rounds-2025-12-29T20:30:54.926Z","/puppals-456c7/us-central1/api/matches-2025-12-29T20:30:54.928Z"],"workRunningCount":2}
+[debug] [2025-12-29T20:30:54.928Z] Accepted request GET /puppals-456c7/us-central1/api/matches?league=SERIE_C_A&round=17.Giornata --> us-central1-api
+[debug] [2025-12-29T20:30:54.929Z] [functions] Runtime ready! Sending request! {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Runtime ready! Sending request!"}}
+[debug] [2025-12-29T20:30:54.929Z] [functions] Got req.url=/puppals-456c7/us-central1/api/matches?league=SERIE_C_A&round=17.Giornata, mapping to path=/matches?league=SERIE_C_A&round=17.Giornata {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Got req.url=/puppals-456c7/us-central1/api/matches?league=SERIE_C_A&round=17.Giornata, mapping to path=/matches?league=SERIE_C_A&round=17.Giornata"}}
+[debug] [2025-12-29T20:30:54.929Z] [worker-pool] submitRequest(triggerId=us-central1-api) {"metadata":{"emulator":{"name":"functions"},"message":"[worker-pool] submitRequest(triggerId=us-central1-api)"}}
+[info] i  functions: Beginning execution of "us-central1-api" {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Beginning execution of \"us-central1-api\""}}
+[debug] [2025-12-29T20:30:54.930Z] [worker-us-central1-api-7f4730f5-cba7-4d20-a200-854ddd33ce77]: BUSY {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-7f4730f5-cba7-4d20-a200-854ddd33ce77]: BUSY"}}
+[info] >  ✅ Matches SERIE_C_A 17.Giornata: 10 partite {"user":"✅ Matches SERIE_C_A 17.Giornata: 10 partite","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"\u001b[90m> \u001b[39m ✅ Matches SERIE_C_A 17.Giornata: 10 partite"}}
+[debug] [2025-12-29T20:30:54.959Z] Finishing up request with event=pause {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=pause"}}
+[info] i  functions: Finished "us-central1-api" in 29.2447ms {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finished \"us-central1-api\" in 29.2447ms"}}
+[debug] [2025-12-29T20:30:54.960Z] [worker-us-central1-api-7f4730f5-cba7-4d20-a200-854ddd33ce77]: IDLE {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-7f4730f5-cba7-4d20-a200-854ddd33ce77]: IDLE"}}
+[debug] [2025-12-29T20:30:54.960Z] Finishing up request with event=finish {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=finish"}}
+[debug] [2025-12-29T20:30:54.960Z] Finishing up request with event=close {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=close"}}
+[debug] [2025-12-29T20:30:54.960Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":["/puppals-456c7/us-central1/api/rounds-2025-12-29T20:30:54.926Z"],"workRunningCount":1}
+[info] >  ✅ Rounds SERIE_C_A: anchor=20.Giornata, count=3 {"user":"✅ Rounds SERIE_C_A: anchor=20.Giornata, count=3","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"\u001b[90m> \u001b[39m ✅ Rounds SERIE_C_A: anchor=20.Giornata, count=3"}}
+[debug] [2025-12-29T20:30:55.089Z] Finishing up request with event=pause {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=pause"}}
+[info] i  functions: Finished "us-central1-api" in 161.3932ms {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finished \"us-central1-api\" in 161.3932ms"}}
+[debug] [2025-12-29T20:30:55.089Z] [worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: IDLE {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: IDLE"}}
+[debug] [2025-12-29T20:30:55.089Z] Finishing up request with event=finish {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=finish"}}
+[debug] [2025-12-29T20:30:55.089Z] Finishing up request with event=close {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=close"}}
+[debug] [2025-12-29T20:30:55.089Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":[],"workRunningCount":0}
+[debug] [2025-12-29T20:30:55.106Z] [work-queue] {"queuedWork":["/puppals-456c7/us-central1/api/matches-2025-12-29T20:30:55.106Z"],"queueLength":1,"runningWork":[],"workRunningCount":0}
+[debug] [2025-12-29T20:30:55.106Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":["/puppals-456c7/us-central1/api/matches-2025-12-29T20:30:55.106Z"],"workRunningCount":1}
+[debug] [2025-12-29T20:30:55.106Z] Accepted request GET /puppals-456c7/us-central1/api/matches?league=SERIE_C_A&round=20.Giornata --> us-central1-api
+[debug] [2025-12-29T20:30:55.106Z] [functions] Runtime ready! Sending request! {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Runtime ready! Sending request!"}}
+[debug] [2025-12-29T20:30:55.106Z] [functions] Got req.url=/puppals-456c7/us-central1/api/matches?league=SERIE_C_A&round=20.Giornata, mapping to path=/matches?league=SERIE_C_A&round=20.Giornata {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Got req.url=/puppals-456c7/us-central1/api/matches?league=SERIE_C_A&round=20.Giornata, mapping to path=/matches?league=SERIE_C_A&round=20.Giornata"}}
+[debug] [2025-12-29T20:30:55.106Z] [worker-pool] submitRequest(triggerId=us-central1-api) {"metadata":{"emulator":{"name":"functions"},"message":"[worker-pool] submitRequest(triggerId=us-central1-api)"}}
+[info] i  functions: Beginning execution of "us-central1-api" {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Beginning execution of \"us-central1-api\""}}
+[debug] [2025-12-29T20:30:55.107Z] [worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: BUSY {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: BUSY"}}
+[info] >  ✅ Matches SERIE_C_A 20.Giornata: 10 partite {"user":"✅ Matches SERIE_C_A 20.Giornata: 10 partite","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"\u001b[90m> \u001b[39m ✅ Matches SERIE_C_A 20.Giornata: 10 partite"}}
+[debug] [2025-12-29T20:30:55.137Z] Finishing up request with event=pause {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=pause"}}
+[info] i  functions: Finished "us-central1-api" in 30.582ms {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finished \"us-central1-api\" in 30.582ms"}}
+[debug] [2025-12-29T20:30:55.138Z] [worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: IDLE {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: IDLE"}}
+[debug] [2025-12-29T20:30:55.138Z] Finishing up request with event=finish {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=finish"}}
+[debug] [2025-12-29T20:30:55.138Z] Finishing up request with event=close {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=close"}}
+[debug] [2025-12-29T20:30:55.138Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":[],"workRunningCount":0}
+[debug] [2025-12-29T20:32:27.865Z] [work-queue] {"queuedWork":["/puppals-456c7/us-central1/api/rounds-2025-12-29T20:32:27.865Z"],"queueLength":1,"runningWork":[],"workRunningCount":0}
+[debug] [2025-12-29T20:32:27.865Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":["/puppals-456c7/us-central1/api/rounds-2025-12-29T20:32:27.865Z"],"workRunningCount":1}
+[debug] [2025-12-29T20:32:27.865Z] Accepted request GET /puppals-456c7/us-central1/api/rounds?league=SERIE_A --> us-central1-api
+[debug] [2025-12-29T20:32:27.868Z] [functions] Runtime ready! Sending request! {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Runtime ready! Sending request!"}}
+[debug] [2025-12-29T20:32:27.868Z] [functions] Got req.url=/puppals-456c7/us-central1/api/rounds?league=SERIE_A, mapping to path=/rounds?league=SERIE_A {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Got req.url=/puppals-456c7/us-central1/api/rounds?league=SERIE_A, mapping to path=/rounds?league=SERIE_A"}}
+[debug] [2025-12-29T20:32:27.868Z] [worker-pool] submitRequest(triggerId=us-central1-api) {"metadata":{"emulator":{"name":"functions"},"message":"[worker-pool] submitRequest(triggerId=us-central1-api)"}}
+[info] i  functions: Beginning execution of "us-central1-api" {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Beginning execution of \"us-central1-api\""}}
+[debug] [2025-12-29T20:32:27.869Z] [worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: BUSY {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: BUSY"}}
+[debug] [2025-12-29T20:32:27.893Z] [work-queue] {"queuedWork":["/puppals-456c7/us-central1/api/matches-2025-12-29T20:32:27.893Z"],"queueLength":1,"runningWork":["/puppals-456c7/us-central1/api/rounds-2025-12-29T20:32:27.865Z"],"workRunningCount":1}
+[debug] [2025-12-29T20:32:27.893Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":["/puppals-456c7/us-central1/api/rounds-2025-12-29T20:32:27.865Z","/puppals-456c7/us-central1/api/matches-2025-12-29T20:32:27.893Z"],"workRunningCount":2}
+[debug] [2025-12-29T20:32:27.893Z] Accepted request GET /puppals-456c7/us-central1/api/matches?league=SERIE_A&round=20.Giornata --> us-central1-api
+[debug] [2025-12-29T20:32:27.895Z] [functions] Runtime ready! Sending request! {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Runtime ready! Sending request!"}}
+[debug] [2025-12-29T20:32:27.895Z] [functions] Got req.url=/puppals-456c7/us-central1/api/matches?league=SERIE_A&round=20.Giornata, mapping to path=/matches?league=SERIE_A&round=20.Giornata {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Got req.url=/puppals-456c7/us-central1/api/matches?league=SERIE_A&round=20.Giornata, mapping to path=/matches?league=SERIE_A&round=20.Giornata"}}
+[debug] [2025-12-29T20:32:27.895Z] [worker-pool] submitRequest(triggerId=us-central1-api) {"metadata":{"emulator":{"name":"functions"},"message":"[worker-pool] submitRequest(triggerId=us-central1-api)"}}
+[info] i  functions: Beginning execution of "us-central1-api" {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Beginning execution of \"us-central1-api\""}}
+[debug] [2025-12-29T20:32:27.896Z] [worker-us-central1-api-7f4730f5-cba7-4d20-a200-854ddd33ce77]: BUSY {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-7f4730f5-cba7-4d20-a200-854ddd33ce77]: BUSY"}}
+[info] >  ✅ Matches SERIE_A 20.Giornata: 10 partite {"user":"✅ Matches SERIE_A 20.Giornata: 10 partite","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"\u001b[90m> \u001b[39m ✅ Matches SERIE_A 20.Giornata: 10 partite"}}
+[debug] [2025-12-29T20:32:27.976Z] Finishing up request with event=pause {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=pause"}}
+[info] i  functions: Finished "us-central1-api" in 80.8398ms {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finished \"us-central1-api\" in 80.8398ms"}}
+[debug] [2025-12-29T20:32:27.977Z] [worker-us-central1-api-7f4730f5-cba7-4d20-a200-854ddd33ce77]: IDLE {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-7f4730f5-cba7-4d20-a200-854ddd33ce77]: IDLE"}}
+[debug] [2025-12-29T20:32:27.977Z] Finishing up request with event=finish {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=finish"}}
+[debug] [2025-12-29T20:32:27.977Z] Finishing up request with event=close {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=close"}}
+[debug] [2025-12-29T20:32:27.977Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":["/puppals-456c7/us-central1/api/rounds-2025-12-29T20:32:27.865Z"],"workRunningCount":1}
+[info] >  ✅ Rounds SERIE_A: anchor=17.Giornata, count=3 {"user":"✅ Rounds SERIE_A: anchor=17.Giornata, count=3","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"\u001b[90m> \u001b[39m ✅ Rounds SERIE_A: anchor=17.Giornata, count=3"}}
+[debug] [2025-12-29T20:32:28.139Z] Finishing up request with event=pause {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=pause"}}
+[info] i  functions: Finished "us-central1-api" in 270.2287ms {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finished \"us-central1-api\" in 270.2287ms"}}
+[debug] [2025-12-29T20:32:28.155Z] [worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: IDLE {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: IDLE"}}
+[debug] [2025-12-29T20:32:28.156Z] Finishing up request with event=finish {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=finish"}}
+[debug] [2025-12-29T20:32:28.156Z] Finishing up request with event=close {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=close"}}
+[debug] [2025-12-29T20:32:28.156Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":[],"workRunningCount":0}
+[debug] [2025-12-29T20:32:28.199Z] [work-queue] {"queuedWork":["/puppals-456c7/us-central1/api/matches-2025-12-29T20:32:28.199Z"],"queueLength":1,"runningWork":[],"workRunningCount":0}
+[debug] [2025-12-29T20:32:28.199Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":["/puppals-456c7/us-central1/api/matches-2025-12-29T20:32:28.199Z"],"workRunningCount":1}
+[debug] [2025-12-29T20:32:28.199Z] Accepted request GET /puppals-456c7/us-central1/api/matches?league=SERIE_A&round=17.Giornata --> us-central1-api
+[debug] [2025-12-29T20:32:28.200Z] [functions] Runtime ready! Sending request! {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Runtime ready! Sending request!"}}
+[debug] [2025-12-29T20:32:28.200Z] [functions] Got req.url=/puppals-456c7/us-central1/api/matches?league=SERIE_A&round=17.Giornata, mapping to path=/matches?league=SERIE_A&round=17.Giornata {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Got req.url=/puppals-456c7/us-central1/api/matches?league=SERIE_A&round=17.Giornata, mapping to path=/matches?league=SERIE_A&round=17.Giornata"}}
+[debug] [2025-12-29T20:32:28.200Z] [worker-pool] submitRequest(triggerId=us-central1-api) {"metadata":{"emulator":{"name":"functions"},"message":"[worker-pool] submitRequest(triggerId=us-central1-api)"}}
+[info] i  functions: Beginning execution of "us-central1-api" {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Beginning execution of \"us-central1-api\""}}
+[debug] [2025-12-29T20:32:28.201Z] [worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: BUSY {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: BUSY"}}
+[info] >  ✅ Matches SERIE_A 17.Giornata: 10 partite {"user":"✅ Matches SERIE_A 17.Giornata: 10 partite","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"\u001b[90m> \u001b[39m ✅ Matches SERIE_A 17.Giornata: 10 partite"}}
+[debug] [2025-12-29T20:32:28.237Z] Finishing up request with event=pause {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=pause"}}
+[info] i  functions: Finished "us-central1-api" in 36.1753ms {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finished \"us-central1-api\" in 36.1753ms"}}
+[debug] [2025-12-29T20:32:28.238Z] [worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: IDLE {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: IDLE"}}
+[debug] [2025-12-29T20:32:28.238Z] Finishing up request with event=finish {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=finish"}}
+[debug] [2025-12-29T20:32:28.238Z] Finishing up request with event=close {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=close"}}
+[debug] [2025-12-29T20:32:28.238Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":[],"workRunningCount":0}
+[debug] [2025-12-29T20:45:25.228Z] [work-queue] {"queuedWork":["/puppals-456c7/us-central1/api/leagues-2025-12-29T20:45:25.228Z"],"queueLength":1,"runningWork":[],"workRunningCount":0}
+[debug] [2025-12-29T20:45:25.228Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":["/puppals-456c7/us-central1/api/leagues-2025-12-29T20:45:25.228Z"],"workRunningCount":1}
+[debug] [2025-12-29T20:45:25.228Z] Accepted request GET /puppals-456c7/us-central1/api/leagues?country=Italy --> us-central1-api
+[debug] [2025-12-29T20:45:25.230Z] [functions] Runtime ready! Sending request! {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Runtime ready! Sending request!"}}
+[debug] [2025-12-29T20:45:25.231Z] [functions] Got req.url=/puppals-456c7/us-central1/api/leagues?country=Italy, mapping to path=/leagues?country=Italy {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Got req.url=/puppals-456c7/us-central1/api/leagues?country=Italy, mapping to path=/leagues?country=Italy"}}
+[debug] [2025-12-29T20:45:25.231Z] [worker-pool] submitRequest(triggerId=us-central1-api) {"metadata":{"emulator":{"name":"functions"},"message":"[worker-pool] submitRequest(triggerId=us-central1-api)"}}
+[info] i  functions: Beginning execution of "us-central1-api" {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Beginning execution of \"us-central1-api\""}}
+[debug] [2025-12-29T20:45:25.231Z] [worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: BUSY {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: BUSY"}}
+[debug] [2025-12-29T20:45:25.278Z] Finishing up request with event=pause {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=pause"}}
+[info] i  functions: Finished "us-central1-api" in 46.9649ms {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finished \"us-central1-api\" in 46.9649ms"}}
+[debug] [2025-12-29T20:45:25.278Z] [worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: IDLE {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: IDLE"}}
+[debug] [2025-12-29T20:45:25.279Z] Finishing up request with event=finish {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=finish"}}
+[debug] [2025-12-29T20:45:25.279Z] Finishing up request with event=close {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=close"}}
+[debug] [2025-12-29T20:45:25.279Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":[],"workRunningCount":0}
+[debug] [2025-12-29T20:45:25.279Z] [work-queue] {"queuedWork":["/puppals-456c7/us-central1/api/leagues-2025-12-29T20:45:25.279Z"],"queueLength":1,"runningWork":[],"workRunningCount":0}
+[debug] [2025-12-29T20:45:25.279Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":["/puppals-456c7/us-central1/api/leagues-2025-12-29T20:45:25.279Z"],"workRunningCount":1}
+[debug] [2025-12-29T20:45:25.279Z] Accepted request GET /puppals-456c7/us-central1/api/leagues?country=Italy --> us-central1-api
+[debug] [2025-12-29T20:45:25.281Z] [functions] Runtime ready! Sending request! {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Runtime ready! Sending request!"}}
+[debug] [2025-12-29T20:45:25.281Z] [functions] Got req.url=/puppals-456c7/us-central1/api/leagues?country=Italy, mapping to path=/leagues?country=Italy {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Got req.url=/puppals-456c7/us-central1/api/leagues?country=Italy, mapping to path=/leagues?country=Italy"}}
+[debug] [2025-12-29T20:45:25.281Z] [worker-pool] submitRequest(triggerId=us-central1-api) {"metadata":{"emulator":{"name":"functions"},"message":"[worker-pool] submitRequest(triggerId=us-central1-api)"}}
+[info] i  functions: Beginning execution of "us-central1-api" {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Beginning execution of \"us-central1-api\""}}
+[debug] [2025-12-29T20:45:25.282Z] [worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: BUSY {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: BUSY"}}
+[debug] [2025-12-29T20:45:25.283Z] Finishing up request with event=pause {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=pause"}}
+[info] i  functions: Finished "us-central1-api" in 1.4236ms {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finished \"us-central1-api\" in 1.4236ms"}}
+[debug] [2025-12-29T20:45:25.284Z] [worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: IDLE {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: IDLE"}}
+[debug] [2025-12-29T20:45:25.284Z] Finishing up request with event=finish {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=finish"}}
+[debug] [2025-12-29T20:45:25.284Z] Finishing up request with event=close {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=close"}}
+[debug] [2025-12-29T20:45:25.284Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":[],"workRunningCount":0}
+[debug] [2025-12-29T20:45:25.371Z] [work-queue] {"queuedWork":["/puppals-456c7/us-central1/api/rounds-2025-12-29T20:45:25.371Z"],"queueLength":1,"runningWork":[],"workRunningCount":0}
+[debug] [2025-12-29T20:45:25.371Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":["/puppals-456c7/us-central1/api/rounds-2025-12-29T20:45:25.371Z"],"workRunningCount":1}
+[debug] [2025-12-29T20:45:25.371Z] Accepted request GET /puppals-456c7/us-central1/api/rounds?league=SERIE_A --> us-central1-api
+[debug] [2025-12-29T20:45:25.372Z] [functions] Runtime ready! Sending request! {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Runtime ready! Sending request!"}}
+[debug] [2025-12-29T20:45:25.372Z] [functions] Got req.url=/puppals-456c7/us-central1/api/rounds?league=SERIE_A, mapping to path=/rounds?league=SERIE_A {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Got req.url=/puppals-456c7/us-central1/api/rounds?league=SERIE_A, mapping to path=/rounds?league=SERIE_A"}}
+[debug] [2025-12-29T20:45:25.372Z] [worker-pool] submitRequest(triggerId=us-central1-api) {"metadata":{"emulator":{"name":"functions"},"message":"[worker-pool] submitRequest(triggerId=us-central1-api)"}}
+[info] i  functions: Beginning execution of "us-central1-api" {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Beginning execution of \"us-central1-api\""}}
+[debug] [2025-12-29T20:45:25.373Z] [worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: BUSY {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: BUSY"}}
+[info] >  ✅ Rounds SERIE_A: anchor=18.Giornata, count=3 {"user":"✅ Rounds SERIE_A: anchor=18.Giornata, count=3","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"\u001b[90m> \u001b[39m ✅ Rounds SERIE_A: anchor=18.Giornata, count=3"}}
+[debug] [2025-12-29T20:45:25.639Z] Finishing up request with event=pause {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=pause"}}
+[info] i  functions: Finished "us-central1-api" in 266.4002ms {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finished \"us-central1-api\" in 266.4002ms"}}
+[debug] [2025-12-29T20:45:25.639Z] [worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: IDLE {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: IDLE"}}
+[debug] [2025-12-29T20:45:25.640Z] Finishing up request with event=finish {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=finish"}}
+[debug] [2025-12-29T20:45:25.640Z] Finishing up request with event=close {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=close"}}
+[debug] [2025-12-29T20:45:25.640Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":[],"workRunningCount":0}
+[debug] [2025-12-29T20:45:25.646Z] [work-queue] {"queuedWork":["/puppals-456c7/us-central1/api/matches-2025-12-29T20:45:25.646Z"],"queueLength":1,"runningWork":[],"workRunningCount":0}
+[debug] [2025-12-29T20:45:25.646Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":["/puppals-456c7/us-central1/api/matches-2025-12-29T20:45:25.646Z"],"workRunningCount":1}
+[debug] [2025-12-29T20:45:25.646Z] Accepted request GET /puppals-456c7/us-central1/api/matches?league=SERIE_A&round=18.Giornata --> us-central1-api
+[debug] [2025-12-29T20:45:25.646Z] [functions] Runtime ready! Sending request! {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Runtime ready! Sending request!"}}
+[debug] [2025-12-29T20:45:25.647Z] [functions] Got req.url=/puppals-456c7/us-central1/api/matches?league=SERIE_A&round=18.Giornata, mapping to path=/matches?league=SERIE_A&round=18.Giornata {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Got req.url=/puppals-456c7/us-central1/api/matches?league=SERIE_A&round=18.Giornata, mapping to path=/matches?league=SERIE_A&round=18.Giornata"}}
+[debug] [2025-12-29T20:45:25.647Z] [worker-pool] submitRequest(triggerId=us-central1-api) {"metadata":{"emulator":{"name":"functions"},"message":"[worker-pool] submitRequest(triggerId=us-central1-api)"}}
+[info] i  functions: Beginning execution of "us-central1-api" {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Beginning execution of \"us-central1-api\""}}
+[debug] [2025-12-29T20:45:25.647Z] [worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: BUSY {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: BUSY"}}
+[info] >  ✅ Matches SERIE_A 18.Giornata: 10 partite {"user":"✅ Matches SERIE_A 18.Giornata: 10 partite","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"\u001b[90m> \u001b[39m ✅ Matches SERIE_A 18.Giornata: 10 partite"}}
+[debug] [2025-12-29T20:45:25.713Z] Finishing up request with event=pause {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=pause"}}
+[info] i  functions: Finished "us-central1-api" in 66.5235ms {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finished \"us-central1-api\" in 66.5235ms"}}
+[debug] [2025-12-29T20:45:25.714Z] [worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: IDLE {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: IDLE"}}
+[debug] [2025-12-29T20:45:25.714Z] Finishing up request with event=finish {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=finish"}}
+[debug] [2025-12-29T20:45:25.714Z] Finishing up request with event=close {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=close"}}
+[debug] [2025-12-29T20:45:25.714Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":[],"workRunningCount":0}
+[debug] [2025-12-29T20:51:05.176Z] [work-queue] {"queuedWork":["/puppals-456c7/us-central1/api/leagues-2025-12-29T20:51:05.176Z"],"queueLength":1,"runningWork":[],"workRunningCount":0}
+[debug] [2025-12-29T20:51:05.176Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":["/puppals-456c7/us-central1/api/leagues-2025-12-29T20:51:05.176Z"],"workRunningCount":1}
+[debug] [2025-12-29T20:51:05.176Z] Accepted request GET /puppals-456c7/us-central1/api/leagues?country=Italy --> us-central1-api
+[debug] [2025-12-29T20:51:05.178Z] [functions] Runtime ready! Sending request! {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Runtime ready! Sending request!"}}
+[debug] [2025-12-29T20:51:05.179Z] [functions] Got req.url=/puppals-456c7/us-central1/api/leagues?country=Italy, mapping to path=/leagues?country=Italy {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Got req.url=/puppals-456c7/us-central1/api/leagues?country=Italy, mapping to path=/leagues?country=Italy"}}
+[debug] [2025-12-29T20:51:05.179Z] [worker-pool] submitRequest(triggerId=us-central1-api) {"metadata":{"emulator":{"name":"functions"},"message":"[worker-pool] submitRequest(triggerId=us-central1-api)"}}
+[info] i  functions: Beginning execution of "us-central1-api" {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Beginning execution of \"us-central1-api\""}}
+[debug] [2025-12-29T20:51:05.183Z] [worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: BUSY {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: BUSY"}}
+[debug] [2025-12-29T20:51:05.185Z] Finishing up request with event=pause {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=pause"}}
+[info] i  functions: Finished "us-central1-api" in 1.8822ms {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finished \"us-central1-api\" in 1.8822ms"}}
+[debug] [2025-12-29T20:51:05.185Z] [worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: IDLE {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: IDLE"}}
+[debug] [2025-12-29T20:51:05.186Z] Finishing up request with event=finish {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=finish"}}
+[debug] [2025-12-29T20:51:05.186Z] Finishing up request with event=close {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=close"}}
+[debug] [2025-12-29T20:51:05.186Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":[],"workRunningCount":0}
+[debug] [2025-12-29T20:51:05.186Z] [work-queue] {"queuedWork":["/puppals-456c7/us-central1/api/leagues-2025-12-29T20:51:05.186Z"],"queueLength":1,"runningWork":[],"workRunningCount":0}
+[debug] [2025-12-29T20:51:05.186Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":["/puppals-456c7/us-central1/api/leagues-2025-12-29T20:51:05.186Z"],"workRunningCount":1}
+[debug] [2025-12-29T20:51:05.186Z] Accepted request GET /puppals-456c7/us-central1/api/leagues?country=Italy --> us-central1-api
+[debug] [2025-12-29T20:51:05.188Z] [functions] Runtime ready! Sending request! {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Runtime ready! Sending request!"}}
+[debug] [2025-12-29T20:51:05.189Z] [functions] Got req.url=/puppals-456c7/us-central1/api/leagues?country=Italy, mapping to path=/leagues?country=Italy {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Got req.url=/puppals-456c7/us-central1/api/leagues?country=Italy, mapping to path=/leagues?country=Italy"}}
+[debug] [2025-12-29T20:51:05.189Z] [worker-pool] submitRequest(triggerId=us-central1-api) {"metadata":{"emulator":{"name":"functions"},"message":"[worker-pool] submitRequest(triggerId=us-central1-api)"}}
+[info] i  functions: Beginning execution of "us-central1-api" {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Beginning execution of \"us-central1-api\""}}
+[debug] [2025-12-29T20:51:05.189Z] [worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: BUSY {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: BUSY"}}
+[debug] [2025-12-29T20:51:05.191Z] Finishing up request with event=pause {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=pause"}}
+[info] i  functions: Finished "us-central1-api" in 1.6292ms {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finished \"us-central1-api\" in 1.6292ms"}}
+[debug] [2025-12-29T20:51:05.193Z] [worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: IDLE {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: IDLE"}}
+[debug] [2025-12-29T20:51:05.193Z] Finishing up request with event=finish {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=finish"}}
+[debug] [2025-12-29T20:51:05.193Z] Finishing up request with event=close {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=close"}}
+[debug] [2025-12-29T20:51:05.193Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":[],"workRunningCount":0}
+[debug] [2025-12-29T20:51:05.320Z] [work-queue] {"queuedWork":["/puppals-456c7/us-central1/api/rounds-2025-12-29T20:51:05.320Z"],"queueLength":1,"runningWork":[],"workRunningCount":0}
+[debug] [2025-12-29T20:51:05.320Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":["/puppals-456c7/us-central1/api/rounds-2025-12-29T20:51:05.320Z"],"workRunningCount":1}
+[debug] [2025-12-29T20:51:05.320Z] Accepted request GET /puppals-456c7/us-central1/api/rounds?league=SERIE_A --> us-central1-api
+[debug] [2025-12-29T20:51:05.321Z] [functions] Runtime ready! Sending request! {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Runtime ready! Sending request!"}}
+[debug] [2025-12-29T20:51:05.321Z] [functions] Got req.url=/puppals-456c7/us-central1/api/rounds?league=SERIE_A, mapping to path=/rounds?league=SERIE_A {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Got req.url=/puppals-456c7/us-central1/api/rounds?league=SERIE_A, mapping to path=/rounds?league=SERIE_A"}}
+[debug] [2025-12-29T20:51:05.321Z] [worker-pool] submitRequest(triggerId=us-central1-api) {"metadata":{"emulator":{"name":"functions"},"message":"[worker-pool] submitRequest(triggerId=us-central1-api)"}}
+[info] i  functions: Beginning execution of "us-central1-api" {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Beginning execution of \"us-central1-api\""}}
+[debug] [2025-12-29T20:51:05.322Z] [worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: BUSY {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: BUSY"}}
+[info] >  ✅ Rounds SERIE_A: anchor=18.Giornata, count=3 {"user":"✅ Rounds SERIE_A: anchor=18.Giornata, count=3","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"\u001b[90m> \u001b[39m ✅ Rounds SERIE_A: anchor=18.Giornata, count=3"}}
+[debug] [2025-12-29T20:51:05.602Z] Finishing up request with event=pause {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=pause"}}
+[info] i  functions: Finished "us-central1-api" in 280.8343ms {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finished \"us-central1-api\" in 280.8343ms"}}
+[debug] [2025-12-29T20:51:05.603Z] [worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: IDLE {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: IDLE"}}
+[debug] [2025-12-29T20:51:05.603Z] Finishing up request with event=finish {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=finish"}}
+[debug] [2025-12-29T20:51:05.603Z] Finishing up request with event=close {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=close"}}
+[debug] [2025-12-29T20:51:05.604Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":[],"workRunningCount":0}
+[debug] [2025-12-29T20:51:05.619Z] [work-queue] {"queuedWork":["/puppals-456c7/us-central1/api/matches-2025-12-29T20:51:05.619Z"],"queueLength":1,"runningWork":[],"workRunningCount":0}
+[debug] [2025-12-29T20:51:05.619Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":["/puppals-456c7/us-central1/api/matches-2025-12-29T20:51:05.619Z"],"workRunningCount":1}
+[debug] [2025-12-29T20:51:05.620Z] Accepted request GET /puppals-456c7/us-central1/api/matches?league=SERIE_A&round=18.Giornata --> us-central1-api
+[debug] [2025-12-29T20:51:05.620Z] [functions] Runtime ready! Sending request! {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Runtime ready! Sending request!"}}
+[debug] [2025-12-29T20:51:05.620Z] [functions] Got req.url=/puppals-456c7/us-central1/api/matches?league=SERIE_A&round=18.Giornata, mapping to path=/matches?league=SERIE_A&round=18.Giornata {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Got req.url=/puppals-456c7/us-central1/api/matches?league=SERIE_A&round=18.Giornata, mapping to path=/matches?league=SERIE_A&round=18.Giornata"}}
+[debug] [2025-12-29T20:51:05.620Z] [worker-pool] submitRequest(triggerId=us-central1-api) {"metadata":{"emulator":{"name":"functions"},"message":"[worker-pool] submitRequest(triggerId=us-central1-api)"}}
+[info] i  functions: Beginning execution of "us-central1-api" {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Beginning execution of \"us-central1-api\""}}
+[debug] [2025-12-29T20:51:05.621Z] [worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: BUSY {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: BUSY"}}
+[info] >  ✅ Matches SERIE_A 18.Giornata: 10 partite {"user":"✅ Matches SERIE_A 18.Giornata: 10 partite","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"\u001b[90m> \u001b[39m ✅ Matches SERIE_A 18.Giornata: 10 partite"}}
+[debug] [2025-12-29T20:51:05.653Z] Finishing up request with event=pause {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=pause"}}
+[info] i  functions: Finished "us-central1-api" in 32.6981ms {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finished \"us-central1-api\" in 32.6981ms"}}
+[debug] [2025-12-29T20:51:05.654Z] [worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: IDLE {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-86e54a8d-da19-4676-9979-4c71b568f5f2]: IDLE"}}
+[debug] [2025-12-29T20:51:05.654Z] Finishing up request with event=finish {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=finish"}}
+[debug] [2025-12-29T20:51:05.654Z] Finishing up request with event=close {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=close"}}
+[debug] [2025-12-29T20:51:05.654Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":[],"workRunningCount":0}
+[debug] [2025-12-29T22:28:24.940Z] File C:\Progetti\simulatore-calcio-backend\functions_python\ai_engine\Aggiornamenti\frequenti\per_agg_pianificato_update_results_only.py changed, reloading triggers {"metadata":{"emulator":{"name":"functions"},"message":"File C:\\Progetti\\simulatore-calcio-backend\\functions_python\\ai_engine\\Aggiornamenti\\frequenti\\per_agg_pianificato_update_results_only.py changed, reloading triggers"}}
+[debug] [2025-12-29T22:28:26.224Z] Customer code is not Node
+[debug] [2025-12-29T22:28:26.319Z] Validating python source
+[debug] [2025-12-29T22:28:26.319Z] Building python source
+[info] i  functions: Loaded environment variables from .env. 
+[debug] [2025-12-29T22:28:26.956Z] Could not find functions.yaml. Must use http discovery
+[debug] [2025-12-29T22:28:27.154Z] Running command with virtualenv: command="C:\Progetti\simulatore-calcio-backend\functions_python\venv\Scripts\activate.bat", args=["","&&","python.exe","-c","\"import firebase_functions; import os; print(os.path.dirname(firebase_functions.__file__))\""]
+[debug] [2025-12-29T22:28:27.791Z] stdout: C:\Progetti\simulatore-calcio-backend\functions_python\venv\Lib\site-packages\firebase_functions
+
+[debug] [2025-12-29T22:28:27.831Z] Running admin server with args: ["python.exe","\"C:\\Progetti\\simulatore-calcio-backend\\functions_python\\venv\\Lib\\site-packages\\firebase_functions\\private\\serving.py\""] and env: {"GCLOUD_PROJECT":"puppals-456c7","K_REVISION":"1","PORT":"80","GOOGLE_CLOUD_QUOTA_PROJECT":"puppals-456c7","FUNCTIONS_EMULATOR":"true","TZ":"UTC","FIREBASE_DEBUG_MODE":"true","FIREBASE_DEBUG_FEATURES":"{\"skipTokenVerification\":true,\"enableCors\":true}","FIREBASE_EMULATOR_HUB":"127.0.0.1:4400","CLOUD_EVENTARC_EMULATOR_HOST":"http://127.0.0.1:9299","CLOUD_TASKS_EMULATOR_HOST":"127.0.0.1:9499","FIREBASE_CONFIG":"{\"storageBucket\":\"puppals-456c7.firebasestorage.app\",\"projectId\":\"puppals-456c7\"}","GOOGLE_APPLICATION_CREDENTIALS":"C:\\Users\\lollo\\AppData\\Roaming\\firebase\\lollotj_gmail_com_application_default_credentials.json","ADMIN_PORT":"8081"} in C:\Progetti\simulatore-calcio-backend\functions_python
+[debug] [2025-12-29T22:28:27.832Z] Running command with virtualenv: command="C:\Progetti\simulatore-calcio-backend\functions_python\venv\Scripts\activate.bat", args=["","&&","python.exe","\"C:\\Progetti\\simulatore-calcio-backend\\functions_python\\venv\\Lib\\site-packages\\firebase_functions\\private\\serving.py\""]
+[info]  * Serving Flask app 'serving'
+ * Debug mode: off
+
+[error] WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+[error] 
+ * Running on http://127.0.0.1:8081
+Press CTRL+C to quit
+
+[error] 127.0.0.1 - - [29/Dec/2025 22:28:35] "GET /__/functions.yaml HTTP/1.1" 200 -
+
+[debug] [2025-12-29T22:28:35.513Z] Got response from /__/functions.yaml endpoints:
+  run_simulation:
+    availableMemoryMb: 1024
+    concurrency: null
+    entryPoint: run_simulation
+    httpsTrigger: {}
+    ingressSettings: null
+    labels: {}
+    maxInstances: null
+    minInstances: null
+    platform: gcfv2
+    region:
+    - us-central1
+    secretEnvironmentVariables: []
+    serviceAccountEmail: null
+    timeoutSeconds: 300
+params: []
+requiredAPIs: []
+specVersion: v1alpha1
+
+[error] 127.0.0.1 - - [29/Dec/2025 22:28:35] "GET /__/quitquitquit HTTP/1.1" 200 -
+
+[info] +  functions: Loaded functions definitions from source: run_simulation. {"metadata":{"emulator":{"name":"functions"},"message":"Loaded functions definitions from source: run_simulation."}}
+[debug] [2025-12-29T22:44:06.751Z] File C:\Progetti\simulatore-calcio-backend\functions_python\ai_engine\web_simulator_A.py changed, reloading triggers {"metadata":{"emulator":{"name":"functions"},"message":"File C:\\Progetti\\simulatore-calcio-backend\\functions_python\\ai_engine\\web_simulator_A.py changed, reloading triggers"}}
+[debug] [2025-12-29T22:44:07.751Z] Customer code is not Node
+[debug] [2025-12-29T22:44:07.751Z] Validating python source
+[debug] [2025-12-29T22:44:07.752Z] Building python source
+[info] i  functions: Loaded environment variables from .env. 
+[debug] [2025-12-29T22:44:07.754Z] Could not find functions.yaml. Must use http discovery
+[debug] [2025-12-29T22:44:07.758Z] Running command with virtualenv: command="C:\Progetti\simulatore-calcio-backend\functions_python\venv\Scripts\activate.bat", args=["","&&","python.exe","-c","\"import firebase_functions; import os; print(os.path.dirname(firebase_functions.__file__))\""]
+[debug] [2025-12-29T22:44:08.054Z] stdout: C:\Progetti\simulatore-calcio-backend\functions_python\venv\Lib\site-packages\firebase_functions
+
+[debug] [2025-12-29T22:44:08.064Z] Running admin server with args: ["python.exe","\"C:\\Progetti\\simulatore-calcio-backend\\functions_python\\venv\\Lib\\site-packages\\firebase_functions\\private\\serving.py\""] and env: {"GCLOUD_PROJECT":"puppals-456c7","K_REVISION":"1","PORT":"80","GOOGLE_CLOUD_QUOTA_PROJECT":"puppals-456c7","FUNCTIONS_EMULATOR":"true","TZ":"UTC","FIREBASE_DEBUG_MODE":"true","FIREBASE_DEBUG_FEATURES":"{\"skipTokenVerification\":true,\"enableCors\":true}","FIREBASE_EMULATOR_HUB":"127.0.0.1:4400","CLOUD_EVENTARC_EMULATOR_HOST":"http://127.0.0.1:9299","CLOUD_TASKS_EMULATOR_HOST":"127.0.0.1:9499","FIREBASE_CONFIG":"{\"storageBucket\":\"puppals-456c7.firebasestorage.app\",\"projectId\":\"puppals-456c7\"}","GOOGLE_APPLICATION_CREDENTIALS":"C:\\Users\\lollo\\AppData\\Roaming\\firebase\\lollotj_gmail_com_application_default_credentials.json","ADMIN_PORT":"8081"} in C:\Progetti\simulatore-calcio-backend\functions_python
+[debug] [2025-12-29T22:44:08.064Z] Running command with virtualenv: command="C:\Progetti\simulatore-calcio-backend\functions_python\venv\Scripts\activate.bat", args=["","&&","python.exe","\"C:\\Progetti\\simulatore-calcio-backend\\functions_python\\venv\\Lib\\site-packages\\firebase_functions\\private\\serving.py\""]
+[info]  * Serving Flask app 'serving'
+ * Debug mode: off
+
+[error] WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://127.0.0.1:8081
+
+[error] Press CTRL+C to quit
+
+[error] 127.0.0.1 - - [29/Dec/2025 22:44:10] "GET /__/functions.yaml HTTP/1.1" 200 -
+
+[debug] [2025-12-29T22:44:10.184Z] Got response from /__/functions.yaml endpoints:
+  run_simulation:
+    availableMemoryMb: 1024
+    concurrency: null
+    entryPoint: run_simulation
+    httpsTrigger: {}
+    ingressSettings: null
+    labels: {}
+    maxInstances: null
+    minInstances: null
+    platform: gcfv2
+    region:
+    - us-central1
+    secretEnvironmentVariables: []
+    serviceAccountEmail: null
+    timeoutSeconds: 300
+params: []
+requiredAPIs: []
+specVersion: v1alpha1
+
+[error] 127.0.0.1 - - [29/Dec/2025 22:44:10] "GET /__/quitquitquit HTTP/1.1" 200 -
+
+[info] +  functions: Loaded functions definitions from source: run_simulation. {"metadata":{"emulator":{"name":"functions"},"message":"Loaded functions definitions from source: run_simulation."}}
+[debug] [2025-12-29T22:45:03.928Z] File C:\Progetti\simulatore-calcio-backend\functions_python\ai_engine\web_simulator_A.py changed, reloading triggers {"metadata":{"emulator":{"name":"functions"},"message":"File C:\\Progetti\\simulatore-calcio-backend\\functions_python\\ai_engine\\web_simulator_A.py changed, reloading triggers"}}
+[debug] [2025-12-29T22:45:04.929Z] Customer code is not Node
+[debug] [2025-12-29T22:45:04.930Z] Validating python source
+[debug] [2025-12-29T22:45:04.930Z] Building python source
+[info] i  functions: Loaded environment variables from .env. 
+[debug] [2025-12-29T22:45:04.932Z] Could not find functions.yaml. Must use http discovery
+[debug] [2025-12-29T22:45:04.941Z] Running command with virtualenv: command="C:\Progetti\simulatore-calcio-backend\functions_python\venv\Scripts\activate.bat", args=["","&&","python.exe","-c","\"import firebase_functions; import os; print(os.path.dirname(firebase_functions.__file__))\""]
+[debug] [2025-12-29T22:45:05.111Z] stdout: C:\Progetti\simulatore-calcio-backend\functions_python\venv\Lib\site-packages\firebase_functions
+
+[debug] [2025-12-29T22:45:05.119Z] Running admin server with args: ["python.exe","\"C:\\Progetti\\simulatore-calcio-backend\\functions_python\\venv\\Lib\\site-packages\\firebase_functions\\private\\serving.py\""] and env: {"GCLOUD_PROJECT":"puppals-456c7","K_REVISION":"1","PORT":"80","GOOGLE_CLOUD_QUOTA_PROJECT":"puppals-456c7","FUNCTIONS_EMULATOR":"true","TZ":"UTC","FIREBASE_DEBUG_MODE":"true","FIREBASE_DEBUG_FEATURES":"{\"skipTokenVerification\":true,\"enableCors\":true}","FIREBASE_EMULATOR_HUB":"127.0.0.1:4400","CLOUD_EVENTARC_EMULATOR_HOST":"http://127.0.0.1:9299","CLOUD_TASKS_EMULATOR_HOST":"127.0.0.1:9499","FIREBASE_CONFIG":"{\"storageBucket\":\"puppals-456c7.firebasestorage.app\",\"projectId\":\"puppals-456c7\"}","GOOGLE_APPLICATION_CREDENTIALS":"C:\\Users\\lollo\\AppData\\Roaming\\firebase\\lollotj_gmail_com_application_default_credentials.json","ADMIN_PORT":"8081"} in C:\Progetti\simulatore-calcio-backend\functions_python
+[debug] [2025-12-29T22:45:05.119Z] Running command with virtualenv: command="C:\Progetti\simulatore-calcio-backend\functions_python\venv\Scripts\activate.bat", args=["","&&","python.exe","\"C:\\Progetti\\simulatore-calcio-backend\\functions_python\\venv\\Lib\\site-packages\\firebase_functions\\private\\serving.py\""]
+[info]  * Serving Flask app 'serving'
+ * Debug mode: off
+
+[error] WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+[error] 
+ * Running on http://127.0.0.1:8081
+Press CTRL+C to quit
+
+[error] 127.0.0.1 - - [29/Dec/2025 22:45:05] "GET /__/functions.yaml HTTP/1.1" 200 -
+
+[debug] [2025-12-29T22:45:05.874Z] Got response from /__/functions.yaml endpoints:
+  run_simulation:
+    availableMemoryMb: 1024
+    concurrency: null
+    entryPoint: run_simulation
+    httpsTrigger: {}
+    ingressSettings: null
+    labels: {}
+    maxInstances: null
+    minInstances: null
+    platform: gcfv2
+    region:
+    - us-central1
+    secretEnvironmentVariables: []
+    serviceAccountEmail: null
+    timeoutSeconds: 300
+params: []
+requiredAPIs: []
+specVersion: v1alpha1
+
+[error] 127.0.0.1 - - [29/Dec/2025 22:45:05] "GET /__/quitquitquit HTTP/1.1" 200 -
+
+[info] +  functions: Loaded functions definitions from source: run_simulation. {"metadata":{"emulator":{"name":"functions"},"message":"Loaded functions definitions from source: run_simulation."}}
+[debug] [2025-12-29T22:45:50.380Z] File C:\Progetti\simulatore-calcio-backend\functions_python\ai_engine\web_simulator_A.py changed, reloading triggers {"metadata":{"emulator":{"name":"functions"},"message":"File C:\\Progetti\\simulatore-calcio-backend\\functions_python\\ai_engine\\web_simulator_A.py changed, reloading triggers"}}
+[debug] [2025-12-29T22:45:51.381Z] Customer code is not Node
+[debug] [2025-12-29T22:45:51.381Z] Validating python source
+[debug] [2025-12-29T22:45:51.381Z] Building python source
+[info] i  functions: Loaded environment variables from .env. 
+[debug] [2025-12-29T22:45:51.383Z] Could not find functions.yaml. Must use http discovery
+[debug] [2025-12-29T22:45:51.387Z] Running command with virtualenv: command="C:\Progetti\simulatore-calcio-backend\functions_python\venv\Scripts\activate.bat", args=["","&&","python.exe","-c","\"import firebase_functions; import os; print(os.path.dirname(firebase_functions.__file__))\""]
+[debug] [2025-12-29T22:45:51.498Z] stdout: C:\Progetti\simulatore-calcio-backend\functions_python\venv\Lib\site-packages\firebase_functions
+
+[debug] [2025-12-29T22:45:51.507Z] Running admin server with args: ["python.exe","\"C:\\Progetti\\simulatore-calcio-backend\\functions_python\\venv\\Lib\\site-packages\\firebase_functions\\private\\serving.py\""] and env: {"GCLOUD_PROJECT":"puppals-456c7","K_REVISION":"1","PORT":"80","GOOGLE_CLOUD_QUOTA_PROJECT":"puppals-456c7","FUNCTIONS_EMULATOR":"true","TZ":"UTC","FIREBASE_DEBUG_MODE":"true","FIREBASE_DEBUG_FEATURES":"{\"skipTokenVerification\":true,\"enableCors\":true}","FIREBASE_EMULATOR_HUB":"127.0.0.1:4400","CLOUD_EVENTARC_EMULATOR_HOST":"http://127.0.0.1:9299","CLOUD_TASKS_EMULATOR_HOST":"127.0.0.1:9499","FIREBASE_CONFIG":"{\"storageBucket\":\"puppals-456c7.firebasestorage.app\",\"projectId\":\"puppals-456c7\"}","GOOGLE_APPLICATION_CREDENTIALS":"C:\\Users\\lollo\\AppData\\Roaming\\firebase\\lollotj_gmail_com_application_default_credentials.json","ADMIN_PORT":"8081"} in C:\Progetti\simulatore-calcio-backend\functions_python
+[debug] [2025-12-29T22:45:51.507Z] Running command with virtualenv: command="C:\Progetti\simulatore-calcio-backend\functions_python\venv\Scripts\activate.bat", args=["","&&","python.exe","\"C:\\Progetti\\simulatore-calcio-backend\\functions_python\\venv\\Lib\\site-packages\\firebase_functions\\private\\serving.py\""]
+[info]  * Serving Flask app 'serving'
+ * Debug mode: off
+
+[error] WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://127.0.0.1:8081
+
+[error] Press CTRL+C to quit
+
+[error] 127.0.0.1 - - [29/Dec/2025 22:45:52] "GET /__/functions.yaml HTTP/1.1" 200 -
+
+[debug] [2025-12-29T22:45:52.339Z] Got response from /__/functions.yaml endpoints:
+  run_simulation:
+    availableMemoryMb: 1024
+    concurrency: null
+    entryPoint: run_simulation
+    httpsTrigger: {}
+    ingressSettings: null
+    labels: {}
+    maxInstances: null
+    minInstances: null
+    platform: gcfv2
+    region:
+    - us-central1
+    secretEnvironmentVariables: []
+    serviceAccountEmail: null
+    timeoutSeconds: 300
+params: []
+requiredAPIs: []
+specVersion: v1alpha1
+
+[error] 127.0.0.1 - - [29/Dec/2025 22:45:52] "GET /__/quitquitquit HTTP/1.1" 200 -
+
+[info] +  functions: Loaded functions definitions from source: run_simulation. {"metadata":{"emulator":{"name":"functions"},"message":"Loaded functions definitions from source: run_simulation."}}
+[debug] [2025-12-29T22:49:01.813Z] File C:\Progetti\simulatore-calcio-backend\functions_python\main.py changed, reloading triggers {"metadata":{"emulator":{"name":"functions"},"message":"File C:\\Progetti\\simulatore-calcio-backend\\functions_python\\main.py changed, reloading triggers"}}
+[debug] [2025-12-29T22:49:02.815Z] Customer code is not Node
+[debug] [2025-12-29T22:49:02.815Z] Validating python source
+[debug] [2025-12-29T22:49:02.815Z] Building python source
+[info] i  functions: Loaded environment variables from .env. 
+[debug] [2025-12-29T22:49:02.816Z] Could not find functions.yaml. Must use http discovery
+[debug] [2025-12-29T22:49:02.820Z] Running command with virtualenv: command="C:\Progetti\simulatore-calcio-backend\functions_python\venv\Scripts\activate.bat", args=["","&&","python.exe","-c","\"import firebase_functions; import os; print(os.path.dirname(firebase_functions.__file__))\""]
+[debug] [2025-12-29T22:49:02.960Z] stdout: C:\Progetti\simulatore-calcio-backend\functions_python\venv\Lib\site-packages\firebase_functions
+
+[debug] [2025-12-29T22:49:02.967Z] Running admin server with args: ["python.exe","\"C:\\Progetti\\simulatore-calcio-backend\\functions_python\\venv\\Lib\\site-packages\\firebase_functions\\private\\serving.py\""] and env: {"GCLOUD_PROJECT":"puppals-456c7","K_REVISION":"1","PORT":"80","GOOGLE_CLOUD_QUOTA_PROJECT":"puppals-456c7","FUNCTIONS_EMULATOR":"true","TZ":"UTC","FIREBASE_DEBUG_MODE":"true","FIREBASE_DEBUG_FEATURES":"{\"skipTokenVerification\":true,\"enableCors\":true}","FIREBASE_EMULATOR_HUB":"127.0.0.1:4400","CLOUD_EVENTARC_EMULATOR_HOST":"http://127.0.0.1:9299","CLOUD_TASKS_EMULATOR_HOST":"127.0.0.1:9499","FIREBASE_CONFIG":"{\"storageBucket\":\"puppals-456c7.firebasestorage.app\",\"projectId\":\"puppals-456c7\"}","GOOGLE_APPLICATION_CREDENTIALS":"C:\\Users\\lollo\\AppData\\Roaming\\firebase\\lollotj_gmail_com_application_default_credentials.json","ADMIN_PORT":"8081"} in C:\Progetti\simulatore-calcio-backend\functions_python
+[debug] [2025-12-29T22:49:02.968Z] Running command with virtualenv: command="C:\Progetti\simulatore-calcio-backend\functions_python\venv\Scripts\activate.bat", args=["","&&","python.exe","\"C:\\Progetti\\simulatore-calcio-backend\\functions_python\\venv\\Lib\\site-packages\\firebase_functions\\private\\serving.py\""]
+[info]  * Serving Flask app 'serving'
+ * Debug mode: off
+
+[error] WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://127.0.0.1:8081
+
+[error] Press CTRL+C to quit
+
+[error] 127.0.0.1 - - [29/Dec/2025 22:49:03] "GET /__/functions.yaml HTTP/1.1" 200 -
+
+[debug] [2025-12-29T22:49:03.979Z] Got response from /__/functions.yaml endpoints:
+  run_simulation:
+    availableMemoryMb: 1024
+    concurrency: null
+    entryPoint: run_simulation
+    httpsTrigger: {}
+    ingressSettings: null
+    labels: {}
+    maxInstances: null
+    minInstances: null
+    platform: gcfv2
+    region:
+    - us-central1
+    secretEnvironmentVariables: []
+    serviceAccountEmail: null
+    timeoutSeconds: 300
+params: []
+requiredAPIs: []
+specVersion: v1alpha1
+
+[error] 127.0.0.1 - - [29/Dec/2025 22:49:03] "GET /__/quitquitquit HTTP/1.1" 200 -
+
+[info] +  functions: Loaded functions definitions from source: run_simulation. {"metadata":{"emulator":{"name":"functions"},"message":"Loaded functions definitions from source: run_simulation."}}
+[debug] [2025-12-29T22:52:22.031Z] File C:\Progetti\simulatore-calcio-backend\functions_python\main.py changed, reloading triggers {"metadata":{"emulator":{"name":"functions"},"message":"File C:\\Progetti\\simulatore-calcio-backend\\functions_python\\main.py changed, reloading triggers"}}
+[debug] [2025-12-29T22:52:23.032Z] Customer code is not Node
+[debug] [2025-12-29T22:52:23.033Z] Validating python source
+[debug] [2025-12-29T22:52:23.033Z] Building python source
+[info] i  functions: Loaded environment variables from .env. 
+[debug] [2025-12-29T22:52:23.035Z] Could not find functions.yaml. Must use http discovery
+[debug] [2025-12-29T22:52:23.050Z] Running command with virtualenv: command="C:\Progetti\simulatore-calcio-backend\functions_python\venv\Scripts\activate.bat", args=["","&&","python.exe","-c","\"import firebase_functions; import os; print(os.path.dirname(firebase_functions.__file__))\""]
+[debug] [2025-12-29T22:52:23.125Z] stdout: C:\Progetti\simulatore-calcio-backend\functions_python\venv\Lib\site-packages\firebase_functions
+
+[debug] [2025-12-29T22:52:23.133Z] Running admin server with args: ["python.exe","\"C:\\Progetti\\simulatore-calcio-backend\\functions_python\\venv\\Lib\\site-packages\\firebase_functions\\private\\serving.py\""] and env: {"GCLOUD_PROJECT":"puppals-456c7","K_REVISION":"1","PORT":"80","GOOGLE_CLOUD_QUOTA_PROJECT":"puppals-456c7","FUNCTIONS_EMULATOR":"true","TZ":"UTC","FIREBASE_DEBUG_MODE":"true","FIREBASE_DEBUG_FEATURES":"{\"skipTokenVerification\":true,\"enableCors\":true}","FIREBASE_EMULATOR_HUB":"127.0.0.1:4400","CLOUD_EVENTARC_EMULATOR_HOST":"http://127.0.0.1:9299","CLOUD_TASKS_EMULATOR_HOST":"127.0.0.1:9499","FIREBASE_CONFIG":"{\"storageBucket\":\"puppals-456c7.firebasestorage.app\",\"projectId\":\"puppals-456c7\"}","GOOGLE_APPLICATION_CREDENTIALS":"C:\\Users\\lollo\\AppData\\Roaming\\firebase\\lollotj_gmail_com_application_default_credentials.json","ADMIN_PORT":"8081"} in C:\Progetti\simulatore-calcio-backend\functions_python
+[debug] [2025-12-29T22:52:23.134Z] Running command with virtualenv: command="C:\Progetti\simulatore-calcio-backend\functions_python\venv\Scripts\activate.bat", args=["","&&","python.exe","\"C:\\Progetti\\simulatore-calcio-backend\\functions_python\\venv\\Lib\\site-packages\\firebase_functions\\private\\serving.py\""]
+[info]  * Serving Flask app 'serving'
+ * Debug mode: off
+
+[error] WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+[error] 
+ * Running on http://127.0.0.1:8081
+Press CTRL+C to quit
+
+[error] 127.0.0.1 - - [29/Dec/2025 22:52:23] "GET /__/functions.yaml HTTP/1.1" 200 -
+
+[debug] [2025-12-29T22:52:23.965Z] Got response from /__/functions.yaml endpoints:
+  run_simulation:
+    availableMemoryMb: 1024
+    concurrency: null
+    entryPoint: run_simulation
+    httpsTrigger: {}
+    ingressSettings: null
+    labels: {}
+    maxInstances: null
+    minInstances: null
+    platform: gcfv2
+    region:
+    - us-central1
+    secretEnvironmentVariables: []
+    serviceAccountEmail: null
+    timeoutSeconds: 300
+params: []
+requiredAPIs: []
+specVersion: v1alpha1
+
+[error] 127.0.0.1 - - [29/Dec/2025 22:52:23] "GET /__/quitquitquit HTTP/1.1" 200 -
+
+[info] +  functions: Loaded functions definitions from source: run_simulation. {"metadata":{"emulator":{"name":"functions"},"message":"Loaded functions definitions from source: run_simulation."}}
+[debug] [2025-12-29T22:53:12.466Z] File C:\Progetti\simulatore-calcio-backend\functions_python\main.py changed, reloading triggers {"metadata":{"emulator":{"name":"functions"},"message":"File C:\\Progetti\\simulatore-calcio-backend\\functions_python\\main.py changed, reloading triggers"}}
+[debug] [2025-12-29T22:53:13.467Z] Customer code is not Node
+[debug] [2025-12-29T22:53:13.467Z] Validating python source
+[debug] [2025-12-29T22:53:13.467Z] Building python source
+[info] i  functions: Loaded environment variables from .env. 
+[debug] [2025-12-29T22:53:13.468Z] Could not find functions.yaml. Must use http discovery
+[debug] [2025-12-29T22:53:13.473Z] Running command with virtualenv: command="C:\Progetti\simulatore-calcio-backend\functions_python\venv\Scripts\activate.bat", args=["","&&","python.exe","-c","\"import firebase_functions; import os; print(os.path.dirname(firebase_functions.__file__))\""]
+[debug] [2025-12-29T22:53:13.585Z] stdout: C:\Progetti\simulatore-calcio-backend\functions_python\venv\Lib\site-packages\firebase_functions
+
+[debug] [2025-12-29T22:53:13.595Z] Running admin server with args: ["python.exe","\"C:\\Progetti\\simulatore-calcio-backend\\functions_python\\venv\\Lib\\site-packages\\firebase_functions\\private\\serving.py\""] and env: {"GCLOUD_PROJECT":"puppals-456c7","K_REVISION":"1","PORT":"80","GOOGLE_CLOUD_QUOTA_PROJECT":"puppals-456c7","FUNCTIONS_EMULATOR":"true","TZ":"UTC","FIREBASE_DEBUG_MODE":"true","FIREBASE_DEBUG_FEATURES":"{\"skipTokenVerification\":true,\"enableCors\":true}","FIREBASE_EMULATOR_HUB":"127.0.0.1:4400","CLOUD_EVENTARC_EMULATOR_HOST":"http://127.0.0.1:9299","CLOUD_TASKS_EMULATOR_HOST":"127.0.0.1:9499","FIREBASE_CONFIG":"{\"storageBucket\":\"puppals-456c7.firebasestorage.app\",\"projectId\":\"puppals-456c7\"}","GOOGLE_APPLICATION_CREDENTIALS":"C:\\Users\\lollo\\AppData\\Roaming\\firebase\\lollotj_gmail_com_application_default_credentials.json","ADMIN_PORT":"8081"} in C:\Progetti\simulatore-calcio-backend\functions_python
+[debug] [2025-12-29T22:53:13.596Z] Running command with virtualenv: command="C:\Progetti\simulatore-calcio-backend\functions_python\venv\Scripts\activate.bat", args=["","&&","python.exe","\"C:\\Progetti\\simulatore-calcio-backend\\functions_python\\venv\\Lib\\site-packages\\firebase_functions\\private\\serving.py\""]
+[info]  * Serving Flask app 'serving'
+ * Debug mode: off
+
+[error] WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://127.0.0.1:8081
+
+[error] Press CTRL+C to quit
+
+[error] [2025-12-29 22:53:14,424] ERROR in app: Exception on /__/functions.yaml [GET]
+Traceback (most recent call last):
+  File "C:\Progetti\simulatore-calcio-backend\functions_python\venv\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Progetti\simulatore-calcio-backend\functions_python\venv\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Progetti\simulatore-calcio-backend\functions_python\venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Progetti\simulatore-calcio-backend\functions_python\venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Progetti\simulatore-calcio-backend\functions_python\venv\Lib\site-packages\firebase_functions\private\serving.py", line 122, in get_functions_yaml
+    functions = get_functions()
+  File "C:\Progetti\simulatore-calcio-backend\functions_python\venv\Lib\site-packages\firebase_functions\private\serving.py", line 40, in get_functions
+    spec.loader.exec_module(module)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^
+  File "<frozen importlib._bootstrap_external>", line 1022, in exec_module
+  File "<frozen importlib._bootstrap_external>", line 1160, in get_code
+  File "<frozen importlib._bootstrap_external>", line 1090, in source_to_code
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "C:\Progetti\simulatore-calcio-backend\functions_python\main.py", line 115
+    for pattern in [r'\{(?:.|\n)*\}\s*$', r'
+                                          ^
+SyntaxError: unterminated string literal (detected at line 115)
+
+[debug] [2025-12-29T22:53:14.437Z] Got response code 500; body <!doctype html>
+<html lang=en>
+<title>500 Internal Server Error</title>
+<h1>Internal Server Error</h1>
+<p>The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application.</p>
+
+[error] 127.0.0.1 - - [29/Dec/2025 22:53:14] "GET /__/functions.yaml HTTP/1.1" 500 -
+
+[error] 127.0.0.1 - - [29/Dec/2025 22:53:14] "GET /__/quitquitquit HTTP/1.1" 200 -
+
+[error] !!  functions: Failed to load function definition from source: FirebaseError: Functions codebase could not be analyzed successfully. It may have a syntax or runtime error {"metadata":{"emulator":{"name":"functions"},"message":"Failed to load function definition from source: FirebaseError: Functions codebase could not be analyzed successfully. It may have a syntax or runtime error"}}
+[debug] [2025-12-29T22:54:59.147Z] File C:\Progetti\simulatore-calcio-backend\functions_python\main.py changed, reloading triggers {"metadata":{"emulator":{"name":"functions"},"message":"File C:\\Progetti\\simulatore-calcio-backend\\functions_python\\main.py changed, reloading triggers"}}
+[debug] [2025-12-29T22:55:00.156Z] Customer code is not Node
+[debug] [2025-12-29T22:55:00.157Z] Validating python source
+[debug] [2025-12-29T22:55:00.157Z] Building python source
+[info] i  functions: Loaded environment variables from .env. 
+[debug] [2025-12-29T22:55:00.165Z] Could not find functions.yaml. Must use http discovery
+[debug] [2025-12-29T22:55:00.179Z] Running command with virtualenv: command="C:\Progetti\simulatore-calcio-backend\functions_python\venv\Scripts\activate.bat", args=["","&&","python.exe","-c","\"import firebase_functions; import os; print(os.path.dirname(firebase_functions.__file__))\""]
+[debug] [2025-12-29T22:55:00.467Z] stdout: C:\Progetti\simulatore-calcio-backend\functions_python\venv\Lib\site-packages\firebase_functions
+
+[debug] [2025-12-29T22:55:00.496Z] Running admin server with args: ["python.exe","\"C:\\Progetti\\simulatore-calcio-backend\\functions_python\\venv\\Lib\\site-packages\\firebase_functions\\private\\serving.py\""] and env: {"GCLOUD_PROJECT":"puppals-456c7","K_REVISION":"1","PORT":"80","GOOGLE_CLOUD_QUOTA_PROJECT":"puppals-456c7","FUNCTIONS_EMULATOR":"true","TZ":"UTC","FIREBASE_DEBUG_MODE":"true","FIREBASE_DEBUG_FEATURES":"{\"skipTokenVerification\":true,\"enableCors\":true}","FIREBASE_EMULATOR_HUB":"127.0.0.1:4400","CLOUD_EVENTARC_EMULATOR_HOST":"http://127.0.0.1:9299","CLOUD_TASKS_EMULATOR_HOST":"127.0.0.1:9499","FIREBASE_CONFIG":"{\"storageBucket\":\"puppals-456c7.firebasestorage.app\",\"projectId\":\"puppals-456c7\"}","GOOGLE_APPLICATION_CREDENTIALS":"C:\\Users\\lollo\\AppData\\Roaming\\firebase\\lollotj_gmail_com_application_default_credentials.json","ADMIN_PORT":"8081"} in C:\Progetti\simulatore-calcio-backend\functions_python
+[debug] [2025-12-29T22:55:00.496Z] Running command with virtualenv: command="C:\Progetti\simulatore-calcio-backend\functions_python\venv\Scripts\activate.bat", args=["","&&","python.exe","\"C:\\Progetti\\simulatore-calcio-backend\\functions_python\\venv\\Lib\\site-packages\\firebase_functions\\private\\serving.py\""]
+[info]  * Serving Flask app 'serving'
+ * Debug mode: off
+
+[error] WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://127.0.0.1:8081
+Press CTRL+C to quit
+
+[error] 127.0.0.1 - - [29/Dec/2025 22:55:01] "GET /__/functions.yaml HTTP/1.1" 200 -
+
+[debug] [2025-12-29T22:55:01.456Z] Got response from /__/functions.yaml endpoints:
+  run_simulation:
+    availableMemoryMb: 1024
+    concurrency: null
+    entryPoint: run_simulation
+    httpsTrigger: {}
+    ingressSettings: null
+    labels: {}
+    maxInstances: null
+    minInstances: null
+    platform: gcfv2
+    region:
+    - us-central1
+    secretEnvironmentVariables: []
+    serviceAccountEmail: null
+    timeoutSeconds: 300
+params: []
+requiredAPIs: []
+specVersion: v1alpha1
+
+[error] 127.0.0.1 - - [29/Dec/2025 22:55:01] "GET /__/quitquitquit HTTP/1.1" 200 -
+
+[info] +  functions: Loaded functions definitions from source: run_simulation. {"metadata":{"emulator":{"name":"functions"},"message":"Loaded functions definitions from source: run_simulation."}}

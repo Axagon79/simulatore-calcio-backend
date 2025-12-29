@@ -28,9 +28,10 @@ try:
         run_monte_carlo_verdict_detailed
     )
 except ImportError as e:
-    # Fallback per debug se chiamato da cartelle strane
-    print(json.dumps({"success": False, "error": f"Import Error: {e}"}))
+    err = {"success": False, "error": f"Import Error: {e}"}
+    print(json.dumps(err, ensure_ascii=False), file=sys.stderr)
     sys.exit(1)
+
 
 # --- CONFIG DB ---
 DB_NAME = "football_simulator_db"
@@ -198,8 +199,10 @@ def main():
             save_db = sys.argv[9].lower() == "true"
         else:
             # Fallback manuale CLI
-            print(json.dumps({"error": "Parametri insufficienti. Usa il frontend."}))
+            err = {"error": "Parametri insufficienti. Usa il frontend."}
+            print(json.dumps(err, ensure_ascii=False), file=sys.stderr)
             sys.exit(1)
+
 
         start_time = datetime.now()
         
@@ -226,9 +229,15 @@ def main():
             "result": result
         }
         print(json.dumps(output, ensure_ascii=False))
+        sys.stdout.flush()
+
 
     except Exception as e:
-        print(json.dumps({"success": False, "error": f"Critical Error: {str(e)}"}))
+        err = {"success": False, "error": f"Critical Error: {str(e)}"}
+        print(json.dumps(err, ensure_ascii=False), file=sys.stderr)
+        sys.stderr.flush()
+        sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

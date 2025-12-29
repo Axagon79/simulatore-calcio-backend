@@ -1,6 +1,7 @@
 import sys
 import os
 import json
+import re
 import subprocess
 from firebase_functions import https_fn, options
 from firebase_admin import initialize_app
@@ -65,28 +66,82 @@ def run_simulation(request: https_fn.Request) -> https_fn.Response:
             ]
 
             cmd = [sys.executable, "-m", "ai_engine.web_simulator_A"] + script_args
-            
-            result_proc = subprocess.run(
-                cmd,
-                cwd=current_dir,
-                capture_output=True,
-                text=True,
-                encoding='utf-8',       
-                errors='replace',      
-                timeout=120
-            )
 
-            output_lines = result_proc.stdout.strip().split('\n')
-            last_line = output_lines[-1] if output_lines else "{}"
-            
             try:
-                json_response = json.loads(last_line)
-            except json.JSONDecodeError:
+                result_proc = subprocess.run(
+                    cmd,
+                    cwd=current_dir,
+                    capture_output=True,
+                    text=True,
+                    encoding='utf-8',
+                    errors='replace',
+                    timeout=300  # timeout aumentato per simulazioni lunghe
+                )
+            except subprocess.TimeoutExpired as te:
+                err_resp = {
+                    "success": False,
+                    "error": "Subprocess timeout",
+                    "details": str(te)
+                }
+                return https_fn.Response(
+                    json.dumps(err_resp, ensure_ascii=False),
+                    status=504,
+                    mimetype="application/json",
+                    headers=headers
+                )
+            except Exception as ex:
+                err_resp = {
+                    "success": False,
+                    "error": "Failed to start subprocess",
+                    "details": str(ex)
+                }
+                return https_fn.Response(
+                    json.dumps(err_resp, ensure_ascii=False),
+                    status=500,
+                    mimetype="application/json",
+                    headers=headers
+                )
+
+            full_stdout = result_proc.stdout or ""
+            full_stderr = result_proc.stderr or ""
+
+            # Log per debug nei log Firebase (stderr)
+            print("Subprocess returncode:", result_proc.returncode, file=sys.stderr)
+            print("Subprocess STDOUT (troncato 2000 chars):", full_stdout[:2000], file=sys.stderr)
+            print("Subprocess STDERR (troncato 2000 chars):", full_stderr[:2000], file=sys.stderr)
+
+            # Prova a trovare l'ultimo oggetto JSON ({} o [])
+            json_match = None
+            for pattern in [r'\{(?:.|\n)*\}\s*$', r'\[(?:.|\n)*\]\s*$']:
+                m = re.search(pattern, full_stdout, re.DOTALL)
+                if m:
+                    json_match = m.group(0).strip()
+                    break
+
+            # Se non trovato come fine stringa, cerca il primo JSON valido ovunque
+            if not json_match:
+                m = re.search(r'(\{(?:.|\n)*?\}|\[(?:.|\n)*?\])', full_stdout, re.DOTALL)
+                if m:
+                    json_match = m.group(0).strip()
+
+            if json_match:
+                try:
+                    json_response = json.loads(json_match)
+                except json.JSONDecodeError:
+                    json_response = {
+                        "success": False,
+                        "error": "JSON Decode Error parsing matched JSON",
+                        "raw_output": full_stdout,
+                        "stderr": full_stderr,
+                        "returncode": result_proc.returncode
+                    }
+            else:
                 json_response = {
-                    "success": False, 
-                    "error": "JSON Decode Error", 
-                    "raw_output": result_proc.stdout,
-                    "stderr": result_proc.stderr
+                    "success": False,
+                    "error": "No JSON found in stdout",
+                    "raw_output": full_stdout,
+                    "stderr": full_stderr,
+                    "returncode": result_proc.returncode
                 }
 
             # Restituiamo la risposta con gli HEADER CORS
@@ -100,11 +155,20 @@ def run_simulation(request: https_fn.Request) -> https_fn.Response:
         # 2. CASO MENU (Get vuota o payload vuoto)
         # ---------------------------------------------------------
         else:
-            print("🚀 AVVIO MENU INTERATTIVO...")
-            subprocess.run(
-                [sys.executable, "-m", "ai_engine.universal_simulator"],
-                cwd=current_dir
-            )
+            print("🚀 AVVIO MENU INTERATTIVO...", file=sys.stderr)
+            try:
+                subprocess.run(
+                    [sys.executable, "-m", "ai_engine.universal_simulator"],
+                    cwd=current_dir,
+                    check=False
+                )
+            except Exception as ex:
+                return https_fn.Response(
+                    json.dumps({"success": False, "error": "Failed to launch interactive menu", "details": str(ex)}),
+                    status=500,
+                    mimetype="application/json",
+                    headers=headers
+                )
             
             return https_fn.Response(
                 json.dumps({"success": True, "message": "Menu chiuso."}),
@@ -113,8 +177,11 @@ def run_simulation(request: https_fn.Request) -> https_fn.Response:
             )
 
     except Exception as e:
+        # Errore imprevisto nella funzione
+        err_payload = {"success": False, "error": str(e)}
+        print("run_simulation error:", str(e), file=sys.stderr)
         return https_fn.Response(
-            json.dumps({"success": False, "error": str(e)}),
+            json.dumps(err_payload, ensure_ascii=False),
             status=500,
             mimetype="application/json",
             headers=headers
