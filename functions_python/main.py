@@ -13,6 +13,12 @@ initialize_app()
 current_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, current_dir)
 
+# --- NUOVA LOGICA DI IMPORTAZIONE (Aggiunta al path di sistema) ---
+# Questo assicura che Python trovi il file config.py dentro ai_engine
+ai_engine_dir = os.path.join(current_dir, "ai_engine")
+if os.path.exists(ai_engine_dir):
+    sys.path.insert(0, ai_engine_dir)
+
 @https_fn.on_request(
     memory=options.MemoryOption.GB_2,     # <--- 2GB RAM
     timeout_sec=540,                     # <--- 9 Minuti Tempo
@@ -66,6 +72,10 @@ def run_simulation(request: https_fn.Request) -> https_fn.Response:
             ]
 
             cmd = [sys.executable, "-m", "ai_engine.web_simulator_A"] + script_args
+            
+            # 2. SUBITO DOPO (prima del try), incolla queste due righe:
+            env = os.environ.copy()
+            env["PYTHONPATH"] = current_dir + os.pathsep + env.get("PYTHONPATH", "")
 
             try:
                 result_proc = subprocess.run(
@@ -75,6 +85,7 @@ def run_simulation(request: https_fn.Request) -> https_fn.Response:
                     text=True,
                     encoding='utf-8',
                     errors='replace',
+                    env=env,
                     timeout=300  # timeout aumentato per simulazioni lunghe
                 )
             except subprocess.TimeoutExpired as te:
@@ -152,19 +163,32 @@ def run_simulation(request: https_fn.Request) -> https_fn.Response:
             )
 
         # ---------------------------------------------------------
-        # 2. CASO MENU (Get vuota o payload vuoto) - EVITIAMO LOOP INFINITO NEL CLOUD
+        # 2. CASO MENU (Get vuota o payload vuoto)
         # ---------------------------------------------------------
         else:
-            # Nel Cloud non possiamo lanciare il menu interattivo (si bloccherebbe)
-            # Restituiamo un messaggio di errore informativo
+            print("🚀 AVVIO MENU INTERATTIVO...", file=sys.stderr)
+            try:
+                subprocess.run(
+                    [sys.executable, "-m", "ai_engine.universal_simulator"],
+                    cwd=current_dir,
+                    check=False
+                )
+            except Exception as ex:
+                return https_fn.Response(
+                    json.dumps({"success": False, "error": "Failed to launch interactive menu", "details": str(ex)}),
+                    status=500,
+                    mimetype="application/json",
+                    headers=headers
+                )
+            
             return https_fn.Response(
-                json.dumps({"success": False, "error": "No simulation payload provided (Cloud environment)"}),
-                status=400,
+                json.dumps({"success": True, "message": "Menu chiuso."}),
                 mimetype="application/json",
                 headers=headers
             )
 
     except Exception as e:
+        # Errore imprevisto nella funzione
         err_payload = {"success": False, "error": str(e)}
         print("run_simulation error:", str(e), file=sys.stderr)
         return https_fn.Response(
@@ -191,20 +215,20 @@ def get_nations(request: https_fn.Request) -> https_fn.Response:
         return https_fn.Response('', status=204, headers=headers)
 
     try:
-        # Importiamo il database dal tuo file di configurazione
-        from config import db
+        # --- LOGICA DI IMPORTAZIONE ROBUSTA ---
+        try:
+            from config import db
+        except ImportError:
+            from ai_engine.config import db
         
-        # 🎯 ACCESSO DIRETTO ALLA TUA COLLEZIONE REALE h2h_by_round
+        # 🎯 ACCESSO DIRETTO ALLA COLLEZIONE
         collection = db["h2h_by_round"]
-        
-        # Cerchiamo tutti i valori unici nel campo "country" alla radice del documento
         nations = collection.distinct("country")
         
-        # Pulizia: eliminiamo valori nulli e ordiniamo alfabeticamente
+        # Pulizia: eliminiamo valori nulli e convertiamo in stringhe
         valid_nations = sorted([str(n) for n in nations if n])
         
-        # Log di debug nei log Firebase
-        print(f"DEBUG get_nations: Trovate {len(valid_nations)} nazioni: {valid_nations}", file=sys.stderr)
+        print(f"DEBUG: Trovate nazioni: {valid_nations}", file=sys.stderr)
         
         return https_fn.Response(
             json.dumps(valid_nations, ensure_ascii=False), 
@@ -212,6 +236,5 @@ def get_nations(request: https_fn.Request) -> https_fn.Response:
             headers=headers
         )
     except Exception as e:
-        # In caso di errore, stampiamo l'errore esatto nei log di Firebase
         print(f"❌ Errore critico get_nations: {str(e)}", file=sys.stderr)
         return https_fn.Response(json.dumps([]), status=500, headers=headers)
