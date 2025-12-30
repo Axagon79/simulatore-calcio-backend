@@ -14,8 +14,8 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, current_dir)
 
 @https_fn.on_request(
-    memory=options.MemoryOption.GB_1,    # <--- 1GB RAM
-    timeout_sec=300,                     # <--- 5 Minuti Tempo
+    memory=options.MemoryOption.GB_2,    # <--- 1GB RAM
+    timeout_sec=540,                     # <--- 5 Minuti Tempo
     region="us-central1"
 )
 def run_simulation(request: https_fn.Request) -> https_fn.Response:
@@ -61,7 +61,7 @@ def run_simulation(request: https_fn.Request) -> https_fn.Response:
                 payload.get('away', 'null'),
                 payload.get('round', 'null'),
                 str(payload.get('algo_id', 5)),
-                str(payload.get('cycles', 80)),
+                str(payload.get('cycles', 20)),
                 str(payload.get('save_db', False)).lower()
             ]
 

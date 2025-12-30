@@ -25,8 +25,27 @@ if project_root not in sys.path:
 print(f"📂 ai_engine_dir: {ai_engine_dir}")
 print(f"📂 project_root: {project_root}")
 
+# Percorso esplicito desiderato
+explicit_config_path = os.path.join(
+    "C:\\Progetti\\simulatore-calcio-backend",
+    "functions_python",
+    "ai_engine",
+    "config.py"
+)
+
+# Percorso calcolato (fallback originale)
+calculated_config_path = os.path.join(project_root, "config.py")
+
+# Scegli quale usare: preferisci il percorso esplicito
+config_path = explicit_config_path if os.path.exists(explicit_config_path) else calculated_config_path
+
+print(f"🔎 Trying to load config from: {config_path}")
+
 try:
-    spec = importlib.util.spec_from_file_location("config", os.path.join(project_root, "config.py"))
+    if not os.path.exists(config_path):
+        raise FileNotFoundError(f"config.py non trovato in: {config_path}")
+
+    spec = importlib.util.spec_from_file_location("config", config_path)
     config_module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(config_module)
     db = config_module.db
@@ -34,6 +53,7 @@ try:
 except Exception as e:
     print(f"❌ Errore Import Config: {e}")
     sys.exit(1)
+
 
 # --- CONFIGURAZIONE ---
 COLLECTION_NAME = "h2h_by_round"

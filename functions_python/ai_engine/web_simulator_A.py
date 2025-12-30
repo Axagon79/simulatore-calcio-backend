@@ -35,7 +35,7 @@ except ImportError as e:
 
 # --- CONFIG DB ---
 DB_NAME = "football_simulator_db"
-MONGO_URI = "mongodb://localhost:27017/"
+MONGO_URI="mongodb+srv://Database_User:LPmYAZkzEVxjSaAd@pup-pals-cluster.y1h2r.mongodb.net/football_simulator_db?retryWrites=true&w=majority&appName=pup-pals-cluster"
 
 ALGO_NAMES = {
     1: "Statistico Puro", 2: "Dinamico", 3: "Tattico", 
