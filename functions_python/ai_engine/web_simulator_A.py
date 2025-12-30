@@ -9,7 +9,9 @@ import os
 import sys
 import json
 import random
+import math  # <--- AGGIUNGI QUESTA RIGA
 from datetime import datetime
+
 
 # --- CONFIGURAZIONE PERCORSI ---
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -34,6 +36,18 @@ except ImportError as e:
     sys.exit(1)
 
 ALGO_NAMES = {1: "Statistico", 2: "Dinamico", 3: "Tattico", 4: "Caos", 5: "Master", 6: "MonteCarlo"}
+
+# --- FUNZIONE SALVAVITA PER EVITARE CRASH DA NaN ---
+def sanitize_data(data):
+    if isinstance(data, dict):
+        return {k: sanitize_data(v) for k, v in data.items()}
+    elif isinstance(data, list):
+        return [sanitize_data(v) for v in data]
+    elif isinstance(data, float):
+        # Se è NaN (Not a Number) o Infinito, lo trasformiamo in 0.0
+        if math.isnan(data) or math.isinf(data):
+            return 0.0
+    return data
 
 def genera_match_report_completo(gh, ga, h2h_data, team_h, team_a, simulazioni_raw, deep_stats):
     """
@@ -222,8 +236,9 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
         h2h_doc = db.h2h_by_round.find_one({"league": league_clean})
         match_data = next((m for m in h2h_doc.get('matches', []) if m['home'] == home_team), {})
         h2h_data = match_data.get('h2h_data', {})
+
         # 1. ESECUZIONE ALGORITMO E CREAZIONE sim_list
-        sim_list = [] # Definiamo subito la variabile per evitare "UndefinedVariable"
+        sim_list = [] 
         preloaded_data = preload_match_data(home_team, away_team)
         
         if algo_id == 6:
@@ -237,10 +252,12 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
             else:
                 sim_list = [f"{gh}-{ga}"] * cycles
             top3 = [x[0] for x in res[2]]
+            cronaca = res[1] if len(res) > 1 else [] # Recupero cronaca se disponibile
         else:
             gh, ga = run_single_algo(algo_id, preloaded_data, home_team, away_team)
             sim_list = [f"{gh}-{ga}"] * cycles
             top3 = [f"{gh}-{ga}"]
+            cronaca = []
 
         # 2. INTEGRAZIONE DEEP ANALYSIS
         analyzer = DeepAnalyzer()
@@ -253,11 +270,12 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
         # DEFINIZIONE DI deep_stats
         deep_stats = analyzer.matches[-1]['algorithms'][algo_id]['stats']
 
-        # 3. GENERAZIONE REPORT (Passiamo sia sim_list che deep_stats)
-        # Qui risolviamo l'errore di riga 256
+        # 3. GENERAZIONE REPORT
+        # Usiamo la tua funzione esistente
         anatomy = genera_match_report_completo(gh, ga, h2h_data, team_h_doc, team_a_doc, sim_list, deep_stats)
 
-        return {
+        # Creazione dell'oggetto risultato
+        raw_result = {
             "success": True,
             "predicted_score": f"{gh}-{ga}", "gh": gh, "ga": ga,
             "sign": get_sign(gh, ga), "top3": top3,
@@ -270,6 +288,11 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
                 "motivazione": team_h_doc.get('ranking_c', {}).get('motivation', 'N/D')
             }
         }
+
+        # PULIZIA FINALE: Rimuove i NaN prima di inviare al frontend
+        # 
+        return sanitize_data(raw_result)
+
     except Exception as e:
         return {"success": False, "error": str(e)}
 
