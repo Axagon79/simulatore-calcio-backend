@@ -129,6 +129,70 @@ def genera_match_report_completo(gh, ga, h2h_data, team_h, team_a, simulazioni_r
         "report_scommesse": report_scommesse
     }
 
+def genera_anatomia_partita(gh, ga, h2h_match_data, team_h_doc, sim_list):
+    """Genera statistiche dettagliate e report scommesse in italiano."""
+    import random
+    from collections import Counter
+    
+    h2h_data = h2h_match_data.get('h2h_data', {})
+    dna_h = h2h_data.get('h2h_dna', {}).get('home_dna', {})
+    dna_a = h2h_data.get('h2h_dna', {}).get('away_dna', {})
+    
+    # --- 1. CALCOLI PRELIMINARI (Necessari per il dizionario stats) ---
+    tec_h, tec_a = dna_h.get('tec', 50), dna_a.get('tec', 50)
+    att_h, att_a = dna_h.get('att', 50), dna_a.get('att', 50)
+    
+    # Possesso
+    pos_h = max(35, min(65, int(50 + (tec_h - tec_a)/3 + random.randint(-2, 2))))
+    
+    # Tiri (Definiamo queste variabili PRIMA di usarle sotto)
+    tiri_h = int(att_h / 5) + random.randint(2, 8)
+    tiri_a = int(att_a / 5) + random.randint(2, 8)
+    
+    # Tiri in porta (SOG)
+    sog_h = min(tiri_h, gh + random.randint(1, 4))
+    sog_a = min(tiri_a, ga + random.randint(1, 4))
+
+    # --- 2. DIZIONARIO STATISTICHE ---
+    stats = {
+        "Possesso Palla": [f"{pos_h}%", f"{100-pos_h}%"],
+        "Possesso Palla (PT)": [f"{pos_h + random.randint(-2,2)}%", f"{100-pos_h + random.randint(-2,2)}%"],
+        "Tiri Totali": [tiri_h, tiri_a],
+        "Tiri in Porta": [sog_h, sog_a],
+        "Tiri Fuori": [max(0, tiri_h - sog_h), max(0, tiri_a - sog_a)],
+        "Tiri Respinti": [random.randint(1, 5), random.randint(1, 5)],
+        "Calci d'Angolo": [max(1, int(att_h/12)), max(1, int(att_a/12))],
+        "Angoli (PT)": [random.randint(0, 4), random.randint(0, 4)],
+        "Attacchi Pericolosi": [random.randint(35, 65), random.randint(35, 65)],
+        "Falli": [random.randint(8, 18), random.randint(8, 18)],
+        "Ammonizioni": [random.randint(0, 4), random.randint(0, 4)],
+        "Parate": [max(0, sog_a - ga), max(0, sog_h - gh)],
+        "Pali Colpiti": [random.choice([0,0,1]), random.choice([0,0,1])],
+        "Sostituzioni": [5, 5]
+    }
+
+    # --- 3. REPORT SCOMMESSE ---
+    tot = len(sim_list)
+    if tot == 0: tot = 1 # Evita divisione per zero
+    
+    v_h = sum(1 for r in sim_list if int(str(r).split('-')[0]) > int(str(r).split('-')[1]))
+    par = sum(1 for r in sim_list if int(str(r).split('-')[0]) == int(str(r).split('-')[1]))
+    v_a = sum(1 for r in sim_list if int(str(r).split('-')[0]) < int(str(r).split('-')[1]))
+    over = sum(1 for r in sim_list if sum(map(int, str(r).split('-'))) > 2.5)
+    gg = sum(1 for r in sim_list if all(int(x) > 0 for x in str(r).split('-')))
+    
+    report_bet = {
+        "Bookmaker": {
+            "1": f"{round(v_h/tot*100, 1)}%", "X": f"{round(par/tot*100, 1)}%", "2": f"{round(v_a/tot*100, 1)}%",
+            "U 2.5": f"{round((tot-over)/tot*100, 1)}%", "O 2.5": f"{round(over/tot*100, 1)}%",
+            "GG": f"{round(gg/tot*100, 1)}%", "NG": f"{round((tot-gg)/tot*100, 1)}%",
+            "1X": f"{round((v_h+par)/tot*100, 1)}%", "12": f"{round((v_h+v_a)/tot*100, 1)}%", "X2": f"{round((v_a+par)/tot*100, 1)}%"
+        },
+        "risultati_esatti_piu_probabili": [{"score": s, "pct": f"{round(f/tot*100, 1)}%"} for s, f in Counter(sim_list).most_common(5)]
+    }
+    
+    return stats, report_bet
+
 def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: int, league: str, main_mode: int) -> dict:
     """Esegue la simulazione e arricchisce il risultato con i dati del DB."""
     try:
