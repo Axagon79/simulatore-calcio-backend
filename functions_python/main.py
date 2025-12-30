@@ -186,3 +186,32 @@ def run_simulation(request: https_fn.Request) -> https_fn.Response:
             mimetype="application/json",
             headers=headers
         )
+        
+@https_fn.on_request(
+    memory=options.MemoryOption.MB_256,
+    region="us-central1"
+)
+def get_nations(request: https_fn.Request) -> https_fn.Response:
+    # Gestione CORS per permettere al sito (Vercel/Firebase Hosting) di leggere i dati
+    headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Content-Type': 'application/json'
+    }
+    
+    if request.method == 'OPTIONS':
+        return https_fn.Response('', status=204, headers=headers)
+
+    try:
+        from config import db
+        # Prende tutti i valori unici dal campo "country" che abbiamo appena popolato
+        nations = db.h2h_by_round.distinct("country")
+        
+        # Pulizia: rimuove eventuali valori vuoti e ordina alfabeticamente
+        valid_nations = sorted([n for n in nations if n])
+        
+        return https_fn.Response(json.dumps(valid_nations), headers=headers)
+    except Exception as e:
+        print(f"Errore get_nations: {e}", file=sys.stderr)
+        return https_fn.Response(json.dumps([]), status=500, headers=headers)

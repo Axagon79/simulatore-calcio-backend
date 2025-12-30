@@ -45,7 +45,12 @@ ALGO_NAMES = {
 def get_real_matches_from_db(nation: str, league: str, main_mode: int):
     """ESATTA logia dal tuo universal_simulator.py [file:50]"""
     try:
-        from config import db  # Come nel tuo file
+        from config import db 
+        
+        # --- TRASFORMAZIONE NOME LEGA (Aggiungi queste righe qui) ---
+        # Trasforma "SERIE_A" -> "Serie A" o "PREMIER_LEAGUE" -> "Premier League"
+        league = league.replace('_', ' ').title()
+        # -----------------------------------------------------------
         
         # OFFSET dal main_mode (IDENTICO al tuo flusso)
         OFFSET = 0
