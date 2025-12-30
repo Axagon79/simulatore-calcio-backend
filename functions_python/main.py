@@ -194,25 +194,22 @@ def run_simulation(request: https_fn.Request) -> https_fn.Response:
     region="us-central1"
 )
 def get_nations(request: https_fn.Request) -> https_fn.Response:
-    # --- GESTIONE CORS ---
     headers = {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type',
         'Content-Type': 'application/json'
     }
-    
     if request.method == 'OPTIONS':
         return https_fn.Response('', status=204, headers=headers)
 
     try:
         from config import db
-        # Questa è la modifica: cerchiamo i valori unici nella collezione h2h_by_round
+        # 🎯 MODIFICA FONDAMENTALE: 
+        # Invece di db.nations, usiamo la tua collezione reale
         nations = db.h2h_by_round.distinct("country")
         
-        # Pulizia e ordinamento
         valid_nations = sorted([n for n in nations if n])
-        
         return https_fn.Response(json.dumps(valid_nations), headers=headers)
     except Exception as e:
         print(f"Errore get_nations: {e}", file=sys.stderr)
