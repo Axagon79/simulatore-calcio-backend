@@ -11,8 +11,8 @@ def tqdm(x):
 
 import contextlib
 import random
-from . import diagnostics
-from .deep_analysis import DeepAnalyzer
+import diagnostics
+from deep_analysis import DeepAnalyzer
 # --- CONFIGURAZIONI ---
 MONTE_CARLO_TOTAL_CYCLES = 5000  # Default, sovrascritto dal menu
 CSV_DELIMITER = ';'
@@ -128,13 +128,13 @@ try:
         from config import db
 
     # Moduli engine dentro ai_engine/engine
-    from .engine import engine_core
-    from .engine.engine_core import predict_match, preload_match_data
-    from .engine.goals_converter import calculate_goals_from_engine
+    from engine import engine_core
+    from engine.engine_core import predict_match, preload_match_data
+    from engine.goals_converter import calculate_goals_from_engine
 
     # PredictionManager nello stesso package ai_engine
     try:
-        from .prediction_manager import PredictionManager
+        from prediction_manager import PredictionManager
         print("✅ [MANAGER] PredictionManager caricato.")
     except ImportError:
         PredictionManager = None

@@ -1,52 +1,64 @@
 {
-  "timestamp": "2025-12-19 17:44:57",
-  "match": "Como vs Milan",
-  "risultato_finale": "2-1",
+  "timestamp": "2025-12-30 02:06:49",
+  "match": "Juventus vs Inter",
+  "risultato_finale": "2-3",
   "algoritmi": {
     "Dinamico": {
-      "totale_simulazioni": 10,
+      "totale_simulazioni": 1250,
       "top_10": [
         [
-          "2-1",
-          3
+          "4-3",
+          59
         ],
         [
-          "1-1",
-          2
+          "3-3",
+          52
         ],
         [
-          "3-0",
-          1
+          "2-3",
+          52
         ],
         [
-          "1-0",
-          1
+          "2-4",
+          48
         ],
         [
-          "0-2",
-          1
+          "3-5",
+          46
         ],
         [
-          "2-0",
-          1
+          "4-2",
+          45
         ],
         [
-          "1-2",
-          1
+          "4-5",
+          42
+        ],
+        [
+          "4-4",
+          40
+        ],
+        [
+          "3-4",
+          39
+        ],
+        [
+          "3-2",
+          37
         ]
       ],
       "top_3_usati": [
         [
-          "2-1",
-          3
+          "4-3",
+          59
         ],
         [
-          "1-1",
-          2
+          "3-3",
+          52
         ],
         [
-          "3-0",
-          1
+          "2-3",
+          52
         ]
       ],
       "pesi_medi": {
@@ -116,14 +128,14 @@
       "scontrino_medio": {
         "casa": {
           "Rating": {
-            "valore": 18.51,
+            "valore": 18.06,
             "peso": 0.28,
-            "punti": 5.18
+            "punti": 5.06
           },
           "Tecnica": {
-            "valore": 17.24,
+            "valore": 16.1,
             "peso": 0.15,
-            "punti": 2.59
+            "punti": 2.41
           },
           "BVS Quote": {
             "valore": 0.0,
@@ -131,46 +143,46 @@
             "punti": 0.0
           },
           "Forma": {
-            "valore": 9.52,
+            "valore": 20.63,
             "peso": 0.3,
-            "punti": 2.86
+            "punti": 6.19
           },
           "Storia H2H": {
-            "valore": 0.0,
+            "valore": 6.83,
             "peso": 0.01,
-            "punti": 0.0
+            "punti": 0.07
           },
           "Motivazione": {
-            "valore": 3.99,
+            "valore": 4.53,
             "peso": 0.15,
-            "punti": 0.6
+            "punti": 0.68
           },
           "Fattore Campo": {
-            "valore": 4.94,
-            "peso": 0.07,
-            "punti": 0.37
+            "valore": 5.17,
+            "peso": 0.08,
+            "punti": 0.39
           },
           "Valore Rosa": {
-            "valore": 3.6,
+            "valore": 6.45,
             "peso": 0.05,
-            "punti": 0.18
+            "punti": 0.32
           },
           "Affidabilità": {
-            "valore": 4.12,
+            "valore": 8.55,
             "peso": 0.06,
-            "punti": 0.25
+            "punti": 0.51
           }
         },
         "ospite": {
           "Rating": {
-            "valore": 18.85,
+            "valore": 19.34,
             "peso": 0.28,
-            "punti": 5.28
+            "punti": 5.42
           },
           "Tecnica": {
-            "valore": 18.43,
+            "valore": 17.48,
             "peso": 0.15,
-            "punti": 2.76
+            "punti": 2.62
           },
           "BVS Quote": {
             "valore": 0.0,
@@ -178,90 +190,94 @@
             "punti": 0.0
           },
           "Forma": {
-            "valore": 0.0,
+            "valore": 22.62,
             "peso": 0.3,
-            "punti": 0.0
+            "punti": 6.79
           },
           "Storia H2H": {
-            "valore": 1.19,
+            "valore": 5.15,
             "peso": 0.01,
-            "punti": 0.01
+            "punti": 0.05
           },
           "Motivazione": {
-            "valore": 4.35,
+            "valore": 2.42,
             "peso": 0.15,
-            "punti": 0.65
+            "punti": 0.36
           },
           "Fattore Campo": {
-            "valore": 6.82,
-            "peso": 0.07,
-            "punti": 0.51
+            "valore": 7.0,
+            "peso": 0.08,
+            "punti": 0.52
           },
           "Valore Rosa": {
-            "valore": 7.09,
+            "valore": 9.0,
             "peso": 0.05,
-            "punti": 0.35
+            "punti": 0.45
           },
           "Affidabilità": {
-            "valore": 4.57,
+            "valore": 8.56,
             "peso": 0.06,
-            "punti": 0.27
+            "punti": 0.51
           }
         }
       }
     },
     "Tattico": {
-      "totale_simulazioni": 10,
+      "totale_simulazioni": 1250,
       "top_10": [
         [
-          "1-1",
-          2
+          "2-3",
+          55
+        ],
+        [
+          "3-3",
+          55
+        ],
+        [
+          "4-3",
+          49
+        ],
+        [
+          "4-2",
+          48
+        ],
+        [
+          "4-4",
+          47
         ],
         [
           "2-4",
-          1
+          46
         ],
         [
-          "4-1",
-          1
+          "3-5",
+          45
         ],
         [
-          "1-0",
-          1
+          "4-5",
+          42
         ],
         [
-          "0-0",
-          1
+          "3-2",
+          40
         ],
         [
-          "2-0",
-          1
-        ],
-        [
-          "1-2",
-          1
-        ],
-        [
-          "1-3",
-          1
-        ],
-        [
-          "5-1",
-          1
+          "3-4",
+          39
         ]
       ],
       "top_3_usati": [
         [
-          "1-1",
-          2
+          "2-3",
+          55
         ],
         [
-          "2-4",
-          1
+          "3-3",
+          55
         ],
         [
-          "4-1",
-          1
+          "4-3",
+          49
         ]
       ],
       "pesi_medi": {
@@ -331,14 +347,14 @@
       "scontrino_medio": {
         "casa": {
           "Rating": {
-            "valore": 18.51,
+            "valore": 18.06,
             "peso": 0.22,
-            "punti": 4.07
+            "punti": 3.97
           },
           "Tecnica": {
-            "valore": 17.24,
+            "valore": 16.1,
             "peso": 0.15,
-            "punti": 2.59
+            "punti": 2.41
           },
           "BVS Quote": {
             "valore": 0.0,
@@ -346,46 +362,46 @@
             "punti": 0.0
           },
           "Forma": {
-            "valore": 9.52,
+            "valore": 20.63,
             "peso": 0.27,
-            "punti": 2.57
+            "punti": 5.57
           },
           "Storia H2H": {
-            "valore": 0.0,
+            "valore": 6.83,
             "peso": 0.01,
-            "punti": 0.0
+            "punti": 0.07
           },
           "Motivazione": {
-            "valore": 3.99,
+            "valore": 4.53,
             "peso": 0.09,
-            "punti": 0.36
+            "punti": 0.41
           },
           "Fattore Campo": {
-            "valore": 4.94,
+            "valore": 5.17,
             "peso": 0.06,
-            "punti": 0.32
+            "punti": 0.34
           },
           "Valore Rosa": {
-            "valore": 3.6,
+            "valore": 6.45,
             "peso": 0.05,
-            "punti": 0.18
+            "punti": 0.32
           },
           "Affidabilità": {
-            "valore": 4.12,
+            "valore": 8.55,
             "peso": 0.06,
-            "punti": 0.27
+            "punti": 0.56
           }
         },
         "ospite": {
           "Rating": {
-            "valore": 18.85,
+            "valore": 19.34,
             "peso": 0.22,
-            "punti": 4.15
+            "punti": 4.25
           },
           "Tecnica": {
-            "valore": 18.43,
+            "valore": 17.48,
             "peso": 0.15,
-            "punti": 2.76
+            "punti": 2.62
           },
           "BVS Quote": {
             "valore": 0.0,
@@ -393,86 +409,94 @@
             "punti": 0.0
           },
           "Forma": {
-            "valore": 0.0,
+            "valore": 22.62,
             "peso": 0.27,
-            "punti": 0.0
+            "punti": 6.11
           },
           "Storia H2H": {
-            "valore": 1.19,
+            "valore": 5.15,
             "peso": 0.01,
-            "punti": 0.01
+            "punti": 0.05
           },
           "Motivazione": {
-            "valore": 4.35,
+            "valore": 2.42,
             "peso": 0.09,
-            "punti": 0.39
+            "punti": 0.22
           },
           "Fattore Campo": {
-            "valore": 6.82,
+            "valore": 7.0,
             "peso": 0.06,
-            "punti": 0.44
+            "punti": 0.45
           },
           "Valore Rosa": {
-            "valore": 7.09,
+            "valore": 9.0,
             "peso": 0.05,
-            "punti": 0.35
+            "punti": 0.45
           },
           "Affidabilità": {
-            "valore": 4.57,
+            "valore": 8.56,
             "peso": 0.06,
-            "punti": 0.3
+            "punti": 0.56
           }
         }
       }
     },
     "Caos": {
-      "totale_simulazioni": 10,
+      "totale_simulazioni": 1250,
       "top_10": [
         [
-          "1-1",
-          2
+          "3-4",
+          56
         ],
         [
-          "2-0",
-          2
+          "3-3",
+          55
         ],
         [
-          "0-1",
-          1
+          "4-4",
+          53
         ],
         [
-          "5-1",
-          1
+          "4-3",
+          50
         ],
         [
-          "0-0",
-          1
+          "3-2",
+          44
         ],
         [
-          "1-6",
-          1
+          "2-4",
+          43
         ],
         [
-          "4-0",
-          1
+          "4-2",
+          40
         ],
         [
-          "1-0",
-          1
+          "2-2",
+          40
+        ],
+        [
+          "2-3",
+          40
+        ],
+        [
+          "5-4",
+          36
         ]
       ],
       "top_3_usati": [
         [
-          "1-1",
-          2
+          "3-4",
+          56
         ],
         [
-          "2-0",
-          2
+          "3-3",
+          55
         ],
         [
-          "0-1",
-          1
+          "4-4",
+          53
         ]
       ],
       "pesi_medi": {
@@ -542,14 +566,14 @@
       "scontrino_medio": {
         "casa": {
           "Rating": {
-            "valore": 18.51,
+            "valore": 18.06,
             "peso": -0.2,
-            "punti": -3.7
+            "punti": -3.61
           },
           "Tecnica": {
-            "valore": 17.24,
+            "valore": 16.1,
             "peso": 0.15,
-            "punti": 2.59
+            "punti": 2.41
           },
           "BVS Quote": {
             "valore": 0.0,
@@ -557,46 +581,46 @@
             "punti": 0.0
           },
           "Forma": {
-            "valore": 9.52,
+            "valore": 20.63,
             "peso": 0.57,
-            "punti": 5.43
+            "punti": 11.76
           },
           "Storia H2H": {
-            "valore": 0.0,
+            "valore": 6.83,
             "peso": 0.03,
-            "punti": 0.0
+            "punti": 0.2
           },
           "Motivazione": {
-            "valore": 3.99,
+            "valore": 4.53,
             "peso": 0.35,
-            "punti": 1.4
+            "punti": 1.59
           },
           "Fattore Campo": {
-            "valore": 4.94,
+            "valore": 5.17,
             "peso": 0.02,
-            "punti": 0.07
+            "punti": 0.08
           },
           "Valore Rosa": {
-            "valore": 3.6,
+            "valore": 6.45,
             "peso": 0.05,
-            "punti": 0.18
+            "punti": 0.32
           },
           "Affidabilità": {
-            "valore": 4.12,
+            "valore": 8.55,
             "peso": 0.11,
-            "punti": 0.47
+            "punti": 0.98
           }
         },
         "ospite": {
           "Rating": {
-            "valore": 18.85,
+            "valore": 19.34,
             "peso": -0.2,
-            "punti": -3.77
+            "punti": -3.87
           },
           "Tecnica": {
-            "valore": 18.43,
+            "valore": 17.48,
             "peso": 0.15,
-            "punti": 2.76
+            "punti": 2.62
           },
           "BVS Quote": {
             "valore": 0.0,
@@ -604,90 +628,94 @@
             "punti": 0.0
           },
           "Forma": {
-            "valore": 0.0,
+            "valore": 22.62,
             "peso": 0.57,
-            "punti": 0.0
+            "punti": 12.89
           },
           "Storia H2H": {
-            "valore": 1.19,
+            "valore": 5.15,
             "peso": 0.03,
-            "punti": 0.04
+            "punti": 0.15
           },
           "Motivazione": {
-            "valore": 4.35,
+            "valore": 2.42,
             "peso": 0.35,
-            "punti": 1.52
+            "punti": 0.85
           },
           "Fattore Campo": {
-            "valore": 6.82,
+            "valore": 7.0,
             "peso": 0.02,
-            "punti": 0.1
+            "punti": 0.11
           },
           "Valore Rosa": {
-            "valore": 7.09,
+            "valore": 9.0,
             "peso": 0.05,
-            "punti": 0.35
+            "punti": 0.45
           },
           "Affidabilità": {
-            "valore": 4.57,
+            "valore": 8.56,
             "peso": 0.11,
-            "punti": 0.53
+            "punti": 0.98
           }
         }
       }
     },
     "Master": {
-      "totale_simulazioni": 10,
+      "totale_simulazioni": 1250,
       "top_10": [
         [
-          "2-1",
-          2
+          "4-4",
+          48
         ],
         [
-          "1-2",
-          1
-        ],
-        [
-          "2-0",
-          1
-        ],
-        [
-          "0-1",
-          1
-        ],
-        [
-          "3-1",
-          1
-        ],
-        [
-          "3-2",
-          1
+          "3-4",
+          47
         ],
         [
           "2-4",
-          1
+          46
         ],
         [
-          "4-1",
-          1
+          "3-3",
+          45
+        ],
+        [
+          "5-4",
+          43
         ],
         [
           "4-5",
-          1
+          43
+        ],
+        [
+          "2-3",
+          40
+        ],
+        [
+          "4-3",
+          39
+        ],
+        [
+          "3-5",
+          37
+        ],
+        [
+          "4-6",
+          35
         ]
       ],
       "top_3_usati": [
         [
-          "2-1",
-          2
+          "4-4",
+          48
         ],
         [
-          "1-2",
-          1
+          "3-4",
+          47
         ],
         [
-          "2-0",
-          1
+          "2-4",
+          46
         ]
       ],
       "pesi_medi": {
@@ -757,14 +785,14 @@
       "scontrino_medio": {
         "casa": {
           "Rating": {
-            "valore": 18.51,
+            "valore": 18.06,
             "peso": 0.3,
-            "punti": 5.55
+            "punti": 5.42
           },
           "Tecnica": {
-            "valore": 17.24,
+            "valore": 16.1,
             "peso": 0.15,
-            "punti": 2.59
+            "punti": 2.41
           },
           "BVS Quote": {
             "valore": 0.0,
@@ -772,46 +800,46 @@
             "punti": 0.0
           },
           "Forma": {
-            "valore": 9.52,
+            "valore": 20.63,
             "peso": 0.33,
-            "punti": 3.14
+            "punti": 6.81
           },
           "Storia H2H": {
-            "valore": 0.0,
+            "valore": 6.83,
             "peso": 0.01,
-            "punti": 0.0
+            "punti": 0.07
           },
           "Motivazione": {
-            "valore": 3.99,
+            "valore": 4.53,
             "peso": 0.13,
-            "punti": 0.52
+            "punti": 0.59
           },
           "Fattore Campo": {
-            "valore": 4.94,
-            "peso": 0.07,
-            "punti": 0.37
+            "valore": 5.17,
+            "peso": 0.08,
+            "punti": 0.39
           },
           "Valore Rosa": {
-            "valore": 3.6,
+            "valore": 6.45,
             "peso": 0.05,
-            "punti": 0.18
+            "punti": 0.32
           },
           "Affidabilità": {
-            "valore": 4.12,
+            "valore": 8.55,
             "peso": 0.06,
-            "punti": 0.23
+            "punti": 0.47
           }
         },
         "ospite": {
           "Rating": {
-            "valore": 18.85,
+            "valore": 19.34,
             "peso": 0.3,
-            "punti": 5.66
+            "punti": 5.8
           },
           "Tecnica": {
-            "valore": 18.43,
+            "valore": 17.48,
             "peso": 0.15,
-            "punti": 2.76
+            "punti": 2.62
           },
           "BVS Quote": {
             "valore": 0.0,
@@ -819,34 +847,34 @@
             "punti": 0.0
           },
           "Forma": {
-            "valore": 0.0,
+            "valore": 22.62,
             "peso": 0.33,
-            "punti": 0.0
+            "punti": 7.46
           },
           "Storia H2H": {
-            "valore": 1.19,
+            "valore": 5.15,
             "peso": 0.01,
-            "punti": 0.01
+            "punti": 0.05
           },
           "Motivazione": {
-            "valore": 4.35,
+            "valore": 2.42,
             "peso": 0.13,
-            "punti": 0.57
+            "punti": 0.31
           },
           "Fattore Campo": {
-            "valore": 6.82,
-            "peso": 0.07,
-            "punti": 0.51
+            "valore": 7.0,
+            "peso": 0.08,
+            "punti": 0.52
           },
           "Valore Rosa": {
-            "valore": 7.09,
+            "valore": 9.0,
             "peso": 0.05,
-            "punti": 0.35
+            "punti": 0.45
           },
           "Affidabilità": {
-            "valore": 4.57,
+            "valore": 8.56,
             "peso": 0.06,
-            "punti": 0.25
+            "punti": 0.47
           }
         }
       }

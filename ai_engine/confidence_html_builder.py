@@ -17,7 +17,7 @@ USAGE:
 
 from datetime import datetime
 
-from .confidence_glossary import get_explanation_box
+from confidence_glossary import get_explanation_box
 class ConfidenceHTMLBuilder:
     """Builder per generare HTML report confidence"""
     

@@ -27,8 +27,8 @@ import csv
 import numpy as np
 from collections import Counter
 from datetime import datetime
-from .confidence_analyzer import ConfidenceCalculator
-from .confidence_html_builder import ConfidenceHTMLBuilder
+from confidence_analyzer import ConfidenceCalculator
+from confidence_html_builder import ConfidenceHTMLBuilder
 class DeepAnalyzer:
     """Analizzatore profondo per simulazioni Monte Carlo"""
     

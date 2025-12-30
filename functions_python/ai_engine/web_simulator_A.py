@@ -130,7 +130,7 @@ def run_single_simulation(home_team: str, away_team: str, league: str,
         results = []
         for _ in range(cycles):
             if algo_id == 6:
-                res = run_monte_carlo_verdict_detailed(home_team, away_team, league, round_name, cycles=1, algo_id=0)
+                res = run_monte_carlo_verdict_detailed(preloaded_data, home_team, away_team, analyzer=None)
                 gh, ga = res[0] if res else (0, 0)
             else:
                 gh, ga = run_single_algo(algo_id, preloaded_data, home_name=home_team, away_name=away_team)

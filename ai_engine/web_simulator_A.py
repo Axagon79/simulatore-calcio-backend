@@ -28,9 +28,10 @@ try:
         run_monte_carlo_verdict_detailed
     )
 except ImportError as e:
-    # Fallback per debug se chiamato da cartelle strane
-    print(json.dumps({"success": False, "error": f"Import Error: {e}"}))
+    err = {"success": False, "error": f"Import Error: {e}"}
+    print(json.dumps(err, ensure_ascii=False), file=sys.stderr)
     sys.exit(1)
+
 
 # --- CONFIG DB ---
 DB_NAME = "football_simulator_db"
@@ -129,7 +130,7 @@ def run_single_simulation(home_team: str, away_team: str, league: str,
         results = []
         for _ in range(cycles):
             if algo_id == 6:
-                res = run_monte_carlo_verdict_detailed(home_team, away_team, league, round_name, cycles=1, algo_id=0)
+                res = run_monte_carlo_verdict_detailed(preloaded_data, home_team, away_team, analyzer=None)
                 gh, ga = res[0] if res else (0, 0)
             else:
                 gh, ga = run_single_algo(algo_id, preloaded_data, home_name=home_team, away_name=away_team)
@@ -198,8 +199,10 @@ def main():
             save_db = sys.argv[9].lower() == "true"
         else:
             # Fallback manuale CLI
-            print(json.dumps({"error": "Parametri insufficienti. Usa il frontend."}))
+            err = {"error": "Parametri insufficienti. Usa il frontend."}
+            print(json.dumps(err, ensure_ascii=False), file=sys.stderr)
             sys.exit(1)
+
 
         start_time = datetime.now()
         
@@ -226,9 +229,15 @@ def main():
             "result": result
         }
         print(json.dumps(output, ensure_ascii=False))
+        sys.stdout.flush()
+
 
     except Exception as e:
-        print(json.dumps({"success": False, "error": f"Critical Error: {str(e)}"}))
+        err = {"success": False, "error": f"Critical Error: {str(e)}"}
+        print(json.dumps(err, ensure_ascii=False), file=sys.stderr)
+        sys.stderr.flush()
+        sys.exit(1)
+
 
 if __name__ == "__main__":
     main()
