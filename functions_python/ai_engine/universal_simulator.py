@@ -191,6 +191,8 @@ def run_single_algo_montecarlo(algo_id, preloaded_data, home_team, away_team, cy
                 analyzer.add_result(algo_id=algo_id, home_goals=gh, away_goals=ga)
         
         # 🔥 BARRA PROGRESSO CON FLUSH
+        # ✅ FIX: Usiamo max(1, ...) per evitare la divisione per zero con pochi cicli
+        # ✅ FIX: Qui usiamo "cycles" (senza _per_algo)
         if cycle_idx % max(1, cycles // 10) == 0 or cycle_idx == cycles - 1:
             pct = (cycle_idx + 1) / cycles * 100
             
@@ -300,7 +302,8 @@ def run_monte_carlo_verdict_detailed(preloaded_data, home_team, away_team, analy
                         scontrini_sum['ospite'][voce]['punti_sum'] += dati.get('punti', 0)
             
             # Barra progresso
-            if cycle_idx % (cycles_per_algo // 10) == 0 or cycle_idx == cycles_per_algo - 1:
+            # ✅ FIX: Qui usiamo "cycles_per_algo" e aggiungiamo max(1, ...) per evitare lo zero
+            if cycle_idx % max(1, cycles_per_algo // 10) == 0 or cycle_idx == cycles_per_algo - 1:
                 pct = (cycle_idx + 1) / cycles_per_algo * 100
                 bar_len = int(pct / 5)
                 bar = "█" * bar_len + "░" * (20 - bar_len)
