@@ -14,8 +14,8 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, current_dir)
 
 @https_fn.on_request(
-    memory=options.MemoryOption.GB_2,    # <--- 1GB RAM
-    timeout_sec=540,                     # <--- 5 Minuti Tempo
+    memory=options.MemoryOption.GB_2,     # <--- 2GB RAM
+    timeout_sec=540,                     # <--- 9 Minuti Tempo
     region="us-central1"
 )
 def run_simulation(request: https_fn.Request) -> https_fn.Response:
@@ -148,36 +148,23 @@ def run_simulation(request: https_fn.Request) -> https_fn.Response:
             return https_fn.Response(
                 json.dumps(json_response, ensure_ascii=False),
                 mimetype="application/json",
-                headers=headers  # <--- IMPORTANTE
+                headers=headers
             )
 
         # ---------------------------------------------------------
-        # 2. CASO MENU (Get vuota o payload vuoto)
+        # 2. CASO MENU (Get vuota o payload vuoto) - EVITIAMO LOOP INFINITO NEL CLOUD
         # ---------------------------------------------------------
         else:
-            print("🚀 AVVIO MENU INTERATTIVO...", file=sys.stderr)
-            try:
-                subprocess.run(
-                    [sys.executable, "-m", "ai_engine.universal_simulator"],
-                    cwd=current_dir,
-                    check=False
-                )
-            except Exception as ex:
-                return https_fn.Response(
-                    json.dumps({"success": False, "error": "Failed to launch interactive menu", "details": str(ex)}),
-                    status=500,
-                    mimetype="application/json",
-                    headers=headers
-                )
-            
+            # Nel Cloud non possiamo lanciare il menu interattivo (si bloccherebbe)
+            # Restituiamo un messaggio di errore informativo
             return https_fn.Response(
-                json.dumps({"success": True, "message": "Menu chiuso."}),
+                json.dumps({"success": False, "error": "No simulation payload provided (Cloud environment)"}),
+                status=400,
                 mimetype="application/json",
                 headers=headers
             )
 
     except Exception as e:
-        # Errore imprevisto nella funzione
         err_payload = {"success": False, "error": str(e)}
         print("run_simulation error:", str(e), file=sys.stderr)
         return https_fn.Response(
@@ -186,8 +173,6 @@ def run_simulation(request: https_fn.Request) -> https_fn.Response:
             mimetype="application/json",
             headers=headers
         )
-        
-# ... (sopra rimane tutto uguale fino alla fine di run_simulation)
 
 @https_fn.on_request(
     memory=options.MemoryOption.MB_256,
@@ -209,17 +194,17 @@ def get_nations(request: https_fn.Request) -> https_fn.Response:
         # Importiamo il database dal tuo file di configurazione
         from config import db
         
-        # 🎯 ACCESSO DIRETTO ALLA COLLEZIONE
-        # Cerchiamo tutti i valori unici nel campo "country"
-        # La tua struttura conferma che il campo è alla radice del documento
+        # 🎯 ACCESSO DIRETTO ALLA TUA COLLEZIONE REALE h2h_by_round
         collection = db["h2h_by_round"]
+        
+        # Cerchiamo tutti i valori unici nel campo "country" alla radice del documento
         nations = collection.distinct("country")
         
-        # Pulizia: eliminiamo valori nulli e convertiamo tutto in stringhe pulite
+        # Pulizia: eliminiamo valori nulli e ordiniamo alfabeticamente
         valid_nations = sorted([str(n) for n in nations if n])
         
-        # Log di debug interno (lo vedrai nei log di Firebase se serve)
-        print(f"DEBUG: Trovate nazioni: {valid_nations}", file=sys.stderr)
+        # Log di debug nei log Firebase
+        print(f"DEBUG get_nations: Trovate {len(valid_nations)} nazioni: {valid_nations}", file=sys.stderr)
         
         return https_fn.Response(
             json.dumps(valid_nations, ensure_ascii=False), 
@@ -228,5 +213,5 @@ def get_nations(request: https_fn.Request) -> https_fn.Response:
         )
     except Exception as e:
         # In caso di errore, stampiamo l'errore esatto nei log di Firebase
-        print(f"❌ Errore get_nations: {str(e)}", file=sys.stderr)
+        print(f"❌ Errore critico get_nations: {str(e)}", file=sys.stderr)
         return https_fn.Response(json.dumps([]), status=500, headers=headers)
