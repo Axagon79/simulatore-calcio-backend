@@ -28,13 +28,14 @@ try:
         has_valid_results
     )
     from config import db
+    from ai_engine.deep_analysis import DeepAnalyzer #
 except ImportError as e:
     print(json.dumps({"success": False, "error": f"Import Error: {e}"}), flush=True)
     sys.exit(1)
 
 ALGO_NAMES = {1: "Statistico", 2: "Dinamico", 3: "Tattico", 4: "Caos", 5: "Master", 6: "MonteCarlo"}
 
-def genera_match_report_completo(gh, ga, h2h_data, team_h, team_a, simulazioni_raw):
+def genera_match_report_completo(gh, ga, h2h_data, team_h, team_a, simulazioni_raw, deep_stats):
     """
     Genera l'anatomia della partita, la cronaca live e il report scommesse professionale.
     Include 30+ parametri statistici e localizzazione integrale in italiano.
@@ -113,14 +114,32 @@ def genera_match_report_completo(gh, ga, h2h_data, team_h, team_a, simulazioni_r
     from collections import Counter
     top5 = Counter(simulazioni_raw).most_common(5)
 
+    # --- REPORT SCOMMESSE CON DATI DAL DEEP ANALYZER ---
+    uo = deep_stats.get('under_over', {}) #
+    conf = deep_stats.get('confidence', {}) #
+
     report_scommesse = {
         "Bookmaker": {
-            "1": f"{round(v_h/tot*100, 1)}%", "X": f"{round(par/tot*100, 1)}%", "2": f"{round(v_a/tot*100, 1)}%",
-            "U 2.5": f"{round((tot-over)/tot*100, 1)}%", "O 2.5": f"{round(over/tot*100, 1)}%",
-            "GG": f"{round(gg/tot*100, 1)}%", "NG": f"{round((tot-gg)/tot*100, 1)}%",
-            "1X": f"{round((v_h+par)/tot*100, 1)}%", "12": f"{round((v_h+v_a)/tot*100, 1)}%", "X2": f"{round((v_a+par)/tot*100, 1)}%"
+            "1": f"{deep_stats['sign_1']['pct']}%", #
+            "X": f"{deep_stats['sign_x']['pct']}%", #
+            "2": f"{deep_stats['sign_2']['pct']}%", #
+            "1X": f"{round(deep_stats['sign_1']['pct'] + deep_stats['sign_x']['pct'], 1)}%", #
+            "X2": f"{round(deep_stats['sign_2']['pct'] + deep_stats['sign_x']['pct'], 1)}%", #
+            "12": f"{round(deep_stats['sign_1']['pct'] + deep_stats['sign_2']['pct'], 1)}%", #
+            "U 2.5": f"{uo.get('U2.5', {}).get('pct', 0)}%", #
+            "O 2.5": f"{uo.get('O2.5', {}).get('pct', 0)}%", #
+            "GG": f"{deep_stats['gg']['pct']}%", #
+            "NG": f"{deep_stats['ng']['pct']}%" #
         },
-        "risultati_esatti_piu_probabili": [{"risultato": s, "pct": f"{round(f/tot*100, 1)}%"} for s, f in top5]
+        "Analisi_Profonda": {
+            "Confidence_Globale": f"{conf.get('global_confidence', 0)}%", #
+            "Deviazione_Standard_Totale": conf.get('total_std', 0), #
+            "Affidabilita_Previsione": f"{conf.get('total_confidence', 0)}%" #
+        },
+        "risultati_esatti_piu_probabili": [
+            {"score": s, "pct": f"{round(c/deep_stats['total_simulations']*100, 1)}%"} 
+            for s, c in deep_stats.get('top_10_scores', [])[:5] #
+        ]
     }
 
     return {
@@ -203,29 +222,40 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
         h2h_doc = db.h2h_by_round.find_one({"league": league_clean})
         match_data = next((m for m in h2h_doc.get('matches', []) if m['home'] == home_team), {})
         h2h_data = match_data.get('h2h_data', {})
-
+        # 1. ESECUZIONE ALGORITMO E CREAZIONE sim_list
+        sim_list = [] # Definiamo subito la variabile per evitare "UndefinedVariable"
         preloaded_data = preload_match_data(home_team, away_team)
-        if not preloaded_data: return {"success": False, "error": "Dati DB insufficienti"}
-
+        
         if algo_id == 6:
             import ai_engine.universal_simulator as us
             us.MONTE_CARLO_TOTAL_CYCLES = cycles
             res = run_monte_carlo_verdict_detailed(preloaded_data, home_team, away_team)
             gh, ga = res[0]
-            # Fix per evitare 'int' is not subscriptable
-            sim_list = []
+            # Creazione sim_list dai risultati grezzi
             if len(res) > 4 and isinstance(res[4], list):
-                for r in res[4]:
-                    if isinstance(r, (list, tuple)): sim_list.append(f"{r[0]}-{r[1]}")
-                    else: sim_list.append(str(r))
-            if not sim_list: sim_list = [f"{gh}-{ga}"] * cycles
-            top3 = [x[0] for x in res[2]] if len(res) > 2 else [f"{gh}-{ga}"]
+                sim_list = [f"{r[0]}-{r[1]}" for r in res[4]]
+            else:
+                sim_list = [f"{gh}-{ga}"] * cycles
+            top3 = [x[0] for x in res[2]]
         else:
             gh, ga = run_single_algo(algo_id, preloaded_data, home_team, away_team)
             sim_list = [f"{gh}-{ga}"] * cycles
             top3 = [f"{gh}-{ga}"]
 
-        anatomy = genera_match_report_completo(gh, ga, h2h_data, team_h_doc, team_a_doc, sim_list)
+        # 2. INTEGRAZIONE DEEP ANALYSIS
+        analyzer = DeepAnalyzer()
+        analyzer.start_match(home_team, away_team, league=league)
+        for score in sim_list:
+            h, a = map(int, score.split('-'))
+            analyzer.add_result(algo_id, h, a)
+        analyzer.end_match()
+        
+        # DEFINIZIONE DI deep_stats
+        deep_stats = analyzer.matches[-1]['algorithms'][algo_id]['stats']
+
+        # 3. GENERAZIONE REPORT (Passiamo sia sim_list che deep_stats)
+        # Qui risolviamo l'errore di riga 256
+        anatomy = genera_match_report_completo(gh, ga, h2h_data, team_h_doc, team_a_doc, sim_list, deep_stats)
 
         return {
             "success": True,
