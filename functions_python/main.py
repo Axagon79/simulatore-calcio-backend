@@ -194,23 +194,39 @@ def run_simulation(request: https_fn.Request) -> https_fn.Response:
     region="us-central1"
 )
 def get_nations(request: https_fn.Request) -> https_fn.Response:
+    # --- GESTIONE CORS ---
     headers = {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type',
         'Content-Type': 'application/json'
     }
+    
     if request.method == 'OPTIONS':
         return https_fn.Response('', status=204, headers=headers)
 
     try:
+        # Importiamo il database dal tuo file di configurazione
         from config import db
-        # 🎯 MODIFICA FONDAMENTALE: 
-        # Invece di db.nations, usiamo la tua collezione reale
-        nations = db.h2h_by_round.distinct("country")
         
-        valid_nations = sorted([n for n in nations if n])
-        return https_fn.Response(json.dumps(valid_nations), headers=headers)
+        # 🎯 ACCESSO DIRETTO ALLA COLLEZIONE
+        # Cerchiamo tutti i valori unici nel campo "country"
+        # La tua struttura conferma che il campo è alla radice del documento
+        collection = db["h2h_by_round"]
+        nations = collection.distinct("country")
+        
+        # Pulizia: eliminiamo valori nulli e convertiamo tutto in stringhe pulite
+        valid_nations = sorted([str(n) for n in nations if n])
+        
+        # Log di debug interno (lo vedrai nei log di Firebase se serve)
+        print(f"DEBUG: Trovate nazioni: {valid_nations}", file=sys.stderr)
+        
+        return https_fn.Response(
+            json.dumps(valid_nations, ensure_ascii=False), 
+            mimetype='application/json',
+            headers=headers
+        )
     except Exception as e:
-        print(f"Errore get_nations: {e}", file=sys.stderr)
+        # In caso di errore, stampiamo l'errore esatto nei log di Firebase
+        print(f"❌ Errore get_nations: {str(e)}", file=sys.stderr)
         return https_fn.Response(json.dumps([]), status=500, headers=headers)
