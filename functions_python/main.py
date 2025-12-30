@@ -187,15 +187,17 @@ def run_simulation(request: https_fn.Request) -> https_fn.Response:
             headers=headers
         )
         
+# ... (sopra rimane tutto uguale fino alla fine di run_simulation)
+
 @https_fn.on_request(
     memory=options.MemoryOption.MB_256,
     region="us-central1"
 )
 def get_nations(request: https_fn.Request) -> https_fn.Response:
-    # Gestione CORS per permettere al sito (Vercel/Firebase Hosting) di leggere i dati
+    # --- GESTIONE CORS ---
     headers = {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET',
+        'Access-Control-Allow-Methods': 'GET, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type',
         'Content-Type': 'application/json'
     }
@@ -205,10 +207,10 @@ def get_nations(request: https_fn.Request) -> https_fn.Response:
 
     try:
         from config import db
-        # Prende tutti i valori unici dal campo "country" che abbiamo appena popolato
+        # Questa è la modifica: cerchiamo i valori unici nella collezione h2h_by_round
         nations = db.h2h_by_round.distinct("country")
         
-        # Pulizia: rimuove eventuali valori vuoti e ordina alfabeticamente
+        # Pulizia e ordinamento
         valid_nations = sorted([n for n in nations if n])
         
         return https_fn.Response(json.dumps(valid_nations), headers=headers)
