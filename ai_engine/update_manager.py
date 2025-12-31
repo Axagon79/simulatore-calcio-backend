@@ -58,26 +58,26 @@ SCRAPER_SEQUENCE = [
       # ⭐ NUOVO SCRIPT DI DEBUG PER FIX MATCHING QUOTE NOWGOAL
       ("debug_nowgoal_scraper.py", "🚀 [14/14] Fix Quote H2H Debug (NowGoal)", "Mancano le quote precise nel CSV", FREQUENT_DIR),
       
-      # ⭐ NUOVO SCRIPT DI DEBUG PER AGGIORNARE SOLO I RISULTATI
-      ("per_agg_pianificato_update_results_only.py", "🔄 [15/15] Aggiorna Solo Risultati (Debug)", "Aggiorna solo i risultati senza toccare altro", FREQUENT_DIR),
-      
       # NUOVO SCRIPT DI DEBUG PER AGGIORNARE SOLO IL LUCIFERO
-      ("cron_update_lucifero.py", "🔥 [16/16] Aggiorna Solo Lucifero (Debug)", "Aggiorna solo il punteggio Lucifero", FREQUENT_DIR),
+      ("cron_update_lucifero.py", "🔥 [15/15] Aggiorna Solo Lucifero (Debug)", "Aggiorna solo il punteggio Lucifero", FREQUENT_DIR),
       
       # NUOVO SCRIPT DI DEBUG PER AGGIORNARE SOLO IL BVS
-      ("db_updater_bvs.py", "💎 [17/17] Aggiorna Solo BVS (Debug)", "Aggiorna solo il punteggio BVS", FREQUENT_DIR),
+      ("db_updater_bvs.py", "💎 [16/16] Aggiorna Solo BVS (Debug)", "Aggiorna solo il punteggio BVS", FREQUENT_DIR),
       
       # NUOVO SCRIPT DI DEBUG PER AGGIORNARE SOLO LE CLASSIFICHE
       ("scraper_classifiche_standings.py", "🏆 [18/18] Aggiorna Solo Classifiche (Debug)", "Aggiorna solo le classifiche", FREQUENT_DIR),
       
       # NUOVO SCRIPT DI DEBUG PER AGGIORNARE IL DNA System (ATT/DEF/TEC/VAL) e le FORMAZIONI
-      ("run_all_injectors.py", "🎩 [19/19] Aggiorna DNA System Completo (Debug)", "Aggiorna ATT/DEF/TEC/VAL e FORMAZIONI", FREQUENT_DIR),
+      ("run_all_injectors.py", "🎩 [17/17] Aggiorna DNA System Completo (Debug)", "Aggiorna ATT/DEF/TEC/VAL e FORMAZIONI", FREQUENT_DIR),
       
       # NUOVO SCRIPT DI DEBUG PER AGGIORNARE IL FATT. CAMPO
-      ("update_fattore_campo.py", "🏟️ [20/20] Aggiorna Fattore Campo (Debug)", "Aggiorna il fattore campo per tutte le partite", FREQUENT_DIR),
+      ("update_fattore_campo.py", "🏟️ [18/18] Aggiorna Fattore Campo (Debug)", "Aggiorna il fattore campo per tutte le partite", FREQUENT_DIR),
       
       # NUOVO SCRIPT DI DEBUG PER AGGIORNARE L'AFFIDABILITÀ
-      ("update_affidabilità.py", "🔥 [21/21] Aggiorna Affidabilità (Debug)", "Aggiorna l'affidabilità delle squadre", FREQUENT_DIR),
+      ("update_affidabilità.py", "🔥 [19/19] Aggiorna Affidabilità (Debug)", "Aggiorna l'affidabilità delle squadre", FREQUENT_DIR),
+      
+      # ⭐ NUOVO SCRIPT DI DEBUG PER AGGIORNARE SOLO I RISULTATI
+      ("per_agg_pianificato_update_results_only.py", "🔄 [20/20] Aggiorna Solo Risultati (Debug)", "Aggiorna solo i risultati senza toccare altro", FREQUENT_DIR),
 ]
 
 
