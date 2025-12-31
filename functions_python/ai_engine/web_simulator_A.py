@@ -315,12 +315,15 @@ def main():
         else:
             result = {"success": False, "error": "Solo modalità Singola (4) supportata"}
 
+        # --- TROVA QUESTA PARTE NEL MAIN E SOSTITUISCILA ---
         final_output = {
             "success": result.get("success", False),
             "timestamp": datetime.now().isoformat(),
             "execution_time": (datetime.now() - start_time).total_seconds(),
-            "result": result 
+            # Questo unisce tutto il contenuto di result al livello principale
+            **{k: v for k, v in result.items() if k != "success"} 
         }
+        
         print(json.dumps(final_output, ensure_ascii=False), flush=True)
 
     except Exception as e:
