@@ -1,12 +1,23 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-web_simulator_A.py - VERSIONE DEFINITIVA PRO (FULL STATS & BETTING)
-Generatore di Match Anatomy, Cronaca Live e Report Scommesse (Italiano)
-"""
 
 import os
 import sys
+
+# --- 1. SPOSTA QUESTO BLOCCO PRIMA DI OGNI ALTRO IMPORT ---
+# Determiniamo il percorso assoluto della cartella corrente (ai_engine)
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Aggiungiamo la cartella corrente ai percorsi di ricerca di Python
+if CURRENT_DIR not in sys.path:
+    sys.path.insert(0, CURRENT_DIR)
+
+# Aggiungiamo anche la radice (functions_python) per sicurezza
+PARENT_DIR = os.path.dirname(CURRENT_DIR)
+if PARENT_DIR not in sys.path:
+    sys.path.insert(0, PARENT_DIR)
+
+# --- 2. ORA PUOI IMPORTARE IL TUO MODULO SENZA ERRORI ---
 import json
 import random
 from betting_logic import analyze_betting_data
