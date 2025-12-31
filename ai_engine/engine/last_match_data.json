@@ -1,57 +1,57 @@
 {
-    "MATCH": "Juventus vs Inter",
+    "MATCH": "Milan vs Sassuolo",
     "CASA": {
-        "Squadra": "Juventus",
+        "Squadra": "AC Milan",
         "Modulo": "3-5-2",
-        "Rating": "18.06/25",
+        "Rating": "19.06/25",
         "1_TITOLARI": [
-            "GK - Michele Di Gregorio (7.0)",
-            "DIF - Pierre Kalulu (6.6)",
-            "DIF - Lloyd Kelly (6.9)",
-            "DIF - Andrea Cambiaso (6.7)",
-            "MID - Manuel Locatelli (7.5)",
-            "MID - Kh\u00e9phren Thuram (7.1)",
-            "MID - Teun Koopmeiners (6.5)",
-            "MID - Weston McKennie (6.3)",
-            "MID - Edon Zhegrova (5.5)",
-            "ATT - Kenan Y\u0131ld\u0131z (7.3)",
-            "ATT - Francisco Concei\u00e7\u00e3o (6.1)"
+            "GK - Mike Maignan (7.9)",
+            "DIF - Alexis Saelemaekers (7.6)",
+            "DIF - Strahinja Pavlovi\u0107 (6.9)",
+            "DIF - Matteo Gabbia (5.9)",
+            "MID - Luka Modri\u0107 (7.3)",
+            "MID - Youssouf Fofana (6.5)",
+            "MID - Adrien Rabiot (7.7)",
+            "MID - Samuele Ricci (7.8)",
+            "MID - Ardon Jashari (7.8)",
+            "ATT - Rafael Le\u00e3o (7.5)",
+            "ATT - Ruben Loftus-Cheek (5.5)"
         ],
         "2_PANCHINA": [
-            "GK - Mattia Perin (6.4)",
-            "DIF (da MID) - Vasilije Ad\u017ei\u0107 (6.6)",
-            "DIF (da MID) - Fabio Miretti (7.6)",
-            "MID (da DIF) - Federico Gatti (6.3)",
-            "MID (da DIF) - Gleison Bremer (6.4)",
-            "ATT - Du\u0161an Vlahovi\u0107 (6.5)",
-            "ATT - Jonathan David (6.0)"
+            "GK - Pietro Terracciano (8.0)",
+            "DIF - Fikayo Tomori (8.0)",
+            "DIF - Davide Bartesaghi (6.9)",
+            "MID (da DIF) - Koni De Winter (6.7)",
+            "MID (da DIF) - Pervis Estupi\u00f1\u00e1n (6.4)",
+            "ATT - Santiago Gim\u00e9nez (4.9)",
+            "ATT - Christopher Nkunku (6.2)"
         ]
     },
     "OSPITE": {
-        "Squadra": "Inter",
-        "Modulo": "3-5-2",
-        "Rating": "19.34/25",
+        "Squadra": "Sassuolo",
+        "Modulo": "4-3-3",
+        "Rating": "17.92/25",
         "1_TITOLARI": [
-            "GK - Yann Sommer (6.3)",
-            "DIF - Alessandro Bastoni (7.8)",
-            "DIF - Manuel Akanji (6.7)",
-            "DIF - Federico Dimarco (6.6)",
-            "MID - Nicol\u00f2 Barella (7.6)",
-            "MID - Hakan \u00c7alhano\u011flu (8.0)",
-            "MID - Petar Sucic (7.5)",
-            "MID - Henrikh Mkhitaryan (6.7)",
-            "MID - Piotr Zieli\u0144ski (7.9)",
-            "ATT - Lautaro Mart\u00ednez (7.6)",
-            "ATT - Marcus Thuram (7.7)"
+            "GK - Arijanet Muric (7.6)",
+            "DIF - Jay Idzes (6.5)",
+            "DIF - Sebastian Walukiewicz (6.8)",
+            "DIF - Tarik Muharemovic (7.2)",
+            "DIF - Josh Doig (7.1)",
+            "MID - Nemanja Mati\u0107 (6.8)",
+            "MID - Isma\u00ebl Kon\u00e9 (6.6)",
+            "MID - Kristian Thorstvedt (5.9)",
+            "ATT - Andrea Pinamonti (6.0)",
+            "ATT - Armand Lauriente (6.3)",
+            "ATT - Domenico Berardi (6.7)"
         ],
         "2_PANCHINA": [
-            "GK - Josep Martinez (7.8)",
-            "DIF - Francesco Acerbi (6.7)",
-            "DIF - Denzel Dumfries (6.4)",
-            "MID - Andy Diouf (6.7)",
-            "MID (da DIF) - Carlos Augusto (7.2)",
-            "ATT - Francesco Esposito (6.2)",
-            "ATT - Ange-Yoan Bonny (8.7)"
+            "GK - Stefano Turati (5.5)",
+            "DIF - Fali Cand\u00e9 (7.0)",
+            "DIF - Woyo Coulibaly (6.9)",
+            "MID - Aster Vranckx (6.0)",
+            "MID - Luca Lipani (5.5)",
+            "ATT - Cristian Volpato (6.5)",
+            "ATT - Alieu Fadera (5.9)"
         ]
     }
 }

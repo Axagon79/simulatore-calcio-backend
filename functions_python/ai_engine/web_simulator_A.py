@@ -9,6 +9,7 @@ import os
 import sys
 import json
 import random
+from betting_logic import analyze_betting_data
 import math  # <--- AGGIUNGI QUESTA RIGA
 from datetime import datetime
 
@@ -274,23 +275,34 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
         # Usiamo la tua funzione esistente
         anatomy = genera_match_report_completo(gh, ga, h2h_data, team_h_doc, team_a_doc, sim_list, deep_stats)
 
-        # Creazione dell'oggetto risultato
+        # PULIZIA FINALE: Rimuove i NaN prima di inviare al frontend
+        #
+        quote_match = {
+            "1": team_h_doc.get('odds', {}).get('1'),
+            "X": team_h_doc.get('odds', {}).get('X'),
+            "2": team_h_doc.get('odds', {}).get('2')
+        }
+
+        # 2. CHIAMATA AL CERVELLO (Betting Logic)
+        # Passiamo la 'sim_list' (la lista di tutti i 1000+ risultati) e le quote
+        report_pro = analyze_betting_data(sim_list, quote_match)
+
+        # 3. INTEGRAZIONE NEL RISULTATO FINALE
         raw_result = {
             "success": True,
-            "predicted_score": f"{gh}-{ga}", "gh": gh, "ga": ga,
-            "sign": get_sign(gh, ga), "top3": top3,
+            "predicted_score": f"{gh}-{ga}",
+            "gh": gh,
+            "ga": ga,
             "algo_name": ALGO_NAMES.get(algo_id, "Custom"),
             "statistiche": anatomy["statistiche"],
             "cronaca": anatomy["cronaca"],
-            "report_scommesse": anatomy["report_scommesse"],
+            # AGGIUNGIAMO IL REPORT PROFESSIONALE QUI
+            "report_scommesse_pro": report_pro, 
             "info_extra": {
                 "valore_mercato": f"{team_h_doc.get('stats', {}).get('marketValue', 0) // 1000000}M €",
-                "motivazione": team_h_doc.get('ranking_c', {}).get('motivation', 'N/D')
+                "motivazione": "Analisi Monte Carlo con rilevamento Value Bet e Dispersione."
             }
         }
-
-        # PULIZIA FINALE: Rimuove i NaN prima di inviare al frontend
-        # 
         return sanitize_data(raw_result)
 
     except Exception as e:

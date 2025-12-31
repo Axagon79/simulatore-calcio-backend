@@ -1,164 +1,20 @@
 {
-  "generated_at": "2025-12-28T23:36:38.639843",
+  "generated_at": "2025-12-31T14:36:37.833829",
   "total_matches": 1,
   "matches": [
     {
-      "home_team": "Lazio",
-      "away_team": "Cremonese",
+      "home_team": "Milan",
+      "away_team": "Sassuolo",
       "league": "Serie A",
-      "date": "2025-12-20",
-      "real_result": "0-0",
-      "real_gh": 0,
-      "real_ga": 0,
+      "date": "2025-12-14",
+      "real_result": "2-2",
+      "real_gh": 2,
+      "real_ga": 2,
       "algorithms": {
-        "4": {
+        "5": {
           "results": [
             [
-              4,
-              1
-            ],
-            [
-              4,
-              2
-            ],
-            [
               2,
-              1
-            ],
-            [
-              4,
-              2
-            ],
-            [
-              3,
-              0
-            ],
-            [
-              0,
-              2
-            ],
-            [
-              4,
-              0
-            ],
-            [
-              3,
-              0
-            ],
-            [
-              2,
-              2
-            ],
-            [
-              3,
-              1
-            ],
-            [
-              1,
-              3
-            ],
-            [
-              2,
-              0
-            ],
-            [
-              1,
-              1
-            ],
-            [
-              1,
-              0
-            ],
-            [
-              2,
-              1
-            ],
-            [
-              5,
-              0
-            ],
-            [
-              2,
-              2
-            ],
-            [
-              2,
-              0
-            ],
-            [
-              3,
-              4
-            ],
-            [
-              4,
-              1
-            ],
-            [
-              3,
-              4
-            ],
-            [
-              4,
-              0
-            ],
-            [
-              1,
-              0
-            ],
-            [
-              1,
-              1
-            ],
-            [
-              4,
-              0
-            ],
-            [
-              2,
-              2
-            ],
-            [
-              1,
-              2
-            ],
-            [
-              4,
-              1
-            ],
-            [
-              3,
-              1
-            ],
-            [
-              4,
-              0
-            ],
-            [
-              3,
-              2
-            ],
-            [
-              3,
-              1
-            ],
-            [
-              1,
-              1
-            ],
-            [
-              4,
-              0
-            ],
-            [
-              1,
-              3
-            ],
-            [
-              0,
-              3
-            ],
-            [
-              1,
               1
             ],
             [
@@ -166,15 +22,19 @@
               4
             ],
             [
-              3,
-              2
-            ],
-            [
-              3,
-              1
+              1,
+              0
             ],
             [
               5,
+              3
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              0,
               2
             ],
             [
@@ -182,11 +42,47 @@
               1
             ],
             [
-              6,
+              2,
+              2
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              3
+            ],
+            [
+              5,
+              4
+            ],
+            [
+              1,
+              3
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              3,
               1
             ],
             [
               2,
+              2
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              3,
               0
             ],
             [
@@ -194,143 +90,199 @@
               2
             ],
             [
-              2,
-              0
-            ],
-            [
-              3,
-              1
-            ],
-            [
-              3,
+              1,
               2
             ],
             [
-              4,
-              3
-            ],
-            [
-              3,
-              0
-            ],
-            [
               2,
               1
             ],
             [
-              5,
-              5
-            ],
-            [
-              3,
-              0
-            ],
-            [
-              5,
+              1,
               1
             ],
             [
-              3,
-              1
-            ],
-            [
-              2,
+              1,
               3
-            ],
-            [
-              7,
-              0
-            ],
-            [
-              5,
-              1
-            ],
-            [
-              3,
-              0
-            ],
-            [
-              3,
-              0
             ],
             [
               4,
               2
             ],
             [
-              6,
+              0,
+              2
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              4,
+              0
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              0,
+              2
+            ],
+            [
+              3,
+              3
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              0,
+              2
+            ],
+            [
+              3,
+              3
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              6
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              1,
+              3
+            ],
+            [
+              0,
+              2
+            ],
+            [
+              2,
               4
             ],
             [
               3,
-              1
-            ],
-            [
-              3,
-              1
+              3
             ],
             [
               2,
-              2
+              1
             ],
             [
-              2,
-              0
+              1,
+              3
             ],
             [
               1,
               1
             ],
             [
-              4,
-              1
-            ],
-            [
-              3,
-              0
-            ],
-            [
               2,
-              2
-            ],
-            [
-              5,
-              1
+              3
             ],
             [
               1,
-              2
-            ],
-            [
-              2,
-              2
-            ],
-            [
-              4,
-              0
-            ],
-            [
-              3,
-              2
-            ],
-            [
-              1,
-              1
-            ],
-            [
-              3,
-              2
-            ],
-            [
-              0,
-              0
-            ],
-            [
-              3,
-              1
-            ],
-            [
-              0,
               2
             ],
             [
@@ -338,6 +290,82 @@
               3
             ],
             [
+              0,
+              3
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              3,
+              0
+            ],
+            [
+              0,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              1,
+              3
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              1,
+              3
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              1,
+              3
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              0,
+              2
+            ],
+            [
               5,
               0
             ],
@@ -346,47 +374,39 @@
               0
             ],
             [
-              3,
-              1
-            ],
-            [
-              3,
+              1,
               2
             ],
             [
               2,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              0,
+              4
+            ],
+            [
+              5,
               0
             ],
             [
-              4,
+              1,
               1
             ],
             [
-              6,
-              1
+              0,
+              2
             ],
             [
               2,
-              1
+              3
             ],
             [
               2,
-              1
-            ],
-            [
-              3,
-              1
-            ],
-            [
-              3,
-              5
-            ],
-            [
-              2,
-              1
-            ],
-            [
-              6,
               2
             ],
             [
@@ -394,27 +414,7 @@
               0
             ],
             [
-              4,
-              2
-            ],
-            [
               1,
-              0
-            ],
-            [
-              1,
-              1
-            ],
-            [
-              2,
-              0
-            ],
-            [
-              2,
-              0
-            ],
-            [
-              3,
               1
             ]
           ],
@@ -422,363 +422,356 @@
           "stats": {
             "total_simulations": 101,
             "home_goals_distribution": {
-              "0": 7,
-              "1": 15,
-              "2": 22,
-              "3": 29,
-              "4": 16,
-              "5": 7,
-              "6": 4,
-              "7": 1
+              "0": 18,
+              "1": 37,
+              "2": 29,
+              "3": 11,
+              "4": 2,
+              "5": 4
             },
             "away_goals_distribution": {
-              "0": 30,
-              "1": 36,
-              "2": 23,
-              "3": 6,
+              "0": 15,
+              "1": 35,
+              "2": 24,
+              "3": 22,
               "4": 4,
-              "5": 2
+              "6": 1
             },
             "exact_scores": {
-              "4-1": 5,
-              "4-2": 4,
-              "2-1": 6,
-              "3-0": 8,
-              "0-2": 3,
-              "4-0": 6,
-              "2-2": 6,
-              "3-1": 12,
-              "1-3": 2,
-              "2-0": 8,
-              "1-1": 8,
-              "1-0": 3,
-              "5-0": 2,
-              "3-4": 2,
-              "1-2": 2,
-              "3-2": 6,
+              "2-1": 9,
+              "2-4": 2,
+              "1-0": 5,
+              "5-3": 1,
+              "2-2": 7,
+              "0-2": 9,
+              "1-1": 16,
+              "0-1": 5,
+              "1-3": 8,
+              "5-4": 1,
+              "2-3": 8,
+              "3-1": 5,
+              "3-0": 3,
+              "1-2": 7,
+              "4-2": 1,
+              "2-0": 3,
+              "4-0": 1,
+              "3-3": 3,
+              "1-6": 1,
               "0-3": 2,
-              "2-4": 1,
-              "5-2": 1,
-              "6-1": 2,
-              "4-3": 1,
-              "5-5": 1,
-              "5-1": 3,
-              "2-3": 1,
-              "7-0": 1,
-              "6-4": 1,
-              "0-0": 2,
-              "3-5": 1,
-              "6-2": 1
+              "5-0": 2,
+              "0-4": 1,
+              "0-0": 1
             },
             "top_10_scores": [
               [
-                "3-1",
-                12
-              ],
-              [
-                "3-0",
-                8
-              ],
-              [
-                "2-0",
-                8
-              ],
-              [
                 "1-1",
-                8
+                16
               ],
               [
                 "2-1",
-                6
+                9
               ],
               [
-                "4-0",
-                6
+                "0-2",
+                9
+              ],
+              [
+                "1-3",
+                8
+              ],
+              [
+                "2-3",
+                8
               ],
               [
                 "2-2",
-                6
+                7
               ],
               [
-                "3-2",
-                6
+                "1-2",
+                7
               ],
               [
-                "4-1",
+                "1-0",
                 5
               ],
               [
-                "4-2",
-                4
+                "0-1",
+                5
+              ],
+              [
+                "3-1",
+                5
               ]
             ],
             "sign_1": {
-              "count": 70,
-              "pct": 69.31
+              "count": 31,
+              "pct": 30.69
             },
             "sign_x": {
-              "count": 17,
-              "pct": 16.83
+              "count": 27,
+              "pct": 26.73
             },
             "sign_2": {
-              "count": 14,
-              "pct": 13.86
+              "count": 43,
+              "pct": 42.57
             },
             "gg": {
-              "count": 66,
-              "pct": 65.35
+              "count": 69,
+              "pct": 68.32
             },
             "ng": {
-              "count": 35,
-              "pct": 34.65
+              "count": 32,
+              "pct": 31.68
             },
             "under_over": {
               "U0.5": {
-                "count": 2,
-                "pct": 1.98
+                "count": 1,
+                "pct": 0.99
               },
               "O0.5": {
-                "count": 99,
-                "pct": 98.02
+                "count": 100,
+                "pct": 99.01
               },
               "U1.5": {
-                "count": 5,
-                "pct": 4.95
+                "count": 11,
+                "pct": 10.89
               },
               "O1.5": {
-                "count": 96,
-                "pct": 95.05
-              },
-              "U2.5": {
-                "count": 24,
-                "pct": 23.76
-              },
-              "O2.5": {
-                "count": 77,
-                "pct": 76.24
-              },
-              "U3.5": {
-                "count": 42,
-                "pct": 41.58
-              },
-              "O3.5": {
-                "count": 59,
-                "pct": 58.42
-              },
-              "U4.5": {
-                "count": 68,
-                "pct": 67.33
-              },
-              "O4.5": {
-                "count": 33,
-                "pct": 32.67
-              },
-              "U5.5": {
-                "count": 82,
-                "pct": 81.19
-              },
-              "O5.5": {
-                "count": 19,
-                "pct": 18.81
-              },
-              "U6.5": {
                 "count": 90,
                 "pct": 89.11
               },
+              "U2.5": {
+                "count": 39,
+                "pct": 38.61
+              },
+              "O2.5": {
+                "count": 62,
+                "pct": 61.39
+              },
+              "U3.5": {
+                "count": 60,
+                "pct": 59.41
+              },
+              "O3.5": {
+                "count": 41,
+                "pct": 40.59
+              },
+              "U4.5": {
+                "count": 82,
+                "pct": 81.19
+              },
+              "O4.5": {
+                "count": 19,
+                "pct": 18.81
+              },
+              "U5.5": {
+                "count": 92,
+                "pct": 91.09
+              },
+              "O5.5": {
+                "count": 9,
+                "pct": 8.91
+              },
+              "U6.5": {
+                "count": 98,
+                "pct": 97.03
+              },
               "O6.5": {
-                "count": 11,
-                "pct": 10.89
+                "count": 3,
+                "pct": 2.97
               }
             },
             "home_scored": {
-              "count": 94,
-              "pct": 93.07
+              "count": 83,
+              "pct": 82.18
             },
             "home_not_scored": {
-              "count": 7,
-              "pct": 6.93
+              "count": 18,
+              "pct": 17.82
             },
-            "home_avg_goals": 2.733,
+            "home_avg_goals": 1.545,
             "away_scored": {
-              "count": 71,
-              "pct": 70.3
+              "count": 86,
+              "pct": 85.15
             },
             "away_not_scored": {
-              "count": 30,
-              "pct": 29.7
+              "count": 15,
+              "pct": 14.85
             },
-            "away_avg_goals": 1.248,
+            "away_avg_goals": 1.693,
             "confidence": {
               "gol": {
                 "home": {
-                  "std": 1.521,
-                  "confidence": 62.0
+                  "std": 1.19,
+                  "confidence": 70.2
                 },
                 "away": {
-                  "std": 1.172,
-                  "confidence": 70.7
+                  "std": 1.175,
+                  "confidence": 70.6
                 },
                 "total": {
-                  "std": 1.904,
-                  "confidence": 71.4
+                  "std": 1.618,
+                  "confidence": 75.7
                 },
-                "variance_ratio": 1.68,
+                "variance_ratio": 1.03,
                 "variance_comparison": "Casa > Ospite",
-                "category_confidence": 68.0
+                "category_confidence": 72.2
               },
               "segni": {
                 "sign_1": {
-                  "percentage": 69.3,
+                  "percentage": 30.7,
                   "confidence": 80.7
                 },
                 "sign_x": {
-                  "percentage": 16.8,
-                  "confidence": 66.8
+                  "percentage": 26.7,
+                  "confidence": 76.7
                 },
                 "sign_2": {
-                  "percentage": 13.9,
-                  "confidence": 63.9
+                  "percentage": 42.6,
+                  "confidence": 92.6
                 },
-                "most_probable": "1",
-                "most_probable_confidence": 69.3,
+                "most_probable": "2",
+                "most_probable_confidence": 39.2,
                 "margins": {
-                  "home_wins_avg": 2.5,
-                  "away_wins_avg": 1.79
+                  "home_wins_avg": 1.87,
+                  "away_wins_avg": 1.7
                 },
                 "top10_distribution": {
-                  "sign_1_count": 8,
+                  "sign_1_count": 3,
                   "sign_x_count": 2,
-                  "sign_2_count": 0,
+                  "sign_2_count": 5,
                   "sign_1_positions": [
-                    1,
                     2,
-                    3,
-                    5,
-                    6,
                     8,
-                    9,
                     10
                   ],
                   "sign_x_positions": [
-                    4,
-                    7
+                    1,
+                    6
                   ],
-                  "sign_2_positions": [],
-                  "dominance_pct": 80.0
+                  "sign_2_positions": [
+                    3,
+                    4,
+                    5,
+                    7,
+                    9
+                  ],
+                  "dominance_pct": 50.0
                 },
                 "anomaly": {
-                  "detected": false,
-                  "message": ""
+                  "detected": true,
+                  "message": "Risultato 'X' in posizione #1 nonostante bassa probabilità generale (26.7%)"
                 },
-                "category_confidence": 70.5
+                "category_confidence": 83.3
               },
               "gg_ng": {
-                "confidence": 52.4,
-                "std": 0.476,
-                "prob_gg": 65.3
+                "confidence": 53.5,
+                "std": 0.465,
+                "prob_gg": 68.3
               },
               "under_over": {
                 "U/O0.5": {
-                  "confidence": 86.1,
-                  "std": 0.139
+                  "confidence": 90.1,
+                  "std": 0.099
                 },
                 "U/O1.5": {
-                  "confidence": 78.3,
-                  "std": 0.217
+                  "confidence": 68.8,
+                  "std": 0.312
                 },
                 "U/O2.5": {
-                  "confidence": 57.4,
-                  "std": 0.426
+                  "confidence": 51.3,
+                  "std": 0.487
                 },
                 "U/O3.5": {
-                  "confidence": 50.7,
-                  "std": 0.493
+                  "confidence": 50.9,
+                  "std": 0.491
                 }
               },
               "most_reliable_uo": {
                 "threshold": "U/O0.5",
-                "confidence": 86.1
+                "confidence": 90.1
               },
               "multigol": {
                 "home": {
-                  "range": "1-3",
-                  "occurrences": 66,
-                  "confidence": 65.3
+                  "range": "0-2",
+                  "occurrences": 84,
+                  "confidence": 83.2
                 },
                 "away": {
-                  "range": "0-2",
-                  "occurrences": 89,
-                  "confidence": 88.1
+                  "range": "1-3",
+                  "occurrences": 81,
+                  "confidence": 80.2
                 },
-                "category_confidence": 76.7
+                "category_confidence": 81.7
               },
               "exact_scores_analysis": {
-                "concentration_top3": 27.7,
-                "entropy": 4.43
+                "concentration_top3": 33.7,
+                "entropy": 4.05
               },
               "exotic": {
                 "pari_dispari": {
-                  "confidence": 50.7,
-                  "std": 0.493,
-                  "pct_dispari": 41.6
+                  "confidence": 50.6,
+                  "std": 0.494,
+                  "pct_dispari": 42.6
                 },
                 "clean_sheet": {
-                  "confidence": 54.3,
-                  "home_pct": 27.7,
-                  "away_pct": 5.0
+                  "confidence": 64.4,
+                  "home_pct": 13.9,
+                  "away_pct": 16.8
                 }
               },
               "advanced": {
-                "correlation_home_away": -0.018,
+                "correlation_home_away": -0.065,
                 "skewness": {
-                  "home": 0.29,
-                  "away": 1.06
+                  "home": 0.93,
+                  "away": 0.58
                 },
                 "kurtosis": {
-                  "home": -0.14,
-                  "away": 1.0
+                  "home": 0.94,
+                  "away": 0.39
                 },
                 "variance": {
-                  "home": 2.315,
-                  "away": 1.374,
-                  "ratio": 1.68
+                  "home": 1.416,
+                  "away": 1.381,
+                  "ratio": 1.03
                 }
               },
               "categories": {
-                "gol": 68.0,
-                "segni": 70.5,
-                "gg_ng": 52.4,
-                "under_over": 68.1,
-                "multigol": 76.7
+                "gol": 72.2,
+                "segni": 83.3,
+                "gg_ng": 53.5,
+                "under_over": 65.3,
+                "multigol": 81.7
               },
-              "global_confidence": 68.0,
+              "global_confidence": 72.2,
               "most_reliable_market": {
-                "name": "MULTIGOL",
-                "confidence": 76.7
+                "name": "SEGNI",
+                "confidence": 83.3
               },
               "least_reliable_market": {
                 "name": "GG_NG",
-                "confidence": 52.4
+                "confidence": 53.5
               },
-              "home_std": 1.521,
-              "away_std": 1.172,
-              "total_std": 1.904,
-              "home_confidence": 62.0,
-              "away_confidence": 70.7,
-              "total_confidence": 71.4
+              "home_std": 1.19,
+              "away_std": 1.175,
+              "total_std": 1.618,
+              "home_confidence": 70.2,
+              "away_confidence": 70.6,
+              "total_confidence": 75.7
             },
             "accuracy": {
-              "predicted_score": "3-1",
-              "real_score": "0-0",
+              "predicted_score": "1-1",
+              "real_score": "2-2",
               "exact_match": false,
-              "sign_correct": false,
+              "sign_correct": true,
               "home_goals_correct": false,
               "away_goals_correct": false,
-              "gg_ng_correct": false,
+              "gg_ng_correct": true,
               "u25_correct": false,
-              "real_score_count": 2,
-              "real_score_pct": 1.98,
-              "real_score_rank": 20
+              "real_score_count": 7,
+              "real_score_pct": 6.93,
+              "real_score_rank": 6
             }
           }
         }

@@ -1,7 +1,7 @@
 
-=== ALGORITMO: CAOS ===
+=== ALGORITMO: MASTER ===
 League;Match;Data;Q1;QX;Q2;Real Score;Real Sign;PRED Score;PRED Sign;1X2 Outcome;Exact Score;U/O 2.5;GG/NG
-Serie A;Lazio vs Cremonese;20/12 18:00;1.55;3.8;6.25;0-0;X;3-1;1;LOSS;LOSS;OVER;GG
+Serie A;Milan vs Sassuolo;14/12 12:30;1.42;4.2;7.5;2-2;X;1-1;X;WIN;LOSS;UNDER;GG
 "--- PERCENTUALI ---
-(Su partite finite)";;;;;;;;0.0%;0.0%;;0.0%;;0.0%
+(Su partite finite)";;;;;;;;100.0%;0.0%;;0.0%;;100.0%
 
