@@ -29,6 +29,7 @@ from collections import Counter
 from datetime import datetime
 from .confidence_analyzer import ConfidenceCalculator
 from .confidence_html_builder import ConfidenceHTMLBuilder
+
 class DeepAnalyzer:
     """Analizzatore profondo per simulazioni Monte Carlo"""
     
@@ -122,6 +123,7 @@ class DeepAnalyzer:
         confidence_home = max(0, min(100, 100 - (std_home * 25)))
         confidence_away = max(0, min(100, 100 - (std_away * 25)))
         confidence_total = max(0, min(100, 100 - (std_total * 15)))
+        
         # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         # 1️⃣ DISTRIBUZIONE GOL ASSOLUTA
         # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -225,6 +227,7 @@ class DeepAnalyzer:
                 'real_score_pct': round(real_score_count / total * 100, 2),
                 'real_score_rank': real_score_rank or "N/A"
             }
+            
         # Merge confidence data con std
         confidence_data.update({
             'home_std': round(std_home, 3),

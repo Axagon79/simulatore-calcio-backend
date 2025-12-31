@@ -412,24 +412,69 @@ class ConfidenceCalculator:
         }
     
     def _calculate_advanced_metrics(self, home_goals_list, away_goals_list):
-        """Calcola metriche statistiche avanzate"""
+        """Calcola metriche statistiche avanzate (VERSIONE SICURA ANTI-CRASH)"""
         
-        # Correlazione
-        correlation = np.corrcoef(home_goals_list, away_goals_list)[0, 1] if len(home_goals_list) > 1 and len(away_goals_list) > 1 else 0.0
+        # 1. Calcolo preventivo delle deviazioni standard
+        # Usiamo ddof=1 per la deviazione campionaria, o 0 per la popolazione (default numpy)
+        std_h = np.std(home_goals_list)
+        std_a = np.std(away_goals_list)
+        epsilon = 1e-9 # Soglia minima per considerare la varianza valida
 
+        # 2. Correlazione Sicura
+        # Se una delle due squadre ha varianza 0 (ha fatto sempre gli stessi gol), la correlazione è 0
+        if std_h > epsilon and std_a > epsilon and len(home_goals_list) > 1:
+            try:
+                correlation = np.corrcoef(home_goals_list, away_goals_list)[0, 1]
+                if np.isnan(correlation): correlation = 0.0
+            except:
+                correlation = 0.0
+        else:
+            correlation = 0.0
+
+        # 3. Skewness Sicura (Asimmetria)
+        if std_h > epsilon:
+            try:
+                skew_home = float(scipy_stats.skew(home_goals_list))
+                if np.isnan(skew_home): skew_home = 0.0
+            except: skew_home = 0.0
+        else:
+            skew_home = 0.0
+
+        if std_a > epsilon:
+            try:
+                skew_away = float(scipy_stats.skew(away_goals_list))
+                if np.isnan(skew_away): skew_away = 0.0
+            except: skew_away = 0.0
+        else:
+            skew_away = 0.0
         
-        # Skewness
-        skew_home = scipy_stats.skew(home_goals_list)
-        skew_away = scipy_stats.skew(away_goals_list)
+        # 4. Kurtosis Sicura (Appiattimento)
+        if std_h > epsilon:
+            try:
+                kurt_home = float(scipy_stats.kurtosis(home_goals_list))
+                if np.isnan(kurt_home): kurt_home = 0.0
+            except: kurt_home = 0.0
+        else:
+            kurt_home = 0.0
+
+        if std_a > epsilon:
+            try:
+                kurt_away = float(scipy_stats.kurtosis(away_goals_list))
+                if np.isnan(kurt_away): kurt_away = 0.0
+            except: kurt_away = 0.0
+        else:
+            kurt_away = 0.0
         
-        # Kurtosis
-        kurt_home = scipy_stats.kurtosis(home_goals_list)
-        kurt_away = scipy_stats.kurtosis(away_goals_list)
-        
-        # Varianza
+        # 5. Varianza (Calcolo standard, non crasha mai ma gestiamo ratio)
         var_home = np.var(home_goals_list)
         var_away = np.var(away_goals_list)
-        var_ratio = var_home / var_away if var_away > 0 else 0
+        
+        # Ratio sicuro
+        if var_away > epsilon:
+            var_ratio = var_home / var_away
+        else:
+            # Se away ha varianza 0, se home ha varianza > 0 il ratio è alto, altrimenti 1
+            var_ratio = 10.0 if var_home > epsilon else 1.0
         
         return {
             'correlation_home_away': round(correlation, 3),
