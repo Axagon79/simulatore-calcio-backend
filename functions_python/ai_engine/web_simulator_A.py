@@ -449,7 +449,13 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
         if algo_id == 6:
             import ai_engine.universal_simulator as us
             us.MONTE_CARLO_TOTAL_CYCLES = cycles
-            res = run_monte_carlo_verdict_detailed(preloaded_data, home_team, away_team)
+            res = run_monte_carlo_verdict_detailed(
+                preloaded_data, 
+                home_team, 
+                away_team, 
+                analyzer=analyzer,
+                cycles=cycles  # ✅ PASSA I CICLI REALI
+            )
             gh, ga = res[0]
             
             # ✅ STAMPA DI DEBUG (rimuovi dopo il test)

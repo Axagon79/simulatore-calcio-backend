@@ -211,7 +211,15 @@ def run_single_algo_montecarlo(algo_id, preloaded_data, home_team, away_team, cy
 
 
 
-def run_monte_carlo_verdict_detailed(preloaded_data, home_team, away_team, analyzer=None, **kwargs):
+def run_monte_carlo_verdict_detailed(preloaded_data, home_team, away_team, analyzer=None, cycles=None, **kwargs):
+    """
+    ✅ NUOVO: Accetta il parametro cycles dal chiamante
+    """
+    # ✅ USA I CICLI PASSATI O IL DEFAULT
+    total_cycles = cycles if cycles is not None else MONTE_CARLO_TOTAL_CYCLES
+    cycles_per_algo = total_cycles // 4
+    
+    print(f"🎯 ESECUZIONE MONTE CARLO: {total_cycles} cicli totali ({cycles_per_algo} per algoritmo)", file=sys.stderr)
     
     """
     Versione SILENZIOSA con statistiche pesi aggregate.
