@@ -447,16 +447,19 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
         preloaded_data = preload_match_data(home_team, away_team)
         
         if algo_id == 6:
-            import ai_engine.universal_simulator as us
-            us.MONTE_CARLO_TOTAL_CYCLES = cycles
+        # ✅ PASSA ESPLICITAMENTE cycles e algo_id alla funzione
             res = run_monte_carlo_verdict_detailed(
                 preloaded_data, 
                 home_team, 
-                away_team, 
-                analyzer=analyzer,
-                cycles=cycles  # ✅ PASSA I CICLI REALI
+                away_team,
+                analyzer=analyzer,  # ✅ Passa l'analyzer
+                cycles=cycles,      # ✅ Passa i cicli REALI
+                algo_id=algo_id     # ✅ Passa l'ID algoritmo
             )
             gh, ga = res[0]
+            
+            # ✅ LOG DI VERIFICA
+            print(f"🎯 MONTE CARLO ESEGUITO: {cycles} cicli richiesti", file=sys.stderr)
             
             # ✅ STAMPA DI DEBUG (rimuovi dopo il test)
             print(f"🎯 RISULTATO FINALE: {gh}-{ga}", file=sys.stderr)
@@ -478,12 +481,26 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
             top3 = [x[0] for x in res[2]]
             cronaca = res[1] if len(res) > 1 else [] # Recupero cronaca se disponibile
         else:
-            gh, ga = run_single_algo(algo_id, preloaded_data, home_team, away_team)
-            sim_list = [f"{gh}-{ga}"] * cycles
-            top3 = [f"{gh}-{ga}"]
-            cronaca = []
+            # ✅ LOG DI VERIFICA
+            print(f"🎯 ALGORITMO {algo_id} ESEGUITO: {cycles} cicli richiesti", file=sys.stderr)
             
-            actual_cycles_executed = cycles  # ✅ Per gli altri algoritmi
+            # ✅ ESEGUI IL SINGOLO ALGORITMO "cycles" VOLTE
+            sim_list = []
+            for i in range(cycles):
+                gh_temp, ga_temp = run_single_algo(algo_id, preloaded_data, home_team, away_team)
+                sim_list.append(f"{gh_temp}-{ga_temp}")
+                
+                # Aggiungi al deep analyzer
+                if analyzer:
+                    analyzer.add_result(algo_id, gh_temp, ga_temp)
+            
+            # Calcola il risultato più frequente
+            from collections import Counter
+            most_common = Counter(sim_list).most_common(1)[0][0]
+            gh, ga = map(int, most_common.split("-"))
+            top3 = [x[0] for x in Counter(sim_list).most_common(3)]
+            cronaca = []
+            actual_cycles_executed = cycles
 
         # 2. INTEGRAZIONE DEEP ANALYSIS
         analyzer = DeepAnalyzer()
