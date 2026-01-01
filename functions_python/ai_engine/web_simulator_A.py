@@ -61,26 +61,26 @@ def sanitize_data(data):
             return 0.0
     return data
 
-def ottieni_nomi_giocatori(team_h, team_a, h2h_data):
-    """Estrae i nomi dei giocatori dalle formazioni"""
+def ottieni_nomi_giocatori(h2h_data):
+    """Estrae i nomi dei giocatori dalle formazioni del database"""
     formazioni = h2h_data.get('formazioni', {})
     
     titolari_h = formazioni.get('home_squad', {}).get('titolari', [])
     titolari_a = formazioni.get('away_squad', {}).get('titolari', [])
     
     # Estrai attaccanti/centrocampisti (più probabili marcatori)
-    def filtra_attaccanti(squad):
+    def filtra_marcatori(squad):
         nomi = []
         for p in squad:
-            ruolo = p.get('position', '')
-            if ruolo in ['FW', 'MF', 'AM', 'ST', 'CF']:
-                nome = p.get('name', 'Giocatore')
-                # Prendi solo cognome
+            ruolo = p.get('role', '')  # ✅ CORRETTO: 'role' non 'position'
+            if ruolo in ['ATT', 'MID']:  # ✅ CORRETTO: usa i valori del tuo DB
+                nome = p.get('player', 'Giocatore')  # ✅ CORRETTO: 'player' non 'name'
+                # Prendi solo cognome (ultima parola)
                 nome_parts = nome.split()
                 nomi.append(nome_parts[-1] if nome_parts else 'Giocatore')
-        return nomi if nomi else ['Giocatore']
+        return nomi if nomi else ['Attaccante', 'Centrocampista', 'Ala']
     
-    return filtra_attaccanti(titolari_h), filtra_attaccanti(titolari_a)
+    return filtra_marcatori(titolari_h), filtra_marcatori(titolari_a)
 
 def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
     """
@@ -172,9 +172,8 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
     minuti_usati.update([0, 45, 45 + recupero_pt, 90])
     
     # --- 2. GOL SINCRONIZZATI (ESATTAMENTE gh per casa, ga per ospite) ---
-    # Lista marcatori di fallback
-    marcatori_casa = ["Attaccante", "Centrocampista", "Ala", "Trequartista", "Bomber"]
-    marcatori_ospite = ["Attaccante", "Centrocampista", "Ala", "Trequartista", "Bomber"]
+    # ✅ Estrai nomi REALI dai dati del database
+    marcatori_casa, marcatori_ospite = ottieni_nomi_giocatori(h2h_data)
     
     # GOL CASA
     for i in range(gh):
