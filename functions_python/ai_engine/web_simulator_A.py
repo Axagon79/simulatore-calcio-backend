@@ -161,6 +161,45 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
     ]
     
     # --- 1. EVENTI SISTEMA ---
+    # --- 1. EVENTI SISTEMA E FORMAZIONI ---
+    
+    # ✅ FORMAZIONI PRE-PARTITA
+    formazioni = h2h_data.get('formazioni', {})
+    home_squad = formazioni.get('home_squad', {})
+    away_squad = formazioni.get('away_squad', {})
+    
+    if home_squad and away_squad:
+        # Modulo e titolari CASA
+        modulo_h = home_squad.get('modulo', '4-3-3')
+        titolari_h = home_squad.get('titolari', [])
+        
+        # Modulo e titolari OSPITE
+        modulo_a = away_squad.get('modulo', '4-3-3')
+        titolari_a = away_squad.get('titolari', [])
+        
+        # Costruisci stringa formazione CASA
+        formazione_h_str = f"📋 [{h}] ({modulo_h}): "
+        giocatori_h = []
+        for p in titolari_h:
+            nome = p.get('player', 'N/A')
+            # Prendi solo cognome
+            cognome = nome.split()[-1] if nome else 'N/A'
+            giocatori_h.append(cognome)
+        formazione_h_str += ", ".join(giocatori_h)
+        
+        # Costruisci stringa formazione OSPITE
+        formazione_a_str = f"📋 [{a}] ({modulo_a}): "
+        giocatori_a = []
+        for p in titolari_a:
+            nome = p.get('player', 'N/A')
+            cognome = nome.split()[-1] if nome else 'N/A'
+            giocatori_a.append(cognome)
+        formazione_a_str += ", ".join(giocatori_a)
+        
+        # Aggiungi alla cronaca (minuto -2 e -1 per apparire prima del fischio)
+        cronaca.append({"minuto": -2, "squadra": "casa", "tipo": "formazione", "testo": formazione_h_str})
+        cronaca.append({"minuto": -1, "squadra": "ospite", "tipo": "formazione", "testo": formazione_a_str})
+    
     cronaca.append({"minuto": 0, "squadra": "casa", "tipo": "info", "testo": f"🏁 [SISTEMA] FISCHIO D'INIZIO! Inizia {h} vs {a}!"})
     
     recupero_pt = random.randint(1, 4)
@@ -176,52 +215,67 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
     # ✅ Estrai nomi REALI dai dati del database
     marcatori_casa, marcatori_ospite = ottieni_nomi_giocatori(h2h_data)
     
+    # ✅ FUNZIONE HELPER: Trova un minuto libero garantito
+    def trova_minuto_libero(minuti_usati, min_range=(5, 89)):
+        """Trova SEMPRE un minuto libero, espandendo il range se necessario"""
+        min_val, max_val = min_range
+        
+        # Prima prova nel range normale
+        for _ in range(100):
+            min_gol = random.randint(min_val, max_val)
+            if min_gol not in minuti_usati:
+                return min_gol
+        
+        # Se non trova, cerca QUALSIASI minuto libero tra 1 e 94
+        tutti_minuti = set(range(1, 95))
+        disponibili = tutti_minuti - minuti_usati
+        if disponibili:
+            return random.choice(list(disponibili))
+        
+        # Ultima risorsa: usa un minuto nel recupero (95-99)
+        for m in range(95, 100):
+            if m not in minuti_usati:
+                return m
+        
+        # Impossibile (non dovrebbe mai succedere)
+        return random.randint(1, 94)
+    
     # GOL CASA
     for i in range(gh):
-        min_gol = random.randint(5, 85)
-        tentativi = 0
-        while min_gol in minuti_usati and tentativi < 100:
-            min_gol = random.randint(5, 85)
-            tentativi += 1
-
-        if tentativi >= 100:
-            continue
-
+        min_gol = trova_minuto_libero(minuti_usati)
         minuti_usati.add(min_gol)
-
-        is_penalty = random.random() > 0.85
+        
+        is_penalty = random.random() < 0.15  # 15% probabilità rigore
         marcatore = rand(marcatori_casa)
 
         if is_penalty:
             cronaca.append({"minuto": min_gol, "squadra": "casa", "tipo": "rigore_fischio", "testo": f"{min_gol}' 📢 [{h}] CALCIO DI RIGORE! Il direttore di gara indica il dischetto!"})
-            if min_gol + 1 not in minuti_usati:
-                cronaca.append({"minuto": min_gol + 1, "squadra": "casa", "tipo": "gol", "testo": f"{min_gol+1}' 🎯 [{h}] GOAL SU RIGORE! {marcatore} - Freddissimo dagli undici metri!"})
-                minuti_usati.add(min_gol + 1)
+            # ✅ FIX: Il gol su rigore va SEMPRE aggiunto
+            min_gol_rigore = min_gol + 1
+            if min_gol_rigore in minuti_usati:
+                min_gol_rigore = trova_minuto_libero(minuti_usati, (min_gol + 1, min_gol + 3))
+            minuti_usati.add(min_gol_rigore)
+            cronaca.append({"minuto": min_gol_rigore, "squadra": "casa", "tipo": "gol", "testo": f"{min_gol_rigore}' 🎯 [{h}] GOAL SU RIGORE! {marcatore} - Freddissimo dagli undici metri!"})
         else:
             tipo_gol = rand(["Conclusione potente!", "Di testa su cross!", "Azione corale!", "Tap-in vincente!"])
             cronaca.append({"minuto": min_gol, "squadra": "casa", "tipo": "gol", "testo": f"{min_gol}' ⚽ [{h}] GOOOL! {marcatore} - {tipo_gol}"})
     
     # GOL OSPITE
     for i in range(ga):
-        min_gol = random.randint(5, 85)
-        tentativi = 0
-        while min_gol in minuti_usati and tentativi < 100:
-            min_gol = random.randint(5, 85)
-            tentativi += 1
-
-        if tentativi >= 100:
-            continue
-
+        min_gol = trova_minuto_libero(minuti_usati)
         minuti_usati.add(min_gol)
-
-        is_penalty = random.random() > 0.85
+        
+        is_penalty = random.random() < 0.15  # 15% probabilità rigore
         marcatore = rand(marcatori_ospite)
 
         if is_penalty:
             cronaca.append({"minuto": min_gol, "squadra": "ospite", "tipo": "rigore_fischio", "testo": f"{min_gol}' 📢 [{a}] CALCIO DI RIGORE! Massima punizione per gli ospiti!"})
-            if min_gol + 1 not in minuti_usati:
-                cronaca.append({"minuto": min_gol + 1, "squadra": "ospite", "tipo": "gol", "testo": f"{min_gol+1}' 🎯 [{a}] GOAL SU RIGORE! {marcatore} - Freddissimo dagli undici metri!"})
-                minuti_usati.add(min_gol + 1)
+            # ✅ FIX: Il gol su rigore va SEMPRE aggiunto
+            min_gol_rigore = min_gol + 1
+            if min_gol_rigore in minuti_usati:
+                min_gol_rigore = trova_minuto_libero(minuti_usati, (min_gol + 1, min_gol + 3))
+            minuti_usati.add(min_gol_rigore)
+            cronaca.append({"minuto": min_gol_rigore, "squadra": "ospite", "tipo": "gol", "testo": f"{min_gol_rigore}' 🎯 [{a}] GOAL SU RIGORE! {marcatore} - Freddissimo dagli undici metri!"})
         else:
             tipo_gol = rand(["Zittisce lo stadio!", "Contropiede micidiale!", "Incredibile girata!", "Palla nel sette!"])
             cronaca.append({"minuto": min_gol, "squadra": "ospite", "tipo": "gol", "testo": f"{min_gol}' ⚽ [{a}] GOOOL! {marcatore} - {tipo_gol}"})
