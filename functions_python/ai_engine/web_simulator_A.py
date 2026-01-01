@@ -61,6 +61,27 @@ def sanitize_data(data):
             return 0.0
     return data
 
+def ottieni_nomi_giocatori(team_h, team_a, h2h_data):
+    """Estrae i nomi dei giocatori dalle formazioni"""
+    formazioni = h2h_data.get('formazioni', {})
+    
+    titolari_h = formazioni.get('home_squad', {}).get('titolari', [])
+    titolari_a = formazioni.get('away_squad', {}).get('titolari', [])
+    
+    # Estrai attaccanti/centrocampisti (più probabili marcatori)
+    def filtra_attaccanti(squad):
+        nomi = []
+        for p in squad:
+            ruolo = p.get('position', '')
+            if ruolo in ['FW', 'MF', 'AM', 'ST', 'CF']:
+                nome = p.get('name', 'Giocatore')
+                # Prendi solo cognome
+                nome_parts = nome.split()
+                nomi.append(nome_parts[-1] if nome_parts else 'Giocatore')
+        return nomi if nomi else ['Giocatore']
+    
+    return filtra_attaccanti(titolari_h), filtra_attaccanti(titolari_a)
+
 def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
     """
     Genera 35-40 eventi live usando i pool di commenti realistici.
@@ -152,28 +173,31 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
     
     # --- 2. GOL SINCRONIZZATI (ESATTAMENTE gh per casa, ga per ospite) ---
     # GOL CASA
+    giocatori_h, giocatori_a = ottieni_nomi_giocatori(team_h, team_a, h2h_data)
+
     for i in range(gh):
         min_gol = random.randint(5, 85)
         tentativi = 0
         while min_gol in minuti_usati and tentativi < 100:
             min_gol = random.randint(5, 85)
             tentativi += 1
-        
+
         if tentativi >= 100:
             continue
-        
+
         minuti_usati.add(min_gol)
-        
+
         is_penalty = random.random() > 0.85
-        
+        marcatore = random.choice(giocatori_h)  # ✅ AGGIUNTO
+
         if is_penalty:
             cronaca.append({"minuto": min_gol, "squadra": "casa", "tipo": "rigore_fischio", "testo": f"📢 [{h}] CALCIO DI RIGORE! Il direttore di gara indica il dischetto!"})
             if min_gol + 1 not in minuti_usati:
-                cronaca.append({"minuto": min_gol + 1, "squadra": "casa", "tipo": "gol", "testo": f"🎯 [{h}] GOAL SU RIGORE! Esecuzione perfetta dal dischetto!"})
+                cronaca.append({"minuto": min_gol + 1, "squadra": "casa", "tipo": "gol", "testo": f"🎯 [{h}] GOAL SU RIGORE! {marcatore} - Freddissimo dagli undici metri!"})  # ✅ MODIFICATO
                 minuti_usati.add(min_gol + 1)
         else:
             tipo_gol = rand(["Conclusione potente!", "Di testa su cross!", "Azione corale!", "Tap-in vincente!"])
-            cronaca.append({"minuto": min_gol, "squadra": "casa", "tipo": "gol", "testo": f"⚽ [{h}] GOOOL! {tipo_gol}"})
+            cronaca.append({"minuto": min_gol, "squadra": "casa", "tipo": "gol", "testo": f"⚽ [{h}] GOOOL! {marcatore} - {tipo_gol}"})  # ✅ MODIFICATO
     
     # GOL OSPITE
     for i in range(ga):
@@ -182,22 +206,23 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
         while min_gol in minuti_usati and tentativi < 100:
             min_gol = random.randint(5, 85)
             tentativi += 1
-        
+
         if tentativi >= 100:
             continue
-        
+
         minuti_usati.add(min_gol)
-        
+
         is_penalty = random.random() > 0.85
-        
+        marcatore = random.choice(giocatori_a)  # ✅ AGGIUNTO
+
         if is_penalty:
             cronaca.append({"minuto": min_gol, "squadra": "ospite", "tipo": "rigore_fischio", "testo": f"📢 [{a}] CALCIO DI RIGORE! Massima punizione per gli ospiti!"})
             if min_gol + 1 not in minuti_usati:
-                cronaca.append({"minuto": min_gol + 1, "squadra": "ospite", "tipo": "gol", "testo": f"🎯 [{a}] GOAL SU RIGORE! Freddissimo dagli undici metri!"})
+                cronaca.append({"minuto": min_gol + 1, "squadra": "ospite", "tipo": "gol", "testo": f"🎯 [{a}] GOAL SU RIGORE! {marcatore} - Freddissimo dagli undici metri!"})  # ✅ MODIFICATO
                 minuti_usati.add(min_gol + 1)
         else:
             tipo_gol = rand(["Zittisce lo stadio!", "Contropiede micidiale!", "Incredibile girata!", "Palla nel sette!"])
-            cronaca.append({"minuto": min_gol, "squadra": "ospite", "tipo": "gol", "testo": f"⚽ [{a}] GOOOL! {tipo_gol}"})
+            cronaca.append({"minuto": min_gol, "squadra": "ospite", "tipo": "gol", "testo": f"⚽ [{a}] GOOOL! {marcatore} - {tipo_gol}"})  # ✅ MODIFICATO
     
     # --- 3. CARTELLINI (3-6 casuali) ---
     num_gialli = random.randint(3, 6)
@@ -430,12 +455,15 @@ def genera_anatomia_partita(gh, ga, h2h_match_data, team_h_doc, sim_list):
 
 def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: int, league: str, main_mode: int) -> dict:
     """Esegue la simulazione e arricchisce il risultato con i dati del DB."""
-    # ✅ AGGIUNGI QUESTE VARIABILI DI TRACKING ALL'INIZIO
     actual_cycles_executed = 0
     start_time = datetime.now()
+    
     try:
+        # ✅ CREA ANALYZER ALL'INIZIO (PRIMA DI USARLO)
         from ai_engine.deep_analysis import DeepAnalyzer
         analyzer = DeepAnalyzer()
+        analyzer.start_match(home_team, away_team, league=league)
+        
         team_h_doc = db.teams.find_one({"name": home_team}) or {}
         team_a_doc = db.teams.find_one({"name": away_team}) or {}
         
@@ -448,108 +476,105 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
         sim_list = [] 
         preloaded_data = preload_match_data(home_team, away_team)
         
-        from ai_engine.deep_analysis import DeepAnalyzer
-        analyzer = DeepAnalyzer()
-        analyzer.start_match(home_team, away_team, league=league)
+        # ✅ LOG INIZIALE
+        print(f"🎯 SIMULAZIONE RICHIESTA: Algo {algo_id}, Cicli {cycles}", file=sys.stderr)
         
         if algo_id == 6:
-        # ✅ PASSA ESPLICITAMENTE cycles e algo_id alla funzione
+            # MONTE CARLO
+            print(f"🔵 MODALITÀ MONTE CARLO ATTIVATA", file=sys.stderr)
+            
             res = run_monte_carlo_verdict_detailed(
                 preloaded_data, 
                 home_team, 
                 away_team,
-                analyzer=analyzer,  # ✅ Passa l'analyzer
-                cycles=cycles,      # ✅ Passa i cicli REALI
-                algo_id=algo_id     # ✅ Passa l'ID algoritmo
+                analyzer=analyzer,
+                cycles=cycles,
+                algo_id=algo_id
             )
             gh, ga = res[0]
             
-            # ✅ LOG DI VERIFICA
-            print(f"🎯 MONTE CARLO ESEGUITO: {cycles} cicli richiesti", file=sys.stderr)
-            
-            # ✅ STAMPA DI DEBUG (rimuovi dopo il test)
-            print(f"🎯 RISULTATO FINALE: {gh}-{ga}", file=sys.stderr)
-            
-            # ✅ TRACKING CICLI REALI (dal risultato Monte Carlo)
+            # Tracking cicli Monte Carlo
             if len(res) > 4 and isinstance(res[4], dict):
-                # Conta i risultati reali eseguiti da tutti gli algoritmi
                 for algo_results in res[4].values():
                     if isinstance(algo_results, list):
                         actual_cycles_executed += len(algo_results)
             else:
-                actual_cycles_executed = cycles  # Fallback
+                actual_cycles_executed = cycles
             
             # Creazione sim_list dai risultati grezzi
-            if len(res) > 4 and isinstance(res[4], list):
+            if len(res) > 4 and isinstance(res[4], dict):
+                for algo_res_list in res[4].values():
+                    if isinstance(algo_res_list, list):
+                        sim_list.extend(algo_res_list)
+            elif len(res) > 4 and isinstance(res[4], list):
                 sim_list = [f"{r[0]}-{r[1]}" for r in res[4]]
             else:
                 sim_list = [f"{gh}-{ga}"] * cycles
-            top3 = [x[0] for x in res[2]]
-            cronaca = res[1] if len(res) > 1 else [] # Recupero cronaca se disponibile
-        else:
-            # ✅ LOG DI VERIFICA
-            print(f"🎯 ALGORITMO {algo_id} ESEGUITO: {cycles} cicli richiesti", file=sys.stderr)
             
-            # ✅ ESEGUI IL SINGOLO ALGORITMO "cycles" VOLTE
+            top3 = [x[0] for x in res[2]]
+            cronaca = res[1] if len(res) > 1 else []
+            
+            print(f"✅ MONTE CARLO COMPLETATO: {actual_cycles_executed} cicli eseguiti", file=sys.stderr)
+            print(f"✅ RISULTATO FINALE: {gh}-{ga}", file=sys.stderr)
+        
+        else:
+            # ✅ ALGORITMI SINGOLI (1-5)
+            print(f"🟢 MODALITÀ SINGOLO ALGORITMO {algo_id} ATTIVATA", file=sys.stderr)
+            
             sim_list = []
             for i in range(cycles):
                 gh_temp, ga_temp = run_single_algo(algo_id, preloaded_data, home_team, away_team)
                 sim_list.append(f"{gh_temp}-{ga_temp}")
+                analyzer.add_result(algo_id, gh_temp, ga_temp)
                 
-                # Aggiungi al deep analyzer
-                if analyzer:
-                    analyzer.add_result(algo_id, gh_temp, ga_temp)
+                # Log progresso ogni 10%
+                if cycles >= 10 and (i + 1) % max(1, cycles // 10) == 0:
+                    pct = int((i + 1) / cycles * 100)
+                    print(f"  📊 Progresso: {pct}% ({i + 1}/{cycles})", file=sys.stderr)
             
-            # Calcola il risultato più frequente
+            # Calcola risultato più frequente
             from collections import Counter
             most_common = Counter(sim_list).most_common(1)[0][0]
             gh, ga = map(int, most_common.split("-"))
             top3 = [x[0] for x in Counter(sim_list).most_common(3)]
             cronaca = []
             actual_cycles_executed = cycles
-
+            
+            print(f"✅ ALGORITMO {algo_id} COMPLETATO: {cycles} cicli eseguiti", file=sys.stderr)
+            print(f"✅ RISULTATO FINALE: {gh}-{ga}", file=sys.stderr)
         
-        for score in sim_list:
-            h, a = map(int, score.split('-'))
-            analyzer.add_result(algo_id, h, a)
+        # ✅ CHIUDI ANALYZER
         analyzer.end_match()
         
-        # DEFINIZIONE DI deep_stats
-        deep_stats = analyzer.matches[-1]['algorithms'][algo_id]['stats']
+        # OTTIENI DEEP STATS
+        deep_stats = analyzer.get_full_report()
 
         # 3. GENERAZIONE REPORT
-        # Usiamo la tua funzione esistente
         anatomy = genera_match_report_completo(gh, ga, h2h_data, team_h_doc, team_a_doc, sim_list, deep_stats)
 
-        # PULIZIA FINALE: Rimuove i NaN prima di inviare al frontend
-        #
+        # QUOTE MATCH
         quote_match = {
             "1": team_h_doc.get('odds', {}).get('1'),
             "X": team_h_doc.get('odds', {}).get('X'),
             "2": team_h_doc.get('odds', {}).get('2')
         }
 
-        # 2. CHIAMATA AL CERVELLO (Betting Logic)
-        # Passiamo la 'sim_list' (la lista di tutti i 1000+ risultati) e le quote
+        # BETTING LOGIC
         report_pro = analyze_betting_data(sim_list, quote_match)
 
-        # 3. INTEGRAZIONE NEL RISULTATO FINALE
+        # RISULTATO FINALE
         raw_result = {
             "success": True,
             "predicted_score": f"{gh}-{ga}",
             "gh": gh,
             "ga": ga,
             "algo_name": ALGO_NAMES.get(algo_id, "Custom"),
-            
-            # ✅ AGGIUNGI QUESTI CAMPI NUOVI
-            "algo_id": algo_id,  # ✅ ID algoritmo reale
-            "cycles_requested": cycles,  # ✅ Cicli richiesti dall'utente
-            "cycles_executed": actual_cycles_executed,  # ✅ Cicli REALMENTE eseguiti
-            "execution_time": (datetime.now() - start_time).total_seconds(),  # ✅ Tempo reale
-            
+            "algo_id": algo_id,
+            "cycles_requested": cycles,
+            "cycles_executed": actual_cycles_executed,
+            "execution_time": (datetime.now() - start_time).total_seconds(),
             "statistiche": anatomy["statistiche"],
             "cronaca": anatomy["cronaca"],
-            # AGGIUNGIAMO IL REPORT PROFESSIONALE QUI
             "report_scommesse_pro": report_pro, 
             "info_extra": {
                 "valore_mercato": f"{team_h_doc.get('stats', {}).get('marketValue', 0) // 1000000}M €",
