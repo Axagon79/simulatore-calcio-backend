@@ -238,3 +238,130 @@ def get_nations(request: https_fn.Request) -> https_fn.Response:
     except Exception as e:
         print(f"❌ Errore critico get_nations: {str(e)}", file=sys.stderr)
         return https_fn.Response(json.dumps([]), status=500, headers=headers)
+    
+@https_fn.on_request(
+    memory=options.MemoryOption.MB_256,
+    timeout_sec=10,  # Velocissimo, solo query DB
+    region="us-central1"
+)
+def get_formations(request: https_fn.Request) -> https_fn.Response:
+    """
+    Endpoint VELOCE per recuperare le formazioni di una partita.
+    Usato per mostrare i giocatori durante il "riscaldamento" mentre la simulazione carica.
+    """
+    # --- GESTIONE CORS ---
+    headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Content-Type': 'application/json'
+    }
+    
+    if request.method == 'OPTIONS':
+        return https_fn.Response('', status=204, headers=headers)
+
+    try:
+        # --- IMPORTA DB ---
+        try:
+            from config import db
+        except ImportError:
+            from ai_engine.config import db
+        
+        # --- LEGGI PARAMETRI ---
+        if hasattr(request, 'get_json'):
+            payload = request.get_json(silent=True) or {}
+        else:
+            payload = {}
+        
+        home_team = payload.get('home', '')
+        away_team = payload.get('away', '')
+        league = payload.get('league', 'Serie A')
+        
+        if not home_team or not away_team:
+            return https_fn.Response(
+                json.dumps({"success": False, "error": "Missing home or away team"}),
+                status=400,
+                mimetype='application/json',
+                headers=headers
+            )
+        
+        # --- PULIZIA NOME LEGA ---
+        league_clean = league.replace('_', ' ').title()
+        if league_clean == "Serie A":
+            league_clean = "Serie A"
+        
+        # --- CERCA LA PARTITA IN TUTTE LE GIORNATE ---
+        match_data = {}
+        h2h_data = {}
+        
+        all_rounds = db.h2h_by_round.find({"league": league_clean})
+        for round_doc in all_rounds:
+            for m in round_doc.get('matches', []):
+                if m.get('home') == home_team and m.get('away') == away_team:
+                    match_data = m
+                    h2h_data = m.get('h2h_data', {})
+                    break
+            if match_data:
+                break
+        
+        if not match_data:
+            return https_fn.Response(
+                json.dumps({"success": False, "error": f"Match {home_team} vs {away_team} not found"}),
+                status=404,
+                mimetype='application/json',
+                headers=headers
+            )
+        
+        # --- ESTRAI FORMAZIONI ---
+        formazioni = h2h_data.get('formazioni', {})
+        home_squad = formazioni.get('home_squad', {})
+        away_squad = formazioni.get('away_squad', {})
+        
+        # --- PREPARA RISPOSTA ---
+        response_data = {
+            "success": True,
+            "home_team": home_team,
+            "away_team": away_team,
+            "home_formation": {
+                "modulo": home_squad.get('modulo', 'N/A'),
+                "titolari": [
+                    {
+                        "role": p.get('role', 'N/A'),
+                        "player": p.get('player', 'N/A'),
+                        "rating": round(p.get('rating', 0), 1)
+                    }
+                    for p in home_squad.get('titolari', [])
+                ]
+            },
+            "away_formation": {
+                "modulo": away_squad.get('modulo', 'N/A'),
+                "titolari": [
+                    {
+                        "role": p.get('role', 'N/A'),
+                        "player": p.get('player', 'N/A'),
+                        "rating": round(p.get('rating', 0), 1)
+                    }
+                    for p in away_squad.get('titolari', [])
+                ]
+            },
+            # Aggiungi anche info extra utili
+            "home_rank": h2h_data.get('home_rank'),
+            "away_rank": h2h_data.get('away_rank'),
+            "home_points": h2h_data.get('home_points'),
+            "away_points": h2h_data.get('away_points')
+        }
+        
+        return https_fn.Response(
+            json.dumps(response_data, ensure_ascii=False),
+            mimetype='application/json',
+            headers=headers
+        )
+        
+    except Exception as e:
+        print(f"❌ Errore get_formations: {str(e)}", file=sys.stderr)
+        return https_fn.Response(
+            json.dumps({"success": False, "error": str(e)}),
+            status=500,
+            mimetype='application/json',
+            headers=headers
+        )
