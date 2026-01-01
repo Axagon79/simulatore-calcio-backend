@@ -172,9 +172,11 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
     minuti_usati.update([0, 45, 45 + recupero_pt, 90])
     
     # --- 2. GOL SINCRONIZZATI (ESATTAMENTE gh per casa, ga per ospite) ---
+    # Lista marcatori di fallback
+    marcatori_casa = ["Attaccante", "Centrocampista", "Ala", "Trequartista", "Bomber"]
+    marcatori_ospite = ["Attaccante", "Centrocampista", "Ala", "Trequartista", "Bomber"]
+    
     # GOL CASA
-    giocatori_h, giocatori_a = ottieni_nomi_giocatori(team_h, team_a, h2h_data)
-
     for i in range(gh):
         min_gol = random.randint(5, 85)
         tentativi = 0
@@ -188,16 +190,16 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
         minuti_usati.add(min_gol)
 
         is_penalty = random.random() > 0.85
-        marcatore = random.choice(giocatori_h)  # ✅ AGGIUNTO
+        marcatore = rand(marcatori_casa)
 
         if is_penalty:
-            cronaca.append({"minuto": min_gol, "squadra": "casa", "tipo": "rigore_fischio", "testo": f"📢 [{h}] CALCIO DI RIGORE! Il direttore di gara indica il dischetto!"})
+            cronaca.append({"minuto": min_gol, "squadra": "casa", "tipo": "rigore_fischio", "testo": f"{min_gol}' 📢 [{h}] CALCIO DI RIGORE! Il direttore di gara indica il dischetto!"})
             if min_gol + 1 not in minuti_usati:
-                cronaca.append({"minuto": min_gol + 1, "squadra": "casa", "tipo": "gol", "testo": f"🎯 [{h}] GOAL SU RIGORE! {marcatore} - Freddissimo dagli undici metri!"})  # ✅ MODIFICATO
+                cronaca.append({"minuto": min_gol + 1, "squadra": "casa", "tipo": "gol", "testo": f"{min_gol+1}' 🎯 [{h}] GOAL SU RIGORE! {marcatore} - Freddissimo dagli undici metri!"})
                 minuti_usati.add(min_gol + 1)
         else:
             tipo_gol = rand(["Conclusione potente!", "Di testa su cross!", "Azione corale!", "Tap-in vincente!"])
-            cronaca.append({"minuto": min_gol, "squadra": "casa", "tipo": "gol", "testo": f"⚽ [{h}] GOOOL! {marcatore} - {tipo_gol}"})  # ✅ MODIFICATO
+            cronaca.append({"minuto": min_gol, "squadra": "casa", "tipo": "gol", "testo": f"{min_gol}' ⚽ [{h}] GOOOL! {marcatore} - {tipo_gol}"})
     
     # GOL OSPITE
     for i in range(ga):
@@ -213,53 +215,62 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
         minuti_usati.add(min_gol)
 
         is_penalty = random.random() > 0.85
-        marcatore = random.choice(giocatori_a)  # ✅ AGGIUNTO
+        marcatore = rand(marcatori_ospite)
 
         if is_penalty:
-            cronaca.append({"minuto": min_gol, "squadra": "ospite", "tipo": "rigore_fischio", "testo": f"📢 [{a}] CALCIO DI RIGORE! Massima punizione per gli ospiti!"})
+            cronaca.append({"minuto": min_gol, "squadra": "ospite", "tipo": "rigore_fischio", "testo": f"{min_gol}' 📢 [{a}] CALCIO DI RIGORE! Massima punizione per gli ospiti!"})
             if min_gol + 1 not in minuti_usati:
-                cronaca.append({"minuto": min_gol + 1, "squadra": "ospite", "tipo": "gol", "testo": f"🎯 [{a}] GOAL SU RIGORE! {marcatore} - Freddissimo dagli undici metri!"})  # ✅ MODIFICATO
+                cronaca.append({"minuto": min_gol + 1, "squadra": "ospite", "tipo": "gol", "testo": f"{min_gol+1}' 🎯 [{a}] GOAL SU RIGORE! {marcatore} - Freddissimo dagli undici metri!"})
                 minuti_usati.add(min_gol + 1)
         else:
             tipo_gol = rand(["Zittisce lo stadio!", "Contropiede micidiale!", "Incredibile girata!", "Palla nel sette!"])
-            cronaca.append({"minuto": min_gol, "squadra": "ospite", "tipo": "gol", "testo": f"⚽ [{a}] GOOOL! {marcatore} - {tipo_gol}"})  # ✅ MODIFICATO
+            cronaca.append({"minuto": min_gol, "squadra": "ospite", "tipo": "gol", "testo": f"{min_gol}' ⚽ [{a}] GOOOL! {marcatore} - {tipo_gol}"})
     
-    # --- 3. CARTELLINI (3-6 casuali) ---
-    num_gialli = random.randint(3, 6)
-    for _ in range(num_gialli):
+    # --- 3. CARTELLINI (3-6 casuali, con possibilità rosso) ---
+    num_cartellini = random.randint(3, 6)
+    for _ in range(num_cartellini):
         min_cart = random.randint(10, 88)
         tentativi = 0
         while min_cart in minuti_usati and tentativi < 100:
             min_cart = random.randint(10, 88)
             tentativi += 1
-        
+
         if tentativi >= 100:
             continue
-        
+
         minuti_usati.add(min_cart)
         sq = random.choice(["casa", "ospite"])
         team = h if sq == "casa" else a
-        cronaca.append({"minuto": min_cart, "squadra": sq, "tipo": "cartellino", "testo": f"🟨 [{team}] Giallo per un fallo tattico a centrocampo."})
+        
+        # 12% probabilità cartellino rosso
+        is_rosso = random.random() < 0.12
+        
+        if is_rosso:
+            motivo_rosso = rand(["Fallo da ultimo uomo!", "Condotta violenta!", "Doppio giallo!", "Grave fallo di gioco!"])
+            cronaca.append({"minuto": min_cart, "squadra": sq, "tipo": "rosso", "testo": f"{min_cart}' 🟥 [{team}] ESPULSO! {motivo_rosso}"})
+        else:
+            motivo_giallo = rand(["Fallo tattico a centrocampo.", "Trattenuta su ripartenza.", "Proteste verso l'arbitro.", "Intervento in ritardo."])
+            cronaca.append({"minuto": min_cart, "squadra": sq, "tipo": "cartellino", "testo": f"{min_cart}' 🟨 [{team}] Giallo! {motivo_giallo}"})
     
-    # --- 4. EVENTI DAI POOL (35-40 eventi distribuiti) ---
-    eventi_per_tempo = 18
+   # --- 4. EVENTI DAI POOL (distribuiti nei due tempi) ---
+    eventi_per_tempo = 10
     
     for tempo in [1, 2]:
         min_base = 1 if tempo == 1 else 46
         min_max = 45 if tempo == 1 else 90
         intervallo = (min_max - min_base) / eventi_per_tempo
-        
+
         for i in range(eventi_per_tempo):
             min_evento = int(min_base + (i * intervallo) + random.uniform(0, intervallo - 1))
-            
+
             if min_evento in minuti_usati:
                 continue
-            
+
             minuti_usati.add(min_evento)
-            
+
             sq = random.choice(["casa", "ospite"])
             team = h if sq == "casa" else a
-            
+
             # Scelta pool equilibrata
             roll = random.random()
             if roll > 0.75:
@@ -270,8 +281,8 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
                 txt = rand(pool_difesa)
             else:
                 txt = rand(pool_atmosfera)
-            
-            cronaca.append({"minuto": min_evento, "squadra": sq, "tipo": "info", "testo": f"[{team}] {txt}"})
+
+            cronaca.append({"minuto": min_evento, "squadra": sq, "tipo": "info", "testo": f"{min_evento}' [{team}] {txt}"})
     
     # ✅ ORDINA PER MINUTO
     cronaca.sort(key=lambda x: x["minuto"])
