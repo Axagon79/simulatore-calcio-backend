@@ -434,6 +434,8 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
     actual_cycles_executed = 0
     start_time = datetime.now()
     try:
+        from ai_engine.deep_analysis import DeepAnalyzer
+        analyzer = DeepAnalyzer()
         team_h_doc = db.teams.find_one({"name": home_team}) or {}
         team_a_doc = db.teams.find_one({"name": away_team}) or {}
         
@@ -445,6 +447,10 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
         # 1. ESECUZIONE ALGORITMO E CREAZIONE sim_list
         sim_list = [] 
         preloaded_data = preload_match_data(home_team, away_team)
+        
+        from ai_engine.deep_analysis import DeepAnalyzer
+        analyzer = DeepAnalyzer()
+        analyzer.start_match(home_team, away_team, league=league)
         
         if algo_id == 6:
         # ✅ PASSA ESPLICITAMENTE cycles e algo_id alla funzione
@@ -502,9 +508,7 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
             cronaca = []
             actual_cycles_executed = cycles
 
-        # 2. INTEGRAZIONE DEEP ANALYSIS
-        analyzer = DeepAnalyzer()
-        analyzer.start_match(home_team, away_team, league=league)
+        
         for score in sim_list:
             h, a = map(int, score.split('-'))
             analyzer.add_result(algo_id, h, a)
