@@ -545,9 +545,38 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
         
         # ✅ CHIUDI ANALYZER
         analyzer.end_match()
-        
-        # OTTIENI DEEP STATS
-        deep_stats = analyzer.get_full_report()
+
+        # OTTIENI DEEP STATS (le stats sono dentro matches dopo end_match)
+        if analyzer.matches and len(analyzer.matches) > 0:
+            last_match = analyzer.matches[-1]
+            if 'algorithms' in last_match and algo_id in last_match['algorithms']:
+                deep_stats = last_match['algorithms'][algo_id]['stats']
+            else:
+                # Fallback se non ci sono stats
+                deep_stats = {
+                    'sign_1': {'pct': 33.3},
+                    'sign_x': {'pct': 33.3},
+                    'sign_2': {'pct': 33.3},
+                    'gg': {'pct': 50},
+                    'ng': {'pct': 50},
+                    'under_over': {'U2.5': {'pct': 50}, 'O2.5': {'pct': 50}},
+                    'confidence': {'global_confidence': 50, 'total_std': 0, 'total_confidence': 50},
+                    'top_10_scores': [],
+                    'total_simulations': cycles
+                }
+        else:
+            # Fallback completo
+            deep_stats = {
+                'sign_1': {'pct': 33.3},
+                'sign_x': {'pct': 33.3},
+                'sign_2': {'pct': 33.3},
+                'gg': {'pct': 50},
+                'ng': {'pct': 50},
+                'under_over': {'U2.5': {'pct': 50}, 'O2.5': {'pct': 50}},
+                'confidence': {'global_confidence': 50, 'total_std': 0, 'total_confidence': 50},
+                'top_10_scores': [],
+                'total_simulations': cycles
+            }
 
         # 3. GENERAZIONE REPORT
         anatomy = genera_match_report_completo(gh, ga, h2h_data, team_h_doc, team_a_doc, sim_list, deep_stats)
