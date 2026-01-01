@@ -478,16 +478,37 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
         team_h_doc = db.teams.find_one({"name": home_team}) or {}
         team_a_doc = db.teams.find_one({"name": away_team}) or {}
         
+        # ✅ FIX: Pulizia nome lega
         league_clean = league.replace('_', ' ').title()
+        if league_clean == "Serie A":
+            league_clean = "Serie A"  # Assicura formato corretto
+        
+        # ✅ FIX: Cerca il documento della lega
         h2h_doc = db.h2h_by_round.find_one({"league": league_clean})
         
+        # ✅ DEBUG
+        print(f"🔍 LEAGUE RICEVUTA: '{league}' -> PULITA: '{league_clean}'", file=sys.stderr)
+        print(f"🔍 H2H_DOC TROVATO: {bool(h2h_doc)}", file=sys.stderr)
+        
+        if not h2h_doc:
+            # Prova a cercare con regex case-insensitive
+            import re
+            h2h_doc = db.h2h_by_round.find_one({"league": {"$regex": f"^{league_clean}$", "$options": "i"}})
+            print(f"🔍 TENTATIVO REGEX: {bool(h2h_doc)}", file=sys.stderr)
+        
         # ✅ FIX: Cerca la partita ESATTA (home E away)
-        match_data = next(
-            (m for m in h2h_doc.get('matches', []) 
-             if m.get('home') == home_team and m.get('away') == away_team), 
-            {}
-        )
+        match_data = {}
+        if h2h_doc:
+            for m in h2h_doc.get('matches', []):
+                if m.get('home') == home_team and m.get('away') == away_team:
+                    match_data = m
+                    break
+        
+        # ✅ IMPORTANTE: h2h_data contiene TUTTO incluse le formazioni
         h2h_data = match_data.get('h2h_data', {})
+        
+        print(f"🔍 MATCH: {match_data.get('home', 'N/A')} vs {match_data.get('away', 'N/A')}", file=sys.stderr)
+        print(f"🔍 FORMAZIONI: {bool(h2h_data.get('formazioni'))}", file=sys.stderr)
         
         # ✅ DEBUG: Log per verificare cosa viene caricato
         print(f"🔍 MATCH CERCATO: {home_team} vs {away_team}", file=sys.stderr)
