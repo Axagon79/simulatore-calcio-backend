@@ -65,6 +65,7 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
     """
     Genera 35-40 eventi live usando i pool di commenti realistici.
     Sincronizza ESATTAMENTE gh gol per casa e ga per ospite.
+    VERSIONE CORRETTA: Elimina duplicati alla fonte.
     """
     import random
     
@@ -85,7 +86,7 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
     def rand(lista):
         return random.choice(lista)
     
-    # ✅ POOL COMPLETI (Copiati dal tuo codice originale)
+    # ✅ POOL COMPLETI
     pool_attacco = [
         "tenta la magia in rovesciata, il pallone viene bloccato dal portiere.",
         "scappa sulla fascia e mette un cross teso: la difesa libera in affanno.",
@@ -153,16 +154,23 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
     # GOL CASA
     for i in range(gh):
         min_gol = random.randint(5, 85)
-        while min_gol in minuti_usati:
+        tentativi = 0
+        while min_gol in minuti_usati and tentativi < 100:
             min_gol = random.randint(5, 85)
+            tentativi += 1
+        
+        if tentativi >= 100:
+            continue
+        
         minuti_usati.add(min_gol)
         
         is_penalty = random.random() > 0.85
         
         if is_penalty:
             cronaca.append({"minuto": min_gol, "squadra": "casa", "tipo": "rigore_fischio", "testo": f"📢 [{h}] CALCIO DI RIGORE! Il direttore di gara indica il dischetto!"})
-            cronaca.append({"minuto": min_gol + 1, "squadra": "casa", "tipo": "gol", "testo": f"🎯 [{h}] GOAL SU RIGORE! Esecuzione perfetta dal dischetto!"})
-            minuti_usati.add(min_gol + 1)
+            if min_gol + 1 not in minuti_usati:
+                cronaca.append({"minuto": min_gol + 1, "squadra": "casa", "tipo": "gol", "testo": f"🎯 [{h}] GOAL SU RIGORE! Esecuzione perfetta dal dischetto!"})
+                minuti_usati.add(min_gol + 1)
         else:
             tipo_gol = rand(["Conclusione potente!", "Di testa su cross!", "Azione corale!", "Tap-in vincente!"])
             cronaca.append({"minuto": min_gol, "squadra": "casa", "tipo": "gol", "testo": f"⚽ [{h}] GOOOL! {tipo_gol}"})
@@ -170,16 +178,23 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
     # GOL OSPITE
     for i in range(ga):
         min_gol = random.randint(5, 85)
-        while min_gol in minuti_usati:
+        tentativi = 0
+        while min_gol in minuti_usati and tentativi < 100:
             min_gol = random.randint(5, 85)
+            tentativi += 1
+        
+        if tentativi >= 100:
+            continue
+        
         minuti_usati.add(min_gol)
         
         is_penalty = random.random() > 0.85
         
         if is_penalty:
             cronaca.append({"minuto": min_gol, "squadra": "ospite", "tipo": "rigore_fischio", "testo": f"📢 [{a}] CALCIO DI RIGORE! Massima punizione per gli ospiti!"})
-            cronaca.append({"minuto": min_gol + 1, "squadra": "ospite", "tipo": "gol", "testo": f"🎯 [{a}] GOAL SU RIGORE! Freddissimo dagli undici metri!"})
-            minuti_usati.add(min_gol + 1)
+            if min_gol + 1 not in minuti_usati:
+                cronaca.append({"minuto": min_gol + 1, "squadra": "ospite", "tipo": "gol", "testo": f"🎯 [{a}] GOAL SU RIGORE! Freddissimo dagli undici metri!"})
+                minuti_usati.add(min_gol + 1)
         else:
             tipo_gol = rand(["Zittisce lo stadio!", "Contropiede micidiale!", "Incredibile girata!", "Palla nel sette!"])
             cronaca.append({"minuto": min_gol, "squadra": "ospite", "tipo": "gol", "testo": f"⚽ [{a}] GOOOL! {tipo_gol}"})
@@ -188,10 +203,13 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
     num_gialli = random.randint(3, 6)
     for _ in range(num_gialli):
         min_cart = random.randint(10, 88)
-        while min_cart in minuti_usati:
-            min_cart += 1
-            if min_cart > 88:
-                min_cart = random.randint(10, 88)
+        tentativi = 0
+        while min_cart in minuti_usati and tentativi < 100:
+            min_cart = random.randint(10, 88)
+            tentativi += 1
+        
+        if tentativi >= 100:
+            continue
         
         minuti_usati.add(min_cart)
         sq = random.choice(["casa", "ospite"])
@@ -230,10 +248,22 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
             
             cronaca.append({"minuto": min_evento, "squadra": sq, "tipo": "info", "testo": f"[{team}] {txt}"})
     
-    # Ordina per minuto
+    # ✅ ORDINA PER MINUTO
     cronaca.sort(key=lambda x: x["minuto"])
     
-    return cronaca
+    # ✅ RIMUOVI DUPLICATI: Tieni solo la prima occorrenza di ogni evento
+    cronaca_unica = []
+    eventi_visti = set()
+    
+    for evento in cronaca:
+        # Crea una chiave unica (minuto + tipo + testo)
+        chiave = f"{evento['minuto']}-{evento['tipo']}-{evento['testo']}"
+        
+        if chiave not in eventi_visti:
+            eventi_visti.add(chiave)
+            cronaca_unica.append(evento)
+    
+    return cronaca_unica
 
 def genera_match_report_completo(gh, ga, h2h_data, team_h, team_a, simulazioni_raw, deep_stats):
     """
@@ -421,6 +451,9 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
             us.MONTE_CARLO_TOTAL_CYCLES = cycles
             res = run_monte_carlo_verdict_detailed(preloaded_data, home_team, away_team)
             gh, ga = res[0]
+            
+            # ✅ STAMPA DI DEBUG (rimuovi dopo il test)
+            print(f"🎯 RISULTATO FINALE: {gh}-{ga}", file=sys.stderr)
             
             # ✅ TRACKING CICLI REALI (dal risultato Monte Carlo)
             if len(res) > 4 and isinstance(res[4], dict):
