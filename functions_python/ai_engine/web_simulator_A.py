@@ -70,8 +70,17 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
     
     cronaca = []
     minuti_usati = set()
-    h = team_h.upper()
-    a = team_a.upper()
+    
+    # ✅ GESTIONE ROBUSTA: Accetta sia dict che stringhe
+    if isinstance(team_h, dict):
+        h = team_h.get('name', 'Home').upper()
+    else:
+        h = str(team_h).upper()
+    
+    if isinstance(team_a, dict):
+        a = team_a.get('name', 'Away').upper()
+    else:
+        a = str(team_a).upper()
     
     def rand(lista):
         return random.choice(lista)
