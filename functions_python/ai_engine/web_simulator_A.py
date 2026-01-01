@@ -616,9 +616,19 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
         # BETTING LOGIC
         report_pro = analyze_betting_data(sim_list, quote_match)
 
+        # ✅ DEBUG INFO
+        debug_info = {
+            "match_cercato": f"{home_team} vs {away_team}",
+            "match_trovato": f"{match_data.get('home', 'N/A')} vs {match_data.get('away', 'N/A')}",
+            "formazioni_presenti": bool(h2h_data.get('formazioni')),
+            "marcatori_casa": ottieni_nomi_giocatori(h2h_data)[0] if h2h_data.get('formazioni') else [],
+            "marcatori_ospite": ottieni_nomi_giocatori(h2h_data)[1] if h2h_data.get('formazioni') else []
+        }
+
         # RISULTATO FINALE
         raw_result = {
             "success": True,
+            "debug": debug_info,
             "predicted_score": f"{gh}-{ga}",
             "gh": gh,
             "ga": ga,
