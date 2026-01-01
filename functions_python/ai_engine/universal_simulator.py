@@ -211,33 +211,38 @@ def run_single_algo_montecarlo(algo_id, preloaded_data, home_team, away_team, cy
 
 
 
-def run_monte_carlo_verdict_detailed(preloaded_data, home_team, away_team, analyzer=None, cycles=None, **kwargs):
-    """
-    ✅ NUOVO: Accetta il parametro cycles dal chiamante
-    """
-    # ✅ USA I CICLI PASSATI O IL DEFAULT
-    total_cycles = cycles if cycles is not None else MONTE_CARLO_TOTAL_CYCLES
-    cycles_per_algo = total_cycles // 4
-    
-    print(f"🎯 ESECUZIONE MONTE CARLO: {total_cycles} cicli totali ({cycles_per_algo} per algoritmo)", file=sys.stderr)
-    
+def run_monte_carlo_verdict_detailed(preloaded_data, home_team, away_team, analyzer=None, cycles=None, algo_id=None, **kwargs):
     """
     Versione SILENZIOSA con statistiche pesi aggregate.
+    
+    ✅ PARAMETRI NUOVI:
+    - cycles: Numero di cicli totali da eseguire
+    - algo_id: ID algoritmo da usare (se specificato, usa SOLO quello invece di tutti e 4)
     """
+    
     nominees = []
     algos_stats = {}
     algos_full_results = {}
     algos_weights_tracking = {}
     algos_scontrini_tracking = {}
     
-    algos = [2, 3, 4, 5]
-    cycles_per_algo = MONTE_CARLO_TOTAL_CYCLES // 4
+    # ✅ USA I CICLI PASSATI O IL DEFAULT
+    total_cycles = cycles if cycles is not None else MONTE_CARLO_TOTAL_CYCLES
     
+    # ✅ LOGICA ALGORITMI: Se algo_id è specificato, usa SOLO quello
+    if algo_id is not None and algo_id != 6:
+        # MODALITÀ SINGOLO ALGORITMO (quando l'utente sceglie 1, 2, 3, 4, o 5)
+        algos = [algo_id]
+        cycles_per_algo = total_cycles
+        print(f"🎯 MODALITÀ SINGOLO ALGORITMO: Algo {algo_id} con {total_cycles} cicli", file=sys.stderr)
+    else:
+        # MODALITÀ MONTE CARLO (quando l'utente sceglie 6 o non specifica)
+        algos = [2, 3, 4, 5]
+        cycles_per_algo = total_cycles // 4
+        print(f"🎯 MODALITÀ MONTE CARLO: 4 algoritmi con {cycles_per_algo} cicli ciascuno", file=sys.stderr)
     
+    tempo_stimato = total_cycles // 70
     
-    tempo_stimato = MONTE_CARLO_TOTAL_CYCLES // 70
-    
-        
     print()
     
     algo_names = {2: 'Dinamico', 3: 'Tattico', 4: 'Caos', 5: 'Master'}
@@ -248,8 +253,6 @@ def run_monte_carlo_verdict_detailed(preloaded_data, home_team, away_team, analy
         params_sum = {}
         scontrini_sum = {'casa': {}, 'ospite': {}}
         valid_cycles = 0
-        
-        
         
         for cycle_idx in range(cycles_per_algo):
             with suppress_stdout():
@@ -263,10 +266,11 @@ def run_monte_carlo_verdict_detailed(preloaded_data, home_team, away_team, analy
                 score = f"{gh}-{ga}"
                 local_results.append(score)
                 valid_cycles += 1
-                # ✨ AGGIUNGI QUESTA RIGA (subito dopo valid_cycles):
+                
                 if analyzer:
                     analyzer.add_result(algo_id=aid, home_goals=gh, away_goals=ga)
-                # Accumula pesi (versione SMART)
+                
+                # Accumula pesi
                 if pesi_dettagliati:
                     for nome_peso, info in pesi_dettagliati.items():
                         if nome_peso not in weights_sum:
@@ -310,14 +314,10 @@ def run_monte_carlo_verdict_detailed(preloaded_data, home_team, away_team, analy
                         scontrini_sum['ospite'][voce]['punti_sum'] += dati.get('punti', 0)
             
             # Barra progresso
-            # ✅ FIX: Qui usiamo "cycles_per_algo" e aggiungiamo max(1, ...) per evitare lo zero
             if cycle_idx % max(1, cycles_per_algo // 10) == 0 or cycle_idx == cycles_per_algo - 1:
                 pct = (cycle_idx + 1) / cycles_per_algo * 100
                 bar_len = int(pct / 5)
                 bar = "█" * bar_len + "░" * (20 - bar_len)
-                
-        
-        
         
         if not local_results:
             continue
@@ -356,7 +356,6 @@ def run_monte_carlo_verdict_detailed(preloaded_data, home_team, away_team, analy
         
         preview = ", ".join([f"{sc}({freq})" for sc, freq in top_3[:3]])
         
-        
         for sc, freq in top_3:
             nominees.extend([sc] * freq)
     
@@ -366,6 +365,11 @@ def run_monte_carlo_verdict_detailed(preloaded_data, home_team, away_team, analy
     final_verdict = random.choice(nominees)
     gh, ga = map(int, final_verdict.split("-"))
     global_top3 = Counter(nominees).most_common(3)
+    
+    # ✅ LOG FINALE PER VERIFICA
+    print(f"✅ SIMULAZIONE COMPLETATA: {total_cycles} cicli eseguiti", file=sys.stderr)
+    print(f"✅ ALGORITMO USATO: {algos}", file=sys.stderr)
+    print(f"✅ RISULTATO FINALE: {gh}-{ga}", file=sys.stderr)
     
     # Salva debug JSON
     try:
