@@ -480,8 +480,19 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
         
         league_clean = league.replace('_', ' ').title()
         h2h_doc = db.h2h_by_round.find_one({"league": league_clean})
-        match_data = next((m for m in h2h_doc.get('matches', []) if m['home'] == home_team), {})
+        
+        # ✅ FIX: Cerca la partita ESATTA (home E away)
+        match_data = next(
+            (m for m in h2h_doc.get('matches', []) 
+             if m.get('home') == home_team and m.get('away') == away_team), 
+            {}
+        )
         h2h_data = match_data.get('h2h_data', {})
+        
+        # ✅ DEBUG: Log per verificare cosa viene caricato
+        print(f"🔍 MATCH CERCATO: {home_team} vs {away_team}", file=sys.stderr)
+        print(f"🔍 MATCH TROVATO: {match_data.get('home', 'N/A')} vs {match_data.get('away', 'N/A')}", file=sys.stderr)
+        print(f"🔍 FORMAZIONI PRESENTI: {'SI' if h2h_data.get('formazioni') else 'NO'}", file=sys.stderr)
 
         # 1. ESECUZIONE ALGORITMO E CREAZIONE sim_list
         sim_list = [] 
