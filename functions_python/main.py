@@ -290,7 +290,7 @@ def get_formations(request: https_fn.Request) -> https_fn.Response:
         if league_clean == "Serie A":
             league_clean = "Serie A"
         
-        # --- CERCA LA PARTITA IN TUTTE LE GIORNATE ---
+        # --- CERCA LA PARTITA IN TUTTE LE GIORNATE  ---
         match_data = {}
         h2h_data = {}
         
