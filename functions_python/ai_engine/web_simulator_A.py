@@ -20,6 +20,7 @@ if PARENT_DIR not in sys.path:
 # --- 2. ORA PUOI IMPORTARE IL TUO MODULO SENZA ERRORI ---
 import json
 import random
+import time
 from betting_logic import analyze_betting_data
 import math  # <--- AGGIUNGI QUESTA RIGA
 from datetime import datetime
@@ -484,7 +485,9 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
 
         # 1. ESECUZIONE ALGORITMO E CREAZIONE sim_list
         sim_list = [] 
+        t1 = time.time()
         preloaded_data = preload_match_data(home_team, away_team)
+        print(f"⏱️ PRELOAD DATI: {time.time() - t1:.2f}s", file=sys.stderr)
         
         # ✅ LOG INIZIALE
         print(f"🎯 SIMULAZIONE RICHIESTA: Algo {algo_id}, Cicli {cycles}", file=sys.stderr)
@@ -531,6 +534,7 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
             # ✅ ALGORITMI SINGOLI (1-5)
             print(f"🟢 MODALITÀ SINGOLO ALGORITMO {algo_id} ATTIVATA", file=sys.stderr)
             
+            t2 = time.time()
             sim_list = []
             for i in range(cycles):
                 gh_temp, ga_temp = run_single_algo(algo_id, preloaded_data, home_team, away_team)
@@ -549,7 +553,7 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
             top3 = [x[0] for x in Counter(sim_list).most_common(3)]
             cronaca = []
             actual_cycles_executed = cycles
-            
+            print(f"⏱️ CICLI SIMULAZIONE: {time.time() - t2:.2f}s", file=sys.stderr)
             print(f"✅ ALGORITMO {algo_id} COMPLETATO: {cycles} cicli eseguiti", file=sys.stderr)
             print(f"✅ RISULTATO FINALE: {gh}-{ga}", file=sys.stderr)
         
