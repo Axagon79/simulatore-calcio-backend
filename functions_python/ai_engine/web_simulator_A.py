@@ -240,6 +240,9 @@ def genera_anatomia_partita(gh, ga, h2h_match_data, team_h_doc, sim_list):
 
 def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: int, league: str, main_mode: int) -> dict:
     """Esegue la simulazione e arricchisce il risultato con i dati del DB."""
+    # ✅ AGGIUNGI QUESTE VARIABILI DI TRACKING ALL'INIZIO
+    actual_cycles_executed = 0
+    start_time = datetime.now()
     try:
         team_h_doc = db.teams.find_one({"name": home_team}) or {}
         team_a_doc = db.teams.find_one({"name": away_team}) or {}
@@ -258,6 +261,16 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
             us.MONTE_CARLO_TOTAL_CYCLES = cycles
             res = run_monte_carlo_verdict_detailed(preloaded_data, home_team, away_team)
             gh, ga = res[0]
+            
+            # ✅ TRACKING CICLI REALI (dal risultato Monte Carlo)
+            if len(res) > 4 and isinstance(res[4], dict):
+                # Conta i risultati reali eseguiti da tutti gli algoritmi
+                for algo_results in res[4].values():
+                    if isinstance(algo_results, list):
+                        actual_cycles_executed += len(algo_results)
+            else:
+                actual_cycles_executed = cycles  # Fallback
+            
             # Creazione sim_list dai risultati grezzi
             if len(res) > 4 and isinstance(res[4], list):
                 sim_list = [f"{r[0]}-{r[1]}" for r in res[4]]
@@ -270,6 +283,8 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
             sim_list = [f"{gh}-{ga}"] * cycles
             top3 = [f"{gh}-{ga}"]
             cronaca = []
+            
+            actual_cycles_executed = cycles  # ✅ Per gli altri algoritmi
 
         # 2. INTEGRAZIONE DEEP ANALYSIS
         analyzer = DeepAnalyzer()
@@ -305,6 +320,13 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
             "gh": gh,
             "ga": ga,
             "algo_name": ALGO_NAMES.get(algo_id, "Custom"),
+            
+            # ✅ AGGIUNGI QUESTI CAMPI NUOVI
+            "algo_id": algo_id,  # ✅ ID algoritmo reale
+            "cycles_requested": cycles,  # ✅ Cicli richiesti dall'utente
+            "cycles_executed": actual_cycles_executed,  # ✅ Cicli REALMENTE eseguiti
+            "execution_time": (datetime.now() - start_time).total_seconds(),  # ✅ Tempo reale
+            
             "statistiche": anatomy["statistiche"],
             "cronaca": anatomy["cronaca"],
             # AGGIUNGIAMO IL REPORT PROFESSIONALE QUI
