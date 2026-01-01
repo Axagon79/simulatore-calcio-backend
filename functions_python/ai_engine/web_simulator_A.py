@@ -481,10 +481,24 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
         # ✅ FIX: Pulizia nome lega
         league_clean = league.replace('_', ' ').title()
         if league_clean == "Serie A":
-            league_clean = "Serie A"  # Assicura formato corretto
+            league_clean = "Serie A"
         
-        # ✅ FIX: Cerca il documento della lega
-        h2h_doc = db.h2h_by_round.find_one({"league": league_clean})
+        # ✅ FIX: Cerca in TUTTE le giornate della lega
+        match_data = {}
+        h2h_data = {}
+        h2h_doc = None
+        
+        # Cerca la partita in tutti i documenti della lega
+        all_rounds = db.h2h_by_round.find({"league": league_clean})
+        for round_doc in all_rounds:
+            for m in round_doc.get('matches', []):
+                if m.get('home') == home_team and m.get('away') == away_team:
+                    match_data = m
+                    h2h_data = m.get('h2h_data', {})
+                    h2h_doc = round_doc
+                    break
+            if match_data:
+                break
         
         # ✅ DEBUG
         print(f"🔍 LEAGUE RICEVUTA: '{league}' -> PULITA: '{league_clean}'", file=sys.stderr)
@@ -496,16 +510,6 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
             h2h_doc = db.h2h_by_round.find_one({"league": {"$regex": f"^{league_clean}$", "$options": "i"}})
             print(f"🔍 TENTATIVO REGEX: {bool(h2h_doc)}", file=sys.stderr)
         
-        # ✅ FIX: Cerca la partita ESATTA (home E away)
-        match_data = {}
-        if h2h_doc:
-            for m in h2h_doc.get('matches', []):
-                if m.get('home') == home_team and m.get('away') == away_team:
-                    match_data = m
-                    break
-        
-        # ✅ IMPORTANTE: h2h_data contiene TUTTO incluse le formazioni
-        h2h_data = match_data.get('h2h_data', {})
         
         print(f"🔍 MATCH: {match_data.get('home', 'N/A')} vs {match_data.get('away', 'N/A')}", file=sys.stderr)
         print(f"🔍 FORMAZIONI: {bool(h2h_data.get('formazioni'))}", file=sys.stderr)
