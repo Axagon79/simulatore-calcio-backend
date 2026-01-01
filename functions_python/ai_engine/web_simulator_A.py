@@ -61,6 +61,171 @@ def sanitize_data(data):
             return 0.0
     return data
 
+def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
+    """
+    Genera 35-40 eventi live usando i pool di commenti realistici.
+    Sincronizza ESATTAMENTE gh gol per casa e ga per ospite.
+    """
+    import random
+    
+    cronaca = []
+    minuti_usati = set()
+    h = team_h.upper()
+    a = team_a.upper()
+    
+    def rand(lista):
+        return random.choice(lista)
+    
+    # ✅ POOL COMPLETI (Copiati dal tuo codice originale)
+    pool_attacco = [
+        "tenta la magia in rovesciata, il pallone viene bloccato dal portiere.",
+        "scappa sulla fascia e mette un cross teso: la difesa libera in affanno.",
+        "grande azione personale, si incunea in area ma viene murato al momento del tiro.",
+        "cerca la palla filtrante per la punta, ma il passaggio è leggermente lungo.",
+        "prova la conclusione dalla distanza: palla che sibila sopra la traversa.",
+        "duello vinto sulla trequarti, palla a rimorchio ma nessuno arriva per il tap-in.",
+        "serie di batti e ribatti nell'area piccola, alla fine il portiere blocca a terra.",
+        "parte in contropiede fulmineo, ma l'ultimo tocco è impreciso.",
+        "palla filtrante geniale! L'attaccante controlla male e sfuma l'occasione.",
+        "colpo di testa imperioso su azione d'angolo: palla fuori di un soffio.",
+        "scambio stretto al limite dell'area, tiro a giro che non inquadra lo specchio.",
+        "insiste nella pressione offensiva, costringendo gli avversari al rinvio lungo.",
+        "si libera bene per il tiro, ma la conclusione è debole e centrale.",
+        "schema su punizione che libera l'ala, il cross è però troppo alto per tutti."
+    ]
+    
+    pool_difesa = [
+        "grande intervento in scivolata! Il difensore legge benissimo la traiettoria.",
+        "muro difensivo invalicabile: respinta la conclusione a botta sicura.",
+        "chiusura provvidenziale in diagonale, l'attaccante era già pronto a calciare.",
+        "anticipo netto a centrocampo, la squadra può ripartire in transizione.",
+        "fa buona guardia sul cross da destra, svettando più in alto di tutti.",
+        "riesce a proteggere l'uscita del pallone sul fondo nonostante la pressione.",
+        "vince il duello fisico spalla a spalla e riconquista il possesso.",
+        "intervento pulito sul pallone, sventata una ripartenza pericolosissima.",
+        "chiusura millimetrica in area di rigore, brivido per i tifosi."
+    ]
+    
+    pool_portiere = [
+        "grande intervento! Il portiere si allunga alla sua sinistra e mette in corner.",
+        "salva sulla linea! Riflesso felino su un colpo di testa ravvicinato.",
+        "attento in uscita bassa, anticipa la punta lanciata a rete con coraggio.",
+        "si oppone con i pugni a una botta violenta dal limite. Sicurezza tra i pali.",
+        "vola all'incrocio dei pali! Parata incredibile che salva il risultato.",
+        "blocca in due tempi un tiro velenoso che era rimbalzato davanti a lui.",
+        "esce con tempismo perfetto fuori dall'area per sventare il lancio lungo.",
+        "deviazione d'istinto su una deviazione improvvisa, corner per gli avversari."
+    ]
+    
+    pool_atmosfera = [
+        "ritmi ora altissimi, le squadre si allungano e i ribaltamenti sono continui.",
+        "gara ora su ritmi bassissimi, si avverte la stanchezza in campo.",
+        "atmosfera elettrica sugli spalti, i tifosi spingono i propri beniamini.",
+        "fraseggio prolungato a centrocampo, le squadre cercano il varco giusto.",
+        "si intensifica il riscaldamento sulla panchina, pronti nuovi cambi tattici.",
+        "errore banale in fase di impostazione, brivido per l'allenatore in panchina.",
+        "il pressing alto inizia a dare i suoi frutti, avversari chiusi nella propria metà campo.",
+        "gioco momentaneamente fermo per un contrasto a centrocampo."
+    ]
+    
+    # --- 1. EVENTI SISTEMA ---
+    cronaca.append({"minuto": 0, "squadra": "casa", "tipo": "info", "testo": f"🏁 [SISTEMA] FISCHIO D'INIZIO! Inizia {h} vs {a}!"})
+    
+    recupero_pt = random.randint(1, 4)
+    cronaca.append({"minuto": 45, "squadra": "casa", "tipo": "info", "testo": f"⏱️ [SISTEMA] Segnalati {recupero_pt} minuti di recupero nel primo tempo."})
+    cronaca.append({"minuto": 45 + recupero_pt, "squadra": "casa", "tipo": "info", "testo": "☕ [SISTEMA] FINE PRIMO TEMPO. Squadre negli spogliatoi."})
+    
+    recupero_st = random.randint(2, 7)
+    cronaca.append({"minuto": 90, "squadra": "casa", "tipo": "info", "testo": f"⏱️ [SISTEMA] Il quarto uomo indica {recupero_st} minuti di recupero."})
+    
+    minuti_usati.update([0, 45, 45 + recupero_pt, 90])
+    
+    # --- 2. GOL SINCRONIZZATI (ESATTAMENTE gh per casa, ga per ospite) ---
+    # GOL CASA
+    for i in range(gh):
+        min_gol = random.randint(5, 85)
+        while min_gol in minuti_usati:
+            min_gol = random.randint(5, 85)
+        minuti_usati.add(min_gol)
+        
+        is_penalty = random.random() > 0.85
+        
+        if is_penalty:
+            cronaca.append({"minuto": min_gol, "squadra": "casa", "tipo": "rigore_fischio", "testo": f"📢 [{h}] CALCIO DI RIGORE! Il direttore di gara indica il dischetto!"})
+            cronaca.append({"minuto": min_gol + 1, "squadra": "casa", "tipo": "gol", "testo": f"🎯 [{h}] GOAL SU RIGORE! Esecuzione perfetta dal dischetto!"})
+            minuti_usati.add(min_gol + 1)
+        else:
+            tipo_gol = rand(["Conclusione potente!", "Di testa su cross!", "Azione corale!", "Tap-in vincente!"])
+            cronaca.append({"minuto": min_gol, "squadra": "casa", "tipo": "gol", "testo": f"⚽ [{h}] GOOOL! {tipo_gol}"})
+    
+    # GOL OSPITE
+    for i in range(ga):
+        min_gol = random.randint(5, 85)
+        while min_gol in minuti_usati:
+            min_gol = random.randint(5, 85)
+        minuti_usati.add(min_gol)
+        
+        is_penalty = random.random() > 0.85
+        
+        if is_penalty:
+            cronaca.append({"minuto": min_gol, "squadra": "ospite", "tipo": "rigore_fischio", "testo": f"📢 [{a}] CALCIO DI RIGORE! Massima punizione per gli ospiti!"})
+            cronaca.append({"minuto": min_gol + 1, "squadra": "ospite", "tipo": "gol", "testo": f"🎯 [{a}] GOAL SU RIGORE! Freddissimo dagli undici metri!"})
+            minuti_usati.add(min_gol + 1)
+        else:
+            tipo_gol = rand(["Zittisce lo stadio!", "Contropiede micidiale!", "Incredibile girata!", "Palla nel sette!"])
+            cronaca.append({"minuto": min_gol, "squadra": "ospite", "tipo": "gol", "testo": f"⚽ [{a}] GOOOL! {tipo_gol}"})
+    
+    # --- 3. CARTELLINI (3-6 casuali) ---
+    num_gialli = random.randint(3, 6)
+    for _ in range(num_gialli):
+        min_cart = random.randint(10, 88)
+        while min_cart in minuti_usati:
+            min_cart += 1
+            if min_cart > 88:
+                min_cart = random.randint(10, 88)
+        
+        minuti_usati.add(min_cart)
+        sq = random.choice(["casa", "ospite"])
+        team = h if sq == "casa" else a
+        cronaca.append({"minuto": min_cart, "squadra": sq, "tipo": "cartellino", "testo": f"🟨 [{team}] Giallo per un fallo tattico a centrocampo."})
+    
+    # --- 4. EVENTI DAI POOL (35-40 eventi distribuiti) ---
+    eventi_per_tempo = 18
+    
+    for tempo in [1, 2]:
+        min_base = 1 if tempo == 1 else 46
+        min_max = 45 if tempo == 1 else 90
+        intervallo = (min_max - min_base) / eventi_per_tempo
+        
+        for i in range(eventi_per_tempo):
+            min_evento = int(min_base + (i * intervallo) + random.uniform(0, intervallo - 1))
+            
+            if min_evento in minuti_usati:
+                continue
+            
+            minuti_usati.add(min_evento)
+            
+            sq = random.choice(["casa", "ospite"])
+            team = h if sq == "casa" else a
+            
+            # Scelta pool equilibrata
+            roll = random.random()
+            if roll > 0.75:
+                txt = rand(pool_portiere)
+            elif roll > 0.50:
+                txt = rand(pool_attacco)
+            elif roll > 0.25:
+                txt = rand(pool_difesa)
+            else:
+                txt = rand(pool_atmosfera)
+            
+            cronaca.append({"minuto": min_evento, "squadra": sq, "tipo": "info", "testo": f"[{team}] {txt}"})
+    
+    # Ordina per minuto
+    cronaca.sort(key=lambda x: x["minuto"])
+    
+    return cronaca
+
 def genera_match_report_completo(gh, ga, h2h_data, team_h, team_a, simulazioni_raw, deep_stats):
     """
     Genera l'anatomia della partita, la cronaca live e il report scommesse professionale.
@@ -112,22 +277,8 @@ def genera_match_report_completo(gh, ga, h2h_data, team_h, team_a, simulazioni_r
         "Sostituzioni": [5, 5]
     }
 
-    # --- 2. CRONACA LIVE (Timeline 0-90' con Nomi Reali) ---
-    cronaca = []
-    titolari_h = h2h_data.get('formazioni', {}).get('home_squad', {}).get('titolari', [])
-    titolari_a = h2h_data.get('formazioni', {}).get('away_squad', {}).get('titolari', [])
-
-    def pick_p(squad, role_list):
-        pool = [p for p in squad if p.get('role') in role_list] or squad
-        return random.choice(pool).get('player', "Giocatore") if pool else "Giocatore"
-
-    for _ in range(gh):
-        cronaca.append({"minuto": random.randint(1, 90), "squadra": "casa", "tipo": "gol", "testo": f"⚽ GOL! {pick_p(titolari_h, ['ATT', 'MID'])}!"})
-    for _ in range(ga):
-        cronaca.append({"minuto": random.randint(1, 90), "squadra": "ospite", "tipo": "gol", "testo": f"⚽ GOL! {pick_p(titolari_a, ['ATT', 'MID'])}!"})
-    
-    for _ in range(random.randint(1, 4)):
-        cronaca.append({"minuto": random.randint(10, 88), "squadra": random.choice(["casa", "ospite"]), "tipo": "cartellino", "testo": "🟨 Ammonizione per gioco scorretto."})
+    # ✅ NUOVO: USA LA FUNZIONE DENSA
+    cronaca = genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data)
 
     # --- 3. REPORT SCOMMESSE PROFESSIONALE ---
     tot = len(simulazioni_raw)
