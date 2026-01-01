@@ -637,13 +637,19 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
         # BETTING LOGIC
         report_pro = analyze_betting_data(sim_list, quote_match)
 
-        # ✅ DEBUG INFO
+        # ✅ DEBUG INFO COMPLETO
         debug_info = {
-            "match_cercato": f"{home_team} vs {away_team}",
-            "match_trovato": f"{match_data.get('home', 'N/A')} vs {match_data.get('away', 'N/A')}",
-            "formazioni_presenti": bool(h2h_data.get('formazioni')),
-            "marcatori_casa": ottieni_nomi_giocatori(h2h_data)[0] if h2h_data.get('formazioni') else [],
-            "marcatori_ospite": ottieni_nomi_giocatori(h2h_data)[1] if h2h_data.get('formazioni') else []
+            "1_league_ricevuta": league,
+            "2_league_pulita": league_clean,
+            "3_h2h_doc_trovato": bool(h2h_doc),
+            "4_num_partite": len(h2h_doc.get('matches', [])) if h2h_doc else 0,
+            "5_prime_partite": [(m.get('home'), m.get('away')) for m in (h2h_doc.get('matches', []) if h2h_doc else [])[:3]],
+            "6_match_cercato": f"{home_team} vs {away_team}",
+            "7_match_trovato": f"{match_data.get('home', 'N/A')} vs {match_data.get('away', 'N/A')}",
+            "8_h2h_data_keys": list(h2h_data.keys()) if h2h_data else [],
+            "9_formazioni_presenti": bool(h2h_data.get('formazioni')),
+            "10_marcatori_casa": ottieni_nomi_giocatori(h2h_data)[0] if h2h_data.get('formazioni') else [],
+            "11_marcatori_ospite": ottieni_nomi_giocatori(h2h_data)[1] if h2h_data.get('formazioni') else []
         }
 
         # RISULTATO FINALE
