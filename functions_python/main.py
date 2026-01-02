@@ -365,3 +365,129 @@ def get_formations(request: https_fn.Request) -> https_fn.Response:
             mimetype='application/json',
             headers=headers
         )
+        
+@https_fn.on_request(
+    memory=options.MemoryOption.MB_256,
+    timeout_sec=10,
+    region="us-central1"
+)
+def get_tuning(request: https_fn.Request) -> https_fn.Response:
+    """
+    Endpoint per LEGGERE i parametri di tuning da MongoDB.
+    Usato dal mixer online per mostrare i valori attuali.
+    """
+    # --- GESTIONE CORS ---
+    headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Content-Type': 'application/json'
+    }
+
+    if request.method == 'OPTIONS':
+        return https_fn.Response('', status=204, headers=headers)
+
+    try:
+        # --- IMPORTA DB ---
+        try:
+            from config import db
+        except ImportError:
+            from ai_engine.config import db
+
+        # --- LEGGI DA MONGODB ---
+        doc = db['tuning_settings'].find_one({"_id": "main_config"})
+        
+        if doc and "config" in doc:
+            return https_fn.Response(
+                json.dumps({"success": True, "config": doc["config"]}, ensure_ascii=False),
+                mimetype='application/json',
+                headers=headers
+            )
+        else:
+            return https_fn.Response(
+                json.dumps({"success": False, "error": "Tuning config not found"}),
+                status=404,
+                mimetype='application/json',
+                headers=headers
+            )
+
+    except Exception as e:
+        print(f"❌ Errore get_tuning: {str(e)}", file=sys.stderr)
+        return https_fn.Response(
+            json.dumps({"success": False, "error": str(e)}),
+            status=500,
+            mimetype='application/json',
+            headers=headers
+        )
+
+
+@https_fn.on_request(
+    memory=options.MemoryOption.MB_256,
+    timeout_sec=10,
+    region="us-central1"
+)
+def save_tuning(request: https_fn.Request) -> https_fn.Response:
+    """
+    Endpoint per SALVARE i parametri di tuning su MongoDB.
+    Usato dal mixer online per aggiornare i valori.
+    """
+    # --- GESTIONE CORS ---
+    headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Content-Type': 'application/json'
+    }
+
+    if request.method == 'OPTIONS':
+        return https_fn.Response('', status=204, headers=headers)
+
+    try:
+        # --- IMPORTA DB ---
+        try:
+            from config import db
+        except ImportError:
+            from ai_engine.config import db
+
+        # --- LEGGI PAYLOAD ---
+        if hasattr(request, 'get_json'):
+            payload = request.get_json(silent=True) or {}
+        else:
+            payload = {}
+
+        config_data = payload.get('config')
+        
+        if not config_data:
+            return https_fn.Response(
+                json.dumps({"success": False, "error": "Missing 'config' in request body"}),
+                status=400,
+                mimetype='application/json',
+                headers=headers
+            )
+
+        # --- SALVA SU MONGODB ---
+        result = db['tuning_settings'].update_one(
+            {"_id": "main_config"},
+            {"$set": {"config": config_data}},
+            upsert=True
+        )
+
+        return https_fn.Response(
+            json.dumps({
+                "success": True,
+                "message": "Tuning saved successfully",
+                "modified": result.modified_count,
+                "upserted": result.upserted_id is not None
+            }, ensure_ascii=False),
+            mimetype='application/json',
+            headers=headers
+        )
+
+    except Exception as e:
+        print(f"❌ Errore save_tuning: {str(e)}", file=sys.stderr)
+        return https_fn.Response(
+            json.dumps({"success": False, "error": str(e)}),
+            status=500,
+            mimetype='application/json',
+            headers=headers
+        )
