@@ -50,12 +50,26 @@ CACHE_FILE = os.path.join(CURRENT_DIR, "last_match_data.json")
 TUNING_FILE = os.path.join(CURRENT_DIR, "tuning_settings.json")
 
 def load_tuning_db():
+    """Carica tuning da MongoDB (con fallback su file locale)"""
+    
+    # 1. PROVA MONGODB
+    try:
+        doc = db['tuning_settings'].find_one({"_id": "main_config"})
+        if doc and "config" in doc:
+            print("✅ [ENGINE] Tuning caricato da MongoDB")
+            return doc["config"]
+    except Exception as e:
+        print(f"⚠️ [ENGINE] MongoDB tuning non disponibile: {e}")
+    
+    # 2. FALLBACK FILE LOCALE
     try:
         if os.path.exists(TUNING_FILE):
             with open(TUNING_FILE, "r", encoding="utf-8") as f:
+                print("✅ [ENGINE] Tuning caricato da file locale (fallback)")
                 return json.load(f)
     except Exception as e:
         print(f"⚠️ Errore lettura tuning: {e}")
+    
     return {}
 
 # 1. Carichiamo tutto il DB grezzo (Global + Algos)

@@ -13,52 +13,65 @@ TUNING_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tuning_s
 
 def load_tuning(algo_mode="GLOBAL"):
     """
-    Carica i settaggi dal file JSON.
+    Carica i settaggi da MongoDB (con fallback su file locale).
     Accetta int (1,2,3...) o stringa ("GLOBAL").
     """
+    full_data = {}
+    
+    # 1. PROVA A LEGGERE DA MONGODB
     try:
-        if not os.path.exists(TUNING_FILE):
-            return {}
-
-        with open(TUNING_FILE, "r", encoding="utf-8") as f:
-            full_data = json.load(f)
-
-        # Mappa: Numero -> Nome Chiave JSON
-        algo_map = {
-            1: "ALGO_1",
-            2: "ALGO_2",
-            3: "ALGO_3",
-            4: "ALGO_4",
-            5: "ALGO_5"
-        }
-
-        # Determinazione della chiave target
-        if isinstance(algo_mode, int):
-            # Se è un numero (es. 1), cercalo nella mappa. Fallback: GLOBAL
-            target_key = algo_map.get(algo_mode, "GLOBAL")
-        else:
-            # Se è già una stringa o altro (es. "GLOBAL"), usalo direttamente
-            target_key = str(algo_mode)
-
-        merged_settings = {}
-
-        # 1. Carica SEMPRE la base GLOBAL (Master)
-        if "GLOBAL" in full_data:
-            for k, v_obj in full_data["GLOBAL"].items():
-                if isinstance(v_obj, dict) and "valore" in v_obj:
-                    merged_settings[k] = v_obj["valore"]
-
-        # 2. Sovrascrivi con lo Specifico (solo se diverso da GLOBAL)
-        if target_key != "GLOBAL" and target_key in full_data:
-            for k, v_obj in full_data[target_key].items():
-                if isinstance(v_obj, dict) and "valore" in v_obj:
-                    merged_settings[k] = v_obj["valore"]
-
-        return merged_settings
-
+        from config import db
+        doc = db['tuning_settings'].find_one({"_id": "main_config"})
+        if doc and "config" in doc:
+            full_data = doc["config"]
+            print("✅ [TUNING] Caricato da MongoDB")
     except Exception as e:
-        print(f"⚠️ Errore caricamento tuning: {e}")
+        print(f"⚠️ [TUNING] MongoDB non disponibile: {e}")
+    
+    # 2. FALLBACK: FILE LOCALE
+    if not full_data:
+        try:
+            if os.path.exists(TUNING_FILE):
+                with open(TUNING_FILE, "r", encoding="utf-8") as f:
+                    full_data = json.load(f)
+                print("✅ [TUNING] Caricato da file locale (fallback)")
+        except Exception as e:
+            print(f"⚠️ [TUNING] Errore lettura file: {e}")
+            return {}
+    
+    if not full_data:
         return {}
+    
+    # Mappa: Numero -> Nome Chiave JSON
+    algo_map = {
+        1: "ALGO_1",
+        2: "ALGO_2",
+        3: "ALGO_3",
+        4: "ALGO_4",
+        5: "ALGO_5"
+    }
+
+    # Determinazione della chiave target
+    if isinstance(algo_mode, int):
+        target_key = algo_map.get(algo_mode, "GLOBAL")
+    else:
+        target_key = str(algo_mode)
+
+    merged_settings = {}
+
+    # 1. Carica SEMPRE la base GLOBAL (Master)
+    if "GLOBAL" in full_data:
+        for k, v_obj in full_data["GLOBAL"].items():
+            if isinstance(v_obj, dict) and "valore" in v_obj:
+                merged_settings[k] = v_obj["valore"]
+
+    # 2. Sovrascrivi con lo Specifico (solo se diverso da GLOBAL)
+    if target_key != "GLOBAL" and target_key in full_data:
+        for k, v_obj in full_data[target_key].items():
+            if isinstance(v_obj, dict) and "valore" in v_obj:
+                merged_settings[k] = v_obj["valore"]
+
+    return merged_settings
 
  
 
