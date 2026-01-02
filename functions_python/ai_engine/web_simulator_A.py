@@ -63,22 +63,18 @@ def sanitize_data(data):
     return data
 
 def ottieni_nomi_giocatori(h2h_data):
-    """Estrae i nomi dei giocatori dalle formazioni del database"""
+    """Estrae nomi giocatori dalle formazioni database"""
     formazioni = h2h_data.get('formazioni', {})
-    
     titolari_h = formazioni.get('home_squad', {}).get('titolari', [])
     titolari_a = formazioni.get('away_squad', {}).get('titolari', [])
     
-    # Estrai attaccanti/centrocampisti (più probabili marcatori)
     def filtra_marcatori(squad):
         nomi = []
         for p in squad:
-            ruolo = p.get('role', '')  # ✅ CORRETTO: 'role' non 'position'
-            if ruolo in ['ATT', 'MID']:  # ✅ CORRETTO: usa i valori del tuo DB
-                nome = p.get('player', 'Giocatore')  # ✅ CORRETTO: 'player' non 'name'
-                # Prendi solo cognome (ultima parola)
-                nome_parts = nome.split()
-                nomi.append(nome_parts[-1] if nome_parts else 'Giocatore')
+            ruolo = p.get('role', '')
+            if ruolo in ['ATT', 'MID']:
+                nome = p.get('player', 'Giocatore')
+                nomi.append(nome)  # ✅ Nome completo
         return nomi if nomi else ['Attaccante', 'Centrocampista', 'Ala']
     
     return filtra_marcatori(titolari_h), filtra_marcatori(titolari_a)
