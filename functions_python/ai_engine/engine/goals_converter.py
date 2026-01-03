@@ -11,6 +11,54 @@ import json
 # --- 0. CONFIGURAZIONE TUNING MIXER ---
 TUNING_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tuning_settings.json")
 
+
+# --- FUNZIONE VALIDAZIONE PARAMETRI ---
+def validate_tuning(settings):
+    """
+    Valida SOLO i parametri critici che causano crash.
+    I pesi possono andare a zero (disattivato) ma non sotto.
+    """
+    validated = settings.copy()
+    
+    # DIVISORI: Non possono essere 0 o negativi (causano CRASH)
+    if "DIVISORE_MEDIA_GOL" in validated:
+        val = validated["DIVISORE_MEDIA_GOL"]
+        if val <= 0:
+            print(f"⚠️ [TUNING] DIVISORE_MEDIA_GOL = {val} causa crash! Uso default: 2.0")
+            validated["DIVISORE_MEDIA_GOL"] = 2.0
+    
+    if "IMPATTO_DIFESA_TATTICA" in validated:
+        val = validated["IMPATTO_DIFESA_TATTICA"]
+        if val <= 0:
+            print(f"⚠️ [TUNING] IMPATTO_DIFESA_TATTICA = {val} causa crash! Uso default: 15.0")
+            validated["IMPATTO_DIFESA_TATTICA"] = 15.0
+    
+    return validated
+
+# --- FUNZIONE VALIDAZIONE PARAMETRI ---
+def validate_tuning(settings):
+    """
+    Valida SOLO i parametri critici che causano crash.
+    I pesi possono andare a zero (disattivato) ma non sotto.
+    """
+    validated = settings.copy()
+    
+    # DIVISORI: Non possono essere 0 o negativi (causano CRASH)
+    if "DIVISORE_MEDIA_GOL" in validated:
+        val = validated["DIVISORE_MEDIA_GOL"]
+        if val <= 0:
+            print(f"⚠️ [TUNING] DIVISORE_MEDIA_GOL = {val} causa crash! Uso default: 2.0")
+            validated["DIVISORE_MEDIA_GOL"] = 2.0
+    
+    if "IMPATTO_DIFESA_TATTICA" in validated:
+        val = validated["IMPATTO_DIFESA_TATTICA"]
+        if val <= 0:
+            print(f"⚠️ [TUNING] IMPATTO_DIFESA_TATTICA = {val} causa crash! Uso default: 15.0")
+            validated["IMPATTO_DIFESA_TATTICA"] = 15.0
+    
+    return validated
+
+
 def load_tuning(algo_mode="GLOBAL"):
     """
     Carica i settaggi da MongoDB (con fallback su file locale).
@@ -37,10 +85,10 @@ def load_tuning(algo_mode="GLOBAL"):
                 print("✅ [TUNING] Caricato da file locale (fallback)")
         except Exception as e:
             print(f"⚠️ [TUNING] Errore lettura file: {e}")
-            return {}
+            return validate_tuning({})
     
     if not full_data:
-        return {}
+        return validate_tuning({})
     
     # Mappa: Numero -> Nome Chiave JSON
     algo_map = {
@@ -71,14 +119,12 @@ def load_tuning(algo_mode="GLOBAL"):
             if isinstance(v_obj, dict) and "valore" in v_obj:
                 merged_settings[k] = v_obj["valore"]
 
-    return merged_settings
+    return validate_tuning(merged_settings)
 
- 
 
 # --- CARICAMENTO INIZIALE ---
 # Carichiamo il MASTER (GLOBAL) come base
 S = load_tuning("GLOBAL")
-
 
 
 # Se i settaggi mancano, usa questi default di sicurezza
