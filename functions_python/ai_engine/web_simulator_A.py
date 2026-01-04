@@ -303,6 +303,7 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
         marcatore = rand(marcatori_casa)
         min_display = format_minuto(min_gol)
         
+        prefisso = ""  # ← INIZIALIZZA QUI FUORI!
         # Se il minuto contiene "+", è recupero!
         if "+" in min_display:
             if min_display.startswith("45+"):
@@ -357,6 +358,7 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
         marcatore = rand(marcatori_ospite)
         min_display = format_minuto(min_gol)
         
+        prefisso = ""  # ← INIZIALIZZA QUI FUORI!
         # Se il minuto contiene "+", è recupero!
         if "+" in min_display:
             if min_display.startswith("45+"):
