@@ -303,26 +303,29 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
         marcatore = rand(marcatori_casa)
         min_display = format_minuto(min_gol)
         
-        prefisso = ""  # ← INIZIALIZZA QUI FUORI!
-        # Se il minuto contiene "+", è recupero!
+        # 🔥 PREFISSO SPECIALE PER GOL NEL RECUPERO
+        prefisso = ""
+
+        # Definisci le frasi PRIMA dell'if
+        frasi_recupero_pt = [
+            "⏱️ ALLO SCADERE DEL PRIMO TEMPO! ",
+            "🔥 IN PIENO RECUPERO! ",
+            "⚡ PRIMA DELL'INTERVALLO! "
+        ]
+
+        frasi_recupero = [
+            "🔥 IN PIENO RECUPERO! ",
+            "⏱️ AL FOTOFINISH! ",
+            "⚡ ALL'ULTIMO RESPIRO! ",
+            "🚨 CLAMOROSO NEL RECUPERO! "
+        ]
+
+        # Ora usa le liste
         if "+" in min_display:
             if min_display.startswith("45+"):
-                # Recupero primo tempo
-                frasi_recupero_pt = [
-                "🔥 IN PIENO RECUPERO! ",
-                "⏱️ AL FOTOFINISH! ",
-                "⚡ ALL'ULTIMO RESPIRO! ",
-                "🚨 CLAMOROSO NEL RECUPERO! "
-            ]
-            prefisso = rand(frasi_recupero_pt)
-        elif min_display.startswith("90+"):
-            # Recupero secondo tempo
-            frasi_recupero = [
-                "⏱️ ALLO SCADERE DEL PRIMO TEMPO! ",
-                "🔥 IN PIENO RECUPERO! ",
-                "⚡ PRIMA DELL'INTERVALLO! "
-            ]
-            prefisso = rand(frasi_recupero_pt)
+                prefisso = rand(frasi_recupero_pt)
+            elif min_display.startswith("90+"):
+                prefisso = rand(frasi_recupero)
 
         if is_penalty:
             cronaca.append({"minuto": min_gol, "squadra": "casa", "tipo": "rigore_fischio", "testo": f"{min_display}' 📢 {prefisso}[{h}] CALCIO DI RIGORE! Il direttore di gara indica il dischetto!"})
@@ -358,26 +361,29 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
         marcatore = rand(marcatori_ospite)
         min_display = format_minuto(min_gol)
         
-        prefisso = ""  # ← INIZIALIZZA QUI FUORI!
-        # Se il minuto contiene "+", è recupero!
+        # 🔥 PREFISSO SPECIALE PER GOL NEL RECUPERO
+        prefisso = ""
+
+        # Definisci le frasi PRIMA dell'if
+        frasi_recupero_pt = [
+            "⏱️ ALLO SCADERE DEL PRIMO TEMPO! ",
+            "🔥 IN PIENO RECUPERO! ",
+            "⚡ PRIMA DELL'INTERVALLO! "
+        ]
+
+        frasi_recupero = [
+            "🔥 IN PIENO RECUPERO! ",
+            "⏱️ AL FOTOFINISH! ",
+            "⚡ ALL'ULTIMO RESPIRO! ",
+            "🚨 CLAMOROSO NEL RECUPERO! "
+        ]
+
+        # Ora usa le liste
         if "+" in min_display:
             if min_display.startswith("45+"):
-                # Recupero primo tempo
-                frasi_recupero_pt = [
-                "🔥 IN PIENO RECUPERO! ",
-                "⏱️ AL FOTOFINISH! ",
-                "⚡ ALL'ULTIMO RESPIRO! ",
-                "🚨 CLAMOROSO NEL RECUPERO! "
-            ]
-            prefisso = rand(frasi_recupero_pt)
-        elif min_display.startswith("90+"):
-            # Recupero secondo tempo
-            frasi_recupero = [
-                "⏱️ ALLO SCADERE DEL PRIMO TEMPO! ",
-                "🔥 IN PIENO RECUPERO! ",
-                "⚡ PRIMA DELL'INTERVALLO! "
-            ]
-            prefisso = rand(frasi_recupero_pt)
+                prefisso = rand(frasi_recupero_pt)
+            elif min_display.startswith("90+"):
+                prefisso = rand(frasi_recupero)
 
         if is_penalty:
             cronaca.append({"minuto": min_gol, "squadra": "ospite", "tipo": "rigore_fischio", "testo": f"{min_display}' 📢 {prefisso}[{a}] CALCIO DI RIGORE! Massima punizione per gli ospiti!"})
