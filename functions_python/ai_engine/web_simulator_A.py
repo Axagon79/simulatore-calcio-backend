@@ -637,16 +637,21 @@ def genera_anatomia_partita(gh, ga, h2h_match_data, team_h_doc, sim_list):
 
 def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: int, league: str, main_mode: int) -> dict:
     """Esegue la simulazione e arricchisce il risultato con i dati del DB."""
+    print(f"\n🚀 [START] Richiesta ricevuta alle: {datetime.now().strftime('%H:%M:%S.%f')}", file=sys.stderr)
+    start_full_process = time.time()
     actual_cycles_executed = 0
     start_time = datetime.now()
     
     try:
         # ✅ CREA ANALYZER ALL'INIZIO (PRIMA DI USARLO)
+        t_init = time.time()
         from ai_engine.deep_analysis import DeepAnalyzer
         analyzer = DeepAnalyzer()
         analyzer.start_match(home_team, away_team, league=league)
+        print(f"⏱️ [1. INIT] Analyzer pronto in: {time.time() - t_init:.3f}s", file=sys.stderr)
         
         # ✅ CERCA OVUNQUE: Nome principale, Alias o Alias Transfermarkt
+        t_alias = time.time()
         team_h_doc = db.teams.find_one({
             "$or": [
                 {"name": home_team},                  # 1. Nome esatto (es. "AC Milan")
@@ -662,6 +667,7 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
                 {"aliases_transfermarkt": away_team}
             ]
         }) or {"name": away_team}
+        print(f"⏱️ [2. ALIAS] Nomi risolti in: {time.time() - t_alias:.3f}s", file=sys.stderr)
         
         # ✅ FIX: Pulizia nome lega
         league_clean = league.replace('_', ' ').title()
@@ -669,6 +675,7 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
             league_clean = "Serie A"
         
         # ✅ RICERCA IBRIDA (VELOCE + FALLBACK)
+        t_h2h = time.time()
         match_data = {}
         h2h_data = {}
         h2h_doc = db.h2h_by_round.find_one({
@@ -693,6 +700,7 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
                         h2h_doc = round_doc
                         break
                 if match_data: break
+        print(f"⏱️ [3. DB SEARCH] H2H trovato in: {time.time() - t_h2h:.3f}s", file=sys.stderr)
         
         # ✅ DEBUG
         print(f"🔍 LEAGUE RICEVUTA: '{league}' -> PULITA: '{league_clean}'", file=sys.stderr)
@@ -703,7 +711,6 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
             import re
             h2h_doc = db.h2h_by_round.find_one({"league": {"$regex": f"^{league_clean}$", "$options": "i"}})
             print(f"🔍 TENTATIVO REGEX: {bool(h2h_doc)}", file=sys.stderr)
-        
         
         print(f"🔍 MATCH: {match_data.get('home', 'N/A')} vs {match_data.get('away', 'N/A')}", file=sys.stderr)
         print(f"🔍 FORMAZIONI: {bool(h2h_data.get('formazioni'))}", file=sys.stderr)
@@ -722,6 +729,7 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
         # ✅ LOG INIZIALE
         print(f"🎯 SIMULAZIONE RICHIESTA: Algo {algo_id}, Cicli {cycles}", file=sys.stderr)
         
+        t_exec_start = time.time()
         if algo_id == 6:
             # MONTE CARLO
             print(f"🔵 MODALITÀ MONTE CARLO ATTIVATA", file=sys.stderr)
@@ -816,7 +824,10 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
             print(f"✅ ALGORITMO {algo_id} COMPLETATO: {cycles} cicli eseguiti", file=sys.stderr)
             print(f"✅ RISULTATO FINALE: {gh}-{ga}", file=sys.stderr)
         
+        print(f"⏱️ [4. EXEC LOOP] Simulazione finita in: {time.time() - t_exec_start:.3f}s", file=sys.stderr)
+
         # ✅ CHIUDI ANALYZER
+        t_final = time.time()
         analyzer.end_match()
 
         # OTTIENI DEEP STATS (le stats sono dentro matches dopo end_match)
@@ -863,6 +874,7 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
 
         # BETTING LOGIC
         report_pro = analyze_betting_data(sim_list, quote_match)
+        print(f"⏱️ [5. FINAL REPORT] Report generato in: {time.time() - t_final:.3f}s", file=sys.stderr)
 
         # ✅ DEBUG INFO COMPLETO
         debug_info = {
@@ -890,7 +902,7 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
             "algo_id": algo_id,
             "cycles_requested": cycles,
             "cycles_executed": actual_cycles_executed,
-            "execution_time": (datetime.now() - start_time).total_seconds(),
+            "execution_time": (time.time() - start_full_process),
             "statistiche": anatomy["statistiche"],
             "cronaca": anatomy["cronaca"],
             "report_scommesse_pro": report_pro, 
@@ -899,9 +911,11 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
                 "motivazione": "Analisi Monte Carlo con rilevamento Value Bet e Dispersione."
             }
         }
+        print(f"🏁 [FINISH] Totale processo terminato in: {time.time() - start_full_process:.3f}s\n", file=sys.stderr)
         return sanitize_data(raw_result)
 
     except Exception as e:
+        print(f"❌ ERRORE CRITICO: {str(e)}", file=sys.stderr)
         return {"success": False, "error": str(e)}
 
 def main():
