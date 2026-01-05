@@ -403,7 +403,8 @@ def run_monte_carlo_verdict_detailed(preloaded_data, home_team, away_team, analy
     except:
         pass
     
-    return (gh, ga), algos_stats, global_top3, algos_weights_tracking, algos_scontrini_tracking
+    # ✅ MODIFICA: Restituisce anche total_cycles
+    return (gh, ga), algos_stats, global_top3, algos_weights_tracking, algos_scontrini_tracking, total_cycles
 
 
 def flow_single_match(nation=None, league=None, home=None, away=None, algo_id=6, cycles=1000):
@@ -564,10 +565,12 @@ def run_universal_simulator(mode=4, league=None, home=None, away=None, algo_id=6
         preloaded = preload_match_data(match['home'], match['away'])
         
         # Eseguiamo il verdetto Monte Carlo
-        (mh, ma), algos_stats, global_top3, pesi_medi, scontrini_medi = run_monte_carlo_verdict_detailed(
-            preloaded, match['home'], match['away'], 
-            analyzer=deep_analyzer
-        )
+        (mh, ma), algos_stats, global_top3, pesi_medi, scontrini_medi, cycles_executed = run_monte_carlo_verdict_detailed(
+        preloaded, match['home'], match['away'], 
+        analyzer=deep_analyzer,
+        algo_id=selected_algo_id,
+        cycles=total_cycles
+    )
     
     deep_analyzer.end_match()
 
@@ -577,6 +580,8 @@ def run_universal_simulator(mode=4, league=None, home=None, away=None, algo_id=6
         "match": f"{match['home']} vs {match['away']}",
         "prediction": f"{mh}-{ma}",
         "sign": get_sign(mh, ma),
+        # ✅ Aggiungi solo questo per completezza (utile per debug manuale)
+        "cycles_executed": cycles_executed,
         "probabilities": {
             "top_3": [{"score": s, "pct": round(f/sum([x[1] for x in global_top3])*100, 1)} for s, f in global_top3]
         },

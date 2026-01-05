@@ -712,6 +712,8 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
             )
             gh, ga = res[0]
             
+            actual_cycles_executed = res[5]
+            
             # Tracking cicli Monte Carlo
             if len(res) > 4 and isinstance(res[4], dict):
                 for algo_results in res[4].values():
