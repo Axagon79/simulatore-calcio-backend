@@ -238,8 +238,11 @@ def run_monte_carlo_verdict_detailed(preloaded_data, home_team, away_team, analy
     else:
         # MODALITÀ MONTE CARLO (quando l'utente sceglie 6 o non specifica)
         algos = [2, 3, 4, 5]
-        cycles_per_algo = total_cycles // 4
-        print(f"🎯 MODALITÀ MONTE CARLO: 4 algoritmi con {cycles_per_algo} cicli ciascuno", file=sys.stderr)
+        
+        # PROTEZIONE DINAMICA: Usa len(algos) per contare automaticamente e max(1, ...) per evitare lo zero
+        cycles_per_algo = max(1, total_cycles // len(algos))
+        
+        print(f"🎯 MODALITÀ MONTE CARLO: {len(algos)} algoritmi con {cycles_per_algo} cicli ciascuno", file=sys.stderr)
     
     tempo_stimato = total_cycles // 70
     
