@@ -587,13 +587,20 @@ def run_universal_simulator(mode=4, league=None, home=None, away=None, algo_id=6
     with suppress_stdout():
         preloaded = preload_match_data(match['home'], match['away'])
         
-        # Eseguiamo il verdetto Monte Carlo
+        # 🟢 AGGIUNGI QUESTE RIGHE: Risolviamo i nomi veri una volta sola
+        # Estraiamo i nomi reali che il motore ha trovato durante il preload
+        real_home = preloaded.get('home_team', match['home'])
+        real_away = preloaded.get('away_team', match['away'])
+        
+        # Ora passiamo real_home e real_away invece di match['home']
         (mh, ma), algos_stats, global_top3, pesi_medi, scontrini_medi, cycles_executed = run_monte_carlo_verdict_detailed(
-        preloaded, match['home'], match['away'], 
-        analyzer=deep_analyzer,
-        algo_id=selected_algo_id,
-        cycles=total_cycles
-    )
+            preloaded, 
+            real_home, # <--- NOME GIÀ RISOLTO
+            real_away, # <--- NOME GIÀ RISOLTO
+            analyzer=deep_analyzer,
+            algo_id=selected_algo_id,
+            cycles=total_cycles
+        )
     
     deep_analyzer.end_match()
 

@@ -668,22 +668,31 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
         if league_clean == "Serie A":
             league_clean = "Serie A"
         
-        # ✅ FIX: Cerca in TUTTE le giornate della lega
+        # ✅ RICERCA IBRIDA (VELOCE + FALLBACK)
         match_data = {}
         h2h_data = {}
-        h2h_doc = None
-        
-        # Cerca la partita in tutti i documenti della lega
-        all_rounds = db.h2h_by_round.find({"league": league_clean})
-        for round_doc in all_rounds:
-            for m in round_doc.get('matches', []):
-                if m.get('home') == home_team and m.get('away') == away_team:
-                    match_data = m
-                    h2h_data = m.get('h2h_data', {})
-                    h2h_doc = round_doc
-                    break
-            if match_data:
-                break
+        h2h_doc = db.h2h_by_round.find_one({
+            "league": league_clean,
+            "matches": { "$elemMatch": { "home": home_team, "away": away_team } }
+        })
+
+        if h2h_doc:
+            # Metodo Veloce riuscito
+            match_data = next((m for m in h2h_doc['matches'] if m['home'] == home_team and m['away'] == away_team), None)
+            h2h_data = match_data.get('h2h_data', {}) if match_data else {}
+            print(f"🚀 Metodo Veloce: Match trovato in {h2h_doc.get('round_name')}", file=sys.stderr)
+        else:
+            # Fallback lento se il veloce fallisce
+            print(f"⚠️ Metodo veloce fallito, avvio scansione completa...", file=sys.stderr)
+            all_rounds = db.h2h_by_round.find({"league": league_clean})
+            for round_doc in all_rounds:
+                for m in round_doc.get('matches', []):
+                    if m.get('home') == home_team and m.get('away') == away_team:
+                        match_data = m
+                        h2h_data = m.get('h2h_data', {})
+                        h2h_doc = round_doc
+                        break
+                if match_data: break
         
         # ✅ DEBUG
         print(f"🔍 LEAGUE RICEVUTA: '{league}' -> PULITA: '{league_clean}'", file=sys.stderr)
@@ -757,20 +766,44 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
             # ✅ ALGORITMI SINGOLI (1-5)
             print(f"🟢 MODALITÀ SINGOLO ALGORITMO {algo_id} ATTIVATA", file=sys.stderr)
             
-            # 1. CARICAMENTO RAM (La novità!)
+            # 1. CARICAMENTO TUNING UNA VOLTA SOLA
             settings_in_ram = load_tuning(algo_id)
+            
+            # 2. RISOLUZIONE NOMI FUORI DAL CICLO (Fondamentale per la velocità)
+            # Prendiamo i nomi già puliti che il sistema ha trovato durante il preload
+            real_home = preloaded_data.get('home_team', home_team)
+            real_away = preloaded_data.get('away_team', away_team)
             
             t2 = time.time()
             sim_list = []
+            
+            print(f"🚀 Avvio simulazione veloce per: {real_home} vs {real_away}", file=sys.stderr)
+
             for i in range(cycles):
-                gh_temp, ga_temp = run_single_algo(algo_id, preloaded_data, home_team, away_team, settings_cache=settings_in_ram, debug_mode=False)              
+                # Usiamo real_home e real_away: il motore non deve più cercarli nel DB o negli Alias ad ogni giro
+                gh_temp, ga_temp = run_single_algo(
+                    algo_id, 
+                    preloaded_data, 
+                    real_home, 
+                    real_away, 
+                    settings_cache=settings_in_ram, 
+                    debug_mode=False
+                )
+                
                 sim_list.append(f"{gh_temp}-{ga_temp}")
                 analyzer.add_result(algo_id, gh_temp, ga_temp)
                 
-                # Log progresso ogni 10%
+                # Log progresso ogni 10% (mantenuto come richiesto)
                 if cycles >= 10 and (i + 1) % max(1, cycles // 10) == 0:
                     pct = int((i + 1) / cycles * 100)
                     print(f"  📊 Progresso: {pct}% ({i + 1}/{cycles})", file=sys.stderr)
+            
+            # 3. CALCOLO RISULTATO FINALE
+            from collections import Counter
+            most_common = Counter(sim_list).most_common(1)[0][0]
+            gh, ga = map(int, most_common.split("-"))
+            
+            print(f"⏱️ CALCOLO COMPLETATO IN: {time.time() - t2:.2f}s", file=sys.stderr)
             
             # Calcola risultato più frequente
             from collections import Counter
