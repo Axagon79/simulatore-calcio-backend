@@ -199,7 +199,7 @@ def get_team_fbref_data(team_name):
 
 # --- 4. MOTORE DI CALCOLO DEFINITIVO (DOPPIO MOTORE: WIN + GOL) ---
 
-def calculate_goals_from_engine(home_score, away_score, home_data, away_data, algo_mode=5, league_name="Unknown", home_name="Home", away_name="Away", debug_mode=True):
+# --- def calculate_goals_from_engine(home_score, away_score, home_data, away_data, algo_mode=5, league_name="Unknown", home_name="Home", away_name="Away", debug_mode=True):
     """
     MOTORE V11: PESI CONDIVISI MA RUOLI DIVERSI
     I pesi lavorano su entrambi i motori (Win & Gol) dove ha senso.
@@ -212,8 +212,24 @@ def calculate_goals_from_engine(home_score, away_score, home_data, away_data, al
     # ⚡ CARICAMENTO DINAMICO DEI PESI ⚡
     # Ricarichiamo i pesi specifici per l'algoritmo richiesto (algo_mode)
     # Questa variabile 'S' oscurerà quella globale solo dentro questa funzione.
-    S = load_tuning(algo_mode)
+ #   S = load_tuning(algo_mode)   ---
 
+# 1. Nella riga qui sotto ho aggiunto ', settings_cache=None' alla fine
+def calculate_goals_from_engine(home_score, away_score, home_data, away_data, algo_mode=5, league_name="Unknown", home_name="Home", away_name="Away", debug_mode=True, settings_cache=None):
+    """
+    MOTORE V11: PESI CONDIVISI MA RUOLI DIVERSI
+    I pesi lavorano su entrambi i motori (Win & Gol) dove ha senso.
+    """
+
+    # ⚡ CARICAMENTO DINAMICO DEI PESI (MODIFICA RAM) ⚡
+    # Se abbiamo i dati in memoria (settings_cache), usiamo quelli (VELOCISSIMO).
+    # Altrimenti leggiamo dal file/DB (LENTO - Come faceva prima).
+    if settings_cache:
+        S = settings_cache
+    else:
+        S = load_tuning(algo_mode)
+        
+        
         # --- INIZIO SPIA DEBUG COMPLETA (SOLO SE RICHIESTO) ---
     if debug_mode:
         print(f"\n Sto usando ALGO: {algo_mode}")

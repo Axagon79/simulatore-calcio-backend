@@ -70,7 +70,7 @@ try:
     # Moduli engine dentro ai_engine/engine
     from .engine import engine_core
     from .engine.engine_core import predict_match, preload_match_data
-    from .engine.goals_converter import calculate_goals_from_engine
+    from .engine.goals_converter import calculate_goals_from_engine, load_tuning
 
     # PredictionManager nello stesso package ai_engine
     try:
@@ -172,17 +172,26 @@ def run_single_algo(algo_id, preloaded_data, home_name="Home", away_name="Away")
     return gh, ga
 
 def run_single_algo_montecarlo(algo_id, preloaded_data, home_team, away_team, cycles=500, analyzer=None):
-    """MonteCarlo per SINGOLO algoritmo - COPIA LOGICA run_monte_carlo_verdict_detailed"""
+    """MonteCarlo per SINGOLO algoritmo"""
     local_results = []
     valid_cycles = 0
     
-    
+    # ⚡ 1. CARICAMENTO IN RAM (Fuori dal ciclo) ⚡
+    settings_in_ram = load_tuning(algo_id)
+
     for cycle_idx in range(cycles):
         with suppress_stdout():
             s_h, s_a, r_h, r_a = predict_match(home_team, away_team, mode=algo_id, preloaded_data=preloaded_data)
             if s_h is None: continue
             
-            gh, ga, *_ = calculate_goals_from_engine(s_h, s_a, r_h, r_a, algo_mode=algo_id, home_name=home_team, away_name=away_team)
+            # ⚡ 2. PASSIAMO LA CACHE (settings_cache=settings_in_ram) ⚡
+            gh, ga, *_ = calculate_goals_from_engine(
+                s_h, s_a, r_h, r_a, 
+                algo_mode=algo_id, 
+                home_name=home_team, 
+                away_name=away_team,
+                settings_cache=settings_in_ram  # <--- ECCO IL TURBO
+            )
             score = f"{gh}-{ga}"
             local_results.append(score)
             valid_cycles += 1
@@ -257,13 +266,21 @@ def run_monte_carlo_verdict_detailed(preloaded_data, home_team, away_team, analy
         scontrini_sum = {'casa': {}, 'ospite': {}}
         valid_cycles = 0
         
+        # ⚡ 1. CARICAMENTO IN RAM (Prima di iniziare i cicli di questo algoritmo) ⚡
+        settings_in_ram = load_tuning(aid)
+        
         for cycle_idx in range(cycles_per_algo):
             with suppress_stdout():
                 s_h, s_a, r_h, r_a = predict_match(home_team, away_team, mode=aid, preloaded_data=preloaded_data)
                 if s_h is None: continue
                 
+                # ⚡ 2. PASSIAMO LA CACHE (settings_cache=settings_in_ram) ⚡
                 gh, ga, _, _, _, pesi_dettagliati, parametri, scontrino_casa, scontrino_ospite = calculate_goals_from_engine(
-                    s_h, s_a, r_h, r_a, algo_mode=aid, home_name=home_team, away_name=away_team
+                    s_h, s_a, r_h, r_a, 
+                    algo_mode=aid, 
+                    home_name=home_team, 
+                    away_name=away_team,
+                    settings_cache=settings_in_ram # <--- ECCO IL TURBO
                 )
                 
                 score = f"{gh}-{ga}"
