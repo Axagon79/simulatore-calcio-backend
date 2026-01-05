@@ -40,7 +40,8 @@ try:
         run_monte_carlo_verdict_detailed,
         get_sign,
         get_round_number,
-        has_valid_results
+        has_valid_results,
+        load_tuning
     )
     from config import db
     from ai_engine.deep_analysis import DeepAnalyzer #
@@ -645,8 +646,22 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
         analyzer = DeepAnalyzer()
         analyzer.start_match(home_team, away_team, league=league)
         
-        team_h_doc = db.teams.find_one({"name": home_team}) or {}
-        team_a_doc = db.teams.find_one({"name": away_team}) or {}
+        # ✅ CERCA OVUNQUE: Nome principale, Alias o Alias Transfermarkt
+        team_h_doc = db.teams.find_one({
+            "$or": [
+                {"name": home_team},                  # 1. Nome esatto (es. "AC Milan")
+                {"aliases": home_team},               # 2. Lista alias (es. "Milan")
+                {"aliases_transfermarkt": home_team}  # 3. Alias TM (es. "AC Milan")
+            ]
+        }) or {"name": home_team}
+
+        team_a_doc = db.teams.find_one({
+            "$or": [
+                {"name": away_team},
+                {"aliases": away_team},
+                {"aliases_transfermarkt": away_team}
+            ]
+        }) or {"name": away_team}
         
         # ✅ FIX: Pulizia nome lega
         league_clean = league.replace('_', ' ').title()
@@ -742,10 +757,13 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
             # ✅ ALGORITMI SINGOLI (1-5)
             print(f"🟢 MODALITÀ SINGOLO ALGORITMO {algo_id} ATTIVATA", file=sys.stderr)
             
+            # 1. CARICAMENTO RAM (La novità!)
+            settings_in_ram = load_tuning(algo_id)
+            
             t2 = time.time()
             sim_list = []
             for i in range(cycles):
-                gh_temp, ga_temp = run_single_algo(algo_id, preloaded_data, home_team, away_team)
+                gh_temp, ga_temp = run_single_algo(algo_id, preloaded_data, home_team, away_team, settings_cache=settings_in_ram, debug_mode=False)              
                 sim_list.append(f"{gh_temp}-{ga_temp}")
                 analyzer.add_result(algo_id, gh_temp, ga_temp)
                 

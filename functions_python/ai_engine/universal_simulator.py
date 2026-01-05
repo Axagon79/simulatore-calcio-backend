@@ -159,7 +159,9 @@ def analyze_odds(match):
 
 
 # --- MOTORI ---
-def run_single_algo(algo_id, preloaded_data, home_name="Home", away_name="Away"):
+# SOSTITUISCI QUESTA FUNZIONE IN universal_simulator.py
+def run_single_algo(algo_id, preloaded_data, home_name="Home", away_name="Away", settings_cache=None, debug_mode=True):
+    """Esegue una singola simulazione (Ora supporta Turbo e Silenziatore)"""
     s_h, s_a, r_h, r_a = predict_match("", "", mode=algo_id, preloaded_data=preloaded_data)
     if s_h is None: return 0, 0
 
@@ -167,7 +169,9 @@ def run_single_algo(algo_id, preloaded_data, home_name="Home", away_name="Away")
         s_h, s_a, r_h, r_a, 
         algo_mode=algo_id, 
         home_name=home_name, 
-        away_name=away_name
+        away_name=away_name,
+        settings_cache=settings_cache,  # <--- ADESSO ACCETTA IL TURBO
+        debug_mode=debug_mode           # <--- ADESSO ACCETTA IL SILENZIATORE
     )
     return gh, ga
 
@@ -190,7 +194,8 @@ def run_single_algo_montecarlo(algo_id, preloaded_data, home_team, away_team, cy
                 algo_mode=algo_id, 
                 home_name=home_team, 
                 away_name=away_team,
-                settings_cache=settings_in_ram  # <--- ECCO IL TURBO
+                settings_cache=settings_in_ram, # <--- ECCO IL TURBO
+                debug_mode=False                # 2. SILENZIATORE (Niente print inutili)
             )
             score = f"{gh}-{ga}"
             local_results.append(score)
@@ -280,7 +285,8 @@ def run_monte_carlo_verdict_detailed(preloaded_data, home_team, away_team, analy
                     algo_mode=aid, 
                     home_name=home_team, 
                     away_name=away_team,
-                    settings_cache=settings_in_ram # <--- ECCO IL TURBO
+                    settings_cache=settings_in_ram, # <--- ECCO IL TURBO
+                    debug_mode=False
                 )
                 
                 score = f"{gh}-{ga}"
