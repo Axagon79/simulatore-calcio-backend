@@ -186,29 +186,40 @@ def calculate_bench_rating(base_rating, minutes_90s, max_minutes_90s):
     return base_rating * multiplier
 
 
-def calculate_team_rating(team_name):
-    """Calcola rating squadra (0-10)"""
-    print(f"\n{'='*70}")
-    print(f"⚽ CALCOLO RATING: {team_name}")
-    print(f"{'='*70}")
+def calculate_team_rating(team_name, verbose=True, bulk_cache=None):
+    """Calcola rating squadra usando Bulk Cache se disponibile"""
+    if verbose:
+        print(f"\n{'='*70}\n⚽ CALCOLO RATING: {team_name}\n{'='*70}")
     
-    # 1. Trova squadra (Ricerca Intelligente)
-    # Prima cerca il nome esatto
-    team = teams_col.find_one({"name": team_name})
-    
-    # Se fallisce, prova a cercare dentro l'array "aliases"
-    if not team:
-        # Cerca case-insensitive negli alias per essere sicuri
-        team = teams_col.find_one({"aliases": team_name})
-        
-        if team:
-            print(f"✅ Trovata tramite Alias: {team['name']} (Input: {team_name})")
-            # Aggiorna il nome con quello ufficiale del DB per le chiamate successive
-            team_name = team['name']
+    team = None
+    # 1. RICERCA TEAM (BULK O DB)
+    if bulk_cache and "TEAMS" in bulk_cache:
+        for t in bulk_cache["TEAMS"]:
+            # --- FIX ALIAS BLINDATO ---
+            aliases = t.get("aliases", [])
+            match_found = False
+            
+            # 1. Controlla Nome Esatto
+            if t.get("name") == team_name:
+                match_found = True
+            
+            # 2. Controlla Alias (Lista o Dizionario)
+            elif isinstance(aliases, list):
+                if team_name in aliases: match_found = True
+            elif isinstance(aliases, dict):
+                if team_name == aliases.get("soccerstats"): match_found = True
+            
+            if match_found:
+                # Sostituisci 'target_team' con il nome della variabile usata nel tuo file (es. team, squad, ecc.)
+                # Esempio:
+                target_team = t 
+                break
+            # --------------------------
+    else:
+        team = teams_col.find_one({"name": team_name}) or teams_col.find_one({"aliases": team_name})
 
-    # Se ancora non trova nulla, allora è davvero assente
     if not team:
-        print(f"\n❌ SQUADRA '{team_name}' NON TROVATA NEL DB\n")
+        if verbose: print(f"\n❌ SQUADRA '{team_name}' NON TROVATA\n")
         return None
 
     
@@ -250,11 +261,21 @@ def calculate_team_rating(team_name):
     formation = parse_formation(formation_str)
     print(f"   → DEF:{formation['DIF']} MID:{formation['MID']} ATT:{formation['ATT']}")
     
-    # 2. Recupera giocatori (GK ora per minuti!)
-    all_gk = get_gk_by_minutes(league, team_aliases)  # ⭐ CAMBIATO
-    all_def = get_players_by_minutes(league, def_col, "def_rating", team_aliases)
-    all_mid = get_players_by_minutes(league, mid_col, "mid_rating", team_aliases)
-    all_att = get_players_by_minutes(league, att_col, "att_rating", team_aliases)
+    # 2. RECUPERO GIOCATORI (BULK O DB)
+    if bulk_cache and "ROSE" in bulk_cache:
+        def filter_bulk(role):
+            players = [p for p in bulk_cache["ROSE"][role] if p.get("team_name_fbref") in team_aliases]
+            return sorted(players, key=lambda x: x.get("minutes_90s", 0), reverse=True)
+        
+        all_gk = [{"player": p["player_name_fbref"], "rating": p.get("gk_rating", {}).get("rating_puro", 0), "minutes_90s": p.get("minutes_90s", 0)} for p in filter_bulk("GK")]
+        all_def = [{"player": p["player_name_fbref"], "rating": p.get("def_rating", {}).get("rating_puro", 0), "minutes_90s": p.get("minutes_90s", 0)} for p in filter_bulk("DEF")]
+        all_mid = [{"player": p["player_name_fbref"], "rating": p.get("mid_rating", {}).get("rating_puro", 0), "minutes_90s": p.get("minutes_90s", 0)} for p in filter_bulk("MID")]
+        all_att = [{"player": p["player_name_fbref"], "rating": p.get("att_rating", {}).get("rating_puro", 0), "minutes_90s": p.get("minutes_90s", 0)} for p in filter_bulk("ATT")]
+    else:
+        all_gk = get_gk_by_minutes(league, team_aliases)
+        all_def = get_players_by_minutes(league, def_col, "def_rating", team_aliases)
+        all_mid = get_players_by_minutes(league, mid_col, "mid_rating", team_aliases)
+        all_att = get_players_by_minutes(league, att_col, "att_rating", team_aliases)
     
     print(f"\n👥 Giocatori:")
     print(f"   GK:  {len(all_gk)} (per minuti)")  # ⭐ CAMBIATO testo
@@ -578,4 +599,3 @@ if __name__ == "__main__":
         for r in sorted(results, key=lambda x: x["rating_5_25"], reverse=True):
             print(f"   {r['team']:20} | {r['formation']:8} | ⭐ {r['rating_5_25']:.2f}/25 (base: {r['rating_0_10']:.2f}/10)")
         print("="*70 + "\n")
-

@@ -8,11 +8,38 @@ teams_collection = db['teams']
 fixtures_collection = db['fixtures']
 h2h_collection = db['h2h_by_round']
 
-def get_stats_from_ranking(team_name):
-    """Recupera statistiche (Casa, Fuori, Totali) dal ranking."""
-    team = teams_collection.find_one({
-        "$or": [{"name": team_name}, {"aliases": team_name}, {"aliases.soccerstats": team_name}]
-    })
+# // modificato per: logica bulk - Supporto alla cache in memoria
+def get_stats_from_ranking(team_name, bulk_cache=None):
+    """Recupera statistiche (Casa, Fuori, Totali) dal ranking. Supporta Bulk Cache."""
+    team = None
+    
+    # Ricerca in Bulk Cache
+    if bulk_cache and "TEAMS" in bulk_cache:
+        for t in bulk_cache["TEAMS"]:
+            # 1. Controllo Nome Esatto
+            if t.get("name") == team_name:
+                team = t
+                break
+            
+            # 2. Controllo Alias (Gestione sicura del tipo)
+            aliases = t.get("aliases", [])
+            if isinstance(aliases, list):
+                # Se è una lista (caso normale), controlla se il nome è dentro
+                if team_name in aliases:
+                    team = t
+                    break
+            elif isinstance(aliases, dict):
+                # Se è un dizionario (caso raro), usa .get()
+                if team_name == aliases.get("soccerstats"):
+                    team = t
+                    break
+    
+    # Fallback su DB se non trovato in cache o cache assente
+    if not team:
+        team = teams_collection.find_one({
+            "$or": [{"name": team_name}, {"aliases": team_name}, {"aliases.soccerstats": team_name}]
+        })
+        
     if not team or "ranking" not in team: 
         return None
     
@@ -184,14 +211,6 @@ def calculate_team_bvs_score(team_sign, classification, qr_1, qr_X, qr_2):
     """
     Calcola il punteggio BVS per UNA SINGOLA squadra (casa '1' o ospite '2').
     Ogni squadra ha il suo punteggio indipendente e continuo.
-    
-    Args:
-        team_sign: '1' per casa, '2' per ospite
-        classification: dict con classificazione BVS
-        qr_1, qr_X, qr_2: quote reali
-    
-    Returns:
-        punteggio (float), debug_info (dict)
     """
     tipo = classification['tipo']
     diff_perc = classification['diff_perc']
@@ -210,69 +229,52 @@ def calculate_team_bvs_score(team_sign, classification, qr_1, qr_X, qr_2):
     
     # ========================================
     # STEP 1: PESO BASE
-    # Dipende da tipo BVS e se la squadra è favorita
     # ========================================
     is_favorita_reale = (team_sign == base_r)
     is_favorita_teorica = (team_sign == base_t)
     
     if tipo == "PURO":
-        # BVS PURO: favorita prende bonus alto
         if is_favorita_reale:
             peso_base = 7.0
         else:
-            peso_base = -2.0  # Sfavorita prende lieve penalità
+            peso_base = -2.0
     
     elif tipo == "SEMI":
-        # SEMI-BVS: bonus ridotto, più equilibrato
         if is_favorita_reale:
             peso_base = 3.5
         else:
-            peso_base = 1.5  # Sfavorita prende comunque qualcosa
+            peso_base = 1.5
     
     else:  # NON_BVS
-        # NON-BVS: discordanza, punteggi più negativi
         if is_favorita_teorica and not is_favorita_reale:
-            # Teoricamente favorita ma realmente no → penalità
             peso_base = -4.0
         elif not is_favorita_teorica and is_favorita_reale:
-            # Teoricamente sfavorita ma realmente favorita → bonus medio
             peso_base = 3.0
         else:
             peso_base = -1.0
     
     # ========================================
-    # STEP 2: FATTORE DISTANZA quote della squadra
+    # STEP 2, 3, 4, 5: FORMULA FINALE (Preservata)
     # ========================================
     fattore_distanza = max(0.0, 1.0 - (diff_team_perc / 100.0))
     
-    # ========================================
-    # STEP 3: FATTORE LINEARITÀ (globale della partita)
-    # ========================================
     if is_linear:
         fattore_linear = 1.0 - (diff_perc / 100.0)
     else:
         fattore_linear = max(0.3, 1.0 - (diff_perc / 80.0))
     
-    # ========================================
-    # STEP 4: BOOST SPECIALE per casi NON-LINEARE <1.65
-    # ========================================
     boost_speciale = 0.0
     is_special_case = False
     
     if not is_linear and qr_team < 1.65 and is_favorita_reale:
         is_special_case = True
-        # Boost proporzionale a quanto è bassa la quota
         boost_speciale = max(0.0, (1.65 - qr_team) * 6.0)
     
-    # ========================================
-    # STEP 5: FORMULA FINALE
-    # ========================================
     if is_special_case:
         punteggio_raw = (peso_base * fattore_distanza * fattore_linear) + boost_speciale
     else:
         punteggio_raw = peso_base * fattore_distanza * fattore_linear
     
-    # Limita al range -6.0 a +7.0
     punteggio = max(-6.0, min(7.0, punteggio_raw))
     
     debug_info = {
@@ -291,15 +293,15 @@ def calculate_team_bvs_score(team_sign, classification, qr_1, qr_X, qr_2):
     
     return punteggio, debug_info
 
-def get_bvs_score(home_team, away_team):
+def get_bvs_score(home_team, away_team, bulk_cache=None):
     """
-    Calcola BVS con punteggio continuo per ENTRAMBE le squadre.
+    Calcola BVS con punteggio continuo per ENTRAMBE le squadre. Supporta Bulk Cache.
     """
     print(f"\n📊 --- ANALISI BVS PROFESSIONALE: {home_team} vs {away_team} ---")
 
-    # 1. RECUPERO DATI
-    stats_h = get_stats_from_ranking(home_team)
-    stats_a = get_stats_from_ranking(away_team)
+    # 1. RECUPERO DATI [modificato per: logica bulk]
+    stats_h = get_stats_from_ranking(home_team, bulk_cache)
+    stats_a = get_stats_from_ranking(away_team, bulk_cache)
 
     if not stats_h or not stats_a:
         print("   ⚠️ Dati classifica mancanti. BVS Neutro.")
@@ -314,88 +316,47 @@ def get_bvs_score(home_team, away_team):
     qt_1, qt_X, qt_2 = theoretical
     print(f"   [PICCHETTO PROF] 1:{qt_1:.2f} X:{qt_X:.2f} 2:{qt_2:.2f}")
 
-    # 3. RECUPERO QUOTE REALI
-    pipeline = [
-        {"$unwind": "$matches"},
-        {"$match": {
-            "$or": [
-                {"matches.home": home_team, "matches.away": away_team, "matches.odds": {"$exists": True}},
-                {"matches.home": {"$regex": f"^{home_team}$", "$options": "i"}, 
-                 "matches.away": {"$regex": f"^{away_team}$", "$options": "i"}, 
-                 "matches.odds": {"$exists": True}}
-            ]
-        }},
-        {"$sort": {"last_updated": -1}}, 
-        {"$limit": 1}, 
-        {"$project": {"match": "$matches"}}
-    ]
-    result = list(h2h_collection.aggregate(pipeline))
+    # 3. RECUPERO QUOTE REALI [modificato per: logica bulk]
+    qr_1 = qr_X = qr_2 = 99.0
     
-    if not result:
-        print(f"   ❌ Quote NON trovate in h2h_by_round.")
+    if bulk_cache and "MATCH_H2H" in bulk_cache and "quotes" in bulk_cache["MATCH_H2H"]:
+        q = bulk_cache["MATCH_H2H"]["quotes"]
+        qr_1, qr_X, qr_2 = float(q.get("1", 99.0)), float(q.get("X", 99.0)), float(q.get("2", 99.0))
+    else:
+        # Fallback su aggregazione DB se bulk non disponibile
+        pipeline = [
+            {"$unwind": "$matches"},
+            {"$match": {
+                "$or": [
+                    {"matches.home": home_team, "matches.away": away_team, "matches.odds": {"$exists": True}},
+                    {"matches.home": {"$regex": f"^{home_team}$", "$options": "i"}, 
+                     "matches.away": {"$regex": f"^{away_team}$", "$options": "i"}, 
+                     "matches.odds": {"$exists": True}}
+                ]
+            }},
+            {"$sort": {"last_updated": -1}}, {"$limit": 1}, {"$project": {"match": "$matches"}}
+        ]
+        result = list(h2h_collection.aggregate(pipeline))
+        if result:
+            odds = result[0]["match"]["odds"]
+            qr_1, qr_X, qr_2 = float(odds.get("1", 99.0)), float(odds.get("X", 99.0)), float(odds.get("2", 99.0))
+    
+    if qr_1 == 99.0:
+        print(f"   ❌ Quote NON trovate. BVS Neutro.")
         return 0, 0
-    
-    odds = result[0]["match"]["odds"]
-    qr_1 = float(odds.get("1", 99.0))
-    qr_X = float(odds.get("X", 99.0))
-    qr_2 = float(odds.get("2", 99.0))
-    
+        
     print(f"   [BOOKMAKER]     1:{qr_1:.2f} X:{qr_X:.2f} 2:{qr_2:.2f}")
 
-    # 4. CLASSIFICAZIONE BVS COMPLETA
+    # 4. CLASSIFICAZIONE E PUNTEGGIO (Preservata)
     classification = get_bvs_classification(qt_1, qt_X, qt_2, qr_1, qr_X, qr_2)
-    
-    tipo = classification['tipo']
-    diff_perc = classification['diff_perc']
-    is_linear = classification['is_linear']
-    
-    linearity = "LINEARE" if is_linear else "NON-LINEARE"
-    
-    print(f"   [CLASSIFICAZIONE] {tipo}")
-    print(f"   [BVS TEORICO]     Base:{classification['base_t']} Var:{classification['var_t']} Sorpresa:{classification['sorpresa_t']}")
-    print(f"   [BVS REALE]       Base:{classification['base_r']} Var:{classification['var_r']} Sorpresa:{classification['sorpresa_r']}")
-    print(f"   [DIFFERENZA]      {diff_perc:.2f}% tra quote teoriche e reali")
-    print(f"   [LINEARITÀ]       {linearity}")
-    
-    # 5. CALCOLO PUNTEGGIO CONTINUO PER ENTRAMBE LE SQUADRE
-    print(f"\n   [CALCOLO CASA (1)]")
     punti_h, debug_h = calculate_team_bvs_score('1', classification, qr_1, qr_X, qr_2)
-    print(f"   • Favorita reale: {'SÌ' if debug_h['is_favorita_reale'] else 'NO'}")
-    print(f"   • Favorita teorica: {'SÌ' if debug_h['is_favorita_teorica'] else 'NO'}")
-    print(f"   • Diff quote Casa: {debug_h['diff_team_perc']:.2f}%")
-    print(f"   • Peso base: {debug_h['peso_base']:+.2f}")
-    print(f"   • Fattore distanza: {debug_h['fattore_distanza']:.3f}")
-    print(f"   • Fattore linearità: {debug_h['fattore_linear']:.3f}")
-    if debug_h['is_special_case']:
-        print(f"   • 🎯 Caso speciale NON-LINEARE (quota {qr_1:.2f} < 1.65)")
-        print(f"   • Boost speciale: +{debug_h['boost_speciale']:.2f}")
-    print(f"   • Punteggio raw: {debug_h['punteggio_raw']:+.2f}")
-    print(f"   • Punteggio finale: {punti_h:+.2f}")
-    
-    print(f"\n   [CALCOLO OSPITE (2)]")
     punti_a, debug_a = calculate_team_bvs_score('2', classification, qr_1, qr_X, qr_2)
-    print(f"   • Favorita reale: {'SÌ' if debug_a['is_favorita_reale'] else 'NO'}")
-    print(f"   • Favorita teorica: {'SÌ' if debug_a['is_favorita_teorica'] else 'NO'}")
-    print(f"   • Diff quote Ospite: {debug_a['diff_team_perc']:.2f}%")
-    print(f"   • Peso base: {debug_a['peso_base']:+.2f}")
-    print(f"   • Fattore distanza: {debug_a['fattore_distanza']:.3f}")
-    print(f"   • Fattore linearità: {debug_a['fattore_linear']:.3f}")
-    if debug_a['is_special_case']:
-        print(f"   • 🎯 Caso speciale NON-LINEARE (quota {qr_2:.2f} < 1.65)")
-        print(f"   • Boost speciale: +{debug_a['boost_speciale']:.2f}")
-    print(f"   • Punteggio raw: {debug_a['punteggio_raw']:+.2f}")
-    print(f"   • Punteggio finale: {punti_a:+.2f}")
-    
-    # Arrotondamento
-    punti_h = round(punti_h, 2)
-    punti_a = round(punti_a, 2)
     
     print(f"\n   ⚡ PUNTEGGIO BVS FINALE:")
     print(f"   • Casa: {punti_h:+.2f} | Ospite: {punti_a:+.2f}")
     print(f"   {'='*70}")
     
-    return punti_h, punti_a
+    return round(punti_h, 2), round(punti_a, 2)
 
 if __name__ == "__main__":
-    # Test
     get_bvs_score("Cagliari", "Pisa")

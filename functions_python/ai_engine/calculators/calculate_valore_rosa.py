@@ -92,6 +92,67 @@ def compute_age_multiplier(age, ages):
         if mult > 1.5: mult = 1.5
         return round(mult, 4)
 
+# // aggiunto per: logica bulk - Funzione core per calcolo ibrido
+def compute_team_value_logic(val, age, values_valid, ages_valid):
+    """Esegue la logica di calcolo del punteggio finale basata sulle liste della lega"""
+    if not values_valid or not ages_valid:
+        return 1.0, 1.0, 3.0
+
+    min_val, max_val = min(values_valid), max(values_valid)
+    mean_val = statistics.mean(values_valid)
+
+    # 1. Calcolo Base (0-9 con media a 4.5)
+    value_score = compute_value_score_split(val, min_val, max_val, mean_val)
+    
+    # 2. Calcolo Moltiplicatore Età (0.5 - 1.5)
+    age_mult = compute_age_multiplier(age, ages_valid)
+    
+    # 3. Punteggio Finale
+    final_score = value_score * age_mult
+
+    if final_score > 10.0:
+        final_score = 10.0
+    if final_score < 3.0:
+        final_score = 3.0
+        
+    return round(value_score, 2), round(age_mult, 4), round(final_score, 2)
+
+# // aggiunto per: logica bulk - Interfaccia per Engine Core
+def get_value_score_live_bulk(team_name, league_name, bulk_cache):
+    """
+    Calcola il valore rosa in tempo reale usando il bulk_cache.
+    """
+    if not bulk_cache or "TEAMS" not in bulk_cache:
+        return 5.0 # Fallback neutro
+
+    league_teams = [t for t in bulk_cache["TEAMS"] if t.get("league") == league_name]
+    if not league_teams:
+        return 5.0
+
+    values_valid = [t.get("stats", {}).get("marketValue", 0) for t in league_teams if t.get("stats", {}).get("marketValue", 0) > 0]
+    ages_valid = [t.get("stats", {}).get("avgAge", 0) for t in league_teams if t.get("stats", {}).get("avgAge", 0) > 0]
+    
+    # RICERCA TARGET TEAM (FIX ALIAS BLINDATO)
+    target_team = None
+    for t in league_teams:
+        # 1. Nome Esatto
+        if t.get("name") == team_name:
+            target_team = t; break
+        
+        # 2. Check Alias (Lista o Dizionario)
+        aliases = t.get("aliases", [])
+        if isinstance(aliases, list):
+            if team_name in aliases: target_team = t; break
+        elif isinstance(aliases, dict):
+            if team_name in aliases.values(): target_team = t; break
+            
+    if not target_team: return 5.0
+    
+    val = target_team.get("stats", {}).get("marketValue", 0)
+    age = target_team.get("stats", {}).get("avgAge", 0)
+    
+    _, _, final_score = compute_team_value_logic(val, age, values_valid, ages_valid)
+    return final_score
 
 def main():
     print("🧮 Calcolo punteggi squadre (0-9) con logica Mean=4.5 e Age +/- 50%...")
@@ -114,20 +175,16 @@ def main():
     for league, league_teams in leagues.items():
         print(f"\n🏆 Campionato: {league}")
 
-        values = [t.get("stats", {}).get("marketValue", 0) for t in league_teams]
-        ages = [t.get("stats", {}).get("avgAge", 0) for t in league_teams]
-
-        values_valid = [v for v in values if isinstance(v, (int, float)) and v > 0]
-        ages_valid = [a for a in ages if isinstance(a, (int, float)) and a > 0]
+        values_valid = [t.get("stats", {}).get("marketValue", 0) for t in league_teams if isinstance(t.get("stats", {}).get("marketValue"), (int, float)) and t.get("stats", {}).get("marketValue", 0) > 0]
+        ages_valid = [t.get("stats", {}).get("avgAge", 0) for t in league_teams if isinstance(t.get("stats", {}).get("avgAge"), (int, float)) and t.get("stats", {}).get("avgAge", 0) > 0]
 
         if not values_valid or not ages_valid:
             print("   ⚠️ Mancano dati sufficienti, salto.")
             continue
 
-        # Calcoliamo Min, Max e MEDIA per entrambi i dati
+        # // modificato per: logica bulk - Calcolo medie per log (preservato ordine originale)
         min_val, max_val = min(values_valid), max(values_valid)
         mean_val = statistics.mean(values_valid)
-
         A_min, A_max = min(ages_valid), max(ages_valid)
         A_mean = statistics.mean(ages_valid)
 
@@ -139,27 +196,13 @@ def main():
             val = stats.get("marketValue", 0)
             age = stats.get("avgAge", 0)
 
-            # 1. Calcolo Base (0-9 con media a 4.5)
-            value_score = compute_value_score_split(val, min_val, max_val, mean_val)
-            
-            # 2. Calcolo Moltiplicatore Età (0.5 - 1.5)
-            age_mult = compute_age_multiplier(age, ages_valid)
-            
-            # 3. Punteggio Finale
-            final_score = value_score * age_mult
-
-            # Clipping finale: anche col bonus non andiamo oltre 9 (o vuoi che superi?)
-            # Se vuoi che possa superare 9 (es. Real Madrid vecchio), togli le righe sotto.
-            # Se vuoi scala rigida 0-9, lascia questo:
-            if final_score > 10.0:
-                final_score = 10.0
-            if final_score < 3.0: # Teoricamente impossibile ma per sicurezza
-                final_score = 3.0
+            # // modificato per: logica bulk - Uso della nuova funzione core
+            value_score, age_mult, final_score = compute_team_value_logic(val, age, values_valid, ages_valid)
 
             update_fields = {
-                "stats.valueScore09": round(value_score, 2),
-                "stats.ageMultiplier": round(age_mult, 4),
-                "stats.strengthScore09": round(final_score, 2),
+                "stats.valueScore09": value_score,
+                "stats.ageMultiplier": age_mult,
+                "stats.strengthScore09": final_score,
             }
 
             teams.update_one(

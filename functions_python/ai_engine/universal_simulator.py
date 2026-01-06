@@ -9,82 +9,85 @@ import statistics
 import contextlib
 import random
 
-# --- GESTIONE PERCORSI FIREBASE (MODIFICATA) ---
-# Forza lo script a vedere la cartella corrente e quella superiore
-CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-if CURRENT_DIR not in sys.path:
-    sys.path.insert(0, CURRENT_DIR)
-
-# --- INIZIO GESTIONE IMPORT ---
-try:
-    from . import diagnostics
-    from .deep_analysis import DeepAnalyzer
-except (ImportError, ValueError):
-    import diagnostics
-    from deep_analysis import DeepAnalyzer
-# --- FINE GESTIONE IMPORT ---
-
-def tqdm(x):
-    return x
-
-import contextlib
-import random
-
-
-
-# --- CONFIGURAZIONI ---
-MONTE_CARLO_TOTAL_CYCLES = 5000  # Default, sovrascritto dal menu
-CSV_DELIMITER = ';'
-
-
-def ask_monte_carlo_cycles(manual_cycles=None):
-    """
-    Versione Online: Non fa domande. 
-    Usa il valore passato dal sito o il default di sistema.
-    """
-    if manual_cycles is not None:
-        # Assicura che sia un multiplo di 4 per i 4 algoritmi
-        adjusted = (int(manual_cycles) // 4) * 4
-        return max(40, adjusted)
-    
-    return MONTE_CARLO_TOTAL_CYCLES
-
-
-# --- HARD FIX PERCORSI ---
+# --- 1. HARD FIX PERCORSI (CRITICO) ---
+# Imposta i percorsi PRIMA di qualsiasi import per evitare errori
 current_script_path = os.path.abspath(__file__)
-ai_engine_dir = os.path.dirname(current_script_path)
-project_root = os.path.dirname(ai_engine_dir)
+ai_engine_dir = os.path.dirname(current_script_path)          # Cartella ai_engine
+project_root = os.path.dirname(ai_engine_dir)                 # Cartella functions_python
+engine_dir = os.path.join(ai_engine_dir, 'engine')            # Cartella engine
 
+# Inseriamo 'project_root' (functions_python) in CIMA al path.
+# Questo è il TRUCCO che permette di importare "ai_engine.deep_analysis"
+# e risolvere l'errore "attempted relative import" dentro quel file.
 if project_root not in sys.path: sys.path.insert(0, project_root)
 if ai_engine_dir not in sys.path: sys.path.insert(0, ai_engine_dir)
-if os.path.join(ai_engine_dir, 'engine') not in sys.path: sys.path.insert(0, os.path.join(ai_engine_dir, 'engine'))
+if engine_dir not in sys.path: sys.path.insert(0, engine_dir)
 
+# --- 2. GESTIONE IMPORT ROBUSTA ---
 try:
-    # config.py nella root del progetto (già gestito con project_root)
+    # A. Configurazione DB
     try:
         from config import db
     except ImportError:
         sys.path.append(project_root)
         from config import db
 
-    # Moduli engine dentro ai_engine/engine
-    from .engine import engine_core
-    from .engine.engine_core import predict_match, preload_match_data
-    from .engine.goals_converter import calculate_goals_from_engine, load_tuning
-
-    # PredictionManager nello stesso package ai_engine
+    # B. Moduli Locali (FIX CRITICO PER DEEP_ANALYSIS)
+    # Importiamo questi moduli attraverso il pacchetto "ai_engine"
+    # Così i loro import relativi interni (es: from .confidence...) funzionano!
     try:
-        from .prediction_manager import PredictionManager
-        print("✅ [MANAGER] PredictionManager caricato.")
+        from ai_engine import diagnostics  # type: ignore
+        from ai_engine.deep_analysis import DeepAnalyzer  # type: ignore
     except ImportError:
-        PredictionManager = None
-        print("⚠️ PredictionManager NON trovato (Salvataggio DB off).")
+        # Fallback se la struttura delle cartelle è diversa
+        import diagnostics  # type: ignore
+        from deep_analysis import DeepAnalyzer  # type: ignore
+
+    # C. Prediction Manager (Opzionale)
+    try:
+        from ai_engine.prediction_manager import PredictionManager  # type: ignore
+        print("✅ [MANAGER] PredictionManager caricato.", file=sys.stderr)
+    except ImportError:
+        try:
+            from prediction_manager import PredictionManager  # type: ignore
+        except ImportError:
+            PredictionManager = None
+
+    # D. Engine Core e Converter
+    # Usiamo il fallback a cascata per garantire che lo trovi
+    try:
+        from engine import engine_core  # type: ignore
+        from engine.engine_core import predict_match, preload_match_data  # type: ignore
+        from engine.goals_converter import calculate_goals_from_engine, load_tuning  # type: ignore
+    except ImportError:
+        import engine_core  # type: ignore
+        from engine_core import predict_match, preload_match_data  # type: ignore
+        from goals_converter import calculate_goals_from_engine, load_tuning  # type: ignore
 
 except ImportError as e:
-    print(f"❌ ERRORE FATALE IMPORT: {e}")
+    # Stampa JSON errore per il frontend ed esce
+    print(json.dumps({"success": False, "error": f"Errore Import Critico: {e}"}))
     sys.exit(1)
 
+# --- 3. UTILS & CONFIG ---
+def tqdm(x): return x
 
+@contextlib.contextmanager
+def suppress_stdout():
+    with open(os.devnull, "w", encoding="utf-8") as devnull:
+        old = sys.stdout
+        sys.stdout = devnull
+        try: yield
+        finally: sys.stdout = old
+
+MONTE_CARLO_TOTAL_CYCLES = 5000  # Default
+CSV_DELIMITER = ';'
+
+def ask_monte_carlo_cycles(manual_cycles=None):
+    if manual_cycles is not None:
+        adjusted = (int(manual_cycles) // 4) * 4
+        return max(40, adjusted)
+    return MONTE_CARLO_TOTAL_CYCLES
 
 # --- MAPPA NAZIONI ---
 NATION_GROUPS = {

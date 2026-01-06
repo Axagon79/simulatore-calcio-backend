@@ -1,5 +1,5 @@
 {
-    "MATCH": "Milan vs Genoa",
+    "MATCH": "Milan vs Inter",
     "CASA": {
         "Squadra": "AC Milan",
         "Modulo": "3-5-2",
@@ -28,29 +28,30 @@
         ]
     },
     "OSPITE": {
-        "Squadra": "Genoa",
-        "Modulo": "4-2-3-1",
-        "Rating": "16.84/25",
+        "Squadra": "Inter",
+        "Modulo": "3-5-2",
+        "Rating": "19.14/25",
         "1_TITOLARI": [
-            "GK - Nicola Leali (6.2)",
-            "DIF - Johan V\u00e1squez (6.8)",
-            "DIF - Brooke Norton-Cuffy (6.9)",
-            "DIF - Aar\u00f3n Mart\u00edn (6.4)",
-            "DIF - Mikael Ellertsson (6.1)",
-            "MID - Morten Frendrup (6.8)",
-            "MID - Ruslan Malinovskyi (6.6)",
-            "MID - Patrizio Masini (6.0)",
-            "MID - Morten Thorsby (6.1)",
-            "MID - Seydou Fini (4.0)",
-            "ATT - Vitinha (6.2)"
+            "GK - Yann Sommer (6.1)",
+            "DIF - Alessandro Bastoni (7.6)",
+            "DIF - Manuel Akanji (6.8)",
+            "DIF - Federico Dimarco (6.4)",
+            "MID - Nicol\u00f2 Barella (7.5)",
+            "MID - Hakan \u00c7alhano\u011flu (8.2)",
+            "MID - Petar Sucic (7.4)",
+            "MID - Piotr Zieli\u0144ski (7.9)",
+            "MID - Henrikh Mkhitaryan (6.6)",
+            "ATT - Lautaro Mart\u00ednez (8.0)",
+            "ATT - Marcus Thuram (7.7)"
         ],
         "2_PANCHINA": [
-            "GK - Daniele Sommariva (5.7)",
-            "DIF - Leo Skiri \u00d8stig\u00e5rd (6.9)",
-            "DIF - Alessandro Marcandalli (6.1)",
-            "MID - Jean Onana (5.4)",
-            "MID (da DIF) - Sebastian Otoa (7.3)",
-            "ATT - Lorenzo Colombo (6.2)"
+            "GK - Josep Martinez (7.8)",
+            "DIF - Francesco Acerbi (6.7)",
+            "DIF - Denzel Dumfries (6.4)",
+            "MID - Davide Frattesi (5.3)",
+            "MID - Andy Diouf (6.7)",
+            "ATT - Francesco Esposito (6.3)",
+            "ATT - Ange-Yoan Bonny (8.7)"
         ]
     }
 }

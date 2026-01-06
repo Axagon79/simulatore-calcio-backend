@@ -636,6 +636,10 @@ def genera_anatomia_partita(gh, ga, h2h_match_data, team_h_doc, sim_list):
     return stats, report_bet
 
 def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: int, league: str, main_mode: int) -> dict:
+    
+    t_inizio_funzione = time.time()
+    
+    
     """Esegue la simulazione e arricchisce il risultato con i dati del DB."""
     print(f"\n🚀 [START] Richiesta ricevuta alle: {datetime.now().strftime('%H:%M:%S.%f')}", file=sys.stderr)
     start_full_process = time.time()

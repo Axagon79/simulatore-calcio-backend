@@ -418,6 +418,93 @@ def main():
         f"\n✅ Completato calcolo motivazione. Aggiornate {total_updated} squadre."
     )
 
+# // aggiunto per: logica bulk - Funzioni di supporto per Engine Core
+
+def calculate_single_motivation(team_data, pos_map, league_conf, league_name):
+    """
+    Riproduce la logica di calcolo per una singola squadra (usata dal Bulk).
+    """
+    total_matches = league_conf.get("total_matches")
+    zones = league_conf.get("zones", {})
+    
+    rc = team_data.get("stats", {}).get("ranking_c", {})
+    pos, pts, played = rc.get("position"), rc.get("points"), rc.get("played")
+    
+    if not all(isinstance(x, (int, float)) for x in [pos, pts, played]):
+        return NEUTRAL_MOTIVATION
+
+    if played < MIN_MATCHES_FOR_MOTIVATION:
+        return NEUTRAL_MOTIVATION
+
+    matches_left = max(0, total_matches - played)
+    points_available = matches_left * 3.0
+    progress = (min(max(played / float(total_matches), 0.0), 1.0)) ** 0.5
+
+    # --- Ricostruzione soglie Europa ---
+    euro_positions = sorted(set([p for z, c in zones.items() if z in EURO_ZONES for p in range(c["min_pos"], c["max_pos"] + 1)]))
+    euro_max_pos = max(euro_positions) if euro_positions else None
+    euro_threshold_points = pos_map[euro_max_pos][0] if euro_max_pos in pos_map else None
+
+    pressure_euro = 0.0
+    if euro_threshold_points is not None:
+        if pos <= euro_max_pos:
+            pressure_euro = compute_pressure_ahead(pts - euro_threshold_points, points_available, total_matches)
+        else:
+            pressure_euro = compute_pressure_chasing(abs(pts - euro_threshold_points), points_available, total_matches)
+
+    # --- Ricostruzione soglie Retrocessione ---
+    releg_pos = sorted(set([p for z, c in zones.items() if z in RELEGATION_ZONES for p in range(c["min_pos"], c["max_pos"] + 1)]))
+    releg_pl_pts = pos_map[min(releg_pos)][0] if releg_pos and min(releg_pos) in pos_map else None
+    pressure_releg = compute_pressure_chasing(abs(pts - releg_pl_pts), points_available, total_matches) if releg_pl_pts else 0.0
+
+    # --- Titolo ---
+    title_pts = pos_map[1][0] if 1 in pos_map else None
+    pressure_title = 0.0
+    if title_pts:
+        if pos == 1:
+            second_pts = pos_map[2][0] if 2 in pos_map else None
+            pressure_title = compute_pressure_ahead(pts - second_pts, points_available, total_matches) if second_pts else 0.0
+        elif pos <= 4:
+            pressure_title = compute_pressure_chasing(abs(pts - title_pts), points_available, total_matches)
+
+    pressure = max(pressure_euro, pressure_releg, pressure_title)
+    motivation_raw = max(MIN_RAW_WITH_PRESSURE, pressure * progress) if pressure > 0 else max(MIN_RAW_NO_PRESSURE, progress * 0.2)
+    
+    return round(max(5.0, min(MAX_MOTIVATION, motivation_raw * MAX_MOTIVATION)), 2)
+
+def get_motivation_live_bulk(team_name, league_name, bulk_cache):
+    """
+    Interfaccia per l'Engine Core per ottenere la motivazione dal bulk_cache.
+    """
+    if league_name not in LEAGUE_OBJECTIVES or not bulk_cache or "TEAMS" not in bulk_cache:
+        return NEUTRAL_MOTIVATION
+
+    league_teams = [t for t in bulk_cache["TEAMS"] if t.get("league") == league_name]
+    pos_map = {t.get("stats", {}).get("ranking_c", {}).get("position"): (t.get("stats", {}).get("ranking_c", {}).get("points"), t.get("stats", {}).get("ranking_c", {}).get("played"), t) for t in league_teams if t.get("stats", {}).get("ranking_c", {}).get("position")}
+    
+    # RICERCA TARGET TEAM (FIX ALIAS BLINDATO)
+    target_team = None
+    for t in league_teams:
+        # 1. Nome Esatto
+        if t.get("name") == team_name:
+            target_team = t
+            break
+        
+        # 2. Check Alias (Lista o Dizionario)
+        aliases = t.get("aliases", [])
+        found = False
+        if isinstance(aliases, list):
+            if team_name in aliases: found = True
+        elif isinstance(aliases, dict):
+            if team_name in aliases.values(): found = True
+            
+        if found:
+            target_team = t
+            break
+            
+    if not target_team: return NEUTRAL_MOTIVATION
+    
+    return calculate_single_motivation(target_team, pos_map, LEAGUE_OBJECTIVES[league_name], league_name)
 
 if __name__ == "__main__":
     main()

@@ -6,16 +6,30 @@ from config import db
 # CONFIGURAZIONE DB
 teams_collection = db['teams']
 
-def get_league_averages(league_name):
+# // modificato per: logica bulk
+def get_league_averages(league_name, bulk_cache=None):
     """
-    Calcola la media punti casalinga e in trasferta dell'intero campionato.
+    Calcola la media punti casalinga e in trasferta dell'intero campionato. Supporta Bulk Cache.
     """
-    # Cerca tutte le squadre di quel campionato
-    teams = list(teams_collection.find({"ranking.league": league_name}))
+    # 1. Tenta recupero da statistiche pre-calcolate nel Bulk
+    if bulk_cache and "LEAGUE_STATS" in bulk_cache:
+        stats = bulk_cache["LEAGUE_STATS"]
+        return stats.get("avg_home_league", 1.60), stats.get("avg_away_league", 1.10)
 
-    if not teams:
-        # Fallback: ricerca parziale (es. "Serie C" trova "Serie C - Girone A")
-        teams = list(teams_collection.find({"ranking.league": {"$regex": league_name, "$options": "i"}}))
+    # 2. Tenta calcolo da lista squadre in memoria
+    if bulk_cache and "TEAMS" in bulk_cache:
+        teams = [t for t in bulk_cache["TEAMS"] if t.get("league") == league_name]
+        if not teams:
+            # Fallback parziale in cache
+            teams = [t for t in bulk_cache["TEAMS"] if league_name.lower() in t.get("league", "").lower()]
+    else:
+        # 3. Fallback su DB
+        # Cerca tutte le squadre di quel campionato
+        teams = list(teams_collection.find({"ranking.league": league_name}))
+
+        if not teams:
+            # Fallback: ricerca parziale (es. "Serie C" trova "Serie C - Girone A")
+            teams = list(teams_collection.find({"ranking.league": {"$regex": league_name, "$options": "i"}}))
 
     if not teams:
         # Se ancora non trova nulla, usa valori standard (Casa avvantaggiata)
@@ -51,14 +65,29 @@ def get_league_averages(league_name):
 
     return avg_home_league, avg_away_league
 
-def calculate_field_factor(home_team_name, away_team_name, league_name=None):
+# // modificato per: logica bulk
+def calculate_field_factor(home_team_name, away_team_name, league_name=None, bulk_cache=None):
     """
-    Restituisce il punteggio Fattore Campo (0-7) per Casa e Trasferta.
-    Se league_name è None, prova a recuperarlo dalla squadra di casa.
+    Restituisce il punteggio Fattore Campo (0-7) per Casa e Trasferta. Supporta Bulk Cache.
     """
     
-    # 1. TROVA SQUADRE
+    # 1. TROVA SQUADRE (CON FIX ALIAS SICURO)
     def find_team(name):
+        # Ricerca in memoria se disponibile
+        if bulk_cache and "TEAMS" in bulk_cache:
+            for t in bulk_cache["TEAMS"]:
+                # Check nome esatto
+                if t.get("name") == name:
+                    return t
+                
+                # Check alias sicuro (gestisce sia list che dict)
+                aliases = t.get("aliases", [])
+                if isinstance(aliases, list):
+                    if name in aliases: return t
+                elif isinstance(aliases, dict):
+                    if name == aliases.get("soccerstats"): return t
+        
+        # Fallback su DB
         return teams_collection.find_one({
             "$or": [
                 {"name": name},
@@ -80,7 +109,7 @@ def calculate_field_factor(home_team_name, away_team_name, league_name=None):
         league_name = home_team.get("ranking", {}).get("league", "Unknown")
 
     # 3. OTTIENI MEDIE CAMPIONATO
-    avg_h_league, avg_a_league = get_league_averages(league_name)
+    avg_h_league, avg_a_league = get_league_averages(league_name, bulk_cache)
 
     # Protezione divisione per zero
     if avg_h_league < 0.1: avg_h_league = 1.5

@@ -34,14 +34,19 @@ TARGET_COLLECTION = "h2h_by_round"
 TEAMS_CACHE = {}
 
 
-def load_teams_cache():
-    """Carica la cache con PRIORITÀ alle squadre principali (evita conflitti con squadre giovanili)"""
-    if TEAMS_CACHE: 
+def load_teams_cache(bulk_cache=None):
+    """Carica la cache con PRIORITÀ alle squadre principali (evita conflitti con squadre giovanili). Supporta Bulk Cache."""
+    if TEAMS_CACHE and not bulk_cache: 
         return
     
-    print(f"{Fore.YELLOW}📥 Caricamento Cache Squadre...{Style.RESET_ALL}")
+    if not bulk_cache:
+        print(f"{Fore.YELLOW}📥 Caricamento Cache Squadre...{Style.RESET_ALL}")
     
-    teams_list = list(db.teams.find({}))
+    # Se bulk_cache è presente, usiamo la lista pre-caricata [modificato per: logica bulk]
+    if bulk_cache and "TEAMS" in bulk_cache:
+        teams_list = bulk_cache["TEAMS"]
+    else:
+        teams_list = list(db.teams.find({}))
     
     # 🎯 PRIORITÀ: Prima squadre principali, poi giovanili
     def is_main_team(team_name):
@@ -59,19 +64,22 @@ def load_teams_cache():
         # Raccogli tutti i possibili nomi
         names = [t["name"]]
         
-        # Aggiungi aliases
-        if t.get("aliases"):
-            if isinstance(t["aliases"], list):
-                names.extend(t["aliases"])
+        # Aggiungi aliases (Fix Blindato: supporta List, Dict e Stringhe)
+        aliases = t.get("aliases")
+        if aliases:
+            if isinstance(aliases, list):
+                names.extend(aliases)
+            elif isinstance(aliases, dict):
+                names.extend(aliases.values())
             else:
-                names.append(t["aliases"])
+                names.append(aliases)
         
         # Aggiungi aliases_transfermarkt
         if t.get("aliases_transfermarkt"):
             names.append(t["aliases_transfermarkt"])
         
-        # Normalizza e pulisci
-        names = [n.lower().strip() for n in names if n]
+        # Normalizza e pulisci (con conversione in stringa sicura)
+        names = [str(n).lower().strip() for n in names if n]
         
         data = {
             "names": names, 
@@ -84,7 +92,8 @@ def load_teams_cache():
             if n not in TEAMS_CACHE:
                 TEAMS_CACHE[n] = data
     
-    print(f"✅ Cache pronta con {len(TEAMS_CACHE)} alias.")
+    if not bulk_cache:
+        print(f"✅ Cache pronta con {len(TEAMS_CACHE)} alias.")
 
 def normalize_name(name):
     """
@@ -260,8 +269,9 @@ def extract_goals_from_score(score_str):
         return 0, 0
 
 
-def get_h2h_score_v2(home_name, away_name, h_canon, a_canon):
-    load_teams_cache()
+def get_h2h_score_v2(home_name, away_name, h_canon, a_canon, bulk_cache=None):
+    """Calcola score H2H. Supporta Bulk Cache per velocizzare la risoluzione identità."""
+    load_teams_cache(bulk_cache)
 
     # --- RISOLUZIONE NOMI STILE SCRAPER (TEAMS_CACHE + NORMALIZE) ---
 
@@ -278,47 +288,27 @@ def get_h2h_score_v2(home_name, away_name, h_canon, a_canon):
     home_official = h_team_data["official_name"] if h_team_data else home_name
     away_official = a_team_data["official_name"] if a_team_data else away_name
 
-    # 3) Costruisci liste di possibili nomi da usare nella query H2H
-    def build_alias_list(team_data, fallback_name, canon_name):
-        aliases = []
-        # fallback raw + canonical
-        if fallback_name:
-            aliases.append(normalize_name(fallback_name))
-        if canon_name:
-            aliases.append(normalize_name(str(canon_name)))
-        # nomi da TEAMS_CACHE (campo "names" creato in load_teams_cache)
-        if team_data:
-            aliases.extend([normalize_name(n) for n in team_data.get("names", [])])
-        # dedup e pulizia
-        aliases = [x for x in set(aliases) if x]
-        return aliases
-
-    possible_names_h = build_alias_list(h_team_data, home_official, h_canon)
-    possible_names_a = build_alias_list(a_team_data, away_official, a_canon)
-
-
-    # 4) Cerca documento H2H usando ID (VELOCE ⚡)
-    doc = None
-
-    
-
-    # Trova squadre in db.teams
-    home_team_doc = db.teams.find_one({"name": home_official})
-   
-    away_team_doc = db.teams.find_one({"name": away_official})
-   
-    if home_team_doc and away_team_doc:
+    # 3) Risoluzione ID [modificato per: logica bulk]
+    # Se abbiamo h_team_data e a_team_data dalla cache, prendiamo gli ID direttamente per saltare query DB
+    if h_team_data and a_team_data:
+        h_id = h_team_data['_id']
+        a_id = a_team_data['_id']
+    else:
+        # Fallback se la cache non ha risolto
+        home_team_doc = db.teams.find_one({"name": home_official})
+        away_team_doc = db.teams.find_one({"name": away_official})
+        if not (home_team_doc and away_team_doc):
+            return None
         h_id = home_team_doc['_id']
         a_id = away_team_doc['_id']
-        
-        
-        # Query indicizzata per ID (millisecondi)
-        doc = db[SOURCE_COLLECTION].find_one({
-            "$or": [
-                {"team_a_id": h_id, "team_b_id": a_id},
-                {"team_a_id": a_id, "team_b_id": h_id}
-            ]
-        })
+    
+    # 4) Cerca documento H2H usando ID (VELOCE ⚡)
+    doc = db[SOURCE_COLLECTION].find_one({
+        "$or": [
+            {"team_a_id": h_id, "team_b_id": a_id},
+            {"team_a_id": a_id, "team_b_id": h_id}
+        ]
+    })
 
     if not doc:
         return None
@@ -483,7 +473,7 @@ def get_h2h_score_v2(home_name, away_name, h_canon, a_canon):
         "history_summary": f"{home_name} V{wins_h} | {away_name} V{wins_a} | P{draws} (Avg Gol: {avg_g_h:.1f}-{avg_g_a:.1f})",
         "total_matches": valid_matches,
         "h2h_weight": confidence,
-        "details": "V2 Pro (Goals + Delta Difficulty)"
+        "details": "V2 Pro (Goals + Delta Difficulty) [Bulk Integrated]"
     }
 
 

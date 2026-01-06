@@ -1,0 +1,27 @@
+================================================================================
+REPORT SCRAPER QUOTE CALCIO
+================================================================================
+
+Data: 2026-01-06 04:40:09
+Partite totali: 315
+Partite aggiornate: 247
+Successo: 78.4%
+
+
+
+================================================================================
+ℹ️ PARTITE TROVATE MA SENZA QUOTE (NORMALE)
+================================================================================
+
+Totale: 68 partite
+Queste partite sono sul sito ma le quote non sono ancora pubblicate.
+Riprova più tardi, specialmente vicino alla data della partita.
+
+
+Serie B: 10 partite
+
+Serie C - Girone A: 20 partite
+
+Serie C - Girone B: 18 partite
+
+Serie C - Girone C: 20 partite

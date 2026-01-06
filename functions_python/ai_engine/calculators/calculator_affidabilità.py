@@ -1,6 +1,7 @@
 import os
 import sys
 import math
+import re
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 from config import db
@@ -13,16 +14,40 @@ COLLECTION_TEAMS = "teams"
 def connect_db():
     return db
 
-def get_team_aliases(db, team_name):
-    """Cerca gli alias della squadra per trovarla nello storico anche se il nome è diverso."""
-    # MODIFICA A VENTAGLIO: Cerca il documento partendo da nome, alias o transfermarkt
-    team = db[COLLECTION_TEAMS].find_one({
-        "$or": [
-            {"name": team_name},
-            {"aliases": team_name},
-            {"alias_transfermarkt": team_name}
-        ]
-    })
+def get_team_aliases(db, team_name, bulk_cache=None):
+    """Cerca gli alias della squadra per trovarla nello storico anche se il nome è diverso. Supporta Bulk Cache."""
+    # // modificato per: logica bulk
+    team = None
+    
+    if bulk_cache and "TEAMS" in bulk_cache:
+        for t in bulk_cache["TEAMS"]:
+            # --- FIX ALIAS BLINDATO (Ricerca) ---
+            found = False
+            # 1. Nome e Transfermarkt
+            if t.get("name") == team_name or t.get("alias_transfermarkt") == team_name:
+                found = True
+            else:
+                # 2. Controllo Aliases (List o Dict)
+                a = t.get("aliases", [])
+                if isinstance(a, list):
+                    if team_name in a: found = True
+                elif isinstance(a, dict):
+                    if team_name in a.values(): found = True
+            
+            if found:
+                team = t
+                break
+    
+    if not team:
+        # MODIFICA A VENTAGLIO: Cerca il documento partendo da nome, alias o transfermarkt
+        team = db[COLLECTION_TEAMS].find_one({
+            "$or": [
+                {"name": team_name},
+                {"aliases": team_name},
+                {"aliases.soccerstats": team_name}, # Supporto esplicito dict
+                {"alias_transfermarkt": team_name}
+            ]
+        })
     
     aliases = [team_name]
     if team:
@@ -30,31 +55,53 @@ def get_team_aliases(db, team_name):
         if team.get('name') and team['name'] not in aliases:
             aliases.append(team['name'])
             
-        # Aggiungi alias da oggetto o lista
-        if isinstance(team.get('aliases'), list):
-            aliases.extend(team['aliases'])
-        elif isinstance(team.get('aliases'), dict):
-            aliases.extend(team['aliases'].values())
+        # Aggiungi alias da oggetto o lista (Già corretto, manteniamo coerenza)
+        raw_aliases = team.get('aliases')
+        if isinstance(raw_aliases, list):
+            aliases.extend(raw_aliases)
+        elif isinstance(raw_aliases, dict):
+            aliases.extend(raw_aliases.values())
             
         # Aggiungi alias transfermarkt se presente
         if team.get('alias_transfermarkt'):
             aliases.append(team['alias_transfermarkt'])
 
-    return [a.lower() for a in list(set(aliases)) if a] # Tutto minuscolo e senza duplicati
+    return [str(a).lower().strip() for a in list(set(aliases)) if a]
 
-def get_team_league(db, team_name):
-    """Recupera il campionato della squadra da teams (per ricerca intelligente)."""
-    # MODIFICA A VENTAGLIO: Cerca la lega anche se il nome passato è un alias
-    team = db[COLLECTION_TEAMS].find_one({
-        "$or": [
-            {"name": team_name},
-            {"aliases": team_name},
-            {"alias_transfermarkt": team_name}
-        ]
-    })
+def get_team_league(db, team_name, bulk_cache=None):
+    """Recupera il campionato della squadra da teams (per ricerca intelligente). Supporta Bulk Cache."""
+    # // modificato per: logica bulk
+    team = None
+    
+    if bulk_cache and "TEAMS" in bulk_cache:
+        for t in bulk_cache["TEAMS"]:
+            # --- FIX ALIAS BLINDATO ---
+            aliases = t.get("aliases", [])
+            match_alias = False
+            if isinstance(aliases, list):
+                if team_name in aliases: match_alias = True
+            elif isinstance(aliases, dict):
+                if team_name in aliases.values(): match_alias = True
+            
+            if t.get("name") == team_name or match_alias or t.get("alias_transfermarkt") == team_name:
+                team = t
+                break
+                
+    if not team:
+        # MODIFICA A VENTAGLIO: Cerca la lega anche se il nome passato è un alias
+        # Nota: Assicurati che COLLECTION_TEAMS sia definito o usa 'teams'
+        collection = db['teams'] if 'teams' in db.list_collection_names() else db[COLLECTION_TEAMS]
+        team = collection.find_one({
+            "$or": [
+                {"name": team_name},
+                {"aliases": team_name},
+                {"aliases.soccerstats": team_name},
+                {"alias_transfermarkt": team_name}
+            ]
+        })
     return team.get('league') if team else None
 
-def calculate_reliability(team_name, specific_league=None):
+def calculate_reliability(team_name, specific_league=None, bulk_cache=None):
     """
     Calcola l'indice di affidabilità (0-10) basandosi su media e deviazione standard.
     Ricerca intelligente a 3 livelli:
@@ -66,14 +113,14 @@ def calculate_reliability(team_name, specific_league=None):
     - Sei inaffidabile se perdi da favorita (delusione) o vinci da sfavorita (sorpresa).
     """
     history_col = db[COLLECTION_HISTORY]
-    aliases = get_team_aliases(db, team_name)
+    aliases = get_team_aliases(db, team_name, bulk_cache)
     
     # Determina lega target (priorità: specific_league → league da teams → nessuna)
-    target_league = specific_league or get_team_league(db, team_name)
+    target_league = specific_league or get_team_league(db, team_name, bulk_cache)
     
     matches = []
     
-    # LIVELLO 1: Lega + Nome Esatto (più preciso)
+   # LIVELLO 1: Lega + Nome Esatto (più preciso)
     if target_league:
         query_l1 = {
             "league": target_league,
@@ -82,26 +129,29 @@ def calculate_reliability(team_name, specific_league=None):
         matches = list(history_col.find(query_l1))
     
     # LIVELLO 2: Lega + Alias (se L1 non trova nulla)
-    if not matches and target_league:
-        regex_pattern = "|".join([f"^{a}$" for a in aliases])
-        query_l2 = {
-            "league": target_league,
-            "$or": [
-                {"homeTeam": {"$regex": regex_pattern, "$options": "i"}},
-                {"awayTeam": {"$regex": regex_pattern, "$options": "i"}}
-            ]
-        }
-        matches = list(history_col.find(query_l2))
+    # Aggiunto controllo 'if aliases' e re.escape per evitare errori regex
+    if not matches and target_league and aliases:
+        regex_pattern = "|".join([f"^{re.escape(str(a))}$" for a in aliases if a])
+        if regex_pattern:
+            query_l2 = {
+                "league": target_league,
+                "$or": [
+                    {"homeTeam": {"$regex": regex_pattern, "$options": "i"}},
+                    {"awayTeam": {"$regex": regex_pattern, "$options": "i"}}
+                ]
+            }
+            matches = list(history_col.find(query_l2))
     
     # LIVELLO 3: Globale con Alias (fallback disperato)
-    if not matches:
-        regex_pattern = "|".join([f"^{a}$" for a in aliases])
-        matches = list(history_col.find({
-            "$or": [
-                {"homeTeam": {"$regex": regex_pattern, "$options": "i"}},
-                {"awayTeam": {"$regex": regex_pattern, "$options": "i"}}
-            ]
-        }))
+    if not matches and aliases:
+        regex_pattern = "|".join([f"^{re.escape(str(a))}$" for a in aliases if a])
+        if regex_pattern:
+            matches = list(history_col.find({
+                "$or": [
+                    {"homeTeam": {"$regex": regex_pattern, "$options": "i"}},
+                    {"awayTeam": {"$regex": regex_pattern, "$options": "i"}}
+                ]
+            }))
 
     if not matches:
         return 5.0 # Valore neutro se nessuna partita trovata
@@ -188,7 +238,7 @@ def calculate_reliability(team_name, specific_league=None):
         scores_list.append(colpo)
         valid_matches += 1
         
-        # DEBUG: Quanti match validi usa il calcolo reale?
+        # DEBUG: Quanti match validi usa il calcolatore reale?
         if valid_matches <= 5:  # Stampa solo i primi 5
             
 

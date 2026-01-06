@@ -16,15 +16,22 @@ def parse_date(date_str):
     except:
         return datetime.min
 
-def get_lucifero_score(team_name):
+# // modificato per: logica bulk
+def get_lucifero_score(team_name, bulk_cache=None):
     """
     Calcola la POTENZA LUCIFERO (Forma Recente).
     Max Punteggio = 25 (se la forma è 100%).
     Legge dalla collezione 'h2h_by_round' (organizzata per giornate).
+    Supporta Bulk Cache per evitare query ripetitive.
     """
     
-    # 1. Prendi le giornate ordinate dalla più recente (last_updated decrescente)
-    all_rounds = list(h2h_collection.find({}).sort('last_updated', -1))
+    # 1. Recupero round (Priorità al Bulk Cache per performance Engine)
+    if bulk_cache and "ALL_ROUNDS" in bulk_cache:
+        all_rounds = bulk_cache["ALL_ROUNDS"]
+    else:
+        # Fallback originale su DB
+        # Prendi le giornate ordinate dalla più recente (last_updated decrescente)
+        all_rounds = list(h2h_collection.find({}).sort('last_updated', -1))
     
     # 2. Cerca gli ultimi 6 MATCH della squadra (non giornate, ma partite!)
     team_matches = []
@@ -54,10 +61,10 @@ def get_lucifero_score(team_name):
     
     if not last_6: return 0.0
 
-    # 3. Calcolo Punti
+    # 3. Calcolo Punti (Preservato riga 54)
     weights = [6, 5, 4, 3, 2, 1] # Pesi decrescenti (la più recente pesa 6)
     total_score = 0
-    max_score = 0 # Calcoliamo il max possibile in base a quante partite abbiamo (magari ne ha giocate solo 3)
+    max_score = 0 # Calcoliamo il max possibile in base a quante partite abbiamo
     
     print(f"\n🔥 ANALISI LUCIFERO: {team_name}")
     

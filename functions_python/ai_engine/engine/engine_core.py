@@ -3,8 +3,9 @@ import sys
 import json
 import random
 import numpy as np
+import time
 
-# (** MOTORE MATEMATICO CENTRALE V2.0: SUPPORTO GRANULARE MULTI-ALGORITMO **)
+# (** MOTORE MATEMATICO CENTRALE V3.0: INTEGRAZIONE BULK TOTALE **)
 # ( Legge il JSON a scompartimenti, crea 5 profili di pesi in memoria e li usa dinamicamente )
 
 # --- 1. CONFIGURAZIONE PATH E IMPORT DB ---
@@ -28,6 +29,12 @@ except ImportError:
         print("❌ [ENGINE] Errore: config.py non trovato! Verifica i path.")
         db = None
 
+# // aggiunto per: logica bulk
+try:
+    import ai_engine.calculators.bulk_manager as bulk_manager
+except ImportError:
+    bulk_manager = None
+
 # --- IMPORT LIBRERIE CALCOLO ---
 try: import ai_engine.calculators.calculate_team_rating as rating_lib
 except: rating_lib = None
@@ -39,6 +46,15 @@ try: import ai_engine.calculators.calculator_fattore_campo as field_lib
 except: field_lib = None
 try: import ai_engine.calculators.calculator_lucifero as lucifero_lib
 except: lucifero_lib = None
+
+# // aggiunto per: logica bulk - Nuovi calcolatori live
+try: import ai_engine.calculators.calculate_attacco_difesa as att_def_lib
+except: att_def_lib = None
+try: import ai_engine.calculators.calculate_motivazioni as motiv_lib
+except: motiv_lib = None
+try: import ai_engine.calculators.calculate_valore_rosa as value_rosa_lib
+except: value_rosa_lib = None
+
 
 # --- 2. CONFIGURAZIONE LEGHE ---
 AI_ENGINE_DIR = os.path.dirname(CURRENT_DIR) 
@@ -95,7 +111,7 @@ def build_weights_compartment(algo_id):
     
     # C. Funzione interna per estrarre valore (Specifico > Globale > Default)
     def get_w(key, default=1.0):
-        # 1. Cerco nello specifico (Override) - SOLO SE non c'è lucchetto bloccante (se implementato in futuro)
+        # 1. Cerco nello specifico (Override) - SOLO SE non c'è lucchetto bloccante
         if key in specific_data and "valore" in specific_data[key]:
             return specific_data[key]["valore"]
         # 2. Cerco nel globale (Fallback)
@@ -155,53 +171,75 @@ except Exception as e:
 DEFAULT_LEAGUE_AVG = 2.50
 
 
-def calculate_base_goals(league_name):
-    league_data = LEAGUE_STATS.get(league_name, {})
-    if isinstance(league_data, dict):
-        avg_total = league_data.get("avg_goals", DEFAULT_LEAGUE_AVG)
+# // modificato per: logica bulk
+def calculate_base_goals(league_name, bulk_cache=None):
+    # Controllo prioritario su Bulk Cache
+    if bulk_cache and "LEAGUE_STATS" in bulk_cache:
+        stats = bulk_cache["LEAGUE_STATS"]
+        avg_total = stats.get("avg_home_league", 1.60) + stats.get("avg_away_league", 1.10)
     else:
-        avg_total = league_data if league_data else DEFAULT_LEAGUE_AVG
+        # Fallback su file JSON
+        league_data = LEAGUE_STATS.get(league_name, {})
+        if isinstance(league_data, dict):
+            avg_total = league_data.get("avg_goals", DEFAULT_LEAGUE_AVG)
+        else:
+            avg_total = league_data if league_data else DEFAULT_LEAGUE_AVG
+            
     avg_team = avg_total / 2
     base_value = ((avg_team / 10) * 2) + (avg_team / 10)
     return round(base_value, 4), avg_total
 
-def get_identity_card(db_conn, input_name):
+# // modificato per: logica bulk
+def get_identity_card(db_conn, input_name, bulk_cache=None):
     """
-    Risolve l'identità della squadra cercando nel DB Teams.
-    Restituisce un dizionario 'Passaporto' con:
-    - official_name: Nome nel DB Teams (es. 'AC Milan')
-    - aliases: Lista alias (es. ['Milan', 'Milan AC'])
-    - input_name: Il nome usato dall'utente
+    Risolve l'identità con priorità al Bulk Cache e supporto Alias Ibridi (List/Dict).
     """
+    # 1. CERCA IN MEMORIA (BULK)
+    if bulk_cache and "TEAMS" in bulk_cache:
+        for t in bulk_cache["TEAMS"]:
+            # Check Nome Esatto
+            if t.get("name", "").lower() == input_name.lower():
+                return {"official_name": t.get("name"), "aliases": t.get("aliases", []), "input_name": input_name}
+            
+            # Check Alias Sicuro (gestisce sia Liste che Dizionari)
+            aliases = t.get("aliases", [])
+            found = False
+            
+            if isinstance(aliases, list):
+                # Se è una lista: controlla se il nome è dentro
+                if input_name.lower() in [a.lower() for a in aliases if isinstance(a, str)]:
+                    found = True
+            elif isinstance(aliases, dict):
+                # Se è un dizionario: controlla valori specifici (es. soccerstats)
+                for key, val in aliases.items():
+                    if isinstance(val, str) and val.lower() == input_name.lower():
+                        found = True
+                        break
+            
+            if found:
+                return {"official_name": t.get("name"), "aliases": aliases, "input_name": input_name}
+
+    # 2. CERCA NEL DB (FALLBACK)
     if db_conn is None: return {"official_name": input_name, "aliases": [], "input_name": input_name}
-    
-    # 1. Cerca per nome esatto (Case insensitive) o Alias
     try:
         query = {
             "$or": [
                 {"name": {"$regex":f"^{input_name}$", "$options": "i"}},
-                {"aliases": {"$regex":f"^{input_name}$", "$options": "i"}}
+                {"aliases": {"$regex":f"^{input_name}$", "$options": "i"}},
+                {"aliases.soccerstats": {"$regex":f"^{input_name}$", "$options": "i"}}
             ]
         }
         doc = db_conn.teams.find_one(query)
-        
-        if doc:
-            return {
-                "official_name": doc.get("name"),
-                "aliases": doc.get("aliases", []),
-                "input_name": input_name
-            }
+        if doc: return {"official_name": doc.get("name"), "aliases": doc.get("aliases", []), "input_name": input_name}
     except Exception as e:
         print(f"⚠️ Errore ricerca identità {input_name}: {e}")
-    
-    # Fallback: Nessuna corrispondenza trovata
+        
     return {"official_name": input_name, "aliases": [], "input_name": input_name}
 
 
 def get_team_data(db_conn, team_identity):
     """
     Recupera i dati tecnici (stats, scores) usando l'identità risolta.
-    team_identity può essere una stringa (vecchio modo) o un dict (nuovo ID Card).
     """
     if db_conn is None: return {}
     
@@ -244,16 +282,23 @@ def get_h2h_data_from_db(db_conn, home_team, away_team):
         
     return 0, 0, "Match non trovato in H2H DB", {}
 
-def get_dynamic_rating(team_name):
-    if rating_lib is None: return 12.5, {}  # ← Default 12.5 (centro scala 5-25)
+# // modificato per: logica bulk
+def get_dynamic_rating(team_name, preloaded_data=None, bulk_cache=None):
+    """Recupera rating e decide se mostrare i log (verbose). Supporta Bulk Cache."""
+    if rating_lib is None: return 12.5, {}
+    
+    # Se preloaded_data ESISTE, siamo dentro i 100 giri -> Silenzio (verbose=False)
+    is_verbose = False if preloaded_data else True
+    
     try:
-        result = rating_lib.calculate_team_rating(team_name)
+        # Passiamo bulk_cache al calcolatore aggiornato
+        result = rating_lib.calculate_team_rating(team_name, verbose=is_verbose, bulk_cache=bulk_cache)
         if result:
-            return result.get('rating_5_25', 12.5), result  # ← USA rating_5_25!
-        return 12.5, {}  # ← Default 12.5
+            return result.get('rating_5_25', 12.5), result
+        return 12.5, {}
     except Exception as e:
-        print(f"⚠️ Errore calcolo rating {team_name}: {e}")
-        return 12.5, {}  # ← Default 12.5
+        if is_verbose: print(f"⚠️ Errore calcolo rating {team_name}: {e}")
+        return 12.5, {}
 
 
 def apply_randomness(value):
@@ -267,7 +312,6 @@ def apply_randomness(value):
 def calculate_match_score(home_raw, away_raw, h2h_scores, base_val, algo_mode):
     
     # A. SELEZIONE PROFILO PESI
-    # Se l'algo_mode è valido (1-5), usa quel profilo. Altrimenti usa GLOBAL (5).
     safe_mode = algo_mode if algo_mode in WEIGHTS_CACHE else 5
     W = WEIGHTS_CACHE[safe_mode]
 
@@ -346,8 +390,6 @@ def calculate_match_score(home_raw, away_raw, h2h_scores, base_val, algo_mode):
     a_tactical_diff = a_def - a_att
     
     # Uso IMPATTO_DIFESA specifico dell'algoritmo
-    # (Per ora manteniamo la logica originale per non rompere i calcoli base)
-    
     freno_dyn_home = a_def + a_tactical_diff 
     freno_dyn_away = h_def + h_tactical_diff 
     
@@ -377,10 +419,13 @@ def predict_match(home_team, away_team, mode=ALGO_MODE, preloaded_data=None):
     NUOVO PARAMETRO: preloaded_data
     Se passato, SALTA il caricamento DB e usa i dati pronti.
     """
+    # // modificato per: logica bulk - Estrazione Cache
+    bulk_cache = preloaded_data.get('bulk_cache') if preloaded_data else None
+
     # --- 1. RISOLUZIONE IDENTITÀ (FIX NOMI) ---
     # Creiamo subito i 'passaporti' corretti per le squadre
-    h_id = get_identity_card(db, home_team)
-    a_id = get_identity_card(db, away_team)
+    h_id = get_identity_card(db, home_team, bulk_cache)
+    a_id = get_identity_card(db, away_team, bulk_cache)
 
     if not preloaded_data:
         print(f"\n🤖 [ENGINE] Analisi: {home_team} vs {away_team}")
@@ -401,7 +446,7 @@ def predict_match(home_team, away_team, mode=ALGO_MODE, preloaded_data=None):
         # ✅ Salviamo anche il voto H2H puro dentro i RAW
         home_raw['h2h_score'] = h2h_h
         away_raw['h2h_score'] = h2h_a
-        # Per compatibilità, definiamo H_OFF anche qui (anche se non usati in fast track)
+        # Per compatibilità, definiamo H_OFF anche qui
         H_OFF, A_OFF = h_id['official_name'], a_id['official_name']
     else:
         # SLOW TRACK 🐢 (Caricamento classico dal DB)
@@ -431,7 +476,6 @@ def predict_match(home_team, away_team, mode=ALGO_MODE, preloaded_data=None):
         
     if not preloaded_data:
 
-
         # Salvataggio Flash Cache (Solo in slow track)
         def clean_roster(team_data_full):
             if not team_data_full or "starters" not in team_data_full: return "N/A"
@@ -455,7 +499,7 @@ def predict_match(home_team, away_team, mode=ALGO_MODE, preloaded_data=None):
         except Exception as e:
             print(f"⚠️ Errore salvataggio Flash: {e}")
 
-                # Calcoli Extra Librerie (Usa NOMI UFFICIALI H_OFF/A_OFF)
+        # Calcoli Extra Librerie (Usa NOMI UFFICIALI H_OFF/A_OFF)
         if reliability_lib:
             h_rel = reliability_lib.calculate_reliability(H_OFF)
             a_rel = reliability_lib.calculate_reliability(A_OFF)
@@ -570,39 +614,78 @@ def predict_match(home_team, away_team, mode=ALGO_MODE, preloaded_data=None):
     return net_home, net_away, home_raw, away_raw
 
 
-
-# Funzione Helper per caricare i dati 1 volta sola (per Monte Carlo)
+# // modificato per: logica bulk
 def preload_match_data(home_team, away_team):
     """
-    Esegue una 'finta' simulazione in modalità 1 (Statistica) 
-    solo per estrarre i dati RAW e restituirli puliti.
+    VERSIONE TURBO BULK V3: Esegue un unico viaggio al DB per caricare tutto.
+    Integra calcolatori satellite per popolare i dati RAW in memoria.
     """
-    _, _, home_raw, away_raw = predict_match(home_team, away_team, mode=1)
+    t_start = time.time()
     
-    # Recuperiamo anche h2h e base_val (che sono nascosti dentro)
-    # Per farlo pulito, li ricalcoliamo velocemente qui perché predict_match li ha già usati
-    # ma non restituiti esplicitamente. 
-    # Trucco: Usiamo predict_match che ci ha dato home_raw/away_raw completi.
+    # 1. Recupero Lega per Bulk
+    match_info = db.matches.find_one({"home_team": home_team, "away_team": away_team})
+    league = match_info.get("league", "Serie A") if match_info else "Serie A"
+    competition = match_info.get("competition", league) if match_info else league
+
+    # 2. DOWNLOAD MASSIVO
+    bulk_cache = bulk_manager.get_all_data_bulk(home_team, away_team, league)
+
+    # 3. ELABORAZIONE SATELLITE (A latenza zero)
+    # Rating
+    h_rating, _ = get_dynamic_rating(home_team, bulk_cache=bulk_cache)
+    a_rating, _ = get_dynamic_rating(away_team, bulk_cache=bulk_cache)
     
-    # Ma ci mancano h2h_h e h2h_a puri per passarli al calcolatore.
-    # Quindi li ripeschiamo velocemente dal DB (è l'unico modo pulito senza rompere tutto)
+    # Calcolatori Satellite Standard
+    h_rel = reliability_lib.calculate_reliability(home_team, bulk_cache=bulk_cache) if reliability_lib else 5.0
+    a_rel = reliability_lib.calculate_reliability(away_team, bulk_cache=bulk_cache) if reliability_lib else 5.0
+    h_bvs, a_bvs = bvs_lib.get_bvs_score(home_team, away_team, bulk_cache=bulk_cache) if bvs_lib else (0,0)
+    h_field, a_field = field_lib.calculate_field_factor(home_team, away_team, league, bulk_cache=bulk_cache) if field_lib else (3.5,3.5)
+    h_luc = lucifero_lib.get_lucifero_score(home_team, bulk_cache=bulk_cache) if lucifero_lib else 0
+    a_luc = lucifero_lib.get_lucifero_score(away_team, bulk_cache=bulk_cache) if lucifero_lib else 0
     
-    match = db.matches.find_one({"home_team": home_team, "away_team": away_team})
-    competition = match.get("competition", "Sconosciuto") if match else "Sconosciuto"
-    base_val, _ = calculate_base_goals(competition)
-    h2h_h, h2h_a, _, _ = get_h2h_data_from_db(db, home_team, away_team)
+    # Nuovi Calcolatori Live
+    h_scores, a_scores = att_def_lib.get_scores_live_bulk(home_team, away_team, league, bulk_cache) if att_def_lib else ({'home_power':10,'attack_home':5,'defense_home':5}, {'away_power':10,'attack_away':5,'defense_away':5})
+    h_motiv = motiv_lib.get_motivation_live_bulk(home_team, league, bulk_cache) if motiv_lib else 10
+    a_motiv = motiv_lib.get_motivation_live_bulk(away_team, league, bulk_cache) if motiv_lib else 10
+    h_val = value_rosa_lib.get_value_score_live_bulk(home_team, league, bulk_cache) if value_rosa_lib else 5
+    a_val = value_rosa_lib.get_value_score_live_bulk(away_team, league, bulk_cache) if value_rosa_lib else 5
+
+    # 4. Recupero H2H e Base Val
+    h2h_data = bulk_cache.get("MATCH_H2H", {})
+    h2h_h = h2h_data.get('h_score', 0)
+    h2h_a = h2h_data.get('a_score', 0)
+    base_val, _ = calculate_base_goals(league, bulk_cache)
+
+    # 5. COSTRUZIONE RAW DATA
+    home_raw = {
+        'power': h_scores['home_power'], 'attack': h_scores['attack_home'], 'defense': h_scores['defense_home'],
+        'motivation': h_motiv, 'strength_score': h_val, 'rating': h_rating,
+        'reliability': h_rel, 'bvs': h_bvs, 'field_factor': h_field, 'lucifero': h_luc,
+        'h2h_score': h2h_h
+    }
+    away_raw = {
+        'power': a_scores['away_power'], 'attack': a_scores['attack_away'], 'defense': a_scores['defense_away'],
+        'motivation': a_motiv, 'strength_score': a_val, 'rating': a_rating,
+        'reliability': a_rel, 'bvs': a_bvs, 'field_factor': a_field, 'lucifero': a_luc,
+        'h2h_score': h2h_a
+    }
+
+    print(f"⏱️ PRELOAD DATI (METODO BULK): {time.time()-t_start:.3f}s")
 
     return {
+        'bulk_cache': bulk_cache,
         'home_raw': home_raw,
         'away_raw': away_raw,
         'h2h_h': h2h_h,
         'h2h_a': h2h_a,
-        'base_val': base_val
+        'base_val': base_val,
+        'home_team': home_team,
+        'away_team': away_team
     }
 
 # --- AREA TEST ESECUZIONE DIRETTA ---
 if __name__ == "__main__":
-    print("\n--- ⚽ ENGINE CORE V9 - TEST MODE ---")
+    print("\n--- ⚽ ENGINE CORE V3.0 - TEST MODE ---")
     print("1-5: Algoritmi Singoli")
     print("6:  SIMULAZIONE MONTE CARLO (500 match RAPIDO)")
     
@@ -623,6 +706,8 @@ if __name__ == "__main__":
             static_data = preload_match_data(home, away)
         except Exception as e:
             print(f"❌ Errore preload: {e}")
+            import traceback
+            traceback.print_exc()
             exit()
         
         simulations = 500  # ← RIDOTTO per test veloce
@@ -635,6 +720,8 @@ if __name__ == "__main__":
         print(f"🚀 {simulations} simulazioni...")
         for i in range(simulations):
             try:
+                # Passiamo static_data per saltare i caricamenti ripetitivi
+                # Il calcolatore userà i dati già spacchettati
                 s_h, s_a, _, _ = predict_match(home, away, mode=5, preloaded_data=static_data)
                 if s_h is None: continue
                 
@@ -650,12 +737,13 @@ if __name__ == "__main__":
                     pct = (i+1)/simulations*100
                     print(f"\r🎲 {pct:.0f}% ({i+1}/{simulations}) | {s_h:.1f}-{s_a:.1f}", end="")
                     
-            except:
-                continue  # Skip errori DB
+            except Exception as e:
+                # print(f"Errore ciclo {i}: {e}") # Opzionale per debug
+                continue 
         
         print()  # Nuova riga
         
-        # Report
+        # Report Finale
         if results_h:
             avg_h = sum(results_h) / len(results_h)
             avg_a = sum(results_a) / len(results_a)
@@ -675,5 +763,3 @@ if __name__ == "__main__":
     
     else:
         predict_match(home, away, mode=mode)
-
-
