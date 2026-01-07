@@ -142,7 +142,7 @@ def has_valid_results(round_doc):
 
 def analyze_odds(match):
     """Calcola favorita bookmaker e colora quote per HTML"""
-    odds = match.get("odds", {})
+    odds = match.get("odds", {})     
     if not odds or "1" not in odds:
         return '<span class="text-muted">-</span>', None, False
     try:
@@ -197,24 +197,20 @@ def run_single_algo_montecarlo(algo_id, preloaded_data, home_team, away_team, cy
                 algo_mode=algo_id, 
                 home_name=home_team, 
                 away_name=away_team,
-                settings_cache=settings_in_ram, # <--- ECCO IL TURBO
-                debug_mode=False                # 2. SILENZIATORE (Niente print inutili)
+                settings_cache=settings_in_ram,
+                debug_mode=False
             )
             score = f"{gh}-{ga}"
             local_results.append(score)
             valid_cycles += 1
             
+            # ✅ SOLO QUESTA CHIAMATA (senza kwargs, aid, bulk_cache)
             if analyzer:
                 analyzer.add_result(algo_id=algo_id, home_goals=gh, away_goals=ga)
         
-        # 🔥 BARRA PROGRESSO CON FLUSH
-        # ✅ FIX: Usiamo max(1, ...) per evitare la divisione per zero con pochi cicli
-        # ✅ FIX: Qui usiamo "cycles" (senza _per_algo)
+        # Barra progresso
         if cycle_idx % max(1, cycles // 10) == 0 or cycle_idx == cycles - 1:
             pct = (cycle_idx + 1) / cycles * 100
-            
-    
-    
     
     if not local_results:
         return 0, 0, []
@@ -224,7 +220,8 @@ def run_single_algo_montecarlo(algo_id, preloaded_data, home_team, away_team, cy
     final_score = top3[0][0]
     gh, ga = map(int, final_score.split("-"))
     
-    return gh, ga, top3, local_results  # ← AGGIUNGI local_results
+    return gh, ga, top3, local_results
+
 
 
 
@@ -236,6 +233,9 @@ def run_monte_carlo_verdict_detailed(preloaded_data, home_team, away_team, analy
     - cycles: Numero di cicli totali da eseguire
     - algo_id: ID algoritmo da usare (se specificato, usa SOLO quello invece di tutti e 4)
     """
+    
+    # ✅ 1. ESTRAI bulk_cache SUBITO ALL'INIZIO (FUORI DA TUTTI I LOOP!)
+    bulk_cache = kwargs.get('bulk_cache', None)
     
     nominees = []
     algos_stats = {}
@@ -297,7 +297,30 @@ def run_monte_carlo_verdict_detailed(preloaded_data, home_team, away_team, analy
                 valid_cycles += 1
                 
                 if analyzer:
-                    analyzer.add_result(algo_id=aid, home_goals=gh, away_goals=ga)
+                    bulk_cache = kwargs.get('bulk_cache', {})
+                    match_data = kwargs.get('match_data', {})
+                    h2h_data = kwargs.get('h2h_data', {})
+                    
+                    # ✅ Estrai odds come nel calcolatore BVS
+                    odds = bulk_cache.get('MATCH_H2H', {}).get('odds')
+                    
+                    analyzer.add_result(
+                        algo_id=aid,
+                        home_goals=gh,
+                        away_goals=ga,
+                        lambda_h=None,
+                        lambda_a=None,
+                        odds_real=odds,  # ✅ Quote reali estratte dal bulk
+                        odds_qt={'1': h2h_data.get('qt_1'), 'X': h2h_data.get('qt_X'), '2': h2h_data.get('qt_2')},
+                        team_scores={
+                            'home': bulk_cache.get('MASTER_DATA', {}).get(home_team, {}),
+                            'away': bulk_cache.get('MASTER_DATA', {}).get(away_team, {})
+                        },
+                        h2h_stats=bulk_cache.get('H2H_HISTORICAL')
+                    )
+
+
+
                 
                 # Accumula pesi
                 if pesi_dettagliati:

@@ -59,20 +59,28 @@ class DeepAnalyzer:
             'algorithms': {}  # {algo_id: {results: [...], stats: {...}}}
         }
     
-    def add_result(self, algo_id, home_goals, away_goals):
-        """Registra un singolo risultato di simulazione"""
+    def add_result(self, algo_id, home_goals, away_goals, lambda_h=None, lambda_a=None, 
+               odds_real=None, odds_qt=None, team_scores=None, h2h_stats=None):
+
         if self.current_match is None:
             raise ValueError("Devi chiamare start_match() prima!")
         
         # Inizializza algoritmo se non esiste
         if algo_id not in self.current_match['algorithms']:
             self.current_match['algorithms'][algo_id] = {
-                'results': [],  # Lista di tuple (gh, ga)
+                'results': [],      # Lista gol casuali (retrocompatibilità)
+                'lambdas': [],      # Lista lambda teorici (NUOVO)
                 'total_simulations': 0
             }
         
-        # Aggiungi risultato
-        self.current_match['algorithms'][algo_id]['results'].append((home_goals, away_goals))
+        # ✅ SE HAI I LAMBDA, salvali (Modalità Teorica)
+        if lambda_h is not None and lambda_a is not None:
+            self.current_match['algorithms'][algo_id]['lambdas'].append((lambda_h, lambda_a))
+        
+        # ✅ ALTRIMENTI salva i gol (Modalità Empirica - retrocompatibilità)
+        else:
+            self.current_match['algorithms'][algo_id]['results'].append((home_goals, away_goals))
+        
         self.current_match['algorithms'][algo_id]['total_simulations'] += 1
     
     def end_match(self):
@@ -82,9 +90,10 @@ class DeepAnalyzer:
         
         # Calcola statistiche per ogni algoritmo
         for algo_id, data in self.current_match['algorithms'].items():
+            # ✅ Passa l'intero oggetto data invece di solo results
             data['stats'] = self._calculate_stats(
-                data['results'], 
-                self.current_match['real_gh'], 
+                data,
+                self.current_match['real_gh'],
                 self.current_match['real_ga']
             )
         
@@ -92,12 +101,386 @@ class DeepAnalyzer:
         self.matches.append(self.current_match)
         self.current_match = None
     
-    def _calculate_stats(self, results, real_gh=None, real_ga=None):
-        """Calcola TUTTE le statistiche possibili dai risultati"""
+    def _calculate_stats(self, algo_data, real_gh=None, real_ga=None):
+        """Calcola statistiche usando lambda teorici O risultati empirici"""
+        
+        # ✅ PRIORITÀ 1: Se hai lambda, usa quelli (Teorico)
+        if 'lambdas' in algo_data and algo_data['lambdas']:
+            return self._calculate_stats_theoretical(algo_data['lambdas'], real_gh, real_ga)
+        
+        # ✅ PRIORITÀ 2: Altrimenti usa results (Empirico - retrocompatibilità)
+        elif 'results' in algo_data and algo_data['results']:
+            return self._calculate_stats_empirical(algo_data['results'], real_gh, real_ga)
+        
+        return {}
+    
+    def _calculate_stats_empirical(self, results, real_gh=None, real_ga=None):
+        """Calcola statistiche da risultati empirici (VECCHIO METODO)"""
         
         total = len(results)
         if total == 0:
             return {}
+        
+    def _calculate_stats_theoretical(self, lambdas_list, real_gh=None, real_ga=None, 
+                                    odds_real=None, odds_qt=None, team_scores=None, h2h_stats=None):
+        """
+        Calcola probabilità teoriche usando Poisson dai lambda medi
+        + BLENDING con quote reali, quote teoriche, power e storico H2H
+        """
+        from scipy.stats import poisson
+        import numpy as np
+        
+        total_simulations = len(lambdas_list)
+        if total_simulations == 0:
+            return {}
+        
+        # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        # 1️⃣ CALCOLA LAMBDA MEDI (da N lambda con fluttuazione ±15%)
+        # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        lambda_h_list = [lh for lh, la in lambdas_list]
+        lambda_a_list = [la for lh, la in lambdas_list]
+        
+        lambda_h_medio = np.mean(lambda_h_list)
+        lambda_a_medio = np.mean(lambda_a_list)
+        
+        # Deviazione standard dei lambda (misura fluttuazione)
+        std_lambda_h = np.std(lambda_h_list) if len(lambda_h_list) > 1 else 0.0
+        std_lambda_a = np.std(lambda_a_list) if len(lambda_a_list) > 1 else 0.0
+        
+        # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        # 2️⃣ GENERA MATRICE POISSON TEORICA (7x7 = 49 risultati possibili)
+        # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        prob_matrix = {}
+        for gh in range(7):
+            for ga in range(7):
+                p_home = poisson.pmf(gh, lambda_h_medio)
+                p_away = poisson.pmf(ga, lambda_a_medio)
+                prob_matrix[f"{gh}-{ga}"] = p_home * p_away
+        
+        # Normalizza (somma = 100%)
+        total_prob = sum(prob_matrix.values())
+        prob_matrix = {k: v/total_prob for k, v in prob_matrix.items()}
+        
+        # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        # 3️⃣ CALCOLA SEGNI 1X2 DA MONTE CARLO (Poisson puro)
+        # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        sign_1_mc = sum(prob for score, prob in prob_matrix.items() 
+                        if int(score.split('-')[0]) > int(score.split('-')[1]))
+        sign_x_mc = sum(prob for score, prob in prob_matrix.items() 
+                        if int(score.split('-')[0]) == int(score.split('-')[1]))
+        sign_2_mc = sum(prob for score, prob in prob_matrix.items() 
+                        if int(score.split('-')[0]) < int(score.split('-')[1]))
+        
+        # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        # 🔥 BLENDING 1X2: Monte Carlo + Quote Reali + Quote Teoriche
+        # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        sources_1x2 = []
+        weights_1x2 = []
+        
+        # Monte Carlo: SEMPRE presente
+        sources_1x2.append((sign_1_mc, sign_x_mc, sign_2_mc))
+        weights_1x2.append(0.40)  # 40% peso base
+        
+        # Quote Reali: Se disponibili
+        if odds_real and '1' in odds_real and 'X' in odds_real and '2' in odds_real:
+            try:
+                prob_1_real = 1 / float(odds_real['1']) if float(odds_real['1']) > 0 else 0
+                prob_x_real = 1 / float(odds_real['X']) if float(odds_real['X']) > 0 else 0
+                prob_2_real = 1 / float(odds_real['2']) if float(odds_real['2']) > 0 else 0
+                
+                total_real = prob_1_real + prob_x_real + prob_2_real
+                if total_real > 0:
+                    prob_1_real /= total_real
+                    prob_x_real /= total_real
+                    prob_2_real /= total_real
+                    
+                    sources_1x2.append((prob_1_real, prob_x_real, prob_2_real))
+                    weights_1x2.append(0.35)  # 35% peso
+            except:
+                pass
+        
+        # Quote Teoriche: Se disponibili
+        if odds_qt and '1' in odds_qt and 'X' in odds_qt and '2' in odds_qt:
+            try:
+                prob_1_qt = 1 / float(odds_qt['1']) if float(odds_qt['1']) > 0 else 0
+                prob_x_qt = 1 / float(odds_qt['X']) if float(odds_qt['X']) > 0 else 0
+                prob_2_qt = 1 / float(odds_qt['2']) if float(odds_qt['2']) > 0 else 0
+                
+                total_qt = prob_1_qt + prob_x_qt + prob_2_qt
+                if total_qt > 0:
+                    prob_1_qt /= total_qt
+                    prob_x_qt /= total_qt
+                    prob_2_qt /= total_qt
+                    
+                    sources_1x2.append((prob_1_qt, prob_x_qt, prob_2_qt))
+                    weights_1x2.append(0.25)  # 25% peso
+            except:
+                pass
+        
+        # Normalizza pesi (se mancano fonti, ridistribuisci)
+        total_weight = sum(weights_1x2)
+        weights_1x2 = [w / total_weight for w in weights_1x2]
+        
+        # MEDIA PESATA 1X2
+        sign_1_final = sum(src[0] * w for src, w in zip(sources_1x2, weights_1x2))
+        sign_x_final = sum(src[1] * w for src, w in zip(sources_1x2, weights_1x2))
+        sign_2_final = sum(src[2] * w for src, w in zip(sources_1x2, weights_1x2))
+        
+        # Normalizza (sicurezza)
+        total_1x2 = sign_1_final + sign_x_final + sign_2_final
+        sign_1_final /= total_1x2
+        sign_x_final /= total_1x2
+        sign_2_final /= total_1x2
+        
+        # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        # 4️⃣ CALCOLA GG/NG DA MONTE CARLO
+        # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        gg_mc = sum(prob for score, prob in prob_matrix.items() 
+                    if int(score.split('-')[0]) > 0 and int(score.split('-')[1]) > 0)
+        ng_mc = 1 - gg_mc
+        
+        # 🔥 BLENDING GG/NG: Monte Carlo + Power + H2H
+        sources_ggng = [(gg_mc, ng_mc)]
+        weights_ggng = [0.40]
+        
+        # Power Attack/Defense
+        if team_scores and 'home' in team_scores and 'away' in team_scores:
+            try:
+                h_scores = team_scores['home']
+                a_scores = team_scores['away']
+                
+                att_h = h_scores.get('attack_home', 5.0)
+                def_a = a_scores.get('defense_away', 5.0)
+                att_a = a_scores.get('attack_away', 5.0)
+                def_h = h_scores.get('defense_home', 5.0)
+                
+                # Probabilità che casa segni
+                prob_h_score = min(0.95, (att_h + (10 - def_a)) / 20)
+                # Probabilità che ospite segni
+                prob_a_score = min(0.95, (att_a + (10 - def_h)) / 20)
+                
+                gg_power = prob_h_score * prob_a_score
+                ng_power = 1 - gg_power
+                
+                sources_ggng.append((gg_power, ng_power))
+                weights_ggng.append(0.30)
+            except:
+                pass
+        
+        # Storico H2H
+        if h2h_stats and 'gg_pct' in h2h_stats:
+            try:
+                gg_h2h = h2h_stats['gg_pct'] / 100
+                ng_h2h = 1 - gg_h2h
+                
+                sources_ggng.append((gg_h2h, ng_h2h))
+                weights_ggng.append(0.30)
+            except:
+                pass
+        
+        # Normalizza e calcola media
+        total_weight_gg = sum(weights_ggng)
+        weights_ggng = [w / total_weight_gg for w in weights_ggng]
+        
+        gg_final = sum(src[0] * w for src, w in zip(sources_ggng, weights_ggng))
+        ng_final = 1 - gg_final
+        
+        # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        # 5️⃣ CALCOLA UNDER/OVER DA MONTE CARLO
+        # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        thresholds = [0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5]
+        under_over = {}
+        
+        for th in thresholds:
+            under_mc = sum(prob for score, prob in prob_matrix.items() 
+                        if sum(map(int, score.split('-'))) < th)
+            over_mc = 1 - under_mc
+            
+            # 🔥 BLENDING U/O: Monte Carlo + Power + H2H
+            sources_uo = [(under_mc, over_mc)]
+            weights_uo = [0.40]
+            
+            # Power (solo per 2.5)
+            if th == 2.5 and team_scores:
+                try:
+                    expected_total = (lambda_h_medio + lambda_a_medio)
+                    if expected_total < 2.5:
+                        under_power = 0.65
+                    elif expected_total > 2.5:
+                        under_power = 0.35
+                    else:
+                        under_power = 0.50
+                    
+                    over_power = 1 - under_power
+                    sources_uo.append((under_power, over_power))
+                    weights_uo.append(0.30)
+                except:
+                    pass
+            
+            # H2H (solo per 2.5)
+            if th == 2.5 and h2h_stats and 'over25_pct' in h2h_stats:
+                try:
+                    over_h2h = h2h_stats['over25_pct'] / 100
+                    under_h2h = 1 - over_h2h
+                    
+                    sources_uo.append((under_h2h, over_h2h))
+                    weights_uo.append(0.30)
+                except:
+                    pass
+            
+            # Normalizza e calcola media
+            total_weight_uo = sum(weights_uo)
+            weights_uo = [w / total_weight_uo for w in weights_uo]
+            
+            under_final = sum(src[0] * w for src, w in zip(sources_uo, weights_uo))
+            over_final = 1 - under_final
+            
+            under_over[f"U{th}"] = {
+                'count': int(under_final * total_simulations),
+                'pct': round(under_final * 100, 2)
+            }
+            under_over[f"O{th}"] = {
+                'count': int(over_final * total_simulations),
+                'pct': round(over_final * 100, 2)
+            }
+        
+        # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        # 6️⃣ TOP 10 RISULTATI ESATTI
+        # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        sorted_scores = sorted(prob_matrix.items(), key=lambda x: x[1], reverse=True)
+        top_10_scores = [(score, int(prob * total_simulations)) for score, prob in sorted_scores[:10]]
+        
+        # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        # 7️⃣ DISTRIBUZIONE GOL (Casa e Trasferta)
+        # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        home_goals_dist = {}
+        away_goals_dist = {}
+        
+        for gh in range(7):
+            home_goals_dist[gh] = int(poisson.pmf(gh, lambda_h_medio) * total_simulations)
+        
+        for ga in range(7):
+            away_goals_dist[ga] = int(poisson.pmf(ga, lambda_a_medio) * total_simulations)
+        
+        # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        # 8️⃣ MEDIE GOL
+        # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        home_avg_goals = lambda_h_medio
+        away_avg_goals = lambda_a_medio
+        
+        # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        # 9️⃣ STATISTICHE CASA/TRASFERTA (segna/non segna)
+        # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        home_scored_prob = 1 - poisson.pmf(0, lambda_h_medio)
+        away_scored_prob = 1 - poisson.pmf(0, lambda_a_medio)
+        
+        home_scored = int(home_scored_prob * total_simulations)
+        away_scored = int(away_scored_prob * total_simulations)
+        
+        # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        # 🔟 CONFIDENCE (Basato su varianza dei lambda)
+        # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        confidence_home = max(0, min(100, 100 - (std_lambda_h * 25)))
+        confidence_away = max(0, min(100, 100 - (std_lambda_a * 25)))
+        
+        total_std = np.std([lh + la for lh, la in lambdas_list]) if total_simulations > 1 else 0.0
+        confidence_total = max(0, min(100, 100 - (total_std * 15)))
+        
+        global_confidence = (confidence_home + confidence_away + confidence_total) / 3
+        
+        # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        # 1️⃣1️⃣ ACCURACY (se disponibile risultato reale)
+        # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        accuracy = None
+        if real_gh is not None and real_ga is not None:
+            real_score_str = f"{real_gh}-{real_ga}"
+            real_score_prob = prob_matrix.get(real_score_str, 0)
+            
+            real_score_rank = None
+            for rank, (score, _) in enumerate(sorted_scores, 1):
+                if score == real_score_str:
+                    real_score_rank = rank
+                    break
+            
+            predicted_score = sorted_scores[0][0]
+            pred_gh, pred_ga = map(int, predicted_score.split("-"))
+            
+            real_sign = "1" if real_gh > real_ga else ("X" if real_gh == real_ga else "2")
+            pred_sign = "1" if pred_gh > pred_ga else ("X" if pred_gh == pred_ga else "2")
+            
+            real_gg = "GG" if (real_gh > 0 and real_ga > 0) else "NG"
+            pred_gg = "GG" if (pred_gh > 0 and pred_ga > 0) else "NG"
+            
+            real_total = real_gh + real_ga
+            pred_total = pred_gh + pred_ga
+            
+            accuracy = {
+                'predicted_score': predicted_score,
+                'real_score': real_score_str,
+                'exact_match': (predicted_score == real_score_str),
+                'sign_correct': (pred_sign == real_sign),
+                'home_goals_correct': (pred_gh == real_gh),
+                'away_goals_correct': (pred_ga == real_ga),
+                'gg_ng_correct': (pred_gg == real_gg),
+                'u25_correct': ((pred_total <= 2.5) == (real_total <= 2.5)),
+                'real_score_count': int(real_score_prob * total_simulations),
+                'real_score_pct': round(real_score_prob * 100, 2),
+                'real_score_rank': real_score_rank or "N/A"
+            }
+        
+        # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        # 🎯 RITORNA TUTTO (con valori BLENDED)
+        # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        return {
+            'total_simulations': total_simulations,
+            
+            # Distribuzione gol
+            'home_goals_distribution': home_goals_dist,
+            'away_goals_distribution': away_goals_dist,
+            
+            # Risultati esatti
+            'exact_scores': {score: int(prob * total_simulations) for score, prob in prob_matrix.items()},
+            'top_10_scores': top_10_scores,
+            
+            # Segni (BLENDED)
+            'sign_1': {'count': int(sign_1_final * total_simulations), 'pct': round(sign_1_final * 100, 2)},
+            'sign_x': {'count': int(sign_x_final * total_simulations), 'pct': round(sign_x_final * 100, 2)},
+            'sign_2': {'count': int(sign_2_final * total_simulations), 'pct': round(sign_2_final * 100, 2)},
+            
+            # GG/NG (BLENDED)
+            'gg': {'count': int(gg_final * total_simulations), 'pct': round(gg_final * 100, 2)},
+            'ng': {'count': int(ng_final * total_simulations), 'pct': round(ng_final * 100, 2)},
+            
+            # Under/Over (BLENDED)
+            'under_over': under_over,
+            
+            # Statistiche Casa
+            'home_scored': {'count': home_scored, 'pct': round(home_scored_prob * 100, 2)},
+            'home_not_scored': {'count': total_simulations - home_scored, 'pct': round((1 - home_scored_prob) * 100, 2)},
+            'home_avg_goals': round(home_avg_goals, 3),
+            
+            # Statistiche Trasferta
+            'away_scored': {'count': away_scored, 'pct': round(away_scored_prob * 100, 2)},
+            'away_not_scored': {'count': total_simulations - away_scored, 'pct': round((1 - away_scored_prob) * 100, 2)},
+            'away_avg_goals': round(away_avg_goals, 3),
+            
+            # Confidence
+            'confidence': {
+                'home_std': round(std_lambda_h, 3),
+                'away_std': round(std_lambda_a, 3),
+                'total_std': round(total_std, 3),
+                'home_confidence': round(confidence_home, 1),
+                'away_confidence': round(confidence_away, 1),
+                'total_confidence': round(confidence_total, 1),
+                'global_confidence': round(global_confidence, 1),
+                'lambda_medio_casa': round(lambda_h_medio, 3),
+                'lambda_medio_ospite': round(lambda_a_medio, 3)
+            },
+            
+            # Accuracy
+            'accuracy': accuracy
+        }
+
         
         # ═══════════════════════════════════════════════════════════
         # 🔬 CALCOLO CONFIDENCE (usa il modulo separato)

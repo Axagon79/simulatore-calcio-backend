@@ -1,6 +1,7 @@
 import time
 from config import db
 
+
 def get_all_data_bulk(home_team, away_team, league_name):
     """
     MAGAZZINO CENTRALE V3: Versione Omnicomprensiva.
@@ -24,29 +25,44 @@ def get_all_data_bulk(home_team, away_team, league_name):
     # Recupero Documenti Squadra
     raw_teams = list(db["teams"].find(team_query, {"_id": 0}))
     
-    # Recupero Round Lega (per Lucifero e H2H)
-    raw_rounds = list(db["h2h_by_round"].find({"_id": {"$regex": f"^{league_name}"}}).sort("last_updated", -1))
+    # ✅ RECUPERO TUTTI I ROUND (come fa il BVS - senza filtro su _id)
+    raw_rounds = list(db["h2h_by_round"].find().sort("last_updated", -1))
 
-    # 3. ESTRAZIONE DATI H2H SPECIFICI
+    # 3. ESTRAZIONE DATI H2H SPECIFICI (METODO BVS)
     h2h_match_data = {"h_score": 0, "a_score": 0, "msg": "Dati non trovati", "extra": {}, "quotes": {}}
-    for round_doc in raw_rounds:
-        for match in round_doc.get("matches", []):
-            # Controllo incrociato nomi e alias per trovare il match esatto
-            if match.get("home") in team_names and match.get("away") in team_names:
-                h2h = match.get("h2h_data", {})
-                h2h_match_data = {
-                    "h_score": h2h.get("home_score", 0),
-                    "a_score": h2h.get("away_score", 0),
-                    "msg": h2h.get("history_summary", "H2H Caricato"),
-                    "extra": {
-                        "avg_goals_home": h2h.get("avg_goals_home", 1.2),
-                        "avg_goals_away": h2h.get("avg_goals_away", 1.0)
-                    },
-                    "quotes": {
-                        "1": h2h.get("qt_1"), "X": h2h.get("qt_X"), "2": h2h.get("qt_2")
-                    }
-                }
-                break
+    
+    # ✅ USA AGGREGATION PIPELINE (come fa calculator_bvs.py)
+    pipeline = [
+        {"$unwind": "$matches"},
+        {"$match": {
+            "$or": [
+                {"matches.home": home_team, "matches.away": away_team, "matches.h2h_data": {"$exists": True}},
+                {"matches.home": {"$regex": f"^{home_team}$", "$options": "i"},
+                 "matches.away": {"$regex": f"^{away_team}$", "$options": "i"},
+                 "matches.h2h_data": {"$exists": True}}
+            ]
+        }},
+        {"$sort": {"last_updated": -1}},
+        {"$limit": 1},
+        {"$project": {"match": "$matches"}}
+    ]
+    
+    result = list(db["h2h_by_round"].aggregate(pipeline))
+    
+    if result:
+        match = result[0]["match"]
+        h2h = match.get("h2h_data", {})
+        
+        h2h_match_data = {
+            "h_score": h2h.get("home_score", 0),
+            "a_score": h2h.get("away_score", 0),
+            "msg": h2h.get("history_summary", "H2H Caricato"),
+            "extra": {
+                "avg_goals_home": h2h.get("avg_goals_home", 1.2),
+                "avg_goals_away": h2h.get("avg_goals_away", 1.0)
+            },
+            "quotes": match.get("odds", {})  # ✅ Quote REALI dal campo "odds" del match
+        }
 
     # 4. CALCOLO MEDIE LEGA (PER FATTORE CAMPO)
     all_teams_league = list(db["teams"].find({"league": league_name}, {"ranking": 1}))
@@ -83,7 +99,7 @@ def get_all_data_bulk(home_team, away_team, league_name):
             "defense": scores.get("defense_home") if name == home_team else scores.get("defense_away"),
             "motivation": stats.get("motivation", 10.0),
             "strength_score": stats.get("strengthScore09", 5.0),
-            "reliability": stats.get("reliability", 5.0) or scores.get("reliability", 5.0), #
+            "reliability": stats.get("reliability", 5.0) or scores.get("reliability", 5.0),
             "rating_stored": team.get("rating_5_25"),
             "ppg_home": h_ppg,
             "ppg_away": a_ppg,
@@ -94,8 +110,57 @@ def get_all_data_bulk(home_team, away_team, league_name):
         master_map[name] = team_entry
         for alias in team.get("aliases", []):
             master_map[alias] = team_entry
+            
+    # 6. CARICA STORICO H2H DA raw_h2h_data_v2
+    h2h_historical_stats = None
+    
+    # Cerca in entrambe le direzioni (A vs B o B vs A)
+    h2h_doc = db.raw_h2h_data_v2.find_one({
+        "$or": [
+            {"team_a": home_team, "team_b": away_team},
+            {"team_a": away_team, "team_b": home_team}
+        ]
+    })
+    
+    if h2h_doc and 'matches' in h2h_doc:
+        matches = h2h_doc['matches']
+        
+        # Filtra solo partite giocate (non future "-:-")
+        played_matches = [m for m in matches if m.get('score') != '-:-' and ':' in m.get('score', '')]
+        
+        if played_matches:
+            # Calcola statistiche Over/Under 2.5
+            over25_count = 0
+            gg_count = 0
+            
+            for match in played_matches:
+                try:
+                    score = match['score']
+                    # Gestisci casi tipo "0:1d.t.s." (dopo tempi supplementari)
+                    score_clean = score.split('d.t.s.')[0].strip()
+                    
+                    gh, ga = map(int, score_clean.split(':'))
+                    total = gh + ga
+                    
+                    if total > 2.5:
+                        over25_count += 1
+                    
+                    if gh > 0 and ga > 0:
+                        gg_count += 1
+                except:
+                    continue
+            
+            total_played = len(played_matches)
+            
+            h2h_historical_stats = {
+                'total_matches': total_played,
+                'over25_pct': round(over25_count / total_played * 100, 2) if total_played > 0 else 0,
+                'under25_pct': round((total_played - over25_count) / total_played * 100, 2) if total_played > 0 else 0,
+                'gg_pct': round(gg_count / total_played * 100, 2) if total_played > 0 else 0,
+                'ng_pct': round((total_played - gg_count) / total_played * 100, 2) if total_played > 0 else 0
+            }
 
-    # 6. PACCO CACHE FINALE
+    # 7. PACCO CACHE FINALE
     bulk_cache = {
         "ROSE": {
             "GK": raw_players_gk, "DEF": raw_players_def, 
@@ -108,7 +173,8 @@ def get_all_data_bulk(home_team, away_team, league_name):
         "LEAGUE_STATS": {
             "avg_home_league": avg_h_l, 
             "avg_away_league": avg_a_l
-        }
+        },
+        "H2H_HISTORICAL": h2h_historical_stats
     }
 
     t_end = time.time() - t_start

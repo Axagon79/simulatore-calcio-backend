@@ -44,7 +44,8 @@ try:
         load_tuning
     )
     from config import db
-    from ai_engine.deep_analysis import DeepAnalyzer #
+    from ai_engine.deep_analysis import DeepAnalyzer 
+    from ai_engine.calculators.bulk_manager import get_all_data_bulk  # ← AGGIUNGI QUESTA RIGA!
 except ImportError as e:
     print(json.dumps({"success": False, "error": f"Import Error: {e}"}), flush=True)
     sys.exit(1)
@@ -652,7 +653,42 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
         from ai_engine.deep_analysis import DeepAnalyzer
         analyzer = DeepAnalyzer()
         analyzer.start_match(home_team, away_team, league=league)
+        # ═══════════════════════════════════════════════════════════
+        # CARICA bulk_cache E ESTRAI MATCHDATA
+        # ═══════════════════════════════════════════════════════════
+        # ✅ NON chiamare qui! Sarà chiamato dopo in base all'algoritmo
+        bulk_cache = None
+
+        # 2. Estrai matchdata dal bulk_cache (cerca negli ALL_ROUNDS)
+        matchdata = None
+        h2h_data = None
+        t_init = time.time()
+        from ai_engine.deep_analysis import DeepAnalyzer
+        analyzer = DeepAnalyzer()
+        analyzer.start_match(home_team, away_team, league=league)
+
+        # NON chiamare get_all_data_bulk qui! Sarà chiamato dopo
+        bulk_cache = None
+        matchdata = None
+        h2h_data = {}
+
         print(f"⏱️ [1. INIT] Analyzer pronto in: {time.time() - t_init:.3f}s", file=sys.stderr)
+
+        # Continua con la sezione ALIAS (riga ~612)
+        t_alias = time.time()
+        team_h_doc = db.teams.find_one({
+            "$or": [
+                {"name": home_team},
+                {"aliases": home_team},
+                {"aliases_transfermarkt": home_team}
+            ]
+        }) or {"name": home_team}
+
+
+
+        print(f"⏱️ [1. INIT] Analyzer pronto in: {time.time() - t_init:.3f}s", file=sys.stderr)
+        
+        
         
         # ✅ CERCA OVUNQUE: Nome principale, Alias o Alias Transfermarkt
         t_alias = time.time()
@@ -729,25 +765,80 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
         t1 = time.time()
         preloaded_data = preload_match_data(home_team, away_team)
         print(f"⏱️ PRELOAD DATI: {time.time() - t1:.2f}s", file=sys.stderr)
-        
+
+        # ✅ ESTRAI I NOMI REALI DAL PRELOAD
+        real_home = preloaded_data.get('home_team', home_team)
+        real_away = preloaded_data.get('away_team', away_team)
+
         # ✅ LOG INIZIALE
         print(f"🎯 SIMULAZIONE RICHIESTA: Algo {algo_id}, Cicli {cycles}", file=sys.stderr)
-        
+
         t_exec_start = time.time()
         if algo_id == 6:
-            # MONTE CARLO
-            print(f"🔵 MODALITÀ MONTE CARLO ATTIVATA", file=sys.stderr)
+            print('🔵 MODALITÀ MONTE CARLO ATTIVATA')
+            
+            # ✅ GESTIONE ROBUSTA: Verifica se bulk_cache è un dict valido con le chiavi necessarie
+            needs_reload = False
+            
+            if bulk_cache is None:
+                needs_reload = True
+                print("📦 bulk_cache è None, caricamento necessario...", file=sys.stderr)
+            elif not isinstance(bulk_cache, dict):
+                needs_reload = True
+                print(f"📦 bulk_cache non è un dict (tipo: {type(bulk_cache)}), ricarico...", file=sys.stderr)
+            elif 'MASTER_DATA' not in bulk_cache:
+                needs_reload = True
+                print(f"📦 bulk_cache manca 'MASTER_DATA', ricarico...", file=sys.stderr)
+            elif 'ALL_ROUNDS' not in bulk_cache:
+                needs_reload = True
+                print(f"📦 bulk_cache manca 'ALL_ROUNDS', ricarico...", file=sys.stderr)
+            else:
+                print("♻️ Riutilizzo bulk_cache già caricato", file=sys.stderr)
+            
+            # Carica se necessario
+            if needs_reload:
+                bulk_cache = get_all_data_bulk(home_team, away_team, league)
+                
+                # Verifica che il caricamento sia andato a buon fine
+                if not isinstance(bulk_cache, dict):
+                    raise ValueError(f"❌ ERRORE: get_all_data_bulk ha restituito {type(bulk_cache)} invece di dict!")
+            
+            # ✅ A questo punto bulk_cache è sicuramente un dict valido
+            # Estrai dati per blending
+            team_h_scores = bulk_cache.get('MASTER_DATA', {}).get(home_team, {})
+            team_a_scores = bulk_cache.get('MASTER_DATA', {}).get(away_team, {})
+            h2h_stats = bulk_cache.get('H2H_HISTORICAL')
+            
+            # Estrai matchdata dal bulk_cache
+            matchdata = None
+            h2h_data = {}
+            
+            for round_doc in bulk_cache.get("ALL_ROUNDS", []):
+                if isinstance(round_doc, dict):  # ✅ Verifica che round_doc sia un dict
+                    for match in round_doc.get("matches", []):
+                        if isinstance(match, dict):  # ✅ Verifica che match sia un dict
+                            if match.get("home") == home_team and match.get("away") == away_team:
+                                matchdata = match
+                                h2h_data = match.get("h2h_data", {})
+                                break
+                    if matchdata:
+                        break
+            
+            # ✅ Se matchdata non trovato, ERRORE
+            if matchdata is None:
+                raise ValueError(f"❌ Match {home_team} vs {away_team} non trovato in ALL_ROUNDS!")
             
             res = run_monte_carlo_verdict_detailed(
                 preloaded_data, 
                 home_team, 
-                away_team,
-                analyzer=analyzer,
-                cycles=cycles,
-                algo_id=algo_id
+                away_team, 
+                analyzer=analyzer, 
+                cycles=cycles, 
+                algo_id=algo_id,
+                bulk_cache=bulk_cache  # ✅ Ora ha valore!
             )
+
             gh, ga = res[0]
-            
             actual_cycles_executed = res[5]
             
             # Tracking cicli Monte Carlo
@@ -773,10 +864,59 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
             
             print(f"✅ MONTE CARLO COMPLETATO: {actual_cycles_executed} cicli eseguiti", file=sys.stderr)
             print(f"✅ RISULTATO FINALE: {gh}-{ga}", file=sys.stderr)
+
         
         else:
             # ✅ ALGORITMI SINGOLI (1-5)
             print(f"🟢 MODALITÀ SINGOLO ALGORITMO {algo_id} ATTIVATA", file=sys.stderr)
+            
+            # ✅ GESTIONE ROBUSTA: Verifica se bulk_cache è un dict valido
+            needs_reload = False
+            
+            if bulk_cache is None:
+                needs_reload = True
+                print("📦 bulk_cache è None, caricamento necessario...", file=sys.stderr)
+            elif not isinstance(bulk_cache, dict):
+                needs_reload = True
+                print(f"📦 bulk_cache non è dict (tipo: {type(bulk_cache)}), ricarico...", file=sys.stderr)
+            elif 'MASTER_DATA' not in bulk_cache:
+                needs_reload = True
+                print(f"📦 bulk_cache manca MASTER_DATA, ricarico...", file=sys.stderr)
+            elif 'ALL_ROUNDS' not in bulk_cache:
+                needs_reload = True
+                print(f"📦 bulk_cache manca ALL_ROUNDS, ricarico...", file=sys.stderr)
+            else:
+                print("♻️ Riutilizzo bulk_cache già caricato", file=sys.stderr)
+            
+            if needs_reload:
+                bulk_cache = get_all_data_bulk(home_team, away_team, league)
+                
+                if not isinstance(bulk_cache, dict):
+                    raise ValueError(f"❌ get_all_data_bulk ha restituito {type(bulk_cache)} invece di dict!")
+            
+            # Estrai dati per blending
+            team_h_scores = bulk_cache.get('MASTER_DATA', {}).get(home_team, {})
+            team_a_scores = bulk_cache.get('MASTER_DATA', {}).get(away_team, {})
+            h2h_stats = bulk_cache.get('H2H_HISTORICAL')
+            
+            # Estrai matchdata
+            matchdata = None
+            h2h_data = {}
+            
+            for round_doc in bulk_cache.get("ALL_ROUNDS", []):
+                if isinstance(round_doc, dict):
+                    for match in round_doc.get("matches", []):
+                        if isinstance(match, dict):
+                            if match.get("home") == home_team and match.get("away") == away_team:
+                                matchdata = match
+                                h2h_data = match.get("h2h_data", {})
+                                break
+                    if matchdata:
+                        break
+            
+            if matchdata is None:
+                raise ValueError(f"❌ Match {home_team} vs {away_team} non trovato!")
+
             
             # 1. CARICAMENTO TUNING UNA VOLTA SOLA
             settings_in_ram = load_tuning(algo_id)
@@ -788,27 +928,54 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
             
             t2 = time.time()
             sim_list = []
-            
             print(f"🚀 Avvio simulazione veloce per: {real_home} vs {real_away}", file=sys.stderr)
-
+            
             for i in range(cycles):
-                # Usiamo real_home e real_away: il motore non deve più cercarli nel DB o negli Alias ad ogni giro
-                gh_temp, ga_temp = run_single_algo(
-                    algo_id, 
-                    preloaded_data, 
-                    real_home, 
-                    real_away, 
-                    settings_cache=settings_in_ram, 
-                    debug_mode=False
-                )
+                # ✅ Chiamata NORMALE (ritorna tutti i 9 valori)
+                result = run_single_algo(algo_id, preloaded_data, real_home, real_away, settings_cache=settings_in_ram, debug_mode=False)
                 
+                # ✅ Unpack in base al numero di valori ritornati
+                if len(result) == 9:
+                    # Formato completo con lambda
+                    gh_temp, ga_temp, lambda_h, lambda_a, xg_info, pesi, params, sc_h, sc_a = result
+                    
+                    # ❌ RIMUOVI QUESTO BLOCCO (bulk_cache è già caricato sopra!)
+                    # bulk_cache = get_all_data_bulk(home_team, away_team, league)
+                    # team_h_scores = bulk_cache['MASTERDATA'].get(home_team, {})
+                    # team_a_scores = bulk_cache['MASTERDATA'].get(away_team, {})
+                    # h2h_stats = bulk_cache.get('H2H_HISTORICAL')
+                    
+                    # ✅ Passa i LAMBDA all'analyzer (le variabili sono già definite sopra)
+                    if analyzer:
+                        odds = bulk_cache.get('MATCH_H2H', {}).get('odds')
+                        
+                        analyzer.add_result(
+                            algo_id, 
+                            gh_temp, 
+                            ga_temp, 
+                            lambda_h=lambda_h, 
+                            lambda_a=lambda_a, 
+                            odds_real=odds,
+                            odds_qt={'1': h2h_data.get('qt_1'), 'X': h2h_data.get('qt_X'), '2': h2h_data.get('qt_2')},
+                            team_scores={'home': team_h_scores, 'away': team_a_scores},
+                            h2h_stats=h2h_stats
+                        )
+                
+                elif len(result) == 2:
+                    # Formato semplice (solo gol) - retrocompatibilità
+                    gh_temp, ga_temp = result
+                    
+                    # Modalità empirica classica
+                    if analyzer:
+                        analyzer.add_result(algo_id, gh_temp, ga_temp)
+                
+                else:
+                    # Errore: formato non riconosciuto
+                    raise ValueError(f"run_single_algo ritorna {len(result)} valori, attesi 2 o 9")
+                
+                # ✅ Aggiungi alla lista simulazioni
                 sim_list.append(f"{gh_temp}-{ga_temp}")
-                analyzer.add_result(algo_id, gh_temp, ga_temp)
-                
-                # Log progresso ogni 10% (mantenuto come richiesto)
-                if cycles >= 10 and (i + 1) % max(1, cycles // 10) == 0:
-                    pct = int((i + 1) / cycles * 100)
-                    print(f"  📊 Progresso: {pct}% ({i + 1}/{cycles})", file=sys.stderr)
+
             
             # 3. CALCOLO RISULTATO FINALE
             from collections import Counter
@@ -894,6 +1061,14 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
             "10_marcatori_casa": ottieni_nomi_giocatori(h2h_data)[0] if h2h_data.get('formazioni') else [],
             "11_marcatori_ospite": ottieni_nomi_giocatori(h2h_data)[1] if h2h_data.get('formazioni') else []
         }
+        # Prima di raw_result = {...}
+        print(f"🔍 ANALYZER MATCHES: {len(analyzer.matches) if analyzer.matches else 0}", file=sys.stderr)
+        if analyzer.matches:
+            print(f"🔍 LAST MATCH: {analyzer.matches[-1].keys()}", file=sys.stderr)
+            print(f"🔍 ALGORITHMS: {analyzer.matches[-1].get('algorithms', {}).keys()}", file=sys.stderr)
+
+        print(f"🔍 DEEP_STATS ESISTE: {bool(deep_stats)}", file=sys.stderr)
+        print(f"🔍 DEEP_STATS KEYS: {deep_stats.keys() if deep_stats else 'VUOTO!'}", file=sys.stderr)
 
         # RISULTATO FINALE
         raw_result = {
@@ -909,12 +1084,78 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
             "execution_time": (time.time() - start_full_process),
             "statistiche": anatomy["statistiche"],
             "cronaca": anatomy["cronaca"],
-            "report_scommesse_pro": report_pro, 
+            "report_scommesse_pro": report_pro,
+            
+             # ═══════════════════════════════════════════════════════════
+            # 🔍 DEBUG BLENDING (visibile nel browser F12)
+            # ═══════════════════════════════════════════════════════════
+            "debug_blending": {
+                "h2h_historical": h2h_stats,
+                "team_home_power": team_h_scores.get('power') if team_h_scores else None,
+                "team_away_power": team_a_scores.get('power') if team_a_scores else None,
+                "quotes_available": bool(bulk_cache.get('MATCH_H2H', {}).get('quotes')),
+                "deep_stats_exists": bool(deep_stats)
+    },
+            
+            # ═══════════════════════════════════════════════════════════
+            # 🆕 DEEP ANALYSIS (per il bottone "Report Completo")
+            # ═══════════════════════════════════════════════════════════
+            "deep_analysis": {
+                "global_confidence": {
+                    "score": round(deep_stats['confidence']['global_confidence'] / 10, 1),  # Da 0-100 a 0-10
+                    "label": (
+                        "ALTISSIMO" if deep_stats['confidence']['global_confidence'] > 85 else
+                        "ALTO" if deep_stats['confidence']['global_confidence'] > 70 else
+                        "MEDIO" if deep_stats['confidence']['global_confidence'] > 50 else
+                        "BASSO"
+                    ),
+                    "color": (
+                        "#00ff88" if deep_stats['confidence']['global_confidence'] > 85 else
+                        "#00f0ff" if deep_stats['confidence']['global_confidence'] > 70 else
+                        "#ffcc00" if deep_stats['confidence']['global_confidence'] > 50 else
+                        "#ff0044"
+                    )
+                },
+                "dispersione": {
+                    "std_dev": round(deep_stats['confidence']['total_std'], 2),
+                    "risk_level": (
+                        "BASSO" if deep_stats['confidence']['total_std'] < 1.5 else
+                        "MEDIO" if deep_stats['confidence']['total_std'] < 2.5 else
+                        "ALTO"
+                    )
+                },
+                "money_management": {
+                    "recommended_stake": (
+                        "10%" if deep_stats['confidence']['global_confidence'] > 85 else
+                        "7%" if deep_stats['confidence']['global_confidence'] > 70 else
+                        "5%" if deep_stats['confidence']['global_confidence'] > 50 else
+                        "2%"
+                    ),
+                    "kelly_criterion": round(
+                        (deep_stats['confidence']['global_confidence'] / 100) * 0.10, 
+                        3
+                    )  # Kelly % basato su confidence
+                },
+                "algo_details": {
+                    f"Algoritmo {algo_id}": {
+                        "prediction": f"{gh}-{ga}",
+                        "probability": round(
+                            deep_stats.get('top_10_scores', [[None, 0]])[0][1] / deep_stats.get('total_simulations', 1) * 100,
+                            1
+                        ) if deep_stats.get('top_10_scores') and len(deep_stats['top_10_scores']) > 0 else 0.0,
+                        "metodo": "Poisson + Blending Multi-Source"
+                    }
+                }
+
+            },
+            
             "info_extra": {
                 "valore_mercato": f"{team_h_doc.get('stats', {}).get('marketValue', 0) // 1000000}M €",
                 "motivazione": "Analisi Monte Carlo con rilevamento Value Bet e Dispersione."
             }
+            
         }
+
         print(f"🏁 [FINISH] Totale processo terminato in: {time.time() - start_full_process:.3f}s\n", file=sys.stderr)
         return sanitize_data(raw_result)
 

@@ -359,4 +359,4 @@ def get_bvs_score(home_team, away_team, bulk_cache=None):
     return round(punti_h, 2), round(punti_a, 2)
 
 if __name__ == "__main__":
-    get_bvs_score("Cagliari", "Pisa")
+    get_bvs_score("Pisa", "Como")

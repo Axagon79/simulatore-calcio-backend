@@ -193,34 +193,37 @@ def calculate_team_rating(team_name, verbose=True, bulk_cache=None):
     
     team = None
     # 1. RICERCA TEAM (BULK O DB)
+    team = None
+
     if bulk_cache and "TEAMS" in bulk_cache:
         for t in bulk_cache["TEAMS"]:
-            # --- FIX ALIAS BLINDATO ---
             aliases = t.get("aliases", [])
             match_found = False
             
             # 1. Controlla Nome Esatto
             if t.get("name") == team_name:
                 match_found = True
-            
-            # 2. Controlla Alias (Lista o Dizionario)
+            # 2. Controlla Alias Lista
             elif isinstance(aliases, list):
-                if team_name in aliases: match_found = True
+                if team_name in aliases:
+                    match_found = True
+            # 3. Controlla Alias Dizionario
             elif isinstance(aliases, dict):
-                if team_name == aliases.get("soccerstats"): match_found = True
-            
+                if team_name == aliases.get("soccerstats"):
+                    match_found = True
+                    
             if match_found:
-                # Sostituisci 'target_team' con il nome della variabile usata nel tuo file (es. team, squad, ecc.)
-                # Esempio:
-                target_team = t 
+                team = t  # ✅ ASSEGNA A 'team' non 'target_team'!
                 break
-            # --------------------------
     else:
+        # Fallback DB
         team = teams_col.find_one({"name": team_name}) or teams_col.find_one({"aliases": team_name})
 
     if not team:
-        if verbose: print(f"\n❌ SQUADRA '{team_name}' NON TROVATA\n")
+        if verbose:
+            print(f"\n❌ SQUADRA '{team_name}' NON TROVATA\n")
         return None
+
 
     
     formation_str = team.get("formation", DEFAULT_FORMATION)
