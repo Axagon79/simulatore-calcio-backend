@@ -50,7 +50,6 @@ def sanitize_data(data):
     elif isinstance(data, list):
         return [sanitize_data(v) for v in data]
     elif isinstance(data, float):
-        # Se è NaN (Not a Number) o Infinito, lo trasformiamo in 0.0
         if math.isnan(data) or math.isinf(data):
             return 0.0
     return data
@@ -67,7 +66,7 @@ def ottieni_nomi_giocatori(h2h_data):
             ruolo = p.get('role', '')
             if ruolo in ['ATT', 'MID']:
                 nome = p.get('player', 'Giocatore')
-                nomi.append(nome)  # ✅ Nome completo
+                nomi.append(nome)
         return nomi if nomi else ['Attaccante', 'Centrocampista', 'Ala']
     
     return filtra_marcatori(titolari_h), filtra_marcatori(titolari_a)
@@ -101,25 +100,25 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
     def get_recupero_primo_tempo():
         """Recupero PT: 1-6 minuti, media ~2, raro dopo 4"""
         rand_val = random.random() * 100
-        if rand_val < 25: return 1       # 25% → 1 min
-        if rand_val < 55: return 2       # 30% → 2 min
-        if rand_val < 80: return 3       # 25% → 3 min
-        if rand_val < 92: return 4       # 12% → 4 min
-        if rand_val < 98: return 5       # 6%  → 5 min
-        return 6                          # 2%  → 6 min (raro)
+        if rand_val < 25: return 1
+        if rand_val < 55: return 2
+        if rand_val < 80: return 3
+        if rand_val < 92: return 4
+        if rand_val < 98: return 5
+        return 6
 
     def get_recupero_secondo_tempo():
         """Recupero ST: 2-10 minuti, media ~4, raro dopo 6"""
         rand_val = random.random() * 100
-        if rand_val < 10: return 2       # 10% → 2 min
-        if rand_val < 30: return 3       # 20% → 3 min
-        if rand_val < 55: return 4       # 25% → 4 min
-        if rand_val < 75: return 5       # 20% → 5 min
-        if rand_val < 88: return 6       # 13% → 6 min
-        if rand_val < 95: return 7       # 7%  → 7 min
-        if rand_val < 98: return 8       # 3%  → 8 min
-        if rand_val < 99.5: return 9     # 1.5% → 9 min
-        return 10                         # 0.5% → 10 min (molto raro)
+        if rand_val < 10: return 2
+        if rand_val < 30: return 3
+        if rand_val < 55: return 4
+        if rand_val < 75: return 5
+        if rand_val < 88: return 6
+        if rand_val < 95: return 7
+        if rand_val < 98: return 8
+        if rand_val < 99.5: return 9
+        return 10
 
     # ✅ POOL COMPLETI
     pool_attacco = [
@@ -174,22 +173,16 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
     ]
 
     # --- 1. EVENTI SISTEMA E FORMAZIONI ---
-
-    # ✅ FORMAZIONI PRE-PARTITA
     formazioni = h2h_data.get('formazioni', {})
     home_squad = formazioni.get('home_squad', {})
     away_squad = formazioni.get('away_squad', {})
 
     if home_squad and away_squad:
-        # Modulo e titolari CASA
         modulo_h = home_squad.get('modulo', '4-3-3')
         titolari_h = home_squad.get('titolari', [])
-
-        # Modulo e titolari OSPITE
         modulo_a = away_squad.get('modulo', '4-3-3')
         titolari_a = away_squad.get('titolari', [])
 
-        # Costruisci stringa formazione CASA
         formazione_h_str = f"📋 [{h}] ({modulo_h}): "
         giocatori_h = []
         for p in titolari_h:
@@ -198,7 +191,6 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
             giocatori_h.append(cognome)
         formazione_h_str += ", ".join(giocatori_h)
 
-        # Costruisci stringa formazione OSPITE
         formazione_a_str = f"📋 [{a}] ({modulo_a}): "
         giocatori_a = []
         for p in titolari_a:
@@ -207,13 +199,11 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
             giocatori_a.append(cognome)
         formazione_a_str += ", ".join(giocatori_a)
 
-        # Aggiungi alla cronaca (minuto -2 e -1 per apparire prima del fischio)
         cronaca.append({"minuto": -2, "squadra": "casa", "tipo": "formazione", "testo": formazione_h_str})
         cronaca.append({"minuto": -1, "squadra": "ospite", "tipo": "formazione", "testo": formazione_a_str})
 
     cronaca.append({"minuto": 0, "squadra": "casa", "tipo": "info", "testo": f"🏁 [SISTEMA] FISCHIO D'INIZIO! Inizia {h} vs {a}!"})
 
-    # ✅ USA LA NUOVA LOGICA PER IL RECUPERO
     recupero_pt = get_recupero_primo_tempo()
     cronaca.append({"minuto": 45, "squadra": "casa", "tipo": "info", "testo": f"⏱️ [SISTEMA] Segnalati {recupero_pt} minuti di recupero nel primo tempo."})
     cronaca.append({"minuto": 45 + recupero_pt, "squadra": "casa", "tipo": "info", "testo": "☕ [SISTEMA] FINE PRIMO TEMPO. Squadre negli spogliatoi."})
@@ -224,46 +214,36 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
     minuti_usati.update([0, 45, 45 + recupero_pt, 90])
 
     # --- 2. GOL SINCRONIZZATI (ESATTAMENTE gh per casa, ga per ospite) ---
-    # ✅ Estrai nomi REALI dai dati del database
     marcatori_casa, marcatori_ospite = ottieni_nomi_giocatori(h2h_data)
 
-    # ✅ FUNZIONE PER DECIDERE SE UN GOL VA NEL RECUPERO
     def gol_nel_recupero():
         """12% di probabilità che un gol sia nei minuti di recupero"""
         return random.random() < 0.12
 
-    # ✅ FUNZIONE HELPER: Trova un minuto libero garantito
     def trova_minuto_libero(minuti_usati_local, min_range=(5, 89), allow_recupero=False):
         """Trova SEMPRE un minuto libero, espandendo il range se necessario"""
         min_val, max_val = min_range
 
-        # Prima prova nel range normale
         for _ in range(100):
             min_gol = random.randint(min_val, max_val)
             if min_gol not in minuti_usati_local:
                 return min_gol
 
-        # Se non trova, cerca QUALSIASI minuto libero tra 1 e 89
         tutti_minuti = set(range(1, 90))
         disponibili = tutti_minuti - minuti_usati_local
         if disponibili:
             return random.choice(list(disponibili))
 
-        # Se allow_recupero, prova nei minuti di recupero
         if allow_recupero:
-            # Recupero primo tempo (46, 47... fino a 45+recupero_pt)
             for m in range(46, 46 + recupero_pt):
                 if m not in minuti_usati_local:
                     return m
-            # Recupero secondo tempo (91, 92... fino a 90+recupero_st)
             for m in range(91, 91 + recupero_st):
                 if m not in minuti_usati_local:
                     return m
 
-        # Ultima risorsa
         return random.randint(1, 89)
 
-    # ✅ FUNZIONE PER FORMATTARE IL MINUTO (es. 45+2, 90+5)
     def format_minuto(min_gol):
         if 46 <= min_gol <= 45 + recupero_pt:
             return f"45+{min_gol - 45}"
@@ -274,9 +254,7 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
 
     # GOL CASA
     for i in range(gh):
-        # Decidi se questo gol va nel recupero (12% probabilità)
         if gol_nel_recupero():
-            # 70% nel recupero ST, 30% nel recupero PT
             if random.random() < 0.7 and recupero_st > 0:
                 min_gol = random.randint(91, 90 + recupero_st)
             elif recupero_pt > 0:
@@ -284,7 +262,6 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
             else:
                 min_gol = trova_minuto_libero(minuti_usati, allow_recupero=True)
             
-            # Assicurati che non sia già usato
             while min_gol in minuti_usati:
                 min_gol = trova_minuto_libero(minuti_usati, allow_recupero=True)
         else:
@@ -292,20 +269,16 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
         
         minuti_usati.add(min_gol)
 
-        is_penalty = random.random() < 0.15  # 15% probabilità rigore
+        is_penalty = random.random() < 0.15
         marcatore = rand(marcatori_casa)
         min_display = format_minuto(min_gol)
         
-        # 🔥 PREFISSO SPECIALE PER GOL NEL RECUPERO
         prefisso = ""
-
-        # Definisci le frasi PRIMA dell'if
         frasi_recupero_pt = [
             "⏱️ ALLO SCADERE DEL PRIMO TEMPO! ",
             "🔥 IN PIENO RECUPERO! ",
             "⚡ PRIMA DELL'INTERVALLO! "
         ]
-
         frasi_recupero = [
             "🔥 IN PIENO RECUPERO! ",
             "⏱️ AL FOTOFINISH! ",
@@ -313,7 +286,6 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
             "🚨 CLAMOROSO NEL RECUPERO! "
         ]
 
-        # Ora usa le liste
         if "+" in min_display:
             if min_display.startswith("45+"):
                 prefisso = rand(frasi_recupero_pt)
@@ -334,7 +306,6 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
 
     # GOL OSPITE
     for i in range(ga):
-        # Decidi se questo gol va nel recupero (12% probabilità)
         if gol_nel_recupero():
             if random.random() < 0.7 and recupero_st > 0:
                 min_gol = random.randint(91, 90 + recupero_st)
@@ -354,16 +325,12 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
         marcatore = rand(marcatori_ospite)
         min_display = format_minuto(min_gol)
         
-        # 🔥 PREFISSO SPECIALE PER GOL NEL RECUPERO
         prefisso = ""
-
-        # Definisci le frasi PRIMA dell'if
         frasi_recupero_pt = [
             "⏱️ ALLO SCADERE DEL PRIMO TEMPO! ",
             "🔥 IN PIENO RECUPERO! ",
             "⚡ PRIMA DELL'INTERVALLO! "
         ]
-
         frasi_recupero = [
             "🔥 IN PIENO RECUPERO! ",
             "⏱️ AL FOTOFINISH! ",
@@ -371,7 +338,6 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
             "🚨 CLAMOROSO NEL RECUPERO! "
         ]
 
-        # Ora usa le liste
         if "+" in min_display:
             if min_display.startswith("45+"):
                 prefisso = rand(frasi_recupero_pt)
@@ -406,7 +372,6 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
         sq = random.choice(["casa", "ospite"])
         team = h if sq == "casa" else a
 
-        # 12% probabilità cartellino rosso
         is_rosso = random.random() < 0.12
 
         if is_rosso:
@@ -435,7 +400,6 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
             sq = random.choice(["casa", "ospite"])
             team = h if sq == "casa" else a
 
-            # Scelta pool equilibrata
             roll = random.random()
             if roll > 0.75:
                 txt = rand(pool_portiere)
@@ -448,16 +412,13 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
 
             cronaca.append({"minuto": min_evento, "squadra": sq, "tipo": "info", "testo": f"{min_evento}' [{team}] {txt}"})
 
-    # ✅ ORDINA PER MINUTO
     cronaca.sort(key=lambda x: x["minuto"])
 
-    # ✅ RIMUOVI DUPLICATI: Tieni solo la prima occorrenza di ogni evento
     cronaca_unica = []
     eventi_visti = set()
 
     for evento in cronaca:
         chiave = f"{evento['minuto']}-{evento['tipo']}-{evento['testo']}"
-
         if chiave not in eventi_visti:
             eventi_visti.add(chiave)
             cronaca_unica.append(evento)
@@ -472,17 +433,14 @@ def genera_match_report_completo(gh, ga, h2h_data, team_h, team_a, simulazioni_r
     dna_h = h2h_data.get('h2h_dna', {}).get('home_dna', {})
     dna_a = h2h_data.get('h2h_dna', {}).get('away_dna', {})
     
-    # --- 1. GENERATORE STATISTICHE ULTRA-DETTAGLIATE (In Italiano) ---
     tec_h, tec_a = dna_h.get('tec', 50), dna_a.get('tec', 50)
     att_h, att_a = dna_h.get('att', 50), dna_a.get('att', 50)
     def_h, def_a = dna_h.get('def', 50), dna_a.get('def', 50)
 
-    # Possesso e Passaggi
     pos_h = max(35, min(65, int(50 + (tec_h - tec_a)/3 + random.randint(-2, 2))))
     pass_h = int(pos_h * 9.2) + random.randint(-20, 20)
     pass_a = int((100 - pos_h) * 8.8) + random.randint(-20, 20)
     
-    # Tiri e Pericolosità
     t_h = int(att_h / 5) + random.randint(2, 8)
     t_a = int(att_a / 5) + random.randint(2, 8)
     sog_h = min(t_h, gh + random.randint(1, 4))
@@ -515,10 +473,8 @@ def genera_match_report_completo(gh, ga, h2h_data, team_h, team_a, simulazioni_r
         "Sostituzioni": [5, 5]
     }
 
-    # ✅ NUOVO: USA LA FUNZIONE DENSA
     cronaca = genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data)
 
-    # --- 3. REPORT SCOMMESSE PROFESSIONALE ---
     tot = len(simulazioni_raw)
     v_h = sum(1 for r in simulazioni_raw if int(str(r).split('-')[0]) > int(str(r).split('-')[1]))
     par = sum(1 for r in simulazioni_raw if int(str(r).split('-')[0]) == int(str(r).split('-')[1]))
@@ -529,31 +485,30 @@ def genera_match_report_completo(gh, ga, h2h_data, team_h, team_a, simulazioni_r
     from collections import Counter
     top5 = Counter(simulazioni_raw).most_common(5)
 
-    # --- REPORT SCOMMESSE CON DATI DAL DEEP ANALYZER ---
-    uo = deep_stats.get('under_over', {}) #
-    conf = deep_stats.get('confidence', {}) #
+    uo = deep_stats.get('under_over', {})
+    conf = deep_stats.get('confidence', {})
 
     report_scommesse = {
         "Bookmaker": {
-            "1": f"{deep_stats['sign_1']['pct']}%", #
-            "X": f"{deep_stats['sign_x']['pct']}%", #
-            "2": f"{deep_stats['sign_2']['pct']}%", #
-            "1X": f"{round(deep_stats['sign_1']['pct'] + deep_stats['sign_x']['pct'], 1)}%", #
-            "X2": f"{round(deep_stats['sign_2']['pct'] + deep_stats['sign_x']['pct'], 1)}%", #
-            "12": f"{round(deep_stats['sign_1']['pct'] + deep_stats['sign_2']['pct'], 1)}%", #
-            "U 2.5": f"{uo.get('U2.5', {}).get('pct', 0)}%", #
-            "O 2.5": f"{uo.get('O2.5', {}).get('pct', 0)}%", #
-            "GG": f"{deep_stats['gg']['pct']}%", #
-            "NG": f"{deep_stats['ng']['pct']}%" #
+            "1": f"{deep_stats['sign_1']['pct']}%",
+            "X": f"{deep_stats['sign_x']['pct']}%",
+            "2": f"{deep_stats['sign_2']['pct']}%",
+            "1X": f"{round(deep_stats['sign_1']['pct'] + deep_stats['sign_x']['pct'], 1)}%",
+            "X2": f"{round(deep_stats['sign_2']['pct'] + deep_stats['sign_x']['pct'], 1)}%",
+            "12": f"{round(deep_stats['sign_1']['pct'] + deep_stats['sign_2']['pct'], 1)}%",
+            "U 2.5": f"{uo.get('U2.5', {}).get('pct', 0)}%",
+            "O 2.5": f"{uo.get('O2.5', {}).get('pct', 0)}%",
+            "GG": f"{deep_stats['gg']['pct']}%",
+            "NG": f"{deep_stats['ng']['pct']}%"
         },
         "Analisi_Profonda": {
-            "Confidence_Globale": f"{conf.get('global_confidence', 0)}%", #
-            "Deviazione_Standard_Totale": conf.get('total_std', 0), #
-            "Affidabilita_Previsione": f"{conf.get('total_confidence', 0)}%" #
+            "Confidence_Globale": f"{conf.get('global_confidence', 0)}%",
+            "Deviazione_Standard_Totale": conf.get('total_std', 0),
+            "Affidabilita_Previsione": f"{conf.get('total_confidence', 0)}%"
         },
         "risultati_esatti_piu_probabili": [
             {"score": s, "pct": f"{round(c/deep_stats['total_simulations']*100, 1)}%"} 
-            for s, c in deep_stats.get('top_10_scores', [])[:5] #
+            for s, c in deep_stats.get('top_10_scores', [])[:5]
         ]
     }
 
@@ -572,22 +527,17 @@ def genera_anatomia_partita(gh, ga, h2h_match_data, team_h_doc, sim_list):
     dna_h = h2h_data.get('h2h_dna', {}).get('home_dna', {})
     dna_a = h2h_data.get('h2h_dna', {}).get('away_dna', {})
     
-    # --- 1. CALCOLI PRELIMINARI (Necessari per il dizionario stats) ---
     tec_h, tec_a = dna_h.get('tec', 50), dna_a.get('tec', 50)
     att_h, att_a = dna_h.get('att', 50), dna_a.get('att', 50)
     
-    # Possesso
     pos_h = max(35, min(65, int(50 + (tec_h - tec_a)/3 + random.randint(-2, 2))))
     
-    # Tiri (Definiamo queste variabili PRIMA di usarle sotto)
     tiri_h = int(att_h / 5) + random.randint(2, 8)
     tiri_a = int(att_a / 5) + random.randint(2, 8)
     
-    # Tiri in porta (SOG)
     sog_h = min(tiri_h, gh + random.randint(1, 4))
     sog_a = min(tiri_a, ga + random.randint(1, 4))
 
-    # --- 2. DIZIONARIO STATISTICHE ---
     stats = {
         "Possesso Palla": [f"{pos_h}%", f"{100-pos_h}%"],
         "Possesso Palla (PT)": [f"{pos_h + random.randint(-2,2)}%", f"{100-pos_h + random.randint(-2,2)}%"],
@@ -605,9 +555,9 @@ def genera_anatomia_partita(gh, ga, h2h_match_data, team_h_doc, sim_list):
         "Sostituzioni": [5, 5]
     }
 
-    # --- 3. REPORT SCOMMESSE ---
     tot = len(sim_list)
-    if tot == 0: tot = 1 # Evita divisione per zero
+    if tot == 0:
+        tot = 1
     
     v_h = sum(1 for r in sim_list if int(str(r).split('-')[0]) > int(str(r).split('-')[1]))
     par = sum(1 for r in sim_list if int(str(r).split('-')[0]) == int(str(r).split('-')[1]))
@@ -617,12 +567,21 @@ def genera_anatomia_partita(gh, ga, h2h_match_data, team_h_doc, sim_list):
     
     report_bet = {
         "Bookmaker": {
-            "1": f"{round(v_h/tot*100, 1)}%", "X": f"{round(par/tot*100, 1)}%", "2": f"{round(v_a/tot*100, 1)}%",
-            "U 2.5": f"{round((tot-over)/tot*100, 1)}%", "O 2.5": f"{round(over/tot*100, 1)}%",
-            "GG": f"{round(gg/tot*100, 1)}%", "NG": f"{round((tot-gg)/tot*100, 1)}%",
-            "1X": f"{round((v_h+par)/tot*100, 1)}%", "12": f"{round((v_h+v_a)/tot*100, 1)}%", "X2": f"{round((v_a+par)/tot*100, 1)}%"
+            "1": f"{round(v_h/tot*100, 1)}%",
+            "X": f"{round(par/tot*100, 1)}%",
+            "2": f"{round(v_a/tot*100, 1)}%",
+            "U 2.5": f"{round((tot-over)/tot*100, 1)}%",
+            "O 2.5": f"{round(over/tot*100, 1)}%",
+            "GG": f"{round(gg/tot*100, 1)}%",
+            "NG": f"{round((tot-gg)/tot*100, 1)}%",
+            "1X": f"{round((v_h+par)/tot*100, 1)}%",
+            "12": f"{round((v_h+v_a)/tot*100, 1)}%",
+            "X2": f"{round((v_a+par)/tot*100, 1)}%"
         },
-        "risultati_esatti_piu_probabili": [{"score": s, "pct": f"{round(f/tot*100, 1)}%"} for s, f in Counter(sim_list).most_common(5)]
+        "risultati_esatti_piu_probabili": [
+            {"score": s, "pct": f"{round(f/tot*100, 1)}%"} 
+            for s, f in Counter(sim_list).most_common(5)
+        ]
     }
     
     return stats, report_bet
@@ -630,7 +589,6 @@ def genera_anatomia_partita(gh, ga, h2h_match_data, team_h_doc, sim_list):
 def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: int, league: str, main_mode: int, bulk_cache=None) -> dict:
     """Esegue la simulazione e arricchisce il risultato con i dati del DB."""
     
-    # ✅ INIZIALIZZAZIONE VARIABILI (prima di tutto)
     t_inizio_funzione = time.time()
     start_full_process = time.time()
     start_time = datetime.now()
@@ -657,33 +615,34 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
     deep_stats = {}
     
     print(f"\n🚀 [START] Richiesta ricevuta alle: {datetime.now().strftime('%H:%M:%S.%f')}", file=sys.stderr)
-    debug_logs = []  # ✅ Lista per raccogliere tutti i log
+    debug_logs = []
     
     def log_debug(msg):
         """Helper per loggare sia su stderr che nella lista"""
         print(msg, file=sys.stderr)
         debug_logs.append(msg)
+    
     try:
         # ═══════════════════════════════════════════════════════════
         # 1. INIZIALIZZAZIONE ANALYZER
         # ═══════════════════════════════════════════════════════════
         t_init = time.time()
-        log_debug("🔍 [DEBUG 1] Importazione DeepAnalyzer...", file=sys.stderr)
+        #log_debug("🔍 [DEBUG 1] Importazione DeepAnalyzer...")
         from ai_engine.deep_analysis import DeepAnalyzer
         
-        log_debug("🔍 [DEBUG 2] Creazione istanza analyzer...", file=sys.stderr)
+        #log_debug("🔍 [DEBUG 2] Creazione istanza analyzer...")
         analyzer = DeepAnalyzer()
         
-        log_debug(f"🔍 [DEBUG 3] Chiamata start_match(home={home_team}, away={away_team}, league={league})...", file=sys.stderr)
+        #log_debug(f"🔍 [DEBUG 3] Chiamata start_match(home={home_team}, away={away_team}, league={league})...")
         analyzer.start_match(home_team, away_team, league=league)
         
-        log_debug(f"⏱️ [1. INIT] Analyzer pronto in: {time.time() - t_init:.3f}s", file=sys.stderr)
+        #log_debug(f"⏱️ [1. INIT] Analyzer pronto in: {time.time() - t_init:.3f}s")
         
         # ═══════════════════════════════════════════════════════════
         # 2. RISOLUZIONE ALIAS SQUADRE
         # ═══════════════════════════════════════════════════════════
         t_alias = time.time()
-        log_debug("🔍 [DEBUG 4] Query MongoDB per team_h_doc...", file=sys.stderr)
+        #log_debug("🔍 [DEBUG 4] Query MongoDB per team_h_doc...")
         
         team_h_doc = db.teams.find_one({
             "$or": [
@@ -693,12 +652,12 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
             ]
         })
         
-        log_debug(f"🔍 [DEBUG 5] team_h_doc trovato: {team_h_doc is not None}", file=sys.stderr)
+        #log_debug(f"🔍 [DEBUG 5] team_h_doc trovato: {team_h_doc is not None}")
         if team_h_doc is None:
             team_h_doc = {"name": home_team}
-            log_debug(f"⚠️ [DEBUG 5.1] team_h_doc era None, usato fallback", file=sys.stderr)
+            #log_debug(f"⚠️ [DEBUG 5.1] team_h_doc era None, usato fallback")
 
-        log_debug("🔍 [DEBUG 6] Query MongoDB per team_a_doc...", file=sys.stderr)
+        #log_debug("🔍 [DEBUG 6] Query MongoDB per team_a_doc...")
         team_a_doc = db.teams.find_one({
             "$or": [
                 {"name": away_team},
@@ -707,25 +666,25 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
             ]
         })
         
-        log_debug(f"🔍 [DEBUG 7] team_a_doc trovato: {team_a_doc is not None}", file=sys.stderr)
+        #log_debug(f"🔍 [DEBUG 7] team_a_doc trovato: {team_a_doc is not None}")
         if team_a_doc is None:
             team_a_doc = {"name": away_team}
-            log_debug(f"⚠️ [DEBUG 7.1] team_a_doc era None, usato fallback", file=sys.stderr)
+            #log_debug(f"⚠️ [DEBUG 7.1] team_a_doc era None, usato fallback")
         
-        log_debug(f"⏱️ [2. ALIAS] Nomi risolti in: {time.time() - t_alias:.3f}s", file=sys.stderr)
+        #log_debug(f"⏱️ [2. ALIAS] Nomi risolti in: {time.time() - t_alias:.3f}s")
         
         # ═══════════════════════════════════════════════════════════
         # 3. RICERCA MATCH NEL DATABASE (H2H)
         # ═══════════════════════════════════════════════════════════
         t_h2h = time.time()
-        log_debug("🔍 [DEBUG 8] Pulizia nome lega...", file=sys.stderr)
+        ##log_debug("🔍 [DEBUG 8] Pulizia nome lega...")
         
         league_clean = league.replace('_', ' ').title()
         if league_clean == "Serie A":
             league_clean = "Serie A"
         
-        log_debug(f"🔍 [DEBUG 9] League: '{league}' -> '{league_clean}'", file=sys.stderr)
-        log_debug(f"🔍 [DEBUG 10] Costruzione pipeline aggregation...", file=sys.stderr)
+        #log_debug(f"🔍 [DEBUG 9] League: '{league}' -> '{league_clean}'")
+        #log_debug(f"🔍 [DEBUG 10] Costruzione pipeline aggregation...")
         
         pipeline = [
             {"$unwind": "$matches"},
@@ -749,116 +708,80 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
             {"$project": {"match": "$matches"}}
         ]
 
-        log_debug("🔍 [DEBUG 11] Esecuzione aggregation query...", file=sys.stderr)
+        #log_debug("🔍 [DEBUG 11] Esecuzione aggregation query...")
         result = list(db["h2h_by_round"].aggregate(pipeline))
         
-        log_debug(f"🔍 [DEBUG 12] Risultati trovati: {len(result)}", file=sys.stderr)
+        #log_debug(f"🔍 [DEBUG 12] Risultati trovati: {len(result)}")
         
         if result:
-            log_debug("🔍 [DEBUG 13] Estrazione matchdata dal result[0]...", file=sys.stderr)
+            #log_debug("🔍 [DEBUG 13] Estrazione matchdata dal result[0]...")
             matchdata = result[0].get("match") if result[0] else None
             
-            log_debug(f"🔍 [DEBUG 14] matchdata è None? {matchdata is None}", file=sys.stderr)
+            #log_debug(f"🔍 [DEBUG 14] matchdata è None? {matchdata is None}")
             
             if matchdata:
                 h2h_data = matchdata.get("h2h_data", {})
-                log_debug(f"✅ Match trovato: {matchdata.get('home', 'N/A')} vs {matchdata.get('away', 'N/A')}", file=sys.stderr)
-                log_debug(f"🔍 [DEBUG 15] h2h_data keys: {list(h2h_data.keys()) if h2h_data else 'VUOTO'}", file=sys.stderr)
+                #log_debug(f"✅ Match trovato: {matchdata.get('home', 'N/A')} vs {matchdata.get('away', 'N/A')}")
+                #log_debug(f"🔍 [DEBUG 15] h2h_data keys: {list(h2h_data.keys()) if h2h_data else 'VUOTO'}")
             else:
-                log_debug(f"⚠️ [DEBUG 14.1] matchdata era None dopo estrazione!", file=sys.stderr)
+                log_debug(f"⚠️ [DEBUG 14.1] matchdata era None dopo estrazione!")
         else:
-            log_debug(f"⚠️ Match non trovato in h2h_by_round per {home_team} vs {away_team}", file=sys.stderr)
+            log_debug(f"⚠️ Match non trovato in h2h_by_round per {home_team} vs {away_team}")
 
-        log_debug(f"⏱️ [3. DB SEARCH] H2H trovato in: {time.time() - t_h2h:.3f}s", file=sys.stderr)
+        log_debug(f"⏱️ [3. DB SEARCH] H2H trovato in: {time.time() - t_h2h:.3f}s")
 
         # ═══════════════════════════════════════════════════════════
         # 4. PRELOAD DATI E BULK_CACHE
         # ═══════════════════════════════════════════════════════════
         t_preload = time.time()
-        log_debug("🔍 [DEBUG 16] Verifica bulk_cache...", file=sys.stderr)
+       # log_debug("🔍 [DEBUG 16] Verifica bulk_cache...")
         
         if bulk_cache is None:
-            log_debug("📦 [DEBUG 17] Caricamento preloaded_data...", file=sys.stderr)
+            #log_debug("📦 Caricamento preloaded_data da zero...")
             preloaded_data = preload_match_data(home_team, away_team)
-            
-            # ✅ VERIFICA COMPLETA
-            print(f"🔍 Type di preloaded_data: {type(preloaded_data)}", file=sys.stderr)
-            print(f"🔍 preloaded_data è None? {preloaded_data is None}", file=sys.stderr)
-            
-            if preloaded_data is None:
-                raise ValueError(f"❌ preload_match_data({home_team}, {away_team}) ha restituito None!")
-            
-            if not isinstance(preloaded_data, dict):
-                raise ValueError(f"❌ preload_match_data ha restituito {type(preloaded_data)}, non dict!")
-            
-            print(f"🔍 Keys in preloaded_data: {list(preloaded_data.keys())}", file=sys.stderr)
-            
-            bulk_cache = preloaded_data.get('bulk_cache')
-            
-            print(f"🔍 Type di bulk_cache: {type(bulk_cache)}", file=sys.stderr)
-            print(f"🔍 bulk_cache è None? {bulk_cache is None}", file=sys.stderr)
-            
-            if bulk_cache is not None and isinstance(bulk_cache, dict):
-                print(f"🔍 Keys in bulk_cache: {list(bulk_cache.keys())}", file=sys.stderr)
-            
-            log_debug(f"🔍 [DEBUG 18] preloaded_data è None? {preloaded_data is None}", file=sys.stderr)
             
             if preloaded_data is None:
                 raise ValueError("❌ preload_match_data ha restituito None!")
             
-            log_debug(f"🔍 [DEBUG 19] preloaded_data keys: {list(preloaded_data.keys())}", file=sys.stderr)
-            
             bulk_cache = preloaded_data.get('bulk_cache')
-            log_debug(f"🔍 [DEBUG 20] bulk_cache estratto, è None? {bulk_cache is None}", file=sys.stderr)
+            #log_debug(f"✅ bulk_cache caricato, keys: {list(bulk_cache.keys()) if bulk_cache else 'None'}")
         else:
-            log_debug("♻️ [DEBUG 21] Riutilizzo bulk_cache già caricato", file=sys.stderr)
-            preloaded_data = preload_match_data(home_team, away_team)
+            #log_debug("♻️ Riutilizzo bulk_cache già caricato")
+            preloaded_data = preload_match_data(home_team, away_team, bulk_cache=bulk_cache)
             
             if preloaded_data is None:
                 raise ValueError("❌ preload_match_data ha restituito None!")
         
-        log_debug(f"🔍 [DEBUG 22] Estrazione real_home/real_away...", file=sys.stderr)
+        #log_debug(f"🔍 [DEBUG 22] Estrazione real_home/real_away...")
         real_home = preloaded_data.get('home_team', home_team)
         real_away = preloaded_data.get('away_team', away_team)
         
-        log_debug(f"🔍 [DEBUG 23] real_home='{real_home}', real_away='{real_away}'", file=sys.stderr)
-        log_debug(f"⏱️ [4. PRELOAD] Dati caricati in: {time.time() - t_preload:.3f}s", file=sys.stderr)
+        #log_debug(f"🔍 [DEBUG 23] real_home='{real_home}', real_away='{real_away}'")
+        #log_debug(f"⏱️ [4. PRELOAD] Dati caricati in: {time.time() - t_preload:.3f}s")
 
         # ═══════════════════════════════════════════════════════════
         # 5. ESECUZIONE ALGORITMO
         # ═══════════════════════════════════════════════════════════
         t_exec_start = time.time()
-        log_debug(f"🎯 SIMULAZIONE: Algo {algo_id}, Cicli {cycles}", file=sys.stderr)
+        #log_debug(f"🎯 SIMULAZIONE: Algo {algo_id}, Cicli {cycles}")
         
         if algo_id == 6:
             # ─────────────────────────────────────────────────────────
             # ALGORITMO MONTE CARLO
             # ─────────────────────────────────────────────────────────
-            log_debug('🔵 MODALITÀ MONTE CARLO ATTIVATA', file=sys.stderr)
+            #log_debug('🔵 MODALITÀ MONTE CARLO ATTIVATA')
             
-            # Verifica/Carica bulk_cache
             if not isinstance(bulk_cache, dict) or 'MASTER_DATA' not in bulk_cache or 'ALL_ROUNDS' not in bulk_cache:
-                log_debug("📦 Ricarico bulk_cache per MonteCarlo...", file=sys.stderr)
+                #log_debug("📦 Ricarico bulk_cache per MonteCarlo...")
                 bulk_cache = get_all_data_bulk(home_team, away_team, league)
                 if not isinstance(bulk_cache, dict):
                     raise ValueError(f"❌ get_all_data_bulk ha restituito {type(bulk_cache)}!")
             
-            # Estrai dati blending
             team_h_scores = bulk_cache.get('MASTER_DATA', {}).get(home_team, {})
             team_a_scores = bulk_cache.get('MASTER_DATA', {}).get(away_team, {})
             h2h_stats = bulk_cache.get('H2H_HISTORICAL')
             
             # Cerca matchdata in ALL_ROUNDS
-            
-        print(f"🔍 [PRE-LOOP] bulk_cache type: {type(bulk_cache)}", file=sys.stderr)
-        print(f"🔍 [PRE-LOOP] bulk_cache keys: {list(bulk_cache.keys()) if isinstance(bulk_cache, dict) else 'NOT A DICT'}", file=sys.stderr)
-
-        all_rounds = bulk_cache.get("ALL_ROUNDS", []) if isinstance(bulk_cache, dict) else []
-        print(f"🔍 [PRE-LOOP] ALL_ROUNDS type: {type(all_rounds)}", file=sys.stderr)
-        print(f"🔍 [PRE-LOOP] ALL_ROUNDS length: {len(all_rounds) if all_rounds else 0}", file=sys.stderr)
-
-        for round_doc in all_rounds:
-            
             for round_doc in bulk_cache.get("ALL_ROUNDS", []):
                 if isinstance(round_doc, dict):
                     for match in round_doc.get("matches", []):
@@ -873,7 +796,6 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
             if matchdata is None:
                 raise ValueError(f"❌ Match {home_team} vs {away_team} non trovato in ALL_ROUNDS!")
             
-            # Esegui MonteCarlo
             res = run_monte_carlo_verdict_detailed(
                 preloaded_data, 
                 home_team, 
@@ -887,7 +809,6 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
             gh, ga = res[0]
             actual_cycles_executed = res[5] if len(res) > 5 else cycles
             
-            # Crea sim_list
             if len(res) > 4 and isinstance(res[4], dict):
                 for algo_res_list in res[4].values():
                     if isinstance(algo_res_list, list):
@@ -900,27 +821,24 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
             top3 = [x[0] for x in res[2]] if len(res) > 2 else []
             cronaca = res[1] if len(res) > 1 else []
             
-            log_debug(f"✅ MONTE CARLO: {actual_cycles_executed} cicli, risultato {gh}-{ga}", file=sys.stderr)
+            #log_debug(f"✅ MONTE CARLO: {actual_cycles_executed} cicli, risultato {gh}-{ga}")
         
         else:
-            # ─────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────────────────
             # ALGORITMI SINGOLI (1-5)
             # ─────────────────────────────────────────────────────────
-            log_debug(f"🟢 ALGORITMO SINGOLO {algo_id} ATTIVATO", file=sys.stderr)
+            #log_debug(f"🟢 ALGORITMO SINGOLO {algo_id} ATTIVATO")
             
-            # Verifica/Carica bulk_cache
             if not isinstance(bulk_cache, dict) or 'MASTER_DATA' not in bulk_cache or 'ALL_ROUNDS' not in bulk_cache:
-                log_debug("📦 Ricarico bulk_cache...", file=sys.stderr)
+                #log_debug("📦 Ricarico bulk_cache...")
                 bulk_cache = get_all_data_bulk(home_team, away_team, league)
                 if not isinstance(bulk_cache, dict):
                     raise ValueError(f"❌ get_all_data_bulk ha restituito {type(bulk_cache)}!")
             
-            # Estrai dati blending
             team_h_scores = bulk_cache.get('MASTER_DATA', {}).get(home_team, {})
             team_a_scores = bulk_cache.get('MASTER_DATA', {}).get(away_team, {})
             h2h_stats = bulk_cache.get('H2H_HISTORICAL')
             
-            # Cerca matchdata
             for round_doc in bulk_cache.get("ALL_ROUNDS", []):
                 if isinstance(round_doc, dict):
                     for match in round_doc.get("matches", []):
@@ -935,10 +853,8 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
             if matchdata is None:
                 raise ValueError(f"❌ Match non trovato!")
             
-            # Carica tuning
             settings_in_ram = load_tuning(algo_id)
             
-            # Ciclo simulazioni
             for i in range(cycles):
                 result = run_single_algo(algo_id, preloaded_data, real_home, real_away, 
                                         settings_cache=settings_in_ram, debug_mode=False)
@@ -966,7 +882,6 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
                 
                 sim_list.append(f"{gh_temp}-{ga_temp}")
             
-            # Risultato più frequente
             from collections import Counter
             most_common = Counter(sim_list).most_common(1)[0][0]
             gh, ga = map(int, most_common.split("-"))
@@ -974,38 +889,77 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
             cronaca = []
             actual_cycles_executed = cycles
             
-            log_debug(f"✅ ALGORITMO {algo_id}: {cycles} cicli, risultato {gh}-{ga}", file=sys.stderr)
+            #log_debug(f"✅ ALGORITMO {algo_id}: {cycles} cicli, risultato {gh}-{ga}")
         
-        log_debug(f"⏱️ [5. EXEC] Simulazione completata in: {time.time() - t_exec_start:.3f}s", file=sys.stderr)
+        #log_debug(f"⏱️ [5. EXEC] Simulazione completata in: {time.time() - t_exec_start:.3f}s")
 
         # ═══════════════════════════════════════════════════════════
         # 6. CHIUSURA ANALYZER E ESTRAZIONE DEEP_STATS
         # ═══════════════════════════════════════════════════════════
         t_final = time.time()
         analyzer.end_match()
+        #log_debug(f"🔍 [AFTER end_match] analyzer.matches length: {len(analyzer.matches) if analyzer.matches else 0}")
+        
+        # ✅ GENERA L'HTML DEL REPORT
+        report_html = analyzer.get_html_report()
+        
+        # ✅ Genera Confidence Report
+        from confidence_html_builder import ConfidenceHTMLBuilder
+        confidence_builder = ConfidenceHTMLBuilder()
+        confidence_html = confidence_builder.get_html_report(analyzer.matches)
+        log_debug(f"📄 Report HTML generato: {len(report_html)} caratteri")
 
         if analyzer.matches and len(analyzer.matches) > 0:
+            #log_debug(f"🔍 [AFTER end_match] last_match keys: {list(analyzer.matches[-1].keys())}")
+            
             last_match = analyzer.matches[-1]
             if 'algorithms' in last_match and algo_id in last_match['algorithms']:
+              #  log_debug(f"🔍 [AFTER end_match] algo {algo_id} trovato in algorithms")
                 deep_stats = last_match['algorithms'][algo_id]['stats']
+                
+                if deep_stats is None:
+                    log_debug(f"⚠️ deep_stats è None dopo estrazione, uso fallback")
+                    deep_stats = {
+                        'sign_1': {'pct': 33.3},
+                        'sign_x': {'pct': 33.3},
+                        'sign_2': {'pct': 33.3},
+                        'gg': {'pct': 50},
+                        'ng': {'pct': 50},
+                        'under_over': {'U2.5': {'pct': 50}, 'O2.5': {'pct': 50}},
+                        'confidence': {'global_confidence': 50, 'total_std': 0, 'total_confidence': 50},
+                        'top_10_scores': [],
+                        'total_simulations': cycles
+                    }
+                else:
+                    log_debug(f"✅ deep_stats estratto correttamente con {len(deep_stats)} chiavi")
             else:
+                log_debug(f"⚠️ [AFTER end_match] algo {algo_id} NON trovato, uso fallback")
                 deep_stats = {
-                    'sign_1': {'pct': 33.3}, 'sign_x': {'pct': 33.3}, 'sign_2': {'pct': 33.3},
-                    'gg': {'pct': 50}, 'ng': {'pct': 50},
+                    'sign_1': {'pct': 33.3},
+                    'sign_x': {'pct': 33.3},
+                    'sign_2': {'pct': 33.3},
+                    'gg': {'pct': 50},
+                    'ng': {'pct': 50},
                     'under_over': {'U2.5': {'pct': 50}, 'O2.5': {'pct': 50}},
                     'confidence': {'global_confidence': 50, 'total_std': 0, 'total_confidence': 50},
-                    'top_10_scores': [], 'total_simulations': cycles
+                    'top_10_scores': [],
+                    'total_simulations': cycles
                 }
         else:
+            log_debug(f"⚠️ [AFTER end_match] analyzer.matches è vuoto, uso fallback completo")
             deep_stats = {
-                'sign_1': {'pct': 33.3}, 'sign_x': {'pct': 33.3}, 'sign_2': {'pct': 33.3},
-                'gg': {'pct': 50}, 'ng': {'pct': 50},
+                'sign_1': {'pct': 33.3},
+                'sign_x': {'pct': 33.3},
+                'sign_2': {'pct': 33.3},
+                'gg': {'pct': 50},
+                'ng': {'pct': 50},
                 'under_over': {'U2.5': {'pct': 50}, 'O2.5': {'pct': 50}},
                 'confidence': {'global_confidence': 50, 'total_std': 0, 'total_confidence': 50},
-                'top_10_scores': [], 'total_simulations': cycles
+                'top_10_scores': [],
+                'total_simulations': cycles
             }
 
-        # ═══════════════════════════════════════════════════════════
+# ═══════════════════════════════════════════════════════════
         # 7. CARICAMENTO QUOTE E REPORT BETTING
         # ═══════════════════════════════════════════════════════════
         odds_real = matchdata.get('odds', {}) if isinstance(matchdata, dict) else {}
@@ -1019,13 +973,29 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
             quote_match["X"] = bulk_quotes.get('X', 3.0)
             quote_match["2"] = bulk_quotes.get('2', 2.8)
         
-        log_debug(f"📊 Quote caricate: {quote_match}", file=sys.stderr)
+        log_debug(f"📊 Quote caricate: {quote_match}")
         
+        # ✅ AGGIUNGI QUESTO PRIMA DI analyze_betting_data():
+        if algo_id == 6:
+            # Per MonteCarlo: estrai results dagli algoritmi 2,3,4,5
+            sim_list = []
+            if deep_stats and 'exact_scores' in deep_stats:
+                # Ricostruisci sim_list dalle frequenze
+                for score, count in deep_stats['exact_scores'].items():
+                    sim_list.extend([score] * count)
+            
+            log_debug(f"🎲 sim_list creato per MonteCarlo: {len(sim_list)} risultati")
+        else:
+            # sim_list già esiste per algoritmi singoli
+            pass
+
+        log_debug(f"📊 Quote caricate: {quote_match}")
+
         report_pro = analyze_betting_data(sim_list, quote_match)
         
         anatomy = genera_match_report_completo(gh, ga, h2h_data, team_h_doc, team_a_doc, sim_list, deep_stats)
         
-        log_debug(f"⏱️ [6. FINAL] Report generato in: {time.time() - t_final:.3f}s", file=sys.stderr)
+        log_debug(f"⏱️ [6. FINAL] Report generato in: {time.time() - t_final:.3f}s")
 
         # ═══════════════════════════════════════════════════════════
         # 8. COSTRUZIONE RISULTATO FINALE
@@ -1058,6 +1028,8 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
             "statistiche": anatomy["statistiche"],
             "cronaca": anatomy["cronaca"],
             "report_scommesse_pro": report_pro,
+            "report_html": report_html,  # ✅ AGGIUNGI QUESTA RIGA
+            "confidence_html": confidence_html,  # ✅ AGGIUNGI
             "debug_blending": {
                 "h2h_historical": h2h_stats if 'h2h_stats' in locals() else None,
                 "team_home_power": team_h_scores.get('power') if 'team_h_scores' in locals() and team_h_scores else None,
@@ -1118,7 +1090,7 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
             }
         }
 
-        log_debug(f"🏁 [FINISH] Processo completato in: {time.time() - start_full_process:.3f}s\n", file=sys.stderr)
+        #log_debug(f"🏁 [FINISH] Processo completato in: {time.time() - start_full_process:.3f}s\n")
         return sanitize_data(raw_result)
 
     except Exception as e:
@@ -1129,8 +1101,8 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
         return {
             "success": False, 
             "error": str(e),
-            "traceback": tb,  # ✅ Stack trace completo
-            "debug_logs": debug_logs,  # ✅ Tutti i log di debug
+            "traceback": tb,
+            "debug_logs": debug_logs,
             "timestamp": datetime.now().isoformat(),
             "execution_time": time.time() - t_inizio_funzione
         }
@@ -1150,19 +1122,15 @@ def main():
         cycles = int(sys.argv[8])
 
         if main_mode == 4 and home_team != "null":
-            # ✅ Carica bulk_cache UNA VOLTA prima della simulazione
             bulk_cache = get_all_data_bulk(home_team, away_team, league)
-            
             result = run_single_simulation(home_team, away_team, algo_id, cycles, league, main_mode, bulk_cache=bulk_cache)
         else:
             result = {"success": False, "error": "Solo modalità Singola (4) supportata"}
 
-        # --- TROVA QUESTA PARTE NEL MAIN E SOSTITUISCILA ---
         final_output = {
             "success": result.get("success", False),
             "timestamp": datetime.now().isoformat(),
             "execution_time": (datetime.now() - start_time).total_seconds(),
-            # Questo unisce tutto il contenuto di result al livello principale
             **{k: v for k, v in result.items() if k != "success"} 
         }
         

@@ -24,6 +24,7 @@ USAGE:
 
 import json
 import csv
+import sys  # ← AGGIUNGI QUESTA RIGA
 import numpy as np
 from collections import Counter
 from datetime import datetime
@@ -34,13 +35,12 @@ class DeepAnalyzer:
     """Analizzatore profondo per simulazioni Monte Carlo"""
     
     def __init__(self):
-        self.matches = []  # Lista di tutte le partite analizzate
-        self.current_match = None  # Partita in analisi
+        self.matches = []
+        self.current_match = None
         
     def start_match(self, home_team, away_team, real_result=None, league="Unknown", date_str=None):
         """Inizia l'analisi di una nuova partita"""
         
-        # Parse risultato reale
         real_gh, real_ga = None, None
         if real_result and isinstance(real_result, str) and "-" in real_result:
             try:
@@ -56,59 +56,75 @@ class DeepAnalyzer:
             'real_result': real_result,
             'real_gh': real_gh,
             'real_ga': real_ga,
-            'algorithms': {}  # {algo_id: {results: [...], stats: {...}}}
+            'algorithms': {}
         }
     
     def add_result(self, algo_id, home_goals, away_goals, lambda_h=None, lambda_a=None, 
-               odds_real=None, odds_qt=None, team_scores=None, h2h_stats=None):
-
+                   odds_real=None, odds_qt=None, team_scores=None, h2h_stats=None):
+        """Aggiunge un risultato di simulazione"""
         if self.current_match is None:
             raise ValueError("Devi chiamare start_match() prima!")
         
-        # Inizializza algoritmo se non esiste
         if algo_id not in self.current_match['algorithms']:
             self.current_match['algorithms'][algo_id] = {
-                'results': [],      # Lista gol casuali (retrocompatibilità)
-                'lambdas': [],      # Lista lambda teorici (NUOVO)
+                'results': [],
+                'lambdas': [],
                 'total_simulations': 0
             }
         
-        # ✅ SE HAI I LAMBDA, salvali (Modalità Teorica)
         if lambda_h is not None and lambda_a is not None:
             self.current_match['algorithms'][algo_id]['lambdas'].append((lambda_h, lambda_a))
-        
-        # ✅ ALTRIMENTI salva i gol (Modalità Empirica - retrocompatibilità)
-        else:
-            self.current_match['algorithms'][algo_id]['results'].append((home_goals, away_goals))
-        
-        self.current_match['algorithms'][algo_id]['total_simulations'] += 1
+            # ✅ AGGIUNGI QUI:
+          #  print(f"💾 Lambda salvati: algo={algo_id}, tot={len(self.current_match['algorithms'][algo_id]['lambdas'])}", file=sys.stderr)
+
+        # SEMPRE salva i results
+        self.current_match['algorithms'][algo_id]['results'].append((home_goals, away_goals))
+        # ✅ AGGIUNGI QUI:
+       # print(f"⚽ Results salvati: algo={algo_id}, tot={len(self.current_match['algorithms'][algo_id]['results'])}", file=sys.stderr)
     
     def end_match(self):
-        """Finalizza l'analisi della partita corrente e calcola le statistiche"""
+        print(f"🏁 end_match() CHIAMATO!", file=sys.stderr)
+        
         if self.current_match is None:
             return
         
-        # Calcola statistiche per ogni algoritmo
+        # Calcola stats per ogni algoritmo (2,3,4,5)
         for algo_id, data in self.current_match['algorithms'].items():
-            # ✅ Passa l'intero oggetto data invece di solo results
-            data['stats'] = self._calculate_stats(
-                data,
+            data['stats'] = self._calculate_stats(data, ...)
+        
+        # ✅ AGGIUNGI QUESTO: Crea stats aggregate per algo 6
+        if len(self.current_match['algorithms']) == 4:  # Se hai 2,3,4,5
+            # Aggrega tutti i lambda
+            all_lambdas = []
+            for aid in [2, 3, 4, 5]:
+                if aid in self.current_match['algorithms']:
+                    all_lambdas.extend(self.current_match['algorithms'][aid]['lambdas'])
+            
+            # Crea algo 6 con tutti i lambda aggregati
+            self.current_match['algorithms'][6] = {
+                'lambdas': all_lambdas,
+                'results': [],
+                'total_simulations': len(all_lambdas)
+            }
+            
+            # Calcola stats per algo 6
+            self.current_match['algorithms'][6]['stats'] = self._calculate_stats(
+                self.current_match['algorithms'][6],
                 self.current_match['real_gh'],
                 self.current_match['real_ga']
             )
-        
-        # Salva partita
+            
+            print(f"✅ Creato algo 6 aggregato con {len(all_lambdas)} lambda", file=sys.stderr)
+            # ✅ AGGIUNGI QUESTE 2 RIGHE ALLA FINE:
         self.matches.append(self.current_match)
         self.current_match = None
+        print(f"✅ Partita salvata in matches, totale={len(self.matches)}", file=sys.stderr)
     
     def _calculate_stats(self, algo_data, real_gh=None, real_ga=None):
         """Calcola statistiche usando lambda teorici O risultati empirici"""
         
-        # ✅ PRIORITÀ 1: Se hai lambda, usa quelli (Teorico)
         if 'lambdas' in algo_data and algo_data['lambdas']:
             return self._calculate_stats_theoretical(algo_data['lambdas'], real_gh, real_ga)
-        
-        # ✅ PRIORITÀ 2: Altrimenti usa results (Empirico - retrocompatibilità)
         elif 'results' in algo_data and algo_data['results']:
             return self._calculate_stats_empirical(algo_data['results'], real_gh, real_ga)
         
@@ -116,13 +132,12 @@ class DeepAnalyzer:
     
     def _calculate_stats_empirical(self, results, real_gh=None, real_ga=None):
         """Calcola statistiche da risultati empirici (VECCHIO METODO)"""
-        
         total = len(results)
         if total == 0:
             return {}
         
     def _calculate_stats_theoretical(self, lambdas_list, real_gh=None, real_ga=None, 
-                                    odds_real=None, odds_qt=None, team_scores=None, h2h_stats=None):
+                                     odds_real=None, odds_qt=None, team_scores=None, h2h_stats=None):
         """
         Calcola probabilità teoriche usando Poisson dai lambda medi
         + BLENDING con quote reali, quote teoriche, power e storico H2H
@@ -135,7 +150,7 @@ class DeepAnalyzer:
             return {}
         
         # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        # 1️⃣ CALCOLA LAMBDA MEDI (da N lambda con fluttuazione ±15%)
+        # 1️⃣ CALCOLA LAMBDA MEDI
         # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         lambda_h_list = [lh for lh, la in lambdas_list]
         lambda_a_list = [la for lh, la in lambdas_list]
@@ -143,12 +158,11 @@ class DeepAnalyzer:
         lambda_h_medio = np.mean(lambda_h_list)
         lambda_a_medio = np.mean(lambda_a_list)
         
-        # Deviazione standard dei lambda (misura fluttuazione)
         std_lambda_h = np.std(lambda_h_list) if len(lambda_h_list) > 1 else 0.0
         std_lambda_a = np.std(lambda_a_list) if len(lambda_a_list) > 1 else 0.0
         
         # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        # 2️⃣ GENERA MATRICE POISSON TEORICA (7x7 = 49 risultati possibili)
+        # 2️⃣ GENERA MATRICE POISSON TEORICA (7x7)
         # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         prob_matrix = {}
         for gh in range(7):
@@ -157,7 +171,6 @@ class DeepAnalyzer:
                 p_away = poisson.pmf(ga, lambda_a_medio)
                 prob_matrix[f"{gh}-{ga}"] = p_home * p_away
         
-        # Normalizza (somma = 100%)
         total_prob = sum(prob_matrix.values())
         prob_matrix = {k: v/total_prob for k, v in prob_matrix.items()}
         
@@ -177,11 +190,9 @@ class DeepAnalyzer:
         sources_1x2 = []
         weights_1x2 = []
         
-        # Monte Carlo: SEMPRE presente
         sources_1x2.append((sign_1_mc, sign_x_mc, sign_2_mc))
-        weights_1x2.append(0.40)  # 40% peso base
+        weights_1x2.append(0.40)
         
-        # Quote Reali: Se disponibili
         if odds_real and '1' in odds_real and 'X' in odds_real and '2' in odds_real:
             try:
                 prob_1_real = 1 / float(odds_real['1']) if float(odds_real['1']) > 0 else 0
@@ -195,11 +206,10 @@ class DeepAnalyzer:
                     prob_2_real /= total_real
                     
                     sources_1x2.append((prob_1_real, prob_x_real, prob_2_real))
-                    weights_1x2.append(0.35)  # 35% peso
+                    weights_1x2.append(0.35)
             except:
                 pass
         
-        # Quote Teoriche: Se disponibili
         if odds_qt and '1' in odds_qt and 'X' in odds_qt and '2' in odds_qt:
             try:
                 prob_1_qt = 1 / float(odds_qt['1']) if float(odds_qt['1']) > 0 else 0
@@ -213,20 +223,17 @@ class DeepAnalyzer:
                     prob_2_qt /= total_qt
                     
                     sources_1x2.append((prob_1_qt, prob_x_qt, prob_2_qt))
-                    weights_1x2.append(0.25)  # 25% peso
+                    weights_1x2.append(0.25)
             except:
                 pass
         
-        # Normalizza pesi (se mancano fonti, ridistribuisci)
         total_weight = sum(weights_1x2)
         weights_1x2 = [w / total_weight for w in weights_1x2]
         
-        # MEDIA PESATA 1X2
         sign_1_final = sum(src[0] * w for src, w in zip(sources_1x2, weights_1x2))
         sign_x_final = sum(src[1] * w for src, w in zip(sources_1x2, weights_1x2))
         sign_2_final = sum(src[2] * w for src, w in zip(sources_1x2, weights_1x2))
         
-        # Normalizza (sicurezza)
         total_1x2 = sign_1_final + sign_x_final + sign_2_final
         sign_1_final /= total_1x2
         sign_x_final /= total_1x2
@@ -239,11 +246,9 @@ class DeepAnalyzer:
                     if int(score.split('-')[0]) > 0 and int(score.split('-')[1]) > 0)
         ng_mc = 1 - gg_mc
         
-        # 🔥 BLENDING GG/NG: Monte Carlo + Power + H2H
         sources_ggng = [(gg_mc, ng_mc)]
         weights_ggng = [0.40]
         
-        # Power Attack/Defense
         if team_scores and 'home' in team_scores and 'away' in team_scores:
             try:
                 h_scores = team_scores['home']
@@ -254,9 +259,7 @@ class DeepAnalyzer:
                 att_a = a_scores.get('attack_away', 5.0)
                 def_h = h_scores.get('defense_home', 5.0)
                 
-                # Probabilità che casa segni
                 prob_h_score = min(0.95, (att_h + (10 - def_a)) / 20)
-                # Probabilità che ospite segni
                 prob_a_score = min(0.95, (att_a + (10 - def_h)) / 20)
                 
                 gg_power = prob_h_score * prob_a_score
@@ -267,7 +270,7 @@ class DeepAnalyzer:
             except:
                 pass
         
-        # Storico H2H
+# Storico H2H
         if h2h_stats and 'gg_pct' in h2h_stats:
             try:
                 gg_h2h = h2h_stats['gg_pct'] / 100
@@ -278,7 +281,6 @@ class DeepAnalyzer:
             except:
                 pass
         
-        # Normalizza e calcola media
         total_weight_gg = sum(weights_ggng)
         weights_ggng = [w / total_weight_gg for w in weights_ggng]
         
@@ -296,11 +298,9 @@ class DeepAnalyzer:
                         if sum(map(int, score.split('-'))) < th)
             over_mc = 1 - under_mc
             
-            # 🔥 BLENDING U/O: Monte Carlo + Power + H2H
             sources_uo = [(under_mc, over_mc)]
             weights_uo = [0.40]
             
-            # Power (solo per 2.5)
             if th == 2.5 and team_scores:
                 try:
                     expected_total = (lambda_h_medio + lambda_a_medio)
@@ -317,7 +317,6 @@ class DeepAnalyzer:
                 except:
                     pass
             
-            # H2H (solo per 2.5)
             if th == 2.5 and h2h_stats and 'over25_pct' in h2h_stats:
                 try:
                     over_h2h = h2h_stats['over25_pct'] / 100
@@ -328,7 +327,6 @@ class DeepAnalyzer:
                 except:
                     pass
             
-            # Normalizza e calcola media
             total_weight_uo = sum(weights_uo)
             weights_uo = [w / total_weight_uo for w in weights_uo]
             
@@ -351,7 +349,7 @@ class DeepAnalyzer:
         top_10_scores = [(score, int(prob * total_simulations)) for score, prob in sorted_scores[:10]]
         
         # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        # 7️⃣ DISTRIBUZIONE GOL (Casa e Trasferta)
+        # 7️⃣ DISTRIBUZIONE GOL
         # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         home_goals_dist = {}
         away_goals_dist = {}
@@ -369,7 +367,7 @@ class DeepAnalyzer:
         away_avg_goals = lambda_a_medio
         
         # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        # 9️⃣ STATISTICHE CASA/TRASFERTA (segna/non segna)
+        # 9️⃣ STATISTICHE CASA/TRASFERTA
         # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         home_scored_prob = 1 - poisson.pmf(0, lambda_h_medio)
         away_scored_prob = 1 - poisson.pmf(0, lambda_a_medio)
@@ -378,7 +376,7 @@ class DeepAnalyzer:
         away_scored = int(away_scored_prob * total_simulations)
         
         # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        # 🔟 CONFIDENCE (Basato su varianza dei lambda)
+        # 🔟 CONFIDENCE
         # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         confidence_home = max(0, min(100, 100 - (std_lambda_h * 25)))
         confidence_away = max(0, min(100, 100 - (std_lambda_a * 25)))
@@ -389,7 +387,7 @@ class DeepAnalyzer:
         global_confidence = (confidence_home + confidence_away + confidence_total) / 3
         
         # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        # 1️⃣1️⃣ ACCURACY (se disponibile risultato reale)
+        # 1️⃣1️⃣ ACCURACY
         # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         accuracy = None
         if real_gh is not None and real_ga is not None:
@@ -429,42 +427,26 @@ class DeepAnalyzer:
             }
         
         # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        # 🎯 RITORNA TUTTO (con valori BLENDED)
+        # 🎯 RITORNA TUTTO
         # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         return {
             'total_simulations': total_simulations,
-            
-            # Distribuzione gol
             'home_goals_distribution': home_goals_dist,
             'away_goals_distribution': away_goals_dist,
-            
-            # Risultati esatti
             'exact_scores': {score: int(prob * total_simulations) for score, prob in prob_matrix.items()},
             'top_10_scores': top_10_scores,
-            
-            # Segni (BLENDED)
             'sign_1': {'count': int(sign_1_final * total_simulations), 'pct': round(sign_1_final * 100, 2)},
             'sign_x': {'count': int(sign_x_final * total_simulations), 'pct': round(sign_x_final * 100, 2)},
             'sign_2': {'count': int(sign_2_final * total_simulations), 'pct': round(sign_2_final * 100, 2)},
-            
-            # GG/NG (BLENDED)
             'gg': {'count': int(gg_final * total_simulations), 'pct': round(gg_final * 100, 2)},
             'ng': {'count': int(ng_final * total_simulations), 'pct': round(ng_final * 100, 2)},
-            
-            # Under/Over (BLENDED)
             'under_over': under_over,
-            
-            # Statistiche Casa
             'home_scored': {'count': home_scored, 'pct': round(home_scored_prob * 100, 2)},
             'home_not_scored': {'count': total_simulations - home_scored, 'pct': round((1 - home_scored_prob) * 100, 2)},
             'home_avg_goals': round(home_avg_goals, 3),
-            
-            # Statistiche Trasferta
             'away_scored': {'count': away_scored, 'pct': round(away_scored_prob * 100, 2)},
             'away_not_scored': {'count': total_simulations - away_scored, 'pct': round((1 - away_scored_prob) * 100, 2)},
             'away_avg_goals': round(away_avg_goals, 3),
-            
-            # Confidence
             'confidence': {
                 'home_std': round(std_lambda_h, 3),
                 'away_std': round(std_lambda_a, 3),
@@ -476,33 +458,27 @@ class DeepAnalyzer:
                 'lambda_medio_casa': round(lambda_h_medio, 3),
                 'lambda_medio_ospite': round(lambda_a_medio, 3)
             },
-            
-            # Accuracy
             'accuracy': accuracy
         }
 
         
-        # ═══════════════════════════════════════════════════════════
+# ═══════════════════════════════════════════════════════════
         # 🔬 CALCOLO CONFIDENCE (usa il modulo separato)
         # ═══════════════════════════════════════════════════════════
-        
         conf_calculator = ConfidenceCalculator()
         confidence_data = conf_calculator.calculate_all_metrics(results, real_gh, real_ga)
         
         # ═══════════════════════════════════════════════════════════
         # 🎲 DEVIAZIONE STANDARD E CONFIDENCE
         # ═══════════════════════════════════════════════════════════
-        
         home_goals_list = [gh for gh, ga in results]
         away_goals_list = [ga for gh, ga in results]
         total_goals_list = [gh + ga for gh, ga in results]
 
-        # SAFE NUMPY: evita warning su liste vuote (PRIMA PARTITA)
         std_home = np.std(home_goals_list) if len(home_goals_list) > 1 else 0.0
         std_away = np.std(away_goals_list) if len(away_goals_list) > 1 else 0.0
         std_total = np.std(total_goals_list) if len(total_goals_list) > 1 else 0.0
 
-        # Confidence Score (0-100): più bassa la std, più alto il confidence
         confidence_home = max(0, min(100, 100 - (std_home * 25)))
         confidence_away = max(0, min(100, 100 - (std_away * 25)))
         confidence_total = max(0, min(100, 100 - (std_total * 15)))
@@ -514,7 +490,7 @@ class DeepAnalyzer:
         away_goals_count = Counter([ga for gh, ga in results])
         
         # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        # 2️⃣ TUTTI I RISULTATI ESATTI (formato "GH-GA")
+        # 2️⃣ TUTTI I RISULTATI ESATTI
         # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         exact_scores = Counter([f"{gh}-{ga}" for gh, ga in results])
         top_10_scores = exact_scores.most_common(10)
@@ -533,7 +509,7 @@ class DeepAnalyzer:
         ng = total - gg
         
         # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        # 5️⃣ UNDER/OVER (0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5)
+        # 5️⃣ UNDER/OVER
         # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         thresholds = [0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5]
         under_over = {}
@@ -543,14 +519,8 @@ class DeepAnalyzer:
             under_count = sum(1 for t in total_goals if t < th)
             over_count = total - under_count
             
-            under_over[f"U{th}"] = {
-                'count': under_count,
-                'pct': round(under_count / total * 100, 2)
-            }
-            under_over[f"O{th}"] = {
-                'count': over_count,
-                'pct': round(over_count / total * 100, 2)
-            }
+            under_over[f"U{th}"] = {'count': under_count, 'pct': round(under_count / total * 100, 2)}
+            under_over[f"O{th}"] = {'count': over_count, 'pct': round(over_count / total * 100, 2)}
         
         # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         # 6️⃣ STATISTICHE GOL CASA
@@ -567,12 +537,12 @@ class DeepAnalyzer:
         away_avg = sum([ga for gh, ga in results]) / total
         
         # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        # 8️⃣ PARTITE CON TOTALE GOL = N (per N da 0 a 10+)
+        # 8️⃣ PARTITE CON TOTALE GOL = N
         # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         total_goals_dist = Counter([gh + ga for gh, ga in results])
         
         # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        # 9️⃣ CONFRONTO CON RISULTATO REALE (se disponibile)
+        # 9️⃣ CONFRONTO CON RISULTATO REALE
         # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         accuracy = None
         if real_gh is not None and real_ga is not None:
@@ -580,14 +550,12 @@ class DeepAnalyzer:
             real_gg = "GG" if (real_gh > 0 and real_ga > 0) else "NG"
             real_total = real_gh + real_ga
             
-            # Risultato più probabile
             predicted_score = exact_scores.most_common(1)[0][0]
             pred_gh, pred_ga = map(int, predicted_score.split("-"))
             pred_sign = "1" if pred_gh > pred_ga else ("X" if pred_gh == pred_ga else "2")
             pred_gg = "GG" if (pred_gh > 0 and pred_ga > 0) else "NG"
             pred_total = pred_gh + pred_ga
             
-            # Quante volte è uscito il risultato reale?
             real_score_str = f"{real_gh}-{real_ga}"
             real_score_count = exact_scores.get(real_score_str, 0)
             real_score_rank = None
@@ -611,7 +579,6 @@ class DeepAnalyzer:
                 'real_score_rank': real_score_rank or "N/A"
             }
             
-        # Merge confidence data con std
         confidence_data.update({
             'home_std': round(std_home, 3),
             'away_std': round(std_away, 3),
@@ -627,78 +594,55 @@ class DeepAnalyzer:
         # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         return {
             'total_simulations': total,
-            
-            # Distribuzione gol
             'home_goals_distribution': dict(sorted(home_goals_count.items())),
             'away_goals_distribution': dict(sorted(away_goals_count.items())),
-            
-            # Risultati esatti
             'exact_scores': dict(exact_scores),
             'top_10_scores': top_10_scores,
-            
-            # Segni
             'sign_1': {'count': sign_1, 'pct': round(sign_1/total*100, 2)},
             'sign_x': {'count': sign_x, 'pct': round(sign_x/total*100, 2)},
             'sign_2': {'count': sign_2, 'pct': round(sign_2/total*100, 2)},
-            
-            # GG/NG
             'gg': {'count': gg, 'pct': round(gg/total*100, 2)},
             'ng': {'count': ng, 'pct': round(ng/total*100, 2)},
-            
-            # Under/Over
             'under_over': under_over,
-            
-            # Statistiche Casa
             'home_scored': {'count': home_scored, 'pct': round(home_scored/total*100, 2)},
             'home_not_scored': {'count': home_not_scored, 'pct': round(home_not_scored/total*100, 2)},
             'home_avg_goals': round(home_avg, 3),
-            
-            # Statistiche Trasferta
             'away_scored': {'count': away_scored, 'pct': round(away_scored/total*100, 2)},
             'away_not_scored': {'count': away_not_scored, 'pct': round(away_not_scored/total*100, 2)},
             'away_avg_goals': round(away_avg, 3),
-            
-            # Confidence (calcolata dal modulo separato)
             'confidence': confidence_data,
-            
-            # Accuracy
             'accuracy': accuracy
         }
     
     # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    # 💾 EXPORT FUNCTIONS
+    # 💾 EXPORT FUNCTIONS (mantieni come sono - già corrette)
     # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     
     def save_report(self, csv_path="deep_analysis.csv", html_path="deep_analysis.html", json_path="deep_analysis.json", confidence_path="confidence_report.html"):
-        """Salva i report in tutti i formati (incluso Confidence HTML)"""
-        
+        """Salva i report in tutti i formati"""
         if not self.matches:
-            print("⚠️  Nessuna partita da analizzare!")
+          #  print("⚠️  Nessuna partita da analizzare!")
             return
         
-        # JSON (completo)
         if json_path:
             self._save_json(json_path)
-            print(f"✅ JSON salvato: {json_path}")
+          #  print(f"✅ JSON salvato: {json_path}")
         
-        # CSV (ultra-dettagliato)
         if csv_path:
             self._save_csv(csv_path)
-            print(f"✅ CSV salvato: {csv_path}")
+          #  print(f"✅ CSV salvato: {csv_path}")
         
-        # HTML (interattivo)
         if html_path:
             self._save_html(html_path)
-            print(f"✅ HTML salvato: {html_path}")
+          #  print(f"✅ HTML salvato: {html_path}")
             
-        # Confidence HTML (NUOVO!)
         if confidence_path:
             builder = ConfidenceHTMLBuilder()
             builder.generate_report(self.matches, confidence_path)
-            print(f"✅ CONFIDENCE HTML salvato: {confidence_path}")
+         #   print(f"✅ CONFIDENCE HTML salvato: {confidence_path}")
     
     def _save_json(self, path):
-        """Salva tutto in JSON (backup completo)"""
+        """Salva tutto in JSON"""
         with open(path, 'w', encoding='utf-8') as f:
             json.dump({
                 'generated_at': datetime.now().isoformat(),
@@ -708,17 +652,14 @@ class DeepAnalyzer:
     
     def _save_csv(self, path):
         """Salva CSV ultra-dettagliato per Excel"""
-        
         with open(path, 'w', newline='', encoding='utf-8') as f:
             writer = csv.writer(f, delimiter=';')
             
-            # Header globale
             writer.writerow(['DEEP ANALYSIS REPORT'])
             writer.writerow(['Generated:', datetime.now().strftime("%Y-%m-%d %H:%M:%S")])
             writer.writerow(['Total Matches:', len(self.matches)])
             writer.writerow([])
             
-            # Per ogni partita
             for match in self.matches:
                 writer.writerow(['=' * 100])
                 writer.writerow([f"⚽ {match['home_team']} vs {match['away_team']}"])
@@ -729,7 +670,6 @@ class DeepAnalyzer:
                 
                 writer.writerow([])
                 
-                # Per ogni algoritmo
                 for algo_id, data in match['algorithms'].items():
                     stats = data['stats']
                     
@@ -737,9 +677,6 @@ class DeepAnalyzer:
                     writer.writerow(['Total Simulations:', stats['total_simulations']])
                     writer.writerow([])
                     
-                    # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-                    # DISTRIBUZIONE GOL
-                    # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
                     writer.writerow(['📊 DISTRIBUZIONE GOL CASA'])
                     writer.writerow(['Gol', 'Occorrenze', 'Percentuale'])
                     for gol, count in stats['home_goals_distribution'].items():
@@ -754,9 +691,6 @@ class DeepAnalyzer:
                         writer.writerow([gol, count, f"{pct}%"])
                     writer.writerow([])
                     
-                    # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-                    # TOP 10 RISULTATI ESATTI
-                    # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
                     writer.writerow(['🏆 TOP 10 RISULTATI ESATTI'])
                     writer.writerow(['Rank', 'Score', 'Occorrenze', 'Percentuale'])
                     for rank, (score, count) in enumerate(stats['top_10_scores'], 1):
@@ -764,9 +698,6 @@ class DeepAnalyzer:
                         writer.writerow([rank, score, count, f"{pct}%"])
                     writer.writerow([])
                     
-                    # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-                    # SEGNI 1X2
-                    # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
                     writer.writerow(['🎯 SEGNI 1X2'])
                     writer.writerow(['Segno', 'Occorrenze', 'Percentuale'])
                     writer.writerow(['1', stats['sign_1']['count'], f"{stats['sign_1']['pct']}%"])
@@ -774,27 +705,18 @@ class DeepAnalyzer:
                     writer.writerow(['2', stats['sign_2']['count'], f"{stats['sign_2']['pct']}%"])
                     writer.writerow([])
                     
-                    # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-                    # GOL/NOGOL
-                    # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
                     writer.writerow(['⚽ GOL/NOGOL'])
                     writer.writerow(['Tipo', 'Occorrenze', 'Percentuale'])
                     writer.writerow(['GG', stats['gg']['count'], f"{stats['gg']['pct']}%"])
                     writer.writerow(['NG', stats['ng']['count'], f"{stats['ng']['pct']}%"])
                     writer.writerow([])
                     
-                    # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-                    # UNDER/OVER
-                    # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
                     writer.writerow(['📊 UNDER/OVER'])
                     writer.writerow(['Soglia', 'Occorrenze', 'Percentuale'])
                     for key, val in stats['under_over'].items():
                         writer.writerow([key, val['count'], f"{val['pct']}%"])
                     writer.writerow([])
                     
-                    # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-                    # STATISTICHE CASA/TRASFERTA
-                    # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
                     writer.writerow(['🏠 STATISTICHE CASA'])
                     writer.writerow(['Ha segnato:', stats['home_scored']['count'], f"{stats['home_scored']['pct']}%"])
                     writer.writerow(['Non ha segnato:', stats['home_not_scored']['count'], f"{stats['home_not_scored']['pct']}%"])
@@ -807,13 +729,6 @@ class DeepAnalyzer:
                     writer.writerow(['Media gol:', stats['away_avg_goals']])
                     writer.writerow([])
                     
-                    
-                    # ═══════════════════════════════════════════════════════════
-                    # 🎲 DEVIAZIONE STANDARD E CONFIDENCE
-                    # ═══════════════════════════════════════════════════════════
-                    
-                    
-                    writer.writerow([])
                     writer.writerow(['📊 CONFIDENCE & DEVIAZIONE STANDARD'])
                     writer.writerow(['Metrica', 'Valore', 'Confidence'])
                     writer.writerow(['Gol Casa (Std Dev)', stats['confidence']['home_std'], f"{stats['confidence']['home_confidence']}%"])
@@ -822,9 +737,6 @@ class DeepAnalyzer:
                     writer.writerow(['Confidence Globale', '-', f"{stats['confidence']['global_confidence']}%"])
                     writer.writerow([])
                     
-                    # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-                    # ACCURACY (se disponibile)
-                    # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
                     if stats['accuracy']:
                         acc = stats['accuracy']
                         writer.writerow(['✅ CONFRONTO CON RISULTATO REALE'])
@@ -850,8 +762,11 @@ class DeepAnalyzer:
             writer.writerow(['=' * 100])
             writer.writerow(['END OF REPORT'])
     
-    def _save_html(self, path):
-        """Genera HTML interattivo con tabelle espandibili"""
+  #  def _save_html(self, path):
+   #     """Genera HTML interattivo con tabelle espandibili"""
+        
+    def get_html_report(self):
+        """Genera HTML e lo ritorna come stringa (NON salva su file)"""
         
         html_content = f"""<!DOCTYPE html>
 <html lang="it">
@@ -1626,8 +1541,7 @@ class DeepAnalyzer:
 </html>
 """
         
-        with open(path, 'w', encoding='utf-8') as f:
-            f.write(html_content)
+        return html_content
 
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

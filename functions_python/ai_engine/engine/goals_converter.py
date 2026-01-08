@@ -435,6 +435,9 @@ def calculate_goals_from_engine(home_score, away_score, home_data, away_data, al
     # Stringa di debug per vedere i valori calcolati (xG previsti)
     xg_info = f"{final_lambda_h:.2f}-{final_lambda_a:.2f}"
     
+    # ✅ AGGIUNGI QUESTA RIGA:
+   # print(f"🔍 LAMBDA DEBUG: lambda_h={final_lambda_h:.3f}, lambda_a={final_lambda_a:.3f}", file=sys.stderr)
+    
     # 📊 RACCOLTA DATI PER STATISTICHE MONTE CARLO
     # Funzione per estrarre il "peso logico" in sicurezza
     def extract_weight_info(w_calculated, peso_key, base_weight):

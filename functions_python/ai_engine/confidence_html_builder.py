@@ -17,7 +17,7 @@ USAGE:
 
 from datetime import datetime
 
-from .confidence_glossary import get_explanation_box
+from confidence_glossary import get_explanation_box
 class ConfidenceHTMLBuilder:
     """Builder per generare HTML report confidence"""
     
@@ -47,6 +47,15 @@ class ConfidenceHTMLBuilder:
         
         with open(output_path, 'w', encoding='utf-8') as f:
             f.write(html_content)
+            
+    def get_html_report(self, matches):
+        if not matches:
+            return "<html><body><h1>Nessuna partita da analizzare</h1></body></html>"
+        
+        html_content = self._build_html_structure(matches)
+        return html_content
+            
+    
     
     def _build_html_structure(self, matches):
         """Costruisce la struttura HTML completa"""
