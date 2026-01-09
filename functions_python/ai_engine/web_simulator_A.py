@@ -680,8 +680,23 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
         ##log_debug("🔍 [DEBUG 8] Pulizia nome lega...")
         
         league_clean = league.replace('_', ' ').title()
-        if league_clean == "Serie A":
-            league_clean = "Serie A"
+
+        # Normalizzazione nomi leghe (SOLO quelle presenti nel simulatore)
+        league_map = {
+            "Serie A": "Serie A",
+            "Serie B": "Serie B",
+            "Serie C - Girone A": "Serie C - Girone A",
+            "Serie C - Girone B": "Serie C - Girone B",
+            "Serie C - Girone C": "Serie C - Girone C",
+            "Premier League": "Premier League",
+            "La Liga": "La Liga",
+            "Bundesliga": "Bundesliga",
+            "Ligue 1": "Ligue 1",
+            "Eredivisie": "Eredivisie",
+            "Liga Portugal": "Liga Portugal"
+        }
+
+        league_clean = league_map.get(league_clean, league_clean)
         
         #log_debug(f"🔍 [DEBUG 9] League: '{league}' -> '{league_clean}'")
         #log_debug(f"🔍 [DEBUG 10] Costruzione pipeline aggregation...")
