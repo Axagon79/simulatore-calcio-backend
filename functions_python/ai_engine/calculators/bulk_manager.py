@@ -6,14 +6,34 @@ from config import db
 def get_all_data_bulk(home_team, away_team, league_name):
     """
     MAGAZZINO CENTRALE V3: Versione Omnicomprensiva.
+    Preleva tutto ciò che l'Engine Core e i Calcolatori cercano,
+    eliminando totalmente la latenza del Database durante la simulazione.
     """
     t_start = time.time()
     
+    # ✅ NORMALIZZAZIONE LEAGUE NAME
+    league_normalized = league_name.replace('_', ' ').title()
+    league_map = {
+        "Serie A": "Serie A",
+        "Serie B": "Serie B",
+        "Serie C Girone A": "Serie C - Girone A",
+        "Serie C Girone B": "Serie C - Girone B",
+        "Serie C Girone C": "Serie C - Girone C",
+        "Premier League": "Premier League",
+        "La Liga": "La Liga",
+        "Bundesliga": "Bundesliga",
+        "Ligue 1": "Ligue 1",
+        "Eredivisie": "Eredivisie",
+        "Liga Portugal": "Liga Portugal"
+    }
+    league_normalized = league_map.get(league_normalized, league_normalized)
+    
     # ✅ LOG 1: INPUT
     print(f"🔍 [BULK] INPUT: home={home_team}, away={away_team}, league={league_name}", file=sys.stderr)
+    print(f"🔍 [BULK] League normalizzata: '{league_name}' -> '{league_normalized}'", file=sys.stderr)
     
     team_names = [home_team, away_team]
-    player_query = {"team_name_fbref": {"$in": team_names}, "league_name": league_name}
+    player_query = {"team_name_fbref": {"$in": team_names}, "league_name": league_normalized}
     team_query = {"$or": [{"name": {"$in": team_names}}, {"aliases": {"$in": team_names}}]}
 
     # ✅ LOG 2: QUERY PLAYERS
@@ -75,9 +95,9 @@ def get_all_data_bulk(home_team, away_team, league_name):
         }
         print(f"🔍 [BULK] H2H trovato: {h2h_match_data['msg']}", file=sys.stderr)
 
-    # ✅ LOG 4: LEAGUE STATS
-    all_teams_league = list(db["teams"].find({"league": league_name}, {"ranking": 1}))
-    print(f"🔍 [BULK] Teams nella lega '{league_name}': {len(all_teams_league)}", file=sys.stderr)
+    # ✅ LOG 4: LEAGUE STATS (USA league_normalized)
+    all_teams_league = list(db["teams"].find({"league": league_normalized}, {"ranking": 1}))
+    print(f"🔍 [BULK] Teams nella lega '{league_normalized}': {len(all_teams_league)}", file=sys.stderr)
     
     total_h_ppg = total_a_ppg = count = 0
     for t in all_teams_league:
