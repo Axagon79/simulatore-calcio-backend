@@ -575,7 +575,29 @@ def preload_match_data(home_team, away_team, bulk_cache=None):
     h_luc = lucifero_lib.get_lucifero_score(home_team, bulk_cache=bulk_cache) if lucifero_lib else 0
     a_luc = lucifero_lib.get_lucifero_score(away_team, bulk_cache=bulk_cache) if lucifero_lib else 0
     
-    h_scores, a_scores = att_def_lib.get_scores_live_bulk(home_team, away_team, league, bulk_cache) if att_def_lib else ({'home_power': 10, 'attack_home': 5, 'defense_home': 5}, {'away_power': 10, 'attack_away': 5, 'defense_away': 5})
+    # Usa direttamente MASTER_DATA (i scores sono già calcolati nel DB)
+    master_data = bulk_cache.get("MASTER_DATA", {})
+
+    if home_team not in master_data:
+        raise ValueError(f"❌ {home_team} non trovato in MASTER_DATA")
+    if away_team not in master_data:
+        raise ValueError(f"❌ {away_team} non trovato in MASTER_DATA")
+
+    h_data = master_data[home_team]
+    a_data = master_data[away_team]
+
+    h_scores = {
+        'home_power': h_data['power'],
+        'attack_home': h_data['attack'],
+        'defense_home': h_data['defense']
+    }
+    a_scores = {
+        'away_power': a_data['power'],
+        'attack_away': a_data['attack'],
+        'defense_away': a_data['defense']
+    }
+
+    print(f"✅ Scores da MASTER_DATA: home_power={h_scores['home_power']}, away_power={a_scores['away_power']}", file=sys.stderr)
     h_motiv = motiv_lib.get_motivation_live_bulk(home_team, league, bulk_cache) if motiv_lib else 10
     a_motiv = motiv_lib.get_motivation_live_bulk(away_team, league, bulk_cache) if motiv_lib else 10
     h_val = value_rosa_lib.get_value_score_live_bulk(home_team, league, bulk_cache) if value_rosa_lib else 5
