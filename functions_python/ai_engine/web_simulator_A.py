@@ -530,74 +530,87 @@ def calcola_tiri_in_porta(tiri_tot, team_tec, team_att, gol, bulkcache):
     return max(gol, min(tiri_tot, int(base)))
 
 
-def calcola_angoli(team_att, possesso_pct, pressing, team_def_avv, bulkcache):
+def calcola_angoli(att_h, att_a, pos_h, pressing_h=3.0, pressing_a=3.0, angoli_mod_h=1.0, angoli_mod_a=1.0):
     """
-    Angoli: attacco + possesso + pressing + difesa avversaria
+    Angoli: attacco + possesso + pressing
+    Ritorna: angoli_h, angoli_a
     """
-    # BASE
-    base = 5.0
-    base += (team_att - 50) * 0.08
-    base += (possesso_pct - 50) * 0.06
-    base += pressing * 0.4                   # Pressing alto → più angoli
-    base += (team_def_avv - 50) * 0.05       # Difesa forte → più angoli contro
+    import random
     
-    mod = bulkcache.get('angoli_mod', 1.0)
-    base *= mod
+    # BASE CASA
+    base_h = 5.0
+    base_h += (att_h - 50) * 0.08
+    base_h += (pos_h - 50) * 0.06
+    base_h += pressing_h * 0.4
+    base_h *= angoli_mod_h
     
-    # CLAMP1
-    base = max(1, min(12, base))
+    # BASE OSPITE
+    base_a = 5.0
+    base_a += (att_a - 50) * 0.08
+    base_a += ((100-pos_h) - 50) * 0.06
+    base_a += pressing_a * 0.4
+    base_a *= angoli_mod_a
     
-    # RANDOM
-    base += random.randint(-3, +3)
+    # Clamp + Random
+    angoli_h = max(1, min(12, int(base_h + random.randint(-2, +2))))
+    angoli_a = max(1, min(12, int(base_a + random.randint(-2, +2))))
     
-    # CLAMP2
-    return max(0, min(15, int(base)))
+    return angoli_h, angoli_a
 
 
-def calcola_falli(team_def, aggressivita, pressing, possesso_avv, bulkcache):
+
+def calcola_falli(def_h, def_a, aggressivita_h, aggressivita_a, pressing_h, pressing_a, pos_h, falli_mod=1.0):
     """
     Falli: difesa + aggressività + pressing + possesso avversario
+    Ritorna: falli_h, falli_a
     """
-    # BASE
-    base = 12.0
-    base += (team_def - 50) * 0.1            # Difesa alta → più falli
-    base += aggressivita * 1.2               # 0-5 aggressività
-    base += pressing * 0.8                   # Pressing alto → più falli
-    base += (possesso_avv - 50) * 0.08       # Più possesso avv → più falli
+    import random
     
-    mod = bulkcache.get('falli_mod', 1.0)
-    base *= mod
+    # BASE CASA (più possesso = meno falli)
+    base_h = 12.0
+    base_h += (def_h - 50) * 0.1
+    base_h += aggressivita_h * 1.2
+    base_h += pressing_h * 0.8
+    base_h -= (pos_h - 50) * 0.05  # Più possesso = meno falli
+    base_h *= falli_mod
     
-    # CLAMP1
-    base = max(6, min(22, base))
+    # BASE OSPITE
+    base_a = 12.0
+    base_a += (def_a - 50) * 0.1
+    base_a += aggressivita_a * 1.2
+    base_a += pressing_a * 0.8
+    base_a -= ((100-pos_h) - 50) * 0.05
+    base_a *= falli_mod
     
-    # RANDOM
-    base += random.randint(-4, +4)
+    # Clamp + Random
+    falli_h = max(6, min(22, int(base_h + random.randint(-3, +3))))
+    falli_a = max(6, min(22, int(base_a + random.randint(-3, +3))))
     
-    # CLAMP2
-    return max(3, min(28, int(base)))
+    return falli_h, falli_a
 
 
-def calcola_passaggi(possesso_pct, team_tec, stile_gioco, bulkcache):
+
+def calcola_passaggi(pos_h, passaggi_mod_h=9.2, passaggi_mod_a=8.8):
     """
-    Passaggi: possesso + tecnica + stile (possesso/contropiede)
+    Passaggi: possesso * modificatori bulkcache
+    Ritorna: pass_h, pass_a
     """
-    # BASE
-    base = possesso_pct * 7.5                # ~750 per 100%
-    base += (team_tec - 50) * 4.0            # Tecnica alta → più passaggi
-    base += stile_gioco * 50                 # 0-5: contropiede→possesso
+    import random
     
-    mod = bulkcache.get('passaggi_mod', 1.0)
-    base *= mod
+    # BASE CASA
+    base_h = pos_h * passaggi_mod_h          # 69% * 9.2 = ~635
+    base_a = (100 - pos_h) * passaggi_mod_a  # 31% * 8.8 = ~273
     
-    # CLAMP1
-    base = max(200, min(850, base))
+    # RANDOM varianza
+    pass_h = int(base_h + random.randint(-30, +30))
+    pass_a = int(base_a + random.randint(-30, +30))
     
-    # RANDOM
-    base += random.randint(-60, +60)
+    # Clamp realistico
+    pass_h = max(400, min(850, pass_h))
+    pass_a = max(250, min(700, pass_a))
     
-    # CLAMP2
-    return max(150, min(950, int(base)))
+    return pass_h, pass_a
+
 
 
 def calcola_precisione_passaggi(team_tec, possesso_pct, pressing_avv):
@@ -907,8 +920,11 @@ def genera_match_report_completo(gh, ga, h2h_data, team_h, team_a, simulazioni_r
         tec_a = dna_a.get('tec', bulkcache.get('tec_away', 50))
         att_h = dna_h.get('att', bulkcache.get('att_home', 50))
         att_a = dna_a.get('att', bulkcache.get('att_away', 50))
-        def_h = dna_h.get('def', bulkcache.get('def_home', 50))
-        def_a = dna_a.get('def', bulkcache.get('def_away', 50))
+        def_h = dna_h.get('def', bulkcache.get('def_home', 50))   # ← AGGIUNGI
+        def_a = dna_a.get('def', bulkcache.get('def_away', 50))   # ← AGGIUNGI
+
+
+
         
         # POSSESSO PARAMETRI
         master_data = bulkcache.get('MASTERDATA', {})
@@ -927,13 +943,23 @@ def genera_match_report_completo(gh, ga, h2h_data, team_h, team_a, simulazioni_r
         home_points = bulkcache.get('home_points', h2h_data.get('home_points', 0))
         away_points = bulkcache.get('away_points', h2h_data.get('away_points', 0))
         
-        # MODIFICATORI STATS (nuovi parametri bulkcache)
+        # =====================================================
+        # MODIFICATORI STATS + PARAMETRI TATTICI (da BULK CACHE)
+        # =====================================================
         tiri_mod_h = bulkcache.get('tiri_mod_home', 1.0)
         tiri_mod_a = bulkcache.get('tiri_mod_away', 1.0)
         passaggi_mod_h = bulkcache.get('passaggi_mod_home', 9.2)
         passaggi_mod_a = bulkcache.get('passaggi_mod_away', 8.8)
         falli_mod = bulkcache.get('falli_mod', 1.0)
         angoli_mod_h = bulkcache.get('angoli_mod_home', 1.0)
+        angoli_mod_a = bulkcache.get('angoli_mod_away', 1.0)
+
+        # PARAMETRI TATTICI (fallback automatici da DNA)
+        pressing_h = bulkcache.get('pressing_home', att_h / 15)
+        pressing_a = bulkcache.get('pressing_away', att_a / 15)
+        aggressivita_h = bulkcache.get('aggressivita_home', def_h / 20)
+        aggressivita_a = bulkcache.get('aggressivita_away', def_a / 20)
+
         
     else:
         # Fallback rapido
@@ -954,14 +980,14 @@ def genera_match_report_completo(gh, ga, h2h_data, team_h, team_a, simulazioni_r
         fattore_campo, home_points, away_points
     )
     pos_h = int(possesso[0])
-    pos_a = int(possesso[1])  # ← AGGIUNGI QUESTA RIGA
+    pos_a = int(possesso[1])
 
-    # Passaggi MODIFICATI
-    pass_h = int(pos_h * passaggi_mod_h) + random.randint(-20, 20)
-    pass_a = int((100 - pos_h) * passaggi_mod_a) + random.randint(-20, 20)
-    
-    # USA FUNZIONI NUOVE
+    # Passaggi
+    pass_h, pass_a = calcola_passaggi(pos_h, passaggi_mod_h, passaggi_mod_a)
+
+    # Tiri  
     t_h, t_a, sog_h, sog_a = calcola_tiri(att_h, att_a, gh, ga, tiri_mod_h, tiri_mod_a)
+
 
     
     # =====================================================
@@ -977,10 +1003,9 @@ def genera_match_report_completo(gh, ga, h2h_data, team_h, team_a, simulazioni_r
         "Tiri in Porta": [sog_h, sog_a],
         "Tiri Fuori": [t_h - sog_h, t_a - sog_a],
         "Tiri Respinti": [random.randint(1, 5), random.randint(1, 5)],
-        "Calci d'Angolo": [
-            max(1, int((att_h/12) * angoli_mod_h)),
-            max(1, int(att_a/12))
-        ],
+        "Calci d'Angolo": calcola_angoli(att_h, att_a, pos_h, pressing_h, pressing_a, angoli_mod_h, angoli_mod_a),
+
+        
         "Angoli (PT)": [random.randint(0, 4), random.randint(0, 4)],
         "Attacchi": [random.randint(90, 115), random.randint(90, 115)],
         "Attacchi Pericolosi": [random.randint(35, 65), random.randint(35, 65)],
@@ -990,10 +1015,9 @@ def genera_match_report_completo(gh, ga, h2h_data, team_h, team_a, simulazioni_r
             f"{random.randint(78, 92)}%",
             f"{random.randint(74, 88)}%"
         ],
-        "Falli": [
-            int(random.randint(8, 18) * falli_mod),
-            int(random.randint(8, 18) * falli_mod)
-        ],
+        "Falli": calcola_falli(def_h, def_a, aggressivita_h, aggressivita_a, pressing_h, pressing_a, pos_h, falli_mod),
+
+        
         "Ammonizioni": [random.randint(0, 4), random.randint(0, 4)],
         "Parate": [max(0, sog_a - ga), max(0, sog_h - gh)],
         "Fuorigioco": [random.randint(0, 4), random.randint(0, 4)],
@@ -1078,6 +1102,9 @@ def genera_anatomia_partita(gh, ga, h2h_match_data, team_h_doc, sim_list, bulkca
         tec_a = dna_a.get('tec', bulkcache.get('tec_away', 50))
         att_h = dna_h.get('att', bulkcache.get('att_home', 50))
         att_a = dna_a.get('att', bulkcache.get('att_away', 50))
+        def_h = dna_h.get('def', bulkcache.get('def_home', 50))
+        def_a = dna_a.get('def', bulkcache.get('def_away', 50))
+
         
         # Possesso parametri (come prima)
         master_data = bulkcache.get('MASTERDATA', {})
@@ -1096,11 +1123,23 @@ def genera_anatomia_partita(gh, ga, h2h_match_data, team_h_doc, sim_list, bulkca
         home_points = bulkcache.get('home_points', h2h_data.get('home_points', 0))
         away_points = bulkcache.get('away_points', h2h_data.get('away_points', 0))
         
-        # PARAMETRI STATISTICHE MODIFICABILI DA BULK
-        tiri_mod_h = bulkcache.get('tiri_mod_home', 1.0)      # Moltiplicatore tiri casa
-        tiri_mod_a = bulkcache.get('tiri_mod_away', 1.0)      # Moltiplicatore tiri ospiti
-        falli_mod = bulkcache.get('falli_mod', 1.0)           # Moltiplicatore falli
-        angoli_mod_h = bulkcache.get('angoli_mod_home', 1.0)  # Moltiplicatore angoli casa
+        # =====================================================
+        # PARAMETRI STATISTICHE + TATTICI (da BULK CACHE)
+        # =====================================================
+        tiri_mod_h = bulkcache.get('tiri_mod_home', 1.0)
+        tiri_mod_a = bulkcache.get('tiri_mod_away', 1.0)
+        falli_mod = bulkcache.get('falli_mod', 1.0)
+        angoli_mod_h = bulkcache.get('angoli_mod_home', 1.0)
+        angoli_mod_a = bulkcache.get('angoli_mod_away', 1.0)
+        passaggi_mod_h = bulkcache.get('passaggi_mod_home', 9.2)
+        passaggi_mod_a = bulkcache.get('passaggi_mod_away', 8.8)
+
+        # PARAMETRI TATTICI (fallback automatici)
+        pressing_h = bulkcache.get('pressing_home', att_h / 15)
+        pressing_a = bulkcache.get('pressing_away', att_a / 15)
+        aggressivita_h = bulkcache.get('aggressivita_home', def_h / 20)
+        aggressivita_a = bulkcache.get('aggressivita_away', def_a / 20)
+
         
     else:
         # Fallback se bulkcache non valido
@@ -1114,6 +1153,10 @@ def genera_anatomia_partita(gh, ga, h2h_match_data, team_h_doc, sim_list, bulkca
         fattore_campo = 10
         home_points = away_points = 0
         tiri_mod_h = tiri_mod_a = falli_mod = angoli_mod_h = 1.0
+        pressing_h = pressing_a = 3.0
+        aggressivita_h = aggressivita_a = 2.5
+        passaggi_mod_h = passaggi_mod_a = 9.0
+        angoli_mod_a = 1.0
     
     # =====================================================
     # CALCOLI CON DATI BULK CACHE
@@ -1126,12 +1169,14 @@ def genera_anatomia_partita(gh, ga, h2h_match_data, team_h_doc, sim_list, bulkca
     )
     pos_h = int(possesso[0])
     pos_a = int(possesso[1])
-    
-    # USA FUNZIONI NUOVE
-    tiri_h, tiri_a, sog_h, sog_a = calcola_tiri(att_h, att_a, gh, ga, tiri_mod_h, tiri_mod_a)
 
-    
-    # Stats con MOD bulkcache
+    # FUNZIONI NUOVE
+    tiri_h, tiri_a, sog_h, sog_a = calcola_tiri(att_h, att_a, gh, ga, tiri_mod_h, tiri_mod_a)
+    pass_h, pass_a = calcola_passaggi(pos_h, passaggi_mod_h, passaggi_mod_a)
+    angoli_h, angoli_a = calcola_angoli(att_h, att_a, pos_h, pressing_h, pressing_a, angoli_mod_h, angoli_mod_a)
+    falli_h, falli_a = calcola_falli(def_h, def_a, aggressivita_h, aggressivita_a, pressing_h, pressing_a, pos_h, falli_mod)
+
+    # Stats COMPLETE
     stats = {
         "Possesso Palla": [f"{pos_h}%", f"{pos_a}%"],
         "Possesso Palla (PT)": [
@@ -1142,21 +1187,22 @@ def genera_anatomia_partita(gh, ga, h2h_match_data, team_h_doc, sim_list, bulkca
         "Tiri in Porta": [sog_h, sog_a],
         "Tiri Fuori": [max(0, tiri_h - sog_h), max(0, tiri_a - sog_a)],
         "Tiri Respinti": [random.randint(1, 5), random.randint(1, 5)],
-        "Calci d'Angolo": [
-            max(1, int((att_h/12) * angoli_mod_h)),
-            max(1, int(att_a/12))
-        ],
+        "Calci d'Angolo": [angoli_h, angoli_a],
         "Angoli (PT)": [random.randint(0, 4), random.randint(0, 4)],
         "Attacchi Pericolosi": [random.randint(35, 65), random.randint(35, 65)],
-        "Falli": [
-            int(random.randint(8, 18) * falli_mod),
-            int(random.randint(8, 18) * falli_mod)
+        "Passaggi Totali": [pass_h, pass_a],
+        "Passaggi Riusciti": [int(pass_h * 0.82), int(pass_a * 0.79)],
+        "Precisione Passaggi": [
+            f"{random.randint(78, 92)}%",
+            f"{random.randint(74, 88)}%"
         ],
+        "Falli": [falli_h, falli_a],
         "Ammonizioni": [random.randint(0, 4), random.randint(0, 4)],
         "Parate": [max(0, sog_a - ga), max(0, sog_h - gh)],
         "Pali Colpiti": [random.choice([0, 0, 1]), random.choice([0, 0, 1])],
         "Sostituzioni": [5, 5]
     }
+
     
     # Report betting (invariato, da sim_list)
     tot = len(sim_list) or 1
