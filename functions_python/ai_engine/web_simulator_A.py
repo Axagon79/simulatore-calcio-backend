@@ -425,46 +425,579 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
 
     return cronaca_unica
 
-def genera_match_report_completo(gh, ga, h2h_data, team_h, team_a, simulazioni_raw, deep_stats):
+def calcola_possesso_palla(team_home_power, team_away_power, lucifero_home, lucifero_away,
+                           lucifero_trend_home, lucifero_trend_away, avg_goals_home, avg_goals_away,
+                           fattore_campo, home_points, away_points):
     """
-    Genera l'anatomia della partita, la cronaca live e il report scommesse professionale.
-    Include 30+ parametri statistici e localizzazione integrale in italiano.
+    Calcola possesso palla [casa%, away%] range 28-72%.
+    🔧 VARIANZA ALTA + NUMERI REALI (58%, 63%, 47%)!
     """
-    dna_h = h2h_data.get('h2h_dna', {}).get('home_dna', {})
-    dna_a = h2h_data.get('h2h_dna', {}).get('away_dna', {})
+    import random
     
-    tec_h, tec_a = dna_h.get('tec', 50), dna_a.get('tec', 50)
-    att_h, att_a = dna_h.get('att', 50), dna_a.get('att', 50)
-    def_h, def_a = dna_h.get('def', 50), dna_a.get('def', 50)
+    # 🔧 ROBUSTO bulkcache (liste/dict/None)
+    def safe_float(val, default=0.0):
+        if isinstance(val, (list, tuple)):
+            val = val[0]
+        if isinstance(val, dict):
+            val = next(iter(val.values()), default)
+        return float(val or default)
+    
+    # Estrai valori sicuri
+    team_home_power = safe_float(team_home_power, 50)
+    team_away_power = safe_float(team_away_power, 50)
+    lucifero_home = safe_float(lucifero_home, 0)
+    lucifero_away = safe_float(lucifero_away, 0)
+    lucifero_trend_home = safe_float(lucifero_trend_home, 0)
+    lucifero_trend_away = safe_float(lucifero_trend_away, 0)
+    avg_goals_home = safe_float(avg_goals_home, 1.2)
+    avg_goals_away = safe_float(avg_goals_away, 1.2)
+    fattore_campo = safe_float(fattore_campo, 10)
+    home_points = safe_float(home_points, 0)
+    away_points = safe_float(away_points, 0)
+    
+        # CALCOLO BASE (dati reali)
+    possesso_away = 50.0
+    possesso_away += (team_away_power - team_home_power) * 1.2
+    possesso_away += (lucifero_away - lucifero_home) * 0.8
+    possesso_away += (lucifero_trend_away - lucifero_trend_home) * 0.6
+    possesso_away += (avg_goals_away - avg_goals_home) * 0.8
+    possesso_away -= fattore_campo * 0.8
+    possesso_away += (away_points - home_points) * 0.05
 
-    pos_h = max(35, min(65, int(50 + (tec_h - tec_a)/3 + random.randint(-2, 2))))
-    pass_h = int(pos_h * 9.2) + random.randint(-20, 20)
-    pass_a = int((100 - pos_h) * 8.8) + random.randint(-20, 20)
+    # 2️⃣ CLAMP BASE (limiti realistici base)
+    possesso_away = max(25, min(75, possesso_away))
     
-    t_h = int(att_h / 5) + random.randint(2, 8)
-    t_a = int(att_a / 5) + random.randint(2, 8)
+    # 3️⃣ RANDOM (alta varianza)
+    possesso_away += random.randint(-25, +25)
+    
+    # 4️⃣ CLAMP FINALE (limiti partita)
+    possesso_away = max(20, min(80, int(possesso_away)))
+    
+    possesso_casa = 100 - int(possesso_away)
+    return [possesso_casa, int(possesso_away)]
+
+
+
+def calcola_tiri(att_h, att_a, gh, ga, tiri_mod_h=1.0, tiri_mod_a=1.0):
+    """
+    Tiri: att + xg + forma → modificatori bulkcache
+    Ritorna: t_h, t_a, sog_h, sog_a
+    """
+    import random
+    
+    # BASE CASA
+    base_h = 10.0
+    base_h += (att_h - 50) * 0.15    # Attacco Villarreal
+    base_h += gh * 2.0               # Gol fatti (xG proxy)
+    base_h *= tiri_mod_h             # Bulkcache mod casa
+    
+    # BASE OSPITE  
+    base_a = 10.0
+    base_a += (att_a - 50) * 0.15    # Attacco Alaves
+    base_a += ga * 2.0               # Gol fatti
+    base_a *= tiri_mod_a             # Bulkcache mod ospite
+    
+    # CLAMP + RANDOM
+    t_h = max(5, min(25, int(base_h + random.randint(-3, +3))))
+    t_a = max(5, min(25, int(base_a + random.randint(-3, +3))))
+    
+    # Tiri in porta (proporzionale gol fatti)
     sog_h = min(t_h, gh + random.randint(1, 4))
     sog_a = min(t_a, ga + random.randint(1, 4))
+    
+    return t_h, t_a, sog_h, sog_a
 
+
+
+def calcola_tiri_in_porta(tiri_tot, team_tec, team_att, gol, bulkcache):
+    """
+    Tiri porta: tecnica + attacco + precisione
+    """
+    # BASE (% tiri in porta)
+    pct_porta = 0.35  # Base 35%
+    pct_porta += (team_tec - 50) * 0.004    # Tecnica alta → più precisi
+    pct_porta += (team_att - 50) * 0.003    # Attacco forte → più precisi
+    
+    base = tiri_tot * pct_porta
+    
+    # CLAMP1
+    base = max(gol + 1, min(tiri_tot, base))
+    
+    # RANDOM
+    base += random.randint(-2, +3)
+    
+    # CLAMP2
+    return max(gol, min(tiri_tot, int(base)))
+
+
+def calcola_angoli(team_att, possesso_pct, pressing, team_def_avv, bulkcache):
+    """
+    Angoli: attacco + possesso + pressing + difesa avversaria
+    """
+    # BASE
+    base = 5.0
+    base += (team_att - 50) * 0.08
+    base += (possesso_pct - 50) * 0.06
+    base += pressing * 0.4                   # Pressing alto → più angoli
+    base += (team_def_avv - 50) * 0.05       # Difesa forte → più angoli contro
+    
+    mod = bulkcache.get('angoli_mod', 1.0)
+    base *= mod
+    
+    # CLAMP1
+    base = max(1, min(12, base))
+    
+    # RANDOM
+    base += random.randint(-3, +3)
+    
+    # CLAMP2
+    return max(0, min(15, int(base)))
+
+
+def calcola_falli(team_def, aggressivita, pressing, possesso_avv, bulkcache):
+    """
+    Falli: difesa + aggressività + pressing + possesso avversario
+    """
+    # BASE
+    base = 12.0
+    base += (team_def - 50) * 0.1            # Difesa alta → più falli
+    base += aggressivita * 1.2               # 0-5 aggressività
+    base += pressing * 0.8                   # Pressing alto → più falli
+    base += (possesso_avv - 50) * 0.08       # Più possesso avv → più falli
+    
+    mod = bulkcache.get('falli_mod', 1.0)
+    base *= mod
+    
+    # CLAMP1
+    base = max(6, min(22, base))
+    
+    # RANDOM
+    base += random.randint(-4, +4)
+    
+    # CLAMP2
+    return max(3, min(28, int(base)))
+
+
+def calcola_passaggi(possesso_pct, team_tec, stile_gioco, bulkcache):
+    """
+    Passaggi: possesso + tecnica + stile (possesso/contropiede)
+    """
+    # BASE
+    base = possesso_pct * 7.5                # ~750 per 100%
+    base += (team_tec - 50) * 4.0            # Tecnica alta → più passaggi
+    base += stile_gioco * 50                 # 0-5: contropiede→possesso
+    
+    mod = bulkcache.get('passaggi_mod', 1.0)
+    base *= mod
+    
+    # CLAMP1
+    base = max(200, min(850, base))
+    
+    # RANDOM
+    base += random.randint(-60, +60)
+    
+    # CLAMP2
+    return max(150, min(950, int(base)))
+
+
+def calcola_precisione_passaggi(team_tec, possesso_pct, pressing_avv):
+    """
+    Precisione %: tecnica + possesso + pressing avversario
+    """
+    # BASE
+    base = 75.0                              # Base 75%
+    base += (team_tec - 50) * 0.25           # Tecnica alta → più precisi
+    base += (possesso_pct - 50) * 0.15       # Possesso alto → più calmi
+    base -= pressing_avv * 1.5               # Pressing avv → meno precisi
+    
+    # CLAMP1
+    base = max(65, min(92, base))
+    
+    # RANDOM
+    base += random.uniform(-2, +2)
+    
+    # CLAMP2
+    return max(60, min(95, round(base, 1)))
+
+
+def calcola_ammonizioni(falli, aggressivita, arbitro_severita):
+    """
+    Ammonizioni: falli + aggressività + arbitro
+    """
+    # BASE (% falli → gialli)
+    base = falli * 0.22                      # ~22% falli = giallo
+    base += aggressivita * 0.4               # Aggressivi → più gialli
+    base += arbitro_severita * 0.6           # Arbitro severo (0-5)
+    
+    # CLAMP1
+    base = max(0, min(5, base))
+    
+    # RANDOM
+    base += random.randint(-1, +2)
+    
+    # CLAMP2
+    return max(0, min(7, int(base)))
+
+
+def calcola_espulsioni(ammonizioni, falli, aggressivita):
+    """
+    Espulsioni: rossi diretti + doppi gialli
+    """
+    # BASE (probabilità bassa)
+    prob = 0.0
+    prob += (falli - 12) * 0.003             # Tanti falli → rischio rosso
+    prob += aggressivita * 0.02              # Aggressività alta
+    prob += (ammonizioni - 2) * 0.015        # Tanti gialli → doppio giallo
+    
+    # RANDOM
+    roll = random.random()
+    
+    # Rosso se probabilità supera soglia
+    if roll < prob * 0.12:                   # ~12% match ha rosso
+        return 1
+    return 0
+
+
+def calcola_tiri_fuori(tiri_totali, tiri_porta, team_tec):
+    """
+    Tiri fuori: totali - in_porta (ajustato tecnica)
+    """
+    base = tiri_totali - tiri_porta
+    
+    # Tecnica alta → meno fuori
+    base -= (team_tec - 50) * 0.02
+    
+    # CLAMP
+    base = max(0, min(tiri_totali - tiri_porta + 2, base))
+    
+    # RANDOM
+    base += random.randint(-1, +2)
+    
+    return max(0, int(base))
+
+
+def calcola_tiri_respinti(tiri_porta, team_def_avv, gol):
+    """
+    Tiri respinti: difesa blocca tiri
+    """
+    # BASE (% tiri porta respinti da difesa)
+    base = (tiri_porta - gol) * 0.25         # ~25% tiri salvati da difesa
+    base += (team_def_avv - 50) * 0.03       # Difesa forte → più respinte
+    
+    # CLAMP1
+    base = max(0, min(tiri_porta - gol, base))
+    
+    # RANDOM
+    base += random.randint(0, +2)
+    
+    # CLAMP2
+    return max(0, min(8, int(base)))
+
+
+def calcola_attacchi(possesso_pct, team_att, stile_gioco):
+    """
+    Attacchi totali: possesso + attacco + stile
+    """
+    # BASE
+    base = 80.0                              # Media partita
+    base += possesso_pct * 0.5               # Possesso → più attacchi
+    base += (team_att - 50) * 0.4            # Attacco forte
+    base += stile_gioco * 4.0                # Possesso → più attacchi
+    
+    # CLAMP1
+    base = max(50, min(140, base))
+    
+    # RANDOM
+    base += random.randint(-15, +15)
+    
+    # CLAMP2
+    return max(40, min(160, int(base)))
+
+
+def calcola_attacchi_pericolosi(attacchi, team_att, xg):
+    """
+    Attacchi pericolosi: sottoinsieme attacchi
+    """
+    # BASE (30-50% attacchi sono pericolosi)
+    pct = 0.40
+    pct += (team_att - 50) * 0.003           # Attacco forte → più pericolosi
+    pct += xg * 0.05                         # xG alto → più occasioni
+    
+    base = attacchi * pct
+    
+    # CLAMP1
+    base = max(15, min(80, base))
+    
+    # RANDOM
+    base += random.randint(-8, +8)
+    
+    # CLAMP2
+    return max(10, min(90, int(base)))
+
+
+def calcola_passaggi_riusciti(passaggi_tot, precisione_pct):
+    """
+    Passaggi riusciti: totali * precisione%
+    """
+    base = passaggi_tot * (precisione_pct / 100)
+    
+    # RANDOM leggero
+    base += random.randint(-10, +10)
+    
+    return max(int(passaggi_tot * 0.6), min(passaggi_tot, int(base)))
+
+
+def calcola_fuorigioco(team_att, stile_gioco, difesa_avv_linea_alta):
+    """
+    Fuorigioco: attacco + stile + tattica difesa avv
+    """
+    # BASE
+    base = 2.0
+    base += (team_att - 50) * 0.03           # Attacco aggressivo
+    base += stile_gioco * 0.2                # Possesso → meno fuorigioco
+    base += difesa_avv_linea_alta * 0.5      # Linea alta avv → più fuorigioco
+    
+    # CLAMP1
+    base = max(0, min(6, base))
+    
+    # RANDOM
+    base += random.randint(-2, +2)
+    
+    # CLAMP2
+    return max(0, min(8, int(base)))
+
+
+def calcola_pali_colpiti(tiri_porta, fortuna):
+    """
+    Pali: sfortuna casuale (raro)
+    """
+    # BASE (probabilità molto bassa)
+    prob = tiri_porta * 0.02                 # 2% tiri → palo
+    prob -= fortuna * 0.01                   # Fortuna alta (0-5)
+    
+    # RANDOM
+    roll = random.random()
+    
+    if roll < prob:
+        return 1
+    return 0
+
+
+def calcola_tackle(team_def, possesso_avv_pct, pressing):
+    """
+    Tackle: difesa + possesso avv + pressing
+    """
+    # BASE
+    base = 12.0
+    base += (team_def - 50) * 0.15           # Difesa forte → più tackle
+    base += (possesso_avv_pct - 50) * 0.12   # Avv ha palla → più tackle
+    base += pressing * 0.8                   # Pressing alto
+    
+    # CLAMP1
+    base = max(8, min(30, base))
+    
+    # RANDOM
+    base += random.randint(-4, +4)
+    
+    # CLAMP2
+    return max(5, min(35, int(base)))
+
+
+def calcola_intercettazioni(team_def, pressing, posizione_media):
+    """
+    Intercettazioni: difesa + pressing + posizione
+    """
+    # BASE
+    base = 10.0
+    base += (team_def - 50) * 0.12
+    base += pressing * 0.9                   # Pressing alto → più intercetti
+    base += (posizione_media - 50) * 0.08    # Campo avversario → più intercetti
+    
+    # CLAMP1
+    base = max(5, min(25, base))
+    
+    # RANDOM
+    base += random.randint(-3, +3)
+    
+    # CLAMP2
+    return max(3, min(30, int(base)))
+
+
+def calcola_dribbling(team_tec, team_att, stile_gioco):
+    """
+    Dribbling: tecnica + attacco + stile
+    """
+    # BASE
+    base = 8.0
+    base += (team_tec - 50) * 0.08           # Tecnica alta → più dribbling
+    base += (team_att - 50) * 0.06
+    base += stile_gioco * 0.4                # Possesso → più 1v1
+    
+    # CLAMP1
+    base = max(2, min(18, base))
+    
+    # RANDOM
+    base += random.randint(-3, +3)
+    
+    # CLAMP2
+    return max(0, min(22, int(base)))
+
+
+def calcola_cross(attacchi, stile_gioco, larghezza):
+    """
+    Cross: attacchi + stile + larghezza campo
+    """
+    # BASE
+    base = attacchi * 0.15                   # ~15% attacchi = cross
+    base -= stile_gioco * 0.5                # Possesso centrale → meno cross
+    base += larghezza * 0.8                  # Gioco largo (0-5)
+    
+    # CLAMP1
+    base = max(3, min(25, base))
+    
+    # RANDOM
+    base += random.randint(-3, +3)
+    
+    # CLAMP2
+    return max(0, min(30, int(base)))
+
+
+def calcola_lanci_lunghi(passaggi_tot, stile_gioco, pressing_avv):
+    """
+    Lanci lunghi: % passaggi + stile + pressing avv
+    """
+    # BASE
+    pct = 0.05                               # ~5% passaggi = lancio lungo
+    pct -= stile_gioco * 0.008               # Possesso → meno lanci
+    pct += pressing_avv * 0.015              # Pressing avv → più lanci
+    
+    base = passaggi_tot * pct
+    
+    # CLAMP1
+    base = max(10, min(50, base))
+    
+    # RANDOM
+    base += random.randint(-5, +5)
+    
+    # CLAMP2
+    return max(5, min(60, int(base)))
+
+
+def calcola_sostituzioni():
+    """
+    Sostituzioni: sempre 5 (regola attuale)
+    """
+    return 5
+
+
+def genera_match_report_completo(gh, ga, h2h_data, team_h, team_a, simulazioni_raw, deep_stats, bulkcache):
+    """
+    TUTTI i dati stats da BULK CACHE. Cronaca/report invariati.
+    """
+    # =====================================================
+    # ESTRAZIONE TOTALE DA BULK CACHE (PRIORITÀ MASSIMA)
+    # =====================================================
+    if isinstance(bulkcache, dict):
+        # DNA da bulkcache
+        dna_h = bulkcache.get('h2h_dna', {}).get('home_dna', h2h_data.get('h2h_dna', {}).get('home_dna', {}))
+        dna_a = bulkcache.get('h2h_dna', {}).get('away_dna', h2h_data.get('h2h_dna', {}).get('away_dna', {}))
+        
+        # PARAMETRI BASE
+        tec_h = dna_h.get('tec', bulkcache.get('tec_home', 50))
+        tec_a = dna_a.get('tec', bulkcache.get('tec_away', 50))
+        att_h = dna_h.get('att', bulkcache.get('att_home', 50))
+        att_a = dna_a.get('att', bulkcache.get('att_away', 50))
+        def_h = dna_h.get('def', bulkcache.get('def_home', 50))
+        def_a = dna_a.get('def', bulkcache.get('def_away', 50))
+        
+        # POSSESSO PARAMETRI
+        master_data = bulkcache.get('MASTERDATA', {})
+        team_h_scores = master_data.get('home_team', {})
+        team_a_scores = master_data.get('away_team', {})
+        
+        team_home_power = team_h_scores.get('power', bulkcache.get('team_home_power', 50))
+        team_away_power = team_a_scores.get('power', bulkcache.get('team_away_power', 50))
+        lucifero_home = bulkcache.get('lucifero_home', h2h_data.get('lucifero_home', 0))
+        lucifero_away = bulkcache.get('lucifero_away', h2h_data.get('lucifero_away', 0))
+        lucifero_trend_home = bulkcache.get('lucifero_trend_home', h2h_data.get('lucifero_trend_home', 0))
+        lucifero_trend_away = bulkcache.get('lucifero_trend_away', h2h_data.get('lucifero_trend_away', 0))
+        avg_goals_home = bulkcache.get('avg_goals_home', h2h_data.get('avg_goals_home', 1.2))
+        avg_goals_away = bulkcache.get('avg_goals_away', h2h_data.get('avg_goals_away', 1.2))
+        fattore_campo = bulkcache.get('fattore_campo', h2h_data.get('fattore_campo', 10))
+        home_points = bulkcache.get('home_points', h2h_data.get('home_points', 0))
+        away_points = bulkcache.get('away_points', h2h_data.get('away_points', 0))
+        
+        # MODIFICATORI STATS (nuovi parametri bulkcache)
+        tiri_mod_h = bulkcache.get('tiri_mod_home', 1.0)
+        tiri_mod_a = bulkcache.get('tiri_mod_away', 1.0)
+        passaggi_mod_h = bulkcache.get('passaggi_mod_home', 9.2)
+        passaggi_mod_a = bulkcache.get('passaggi_mod_away', 8.8)
+        falli_mod = bulkcache.get('falli_mod', 1.0)
+        angoli_mod_h = bulkcache.get('angoli_mod_home', 1.0)
+        
+    else:
+        # Fallback rapido
+        tec_h = tec_a = att_h = att_a = def_h = def_a = 50
+        team_home_power = team_away_power = 50
+        lucifero_home = lucifero_away = lucifero_trend_home = lucifero_trend_away = 0
+        avg_goals_home = avg_goals_away = 1.2
+        fattore_campo = 10
+        home_points = away_points = 0
+        tiri_mod_h = tiri_mod_a = passaggi_mod_h = passaggi_mod_a = falli_mod = angoli_mod_h = 1.0
+    
+    # =====================================================
+    # CALCOLI CON BULK CACHE DATI
+    # =====================================================
+    possesso = calcola_possesso_palla(
+        team_home_power, team_away_power, lucifero_home, lucifero_away,
+        lucifero_trend_home, lucifero_trend_away, avg_goals_home, avg_goals_away,
+        fattore_campo, home_points, away_points
+    )
+    pos_h = int(possesso[0])
+    pos_a = int(possesso[1])  # ← AGGIUNGI QUESTA RIGA
+
+    # Passaggi MODIFICATI
+    pass_h = int(pos_h * passaggi_mod_h) + random.randint(-20, 20)
+    pass_a = int((100 - pos_h) * passaggi_mod_a) + random.randint(-20, 20)
+    
+    # USA FUNZIONI NUOVE
+    t_h, t_a, sog_h, sog_a = calcola_tiri(att_h, att_a, gh, ga, tiri_mod_h, tiri_mod_a)
+
+    
+    # =====================================================
+    # STATS COMPLETE CON MOD BULK CACHE
+    # =====================================================
     stats_finali = {
-        "Possesso Palla": [f"{pos_h}%", f"{100-pos_h}%"],
-        "Possesso Palla (PT)": [f"{pos_h + random.randint(-3,3)}%", f"{100-pos_h + random.randint(-3,3)}%"],
+        "Possesso Palla": [f"{pos_h}%", f"{pos_a}%"],
+        "Possesso Palla (PT)": [
+            f"{pos_h + random.randint(-3, 3)}%",
+            f"{100-pos_h + random.randint(-3, 3)}%"
+        ],
         "Tiri Totali": [t_h, t_a],
         "Tiri in Porta": [sog_h, sog_a],
         "Tiri Fuori": [t_h - sog_h, t_a - sog_a],
         "Tiri Respinti": [random.randint(1, 5), random.randint(1, 5)],
-        "Calci d'Angolo": [max(1, int(att_h/12)), max(1, int(att_a/12))],
+        "Calci d'Angolo": [
+            max(1, int((att_h/12) * angoli_mod_h)),
+            max(1, int(att_a/12))
+        ],
         "Angoli (PT)": [random.randint(0, 4), random.randint(0, 4)],
         "Attacchi": [random.randint(90, 115), random.randint(90, 115)],
         "Attacchi Pericolosi": [random.randint(35, 65), random.randint(35, 65)],
         "Passaggi Totali": [pass_h, pass_a],
         "Passaggi Riusciti": [int(pass_h * 0.82), int(pass_a * 0.79)],
-        "Precisione Passaggi": [f"{random.randint(78, 92)}%", f"{random.randint(74, 88)}%"],
-        "Falli": [random.randint(8, 18), random.randint(8, 18)],
+        "Precisione Passaggi": [
+            f"{random.randint(78, 92)}%",
+            f"{random.randint(74, 88)}%"
+        ],
+        "Falli": [
+            int(random.randint(8, 18) * falli_mod),
+            int(random.randint(8, 18) * falli_mod)
+        ],
         "Ammonizioni": [random.randint(0, 4), random.randint(0, 4)],
-        "Parate": [sog_a - ga, sog_h - gh],
+        "Parate": [max(0, sog_a - ga), max(0, sog_h - gh)],
         "Fuorigioco": [random.randint(0, 4), random.randint(0, 4)],
-        "Pali Colpiti": [random.choice([0,0,1]), random.choice([0,0,1])],
+        "Pali Colpiti": [random.choice([0, 0, 1]), random.choice([0, 0, 1])],
         "Tackle Totali": [random.randint(15, 25), random.randint(15, 25)],
         "Intercettazioni": [random.randint(10, 20), random.randint(10, 20)],
         "Dribbling": [random.randint(3, 12), random.randint(3, 12)],
@@ -472,22 +1005,25 @@ def genera_match_report_completo(gh, ga, h2h_data, team_h, team_a, simulazioni_r
         "Lanci Lunghi": [random.randint(15, 30), random.randint(15, 30)],
         "Sostituzioni": [5, 5]
     }
-
+    
+    # =====================================================
+    # PARTE INVARIATA (cronaca + report_scommesse)
+    # =====================================================
     cronaca = genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data)
-
+    
     tot = len(simulazioni_raw)
     v_h = sum(1 for r in simulazioni_raw if int(str(r).split('-')[0]) > int(str(r).split('-')[1]))
     par = sum(1 for r in simulazioni_raw if int(str(r).split('-')[0]) == int(str(r).split('-')[1]))
     v_a = sum(1 for r in simulazioni_raw if int(str(r).split('-')[0]) < int(str(r).split('-')[1]))
     over = sum(1 for r in simulazioni_raw if sum(map(int, str(r).split('-'))) > 2.5)
     gg = sum(1 for r in simulazioni_raw if all(int(x) > 0 for x in str(r).split('-')))
-
+    
     from collections import Counter
     top5 = Counter(simulazioni_raw).most_common(5)
-
+    
     uo = deep_stats.get('under_over', {})
     conf = deep_stats.get('confidence', {})
-
+    
     report_scommesse = {
         "Bookmaker": {
             "1": f"{deep_stats['sign_1']['pct']}%",
@@ -507,61 +1043,126 @@ def genera_match_report_completo(gh, ga, h2h_data, team_h, team_a, simulazioni_r
             "Affidabilita_Previsione": f"{conf.get('total_confidence', 0)}%"
         },
         "risultati_esatti_piu_probabili": [
-            {"score": s, "pct": f"{round(c/deep_stats['total_simulations']*100, 1)}%"} 
+            {"score": s, "pct": f"{round(c/deep_stats['total_simulations']*100, 1)}%"}
             for s, c in deep_stats.get('top_10_scores', [])[:5]
         ]
     }
-
+    
     return {
         "statistiche": stats_finali,
         "cronaca": sorted(cronaca, key=lambda x: x['minuto']),
         "report_scommesse": report_scommesse
     }
 
-def genera_anatomia_partita(gh, ga, h2h_match_data, team_h_doc, sim_list):
-    """Genera statistiche dettagliate e report scommesse in italiano."""
+
+def genera_anatomia_partita(gh, ga, h2h_match_data, team_h_doc, sim_list, bulkcache):
+    """
+    TUTTI i dati da BULK CACHE all'inizio. Modifica parametri con bulkcache.
+    Fallback h2h_data → default.
+    """
     import random
     from collections import Counter
     
-    h2h_data = h2h_match_data.get('h2h_data', {})
-    dna_h = h2h_data.get('h2h_dna', {}).get('home_dna', {})
-    dna_a = h2h_data.get('h2h_dna', {}).get('away_dna', {})
+    h2h_data = h2h_match_data.get('h2h_data', {}) if h2h_match_data else {}
     
-    tec_h, tec_a = dna_h.get('tec', 50), dna_a.get('tec', 50)
-    att_h, att_a = dna_h.get('att', 50), dna_a.get('att', 50)
+    # =====================================================
+    # ESTRAZIONE TOTALE DA BULK CACHE (PRIORITÀ MASSIMA)
+    # =====================================================
+    if isinstance(bulkcache, dict):
+        # DNA tattico da bulkcache
+        dna_h = bulkcache.get('h2h_dna', {}).get('home_dna', h2h_data.get('h2h_dna', {}).get('home_dna', {}))
+        dna_a = bulkcache.get('h2h_dna', {}).get('away_dna', h2h_data.get('h2h_dna', {}).get('away_dna', {}))
+        
+        # PARAMETRI MODIFICABILI DA BULK CACHE
+        tec_h = dna_h.get('tec', bulkcache.get('tec_home', 50))
+        tec_a = dna_a.get('tec', bulkcache.get('tec_away', 50))
+        att_h = dna_h.get('att', bulkcache.get('att_home', 50))
+        att_a = dna_a.get('att', bulkcache.get('att_away', 50))
+        
+        # Possesso parametri (come prima)
+        master_data = bulkcache.get('MASTERDATA', {})
+        team_h_scores = master_data.get('home_team', {})
+        team_a_scores = master_data.get('away_team', {})
+        
+        team_home_power = team_h_scores.get('power', bulkcache.get('team_home_power', 50))
+        team_away_power = team_a_scores.get('power', bulkcache.get('team_away_power', 50))
+        lucifero_home = bulkcache.get('lucifero_home', h2h_data.get('lucifero_home', 0))
+        lucifero_away = bulkcache.get('lucifero_away', h2h_data.get('lucifero_away', 0))
+        lucifero_trend_home = bulkcache.get('lucifero_trend_home', h2h_data.get('lucifero_trend_home', 0))
+        lucifero_trend_away = bulkcache.get('lucifero_trend_away', h2h_data.get('lucifero_trend_away', 0))
+        avg_goals_home = bulkcache.get('avg_goals_home', h2h_data.get('avg_goals_home', 1.2))
+        avg_goals_away = bulkcache.get('avg_goals_away', h2h_data.get('avg_goals_away', 1.2))
+        fattore_campo = bulkcache.get('fattore_campo', h2h_data.get('fattore_campo', 10))
+        home_points = bulkcache.get('home_points', h2h_data.get('home_points', 0))
+        away_points = bulkcache.get('away_points', h2h_data.get('away_points', 0))
+        
+        # PARAMETRI STATISTICHE MODIFICABILI DA BULK
+        tiri_mod_h = bulkcache.get('tiri_mod_home', 1.0)      # Moltiplicatore tiri casa
+        tiri_mod_a = bulkcache.get('tiri_mod_away', 1.0)      # Moltiplicatore tiri ospiti
+        falli_mod = bulkcache.get('falli_mod', 1.0)           # Moltiplicatore falli
+        angoli_mod_h = bulkcache.get('angoli_mod_home', 1.0)  # Moltiplicatore angoli casa
+        
+    else:
+        # Fallback se bulkcache non valido
+        dna_h = h2h_data.get('h2h_dna', {}).get('home_dna', {})
+        dna_a = h2h_data.get('h2h_dna', {}).get('away_dna', {})
+        tec_h = tec_a = att_h = att_a = 50
+        team_home_power = team_away_power = 50
+        lucifero_home = lucifero_away = 0
+        lucifero_trend_home = lucifero_trend_away = 0
+        avg_goals_home = avg_goals_away = 1.2
+        fattore_campo = 10
+        home_points = away_points = 0
+        tiri_mod_h = tiri_mod_a = falli_mod = angoli_mod_h = 1.0
     
-    pos_h = max(35, min(65, int(50 + (tec_h - tec_a)/3 + random.randint(-2, 2))))
+    # =====================================================
+    # CALCOLI CON DATI BULK CACHE
+    # =====================================================
+    # Possesso
+    possesso = calcola_possesso_palla(
+        team_home_power, team_away_power, lucifero_home, lucifero_away,
+        lucifero_trend_home, lucifero_trend_away, avg_goals_home, avg_goals_away,
+        fattore_campo, home_points, away_points
+    )
+    pos_h = int(possesso[0])
+    pos_a = int(possesso[1])
     
-    tiri_h = int(att_h / 5) + random.randint(2, 8)
-    tiri_a = int(att_a / 5) + random.randint(2, 8)
-    
-    sog_h = min(tiri_h, gh + random.randint(1, 4))
-    sog_a = min(tiri_a, ga + random.randint(1, 4))
+    # USA FUNZIONI NUOVE
+    tiri_h, tiri_a, sog_h, sog_a = calcola_tiri(att_h, att_a, gh, ga, tiri_mod_h, tiri_mod_a)
 
+    
+    # Stats con MOD bulkcache
     stats = {
-        "Possesso Palla": [f"{pos_h}%", f"{100-pos_h}%"],
-        "Possesso Palla (PT)": [f"{pos_h + random.randint(-2,2)}%", f"{100-pos_h + random.randint(-2,2)}%"],
+        "Possesso Palla": [f"{pos_h}%", f"{pos_a}%"],
+        "Possesso Palla (PT)": [
+            f"{pos_h + random.randint(-2, 2)}%",
+            f"{100-pos_h + random.randint(-2, 2)}%"
+        ],
         "Tiri Totali": [tiri_h, tiri_a],
         "Tiri in Porta": [sog_h, sog_a],
         "Tiri Fuori": [max(0, tiri_h - sog_h), max(0, tiri_a - sog_a)],
         "Tiri Respinti": [random.randint(1, 5), random.randint(1, 5)],
-        "Calci d'Angolo": [max(1, int(att_h/12)), max(1, int(att_a/12))],
+        "Calci d'Angolo": [
+            max(1, int((att_h/12) * angoli_mod_h)),
+            max(1, int(att_a/12))
+        ],
         "Angoli (PT)": [random.randint(0, 4), random.randint(0, 4)],
         "Attacchi Pericolosi": [random.randint(35, 65), random.randint(35, 65)],
-        "Falli": [random.randint(8, 18), random.randint(8, 18)],
+        "Falli": [
+            int(random.randint(8, 18) * falli_mod),
+            int(random.randint(8, 18) * falli_mod)
+        ],
         "Ammonizioni": [random.randint(0, 4), random.randint(0, 4)],
         "Parate": [max(0, sog_a - ga), max(0, sog_h - gh)],
-        "Pali Colpiti": [random.choice([0,0,1]), random.choice([0,0,1])],
+        "Pali Colpiti": [random.choice([0, 0, 1]), random.choice([0, 0, 1])],
         "Sostituzioni": [5, 5]
     }
-
-    tot = len(sim_list)
-    if tot == 0:
-        tot = 1
     
+    # Report betting (invariato, da sim_list)
+    tot = len(sim_list) or 1
     v_h = sum(1 for r in sim_list if int(str(r).split('-')[0]) > int(str(r).split('-')[1]))
     par = sum(1 for r in sim_list if int(str(r).split('-')[0]) == int(str(r).split('-')[1]))
-    v_a = sum(1 for r in sim_list if int(str(r).split('-')[0]) < int(str(r).split('-')[1]))
+    v_a = tot - v_h - par
     over = sum(1 for r in sim_list if sum(map(int, str(r).split('-'))) > 2.5)
     gg = sum(1 for r in sim_list if all(int(x) > 0 for x in str(r).split('-')))
     
@@ -579,12 +1180,15 @@ def genera_anatomia_partita(gh, ga, h2h_match_data, team_h_doc, sim_list):
             "X2": f"{round((v_a+par)/tot*100, 1)}%"
         },
         "risultati_esatti_piu_probabili": [
-            {"score": s, "pct": f"{round(f/tot*100, 1)}%"} 
+            {"score": s, "pct": f"{round(f/tot*100, 1)}%"}
             for s, f in Counter(sim_list).most_common(5)
         ]
     }
     
     return stats, report_bet
+
+
+
 
 def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: int, league: str, main_mode: int, bulk_cache=None) -> dict:
     """Esegue la simulazione e arricchisce il risultato con i dati del DB."""
@@ -839,7 +1443,7 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
             #log_debug(f"✅ MONTE CARLO: {actual_cycles_executed} cicli, risultato {gh}-{ga}")
         
         else:
-# ─────────────────────────────────────────────────────────
+            # ─────────────────────────────────────────────────────────
             # ALGORITMI SINGOLI (1-5)
             # ─────────────────────────────────────────────────────────
             #log_debug(f"🟢 ALGORITMO SINGOLO {algo_id} ATTIVATO")
@@ -974,7 +1578,7 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
                 'total_simulations': cycles
             }
 
-# ═══════════════════════════════════════════════════════════
+        # ═══════════════════════════════════════════════════════════
         # 7. CARICAMENTO QUOTE E REPORT BETTING
         # ═══════════════════════════════════════════════════════════
         odds_real = matchdata.get('odds', {}) if isinstance(matchdata, dict) else {}
@@ -1008,7 +1612,7 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
 
         report_pro = analyze_betting_data(sim_list, quote_match)
         
-        anatomy = genera_match_report_completo(gh, ga, h2h_data, team_h_doc, team_a_doc, sim_list, deep_stats)
+        anatomy = genera_match_report_completo(gh, ga, h2h_data, team_h_doc, team_a_doc, sim_list, deep_stats, bulkcache=bulk_cache)
         
         log_debug(f"⏱️ [6. FINAL] Report generato in: {time.time() - t_final:.3f}s")
 
