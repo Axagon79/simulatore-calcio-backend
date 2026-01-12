@@ -1520,32 +1520,44 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
             
             settings_in_ram = load_tuning(algo_id)
             
+            # Variabili per salvare l'ultimo risultato dettagliato
+            last_lambda_h = None
+            last_lambda_a = None
+            last_result_full = None
+
             for i in range(cycles):
-                result = run_single_algo(algo_id, preloaded_data, real_home, real_away, 
+                result = run_single_algo(algo_id, preloaded_data, real_home, real_away,
                                         settings_cache=settings_in_ram, debug_mode=False)
                 
                 if len(result) == 9:
                     gh_temp, ga_temp, lambda_h, lambda_a, xg_info, pesi, params, sc_h, sc_a = result
-                    
-                    if analyzer:
-                        odds = bulk_cache.get('MATCH_H2H', {}).get('odds')
-                        analyzer.add_result(
-                            algo_id, gh_temp, ga_temp, 
-                            lambda_h=lambda_h, lambda_a=lambda_a,
-                            odds_real=odds,
-                            odds_qt={'1': h2h_data.get('qt_1'), 'X': h2h_data.get('qt_X'), '2': h2h_data.get('qt_2')},
-                            team_scores={'home': team_h_scores, 'away': team_a_scores},
-                            h2h_stats=h2h_stats
-                        )
+                    # Salva gli ultimi valori per l'analyzer
+                    last_lambda_h = lambda_h
+                    last_lambda_a = lambda_a
+                    last_result_full = result
                 
                 elif len(result) == 2:
                     gh_temp, ga_temp = result
-                    if analyzer:
-                        analyzer.add_result(algo_id, gh_temp, ga_temp)
                 else:
                     raise ValueError(f"run_single_algo ritorna {len(result)} valori, attesi 2 o 9")
                 
                 sim_list.append(f"{gh_temp}-{ga_temp}")
+
+            # ✅ CHIAMATA ANALYZER UNA SOLA VOLTA (DOPO IL LOOP)
+            if analyzer and last_result_full is not None:
+                gh_temp, ga_temp, lambda_h, lambda_a, xg_info, pesi, params, sc_h, sc_a = last_result_full
+                odds = bulk_cache.get('MATCH_H2H', {}).get('odds')
+                analyzer.add_result(
+                    algo_id, gh_temp, ga_temp,
+                    lambda_h=lambda_h, lambda_a=lambda_a,
+                    odds_real=odds,
+                    odds_qt={'1': h2h_data.get('qt_1'), 'X': h2h_data.get('qt_X'), '2': h2h_data.get('qt_2')},
+                    team_scores={'home': team_h_scores, 'away': team_a_scores},
+                    h2h_stats=h2h_stats
+                )
+            elif analyzer:
+                # Caso semplice (result con 2 valori)
+                analyzer.add_result(algo_id, gh, ga)
             
             from collections import Counter
             most_common = Counter(sim_list).most_common(1)[0][0]
