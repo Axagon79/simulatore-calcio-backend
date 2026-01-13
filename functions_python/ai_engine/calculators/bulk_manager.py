@@ -11,20 +11,45 @@ def get_all_data_bulk(home_team, away_team, league_name):
     """
     t_start = time.time()
     
-    # ✅ NORMALIZZAZIONE LEAGUE NAME
     league_normalized = league_name.replace('_', ' ').title()
     league_map = {
+        # ITALIA
         "Serie A": "Serie A",
         "Serie B": "Serie B",
         "Serie C Girone A": "Serie C - Girone A",
         "Serie C Girone B": "Serie C - Girone B",
         "Serie C Girone C": "Serie C - Girone C",
+        
+        # EUROPA TOP
         "Premier League": "Premier League",
         "La Liga": "La Liga",
         "Bundesliga": "Bundesliga",
         "Ligue 1": "Ligue 1",
         "Eredivisie": "Eredivisie",
-        "Liga Portugal": "Liga Portugal"
+        "Liga Portugal": "Liga Portugal",
+        
+        # EUROPA SERIE B
+        "Championship": "Championship",
+        "Laliga 2": "LaLiga 2",
+        "2. Bundesliga": "2. Bundesliga",
+        "Ligue 2": "Ligue 2",
+        
+        # EUROPA NORDICI + EXTRA
+        "Scottish Premiership": "Scottish Premiership",
+        "Allsvenskan": "Allsvenskan",
+        "Eliteserien": "Eliteserien",
+        "Superligaen": "Superligaen",
+        "Jupiler Pro League": "Jupiler Pro League",
+        "Süper Lig": "Süper Lig",
+        "League Of Ireland": "League of Ireland Premier Division",
+        
+        # AMERICHE
+        "Brasileirão": "Brasileirão Serie A",
+        "Primera División": "Primera División",
+        "Mls": "Major League Soccer",
+        
+        # ASIA
+        "J1 League": "J1 League"
     }
     league_normalized = league_map.get(league_normalized, league_normalized)
     

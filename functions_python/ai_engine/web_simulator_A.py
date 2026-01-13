@@ -31,7 +31,8 @@ try:
         get_sign,
         get_round_number,
         has_valid_results,
-        load_tuning
+        load_tuning,
+        run_single_algo_montecarlo
     )
     from ai_engine.calculators.bulk_manager import get_all_data_bulk
     from config import db
@@ -1331,20 +1332,46 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
         
         league_clean = league.replace('_', ' ').title()
 
-        # Normalizzazione nomi leghe (SOLO quelle presenti nel simulatore)
+        # Normalizzazione nomi leghe (26 campionati)
         league_map = {
-        "Serie A": "Serie A",
-        "Serie B": "Serie B",
-        "Serie C Girone A": "Serie C - Girone A",
-        "Serie C Girone B": "Serie C - Girone B",
-        "Serie C Girone C": "Serie C - Girone C",
-        "Premier League": "Premier League",
-        "La Liga": "La Liga",
-        "Bundesliga": "Bundesliga",
-        "Ligue 1": "Ligue 1",
-        "Eredivisie": "Eredivisie",
-        "Liga Portugal": "Liga Portugal"
-    }
+            # ITALIA
+            "Serie A": "Serie A",
+            "Serie B": "Serie B",
+            "Serie C Girone A": "Serie C - Girone A",
+            "Serie C Girone B": "Serie C - Girone B",
+            "Serie C Girone C": "Serie C - Girone C",
+            
+            # EUROPA TOP
+            "Premier League": "Premier League",
+            "La Liga": "La Liga",
+            "Bundesliga": "Bundesliga",
+            "Ligue 1": "Ligue 1",
+            "Eredivisie": "Eredivisie",
+            "Liga Portugal": "Liga Portugal",
+            
+            # EUROPA SERIE B
+            "Championship": "Championship",
+            "Laliga 2": "LaLiga 2",
+            "2. Bundesliga": "2. Bundesliga",
+            "Ligue 2": "Ligue 2",
+            
+            # EUROPA NORDICI + EXTRA
+            "Scottish Premiership": "Scottish Premiership",
+            "Allsvenskan": "Allsvenskan",
+            "Eliteserien": "Eliteserien",
+            "Superligaen": "Superligaen",
+            "Jupiler Pro League": "Jupiler Pro League",
+            "Süper Lig": "Süper Lig",
+            "League Of Ireland": "League of Ireland Premier Division",
+            
+            # AMERICHE
+            "Brasileirão": "Brasileirão Serie A",
+            "Primera División": "Primera División",
+            "Mls": "Major League Soccer",
+            
+            # ASIA
+            "J1 League": "J1 League"
+        }
 
         league_clean = league_map.get(league_clean, league_clean)
         
@@ -1492,7 +1519,8 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
             # ─────────────────────────────────────────────────────────
             # ALGORITMI SINGOLI (1-5)
             # ─────────────────────────────────────────────────────────
-            #log_debug(f"🟢 ALGORITMO SINGOLO {algo_id} ATTIVATO")
+            log_debug(f"🟢 ALGORITMO SINGOLO {algo_id} - {cycles} cicli")
+            t_algo_start = time.time()
             
             if not isinstance(bulk_cache, dict) or 'MASTER_DATA' not in bulk_cache or 'ALL_ROUNDS' not in bulk_cache:
                 #log_debug("📦 Ricarico bulk_cache...")
@@ -1518,51 +1546,23 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
             if matchdata is None:
                 raise ValueError(f"❌ Match non trovato!")
             
-            settings_in_ram = load_tuning(algo_id)
-            
-            # Variabili per salvare l'ultimo risultato dettagliato
-            last_lambda_h = None
-            last_lambda_a = None
-            last_result_full = None
+            log_debug(f"🔄 Chiamata run_single_algo_montecarlo con {cycles} cicli...")
+            t_loop_start = time.time()
 
-            for i in range(cycles):
-                result = run_single_algo(algo_id, preloaded_data, real_home, real_away,
-                                        settings_cache=settings_in_ram, debug_mode=False)
-                
-                if len(result) == 9:
-                    gh_temp, ga_temp, lambda_h, lambda_a, xg_info, pesi, params, sc_h, sc_a = result
-                    # Salva gli ultimi valori per l'analyzer
-                    last_lambda_h = lambda_h
-                    last_lambda_a = lambda_a
-                    last_result_full = result
-                
-                elif len(result) == 2:
-                    gh_temp, ga_temp = result
-                else:
-                    raise ValueError(f"run_single_algo ritorna {len(result)} valori, attesi 2 o 9")
-                
-                sim_list.append(f"{gh_temp}-{ga_temp}")
+            # ✅ UNA SOLA CHIAMATA - Loop dentro la funzione
+            gh, ga, top3, sim_list = run_single_algo_montecarlo(
+                algo_id=algo_id,
+                preloaded_data=preloaded_data,
+                home_team=real_home,
+                away_team=real_away,
+                cycles=cycles,
+                analyzer=analyzer
+            )
 
-            # ✅ CHIAMATA ANALYZER UNA SOLA VOLTA (DOPO IL LOOP)
-            if analyzer and last_result_full is not None:
-                gh_temp, ga_temp, lambda_h, lambda_a, xg_info, pesi, params, sc_h, sc_a = last_result_full
-                odds = bulk_cache.get('MATCH_H2H', {}).get('odds')
-                analyzer.add_result(
-                    algo_id, gh_temp, ga_temp,
-                    lambda_h=lambda_h, lambda_a=lambda_a,
-                    odds_real=odds,
-                    odds_qt={'1': h2h_data.get('qt_1'), 'X': h2h_data.get('qt_X'), '2': h2h_data.get('qt_2')},
-                    team_scores={'home': team_h_scores, 'away': team_a_scores},
-                    h2h_stats=h2h_stats
-                )
-            elif analyzer:
-                # Caso semplice (result con 2 valori)
-                analyzer.add_result(algo_id, gh, ga)
-            
-            from collections import Counter
-            most_common = Counter(sim_list).most_common(1)[0][0]
-            gh, ga = map(int, most_common.split("-"))
-            top3 = [x[0] for x in Counter(sim_list).most_common(3)]
+            log_debug(f"✅ Simulazione completata in: {time.time() - t_loop_start:.3f}s")
+            log_debug(f"📊 Risultato: {gh}-{ga}, Simulazioni: {len(sim_list)}")
+            log_debug(f"⏱️ TOTALE algoritmo singolo: {time.time() - t_algo_start:.3f}s")
+
             cronaca = []
             actual_cycles_executed = cycles
             
