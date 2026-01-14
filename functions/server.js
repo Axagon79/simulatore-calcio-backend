@@ -102,37 +102,6 @@ app.get('/api/leagues', (req, res) => {
 });
 
 
-    // Endpoint Vet Assistant
-    app.post('/api/vet-assistant', async (req, res) => {
-      try {
-        if (!geminiModel) {
-          return res.status(500).json({ error: 'Assistente virtuale non disponibile.' });
-        }
-
-        const { systemPrompt, animalDetails, conversationHistory, question } = req.body;
-
-        // Configurazione dei parametri di generazione
-        const generationConfig = {
-          temperature: 0.7, // Modifica la temperatura qui
-          topK: 40,
-          topP: 0.90,
-          maxOutputTokens: 8192,
-        };
-
-        const fullPrompt = constructPrompt(systemPrompt, animalDetails, conversationHistory, question);
-
-        const result = await geminiModel.generateContent({
-          contents: [{ role: "user", parts: [{ text: fullPrompt }] }],
-          generationConfig, // Passa l'oggetto generationConfig
-        });
-
-        res.json({ response: result.response.text() });
-      } catch (error) {
-        console.error('Errore Gemini:', error);
-        res.status(500).json({ error: 'Errore durante la generazione della risposta.' });
-      }
-    });
-
     // File Routes
     setupFileRoutes(app);
 
@@ -148,62 +117,9 @@ app.get('/api/leagues', (req, res) => {
   }
 };
 
-const constructPrompt = (systemPrompt, animalDetails, conversationHistory, question) => {
-  let prompt = `${systemPrompt || ''}\n\n`;
-  if (animalDetails) prompt += `PROFILO ANIMALE AGGIORNATO:\n${animalDetails}\n`;
-  if (conversationHistory) prompt += `CONTESTO CONVERSAZIONE:\n${conversationHistory}\n`;
-  prompt += `\nNUOVA DOMANDA: ${question}\n\nISTRUZIONI SPECIALI:\n`;
-  prompt += `- Rispondi SEMPRE in italiano in modo conciso e naturale\n`;
-  prompt += `- Fornisci informazioni utili e pratiche\n`;
-  prompt += `- Usa un linguaggio chiaro e comprensibile\n`;
-  prompt += `- Mostra empatia e comprensione verso l'utente\n`;
-  return prompt;
-};
 
-const setupFileRoutes = (app) => {
-  app.get('/api/files/:filename', async (req, res) => {
-    try {
-      const bucket = req.app.get('bucket');
-      res.setHeader('Content-Type', 'image/jpeg');
-      res.setHeader('Cache-Control', 'public, max-age=86400');
-      
-      const downloadStream = bucket.openDownloadStreamByName(req.params.filename);
-      downloadStream.pipe(res);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  });
 
-  app.get('/api/files/post/:postId', async (req, res) => {
-    try {
-      const files = await File.find({ postId: req.params.postId });
-      res.json(files);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  });
-
-  app.delete('/api/files/:filename', async (req, res) => {
-    try {
-      const file = await File.findOne({ filename: req.params.filename });
-      if (!file) return res.status(404).json({ error: 'File non trovato' });
-
-      const bucket = req.app.get('bucket');
-      await bucket.delete(file.fileId);
-      await File.deleteOne({ _id: file._id });
-
-      const post = await Post.findById(file.postId);
-      if (post) {
-        post.files = post.files.filter(fileId => fileId.toString() !== file.fileId.toString());
-        await post.save();
-      }
-
-      res.json({ message: 'File eliminato con successo' });
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  });
-};
+  
 
 const setupErrorHandling = (app) => {
   app.use((err, req, res, next) => {

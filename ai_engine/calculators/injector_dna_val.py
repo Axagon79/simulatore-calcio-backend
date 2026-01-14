@@ -2,9 +2,14 @@ import os
 import sys
 from datetime import datetime
 
-# Aggiunta path per caricare la configurazione centralizzata
-CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(CURRENT_DIR)
+# --- FIX PERCORSI UNIVERSALE ---
+current_path = os.path.dirname(os.path.abspath(__file__))
+while not os.path.exists(os.path.join(current_path, 'config.py')):
+    parent = os.path.dirname(current_path)
+    if parent == current_path:
+        raise FileNotFoundError("Impossibile trovare config.py!")
+    current_path = parent
+sys.path.append(current_path)
 
 try:
     from config import db

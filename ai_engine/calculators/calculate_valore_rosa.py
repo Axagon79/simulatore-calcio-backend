@@ -1,7 +1,14 @@
 import statistics
 import os
 import sys
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+# --- FIX PERCORSI UNIVERSALE ---
+current_path = os.path.dirname(os.path.abspath(__file__))
+while not os.path.exists(os.path.join(current_path, 'config.py')):
+    parent = os.path.dirname(current_path)
+    if parent == current_path:
+        raise FileNotFoundError("Impossibile trovare config.py!")
+    current_path = parent
+sys.path.append(current_path)
 
 from config import db  # ← CENTRALIZZATO!
 
@@ -137,7 +144,13 @@ def main():
         for team in league_teams:
             stats = team.get("stats", {})
             val = stats.get("marketValue", 0)
-            age = stats.get("avgAge", 0)
+            age = stats.get("avgAge")
+            
+            # ✅ SE MANCA L'ETÀ, USA LA MEDIA DEL CAMPIONATO
+            if age is None or age <= 0:
+                age = A_mean
+                team_name = team.get("name", "???")
+                print(f"   ⚠️  {team_name:<20} | Età MANCANTE, uso media campionato: {age:.1f}")
 
             # 1. Calcolo Base (0-9 con media a 4.5)
             value_score = compute_value_score_split(val, min_val, max_val, mean_val)
