@@ -81,7 +81,7 @@ def parse_tm_date(date_str):
     return None
 
 def scrape_tm_calendar_v8():
-    print(f"🚀 AVVIO SCRAPER TM V8 (FIX MERGE H2H & FULL DEBUG) - Stagione ")
+    
     print(f"🛠️  MODALITÀ DRY_RUN: {'ATTIVA (Nessuna scrittura)' if DRY_RUN else 'DISATTIVA (Scrittura su DB)'}")
     
     col = db[COLLECTION_NAME]
@@ -288,7 +288,7 @@ def save_round(col, league, round_name, matches):
         "$set": {
             "league": league, 
             "round_name": round_name, 
-            "season": TARGET_SEASON,
+            
             "matches": matches, 
             "last_updated": datetime.now()
         }
