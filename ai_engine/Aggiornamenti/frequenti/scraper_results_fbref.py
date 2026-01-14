@@ -26,6 +26,7 @@ print(f"🔌 Connesso a MongoDB.")
 
 # 2. CONFIGURAZIONE DOPPIA (Fixture + Stats)
 LEAGUES_CONFIG = [
+    # ITALIA
     {
         "name": "Serie A", 
         "fixtures": "https://fbref.com/en/comps/11/schedule/Serie-A-Scores-and-Fixtures",
@@ -36,6 +37,8 @@ LEAGUES_CONFIG = [
         "fixtures": "https://fbref.com/en/comps/18/schedule/Serie-B-Scores-and-Fixtures",
         "stats": "https://fbref.com/en/comps/18/Serie-B-Stats"
     },
+    
+    # EUROPA TOP
     {
         "name": "Premier League", 
         "fixtures": "https://fbref.com/en/comps/9/schedule/Premier-League-Scores-and-Fixtures",
@@ -65,6 +68,89 @@ LEAGUES_CONFIG = [
         "name": "Liga Portugal", 
         "fixtures": "https://fbref.com/en/comps/32/schedule/Primeira-Liga-Scores-and-Fixtures",
         "stats": "https://fbref.com/en/comps/32/Primeira-Liga-Stats"
+    },
+    
+    # 🆕 EUROPA SERIE B
+    {
+        "name": "Championship", 
+        "fixtures": "https://fbref.com/en/comps/10/schedule/Championship-Scores-and-Fixtures",
+        "stats": "https://fbref.com/en/comps/10/Championship-Stats"
+    },
+    {
+        "name": "LaLiga 2", 
+        "fixtures": "https://fbref.com/en/comps/17/schedule/La-Liga-2-Scores-and-Fixtures",
+        "stats": "https://fbref.com/en/comps/17/La-Liga-2-Stats"
+    },
+    {
+        "name": "2. Bundesliga", 
+        "fixtures": "https://fbref.com/en/comps/33/schedule/2-Bundesliga-Scores-and-Fixtures",
+        "stats": "https://fbref.com/en/comps/33/2-Bundesliga-Stats"
+    },
+    {
+        "name": "Ligue 2", 
+        "fixtures": "https://fbref.com/en/comps/60/schedule/Ligue-2-Scores-and-Fixtures",
+        "stats": "https://fbref.com/en/comps/60/Ligue-2-Stats"
+    },
+    
+    # 🆕 EUROPA NORDICI + EXTRA
+    {
+        "name": "Scottish Premiership", 
+        "fixtures": "https://fbref.com/en/comps/40/schedule/Scottish-Premiership-Scores-and-Fixtures",
+        "stats": "https://fbref.com/en/comps/40/Scottish-Premiership-Stats"
+    },
+    {
+        "name": "Allsvenskan", 
+        "fixtures": "https://fbref.com/en/comps/29/schedule/Allsvenskan-Scores-and-Fixtures",
+        "stats": "https://fbref.com/en/comps/29/Allsvenskan-Stats"
+    },
+    {
+        "name": "Eliteserien", 
+        "fixtures": "https://fbref.com/en/comps/28/schedule/Eliteserien-Scores-and-Fixtures",
+        "stats": "https://fbref.com/en/comps/28/Eliteserien-Stats"
+    },
+    {
+        "name": "Superligaen", 
+        "fixtures": "https://fbref.com/en/comps/50/schedule/Superligaen-Scores-and-Fixtures",
+        "stats": "https://fbref.com/en/comps/50/Superligaen-Stats"
+    },
+    {
+        "name": "Jupiler Pro League", 
+        "fixtures": "https://fbref.com/en/comps/37/schedule/Belgian-Pro-League-Scores-and-Fixtures",
+        "stats": "https://fbref.com/en/comps/37/Belgian-Pro-League-Stats"
+    },
+    {
+        "name": "Süper Lig", 
+        "fixtures": "https://fbref.com/en/comps/26/schedule/Super-Lig-Scores-and-Fixtures",
+        "stats": "https://fbref.com/en/comps/26/Super-Lig-Stats"
+    },
+    {
+        "name": "League of Ireland Premier Division", 
+        "fixtures": "https://fbref.com/en/comps/80/schedule/League-of-Ireland-Premier-Division-Scores-and-Fixtures",
+        "stats": "https://fbref.com/en/comps/80/League-of-Ireland-Premier-Division-Stats"
+    },
+    
+    # 🆕 AMERICHE
+    {
+        "name": "Brasileirão Serie A", 
+        "fixtures": "https://fbref.com/en/comps/24/schedule/Serie-A-Scores-and-Fixtures",
+        "stats": "https://fbref.com/en/comps/24/Serie-A-Stats"
+    },
+    {
+        "name": "Primera División", 
+        "fixtures": "https://fbref.com/en/comps/21/schedule/Primera-Division-Scores-and-Fixtures",
+        "stats": "https://fbref.com/en/comps/21/Primera-Division-Stats"
+    },
+    {
+        "name": "Major League Soccer", 
+        "fixtures": "https://fbref.com/en/comps/22/schedule/Major-League-Soccer-Scores-and-Fixtures",
+        "stats": "https://fbref.com/en/comps/22/Major-League-Soccer-Stats"
+    },
+    
+    # 🆕 ASIA
+    {
+        "name": "J1 League", 
+        "fixtures": "https://fbref.com/en/comps/25/schedule/J1-League-Scores-and-Fixtures",
+        "stats": "https://fbref.com/en/comps/25/J1-League-Stats"
     }
 ]
 

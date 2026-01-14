@@ -1,0 +1,299 @@
+================================================================================
+REPORT SCRAPER QUOTE CALCIO
+================================================================================
+
+Data: 2026-01-14 01:48:17
+Partite totali: 472
+Partite aggiornate: 305
+Successo: 64.6%
+
+================================================================================
+🚨 SQUADRE CON PROBLEMI DI MATCHING
+================================================================================
+
+Totale squadre uniche con problemi: 54
+
+❌ FC Andorra (3 partite mancanti)
+   Alias usati: andorra, fc andorra
+
+❌ UD Almería (3 partite mancanti)
+   Alias usati: ud almeria, almería, ud almería, almeria
+
+❌ SD Huesca (3 partite mancanti)
+   Alias usati: huesca, sd huesca
+
+❌ Real Valladolid (3 partite mancanti)
+   Alias usati: valladolid, real, real valladolid
+
+❌ Real Sociedad B (3 partite mancanti)
+   Alias usati: real, sociedad, real sociedad b
+
+❌ Sporting Gijón (3 partite mancanti)
+   Alias usati: sporting, sporting gijón, gijón, sporting gijon, gijon
+
+❌ Cádiz (3 partite mancanti)
+   Alias usati: cádiz, cadiz
+
+❌ Racing (3 partite mancanti)
+   Alias usati: racing
+
+❌ CD Leganés (3 partite mancanti)
+   Alias usati: leganés, cd leganés, leganes, cd leganes
+
+❌ Córdoba CF (3 partite mancanti)
+   Alias usati: córdoba, cordoba, córdoba cf
+
+❌ Dep. La Coruña (3 partite mancanti)
+   Alias usati: deportivo, dep., coruna, dep. la coruna, dep. la coruña
+
+❌ Castellón (3 partite mancanti)
+   Alias usati: castellón, castellon
+
+❌ Eibar (3 partite mancanti)
+   Alias usati: eibar
+
+❌ CyD Leonesa (3 partite mancanti)
+   Alias usati: leonesa, cyd leonesa
+
+❌ Granada (3 partite mancanti)
+   Alias usati: granada
+
+❌ AD Ceuta (3 partite mancanti)
+   Alias usati: ceuta, ad ceuta
+
+❌ Burgos CF (3 partite mancanti)
+   Alias usati: burgos, burgos cf
+
+❌ Albacete (3 partite mancanti)
+   Alias usati: albacete
+
+❌ Las Palmas (3 partite mancanti)
+   Alias usati: las palmas, palmas
+
+❌ Mirandés (3 partite mancanti)
+   Alias usati: mirandes, mirandés
+
+❌ Málaga CF (3 partite mancanti)
+   Alias usati: málaga, málaga cf, malaga
+
+❌ Real Saragozza (3 partite mancanti)
+   Alias usati: saragozza, real, real saragozza, real zaragoza
+
+❌ Saint-Étienne (3 partite mancanti)
+   Alias usati: saint-étienne, saint-etienne
+
+❌ Falkirk FC (3 partite mancanti)
+   Alias usati: falkirk, falkirk fc
+
+❌ Heart of Midl. (3 partite mancanti)
+   Alias usati: hearts, midl., heart of midl., heart
+
+❌ Dundee FC (3 partite mancanti)
+   Alias usati: dundee fc, dundee
+
+❌ Kilmarnock FC (3 partite mancanti)
+   Alias usati: kilmarnock, kilmarnock fc
+
+❌ Hibernian FC (3 partite mancanti)
+   Alias usati: hibernian, hibernian fc
+
+❌ Aberdeen FC (3 partite mancanti)
+   Alias usati: aberdeen, aberdeen fc
+
+❌ Livingston FC (3 partite mancanti)
+   Alias usati: livingston, livingston fc
+
+❌ Dundee United (3 partite mancanti)
+   Alias usati: dundee utd, dundee, dundee united, united
+
+❌ Glasgow Rangers (3 partite mancanti)
+   Alias usati: glasgow, rangers, glasgow rangers
+
+❌ St. Mirren (3 partite mancanti)
+   Alias usati: st. mirren, mirren
+
+❌ Motherwell FC (3 partite mancanti)
+   Alias usati: motherwell, motherwell fc
+
+❌ Celtic Glasgow (3 partite mancanti)
+   Alias usati: celtic glasgow, glasgow, celtic
+
+❌ Djurgården (2 partite mancanti)
+   Alias usati: djurgarden, varnamo, djurgården
+
+❌ Häcken (2 partite mancanti)
+   Alias usati: hacken, häcken
+
+❌ IFK Göteborg (2 partite mancanti)
+   Alias usati: göteborg, goteborg, ifk goteborg, ifk göteborg
+
+❌ Sirius (2 partite mancanti)
+   Alias usati: sirius
+
+❌ Malmö FF (2 partite mancanti)
+   Alias usati: malmo, malmo ff, malmö, malmö ff
+
+❌ Brommapojkarna (2 partite mancanti)
+   Alias usati: brommapojkarna
+
+❌ Elfsborg (2 partite mancanti)
+   Alias usati: elfsborg
+
+❌ GAIS (2 partite mancanti)
+   Alias usati: gais
+
+❌ Degerfors (2 partite mancanti)
+   Alias usati: degerfors
+
+❌ Örgryte (2 partite mancanti)
+   Alias usati: örgryte, orgryte, oster
+
+❌ Västerås SK (2 partite mancanti)
+   Alias usati: västerås sk, västerås
+
+❌ Hammarby (2 partite mancanti)
+   Alias usati: hammarby
+
+❌ Kalmar FF (2 partite mancanti)
+   Alias usati: kalmar, kalmar ff
+
+❌ AIK (2 partite mancanti)
+   Alias usati: aik, norrkoping
+
+❌ Halmstads BK (2 partite mancanti)
+   Alias usati: halmstad, halmstads, halmstads bk
+
+❌ Mjällby AIF (2 partite mancanti)
+   Alias usati: mjällby aif, mjällby, mjallby
+
+❌ Clermont Foot (1 partite mancanti)
+   Alias usati: foot, clermont foot, clermont
+
+❌ Le Mans FC (1 partite mancanti)
+   Alias usati: mans, le mans fc, le mans
+
+❌ Stade Reims (1 partite mancanti)
+   Alias usati: stade, reims, stade reims
+
+
+💡 SUGGERIMENTI:
+1. Vai sul sito NowGoal e cerca queste squadre
+2. Annota il nome ESATTO usato sul sito
+3. Aggiungi il nome del sito come alias nel database
+4. Se il nome è molto diverso, aggiorna normalize_name()
+
+================================================================================
+DETTAGLIO PARTITE NON TROVATE
+================================================================================
+
+
+NESSUNA_SQUADRA_TROVATA (67 partite)
+--------------------------------------------------------------------------------
+  • FC Andorra vs UD Almería
+    Lega: LaLiga 2 - Giornata: 17
+    Nota: Nessuna delle due squadre trovata sul sito
+
+  • SD Huesca vs Real Valladolid
+    Lega: LaLiga 2 - Giornata: 17
+    Nota: Nessuna delle due squadre trovata sul sito
+
+  • Real Sociedad B vs Sporting Gijón
+    Lega: LaLiga 2 - Giornata: 17
+    Nota: Nessuna delle due squadre trovata sul sito
+
+  • Cádiz vs Racing
+    Lega: LaLiga 2 - Giornata: 17
+    Nota: Nessuna delle due squadre trovata sul sito
+
+  • CD Leganés vs Córdoba CF
+    Lega: LaLiga 2 - Giornata: 17
+    Nota: Nessuna delle due squadre trovata sul sito
+
+  • Dep. La Coruña vs Castellón
+    Lega: LaLiga 2 - Giornata: 17
+    Nota: Nessuna delle due squadre trovata sul sito
+
+  • Eibar vs CyD Leonesa
+    Lega: LaLiga 2 - Giornata: 17
+    Nota: Nessuna delle due squadre trovata sul sito
+
+  • Granada vs AD Ceuta
+    Lega: LaLiga 2 - Giornata: 17
+    Nota: Nessuna delle due squadre trovata sul sito
+
+  • Burgos CF vs Albacete
+    Lega: LaLiga 2 - Giornata: 17
+    Nota: Nessuna delle due squadre trovata sul sito
+
+  • Las Palmas vs Mirandés
+    Lega: LaLiga 2 - Giornata: 17
+    Nota: Nessuna delle due squadre trovata sul sito
+
+  ... e altre 57 partite
+
+SOLO_TRASFERTA_TROVATA (1 partite)
+--------------------------------------------------------------------------------
+  • Saint-Étienne vs Clermont Foot
+    Lega: Ligue 2 - Giornata: 19
+
+    📄 RIGA SUL SITO:
+    19 17-01
+20:55 Saint Etienne[3]
+-
+Clermont[11]
+1.40 4.00 6.50   
+    💡 Cerca 'Saint-Étienne' in questa riga per vedere come si chiama sul sito
+    ⚠️ Trasferta trovata in altre righe
+
+
+SOLO_CASA_TROVATA (2 partite)
+--------------------------------------------------------------------------------
+  • Le Mans FC vs Saint-Étienne
+    Lega: Ligue 2 - Giornata: 18
+
+    📄 RIGA SUL SITO:
+    18 03-01
+20:00 Le Mans[3]
+0-0
+Saint Etienne[2]
+2.40 3.40 2.63    0-0
+    💡 Cerca 'Saint-Étienne' in questa riga per vedere come si chiama sul sito
+    ⚠️ Casa trovata in altre righe
+
+  • Stade Reims vs Saint-Étienne
+    Lega: Ligue 2 - Giornata: 20
+
+    📄 RIGA SUL SITO:
+    20 23-01
+20:00 Amiens - Stade Lavallois MFC
+    💡 Cerca 'Saint-Étienne' in questa riga per vedere come si chiama sul sito
+    ⚠️ Casa trovata in altre righe
+
+
+
+================================================================================
+ℹ️ PARTITE TROVATE MA SENZA QUOTE (NORMALE)
+================================================================================
+
+Totale: 97 partite
+Queste partite sono sul sito ma le quote non sono ancora pubblicate.
+Riprova più tardi, specialmente vicino alla data della partita.
+
+
+Serie B: 10 partite
+
+Serie C - Girone A: 10 partite
+
+Serie C - Girone B: 18 partite
+
+Serie C - Girone C: 20 partite
+
+Eredivisie: 1 partite
+
+Liga Portugal: 9 partite
+
+Championship: 12 partite
+
+2. Bundesliga: 9 partite
+
+Ligue 2: 8 partite

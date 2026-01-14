@@ -33,17 +33,43 @@ except ImportError:
     sys.exit(1)
 
 LEAGUES_CONFIG = [
+    # ITALIA
     {"name": "Serie A", "url": "https://football.nowgoal26.com/subleague/34"},
     {"name": "Serie B", "url": "https://football.nowgoal26.com/subleague/40"},
     {"name": "Serie C - Girone A", "url": "https://football.nowgoal26.com/subleague/142"},
     {"name": "Serie C - Girone B", "url": "https://football.nowgoal26.com/subleague/2025-2026/142/1526"},
     {"name": "Serie C - Girone C", "url": "https://football.nowgoal26.com/subleague/2025-2026/142/1527"},
+    
+    # EUROPA TOP
     {"name": "Premier League", "url": "https://football.nowgoal26.com/league/36"},
     {"name": "La Liga", "url": "https://football.nowgoal26.com/league/31"},
     {"name": "Bundesliga", "url": "https://football.nowgoal26.com/league/8"},
     {"name": "Ligue 1", "url": "https://football.nowgoal26.com/league/11"},
     {"name": "Eredivisie", "url": "https://football.nowgoal26.com/league/16"},
-    {"name": "Liga Portugal", "url": "https://football.nowgoal26.com/league/23"} 
+    {"name": "Liga Portugal", "url": "https://football.nowgoal26.com/league/23"},
+    
+    # 🆕 EUROPA SERIE B
+    {"name": "Championship", "url": "https://football.nowgoal26.com/league/37"},
+    {"name": "LaLiga 2", "url": "https://football.nowgoal26.com/league/32"},
+    {"name": "2. Bundesliga", "url": "https://football.nowgoal26.com/league/9"},
+    {"name": "Ligue 2", "url": "https://football.nowgoal26.com/league/12"},
+    
+    # 🆕 EUROPA NORDICI + EXTRA
+    {"name": "Scottish Premiership", "url": "https://football.nowgoal26.com/league/40"},
+    {"name": "Allsvenskan", "url": "https://football.nowgoal26.com/league/61"},
+    {"name": "Eliteserien", "url": "https://football.nowgoal26.com/league/59"},
+    {"name": "Superligaen", "url": "https://football.nowgoal26.com/league/54"},
+    {"name": "Jupiler Pro League", "url": "https://football.nowgoal26.com/league/49"},
+    {"name": "Süper Lig", "url": "https://football.nowgoal26.com/league/52"},
+    {"name": "League of Ireland Premier Division", "url": "https://football.nowgoal26.com/league/65"},
+    
+    # 🆕 AMERICHE
+    {"name": "Brasileirão Serie A", "url": "https://football.nowgoal26.com/league/18"},
+    {"name": "Primera División", "url": "https://football.nowgoal26.com/league/19"},
+    {"name": "Major League Soccer", "url": "https://football.nowgoal26.com/league/42"},
+    
+    # 🆕 ASIA
+    {"name": "J1 League", "url": "https://football.nowgoal26.com/league/56"},
 ]
 
 def normalize_name(name):

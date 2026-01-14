@@ -5,8 +5,11 @@ from datetime import datetime, timedelta
 
 # --- FIX PERCORSI ---
 current_path = os.path.dirname(os.path.abspath(__file__))
-project_root = os.path.dirname(os.path.dirname(current_path))
-sys.path.append(project_root)
+while not os.path.exists(os.path.join(current_path, 'config.py')):
+    parent = os.path.dirname(current_path)
+    if parent == current_path: raise FileNotFoundError("No config.py!")
+    current_path = parent
+sys.path.append(current_path)
 
 from config import db
 from selenium import webdriver
@@ -21,17 +24,43 @@ from webdriver_manager.chrome import ChromeDriverManager
 safe_col = db['matches_history_betexplorer']
 
 LEAGUES = [
+    # ITALIA
     {"name": "Serie A", "url": "https://www.betexplorer.com/football/italy/serie-a/results/"},
     {"name": "Serie B", "url": "https://www.betexplorer.com/football/italy/serie-b/results/"},
     {"name": "Serie C - Girone A", "url": "https://www.betexplorer.com/football/italy/serie-c-group-a/results/"},
     {"name": "Serie C - Girone B", "url": "https://www.betexplorer.com/football/italy/serie-c-group-b/results/"},
     {"name": "Serie C - Girone C", "url": "https://www.betexplorer.com/football/italy/serie-c-group-c/results/"},
+    
+    # EUROPA TOP
     {"name": "Premier League", "url": "https://www.betexplorer.com/football/england/premier-league/results/"},
     {"name": "La Liga", "url": "https://www.betexplorer.com/football/spain/laliga/results/"},
     {"name": "Bundesliga", "url": "https://www.betexplorer.com/football/germany/bundesliga/results/"},
     {"name": "Ligue 1", "url": "https://www.betexplorer.com/football/france/ligue-1/results/"},
     {"name": "Eredivisie", "url": "https://www.betexplorer.com/football/netherlands/eredivisie/results/"},
-    {"name": "Liga Portugal", "url": "https://www.betexplorer.com/football/portugal/liga-portugal/results/"}
+    {"name": "Liga Portugal", "url": "https://www.betexplorer.com/football/portugal/liga-portugal/results/"},
+    
+    # 🆕 EUROPA SERIE B
+    {"name": "Championship", "url": "https://www.betexplorer.com/football/england/championship/results/"},
+    {"name": "LaLiga 2", "url": "https://www.betexplorer.com/football/spain/laliga2/results/"},
+    {"name": "2. Bundesliga", "url": "https://www.betexplorer.com/football/germany/2-bundesliga/results/"},
+    {"name": "Ligue 2", "url": "https://www.betexplorer.com/football/france/ligue-2/results/"},
+    
+    # 🆕 EUROPA NORDICI + EXTRA
+    {"name": "Scottish Premiership", "url": "https://www.betexplorer.com/football/scotland/premiership/results/"},
+    {"name": "Allsvenskan", "url": "https://www.betexplorer.com/football/sweden/allsvenskan/results/"},
+    {"name": "Eliteserien", "url": "https://www.betexplorer.com/football/norway/eliteserien/results/"},
+    {"name": "Superligaen", "url": "https://www.betexplorer.com/football/denmark/superliga/results/"},
+    {"name": "Jupiler Pro League", "url": "https://www.betexplorer.com/football/belgium/jupiler-pro-league/results/"},
+    {"name": "Süper Lig", "url": "https://www.betexplorer.com/football/turkey/super-lig/results/"},
+    {"name": "League of Ireland Premier Division", "url": "https://www.betexplorer.com/football/ireland/premier-division/results/"},
+    
+    # 🆕 AMERICHE
+    {"name": "Brasileirão Serie A", "url": "https://www.betexplorer.com/it/football/brazil/serie-a-betano/results/"},
+    {"name": "Primera División", "url": "https://www.betexplorer.com/it/football/argentina/liga-profesional/results/"},
+    {"name": "Major League Soccer", "url": "https://www.betexplorer.com/football/usa/mls/results/"},
+    
+    # 🆕 ASIA
+    {"name": "J1 League", "url": "https://www.betexplorer.com/football/japan/j1-league/results/"}
 ]
 
 def clean_float(txt):

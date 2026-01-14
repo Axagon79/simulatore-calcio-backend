@@ -5,6 +5,7 @@ import re
 import random
 from datetime import datetime
 import dateutil.parser
+sys.path.insert(0, r"C:\Progetti\simulatore-calcio-backend")
 from config import db
 
 # ==========================================

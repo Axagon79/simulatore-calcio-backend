@@ -33,17 +33,43 @@ from config import db
 teams_collection = db['teams']
 
 SOCCERSTATS_LEAGUES = [
+    # ITALIA
     {"name": "Serie A", "url": "https://www.soccerstats.com/widetable.asp?league=italy"},
     {"name": "Serie B", "url": "https://www.soccerstats.com/widetable.asp?league=italy2"},
     {"name": "Serie C - Girone A", "url": "https://www.soccerstats.com/widetable.asp?league=italy3"},
     {"name": "Serie C - Girone B", "url": "https://www.soccerstats.com/widetable.asp?league=italy4"},
     {"name": "Serie C - Girone C", "url": "https://www.soccerstats.com/widetable.asp?league=italy5"},
+    
+    # EUROPA TOP
     {"name": "Premier League", "url": "https://www.soccerstats.com/widetable.asp?league=england"},
     {"name": "La Liga", "url": "https://www.soccerstats.com/widetable.asp?league=spain"},
     {"name": "Bundesliga", "url": "https://www.soccerstats.com/widetable.asp?league=germany"},
     {"name": "Ligue 1", "url": "https://www.soccerstats.com/widetable.asp?league=france"},
     {"name": "Eredivisie", "url": "https://www.soccerstats.com/widetable.asp?league=netherlands"},
     {"name": "Liga Portugal", "url": "https://www.soccerstats.com/widetable.asp?league=portugal"},
+    
+    # 🆕 EUROPA SERIE B
+    {"name": "Championship", "url": "https://www.soccerstats.com/widetable.asp?league=england2"},
+    {"name": "LaLiga 2", "url": "https://www.soccerstats.com/widetable.asp?league=spain2"},
+    {"name": "2. Bundesliga", "url": "https://www.soccerstats.com/widetable.asp?league=germany2"},
+    {"name": "Ligue 2", "url": "https://www.soccerstats.com/widetable.asp?league=france2"},
+    
+    # 🆕 EUROPA NORDICI + EXTRA
+    {"name": "Scottish Premiership", "url": "https://www.soccerstats.com/widetable.asp?league=scotland"},
+    {"name": "Allsvenskan", "url": "https://www.soccerstats.com/widetable.asp?league=sweden"},
+    {"name": "Eliteserien", "url": "https://www.soccerstats.com/widetable.asp?league=norway"},
+    {"name": "Superligaen", "url": "https://www.soccerstats.com/widetable.asp?league=denmark"},
+    {"name": "Jupiler Pro League", "url": "https://www.soccerstats.com/widetable.asp?league=belgium"},
+    {"name": "Süper Lig", "url": "https://www.soccerstats.com/widetable.asp?league=turkey"},
+    {"name": "League of Ireland Premier Division", "url": "https://www.soccerstats.com/widetable.asp?league=ireland"},
+    
+    # 🆕 AMERICHE
+    {"name": "Brasileirão Serie A", "url": "https://www.soccerstats.com/widetable.asp?league=brazil"},
+    {"name": "Primera División", "url": "https://www.soccerstats.com/widetable.asp?league=argentina"},
+    {"name": "Major League Soccer", "url": "https://www.soccerstats.com/widetable.asp?league=usa"},
+    
+    # 🆕 ASIA
+    {"name": "J1 League", "url": "https://www.soccerstats.com/widetable.asp?league=japan"}
 ]
 
 def to_int(val):

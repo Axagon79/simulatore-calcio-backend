@@ -28,58 +28,142 @@ COMPETITIONS = [
     {
         "name": "Serie A",
         "country": "Italy",
-        "table_url": "https://www.transfermarkt.it/serie-a/tabelle/wettbewerb/IT1/saison_id/2025", 
+        "table_url": "https://www.transfermarkt.it/serie-a/tabelle/wettbewerb/IT1", 
     },
     {
         "name": "Serie B",
         "country": "Italy",
-        "table_url": "https://www.transfermarkt.it/serie-b/tabelle/wettbewerb/IT2/saison_id/2025",
+        "table_url": "https://www.transfermarkt.it/serie-b/tabelle/wettbewerb/IT2",
     },
     {
         "name": "Serie C - Girone A",
         "country": "Italy",
-        "table_url": "https://www.transfermarkt.it/serie-c-girone-a/tabelle/wettbewerb/IT3A/saison_id/2025",
+        "table_url": "https://www.transfermarkt.it/serie-c-girone-a/tabelle/wettbewerb/IT3A",
     },
     {
         "name": "Serie C - Girone B",
         "country": "Italy",
-        "table_url": "https://www.transfermarkt.it/serie-c-girone-b/tabelle/wettbewerb/IT3B/saison_id/2025",
+        "table_url": "https://www.transfermarkt.it/serie-c-girone-b/tabelle/wettbewerb/IT3B",
     },
     {
         "name": "Serie C - Girone C",
         "country": "Italy",
-        "table_url": "https://www.transfermarkt.it/serie-c-girone-c/tabelle/wettbewerb/IT3C/saison_id/2025",
+        "table_url": "https://www.transfermarkt.it/serie-c-girone-c/tabelle/wettbewerb/IT3C",
     },
-    # ESTERO (Transfermarkt.com -> Nomi Internazionali/Inglesi)
+    
+    # EUROPA TOP (Transfermarkt.com -> Nomi Internazionali/Inglesi)
     {
         "name": "Premier League",
         "country": "England",
-        "table_url": "https://www.transfermarkt.com/premier-league/tabelle/wettbewerb/GB1/saison_id/2025",
+        "table_url": "https://www.transfermarkt.com/premier-league/tabelle/wettbewerb/GB1",
     },
     {
         "name": "La Liga",
         "country": "Spain",
-        "table_url": "https://www.transfermarkt.com/la-liga/tabelle/wettbewerb/ES1/saison_id/2025",
-    },
-    {
-        "name": "Eredivisie",
-        "country": "Netherlands",
-        "table_url": "https://www.transfermarkt.com/eredivisie/tabelle/wettbewerb/NL1/saison_id/2025",
+        "table_url": "https://www.transfermarkt.com/la-liga/tabelle/wettbewerb/ES1",
     },
     {
         "name": "Bundesliga",
         "country": "Germany",
-        "table_url": "https://www.transfermarkt.com/bundesliga/tabelle/wettbewerb/L1/saison_id/2025",
+        "table_url": "https://www.transfermarkt.com/bundesliga/tabelle/wettbewerb/L1",
     },
     {
         "name": "Ligue 1",
         "country": "France",
-        "table_url": "https://www.transfermarkt.com/ligue-1/tabelle/wettbewerb/FR1/saison_id/2025",
+        "table_url": "https://www.transfermarkt.com/ligue-1/tabelle/wettbewerb/FR1",
+    },
+    {
+        "name": "Eredivisie",
+        "country": "Netherlands",
+        "table_url": "https://www.transfermarkt.com/eredivisie/tabelle/wettbewerb/NL1",
     },
     {
         "name": "Liga Portugal",
         "country": "Portugal",
-        "table_url": "https://www.transfermarkt.com/liga-nos/tabelle/wettbewerb/PO1/saison_id/2025",
+        "table_url": "https://www.transfermarkt.com/liga-nos/tabelle/wettbewerb/PO1",
+    },
+    
+    # 🆕 EUROPA SERIE B
+    {
+        "name": "Championship",
+        "country": "England",
+        "table_url": "https://www.transfermarkt.com/championship/tabelle/wettbewerb/GB2",
+    },
+    {
+        "name": "LaLiga 2",
+        "country": "Spain",
+        "table_url": "https://www.transfermarkt.com/laliga2/tabelle/wettbewerb/ES2",
+    },
+    {
+        "name": "2. Bundesliga",
+        "country": "Germany",
+        "table_url": "https://www.transfermarkt.com/2-bundesliga/tabelle/wettbewerb/L2",
+    },
+    {
+        "name": "Ligue 2",
+        "country": "France",
+        "table_url": "https://www.transfermarkt.com/ligue-2/tabelle/wettbewerb/FR2",
+    },
+    
+    # 🆕 EUROPA NORDICI + EXTRA
+    {
+        "name": "Scottish Premiership",
+        "country": "Scotland",
+        "table_url": "https://www.transfermarkt.com/premiership/tabelle/wettbewerb/SC1",
+    },
+    {
+        "name": "Allsvenskan",
+        "country": "Sweden",
+        "table_url": "https://www.transfermarkt.com/allsvenskan/tabelle/wettbewerb/SE1",
+    },
+    {
+        "name": "Eliteserien",
+        "country": "Norway",
+        "table_url": "https://www.transfermarkt.com/eliteserien/tabelle/wettbewerb/NO1",
+    },
+    {
+        "name": "Superligaen",
+        "country": "Denmark",
+        "table_url": "https://www.transfermarkt.com/superligaen/tabelle/wettbewerb/DK1",
+    },
+    {
+        "name": "Jupiler Pro League",
+        "country": "Belgium",
+        "table_url": "https://www.transfermarkt.com/jupiler-pro-league/tabelle/wettbewerb/BE1",
+    },
+    {
+        "name": "Süper Lig",
+        "country": "Turkey",
+        "table_url": "https://www.transfermarkt.com/super-lig/tabelle/wettbewerb/TR1",
+    },
+    {
+        "name": "League of Ireland Premier Division",
+        "country": "Ireland",
+        "table_url": "https://www.transfermarkt.com/premier-league/tabelle/wettbewerb/IR1",
+    },
+    
+    # 🆕 AMERICHE
+    {
+        "name": "Brasileirão Serie A",
+        "country": "Brazil",
+        "table_url": "https://www.transfermarkt.com/campeonato-brasileiro-serie-a/tabelle/wettbewerb/BRA1",
+    },
+    {
+        "name": "Primera División",
+        "country": "Argentina",
+        "table_url": "https://www.transfermarkt.com/primera-division/tabelle/wettbewerb/AR1N",
+    },
+    {
+        "name": "Major League Soccer",
+        "country": "USA",
+        "table_url": "https://www.transfermarkt.com/major-league-soccer/tabelle/wettbewerb/MLS1",
+    },
+    
+    # 🆕 ASIA
+    {
+        "name": "J1 League",
+        "country": "Japan",
+        "table_url": "https://www.transfermarkt.com/j1-league/tabelle/wettbewerb/JAP1",
     },
 ]
 

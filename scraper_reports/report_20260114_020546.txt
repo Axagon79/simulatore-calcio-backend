@@ -1,0 +1,461 @@
+================================================================================
+REPORT SCRAPER QUOTE CALCIO
+================================================================================
+
+Data: 2026-01-14 02:03:37
+Partite totali: 286
+Partite aggiornate: 144
+Successo: 50.3%
+
+================================================================================
+🚨 SQUADRE CON PROBLEMI DI MATCHING
+================================================================================
+
+Totale squadre uniche con problemi: 70
+
+❌ Saint-Étienne (3 partite mancanti)
+   Alias usati: saint-étienne, saint-etienne
+
+❌ Union SG (3 partite mancanti)
+   Alias usati: union sg, union, royale union sg
+
+❌ Västerås SK (2 partite mancanti)
+   Alias usati: västerås sk, västerås
+
+❌ HamKam (2 partite mancanti)
+   Alias usati: hamkam
+
+❌ Bodø/Glimt (2 partite mancanti)
+   Alias usati: bodø/glimt, bodo/glimt
+
+❌ Lillestrøm (2 partite mancanti)
+   Alias usati: stromsgodset, lillestrøm
+
+❌ Dallas (2 partite mancanti)
+   Alias usati: dallas
+
+❌ LAFC (2 partite mancanti)
+   Alias usati: lafc
+
+❌ Clermont Foot (1 partite mancanti)
+   Alias usati: clermont, foot, clermont foot
+
+❌ Le Mans FC (1 partite mancanti)
+   Alias usati: le mans, mans, le mans fc
+
+❌ Stade Reims (1 partite mancanti)
+   Alias usati: stade reims, stade, reims
+
+❌ Kalmar FF (1 partite mancanti)
+   Alias usati: kalmar, kalmar ff
+
+❌ Elfsborg (1 partite mancanti)
+   Alias usati: elfsborg
+
+❌ Viking (1 partite mancanti)
+   Alias usati: haugesund, viking
+
+❌ Sarpsborg 08 (1 partite mancanti)
+   Alias usati: sarpsborg, sarpsborg 08
+
+❌ Aalesund (1 partite mancanti)
+   Alias usati: aalesund
+
+❌ Kristiansund (1 partite mancanti)
+   Alias usati: kristiansund
+
+❌ KV Mechelen (1 partite mancanti)
+   Alias usati: mechelen, kv mechelen
+
+❌ Cercle Bruges (1 partite mancanti)
+   Alias usati: cercle brugge, bruges, cercle bruges, cercle
+
+❌ OH Leuven (1 partite mancanti)
+   Alias usati: oh leuven, leuven
+
+❌ Sarmiento Junín (1 partite mancanti)
+   Alias usati: junín, sarmiento junín, junin, sarmiento junin, sarmiento
+
+❌ Instituto ACC (1 partite mancanti)
+   Alias usati: e. rio cuarto, instituto acc, instituto
+
+❌ Argentinos Jrs. (1 partite mancanti)
+   Alias usati: jrs., argentinos jrs., argentinos, argentinos jrs
+
+❌ Rosario Central (1 partite mancanti)
+   Alias usati: rosario, rosario central, central
+
+❌ Newell's (1 partite mancanti)
+   Alias usati: newell's, newells
+
+❌ Platense (1 partite mancanti)
+   Alias usati: aldosivi, platense
+
+❌ Huracán (1 partite mancanti)
+   Alias usati: huracán, huracan
+
+❌ Defensa (1 partite mancanti)
+   Alias usati: defensa, defensa y j.
+
+❌ Godoy Cruz (1 partite mancanti)
+   Alias usati: godoy cruz, godoy, g. mendoza, cruz
+
+❌ Barracas C. (1 partite mancanti)
+   Alias usati: barracas, barracas c.
+
+❌ Independiente (1 partite mancanti)
+   Alias usati: independiente
+
+❌ CA Talleres (1 partite mancanti)
+   Alias usati: t. de cordoba, talleres, ca talleres
+
+❌ Dep. Riestra (1 partite mancanti)
+   Alias usati: dep. riestra, dep., d. riestra, riestra
+
+❌ San Lorenzo (1 partite mancanti)
+   Alias usati: san lorenzo, lorenzo
+
+❌ Belgrano (1 partite mancanti)
+   Alias usati: belgrano
+
+❌ Racing (1 partite mancanti)
+   Alias usati: racing
+
+❌ Lanús (1 partite mancanti)
+   Alias usati: lanus, lanús
+
+❌ Ind. Rivadavia (1 partite mancanti)
+   Alias usati: ind. rivadavia, rivadavia, ind., i. rivadavia
+
+❌ Atl. Tucumán (1 partite mancanti)
+   Alias usati: atl., tucumán, tucuman, a. tucuman, atl. tucumán
+
+❌ Boca Juniors (1 partite mancanti)
+   Alias usati: boca juniors, juniors, boca
+
+❌ Gimnasia (1 partite mancanti)
+   Alias usati: gimnasia
+
+❌ Vélez Sarsfield (1 partite mancanti)
+   Alias usati: sarsfield, velez, vélez, velez sarsfield, vélez sarsfield
+
+❌ Unión Santa Fe (1 partite mancanti)
+   Alias usati: santa, unión santa fe, union santa fe, union, unión
+
+❌ Banfield (1 partite mancanti)
+   Alias usati: banfield
+
+❌ New York (1 partite mancanti)
+   Alias usati: new york, york
+
+❌ New England (1 partite mancanti)
+   Alias usati: england, new england
+
+❌ Chicago (1 partite mancanti)
+   Alias usati: chicago
+
+❌ Montréal (1 partite mancanti)
+   Alias usati: montreal, montréal
+
+❌ Minnesota (1 partite mancanti)
+   Alias usati: minnesota
+
+❌ Cincinnati (1 partite mancanti)
+   Alias usati: cincinnati
+
+❌ Colorado (1 partite mancanti)
+   Alias usati: colorado
+
+❌ Portland (1 partite mancanti)
+   Alias usati: portland
+
+❌ Orlando (1 partite mancanti)
+   Alias usati: orlando
+
+❌ Miami (1 partite mancanti)
+   Alias usati: miami
+
+❌ SJ Earthquakes (1 partite mancanti)
+   Alias usati: earthquakes, sj earthquakes
+
+❌ Atlanta (1 partite mancanti)
+   Alias usati: atlanta
+
+❌ Salt Lake (1 partite mancanti)
+   Alias usati: lake, salt lake, salt
+
+❌ Seattle (1 partite mancanti)
+   Alias usati: seattle
+
+❌ Nashville (1 partite mancanti)
+   Alias usati: nashville
+
+❌ Houston (1 partite mancanti)
+   Alias usati: houston
+
+❌ Kansas City (1 partite mancanti)
+   Alias usati: kansas, kansas city, city
+
+❌ Columbus (1 partite mancanti)
+   Alias usati: columbus
+
+❌ San Diego (1 partite mancanti)
+   Alias usati: san diego, diego
+
+❌ St. Louis CITY (1 partite mancanti)
+   Alias usati: city, st. louis, louis, st. louis city
+
+❌ Vancouver (1 partite mancanti)
+   Alias usati: vancouver
+
+❌ Toronto (1 partite mancanti)
+   Alias usati: toronto
+
+❌ LA Galaxy (1 partite mancanti)
+   Alias usati: la galaxy, galaxy
+
+❌ Charlotte (1 partite mancanti)
+   Alias usati: charlotte
+
+❌ Philadelphia (1 partite mancanti)
+   Alias usati: philadelphia
+
+❌ New York City (1 partite mancanti)
+   Alias usati: new york, new york city, york, city
+
+
+💡 SUGGERIMENTI:
+1. Vai sul sito NowGoal e cerca queste squadre
+2. Annota il nome ESATTO usato sul sito
+3. Aggiungi il nome del sito come alias nel database
+4. Se il nome è molto diverso, aggiorna normalize_name()
+
+================================================================================
+DETTAGLIO PARTITE NON TROVATE
+================================================================================
+
+
+SOLO_TRASFERTA_TROVATA (7 partite)
+--------------------------------------------------------------------------------
+  • Saint-Étienne vs Clermont Foot
+    Lega: Ligue 2 - Giornata: 19
+
+    📄 RIGA SUL SITO:
+    19 17-01
+20:55 Saint Etienne[3]
+-
+Clermont[11]
+1.40 4.00 6.50   
+    💡 Cerca 'Saint-Étienne' in questa riga per vedere come si chiama sul sito
+    ⚠️ Trasferta trovata in altre righe
+
+  • Västerås SK vs Elfsborg
+    Lega: Allsvenskan - Giornata: 2
+
+    📄 RIGA SUL SITO:
+    2 12-04
+14:00 Vasteras SK FK - Elfsborg
+    💡 Cerca 'Västerås SK' in questa riga per vedere come si chiama sul sito
+    ⚠️ Trasferta trovata in altre righe
+
+  • HamKam vs Viking
+    Lega: Eliteserien - Giornata: 1
+
+    📄 RIGA SUL SITO:
+    1 14-03
+16:00 Ham-Kam - Viking
+    💡 Cerca 'HamKam' in questa riga per vedere come si chiama sul sito
+    ⚠️ Trasferta trovata in altre righe
+
+  • Lillestrøm vs Kristiansund
+    Lega: Eliteserien - Giornata: 2
+
+    📄 RIGA SUL SITO:
+    2 22-03
+17:00 Lillestrom - Kristiansund BK
+    💡 Cerca 'Lillestrøm' in questa riga per vedere come si chiama sul sito
+    ⚠️ Trasferta trovata in altre righe
+
+  • Union SG vs KV Mechelen
+    Lega: Jupiler Pro League - Giornata: 21
+
+    📄 RIGA SUL SITO:
+    21 17-01
+20:45 Saint Gilloise[1]
+-
+Mechelen[5]
+1.25 5.00 10.00   
+    💡 Cerca 'Union SG' in questa riga per vedere come si chiama sul sito
+    ⚠️ Trasferta trovata in altre righe
+
+  • Godoy Cruz vs Barracas C.
+    Lega: Primera División - Giornata: 1
+
+    📄 RIGA SUL SITO:
+    1 24-01
+21:00 Barracas Central - River Plate
+4.75 3.10 1.91
+    💡 Cerca 'Godoy Cruz' in questa riga per vedere come si chiama sul sito
+    ⚠️ Trasferta trovata in altre righe
+
+  • LAFC vs Dallas
+    Lega: Major League Soccer - Giornata: 3
+
+    📄 RIGA SUL SITO:
+    3 01-03
+02:30 FC Dallas - Nashville
+    💡 Cerca 'LAFC' in questa riga per vedere come si chiama sul sito
+    ⚠️ Trasferta trovata in altre righe
+
+
+SOLO_CASA_TROVATA (8 partite)
+--------------------------------------------------------------------------------
+  • Le Mans FC vs Saint-Étienne
+    Lega: Ligue 2 - Giornata: 18
+
+    📄 RIGA SUL SITO:
+    18 03-01
+20:00 Le Mans[3]
+0-0
+Saint Etienne[2]
+2.40 3.40 2.63    0-0
+    💡 Cerca 'Saint-Étienne' in questa riga per vedere come si chiama sul sito
+    ⚠️ Casa trovata in altre righe
+
+  • Stade Reims vs Saint-Étienne
+    Lega: Ligue 2 - Giornata: 20
+
+    📄 RIGA SUL SITO:
+    20 23-01
+20:00 Amiens - Stade Lavallois MFC
+    💡 Cerca 'Saint-Étienne' in questa riga per vedere come si chiama sul sito
+    ⚠️ Casa trovata in altre righe
+
+  • Kalmar FF vs Västerås SK
+    Lega: Allsvenskan - Giornata: 1
+
+    📄 RIGA SUL SITO:
+    1 05-04
+14:00 Kalmar - Vasteras SK FK
+    💡 Cerca 'Västerås SK' in questa riga per vedere come si chiama sul sito
+    ⚠️ Casa trovata in altre righe
+
+  • Sarpsborg 08 vs Bodø/Glimt
+    Lega: Eliteserien - Giornata: 1
+
+    📄 RIGA SUL SITO:
+    1 15-03
+17:00 Sarpsborg 08 - Bodo Glimt
+    💡 Cerca 'Bodø/Glimt' in questa riga per vedere come si chiama sul sito
+    ⚠️ Casa trovata in altre righe
+
+  • Aalesund vs Lillestrøm
+    Lega: Eliteserien - Giornata: 1
+
+    📄 RIGA SUL SITO:
+    1 15-03
+17:00 Aalesund FK - Lillestrom
+    💡 Cerca 'Lillestrøm' in questa riga per vedere come si chiama sul sito
+    ⚠️ Casa trovata in altre righe
+
+  • Cercle Bruges vs Union SG
+    Lega: Jupiler Pro League - Giornata: 20
+
+    📄 RIGA SUL SITO:
+    20 26-12
+16:00 1Cercle Brugge[15]
+1-1
+Saint Gilloise[1]1
+3.80 3.50 1.83    1-1
+    💡 Cerca 'Union SG' in questa riga per vedere come si chiama sul sito
+    ⚠️ Casa trovata in altre righe
+
+  • OH Leuven vs Union SG
+    Lega: Jupiler Pro League - Giornata: 22
+
+    📄 RIGA SUL SITO:
+    22 24-01
+20:45 Oud-Heverlee Leuven - Saint Gilloise
+    💡 Cerca 'Union SG' in questa riga per vedere come si chiama sul sito
+    ⚠️ Casa trovata in altre righe
+
+  • Houston vs LAFC
+    Lega: Major League Soccer - Giornata: 2
+
+    📄 RIGA SUL SITO:
+    2 22-02
+02:30 Houston Dynamo - Chicago Fire
+    💡 Cerca 'LAFC' in questa riga per vedere come si chiama sul sito
+    ⚠️ Casa trovata in altre righe
+
+
+NESSUNA_SQUADRA_TROVATA (1 partite)
+--------------------------------------------------------------------------------
+  • Bodø/Glimt vs HamKam
+    Lega: Eliteserien - Giornata: 2
+    Nota: Nessuna delle due squadre trovata sul sito
+
+
+SQUADRE_IN_RIGHE_DIVERSE (24 partite)
+--------------------------------------------------------------------------------
+  • Sarmiento Junín vs Instituto ACC
+    Lega: Primera División - Giornata: 1
+
+  • Argentinos Jrs. vs Rosario Central
+    Lega: Primera División - Giornata: 1
+
+  • Newell's vs Platense
+    Lega: Primera División - Giornata: 1
+
+  • Huracán vs Defensa
+    Lega: Primera División - Giornata: 1
+
+  • Independiente vs CA Talleres
+    Lega: Primera División - Giornata: 1
+
+  • Dep. Riestra vs San Lorenzo
+    Lega: Primera División - Giornata: 1
+
+  • Belgrano vs Racing
+    Lega: Primera División - Giornata: 1
+
+  • Lanús vs Ind. Rivadavia
+    Lega: Primera División - Giornata: 1
+
+  • Atl. Tucumán vs Boca Juniors
+    Lega: Primera División - Giornata: 1
+
+  • Gimnasia vs Vélez Sarsfield
+    Lega: Primera División - Giornata: 1
+
+  ... e altre 14 partite
+
+
+================================================================================
+ℹ️ PARTITE TROVATE MA SENZA QUOTE (NORMALE)
+================================================================================
+
+Totale: 102 partite
+Queste partite sono sul sito ma le quote non sono ancora pubblicate.
+Riprova più tardi, specialmente vicino alla data della partita.
+
+
+Championship: 12 partite
+
+LaLiga 2: 11 partite
+
+2. Bundesliga: 9 partite
+
+Ligue 2: 8 partite
+
+Allsvenskan: 14 partite
+
+Eliteserien: 11 partite
+
+Superligaen: 6 partite
+
+Jupiler Pro League: 7 partite
+
+Süper Lig: 9 partite
+
+Major League Soccer: 15 partite

@@ -1,0 +1,158 @@
+{
+    "Serie A": {
+        "avg_goals": 2.37,
+        "season_start": "23 Aug",
+        "next_update_check": "2026-08-08",
+        "last_updated": "2026-01-13"
+    },
+    "Serie B": {
+        "avg_goals": 2.47,
+        "season_start": "22 Aug",
+        "next_update_check": "2026-08-07",
+        "last_updated": "2026-01-13"
+    },
+    "Serie C - Girone A": {
+        "avg_goals": 2.2,
+        "season_start": "23 Aug",
+        "next_update_check": "2026-08-08",
+        "last_updated": "2026-01-13"
+    },
+    "Serie C - Girone B": {
+        "avg_goals": 2.28,
+        "season_start": "22 Aug",
+        "next_update_check": "2026-08-07",
+        "last_updated": "2026-01-13"
+    },
+    "Serie C - Girone C": {
+        "avg_goals": 2.52,
+        "season_start": "24 Aug",
+        "next_update_check": "2026-08-09",
+        "last_updated": "2026-01-13"
+    },
+    "Premier League": {
+        "avg_goals": 2.8,
+        "season_start": "15 Aug",
+        "next_update_check": "2026-07-31",
+        "last_updated": "2026-01-13"
+    },
+    "Championship": {
+        "avg_goals": 2.61,
+        "season_start": "8 Aug",
+        "next_update_check": "2026-07-24",
+        "last_updated": "2026-01-13"
+    },
+    "La Liga": {
+        "avg_goals": 2.57,
+        "season_start": "15 Aug",
+        "next_update_check": "2026-07-31",
+        "last_updated": "2026-01-13"
+    },
+    "LaLiga 2": {
+        "avg_goals": 2.55,
+        "season_start": "15 Aug",
+        "next_update_check": "2026-07-31",
+        "last_updated": "2026-01-13"
+    },
+    "Bundesliga": {
+        "avg_goals": 3.25,
+        "season_start": "22 Aug",
+        "next_update_check": "2026-08-07",
+        "last_updated": "2026-01-13"
+    },
+    "2. Bundesliga": {
+        "avg_goals": 2.82,
+        "season_start": "1 Aug",
+        "next_update_check": "2026-07-17",
+        "last_updated": "2026-01-13"
+    },
+    "Ligue 1": {
+        "avg_goals": 2.84,
+        "season_start": "15 Aug",
+        "next_update_check": "2026-07-31",
+        "last_updated": "2026-01-13"
+    },
+    "Ligue 2": {
+        "avg_goals": 2.55,
+        "season_start": "9 Aug",
+        "next_update_check": "2026-07-25",
+        "last_updated": "2026-01-13"
+    },
+    "Eredivisie": {
+        "avg_goals": 3.24,
+        "season_start": "8 Aug",
+        "next_update_check": "2026-07-24",
+        "last_updated": "2026-01-13"
+    },
+    "Liga Portugal": {
+        "avg_goals": 2.73,
+        "season_start": "8 Aug",
+        "next_update_check": "2026-07-24",
+        "last_updated": "2026-01-13"
+    },
+    "Scottish Premiership": {
+        "avg_goals": 2.53,
+        "season_start": "2 Aug",
+        "next_update_check": "2026-07-18",
+        "last_updated": "2026-01-13"
+    },
+    "Jupiler Pro League": {
+        "avg_goals": 2.53,
+        "season_start": "25 Jul",
+        "next_update_check": "2026-07-10",
+        "last_updated": "2026-01-13"
+    },
+    "S\u00fcper Lig": {
+        "avg_goals": 2.6,
+        "season_start": "8 Aug",
+        "next_update_check": "2026-07-24",
+        "last_updated": "2026-01-13"
+    },
+    "Allsvenskan": {
+        "avg_goals": 2.85,
+        "season_start": "29 Mar",
+        "next_update_check": "2026-03-14",
+        "last_updated": "2026-01-13"
+    },
+    "Eliteserien": {
+        "avg_goals": 3.19,
+        "season_start": "29 Mar",
+        "next_update_check": "2026-03-14",
+        "last_updated": "2026-01-13"
+    },
+    "Superligaen": {
+        "avg_goals": 3.22,
+        "season_start": "18 Jul",
+        "next_update_check": "2026-07-03",
+        "last_updated": "2026-01-13"
+    },
+    "League of Ireland": {
+        "avg_goals": 2.43,
+        "season_start": "14 Feb",
+        "next_update_check": "2026-01-30",
+        "last_updated": "2026-01-13"
+    },
+    "Brasileir\u00e3o": {
+        "avg_goals": 2.52,
+        "season_start": "29 Mar",
+        "next_update_check": "2026-03-14",
+        "last_updated": "2026-01-13"
+    },
+    "Primera Divisi\u00f3n": {
+        "avg_goals": 2.5,
+        "season_start": "22 Jan",
+        "next_update_check": "2026-01-07",
+        "last_updated": "2026-01-13"
+    },
+    "MLS": {
+        "avg_goals": 3.0,
+        "season_start": "22 Feb",
+        "next_update_check": "2026-02-07",
+        "last_updated": "2026-01-13"
+    },
+    "J1 League": {
+        "avg_goals": 2.4,
+        "season_start": "14 Feb",
+        "next_update_check": "2026-01-30",
+        "last_updated": "2026-01-13"
+    }
+}

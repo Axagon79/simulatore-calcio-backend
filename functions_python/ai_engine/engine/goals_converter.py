@@ -148,19 +148,29 @@ except:
     DB_AVAILABLE = False
 
 
-# --- 2. CARICAMENTO MEDIE LEGHE (JSON) ---
-LEAGUE_STATS_FILE = os.path.join(current_path, "league_stats.json")
+# === SISTEMA IBRIDO: DB league_stats → JSON fallback ===
 LEAGUE_AVERAGES = {}
-
 try:
-    if os.path.exists(LEAGUE_STATS_FILE):
-        with open(LEAGUE_STATS_FILE, "r", encoding="utf-8") as f:
-            data = json.load(f)
-            for league, stats in data.items():
-                # Carichiamo la media gol della lega (es. 2.50) e la dividiamo per 2 (squadra)
-                val = stats.get("avg_goals", 2.5) if isinstance(stats, dict) else stats
-                LEAGUE_AVERAGES[league] = val / 2.0
+    from config import db  # DB già importato? Se no, aggiungi qui
+    docs = list(db.league_stats.find())
+    for doc in docs:
+        LEAGUE_AVERAGES[doc['_id']] = doc.get('avg_goals', 2.5)
+    print(f"✅ LEAGUE_AVERAGES da DB league_stats: {len(LEAGUE_AVERAGES)} campionati")
 except Exception as e:
+    print(f"⚠️ DB league_stats non disponibile: {e}")
+    # === FALLBACK JSON (come prima) ===
+    LEAGUE_STATS_FILE = os.path.join(current_path, "leaguestats.json")
+    try:
+        if os.path.exists(LEAGUE_STATS_FILE):
+            with open(LEAGUE_STATS_FILE, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                for league, stats in data.items():
+                    val = stats.get('avg_goals', 2.5) if isinstance(stats, dict) else stats
+                    LEAGUE_AVERAGES[league] = val
+                print(f"✅ Fallback JSON: {len(LEAGUE_AVERAGES)} campionati")
+    except Exception as e2:
+        print(f"❌ Anche JSON fallito: {e2}")
+        LEAGUE_AVERAGES = {"Serie A": 2.5}  # Ultimo fallback
     print(f"⚠️ Warning: Impossibile caricare league_stats.json ({e})")
 
 

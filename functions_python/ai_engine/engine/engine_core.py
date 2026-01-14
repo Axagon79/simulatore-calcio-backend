@@ -47,6 +47,7 @@ try: import ai_engine.calculators.calculate_valore_rosa as value_rosa_lib
 except: value_rosa_lib = None
 
 AI_ENGINE_DIR = os.path.dirname(CURRENT_DIR)
+
 STATS_FILE = os.path.join(AI_ENGINE_DIR, "league_stats.json")
 LEAGUE_STATS = {}
 CACHE_FILE = os.path.join(CURRENT_DIR, "last_match_data.json")
@@ -129,20 +130,34 @@ ALGO_NAMES = {
     5: "MASTER (Ensemble)"
 }
 
+# === SISTEMA IBRIDO: DB league_stats → JSON fallback ===
+LEAGUE_STATS = {}
 try:
-    if os.path.exists(STATS_FILE):
-        with open(STATS_FILE, "r", encoding="utf-8") as f:
-            LEAGUE_STATS = json.load(f)
-        print(f"✅ [ENGINE] Medie caricate.")
-    else:
-        if os.path.exists(os.path.join(CURRENT_DIR, "league_stats.json")):
-            with open(os.path.join(CURRENT_DIR, "league_stats.json"), "r", encoding="utf-8") as f:
-                LEAGUE_STATS = json.load(f)
-            print(f"✅ [ENGINE] Medie caricate (path locale).")
-        else:
-            print(f"⚠️ [ENGINE] File league_stats.json mancante.")
+    # db già importato all'inizio del file
+    docs = list(db.league_stats.find())
+    for doc in docs:
+        league_name = doc['_id']
+        avg_goals = doc.get('avg_goals', 2.50)
+        LEAGUE_STATS[league_name] = {
+            'avg_goals': avg_goals,
+            'avg_home_league': avg_goals / 2,
+            'avg_away_league': avg_goals / 2
+        }
+    print(f"✅ LEAGUE_STATS da DB league_stats: {len(LEAGUE_STATS)} campionati")
 except Exception as e:
-    print(f"❌ [ENGINE] Errore JSON: {e}")
+    print(f"⚠️ DB league_stats non disponibile: {e}")
+    # === FALLBACK JSON (come prima) ===
+    STATS_FILE = os.path.join(AI_ENGINE_DIR, "league_stats.json")
+    try:
+        if os.path.exists(STATS_FILE):
+            with open(STATS_FILE, "r", encoding="utf-8") as f:
+                LEAGUE_STATS = json.load(f)
+            print(f"✅ Fallback JSON league_stats.json: {len(LEAGUE_STATS)}")
+        else:
+            print(f"⚠️ File {STATS_FILE} non trovato")
+    except Exception as e2:
+        print(f"❌ Anche JSON fallito: {e2}")
+
 
 DEFAULT_LEAGUE_AVG = 2.50
 

@@ -1,0 +1,528 @@
+[debug] [2026-01-13T17:27:28.832Z] ----------------------------------------------------------------------
+[debug] [2026-01-13T17:27:28.835Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\lollo\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js emulators:start --only functions
+[debug] [2026-01-13T17:27:28.836Z] CLI Version:   15.1.0
+[debug] [2026-01-13T17:27:28.836Z] Platform:      win32
+[debug] [2026-01-13T17:27:28.836Z] Node Version:  v22.12.0
+[debug] [2026-01-13T17:27:28.836Z] Time:          Tue Jan 13 2026 18:27:28 GMT+0100 (Ora standard dell’Europa centrale)
+[debug] [2026-01-13T17:27:28.837Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-01-13T17:27:31.421Z] Field "/functions" in "firebase.json" is possibly invalid: must be object
+[debug] [2026-01-13T17:27:31.422Z] Field "/functions" in "firebase.json" is possibly invalid: must be object
+[debug] [2026-01-13T17:27:31.422Z] Object "/functions/0" in "firebase.json" has unknown property: {"additionalProperty":"include"}
+[debug] [2026-01-13T17:27:31.422Z] Object "/functions/0" in "firebase.json" is missing required property: {"missingProperty":"remoteSource"}
+[debug] [2026-01-13T17:27:31.422Z] Field "/functions/0" in "firebase.json" is possibly invalid: must match a schema in anyOf
+[debug] [2026-01-13T17:27:31.422Z] Field "/functions" in "firebase.json" is possibly invalid: must match a schema in anyOf
+[debug] [2026-01-13T17:27:31.429Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-01-13T17:27:31.430Z] > authorizing via signed-in user (lollotj@gmail.com)
+[info] i  emulators: Starting emulators: functions {"metadata":{"emulator":{"name":"hub"},"message":"Starting emulators: functions"}}
+[debug] [2026-01-13T17:27:31.442Z] [logging] Logging Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2026-01-13T17:27:31.443Z] assigned listening specs for emulators {"user":{"hub":[{"address":"127.0.0.1","family":"IPv4","port":4400},{"address":"::1","family":"IPv6","port":4400}],"ui":[{"address":"127.0.0.1","family":"IPv4","port":4000},{"address":"::1","family":"IPv6","port":4000}],"logging":[{"address":"127.0.0.1","family":"IPv4","port":4500}]},"metadata":{"message":"assigned listening specs for emulators"}}
+[debug] [2026-01-13T17:27:31.451Z] Emulator locator file path: C:\Users\lollo\AppData\Local\Temp\hub-puppals-456c7.json
+[warn] !  emulators: It seems that you are running multiple instances of the emulator suite for project puppals-456c7. This may result in unexpected behavior. 
+[debug] [2026-01-13T17:27:31.453Z] [hub] writing locator at C:\Users\lollo\AppData\Local\Temp\hub-puppals-456c7.json
+[debug] [2026-01-13T17:27:31.470Z] [functions] Functions Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2026-01-13T17:27:31.470Z] [eventarc] Eventarc Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2026-01-13T17:27:31.470Z] [tasks] Cloud Tasks Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2026-01-13T17:27:31.471Z] late-assigned ports for functions and eventarc emulators {"user":{"hub":[{"address":"127.0.0.1","family":"IPv4","port":4400},{"address":"::1","family":"IPv6","port":4400}],"ui":[{"address":"127.0.0.1","family":"IPv4","port":4000},{"address":"::1","family":"IPv6","port":4000}],"logging":[{"address":"127.0.0.1","family":"IPv4","port":4500}],"functions":[{"address":"127.0.0.1","family":"IPv4","port":5001}],"eventarc":[{"address":"127.0.0.1","family":"IPv4","port":9299}],"tasks":[{"address":"127.0.0.1","family":"IPv4","port":9499}]},"metadata":{"message":"late-assigned ports for functions and eventarc emulators"}}
+[warn] !  functions: The following emulators are not running, calls to these services from the Functions emulator will affect production: apphosting, auth, firestore, database, hosting, pubsub, storage, dataconnect {"metadata":{"emulator":{"name":"functions"},"message":"The following emulators are not running, calls to these services from the Functions emulator will affect production: \u001b[1mapphosting, auth, firestore, database, hosting, pubsub, storage, dataconnect\u001b[22m"}}
+[warn] !  functions: Application Default Credentials detected. Non-emulated services will access production using these credentials. Be careful! {"metadata":{"emulator":{"name":"functions"},"message":"Application Default Credentials detected. Non-emulated services will access production using these credentials. Be careful!"}}
+[debug] [2026-01-13T17:27:45.613Z] Checked if tokens are valid: false, expires at: 1768264832114
+[debug] [2026-01-13T17:27:45.613Z] Checked if tokens are valid: false, expires at: 1768264832114
+[debug] [2026-01-13T17:27:45.613Z] > refreshing access token with scopes: []
+[debug] [2026-01-13T17:27:45.617Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-01-13T17:27:45.617Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-01-13T17:27:45.737Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2026-01-13T17:27:45.738Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-01-13T17:27:45.749Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/puppals-456c7/adminSdkConfig [none]
+[debug] [2026-01-13T17:27:46.464Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/puppals-456c7/adminSdkConfig 200
+[debug] [2026-01-13T17:27:46.464Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/puppals-456c7/adminSdkConfig {"projectId":"puppals-456c7","storageBucket":"puppals-456c7.firebasestorage.app"}
+[info] i  ui: downloading ui-v1.15.0.zip... {"metadata":{"emulator":{"name":"ui"},"message":"downloading ui-v1.15.0.zip..."}}
+[debug] [2026-01-13T17:27:46.495Z] >>> [apiv2][query] GET https://storage.googleapis.com/firebase-preview-drop/emulator/ui-v1.15.0.zip 
+[debug] [2026-01-13T17:27:46.592Z] <<< [apiv2][status] GET https://storage.googleapis.com/firebase-preview-drop/emulator/ui-v1.15.0.zip 200
+[debug] [2026-01-13T17:27:46.592Z] <<< [apiv2][body] GET https://storage.googleapis.com/firebase-preview-drop/emulator/ui-v1.15.0.zip [stream]
+[debug] [2026-01-13T17:27:46.759Z] Data is 3538469
+[debug] [2026-01-13T17:27:46.760Z] [unzip] Entry: client/ (compressed_size=0 bytes, uncompressed_size=0 bytes)
+[debug] [2026-01-13T17:27:46.760Z] [unzip] Processing entry: client\
+[debug] [2026-01-13T17:27:46.760Z] [unzip] mkdir: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\
+[debug] [2026-01-13T17:27:46.760Z] [unzip] Entry: client/favicon-16x16.png (compressed_size=293 bytes, uncompressed_size=293 bytes)
+[debug] [2026-01-13T17:27:46.761Z] [unzip] Processing entry: client\favicon-16x16.png
+[debug] [2026-01-13T17:27:46.761Z] [unzip] else mkdir: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client
+[debug] [2026-01-13T17:27:46.761Z] [unzip] Writing file: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\favicon-16x16.png
+[debug] [2026-01-13T17:27:46.762Z] [unzip] Entry: client/safari-pinned-tab.svg (compressed_size=1433 bytes, uncompressed_size=2611 bytes)
+[debug] [2026-01-13T17:27:46.762Z] [unzip] Processing entry: client\safari-pinned-tab.svg
+[debug] [2026-01-13T17:27:46.762Z] [unzip] else mkdir: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client
+[debug] [2026-01-13T17:27:46.762Z] [unzip] deflating: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\safari-pinned-tab.svg
+[debug] [2026-01-13T17:27:46.767Z] [unzip] Entry: client/favicon.ico (compressed_size=2933 bytes, uncompressed_size=13294 bytes)
+[debug] [2026-01-13T17:27:46.767Z] [unzip] Processing entry: client\favicon.ico
+[debug] [2026-01-13T17:27:46.767Z] [unzip] else mkdir: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client
+[debug] [2026-01-13T17:27:46.767Z] [unzip] deflating: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\favicon.ico
+[debug] [2026-01-13T17:27:46.769Z] [unzip] Entry: client/index.html (compressed_size=1364 bytes, uncompressed_size=3071 bytes)
+[debug] [2026-01-13T17:27:46.769Z] [unzip] Processing entry: client\index.html
+[debug] [2026-01-13T17:27:46.769Z] [unzip] else mkdir: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client
+[debug] [2026-01-13T17:27:46.769Z] [unzip] deflating: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\index.html
+[debug] [2026-01-13T17:27:46.771Z] [unzip] Entry: client/android-chrome-192x192.png (compressed_size=2684 bytes, uncompressed_size=2684 bytes)
+[debug] [2026-01-13T17:27:46.771Z] [unzip] Processing entry: client\android-chrome-192x192.png
+[debug] [2026-01-13T17:27:46.771Z] [unzip] else mkdir: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client
+[debug] [2026-01-13T17:27:46.771Z] [unzip] Writing file: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\android-chrome-192x192.png
+[debug] [2026-01-13T17:27:46.772Z] [unzip] Entry: client/apple-touch-icon.png (compressed_size=2123 bytes, uncompressed_size=2152 bytes)
+[debug] [2026-01-13T17:27:46.772Z] [unzip] Processing entry: client\apple-touch-icon.png
+[debug] [2026-01-13T17:27:46.772Z] [unzip] else mkdir: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client
+[debug] [2026-01-13T17:27:46.772Z] [unzip] deflating: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\apple-touch-icon.png
+[debug] [2026-01-13T17:27:46.773Z] [unzip] Entry: client/android-chrome-512x512.png (compressed_size=5369 bytes, uncompressed_size=5411 bytes)
+[debug] [2026-01-13T17:27:46.773Z] [unzip] Processing entry: client\android-chrome-512x512.png
+[debug] [2026-01-13T17:27:46.773Z] [unzip] else mkdir: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client
+[debug] [2026-01-13T17:27:46.774Z] [unzip] deflating: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\android-chrome-512x512.png
+[debug] [2026-01-13T17:27:46.775Z] [unzip] Entry: client/manifest.json (compressed_size=245 bytes, uncompressed_size=551 bytes)
+[debug] [2026-01-13T17:27:46.775Z] [unzip] Processing entry: client\manifest.json
+[debug] [2026-01-13T17:27:46.775Z] [unzip] else mkdir: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client
+[debug] [2026-01-13T17:27:46.775Z] [unzip] deflating: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\manifest.json
+[debug] [2026-01-13T17:27:46.776Z] [unzip] Entry: client/robots.txt (compressed_size=26 bytes, uncompressed_size=26 bytes)
+[debug] [2026-01-13T17:27:46.776Z] [unzip] Processing entry: client\robots.txt
+[debug] [2026-01-13T17:27:46.776Z] [unzip] else mkdir: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client
+[debug] [2026-01-13T17:27:46.777Z] [unzip] Writing file: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\robots.txt
+[debug] [2026-01-13T17:27:46.801Z] [unzip] Entry: client/mstile-150x150.png (compressed_size=2034 bytes, uncompressed_size=2034 bytes)
+[debug] [2026-01-13T17:27:46.801Z] [unzip] Processing entry: client\mstile-150x150.png
+[debug] [2026-01-13T17:27:46.801Z] [unzip] else mkdir: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client
+[debug] [2026-01-13T17:27:46.806Z] [unzip] Writing file: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\mstile-150x150.png
+[debug] [2026-01-13T17:27:46.807Z] [unzip] Entry: client/assets/ (compressed_size=0 bytes, uncompressed_size=0 bytes)
+[debug] [2026-01-13T17:27:46.807Z] [unzip] Processing entry: client\assets\
+[debug] [2026-01-13T17:27:46.807Z] [unzip] mkdir: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\assets\
+[debug] [2026-01-13T17:27:46.807Z] [unzip] Entry: client/assets/index-BX-A56oj.js (compressed_size=582089 bytes, uncompressed_size=2092775 bytes)
+[debug] [2026-01-13T17:27:46.807Z] [unzip] Processing entry: client\assets\index-BX-A56oj.js
+[debug] [2026-01-13T17:27:46.807Z] [unzip] else mkdir: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\assets
+[debug] [2026-01-13T17:27:46.808Z] [unzip] deflating: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\assets\index-BX-A56oj.js
+[debug] [2026-01-13T17:27:46.821Z] [unzip] Entry: client/assets/index-CjB9C900.css (compressed_size=35979 bytes, uncompressed_size=298654 bytes)
+[debug] [2026-01-13T17:27:46.821Z] [unzip] Processing entry: client\assets\index-CjB9C900.css
+[debug] [2026-01-13T17:27:46.821Z] [unzip] else mkdir: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\assets
+[debug] [2026-01-13T17:27:46.822Z] [unzip] deflating: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\assets\index-CjB9C900.css
+[debug] [2026-01-13T17:27:46.824Z] [unzip] Entry: client/assets/index-BX-A56oj.js.map (compressed_size=2362482 bytes, uncompressed_size=10036679 bytes)
+[debug] [2026-01-13T17:27:46.824Z] [unzip] Processing entry: client\assets\index-BX-A56oj.js.map
+[debug] [2026-01-13T17:27:46.824Z] [unzip] else mkdir: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\assets
+[debug] [2026-01-13T17:27:46.825Z] [unzip] deflating: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\assets\index-BX-A56oj.js.map
+[debug] [2026-01-13T17:27:46.881Z] [unzip] Entry: client/assets/extensions/ (compressed_size=0 bytes, uncompressed_size=0 bytes)
+[debug] [2026-01-13T17:27:46.881Z] [unzip] Processing entry: client\assets\extensions\
+[debug] [2026-01-13T17:27:46.881Z] [unzip] mkdir: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\assets\extensions\
+[debug] [2026-01-13T17:27:46.881Z] [unzip] Entry: client/assets/extensions/default-extension.png (compressed_size=1646 bytes, uncompressed_size=1657 bytes)
+[debug] [2026-01-13T17:27:46.881Z] [unzip] Processing entry: client\assets\extensions\default-extension.png
+[debug] [2026-01-13T17:27:46.881Z] [unzip] else mkdir: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\assets\extensions
+[debug] [2026-01-13T17:27:46.882Z] [unzip] deflating: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\assets\extensions\default-extension.png
+[debug] [2026-01-13T17:27:46.883Z] [unzip] Entry: client/assets/img/ (compressed_size=0 bytes, uncompressed_size=0 bytes)
+[debug] [2026-01-13T17:27:46.883Z] [unzip] Processing entry: client\assets\img\
+[debug] [2026-01-13T17:27:46.883Z] [unzip] mkdir: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\assets\img\
+[debug] [2026-01-13T17:27:46.883Z] [unzip] Entry: client/assets/img/database.png (compressed_size=29449 bytes, uncompressed_size=29988 bytes)
+[debug] [2026-01-13T17:27:46.883Z] [unzip] Processing entry: client\assets\img\database.png
+[debug] [2026-01-13T17:27:46.884Z] [unzip] else mkdir: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\assets\img
+[debug] [2026-01-13T17:27:46.884Z] [unzip] deflating: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\assets\img\database.png
+[debug] [2026-01-13T17:27:46.885Z] [unzip] Entry: client/assets/provider-icons/ (compressed_size=0 bytes, uncompressed_size=0 bytes)
+[debug] [2026-01-13T17:27:46.885Z] [unzip] Processing entry: client\assets\provider-icons\
+[debug] [2026-01-13T17:27:46.885Z] [unzip] mkdir: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons\
+[debug] [2026-01-13T17:27:46.885Z] [unzip] Entry: client/assets/provider-icons/auth_service_saml.svg (compressed_size=575 bytes, uncompressed_size=1226 bytes)
+[debug] [2026-01-13T17:27:46.885Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_saml.svg
+[debug] [2026-01-13T17:27:46.886Z] [unzip] else mkdir: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons
+[debug] [2026-01-13T17:27:46.886Z] [unzip] deflating: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons\auth_service_saml.svg
+[debug] [2026-01-13T17:27:46.887Z] [unzip] Entry: client/assets/provider-icons/auth_service_phone.svg (compressed_size=261 bytes, uncompressed_size=414 bytes)
+[debug] [2026-01-13T17:27:46.887Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_phone.svg
+[debug] [2026-01-13T17:27:46.887Z] [unzip] else mkdir: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons
+[debug] [2026-01-13T17:27:46.887Z] [unzip] deflating: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons\auth_service_phone.svg
+[debug] [2026-01-13T17:27:46.888Z] [unzip] Entry: client/assets/provider-icons/auth_service_facebook.svg (compressed_size=289 bytes, uncompressed_size=457 bytes)
+[debug] [2026-01-13T17:27:46.888Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_facebook.svg
+[debug] [2026-01-13T17:27:46.888Z] [unzip] else mkdir: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons
+[debug] [2026-01-13T17:27:46.889Z] [unzip] deflating: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons\auth_service_facebook.svg
+[debug] [2026-01-13T17:27:46.889Z] [unzip] Entry: client/assets/provider-icons/auth_service_game_center.svg (compressed_size=991 bytes, uncompressed_size=3921 bytes)
+[debug] [2026-01-13T17:27:46.890Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_game_center.svg
+[debug] [2026-01-13T17:27:46.890Z] [unzip] else mkdir: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons
+[debug] [2026-01-13T17:27:46.890Z] [unzip] deflating: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons\auth_service_game_center.svg
+[debug] [2026-01-13T17:27:46.891Z] [unzip] Entry: client/assets/provider-icons/auth_service_apple.svg (compressed_size=230 bytes, uncompressed_size=334 bytes)
+[debug] [2026-01-13T17:27:46.891Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_apple.svg
+[debug] [2026-01-13T17:27:46.891Z] [unzip] else mkdir: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons
+[debug] [2026-01-13T17:27:46.891Z] [unzip] deflating: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons\auth_service_apple.svg
+[debug] [2026-01-13T17:27:46.892Z] [unzip] Entry: client/assets/provider-icons/auth_service_github.svg (compressed_size=466 bytes, uncompressed_size=838 bytes)
+[debug] [2026-01-13T17:27:46.892Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_github.svg
+[debug] [2026-01-13T17:27:46.892Z] [unzip] else mkdir: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons
+[debug] [2026-01-13T17:27:46.893Z] [unzip] deflating: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons\auth_service_github.svg
+[debug] [2026-01-13T17:27:46.893Z] [unzip] Entry: client/assets/provider-icons/auth_service_mslive.svg (compressed_size=203 bytes, uncompressed_size=378 bytes)
+[debug] [2026-01-13T17:27:46.893Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_mslive.svg
+[debug] [2026-01-13T17:27:46.894Z] [unzip] else mkdir: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons
+[debug] [2026-01-13T17:27:46.894Z] [unzip] deflating: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons\auth_service_mslive.svg
+[debug] [2026-01-13T17:27:46.895Z] [unzip] Entry: client/assets/provider-icons/auth_service_yahoo.svg (compressed_size=577 bytes, uncompressed_size=1182 bytes)
+[debug] [2026-01-13T17:27:46.895Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_yahoo.svg
+[debug] [2026-01-13T17:27:46.895Z] [unzip] else mkdir: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons
+[debug] [2026-01-13T17:27:46.895Z] [unzip] deflating: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons\auth_service_yahoo.svg
+[debug] [2026-01-13T17:27:46.896Z] [unzip] Entry: client/assets/provider-icons/auth_service_twitter.svg (compressed_size=444 bytes, uncompressed_size=751 bytes)
+[debug] [2026-01-13T17:27:46.896Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_twitter.svg
+[debug] [2026-01-13T17:27:46.896Z] [unzip] else mkdir: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons
+[debug] [2026-01-13T17:27:46.896Z] [unzip] deflating: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons\auth_service_twitter.svg
+[debug] [2026-01-13T17:27:46.897Z] [unzip] Entry: client/assets/provider-icons/auth_service_play_games.svg (compressed_size=565 bytes, uncompressed_size=1173 bytes)
+[debug] [2026-01-13T17:27:46.897Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_play_games.svg
+[debug] [2026-01-13T17:27:46.897Z] [unzip] else mkdir: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons
+[debug] [2026-01-13T17:27:46.898Z] [unzip] deflating: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons\auth_service_play_games.svg
+[debug] [2026-01-13T17:27:46.899Z] [unzip] Entry: client/assets/provider-icons/auth_service_email.svg (compressed_size=228 bytes, uncompressed_size=326 bytes)
+[debug] [2026-01-13T17:27:46.899Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_email.svg
+[debug] [2026-01-13T17:27:46.899Z] [unzip] else mkdir: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons
+[debug] [2026-01-13T17:27:46.899Z] [unzip] deflating: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons\auth_service_email.svg
+[debug] [2026-01-13T17:27:46.900Z] [unzip] Entry: client/assets/provider-icons/auth_service_google.svg (compressed_size=409 bytes, uncompressed_size=720 bytes)
+[debug] [2026-01-13T17:27:46.900Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_google.svg
+[debug] [2026-01-13T17:27:46.900Z] [unzip] else mkdir: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons
+[debug] [2026-01-13T17:27:46.900Z] [unzip] deflating: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons\auth_service_google.svg
+[debug] [2026-01-13T17:27:46.901Z] [unzip] Entry: client/assets/provider-icons/auth_service_oidc.svg (compressed_size=414 bytes, uncompressed_size=858 bytes)
+[debug] [2026-01-13T17:27:46.901Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_oidc.svg
+[debug] [2026-01-13T17:27:46.901Z] [unzip] else mkdir: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons
+[debug] [2026-01-13T17:27:46.902Z] [unzip] deflating: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons\auth_service_oidc.svg
+[debug] [2026-01-13T17:27:46.903Z] [unzip] Entry: client/browserconfig.xml (compressed_size=491 bytes, uncompressed_size=822 bytes)
+[debug] [2026-01-13T17:27:46.903Z] [unzip] Processing entry: client\browserconfig.xml
+[debug] [2026-01-13T17:27:46.903Z] [unzip] else mkdir: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client
+[debug] [2026-01-13T17:27:46.903Z] [unzip] deflating: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\browserconfig.xml
+[debug] [2026-01-13T17:27:46.904Z] [unzip] Entry: client/favicon-32x32.png (compressed_size=475 bytes, uncompressed_size=475 bytes)
+[debug] [2026-01-13T17:27:46.904Z] [unzip] Processing entry: client\favicon-32x32.png
+[debug] [2026-01-13T17:27:46.904Z] [unzip] else mkdir: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client
+[debug] [2026-01-13T17:27:46.904Z] [unzip] Writing file: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\client\favicon-32x32.png
+[debug] [2026-01-13T17:27:46.905Z] [unzip] Entry: server/ (compressed_size=0 bytes, uncompressed_size=0 bytes)
+[debug] [2026-01-13T17:27:46.905Z] [unzip] Processing entry: server\
+[debug] [2026-01-13T17:27:46.905Z] [unzip] mkdir: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\server\
+[debug] [2026-01-13T17:27:46.906Z] [unzip] Entry: server/server.mjs.map (compressed_size=217845 bytes, uncompressed_size=944978 bytes)
+[debug] [2026-01-13T17:27:46.906Z] [unzip] Processing entry: server\server.mjs.map
+[debug] [2026-01-13T17:27:46.906Z] [unzip] else mkdir: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\server
+[debug] [2026-01-13T17:27:46.906Z] [unzip] deflating: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\server\server.mjs.map
+[debug] [2026-01-13T17:27:46.914Z] [unzip] Entry: server/server.mjs (compressed_size=276407 bytes, uncompressed_size=933701 bytes)
+[debug] [2026-01-13T17:27:46.914Z] [unzip] Processing entry: server\server.mjs
+[debug] [2026-01-13T17:27:46.914Z] [unzip] else mkdir: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\server
+[debug] [2026-01-13T17:27:46.914Z] [unzip] deflating: C:\Users\lollo\.cache\firebase\emulators\ui-v1.15.0\server\server.mjs
+[info] i  ui: Removing outdated emulator files: ui-v1.14.0 {"metadata":{"emulator":{"name":"ui"},"message":"Removing outdated emulator files: ui-v1.14.0"}}
+[info] i  ui: Removing outdated emulator files: ui-v1.14.0.zip {"metadata":{"emulator":{"name":"ui"},"message":"Removing outdated emulator files: ui-v1.14.0.zip"}}
+[info] i  functions: Watching "C:\Progetti\simulatore-calcio-backend\functions" for Cloud Functions... {"metadata":{"emulator":{"name":"functions"},"message":"Watching \"C:\\Progetti\\simulatore-calcio-backend\\functions\" for Cloud Functions..."}}
+[debug] [2026-01-13T17:27:46.958Z] Validating nodejs source
+[warn] !  functions: package.json indicates an outdated version of firebase-functions. Please upgrade using npm install --save firebase-functions@latest in your functions directory. 
+[warn] !  functions: Please note that there will be breaking changes when you upgrade. 
+[debug] [2026-01-13T17:27:48.138Z] > [functions] package.json contents: {
+  "name": "functions",
+  "description": "Cloud Functions for Firebase",
+  "scripts": {
+    "lint": "eslint .",
+    "serve": "firebase emulators:start --only functions",
+    "shell": "firebase functions:shell",
+    "start": "yarn run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log",
+    "lint:fix": "eslint . --fix",
+    "predeploy": "yarn run lint"
+  },
+  "engines": {
+    "node": "22"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "@google-cloud/vertexai": "^1.9.2",
+    "@google/generative-ai": "^0.21.0",
+    "@types/cors": "^2.8.17",
+    "axios": "^1.7.9",
+    "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.3",
+    "cors": "^2.8.5",
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.6.1",
+    "express": "^4.21.2",
+    "firebase-admin": "^13.0.2",
+    "firebase-functions": "^6.2.0",
+    "gcp-metadata": "^5.3.0",
+    "google-auth-library": "^9.15.0",
+    "googleapis": "^144.0.0",
+    "helmet": "^8.0.0",
+    "https": "^1.0.0",
+    "jest": "^29.7.0",
+    "joi": "^17.13.3",
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.21.0",
+    "mongoose": "^8.20.3",
+    "multer": "^1.4.5-lts.1",
+    "path": "^0.12.7",
+    "winston": "^3.17.0"
+  },
+  "devDependencies": {
+    "eslint": "^9.17.0",
+    "eslint-config-google": "^0.14.0",
+    "eslint-plugin-import": "^2.29.1",
+    "firebase-functions-test": "^3.4.0"
+  },
+  "private": true
+}
+[debug] [2026-01-13T17:27:48.139Z] Building nodejs source
+[debug] [2026-01-13T17:27:48.139Z] Failed to find version of module node: reached end of search path C:\Progetti\simulatore-calcio-backend\functions\node_modules
+[warn] !  functions: Your requested "node" version "20" doesn't match your global version "22". Using node@22 from host. 
+[debug] [2026-01-13T17:27:48.141Z] Could not find functions.yaml. Must use http discovery
+[debug] [2026-01-13T17:27:48.148Z] Found firebase-functions binary at 'C:\Progetti\simulatore-calcio-backend\functions\node_modules\.bin\firebase-functions'
+[info] Serving at port 8780
+
+[info] 📂 [simulationRoutes] Base: C:\Progetti\simulatore-calcio-backend\ai_engine\web_simulator_A.py
+
+[info] 📂 [simulationRoutes] DEV: C:\Progetti\simulatore-calcio-backend\ai_engine\web_simulator_A.py
+
+[error] (node:17268) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+[debug] [2026-01-13T17:27:49.178Z] Got response from /__/functions.yaml {"endpoints":{"api":{"availableMemoryMb":256,"timeoutSeconds":60,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","region":["us-central1"],"labels":{},"httpsTrigger":{"invoker":["public"]},"entryPoint":"api"}},"specVersion":"v1alpha1","requiredAPIs":[],"extensions":{}}
+[info] +  functions: Loaded functions definitions from source: api. {"metadata":{"emulator":{"name":"functions"},"message":"Loaded functions definitions from source: api."}}
+[info] +  functions[us-central1-api]: http function initialized (http://127.0.0.1:5001/puppals-456c7/us-central1/api). {"metadata":{"emulator":{"name":"functions"},"message":"\u001b[1mhttp\u001b[22m function initialized (http://127.0.0.1:5001/puppals-456c7/us-central1/api)."}}
+[info] i  functions: Watching "C:\Progetti\simulatore-calcio-backend\functions_python" for Cloud Functions... {"metadata":{"emulator":{"name":"functions"},"message":"Watching \"C:\\Progetti\\simulatore-calcio-backend\\functions_python\" for Cloud Functions..."}}
+[debug] [2026-01-13T17:27:53.215Z] Customer code is not Node
+[debug] [2026-01-13T17:27:53.215Z] Validating python source
+[debug] [2026-01-13T17:27:53.215Z] Building python source
+[info] i  functions: Loaded environment variables from .env. 
+[debug] [2026-01-13T17:27:53.218Z] Could not find functions.yaml. Must use http discovery
+[debug] [2026-01-13T17:27:53.222Z] Running command with virtualenv: command="C:\Progetti\simulatore-calcio-backend\functions_python\venv\Scripts\activate.bat", args=["","&&","python.exe","-c","\"import firebase_functions; import os; print(os.path.dirname(firebase_functions.__file__))\""]
+[debug] [2026-01-13T17:27:53.547Z] stdout: C:\Progetti\simulatore-calcio-backend\functions_python\venv\Lib\site-packages\firebase_functions
+
+[debug] [2026-01-13T17:27:53.555Z] Running admin server with args: ["python.exe","\"C:\\Progetti\\simulatore-calcio-backend\\functions_python\\venv\\Lib\\site-packages\\firebase_functions\\private\\serving.py\""] and env: {"GCLOUD_PROJECT":"puppals-456c7","K_REVISION":"1","PORT":"80","GOOGLE_CLOUD_QUOTA_PROJECT":"puppals-456c7","FUNCTIONS_EMULATOR":"true","TZ":"UTC","FIREBASE_DEBUG_MODE":"true","FIREBASE_DEBUG_FEATURES":"{\"skipTokenVerification\":true,\"enableCors\":true}","FIREBASE_EMULATOR_HUB":"127.0.0.1:4400","CLOUD_EVENTARC_EMULATOR_HOST":"http://127.0.0.1:9299","CLOUD_TASKS_EMULATOR_HOST":"127.0.0.1:9499","FIREBASE_CONFIG":"{\"storageBucket\":\"puppals-456c7.firebasestorage.app\",\"projectId\":\"puppals-456c7\"}","ADMIN_PORT":"8081"} in C:\Progetti\simulatore-calcio-backend\functions_python
+[debug] [2026-01-13T17:27:53.555Z] Running command with virtualenv: command="C:\Progetti\simulatore-calcio-backend\functions_python\venv\Scripts\activate.bat", args=["","&&","python.exe","\"C:\\Progetti\\simulatore-calcio-backend\\functions_python\\venv\\Lib\\site-packages\\firebase_functions\\private\\serving.py\""]
+[info]  * Serving Flask app 'serving'
+ * Debug mode: off
+
+[error] WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+[error] 
+ * Running on http://127.0.0.1:8081
+Press CTRL+C to quit
+
+[error] 127.0.0.1 - - [13/Jan/2026 17:27:55] "GET /__/functions.yaml HTTP/1.1" 200 -
+
+[debug] [2026-01-13T17:27:55.742Z] Got response from /__/functions.yaml endpoints:
+  get_formations:
+    availableMemoryMb: 256
+    concurrency: null
+    entryPoint: get_formations
+    httpsTrigger: {}
+    ingressSettings: null
+    labels: {}
+    maxInstances: null
+    minInstances: null
+    platform: gcfv2
+    region:
+    - us-central1
+    secretEnvironmentVariables: []
+    serviceAccountEmail: null
+    timeoutSeconds: 10
+  get_nations:
+    availableMemoryMb: 256
+    concurrency: null
+    entryPoint: get_nations
+    httpsTrigger: {}
+    ingressSettings: null
+    labels: {}
+    maxInstances: null
+    minInstances: null
+    platform: gcfv2
+    region:
+    - us-central1
+    secretEnvironmentVariables: []
+    serviceAccountEmail: null
+    timeoutSeconds: null
+  get_tuning:
+    availableMemoryMb: 256
+    concurrency: null
+    entryPoint: get_tuning
+    httpsTrigger: {}
+    ingressSettings: null
+    labels: {}
+    maxInstances: null
+    minInstances: null
+    platform: gcfv2
+    region:
+    - us-central1
+    secretEnvironmentVariables: []
+    serviceAccountEmail: null
+    timeoutSeconds: 10
+  run_simulation:
+    availableMemoryMb: 2048
+    concurrency: null
+    entryPoint: run_simulation
+    httpsTrigger: {}
+    ingressSettings: null
+    labels: {}
+    maxInstances: null
+    minInstances: null
+    platform: gcfv2
+    region:
+    - us-central1
+    secretEnvironmentVariables: []
+    serviceAccountEmail: null
+    timeoutSeconds: 540
+  save_tuning:
+    availableMemoryMb: 256
+    concurrency: null
+    entryPoint: save_tuning
+    httpsTrigger: {}
+    ingressSettings: null
+    labels: {}
+    maxInstances: null
+    minInstances: null
+    platform: gcfv2
+    region:
+    - us-central1
+    secretEnvironmentVariables: []
+    serviceAccountEmail: null
+    timeoutSeconds: 10
+params: []
+requiredAPIs: []
+specVersion: v1alpha1
+
+[error] 127.0.0.1 - - [13/Jan/2026 17:27:55] "GET /__/quitquitquit HTTP/1.1" 200 -
+
+[info] +  functions: Loaded functions definitions from source: get_formations, get_nations, get_tuning, run_simulation, save_tuning. {"metadata":{"emulator":{"name":"functions"},"message":"Loaded functions definitions from source: get_formations, get_nations, get_tuning, run_simulation, save_tuning."}}
+[info] +  functions[us-central1-get_formations]: http function initialized (http://127.0.0.1:5001/puppals-456c7/us-central1/get_formations). {"metadata":{"emulator":{"name":"functions"},"message":"\u001b[1mhttp\u001b[22m function initialized (http://127.0.0.1:5001/puppals-456c7/us-central1/get_formations)."}}
+[info] +  functions[us-central1-get_nations]: http function initialized (http://127.0.0.1:5001/puppals-456c7/us-central1/get_nations). {"metadata":{"emulator":{"name":"functions"},"message":"\u001b[1mhttp\u001b[22m function initialized (http://127.0.0.1:5001/puppals-456c7/us-central1/get_nations)."}}
+[info] +  functions[us-central1-get_tuning]: http function initialized (http://127.0.0.1:5001/puppals-456c7/us-central1/get_tuning). {"metadata":{"emulator":{"name":"functions"},"message":"\u001b[1mhttp\u001b[22m function initialized (http://127.0.0.1:5001/puppals-456c7/us-central1/get_tuning)."}}
+[info] +  functions[us-central1-run_simulation]: http function initialized (http://127.0.0.1:5001/puppals-456c7/us-central1/run_simulation). {"metadata":{"emulator":{"name":"functions"},"message":"\u001b[1mhttp\u001b[22m function initialized (http://127.0.0.1:5001/puppals-456c7/us-central1/run_simulation)."}}
+[info] +  functions[us-central1-save_tuning]: http function initialized (http://127.0.0.1:5001/puppals-456c7/us-central1/save_tuning). {"metadata":{"emulator":{"name":"functions"},"message":"\u001b[1mhttp\u001b[22m function initialized (http://127.0.0.1:5001/puppals-456c7/us-central1/save_tuning)."}}
+[debug] [2026-01-13T17:27:55.776Z] Could not find VSCode notification endpoint: FetchError: request to http://localhost:40001/vscode/notify failed, reason: connect ECONNREFUSED ::1:40001. If you are not running the Firebase Data Connect VSCode extension, this is expected and not an issue.
+[info] 
+┌─────────────────────────────────────────────────────────────┐
+│ ✔  All emulators ready! It is now safe to connect your app. │
+│ i  View Emulator UI at http://127.0.0.1:4000/               │
+└─────────────────────────────────────────────────────────────┘
+
+┌───────────┬────────────────┬─────────────────────────────────┐
+│ Emulator  │ Host:Port      │ View in Emulator UI             │
+├───────────┼────────────────┼─────────────────────────────────┤
+│ Functions │ 127.0.0.1:5001 │ http://127.0.0.1:4000/functions │
+└───────────┴────────────────┴─────────────────────────────────┘
+  Emulator Hub host: 127.0.0.1 port: 4400
+  Other reserved ports: 4500
+
+Issues? Report them at https://github.com/firebase/firebase-tools/issues and attach the *-debug.log files.
+ 
+[debug] [2026-01-13T17:28:04.214Z] [work-queue] {"queuedWork":["/puppals-456c7/us-central1/api/leagues-2026-01-13T17:28:04.214Z"],"queueLength":1,"runningWork":[],"workRunningCount":0}
+[debug] [2026-01-13T17:28:04.215Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":["/puppals-456c7/us-central1/api/leagues-2026-01-13T17:28:04.214Z"],"workRunningCount":1}
+[debug] [2026-01-13T17:28:04.215Z] Accepted request GET /puppals-456c7/us-central1/api/leagues?country=England --> us-central1-api
+[debug] [2026-01-13T17:28:04.218Z] [functions] Runtime ready! Sending request! {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Runtime ready! Sending request!"}}
+[debug] [2026-01-13T17:28:04.219Z] [functions] Got req.url=/puppals-456c7/us-central1/api/leagues?country=England, mapping to path=/leagues?country=England {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Got req.url=/puppals-456c7/us-central1/api/leagues?country=England, mapping to path=/leagues?country=England"}}
+[debug] [2026-01-13T17:28:04.226Z] [worker-pool] addWorker(us-central1-api) {"metadata":{"emulator":{"name":"functions"},"message":"[worker-pool] addWorker(us-central1-api)"}}
+[debug] [2026-01-13T17:28:04.227Z] [worker-pool] Adding worker with key us-central1-api, total=1 {"metadata":{"emulator":{"name":"functions"},"message":"[worker-pool] Adding worker with key us-central1-api, total=1"}}
+[debug] [2026-01-13T17:28:05.011Z] [work-queue] {"queuedWork":["/puppals-456c7/us-central1/api/leagues-2026-01-13T17:28:05.011Z"],"queueLength":1,"runningWork":["/puppals-456c7/us-central1/api/leagues-2026-01-13T17:28:04.214Z"],"workRunningCount":1}
+[debug] [2026-01-13T17:28:05.012Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":["/puppals-456c7/us-central1/api/leagues-2026-01-13T17:28:04.214Z","/puppals-456c7/us-central1/api/leagues-2026-01-13T17:28:05.011Z"],"workRunningCount":2}
+[debug] [2026-01-13T17:28:05.012Z] Accepted request GET /puppals-456c7/us-central1/api/leagues?country=Spain --> us-central1-api
+[debug] [2026-01-13T17:28:05.013Z] [functions] Runtime ready! Sending request! {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Runtime ready! Sending request!"}}
+[debug] [2026-01-13T17:28:05.013Z] [functions] Got req.url=/puppals-456c7/us-central1/api/leagues?country=Spain, mapping to path=/leagues?country=Spain {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Got req.url=/puppals-456c7/us-central1/api/leagues?country=Spain, mapping to path=/leagues?country=Spain"}}
+[debug] [2026-01-13T17:28:05.020Z] [worker-pool] addWorker(us-central1-api) {"metadata":{"emulator":{"name":"functions"},"message":"[worker-pool] addWorker(us-central1-api)"}}
+[debug] [2026-01-13T17:28:05.020Z] [worker-pool] Adding worker with key us-central1-api, total=2 {"metadata":{"emulator":{"name":"functions"},"message":"[worker-pool] Adding worker with key us-central1-api, total=2"}}
+[debug] [2026-01-13T17:28:05.025Z] [work-queue] {"queuedWork":["/puppals-456c7/us-central1/api/rounds-2026-01-13T17:28:05.025Z"],"queueLength":1,"runningWork":["/puppals-456c7/us-central1/api/leagues-2026-01-13T17:28:04.214Z","/puppals-456c7/us-central1/api/leagues-2026-01-13T17:28:05.011Z"],"workRunningCount":2}
+[debug] [2026-01-13T17:28:05.025Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":["/puppals-456c7/us-central1/api/leagues-2026-01-13T17:28:04.214Z","/puppals-456c7/us-central1/api/leagues-2026-01-13T17:28:05.011Z","/puppals-456c7/us-central1/api/rounds-2026-01-13T17:28:05.025Z"],"workRunningCount":3}
+[debug] [2026-01-13T17:28:05.026Z] Accepted request GET /puppals-456c7/us-central1/api/rounds?league=LA_LIGA --> us-central1-api
+[debug] [2026-01-13T17:28:05.028Z] [functions] Runtime ready! Sending request! {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Runtime ready! Sending request!"}}
+[debug] [2026-01-13T17:28:05.028Z] [functions] Got req.url=/puppals-456c7/us-central1/api/rounds?league=LA_LIGA, mapping to path=/rounds?league=LA_LIGA {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Got req.url=/puppals-456c7/us-central1/api/rounds?league=LA_LIGA, mapping to path=/rounds?league=LA_LIGA"}}
+[debug] [2026-01-13T17:28:05.035Z] [worker-pool] addWorker(us-central1-api) {"metadata":{"emulator":{"name":"functions"},"message":"[worker-pool] addWorker(us-central1-api)"}}
+[debug] [2026-01-13T17:28:05.035Z] [worker-pool] Adding worker with key us-central1-api, total=3 {"metadata":{"emulator":{"name":"functions"},"message":"[worker-pool] Adding worker with key us-central1-api, total=3"}}
+[info] >  (node:11600) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead. {"user":"(node:11600) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"\u001b[90m> \u001b[39m (node:11600) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead."}}
+[info] >  (Use `node --trace-deprecation ...` to show where the warning was created) {"user":"(Use `node --trace-deprecation ...` to show where the warning was created)","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"\u001b[90m> \u001b[39m (Use `node --trace-deprecation ...` to show where the warning was created)"}}
+[debug] [2026-01-13T17:28:05.719Z] [runtime-status] [11600] Resolved module firebase-admin {"declared":true,"installed":true,"version":"13.0.2","resolution":"C:\\Progetti\\simulatore-calcio-backend\\functions\\node_modules\\firebase-admin\\lib\\index.js"} {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[runtime-status] [11600] Resolved module firebase-admin {\"declared\":true,\"installed\":true,\"version\":\"13.0.2\",\"resolution\":\"C:\\\\Progetti\\\\simulatore-calcio-backend\\\\functions\\\\node_modules\\\\firebase-admin\\\\lib\\\\index.js\"}"}}
+[debug] [2026-01-13T17:28:05.720Z] [runtime-status] [11600] Resolved module firebase-functions {"declared":true,"installed":true,"version":"6.2.0","resolution":"C:\\Progetti\\simulatore-calcio-backend\\functions\\node_modules\\firebase-functions\\lib\\v2\\index.js"} {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[runtime-status] [11600] Resolved module firebase-functions {\"declared\":true,\"installed\":true,\"version\":\"6.2.0\",\"resolution\":\"C:\\\\Progetti\\\\simulatore-calcio-backend\\\\functions\\\\node_modules\\\\firebase-functions\\\\lib\\\\v2\\\\index.js\"}"}}
+[debug] [2026-01-13T17:28:05.721Z] [runtime-status] [11600] Outgoing network have been stubbed. [{"name":"http","status":"mocked"},{"name":"http","status":"mocked"},{"name":"https","status":"mocked"},{"name":"https","status":"mocked"},{"name":"net","status":"mocked"}] {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[runtime-status] [11600] Outgoing network have been stubbed. [{\"name\":\"http\",\"status\":\"mocked\"},{\"name\":\"http\",\"status\":\"mocked\"},{\"name\":\"https\",\"status\":\"mocked\"},{\"name\":\"https\",\"status\":\"mocked\"},{\"name\":\"net\",\"status\":\"mocked\"}]"}}
+[debug] [2026-01-13T17:28:05.722Z] [runtime-status] [11600] Resolved module firebase-functions {"declared":true,"installed":true,"version":"6.2.0","resolution":"C:\\Progetti\\simulatore-calcio-backend\\functions\\node_modules\\firebase-functions\\lib\\v2\\index.js"} {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[runtime-status] [11600] Resolved module firebase-functions {\"declared\":true,\"installed\":true,\"version\":\"6.2.0\",\"resolution\":\"C:\\\\Progetti\\\\simulatore-calcio-backend\\\\functions\\\\node_modules\\\\firebase-functions\\\\lib\\\\v2\\\\index.js\"}"}}
+[debug] [2026-01-13T17:28:06.071Z] [runtime-status] [11600] Resolved module firebase-admin {"declared":true,"installed":true,"version":"13.0.2","resolution":"C:\\Progetti\\simulatore-calcio-backend\\functions\\node_modules\\firebase-admin\\lib\\index.js"} {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[runtime-status] [11600] Resolved module firebase-admin {\"declared\":true,\"installed\":true,\"version\":\"13.0.2\",\"resolution\":\"C:\\\\Progetti\\\\simulatore-calcio-backend\\\\functions\\\\node_modules\\\\firebase-admin\\\\lib\\\\index.js\"}"}}
+[debug] [2026-01-13T17:28:06.075Z] [runtime-status] [11600] Resolved module firebase-functions {"declared":true,"installed":true,"version":"6.2.0","resolution":"C:\\Progetti\\simulatore-calcio-backend\\functions\\node_modules\\firebase-functions\\lib\\v2\\index.js"} {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[runtime-status] [11600] Resolved module firebase-functions {\"declared\":true,\"installed\":true,\"version\":\"6.2.0\",\"resolution\":\"C:\\\\Progetti\\\\simulatore-calcio-backend\\\\functions\\\\node_modules\\\\firebase-functions\\\\lib\\\\v2\\\\index.js\"}"}}
+[debug] [2026-01-13T17:28:06.352Z] [runtime-status] [11600] firebase-admin has been stubbed. {"adminResolution":{"declared":true,"installed":true,"version":"13.0.2","resolution":"C:\\Progetti\\simulatore-calcio-backend\\functions\\node_modules\\firebase-admin\\lib\\index.js"}} {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[runtime-status] [11600] firebase-admin has been stubbed. {\"adminResolution\":{\"declared\":true,\"installed\":true,\"version\":\"13.0.2\",\"resolution\":\"C:\\\\Progetti\\\\simulatore-calcio-backend\\\\functions\\\\node_modules\\\\firebase-admin\\\\lib\\\\index.js\"}}"}}
+[info] >  (node:21864) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead. {"user":"(node:21864) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"\u001b[90m> \u001b[39m (node:21864) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead."}}
+[info] >  (Use `node --trace-deprecation ...` to show where the warning was created) {"user":"(Use `node --trace-deprecation ...` to show where the warning was created)","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"\u001b[90m> \u001b[39m (Use `node --trace-deprecation ...` to show where the warning was created)"}}
+[debug] [2026-01-13T17:28:06.370Z] [runtime-status] [21864] Resolved module firebase-admin {"declared":true,"installed":true,"version":"13.0.2","resolution":"C:\\Progetti\\simulatore-calcio-backend\\functions\\node_modules\\firebase-admin\\lib\\index.js"} {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[runtime-status] [21864] Resolved module firebase-admin {\"declared\":true,\"installed\":true,\"version\":\"13.0.2\",\"resolution\":\"C:\\\\Progetti\\\\simulatore-calcio-backend\\\\functions\\\\node_modules\\\\firebase-admin\\\\lib\\\\index.js\"}"}}
+[debug] [2026-01-13T17:28:06.372Z] [runtime-status] [21864] Resolved module firebase-functions {"declared":true,"installed":true,"version":"6.2.0","resolution":"C:\\Progetti\\simulatore-calcio-backend\\functions\\node_modules\\firebase-functions\\lib\\v2\\index.js"} {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[runtime-status] [21864] Resolved module firebase-functions {\"declared\":true,\"installed\":true,\"version\":\"6.2.0\",\"resolution\":\"C:\\\\Progetti\\\\simulatore-calcio-backend\\\\functions\\\\node_modules\\\\firebase-functions\\\\lib\\\\v2\\\\index.js\"}"}}
+[debug] [2026-01-13T17:28:06.373Z] [runtime-status] [21864] Outgoing network have been stubbed. [{"name":"http","status":"mocked"},{"name":"http","status":"mocked"},{"name":"https","status":"mocked"},{"name":"https","status":"mocked"},{"name":"net","status":"mocked"}] {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[runtime-status] [21864] Outgoing network have been stubbed. [{\"name\":\"http\",\"status\":\"mocked\"},{\"name\":\"http\",\"status\":\"mocked\"},{\"name\":\"https\",\"status\":\"mocked\"},{\"name\":\"https\",\"status\":\"mocked\"},{\"name\":\"net\",\"status\":\"mocked\"}]"}}
+[debug] [2026-01-13T17:28:06.373Z] [runtime-status] [21864] Resolved module firebase-functions {"declared":true,"installed":true,"version":"6.2.0","resolution":"C:\\Progetti\\simulatore-calcio-backend\\functions\\node_modules\\firebase-functions\\lib\\v2\\index.js"} {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[runtime-status] [21864] Resolved module firebase-functions {\"declared\":true,\"installed\":true,\"version\":\"6.2.0\",\"resolution\":\"C:\\\\Progetti\\\\simulatore-calcio-backend\\\\functions\\\\node_modules\\\\firebase-functions\\\\lib\\\\v2\\\\index.js\"}"}}
+[info] >  (node:12488) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead. {"user":"(node:12488) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"\u001b[90m> \u001b[39m (node:12488) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead."}}
+[info] >  (Use `node --trace-deprecation ...` to show where the warning was created) {"user":"(Use `node --trace-deprecation ...` to show where the warning was created)","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"\u001b[90m> \u001b[39m (Use `node --trace-deprecation ...` to show where the warning was created)"}}
+[debug] [2026-01-13T17:28:06.420Z] [runtime-status] [12488] Resolved module firebase-admin {"declared":true,"installed":true,"version":"13.0.2","resolution":"C:\\Progetti\\simulatore-calcio-backend\\functions\\node_modules\\firebase-admin\\lib\\index.js"} {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[runtime-status] [12488] Resolved module firebase-admin {\"declared\":true,\"installed\":true,\"version\":\"13.0.2\",\"resolution\":\"C:\\\\Progetti\\\\simulatore-calcio-backend\\\\functions\\\\node_modules\\\\firebase-admin\\\\lib\\\\index.js\"}"}}
+[debug] [2026-01-13T17:28:06.420Z] [runtime-status] [12488] Resolved module firebase-functions {"declared":true,"installed":true,"version":"6.2.0","resolution":"C:\\Progetti\\simulatore-calcio-backend\\functions\\node_modules\\firebase-functions\\lib\\v2\\index.js"} {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[runtime-status] [12488] Resolved module firebase-functions {\"declared\":true,\"installed\":true,\"version\":\"6.2.0\",\"resolution\":\"C:\\\\Progetti\\\\simulatore-calcio-backend\\\\functions\\\\node_modules\\\\firebase-functions\\\\lib\\\\v2\\\\index.js\"}"}}
+[debug] [2026-01-13T17:28:06.420Z] [runtime-status] [12488] Outgoing network have been stubbed. [{"name":"http","status":"mocked"},{"name":"http","status":"mocked"},{"name":"https","status":"mocked"},{"name":"https","status":"mocked"},{"name":"net","status":"mocked"}] {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[runtime-status] [12488] Outgoing network have been stubbed. [{\"name\":\"http\",\"status\":\"mocked\"},{\"name\":\"http\",\"status\":\"mocked\"},{\"name\":\"https\",\"status\":\"mocked\"},{\"name\":\"https\",\"status\":\"mocked\"},{\"name\":\"net\",\"status\":\"mocked\"}]"}}
+[debug] [2026-01-13T17:28:06.420Z] [runtime-status] [12488] Resolved module firebase-functions {"declared":true,"installed":true,"version":"6.2.0","resolution":"C:\\Progetti\\simulatore-calcio-backend\\functions\\node_modules\\firebase-functions\\lib\\v2\\index.js"} {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[runtime-status] [12488] Resolved module firebase-functions {\"declared\":true,\"installed\":true,\"version\":\"6.2.0\",\"resolution\":\"C:\\\\Progetti\\\\simulatore-calcio-backend\\\\functions\\\\node_modules\\\\firebase-functions\\\\lib\\\\v2\\\\index.js\"}"}}
+[info] >  📂 [simulationRoutes] Base: C:\Progetti\simulatore-calcio-backend\ai_engine\web_simulator_A.py {"user":"📂 [simulationRoutes] Base: C:\\Progetti\\simulatore-calcio-backend\\ai_engine\\web_simulator_A.py","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"\u001b[90m> \u001b[39m 📂 [simulationRoutes] Base: C:\\Progetti\\simulatore-calcio-backend\\ai_engine\\web_simulator_A.py"}}
+[info] >  📂 [simulationRoutes] DEV: C:\Progetti\simulatore-calcio-backend\ai_engine\web_simulator_A.py {"user":"📂 [simulationRoutes] DEV: C:\\Progetti\\simulatore-calcio-backend\\ai_engine\\web_simulator_A.py","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"\u001b[90m> \u001b[39m 📂 [simulationRoutes] DEV: C:\\Progetti\\simulatore-calcio-backend\\ai_engine\\web_simulator_A.py"}}
+[debug] [2026-01-13T17:28:06.737Z] [runtime-status] [11600] Functions runtime initialized. {"cwd":"C:\\Progetti\\simulatore-calcio-backend\\functions","node_version":"22.12.0"} {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[runtime-status] [11600] Functions runtime initialized. {\"cwd\":\"C:\\\\Progetti\\\\simulatore-calcio-backend\\\\functions\",\"node_version\":\"22.12.0\"}"}}
+[debug] [2026-01-13T17:28:06.737Z] [runtime-status] [11600] Listening to port: \\?\pipe\fire_emu_3f81005bc814942f {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[runtime-status] [11600] Listening to port: \\\\?\\pipe\\fire_emu_3f81005bc814942f"}}
+[debug] [2026-01-13T17:28:06.756Z] [runtime-status] [21864] Resolved module firebase-admin {"declared":true,"installed":true,"version":"13.0.2","resolution":"C:\\Progetti\\simulatore-calcio-backend\\functions\\node_modules\\firebase-admin\\lib\\index.js"} {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[runtime-status] [21864] Resolved module firebase-admin {\"declared\":true,\"installed\":true,\"version\":\"13.0.2\",\"resolution\":\"C:\\\\Progetti\\\\simulatore-calcio-backend\\\\functions\\\\node_modules\\\\firebase-admin\\\\lib\\\\index.js\"}"}}
+[debug] [2026-01-13T17:28:06.760Z] [runtime-status] [21864] Resolved module firebase-functions {"declared":true,"installed":true,"version":"6.2.0","resolution":"C:\\Progetti\\simulatore-calcio-backend\\functions\\node_modules\\firebase-functions\\lib\\v2\\index.js"} {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[runtime-status] [21864] Resolved module firebase-functions {\"declared\":true,\"installed\":true,\"version\":\"6.2.0\",\"resolution\":\"C:\\\\Progetti\\\\simulatore-calcio-backend\\\\functions\\\\node_modules\\\\firebase-functions\\\\lib\\\\v2\\\\index.js\"}"}}
+[debug] [2026-01-13T17:28:06.784Z] [worker-us-central1-api-487d2275-c924-4e80-85e7-ed51de86f73e]: IDLE {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-487d2275-c924-4e80-85e7-ed51de86f73e]: IDLE"}}
+[debug] [2026-01-13T17:28:06.784Z] [worker-pool] submitRequest(triggerId=us-central1-api) {"metadata":{"emulator":{"name":"functions"},"message":"[worker-pool] submitRequest(triggerId=us-central1-api)"}}
+[info] i  functions: Beginning execution of "us-central1-api" {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Beginning execution of \"us-central1-api\""}}
+[debug] [2026-01-13T17:28:06.784Z] [worker-us-central1-api-487d2275-c924-4e80-85e7-ed51de86f73e]: BUSY {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-487d2275-c924-4e80-85e7-ed51de86f73e]: BUSY"}}
+[debug] [2026-01-13T17:28:06.786Z] [runtime-status] [12488] Resolved module firebase-admin {"declared":true,"installed":true,"version":"13.0.2","resolution":"C:\\Progetti\\simulatore-calcio-backend\\functions\\node_modules\\firebase-admin\\lib\\index.js"} {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[runtime-status] [12488] Resolved module firebase-admin {\"declared\":true,\"installed\":true,\"version\":\"13.0.2\",\"resolution\":\"C:\\\\Progetti\\\\simulatore-calcio-backend\\\\functions\\\\node_modules\\\\firebase-admin\\\\lib\\\\index.js\"}"}}
+[debug] [2026-01-13T17:28:06.789Z] [runtime-status] [12488] Resolved module firebase-functions {"declared":true,"installed":true,"version":"6.2.0","resolution":"C:\\Progetti\\simulatore-calcio-backend\\functions\\node_modules\\firebase-functions\\lib\\v2\\index.js"} {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[runtime-status] [12488] Resolved module firebase-functions {\"declared\":true,\"installed\":true,\"version\":\"6.2.0\",\"resolution\":\"C:\\\\Progetti\\\\simulatore-calcio-backend\\\\functions\\\\node_modules\\\\firebase-functions\\\\lib\\\\v2\\\\index.js\"}"}}
+[debug] [2026-01-13T17:28:06.984Z] [runtime-status] [21864] firebase-admin has been stubbed. {"adminResolution":{"declared":true,"installed":true,"version":"13.0.2","resolution":"C:\\Progetti\\simulatore-calcio-backend\\functions\\node_modules\\firebase-admin\\lib\\index.js"}} {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[runtime-status] [21864] firebase-admin has been stubbed. {\"adminResolution\":{\"declared\":true,\"installed\":true,\"version\":\"13.0.2\",\"resolution\":\"C:\\\\Progetti\\\\simulatore-calcio-backend\\\\functions\\\\node_modules\\\\firebase-admin\\\\lib\\\\index.js\"}}"}}
+[debug] [2026-01-13T17:28:07.005Z] [runtime-status] [12488] firebase-admin has been stubbed. {"adminResolution":{"declared":true,"installed":true,"version":"13.0.2","resolution":"C:\\Progetti\\simulatore-calcio-backend\\functions\\node_modules\\firebase-admin\\lib\\index.js"}} {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[runtime-status] [12488] firebase-admin has been stubbed. {\"adminResolution\":{\"declared\":true,\"installed\":true,\"version\":\"13.0.2\",\"resolution\":\"C:\\\\Progetti\\\\simulatore-calcio-backend\\\\functions\\\\node_modules\\\\firebase-admin\\\\lib\\\\index.js\"}}"}}
+[info] >  📂 [simulationRoutes] Base: C:\Progetti\simulatore-calcio-backend\ai_engine\web_simulator_A.py {"user":"📂 [simulationRoutes] Base: C:\\Progetti\\simulatore-calcio-backend\\ai_engine\\web_simulator_A.py","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"\u001b[90m> \u001b[39m 📂 [simulationRoutes] Base: C:\\Progetti\\simulatore-calcio-backend\\ai_engine\\web_simulator_A.py"}}
+[info] >  📂 [simulationRoutes] DEV: C:\Progetti\simulatore-calcio-backend\ai_engine\web_simulator_A.py {"user":"📂 [simulationRoutes] DEV: C:\\Progetti\\simulatore-calcio-backend\\ai_engine\\web_simulator_A.py","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"\u001b[90m> \u001b[39m 📂 [simulationRoutes] DEV: C:\\Progetti\\simulatore-calcio-backend\\ai_engine\\web_simulator_A.py"}}
+[info] >  📂 [simulationRoutes] Base: C:\Progetti\simulatore-calcio-backend\ai_engine\web_simulator_A.py {"user":"📂 [simulationRoutes] Base: C:\\Progetti\\simulatore-calcio-backend\\ai_engine\\web_simulator_A.py","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"\u001b[90m> \u001b[39m 📂 [simulationRoutes] Base: C:\\Progetti\\simulatore-calcio-backend\\ai_engine\\web_simulator_A.py"}}
+[info] >  📂 [simulationRoutes] DEV: C:\Progetti\simulatore-calcio-backend\ai_engine\web_simulator_A.py {"user":"📂 [simulationRoutes] DEV: C:\\Progetti\\simulatore-calcio-backend\\ai_engine\\web_simulator_A.py","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"\u001b[90m> \u001b[39m 📂 [simulationRoutes] DEV: C:\\Progetti\\simulatore-calcio-backend\\ai_engine\\web_simulator_A.py"}}
+[info] >  ✅ DB connesso: football_simulator_db {"user":"✅ DB connesso: football_simulator_db","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"\u001b[90m> \u001b[39m ✅ DB connesso: football_simulator_db"}}
+[debug] [2026-01-13T17:28:07.287Z] Finishing up request with event=pause {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=pause"}}
+[info] i  functions: Finished "us-central1-api" in 502.8253ms {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finished \"us-central1-api\" in 502.8253ms"}}
+[debug] [2026-01-13T17:28:07.288Z] [worker-us-central1-api-487d2275-c924-4e80-85e7-ed51de86f73e]: IDLE {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-487d2275-c924-4e80-85e7-ed51de86f73e]: IDLE"}}
+[debug] [2026-01-13T17:28:07.288Z] Finishing up request with event=finish {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=finish"}}
+[debug] [2026-01-13T17:28:07.288Z] Finishing up request with event=close {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=close"}}
+[debug] [2026-01-13T17:28:07.288Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":["/puppals-456c7/us-central1/api/leagues-2026-01-13T17:28:05.011Z","/puppals-456c7/us-central1/api/rounds-2026-01-13T17:28:05.025Z"],"workRunningCount":2}
+[debug] [2026-01-13T17:28:07.377Z] [runtime-status] [21864] Functions runtime initialized. {"cwd":"C:\\Progetti\\simulatore-calcio-backend\\functions","node_version":"22.12.0"} {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[runtime-status] [21864] Functions runtime initialized. {\"cwd\":\"C:\\\\Progetti\\\\simulatore-calcio-backend\\\\functions\",\"node_version\":\"22.12.0\"}"}}
+[debug] [2026-01-13T17:28:07.377Z] [runtime-status] [21864] Listening to port: \\?\pipe\fire_emu_f8b00061fcd4f07a {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[runtime-status] [21864] Listening to port: \\\\?\\pipe\\fire_emu_f8b00061fcd4f07a"}}
+[debug] [2026-01-13T17:28:07.391Z] [runtime-status] [12488] Functions runtime initialized. {"cwd":"C:\\Progetti\\simulatore-calcio-backend\\functions","node_version":"22.12.0"} {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[runtime-status] [12488] Functions runtime initialized. {\"cwd\":\"C:\\\\Progetti\\\\simulatore-calcio-backend\\\\functions\",\"node_version\":\"22.12.0\"}"}}
+[debug] [2026-01-13T17:28:07.391Z] [runtime-status] [12488] Listening to port: \\?\pipe\fire_emu_5bf0f4e1e9fa356c {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[runtime-status] [12488] Listening to port: \\\\?\\pipe\\fire_emu_5bf0f4e1e9fa356c"}}
+[debug] [2026-01-13T17:28:07.442Z] [worker-us-central1-api-04812599-51aa-4c45-9db4-ee995b9cc99c]: IDLE {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-04812599-51aa-4c45-9db4-ee995b9cc99c]: IDLE"}}
+[debug] [2026-01-13T17:28:07.442Z] [worker-pool] submitRequest(triggerId=us-central1-api) {"metadata":{"emulator":{"name":"functions"},"message":"[worker-pool] submitRequest(triggerId=us-central1-api)"}}
+[info] i  functions: Beginning execution of "us-central1-api" {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Beginning execution of \"us-central1-api\""}}
+[debug] [2026-01-13T17:28:07.443Z] [worker-us-central1-api-487d2275-c924-4e80-85e7-ed51de86f73e]: BUSY {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-487d2275-c924-4e80-85e7-ed51de86f73e]: BUSY"}}
+[debug] [2026-01-13T17:28:07.446Z] Finishing up request with event=pause {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=pause"}}
+[info] i  functions: Finished "us-central1-api" in 2.9404ms {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finished \"us-central1-api\" in 2.9404ms"}}
+[debug] [2026-01-13T17:28:07.446Z] [worker-us-central1-api-487d2275-c924-4e80-85e7-ed51de86f73e]: IDLE {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-487d2275-c924-4e80-85e7-ed51de86f73e]: IDLE"}}
+[debug] [2026-01-13T17:28:07.446Z] Finishing up request with event=finish {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=finish"}}
+[debug] [2026-01-13T17:28:07.446Z] Finishing up request with event=close {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=close"}}
+[debug] [2026-01-13T17:28:07.446Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":["/puppals-456c7/us-central1/api/rounds-2026-01-13T17:28:05.025Z"],"workRunningCount":1}
+[debug] [2026-01-13T17:28:07.493Z] [worker-us-central1-api-2bb566a6-1b4e-4517-8ca6-b5d58bf1c9f3]: IDLE {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-2bb566a6-1b4e-4517-8ca6-b5d58bf1c9f3]: IDLE"}}
+[debug] [2026-01-13T17:28:07.494Z] [worker-pool] submitRequest(triggerId=us-central1-api) {"metadata":{"emulator":{"name":"functions"},"message":"[worker-pool] submitRequest(triggerId=us-central1-api)"}}
+[info] i  functions: Beginning execution of "us-central1-api" {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Beginning execution of \"us-central1-api\""}}
+[debug] [2026-01-13T17:28:07.494Z] [worker-us-central1-api-487d2275-c924-4e80-85e7-ed51de86f73e]: BUSY {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-487d2275-c924-4e80-85e7-ed51de86f73e]: BUSY"}}
+[info] >  ✅ Rounds LA_LIGA: anchor=20.Giornata, count=3 {"user":"✅ Rounds LA_LIGA: anchor=20.Giornata, count=3","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"\u001b[90m> \u001b[39m ✅ Rounds LA_LIGA: anchor=20.Giornata, count=3"}}
+[debug] [2026-01-13T17:28:07.795Z] Finishing up request with event=pause {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=pause"}}
+[info] i  functions: Finished "us-central1-api" in 301.0501ms {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finished \"us-central1-api\" in 301.0501ms"}}
+[debug] [2026-01-13T17:28:07.795Z] [worker-us-central1-api-487d2275-c924-4e80-85e7-ed51de86f73e]: IDLE {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-487d2275-c924-4e80-85e7-ed51de86f73e]: IDLE"}}
+[debug] [2026-01-13T17:28:07.796Z] Finishing up request with event=finish {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=finish"}}
+[debug] [2026-01-13T17:28:07.796Z] Finishing up request with event=close {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=close"}}
+[debug] [2026-01-13T17:28:07.796Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":[],"workRunningCount":0}
+[debug] [2026-01-13T17:28:18.113Z] [work-queue] {"queuedWork":["/puppals-456c7/us-central1/api/rounds-2026-01-13T17:28:18.113Z"],"queueLength":1,"runningWork":[],"workRunningCount":0}
+[debug] [2026-01-13T17:28:18.113Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":["/puppals-456c7/us-central1/api/rounds-2026-01-13T17:28:18.113Z"],"workRunningCount":1}
+[debug] [2026-01-13T17:28:18.114Z] Accepted request GET /puppals-456c7/us-central1/api/rounds?league=LA_LIGA --> us-central1-api
+[debug] [2026-01-13T17:28:18.117Z] [functions] Runtime ready! Sending request! {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Runtime ready! Sending request!"}}
+[debug] [2026-01-13T17:28:18.117Z] [functions] Got req.url=/puppals-456c7/us-central1/api/rounds?league=LA_LIGA, mapping to path=/rounds?league=LA_LIGA {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Got req.url=/puppals-456c7/us-central1/api/rounds?league=LA_LIGA, mapping to path=/rounds?league=LA_LIGA"}}
+[debug] [2026-01-13T17:28:18.118Z] [worker-pool] submitRequest(triggerId=us-central1-api) {"metadata":{"emulator":{"name":"functions"},"message":"[worker-pool] submitRequest(triggerId=us-central1-api)"}}
+[info] i  functions: Beginning execution of "us-central1-api" {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Beginning execution of \"us-central1-api\""}}
+[debug] [2026-01-13T17:28:18.118Z] [worker-us-central1-api-487d2275-c924-4e80-85e7-ed51de86f73e]: BUSY {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-487d2275-c924-4e80-85e7-ed51de86f73e]: BUSY"}}
+[debug] [2026-01-13T17:28:18.121Z] [work-queue] {"queuedWork":["/puppals-456c7/us-central1/api/matches-2026-01-13T17:28:18.121Z"],"queueLength":1,"runningWork":["/puppals-456c7/us-central1/api/rounds-2026-01-13T17:28:18.113Z"],"workRunningCount":1}
+[debug] [2026-01-13T17:28:18.121Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":["/puppals-456c7/us-central1/api/rounds-2026-01-13T17:28:18.113Z","/puppals-456c7/us-central1/api/matches-2026-01-13T17:28:18.121Z"],"workRunningCount":2}
+[debug] [2026-01-13T17:28:18.121Z] Accepted request GET /puppals-456c7/us-central1/api/matches?league=LA_LIGA&round=20.Giornata --> us-central1-api
+[debug] [2026-01-13T17:28:18.124Z] [functions] Runtime ready! Sending request! {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Runtime ready! Sending request!"}}
+[debug] [2026-01-13T17:28:18.124Z] [functions] Got req.url=/puppals-456c7/us-central1/api/matches?league=LA_LIGA&round=20.Giornata, mapping to path=/matches?league=LA_LIGA&round=20.Giornata {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Got req.url=/puppals-456c7/us-central1/api/matches?league=LA_LIGA&round=20.Giornata, mapping to path=/matches?league=LA_LIGA&round=20.Giornata"}}
+[debug] [2026-01-13T17:28:18.124Z] [worker-pool] submitRequest(triggerId=us-central1-api) {"metadata":{"emulator":{"name":"functions"},"message":"[worker-pool] submitRequest(triggerId=us-central1-api)"}}
+[info] i  functions: Beginning execution of "us-central1-api" {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Beginning execution of \"us-central1-api\""}}
+[debug] [2026-01-13T17:28:18.125Z] [worker-us-central1-api-04812599-51aa-4c45-9db4-ee995b9cc99c]: BUSY {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-04812599-51aa-4c45-9db4-ee995b9cc99c]: BUSY"}}
+[info] >  ✅ Rounds LA_LIGA: anchor=20.Giornata, count=3 {"user":"✅ Rounds LA_LIGA: anchor=20.Giornata, count=3","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"\u001b[90m> \u001b[39m ✅ Rounds LA_LIGA: anchor=20.Giornata, count=3"}}
+[debug] [2026-01-13T17:28:18.390Z] Finishing up request with event=pause {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=pause"}}
+[info] i  functions: Finished "us-central1-api" in 271.8358ms {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finished \"us-central1-api\" in 271.8358ms"}}
+[debug] [2026-01-13T17:28:18.392Z] [worker-us-central1-api-487d2275-c924-4e80-85e7-ed51de86f73e]: IDLE {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-487d2275-c924-4e80-85e7-ed51de86f73e]: IDLE"}}
+[debug] [2026-01-13T17:28:18.392Z] Finishing up request with event=finish {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=finish"}}
+[debug] [2026-01-13T17:28:18.392Z] Finishing up request with event=close {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=close"}}
+[debug] [2026-01-13T17:28:18.392Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":["/puppals-456c7/us-central1/api/matches-2026-01-13T17:28:18.121Z"],"workRunningCount":1}
+[info] >  ✅ DB connesso: football_simulator_db {"user":"✅ DB connesso: football_simulator_db","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"\u001b[90m> \u001b[39m ✅ DB connesso: football_simulator_db"}}
+[info] >  ✅ Matches LA_LIGA 20.Giornata: 10 partite {"user":"✅ Matches LA_LIGA 20.Giornata: 10 partite","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"\u001b[90m> \u001b[39m ✅ Matches LA_LIGA 20.Giornata: 10 partite"}}
+[debug] [2026-01-13T17:28:18.683Z] Finishing up request with event=pause {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=pause"}}
+[info] i  functions: Finished "us-central1-api" in 558.8143ms {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finished \"us-central1-api\" in 558.8143ms"}}
+[debug] [2026-01-13T17:28:18.684Z] [worker-us-central1-api-04812599-51aa-4c45-9db4-ee995b9cc99c]: IDLE {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-04812599-51aa-4c45-9db4-ee995b9cc99c]: IDLE"}}
+[debug] [2026-01-13T17:28:18.685Z] Finishing up request with event=finish {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=finish"}}
+[debug] [2026-01-13T17:28:18.685Z] Finishing up request with event=close {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=close"}}
+[debug] [2026-01-13T17:28:18.685Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":[],"workRunningCount":0}
+[debug] [2026-01-13T17:28:18.686Z] [work-queue] {"queuedWork":["/puppals-456c7/us-central1/api/matches-2026-01-13T17:28:18.685Z"],"queueLength":1,"runningWork":[],"workRunningCount":0}
+[debug] [2026-01-13T17:28:18.686Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":["/puppals-456c7/us-central1/api/matches-2026-01-13T17:28:18.685Z"],"workRunningCount":1}
+[debug] [2026-01-13T17:28:18.686Z] Accepted request GET /puppals-456c7/us-central1/api/matches?league=LA_LIGA&round=20.Giornata --> us-central1-api
+[debug] [2026-01-13T17:28:18.686Z] [functions] Runtime ready! Sending request! {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Runtime ready! Sending request!"}}
+[debug] [2026-01-13T17:28:18.687Z] [functions] Got req.url=/puppals-456c7/us-central1/api/matches?league=LA_LIGA&round=20.Giornata, mapping to path=/matches?league=LA_LIGA&round=20.Giornata {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Got req.url=/puppals-456c7/us-central1/api/matches?league=LA_LIGA&round=20.Giornata, mapping to path=/matches?league=LA_LIGA&round=20.Giornata"}}
+[debug] [2026-01-13T17:28:18.687Z] [worker-pool] submitRequest(triggerId=us-central1-api) {"metadata":{"emulator":{"name":"functions"},"message":"[worker-pool] submitRequest(triggerId=us-central1-api)"}}
+[info] i  functions: Beginning execution of "us-central1-api" {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Beginning execution of \"us-central1-api\""}}
+[debug] [2026-01-13T17:28:18.687Z] [worker-us-central1-api-487d2275-c924-4e80-85e7-ed51de86f73e]: BUSY {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-487d2275-c924-4e80-85e7-ed51de86f73e]: BUSY"}}
+[info] >  ✅ Matches LA_LIGA 20.Giornata: 10 partite {"user":"✅ Matches LA_LIGA 20.Giornata: 10 partite","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"\u001b[90m> \u001b[39m ✅ Matches LA_LIGA 20.Giornata: 10 partite"}}
+[debug] [2026-01-13T17:28:18.719Z] Finishing up request with event=pause {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=pause"}}
+[info] i  functions: Finished "us-central1-api" in 32.1603ms {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finished \"us-central1-api\" in 32.1603ms"}}
+[debug] [2026-01-13T17:28:18.720Z] [worker-us-central1-api-487d2275-c924-4e80-85e7-ed51de86f73e]: IDLE {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"[worker-us-central1-api-487d2275-c924-4e80-85e7-ed51de86f73e]: IDLE"}}
+[debug] [2026-01-13T17:28:18.720Z] Finishing up request with event=finish {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=finish"}}
+[debug] [2026-01-13T17:28:18.720Z] Finishing up request with event=close {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-api"},"extension":{},"message":"Finishing up request with event=close"}}
+[debug] [2026-01-13T17:28:18.720Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":[],"workRunningCount":0}

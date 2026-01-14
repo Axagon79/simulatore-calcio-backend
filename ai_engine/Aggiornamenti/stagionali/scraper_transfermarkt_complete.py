@@ -3,16 +3,18 @@ from bs4 import BeautifulSoup
 import time
 import random
 import re
+import sys
 import unicodedata
 from fake_useragent import UserAgent
 
 # CONFIGURAZIONE DB
+sys.path.insert(0, r"C:\Progetti\simulatore-calcio-backend")
 from config import db
 teams_collection = db["teams"]
 
-# TUTTI I CAMPIONATI PRINCIPALI (senza Turchia)
+# TUTTI I CAMPIONATI PRINCIPALI 
 LEAGUES_CONFIG = [
-    # ITALIA
+    #ITALIA
     {
         "name": "Serie A",
         "url_value": "https://www.transfermarkt.it/serie-a/startseite/wettbewerb/IT1",
@@ -80,6 +82,92 @@ LEAGUES_CONFIG = [
         "url_value": "https://www.transfermarkt.it/liga-portugal/startseite/wettbewerb/PO1",
         "url_age": "https://www.transfermarkt.it/liga-portugal/altersschnitt/wettbewerb/PO1/plus/1",
     },
+    
+    # SUPER LIG
+    {
+        "name": "Super Lig (Turchia)",
+        "url_value": "https://www.transfermarkt.it/super-lig/startseite/wettbewerb/TR1",
+        "url_age": "https://www.transfermarkt.it/super-lig/altersschnitt/wettbewerb/TR1/plus/1"
+    },
+    
+    # 🆕 EUROPA SERIE B
+    {
+        "name": "Championship",
+        "url_value": "https://www.transfermarkt.it/championship/startseite/wettbewerb/GB2",
+        "url_age": "https://www.transfermarkt.it/championship/altersschnitt/wettbewerb/GB2/plus/1"
+    },
+    {
+        "name": "LaLiga 2",
+        "url_value": "https://www.transfermarkt.it/laliga2/startseite/wettbewerb/ES2",
+        "url_age": "https://www.transfermarkt.it/laliga2/altersschnitt/wettbewerb/ES2/plus/1"
+    },
+    {
+        "name": "2. Bundesliga",
+        "url_value": "https://www.transfermarkt.it/2-bundesliga/startseite/wettbewerb/L2",
+        "url_age": "https://www.transfermarkt.it/2-bundesliga/altersschnitt/wettbewerb/L2/plus/1"
+    },
+    {
+        "name": "Ligue 2",
+        "url_value": "https://www.transfermarkt.it/ligue-2/startseite/wettbewerb/FR2",
+        "url_age": "https://www.transfermarkt.it/ligue-2/altersschnitt/wettbewerb/FR2/plus/1"
+    },
+
+    # 🆕 EUROPA NORDICI
+    {
+        "name": "Scottish Premiership",
+        "url_value": "https://www.transfermarkt.it/premiership/startseite/wettbewerb/SC1",
+        "url_age": "https://www.transfermarkt.it/premiership/altersschnitt/wettbewerb/SC1/plus/1"
+    },
+    {
+        "name": "Allsvenskan",
+        "url_value": "https://www.transfermarkt.it/allsvenskan/startseite/wettbewerb/SE1",
+        "url_age": "https://www.transfermarkt.it/allsvenskan/altersschnitt/wettbewerb/SE1/plus/1"
+    },
+    {
+        "name": "Eliteserien",
+        "url_value": "https://www.transfermarkt.it/eliteserien/startseite/wettbewerb/NO1",
+        "url_age": "https://www.transfermarkt.it/eliteserien/altersschnitt/wettbewerb/NO1/plus/1"
+    },
+    {
+        "name": "Superligaen",
+        "url_value": "https://www.transfermarkt.it/superligaen/startseite/wettbewerb/DK1",
+        "url_age": "https://www.transfermarkt.it/superligaen/altersschnitt/wettbewerb/DK1/plus/1"
+    },
+    {
+        "name": "Jupiler Pro League",
+        "url_value": "https://www.transfermarkt.it/jupiler-pro-league/startseite/wettbewerb/BE1",
+        "url_age": "https://www.transfermarkt.it/jupiler-pro-league/altersschnitt/wettbewerb/BE1/plus/1"
+    },
+    {
+        "name": "League of Ireland Premier Division",
+        "url_value": "https://www.transfermarkt.it/premier-league/startseite/wettbewerb/IR1",
+        "url_age": "https://www.transfermarkt.it/league-of-ireland-premier-division/altersschnitt/wettbewerb/IR1/plus/1"
+    },
+
+    # 🆕 AMERICHE
+    {
+        "name": "Brasileirão Serie A",
+        "url_value": "https://www.transfermarkt.it/campeonato-brasileiro-serie-a/startseite/wettbewerb/BRA1",
+        "url_age": "https://www.transfermarkt.it/campeonato-brasileiro-serie-a/altersschnitt/wettbewerb/BRA1/plus/1"
+    },
+    {
+        "name": "Primera División",
+        "url_value": "https://www.transfermarkt.it/primera-division/startseite/wettbewerb/AR1N",
+        "url_age": "https://www.transfermarkt.it/primera-division/altersschnitt/wettbewerb/AR1N/plus/1"
+    },
+    {
+        "name": "Major League Soccer",
+        "url_value": "https://www.transfermarkt.it/major-league-soccer/startseite/wettbewerb/MLS1",
+        "url_age": "https://www.transfermarkt.it/major-league-soccer/altersschnitt/wettbewerb/MLS1/plus/1"
+    },
+
+    # 🆕 ASIA
+    {
+        "name": "J1 League",
+        "url_value": "https://www.transfermarkt.it/j1-100-year-vision-league/teilnehmer/pokalwettbewerb/J1YV",
+        "url_age": "https://www.transfermarkt.it/j1-100-year-vision-league/teilnehmer/pokalwettbewerb/J1YV"
+    },
+
 ]
 
 # Normalizzazione nomi Transfermarkt (varie forme -> nome TM "canonico")
@@ -242,11 +330,26 @@ def smart_find_team(tm_name: str):
 
     return None
 
-def update_team_data(tm_name: str, data_dict: dict):
+def update_team_data(tm_name: str, data_dict: dict, tm_id: int = None):
     """
     Aggiorna SOLO stats.marketValue / stats.avgAge della squadra trovata.
-    Non tocca name, aliases o altri campi.
+    Cerca prima per ID (univoco), poi per nome.
     """
+    # ✅ PRIMA: Cerca per ID (100% affidabile)
+    if tm_id:
+        db_team = teams_collection.find_one({"transfermarkt_id": tm_id})
+        if db_team:
+            update_fields = {}
+            for k, v in data_dict.items():
+                update_fields[f"stats.{k}"] = v
+            
+            teams_collection.update_one(
+                {"_id": db_team["_id"]},
+                {"$set": update_fields},
+            )
+            return True, db_team
+    
+    # ❌ FALLBACK: Cerca per nome (vecchio metodo)
     db_team = smart_find_team(tm_name)
     if not db_team:
         return False, None
@@ -277,30 +380,64 @@ def scrape_league_data(league_conf: dict):
         r = requests.get(league_conf["url_value"], headers=headers, timeout=20)
         if r.status_code == 200:
             soup = BeautifulSoup(r.content, "html.parser")
-            rows = soup.select("table.items tbody tr")
-            for row in rows:
-                name_tag = row.find("td", class_="hauptlink")
-                if not name_tag:
-                    continue
+            
+            # ✅ TROVA L'INDICE DELLA COLONNA "Valore rosa"
+            headers_row = soup.select("table.items thead tr th")
+            value_col_index = None
+            
+            for idx, th in enumerate(headers_row):
+                header_text = th.get_text(strip=True).lower()
+                # Cerca "valore rosa" o "valore di mercato" (totale, non medio)
+                if "valore rosa" in header_text or \
+                "vdm-rosa" in header_text or \
+                "vdm rosa" in header_text or \
+                ("valore" in header_text and "mercato" in header_text and "ø" not in header_text and "medio" not in header_text):
+                    value_col_index = idx
+                    break
+            
+            if value_col_index is None:
+                print("   ⚠️ Colonna 'Valore rosa' non trovata")
+            else:
+                rows = soup.select("table.items tbody tr")
+                for row in rows:
+                    name_tag = row.find("td", class_="hauptlink")
+                    if not name_tag:
+                        continue
 
-                tm_raw = name_tag.text.strip().replace("\n", "")
-                tm_name = TM_NAME_NORMALIZE.get(tm_raw, tm_raw)
+                    tm_raw = name_tag.text.strip().replace("\n", "")
+                    tm_name = TM_NAME_NORMALIZE.get(tm_raw, tm_raw)
+                    
+                    # ✅ ESTRAI TRANSFERMARKT_ID
+                    link_tag = name_tag.find("a")
+                    tm_id = None
+                    if link_tag and link_tag.get("href"):
+                        href = link_tag["href"]
+                        if "verein" in href:
+                            parts = href.split("/")
+                            if len(parts) >= 5:
+                                try:
+                                    tm_id = int(parts[4])
+                                except:
+                                    pass
 
-                val_cells = row.find_all("td", class_="rechts")
-                if not val_cells:
-                    continue
+                    # ✅ PRENDI LA CELLA NELLA COLONNA CORRETTA
+                    all_cells = row.find_all("td")
+                    if len(all_cells) <= value_col_index:
+                        continue
+                    
+                    raw_text = all_cells[value_col_index].text.strip()
+                    
+                    if "€" not in raw_text:
+                        continue
 
-                raw_text = val_cells[-1].text.strip()
-                if "€" not in raw_text:
-                    continue
+                    market_val = clean_money_value(raw_text)
+                    if market_val < 1_000:
+                        continue
 
-                market_val = clean_money_value(raw_text)
-                if market_val < 1_000:
-                    continue
-
-                if tm_name not in league_stats:
-                    league_stats[tm_name] = {}
-                league_stats[tm_name]["marketValue"] = market_val
+                    if tm_name not in league_stats:
+                        league_stats[tm_name] = {}
+                    league_stats[tm_name]["marketValue"] = market_val
+                    league_stats[tm_name]["tm_id"] = tm_id
         else:
             print(f"   ⚠️ HTTP {r.status_code} su Valori")
     except Exception as e:
@@ -322,6 +459,19 @@ def scrape_league_data(league_conf: dict):
 
                 tm_raw = name_tag.text.strip().replace("\n", "")
                 tm_name = TM_NAME_NORMALIZE.get(tm_raw, tm_raw)
+                
+                # ✅ ESTRAI TRANSFERMARKT_ID (stesso codice di prima)
+                link_tag = name_tag.find("a")
+                tm_id = None
+                if link_tag and link_tag.get("href"):
+                    href = link_tag["href"]
+                    if "verein" in href:
+                        parts = href.split("/")
+                        if len(parts) >= 5:
+                            try:
+                                tm_id = int(parts[4])
+                            except:
+                                pass
 
                 cells = row.find_all("td", class_="zentriert")
                 avg_age = 0.0
@@ -341,6 +491,8 @@ def scrape_league_data(league_conf: dict):
                     if tm_name not in league_stats:
                         league_stats[tm_name] = {}
                     league_stats[tm_name]["avgAge"] = avg_age
+                    if tm_id and "tm_id" not in league_stats[tm_name]:  # ✅ SALVA ID se non c'è già
+                        league_stats[tm_name]["tm_id"] = tm_id
         else:
             print(f"   ⚠️ HTTP {r.status_code} su Età")
     except Exception as e:
@@ -351,8 +503,10 @@ def scrape_league_data(league_conf: dict):
     for tm_name, stats in league_stats.items():
         val = stats.get("marketValue", 0.0)
         age = stats.get("avgAge", 0.0)
+        tm_id = stats.get("tm_id")  # ✅ PRENDI ID
 
-        found, db_team = update_team_data(tm_name, stats)
+        # ✅ PASSA ID alla funzione
+        found, db_team = update_team_data(tm_name, stats, tm_id=tm_id)
 
         val_str = f"{val:,.0f}€" if val > 0 else "???"
         age_str = f"{age:.1f}" if age > 0 else "??"

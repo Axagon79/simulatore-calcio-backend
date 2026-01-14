@@ -69,81 +69,169 @@ SEASON = "2025-2026"
 COMPETITIONS = [
     # ITALIA
     {
-        "name": "Serie A",
-        "league_code": "ITA1",
+        "name": "Serie A", "league_code": "ITA1",
         "startseite_url": "https://www.transfermarkt.it/serie-a/startseite/wettbewerb/IT1",
         "table_url": "https://www.transfermarkt.it/serie-a/tabelle/wettbewerb/IT1/saison_id/2025",
         "base_domain": BASE_DOMAIN_IT,
     },
     {
-        "name": "Serie B",
-        "league_code": "ITA2",
+        "name": "Serie B", "league_code": "ITA2",
         "startseite_url": "https://www.transfermarkt.it/serie-b/startseite/wettbewerb/IT2",
         "table_url": "https://www.transfermarkt.it/serie-b/tabelle/wettbewerb/IT2/saison_id/2025",
         "base_domain": BASE_DOMAIN_IT,
     },
     {
-        "name": "Serie C - Girone A",
-        "league_code": "ITA3A",
+        "name": "Serie C - Girone A", "league_code": "ITA3A",
         "startseite_url": "https://www.transfermarkt.it/serie-c-girone-a/startseite/wettbewerb/IT3A",
         "table_url": "https://www.transfermarkt.it/serie-c-girone-a/tabelle/wettbewerb/IT3A/saison_id/2025",
         "base_domain": BASE_DOMAIN_IT,
     },
     {
-        "name": "Serie C - Girone B",
-        "league_code": "ITA3B",
+        "name": "Serie C - Girone B", "league_code": "ITA3B",
         "startseite_url": "https://www.transfermarkt.it/serie-c-girone-b/startseite/wettbewerb/IT3B",
         "table_url": "https://www.transfermarkt.it/serie-c-girone-b/tabelle/wettbewerb/IT3B/saison_id/2025",
         "base_domain": BASE_DOMAIN_IT,
     },
     {
-        "name": "Serie C - Girone C",
-        "league_code": "ITA3C",
+        "name": "Serie C - Girone C", "league_code": "ITA3C",
         "startseite_url": "https://www.transfermarkt.it/serie-c-girone-c/startseite/wettbewerb/IT3C",
         "table_url": "https://www.transfermarkt.it/serie-c-girone-c/tabelle/wettbewerb/IT3C/saison_id/2025",
         "base_domain": BASE_DOMAIN_IT,
     },
-    # ESTERO
+    
+    # EUROPA TOP
     {
-        "name": "Premier League",
-        "league_code": "GB1",
+        "name": "Premier League", "league_code": "GB1",
         "startseite_url": "https://www.transfermarkt.com/premier-league/startseite/wettbewerb/GB1",
         "table_url": "https://www.transfermarkt.com/premier-league/tabelle/wettbewerb/GB1/saison_id/2025",
         "base_domain": BASE_DOMAIN_COM,
     },
     {
-        "name": "La Liga",
-        "league_code": "ES1",
+        "name": "La Liga", "league_code": "ES1",
         "startseite_url": "https://www.transfermarkt.com/la-liga/startseite/wettbewerb/ES1",
         "table_url": "https://www.transfermarkt.com/la-liga/tabelle/wettbewerb/ES1/saison_id/2025",
         "base_domain": BASE_DOMAIN_COM,
     },
     {
-        "name": "Eredivisie",
-        "league_code": "NL1",
-        "startseite_url": "https://www.transfermarkt.com/eredivisie/startseite/wettbewerb/NL1",
-        "table_url": "https://www.transfermarkt.com/eredivisie/tabelle/wettbewerb/NL1/saison_id/2025",
-        "base_domain": BASE_DOMAIN_COM,
-    },
-    {
-        "name": "Bundesliga",
-        "league_code": "DE1",
+        "name": "Bundesliga", "league_code": "DE1",
         "startseite_url": "https://www.transfermarkt.com/bundesliga/startseite/wettbewerb/L1",
         "table_url": "https://www.transfermarkt.com/bundesliga/tabelle/wettbewerb/L1/saison_id/2025",
         "base_domain": BASE_DOMAIN_COM,
     },
     {
-        "name": "Ligue 1",
-        "league_code": "FR1",
+        "name": "Ligue 1", "league_code": "FR1",
         "startseite_url": "https://www.transfermarkt.com/ligue-1/startseite/wettbewerb/FR1",
         "table_url": "https://www.transfermarkt.com/ligue-1/tabelle/wettbewerb/FR1/saison_id/2025",
         "base_domain": BASE_DOMAIN_COM,
     },
     {
-        "name": "Primeira Liga",
-        "league_code": "PT1",
+        "name": "Eredivisie", "league_code": "NL1",
+        "startseite_url": "https://www.transfermarkt.com/eredivisie/startseite/wettbewerb/NL1",
+        "table_url": "https://www.transfermarkt.com/eredivisie/tabelle/wettbewerb/NL1/saison_id/2025",
+        "base_domain": BASE_DOMAIN_COM,
+    },
+    {
+        "name": "Primeira Liga", "league_code": "PT1",
         "startseite_url": "https://www.transfermarkt.com/liga-nos/startseite/wettbewerb/PO1",
         "table_url": "https://www.transfermarkt.com/liga-nos/tabelle/wettbewerb/PO1/saison_id/2025",
+        "base_domain": BASE_DOMAIN_COM,
+    },
+    
+    # 🆕 EUROPA SERIE B
+    {
+        "name": "Championship", "league_code": "GB2",
+        "startseite_url": "https://www.transfermarkt.com/championship/startseite/wettbewerb/GB2",
+        "table_url": "https://www.transfermarkt.com/championship/tabelle/wettbewerb/GB2/saison_id/2025",
+        "base_domain": BASE_DOMAIN_COM,
+    },
+    {
+        "name": "LaLiga 2", "league_code": "ES2",
+        "startseite_url": "https://www.transfermarkt.com/laliga2/startseite/wettbewerb/ES2",
+        "table_url": "https://www.transfermarkt.com/laliga2/tabelle/wettbewerb/ES2/saison_id/2025",
+        "base_domain": BASE_DOMAIN_COM,
+    },
+    {
+        "name": "2. Bundesliga", "league_code": "DE2",
+        "startseite_url": "https://www.transfermarkt.com/2-bundesliga/startseite/wettbewerb/L2",
+        "table_url": "https://www.transfermarkt.com/2-bundesliga/tabelle/wettbewerb/L2/saison_id/2025",
+        "base_domain": BASE_DOMAIN_COM,
+    },
+    {
+        "name": "Ligue 2", "league_code": "FR2",
+        "startseite_url": "https://www.transfermarkt.com/ligue-2/startseite/wettbewerb/FR2",
+        "table_url": "https://www.transfermarkt.com/ligue-2/tabelle/wettbewerb/FR2/saison_id/2025",
+        "base_domain": BASE_DOMAIN_COM,
+    },
+    
+    # 🆕 EUROPA NORDICI + EXTRA
+    {
+        "name": "Scottish Premiership", "league_code": "SC1",
+        "startseite_url": "https://www.transfermarkt.com/premiership/startseite/wettbewerb/SC1",
+        "table_url": "https://www.transfermarkt.com/premiership/tabelle/wettbewerb/SC1/saison_id/2025",
+        "base_domain": BASE_DOMAIN_COM,
+    },
+    {
+        "name": "Allsvenskan", "league_code": "SE1",
+        "startseite_url": "https://www.transfermarkt.com/allsvenskan/startseite/wettbewerb/SE1",
+        "table_url": "https://www.transfermarkt.com/allsvenskan/tabelle/wettbewerb/SE1/saison_id/2025",
+        "base_domain": BASE_DOMAIN_COM,
+    },
+    {
+        "name": "Eliteserien", "league_code": "NO1",
+        "startseite_url": "https://www.transfermarkt.com/eliteserien/startseite/wettbewerb/NO1",
+        "table_url": "https://www.transfermarkt.com/eliteserien/tabelle/wettbewerb/NO1/saison_id/2025",
+        "base_domain": BASE_DOMAIN_COM,
+    },
+    {
+        "name": "Superligaen", "league_code": "DK1",
+        "startseite_url": "https://www.transfermarkt.com/superligaen/startseite/wettbewerb/DK1",
+        "table_url": "https://www.transfermarkt.com/superligaen/tabelle/wettbewerb/DK1/saison_id/2025",
+        "base_domain": BASE_DOMAIN_COM,
+    },
+    {
+        "name": "Jupiler Pro League", "league_code": "BE1",
+        "startseite_url": "https://www.transfermarkt.com/jupiler-pro-league/startseite/wettbewerb/BE1",
+        "table_url": "https://www.transfermarkt.com/jupiler-pro-league/tabelle/wettbewerb/BE1/saison_id/2025",
+        "base_domain": BASE_DOMAIN_COM,
+    },
+    {
+        "name": "Süper Lig", "league_code": "TR1",
+        "startseite_url": "https://www.transfermarkt.com/super-lig/startseite/wettbewerb/TR1",
+        "table_url": "https://www.transfermarkt.com/super-lig/tabelle/wettbewerb/TR1/saison_id/2025",
+        "base_domain": BASE_DOMAIN_COM,
+    },
+    {
+        "name": "League of Ireland Premier Division", "league_code": "IRL1",
+        "startseite_url": "https://www.transfermarkt.com/premier-division/startseite/wettbewerb/IRL1",
+        "table_url": "https://www.transfermarkt.com/premier-division/tabelle/wettbewerb/IRL1/saison_id/2025",
+        "base_domain": BASE_DOMAIN_COM,
+    },
+    
+    # 🆕 AMERICHE
+    {
+        "name": "Brasileirão Serie A", "league_code": "BRA1",
+        "startseite_url": "https://www.transfermarkt.com/campeonato-brasileiro-serie-a/startseite/wettbewerb/BRA1",
+        "table_url": "https://www.transfermarkt.com/campeonato-brasileiro-serie-a/tabelle/wettbewerb/BRA1/saison_id/2025",
+        "base_domain": BASE_DOMAIN_COM,
+    },
+    {
+        "name": "Primera División", "league_code": "ARG1",
+        "startseite_url": "https://www.transfermarkt.com/primera-division/startseite/wettbewerb/AR1N",
+        "table_url": "https://www.transfermarkt.com/primera-division/tabelle/wettbewerb/AR1N/saison_id/2025",
+        "base_domain": BASE_DOMAIN_COM,
+    },
+    {
+        "name": "Major League Soccer", "league_code": "USA1",
+        "startseite_url": "https://www.transfermarkt.com/major-league-soccer/startseite/wettbewerb/MLS1",
+        "table_url": "https://www.transfermarkt.com/major-league-soccer/tabelle/wettbewerb/MLS1/saison_id/2025",
+        "base_domain": BASE_DOMAIN_COM,
+    },
+    
+    # 🆕 ASIA
+    {
+        "name": "J1 League", "league_code": "JAP1",
+        "startseite_url": "https://www.transfermarkt.com/j1-league/startseite/wettbewerb/JAP1",
+        "table_url": "https://www.transfermarkt.com/j1-league/tabelle/wettbewerb/JAP1/saison_id/2025",
         "base_domain": BASE_DOMAIN_COM,
     },
 ]

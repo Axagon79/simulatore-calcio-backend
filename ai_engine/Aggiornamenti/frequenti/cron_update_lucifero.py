@@ -14,9 +14,13 @@ TEST_AWAY = "Getafe CF"
 # ==========================================
 
 
-# --- SETUP PERCORSI ---
+# FIX PERCORSI
 current_dir = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(current_dir)
+ai_engine_dir = os.path.dirname(os.path.dirname(current_dir))
+project_root = os.path.dirname(ai_engine_dir)
+
+if ai_engine_dir not in sys.path: sys.path.insert(0, ai_engine_dir)
+if project_root not in sys.path: sys.path.insert(0, project_root)
 
 try:
     from config import db

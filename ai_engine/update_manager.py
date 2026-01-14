@@ -30,6 +30,10 @@ CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 # ------------------------------------------------------------------------------
 
 SCRAPER_SEQUENCE = [
+    
+      # ( FA AGGIORNAMENTO STAGIONALE MEDIE GOL CAMPIONATI )
+      ("aggiorna_media_gol_partita_tutti_campionati.py", "📊 [0/13] Media Gol Partita (Campionati)", "Mancano media gol per campionato", FREQUENT_DIR),
+      
       ("scraper_results_fbref.py", "📊 [1/13] Risultati & xG (FBref)", "Mancano risultati recenti e xG", FREQUENT_DIR),
       
       ("scrape_lucifero_betexplorer_safe.py", "🔥 [2/13] Affidabilità squadre (BetExplorer)", "Affidabilità assente", FREQUENT_DIR),
@@ -50,7 +54,7 @@ SCRAPER_SEQUENCE = [
     
     # ("scraper_fixtures.py", "📆 [12/13] Partite Future", "Il motore non saprà cosa simulare", FREQUENT_DIR),
     
-    # ("scraper_odds_oddsmath.py", "💎 [13/13] Quote Future", "Manca confronto con bookmaker", FREQUENT_DIR),
+    # ("scraper_odds_oddsmath.py", "💎 [13/13] Quote Future", "Manca confronto con bookmaker", FREQUENT_DIR), 
       
       # ⭐ NUOVO SCRIPT AGGIUNTO QUI ALLA FINE NELLA CARTELLA FREQUENTI
       ("nowgoal_scraper.py", "🚀 [14/14] Quote H2H Arricchite (NowGoal)", "Mancano le quote precise nel CSV", FREQUENT_DIR),
