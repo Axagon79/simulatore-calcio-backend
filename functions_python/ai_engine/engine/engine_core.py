@@ -567,17 +567,28 @@ def preload_match_data(home_team, away_team, bulk_cache=None):
         bulk_cache: Se fornito, riutilizza questi dati invece di ricaricare
     """
     t_start = time.time()
-    
+    # ✅ Inizializza subito le variabili con valori di default
+    league = ""
+    competition = ""
     if bulk_cache is None:
         match_info = db.matches.find_one({"home_team": home_team, "away_team": away_team})
-        league = match_info.get("league", "Serie A") if match_info else "Serie A"
-        competition = match_info.get("competition", league) if match_info else league
+        
+        if match_info is None:
+            raise ValueError(f"❌ Partita {home_team} vs {away_team} non trovata nel database")
+        
+        league = match_info.get("league")
+        if not league:
+            raise ValueError(f"❌ Campo 'league' mancante per {home_team} vs {away_team}")
+        
+        competition = match_info.get("competition", league)
 
         bulk_cache = bulk_manager.get_all_data_bulk(home_team, away_team, league)
-        print(f"📦 Bulk_cache caricato da DB", file=sys.stderr)
+        print(f"📦 Bulk_cache caricato da DB per league: {league}", file=sys.stderr)
     else:
         print(f"♻️ Riutilizzo bulk_cache fornito", file=sys.stderr)
-        league = bulk_cache.get('LEAGUE_STATS', {}).get('league', 'Serie A')
+        league = bulk_cache.get('LEAGUE_STATS', {}).get('league')
+        if not league:
+            raise ValueError(f"❌ League non trovato in bulk_cache")
         competition = league
 
     h_rating, _ = get_dynamic_rating(home_team, bulk_cache=bulk_cache)
@@ -661,7 +672,8 @@ def preload_match_data(home_team, away_team, bulk_cache=None):
         'h2h_a': h2h_a,
         'base_val': base_val,
         'home_team': home_team,
-        'away_team': away_team
+        'away_team': away_team,
+        'competition': competition  # ✅ Aggiungi questa riga
     }
 
 if __name__ == "__main__":

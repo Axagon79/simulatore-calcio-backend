@@ -77,7 +77,29 @@ app.get('/rounds', async (req, res) => {
       BUNDESLIGA: 'Bundesliga',
       LIGUE_1: 'Ligue 1',
       EREDIVISIE: 'Eredivisie',
-      LIGA_PORTUGAL: 'Liga Portugal'
+      LIGA_PORTUGAL: 'Liga Portugal',
+      // 🆕 EUROPA SERIE B
+      CHAMPIONSHIP: 'Championship',
+      LA_LIGA_2: 'LaLiga 2',
+      BUNDESLIGA_2: '2. Bundesliga',
+      LIGUE_2: 'Ligue 2',
+
+      // 🆕 NORDICI + EXTRA
+      SCOTTISH_PREMIERSHIP: 'Scottish Premiership',
+      ALLSVENSKAN: 'Allsvenskan',
+      ELITESERIEN: 'Eliteserien',
+      SUPERLIGAEN: 'Superligaen',
+      JUPILER_PRO_LEAGUE: 'Jupiler Pro League',
+      SUPER_LIG: 'Süper Lig',
+      LEAGUE_OF_IRELAND: 'League of Ireland Premier Division',
+
+      // 🆕 AMERICHE
+      BRASILEIRAO: 'Brasileirão Serie A',
+      PRIMERA_DIVISION_ARG: 'Primera División',
+      MLS: 'Major League Soccer',
+
+      // 🆕 ASIA
+      J1_LEAGUE: 'J1 League'
     };
 
     const leagueName = leagueMap[leagueId];
@@ -217,7 +239,29 @@ app.get('/matches', async (req, res) => {
       'BUNDESLIGA': 'Bundesliga',
       'LIGUE_1': 'Ligue 1',
       'EREDIVISIE': 'Eredivisie',
-      'LIGA_PORTUGAL': 'Liga Portugal'
+      'LIGA_PORTUGAL': 'Liga Portugal',
+      // 🆕 EUROPA SERIE B
+      'CHAMPIONSHIP': 'Championship',
+      'LA_LIGA_2': 'LaLiga 2',
+      'BUNDESLIGA_2': '2. Bundesliga',
+      'LIGUE_2': 'Ligue 2',
+
+      // 🆕 NORDICI + EXTRA
+      'SCOTTISH_PREMIERSHIP': 'Scottish Premiership',
+      'ALLSVENSKAN': 'Allsvenskan',
+      'ELITESERIEN': 'Eliteserien',
+      'SUPERLIGAEN': 'Superligaen',
+      'JUPILER_PRO_LEAGUE': 'Jupiler Pro League',
+      'SUPER_LIG': 'Süper Lig',
+      'LEAGUE_OF_IRELAND': 'League of Ireland Premier Division',
+
+      // 🆕 AMERICHE
+      'BRASILEIRAO': 'Brasileirão Serie A',
+      'PRIMERA_DIVISION_ARG': 'Primera División',
+      'MLS': 'Major League Soccer',
+
+      // 🆕 ASIA
+      'J1_LEAGUE': 'J1 League'
     };
     
     const leagueName = leagueMap[leagueId];
@@ -264,12 +308,35 @@ app.get('/leagues', (req, res) => {
       { id: 'SERIE_C_B', name: 'Serie C - Girone B' },
       { id: 'SERIE_C_C', name: 'Serie C - Girone C' }
     ],
-    'England': [{ id: 'PREMIER_LEAGUE', name: 'Premier League' }],
-    'Spain': [{ id: 'LA_LIGA', name: 'La Liga' }],
-    'Germany': [{ id: 'BUNDESLIGA', name: 'Bundesliga' }],
-    'France': [{ id: 'LIGUE_1', name: 'Ligue 1' }],
+    'England': [
+      { id: 'PREMIER_LEAGUE', name: 'Premier League' },
+      { id: 'CHAMPIONSHIP', name: 'Championship' }
+    ],
+    'Spain': [
+      { id: 'LA_LIGA', name: 'La Liga' },
+      { id: 'LA_LIGA_2', name: 'LaLiga 2' }
+    ],
+    'Germany': [
+      { id: 'BUNDESLIGA', name: 'Bundesliga' },
+      { id: 'BUNDESLIGA_2', name: '2. Bundesliga' }
+    ],
+    'France': [
+      { id: 'LIGUE_1', name: 'Ligue 1' },
+      { id: 'LIGUE_2', name: 'Ligue 2' }
+    ],
     'Netherlands': [{ id: 'EREDIVISIE', name: 'Eredivisie' }],
-    'Portugal': [{ id: 'LIGA_PORTUGAL', name: 'Liga Portugal' }]
+    'Portugal': [{ id: 'LIGA_PORTUGAL', name: 'Liga Portugal' }],
+    'Scotland': [{ id: 'SCOTTISH_PREMIERSHIP', name: 'Scottish Premiership' }],
+    'Sweden': [{ id: 'ALLSVENSKAN', name: 'Allsvenskan' }],
+    'Norway': [{ id: 'ELITESERIEN', name: 'Eliteserien' }],
+    'Denmark': [{ id: 'SUPERLIGAEN', name: 'Superligaen' }],
+    'Belgium': [{ id: 'JUPILER_PRO_LEAGUE', name: 'Jupiler Pro League' }],
+    'Turkey': [{ id: 'SUPER_LIG', name: 'Süper Lig' }],
+    'Ireland': [{ id: 'LEAGUE_OF_IRELAND', name: 'League of Ireland Premier Division' }],
+    'Brazil': [{ id: 'BRASILEIRAO', name: 'Brasileirão Serie A' }],
+    'Argentina': [{ id: 'PRIMERA_DIVISION_ARG', name: 'Primera División' }],
+    'USA': [{ id: 'MLS', name: 'Major League Soccer' }],
+    'Japan': [{ id: 'J1_LEAGUE', name: 'J1 League' }]
   };
   res.json(leaguesData[country] || []);
 });

@@ -1351,7 +1351,8 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
             
             # EUROPA SERIE B
             "Championship": "Championship",
-            "Laliga 2": "LaLiga 2",
+            "LaLiga 2": "LaLiga 2",           # ✅ Fix: L maiuscola
+            "Laliga 2": "LaLiga 2",           # ✅ Fallback per scrapers
             "2. Bundesliga": "2. Bundesliga",
             "Ligue 2": "Ligue 2",
             
@@ -1362,12 +1363,17 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
             "Superligaen": "Superligaen",
             "Jupiler Pro League": "Jupiler Pro League",
             "Süper Lig": "Süper Lig",
-            "League Of Ireland": "League of Ireland Premier Division",
+            "Super Lig": "Süper Lig",                              # ✅ Fallback senza umlaut
+            "League of Ireland": "League of Ireland Premier Division",  # ✅ Minuscolo
+            "League Of Ireland": "League of Ireland Premier Division",  # ✅ Maiuscolo
             
             # AMERICHE
-            "Brasileirão": "Brasileirão Serie A",
+            "Brasileirão": "Brasileirão Serie A",     # ✅ Con tilde
+            "Brasileirao": "Brasileirão Serie A",     # ✅ Senza tilde
             "Primera División": "Primera División",
-            "Mls": "Major League Soccer",
+            "Primera Division": "Primera División",   # ✅ Fallback senza accento
+            "MLS": "Major League Soccer",             # ✅ Tutto maiuscolo
+            "Mls": "Major League Soccer",             # ✅ Capitalizzato
             
             # ASIA
             "J1 League": "J1 League"
