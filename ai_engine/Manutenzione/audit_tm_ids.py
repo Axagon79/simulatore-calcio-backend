@@ -1,27 +1,18 @@
 import os
 import sys
 import importlib.util
-from collections import defaultdict
-
 # --- CONFIGURAZIONE PERCORSI ---
 current_dir = os.path.dirname(os.path.abspath(__file__))
-aggiornamenti_dir = os.path.dirname(current_dir)
-ai_engine_dir = os.path.dirname(aggiornamenti_dir)
+ai_engine_dir = os.path.dirname(os.path.dirname(current_dir))
 project_root = os.path.dirname(ai_engine_dir)
-
-if ai_engine_dir not in sys.path:
-    sys.path.insert(0, ai_engine_dir)
-if project_root not in sys.path:
-    sys.path.insert(0, project_root)
+if ai_engine_dir not in sys.path: sys.path.insert(0, ai_engine_dir)
+if project_root not in sys.path: sys.path.insert(0, project_root)
 
 try:
-    spec = importlib.util.spec_from_file_location("config", os.path.join(project_root, "config.py"))
-    config_module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(config_module)
-    db = config_module.db
-    print(f"✅ DB Connesso: {db.name}\n")
-except Exception as e:
-    print(f"❌ Errore Import Config: {e}")
+    from config import db
+    print(f"✅ DB Connesso: {db.name}")
+except ImportError:
+    print("❌ Errore Import Config")
     sys.exit(1)
 
 # --- COLLECTIONS ---

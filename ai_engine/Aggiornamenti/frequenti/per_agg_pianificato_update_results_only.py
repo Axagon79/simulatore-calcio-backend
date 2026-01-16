@@ -60,7 +60,7 @@ LEAGUES_CONFIG = [
     # 🆕 EUROPA SERIE B
     {"league_name": "Championship", "id_prefix": "Championship", "url": "https://www.betexplorer.com/it/football/england/championship/results/"},
     {"league_name": "LaLiga 2", "id_prefix": "LaLiga2", "url": "https://www.betexplorer.com/it/football/spain/laliga2/results/"},
-    {"league_name": "2. Bundesliga", "id_prefix": "2Bundesliga", "url": "https://www.betexplorer.com/it/football/germany/2-bundesliga/results/"},
+    {"league_name": "2. Bundesliga", "id_prefix": "2.Bundesliga", "url": "https://www.betexplorer.com/it/football/germany/2-bundesliga/results/"},
     {"league_name": "Ligue 2", "id_prefix": "Ligue2", "url": "https://www.betexplorer.com/it/football/france/ligue-2/results/"},
     
     # 🆕 EUROPA NORDICI + EXTRA
@@ -69,12 +69,12 @@ LEAGUES_CONFIG = [
     {"league_name": "Eliteserien", "id_prefix": "Eliteserien", "url": "https://www.betexplorer.com/it/football/norway/eliteserien/results/"},
     {"league_name": "Superligaen", "id_prefix": "Superligaen", "url": "https://www.betexplorer.com/it/football/denmark/superliga/results/"},
     {"league_name": "Jupiler Pro League", "id_prefix": "JupilerProLeague", "url": "https://www.betexplorer.com/it/football/belgium/jupiler-pro-league/results/"},
-    {"league_name": "Süper Lig", "id_prefix": "SuperLig", "url": "https://www.betexplorer.com/it/football/turkey/super-lig/results/"},
+    {"league_name": "Süper Lig", "id_prefix": "SüperLig", "url": "https://www.betexplorer.com/it/football/turkey/super-lig/results/"},
     {"league_name": "League of Ireland Premier Division", "id_prefix": "LeagueOfIreland", "url": "https://www.betexplorer.com/it/football/ireland/premier-division/results/"},
     
     # 🆕 AMERICHE
-    {"league_name": "Brasileirão Serie A", "id_prefix": "Brasileirao", "url": "https://www.betexplorer.com/it/football/brazil/serie-a/results/"},
-    {"league_name": "Primera División", "id_prefix": "PrimeraDivision", "url": "https://www.betexplorer.com/it/football/argentina/primera-division/results/"},
+    {"league_name": "Brasileirão Serie A", "id_prefix": "Brasileirao", "url": "https://www.betexplorer.com/it/football/brazil/serie-a-betano/results/"},
+    {"league_name": "Primera División", "id_prefix": "PrimeraDivision", "url": "https://www.betexplorer.com/it/football/argentina/liga-profesional/results//"},
     {"league_name": "Major League Soccer", "id_prefix": "MLS", "url": "https://www.betexplorer.com/it/football/usa/mls/results/"},
     
     # 🆕 ASIA

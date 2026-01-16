@@ -41,6 +41,8 @@ def get_all_data_bulk(home_team, away_team, league_name):
         "Superligaen": "Superligaen",
         "Jupiler Pro League": "Jupiler Pro League",
         "Süper Lig": "Süper Lig",
+        "Super Lig": "Süper Lig",  # ✅ AGGIUNGI QUESTA RIGA!
+        "Sper Lig": "Süper Lig",   # Fallback se arriva senza ü
         "League Of Ireland": "League of Ireland Premier Division",
         
         # AMERICHE
@@ -230,6 +232,7 @@ def get_all_data_bulk(home_team, away_team, league_name):
         "ALL_ROUNDS": raw_rounds,
         "MATCH_H2H": h2h_match_data,
         "LEAGUE_STATS": {
+            'league': league_normalized,  # ✅ AGGIUNGI QUESTA RIGA!
             "avg_home_league": avg_h_l,
             "avg_away_league": avg_a_l
         },

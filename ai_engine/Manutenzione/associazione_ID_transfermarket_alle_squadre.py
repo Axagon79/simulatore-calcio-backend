@@ -23,7 +23,7 @@ COLLECTION_H2H = "h2h_by_round"
 LOG_FILE = "squadre_da_sistemare.txt"
 
 # 🚩 TEST MODE: Se True, non scrive nulla nel DB. Mettilo a False quando la lista è ok.
-DRY_RUN = False 
+DRY_RUN = True 
 
 def normalize(name):
     """ Normalizzazione identica per evitare errori di battitura o spazi extra """

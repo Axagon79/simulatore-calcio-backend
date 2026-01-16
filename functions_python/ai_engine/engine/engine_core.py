@@ -558,7 +558,7 @@ def predict_match(home_team, away_team, mode=ALGO_MODE, preloaded_data=None):
 
 
 # // modificato per: logica bulk
-def preload_match_data(home_team, away_team, bulk_cache=None):
+def preload_match_data(home_team, away_team,league=None, bulk_cache=None):
     """
     VERSIONE TURBO BULK V3: Esegue un unico viaggio al DB per caricare tutto.
     Integra calcolatori satellite per popolare i dati RAW in memoria.
@@ -586,10 +586,25 @@ def preload_match_data(home_team, away_team, bulk_cache=None):
         print(f"📦 Bulk_cache caricato da DB per league: {league}", file=sys.stderr)
     else:
         print(f"♻️ Riutilizzo bulk_cache fornito", file=sys.stderr)
+        
+        # Estrai league da LEAGUE_STATS
         league = bulk_cache.get('LEAGUE_STATS', {}).get('league')
+        
+        # Fallback: estrai da MASTER_DATA se LEAGUE_STATS è vuoto
         if not league:
-            raise ValueError(f"❌ League non trovato in bulk_cache")
+            master_data = bulk_cache.get('MASTER_DATA', {})
+            if master_data:
+                # Prendi la league dalla prima squadra
+                first_team_data = next(iter(master_data.values()), {})
+                league = first_team_data.get('league')
+        
+        print(f"🔍 [PRELOAD] League estratta: '{league}'", file=sys.stderr)
+        
+        if not league:
+            raise ValueError(f"❌ Campo 'league' non trovato in bulk_cache. Verifica LEAGUE_STATS.")
+        
         competition = league
+
 
     h_rating, _ = get_dynamic_rating(home_team, bulk_cache=bulk_cache)
     a_rating, _ = get_dynamic_rating(away_team, bulk_cache=bulk_cache)

@@ -1,0 +1,156 @@
+================================================================================
+REPORT SCRAPER QUOTE CALCIO
+================================================================================
+
+Data: 2026-01-15 19:07:32
+Partite totali: 30
+Partite aggiornate: 0
+Successo: 0.0%
+
+================================================================================
+🚨 SQUADRE CON PROBLEMI DI MATCHING
+================================================================================
+
+Totale squadre uniche con problemi: 28
+
+❌ New York (1 partite mancanti)
+   Alias usati: york, new york
+
+❌ New England (1 partite mancanti)
+   Alias usati: new england, new england revolution, england
+
+❌ Chicago (1 partite mancanti)
+   Alias usati: chicago fire, chicago
+
+❌ Montréal (1 partite mancanti)
+   Alias usati: montréal, cf montreal, montreal
+
+❌ Minnesota (1 partite mancanti)
+   Alias usati: minnesota united fc, minnesota, minnesota utd
+
+❌ Cincinnati (1 partite mancanti)
+   Alias usati: fc cincinnati, cincinnati
+
+❌ Colorado (1 partite mancanti)
+   Alias usati: colorado rapids, colorado
+
+❌ Portland (1 partite mancanti)
+   Alias usati: portland timbers, portland
+
+❌ Orlando (1 partite mancanti)
+   Alias usati: orlando city, orlando
+
+❌ Miami (1 partite mancanti)
+   Alias usati: inter miami, miami, inter miami cf
+
+❌ SJ Earthquakes (1 partite mancanti)
+   Alias usati: san jose earthquakes, sj earthquakes, earthquakes
+
+❌ Atlanta (1 partite mancanti)
+   Alias usati: atlanta utd, atlanta, atlanta united
+
+❌ Salt Lake (1 partite mancanti)
+   Alias usati: salt lake, real salt lake, salt, lake
+
+❌ Seattle (1 partite mancanti)
+   Alias usati: seattle sounders, seattle
+
+❌ Dallas (1 partite mancanti)
+   Alias usati: dallas, fc dallas
+
+❌ Nashville (1 partite mancanti)
+   Alias usati: nashville
+
+❌ Houston (1 partite mancanti)
+   Alias usati: houston, houston dynamo
+
+❌ LAFC (1 partite mancanti)
+   Alias usati: los angeles fc, la fc, los angeles, lafc, la
+
+❌ Kansas City (1 partite mancanti)
+   Alias usati: kansas city, sporting kansas city, city, sporting kc, sporting kansas
+
+❌ Columbus (1 partite mancanti)
+   Alias usati: columbus, columbus crew
+
+❌ San Diego (1 partite mancanti)
+   Alias usati: diego, san diego, san diego fc
+
+❌ St. Louis CITY (1 partite mancanti)
+   Alias usati: city, louis, st. louis, st. louis city
+
+❌ Vancouver (1 partite mancanti)
+   Alias usati: vancouver, vancouver whitecaps
+
+❌ Toronto (1 partite mancanti)
+   Alias usati: toronto, toronto fc
+
+❌ LA Galaxy (1 partite mancanti)
+   Alias usati: galaxy, la galaxy, los angeles galaxy
+
+❌ Charlotte (1 partite mancanti)
+   Alias usati: charlotte, charlotte fc
+
+❌ Philadelphia (1 partite mancanti)
+   Alias usati: philadelphia, philadelphia union
+
+❌ New York City (1 partite mancanti)
+   Alias usati: city, new york, york, new york city, new york city fc
+
+
+💡 SUGGERIMENTI:
+1. Vai sul sito NowGoal e cerca queste squadre
+2. Annota il nome ESATTO usato sul sito
+3. Aggiungi il nome del sito come alias nel database
+4. Se il nome è molto diverso, aggiorna normalize_name()
+
+================================================================================
+DETTAGLIO PARTITE NON TROVATE
+================================================================================
+
+
+SQUADRE_IN_RIGHE_DIVERSE (14 partite)
+--------------------------------------------------------------------------------
+  • New York vs New England
+    Lega: Major League Soccer - Giornata: 2
+
+  • Chicago vs Montréal
+    Lega: Major League Soccer - Giornata: 2
+
+  • Minnesota vs Cincinnati
+    Lega: Major League Soccer - Giornata: 2
+
+  • Colorado vs Portland
+    Lega: Major League Soccer - Giornata: 2
+
+  • Orlando vs Miami
+    Lega: Major League Soccer - Giornata: 2
+
+  • SJ Earthquakes vs Atlanta
+    Lega: Major League Soccer - Giornata: 2
+
+  • Salt Lake vs Seattle
+    Lega: Major League Soccer - Giornata: 2
+
+  • Dallas vs Nashville
+    Lega: Major League Soccer - Giornata: 2
+
+  • Houston vs LAFC
+    Lega: Major League Soccer - Giornata: 2
+
+  • Kansas City vs Columbus
+    Lega: Major League Soccer - Giornata: 2
+
+  ... e altre 4 partite
+
+
+================================================================================
+ℹ️ PARTITE TROVATE MA SENZA QUOTE (NORMALE)
+================================================================================
+
+Totale: 16 partite
+Queste partite sono sul sito ma le quote non sono ancora pubblicate.
+Riprova più tardi, specialmente vicino alla data della partita.
+
+
+Major League Soccer: 16 partite
