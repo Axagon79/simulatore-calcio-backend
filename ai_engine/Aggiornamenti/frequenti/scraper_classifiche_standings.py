@@ -29,26 +29,31 @@ COMPETITIONS = [
         "name": "Serie A",
         "country": "Italy",
         "table_url": "https://www.transfermarkt.it/serie-a/tabelle/wettbewerb/IT1", 
+        "dual_tables": False,
     },
     {
         "name": "Serie B",
         "country": "Italy",
         "table_url": "https://www.transfermarkt.it/serie-b/tabelle/wettbewerb/IT2",
+        "dual_tables": False,
     },
     {
         "name": "Serie C - Girone A",
         "country": "Italy",
         "table_url": "https://www.transfermarkt.it/serie-c-girone-a/tabelle/wettbewerb/IT3A",
+        "dual_tables": False,
     },
     {
         "name": "Serie C - Girone B",
         "country": "Italy",
         "table_url": "https://www.transfermarkt.it/serie-c-girone-b/tabelle/wettbewerb/IT3B",
+        "dual_tables": False,
     },
     {
         "name": "Serie C - Girone C",
         "country": "Italy",
         "table_url": "https://www.transfermarkt.it/serie-c-girone-c/tabelle/wettbewerb/IT3C",
+        "dual_tables": False,
     },
     
     # EUROPA TOP (Transfermarkt.com -> Nomi Internazionali/Inglesi)
@@ -56,31 +61,37 @@ COMPETITIONS = [
         "name": "Premier League",
         "country": "England",
         "table_url": "https://www.transfermarkt.com/premier-league/tabelle/wettbewerb/GB1",
+        "dual_tables": False,
     },
     {
         "name": "La Liga",
         "country": "Spain",
-        "table_url": "https://www.transfermarkt.com/la-liga/tabelle/wettbewerb/ES1",
+        "table_url": "https://www.transfermarkt.com/la-liga/tabelle/wettbewerb/ES1",    
+        "dual_tables": False,
     },
     {
         "name": "Bundesliga",
         "country": "Germany",
         "table_url": "https://www.transfermarkt.com/bundesliga/tabelle/wettbewerb/L1",
+        "dual_tables": False,
     },
     {
         "name": "Ligue 1",
         "country": "France",
         "table_url": "https://www.transfermarkt.com/ligue-1/tabelle/wettbewerb/FR1",
+        "dual_tables": False,
     },
     {
         "name": "Eredivisie",
         "country": "Netherlands",
         "table_url": "https://www.transfermarkt.com/eredivisie/tabelle/wettbewerb/NL1",
+        "dual_tables": False,
     },
     {
         "name": "Liga Portugal",
         "country": "Portugal",
         "table_url": "https://www.transfermarkt.com/liga-nos/tabelle/wettbewerb/PO1",
+        "dual_tables": False,
     },
     
     # 🆕 EUROPA SERIE B
@@ -88,21 +99,25 @@ COMPETITIONS = [
         "name": "Championship",
         "country": "England",
         "table_url": "https://www.transfermarkt.com/championship/tabelle/wettbewerb/GB2",
+        "dual_tables": False,
     },
     {
         "name": "LaLiga 2",
         "country": "Spain",
         "table_url": "https://www.transfermarkt.com/laliga2/tabelle/wettbewerb/ES2",
+        "dual_tables": False,
     },
     {
         "name": "2. Bundesliga",
         "country": "Germany",
         "table_url": "https://www.transfermarkt.com/2-bundesliga/tabelle/wettbewerb/L2",
+        "dual_tables": False,
     },
     {
         "name": "Ligue 2",
         "country": "France",
         "table_url": "https://www.transfermarkt.com/ligue-2/tabelle/wettbewerb/FR2",
+        "dual_tables": False,
     },
     
     # 🆕 EUROPA NORDICI + EXTRA
@@ -110,36 +125,43 @@ COMPETITIONS = [
         "name": "Scottish Premiership",
         "country": "Scotland",
         "table_url": "https://www.transfermarkt.com/premiership/tabelle/wettbewerb/SC1",
+        "dual_tables": False,
     },
     {
         "name": "Allsvenskan",
         "country": "Sweden",
         "table_url": "https://www.transfermarkt.com/allsvenskan/tabelle/wettbewerb/SE1",
+        "dual_tables": False,
     },
     {
         "name": "Eliteserien",
         "country": "Norway",
         "table_url": "https://www.transfermarkt.com/eliteserien/tabelle/wettbewerb/NO1",
+        "dual_tables": False,
     },
     {
         "name": "Superligaen",
         "country": "Denmark",
         "table_url": "https://www.transfermarkt.com/superligaen/tabelle/wettbewerb/DK1",
+        "dual_tables": False,
     },
     {
         "name": "Jupiler Pro League",
         "country": "Belgium",
         "table_url": "https://www.transfermarkt.com/jupiler-pro-league/tabelle/wettbewerb/BE1",
+        "dual_tables": False,
     },
     {
         "name": "Süper Lig",
         "country": "Turkey",
         "table_url": "https://www.transfermarkt.com/super-lig/tabelle/wettbewerb/TR1",
+        "dual_tables": False,
     },
     {
         "name": "League of Ireland Premier Division",
         "country": "Ireland",
         "table_url": "https://www.transfermarkt.com/premier-league/tabelle/wettbewerb/IR1",
+        "dual_tables": False,
     },
     
     # 🆕 AMERICHE
@@ -147,16 +169,19 @@ COMPETITIONS = [
         "name": "Brasileirão Serie A",
         "country": "Brazil",
         "table_url": "https://www.transfermarkt.com/campeonato-brasileiro-serie-a/tabelle/wettbewerb/BRA1",
+        "dual_tables": False,
     },
     {
         "name": "Primera División",
         "country": "Argentina",
-        "table_url": "https://www.transfermarkt.com/primera-division/tabelle/wettbewerb/AR1N",
+        "table_url": "https://www.transfermarkt.com/torneo-inicial/tabelle/wettbewerb/ARG1",
+        "dual_tables": True,
     },
     {
         "name": "Major League Soccer",
         "country": "USA",
         "table_url": "https://www.transfermarkt.com/major-league-soccer/tabelle/wettbewerb/MLS1",
+        "dual_tables": False,
     },
     
     # 🆕 ASIA
@@ -164,6 +189,7 @@ COMPETITIONS = [
         "name": "J1 League",
         "country": "Japan",
         "table_url": "https://www.transfermarkt.com/j1-league/tabelle/wettbewerb/JAP1",
+        "dual_tables": False,
     },
 ]
 
@@ -209,6 +235,114 @@ def find_db_data(scraped_name):
     
     return None, None
 
+def scrape_single_table(soup, table_index=0, split_mode=None, force_grid_view=False):
+    """
+    Scarica una singola tabella dalla pagina.
+    table_index: 0 = prima tabella, 1 = seconda tabella
+    split_mode: None = tabella intera, 'first_half' = prime 15, 'second_half' = ultime 15
+    force_grid_view: True = usa grid-view (Argentina), False = usa responsive-table
+    """
+    standings_table = []
+    
+    # Trova TUTTE le tabelle nella pagina
+    if force_grid_view:
+        # Argentina: usa grid-view
+        all_tables = soup.find_all("div", class_="grid-view")
+    else:
+        # Campionati normali: usa responsive-table
+        all_tables = soup.find_all("div", class_="responsive-table")
+        
+        # Fallback: se non trova responsive-table, prova grid-view
+        if not all_tables:
+            all_tables = soup.find_all("div", class_="grid-view")
+
+
+    if table_index >= len(all_tables):
+        print(f"⚠️  Tabella {table_index} non trovata")
+        return []
+
+    tablediv = all_tables[table_index]
+
+    # Per grid-view (Argentina), la tabella è dentro il div
+    if "grid-view" in tablediv.get("class", []):
+        table = tablediv.find("table", class_="items")
+        if not table:
+            print(f"⚠️  Tabella items non trovata dentro grid-view")
+            return []
+        rows = table.find("tbody").find_all("tr")
+    else:
+        rows = tablediv.find("tbody").find_all("tr")
+
+    
+    foundidscount = 0
+    for row in rows:
+        try:
+            # 1. POSIZIONE
+            rankcell = row.find("td", class_="rechts hauptlink")
+            if not rankcell:
+                rankcell = row.find_all("td")[0]
+            ranktext = rankcell.get_text(strip=True).replace(".", "")
+            if not ranktext.isdigit():
+                continue
+            rank = int(ranktext)
+            
+            # 2. NOME SQUADRA
+            namecell = row.find("td", class_="no-border-links hauptlink")
+            if not namecell:
+                namecell = row.find("td", class_="hauptlink")
+            if not namecell:
+                continue
+            teamlink = namecell.find("a")
+            teamname = teamlink.get_text(strip=True)
+            
+            # 3. PUNTI
+            pointscells = row.find_all("td", class_="zentriert")
+            if pointscells:
+                points = to_int(pointscells[-1].get_text(strip=True).split()[0])
+                played = to_int(pointscells[0].get_text(strip=True))
+            else:
+                points = 0
+                played = 0
+            
+            # Cerca nel DB
+            tmidfromdb, _ = find_db_data(teamname)
+            if tmidfromdb:
+                foundidscount += 1
+            
+            teamdata = {
+                "rank": rank,
+                "team": teamname,
+                "transfermarkt_id": tmidfromdb,
+                "points": points,
+                "played": played
+            }
+            standings_table.append(teamdata)
+            
+        except Exception:
+            continue
+    
+        # Se split_mode attivo, dividi la tabella
+    if split_mode == 'first_half':
+        standings_table = standings_table[:15]  # Prime 15 squadre
+        # Ricalcola rank da 1 a 15
+        for i, team in enumerate(standings_table, 1):
+            team['rank'] = i
+        # Ricalcola foundidscount
+        foundidscount = sum(1 for team in standings_table if team.get('transfermarkt_id'))
+    elif split_mode == 'second_half':
+        standings_table = standings_table[15:30]  # Ultime 15 squadre
+        # Ricalcola rank da 1 a 15
+        for i, team in enumerate(standings_table, 1):
+            team['rank'] = i
+        # Ricalcola foundidscount
+        foundidscount = sum(1 for team in standings_table if team.get('transfermarkt_id'))
+    
+    print(f"   ✅ Estratte {len(standings_table)} squadre (ID trovati: {foundidscount})")
+    return standings_table
+
+
+
+
 def scrape_transfermarkt():
     print("🦁 AVVIO SCRAPER TRANSFERMARKT 2025 (Con Smart Matching ID)")
     
@@ -230,77 +364,56 @@ def scrape_transfermarkt():
                 
             soup = BeautifulSoup(resp.content, "html.parser")
             
-            # Cerca il contenitore tabella principale
-            table_div = soup.find("div", {"class": "responsive-table"})
-            if not table_div:
-                print("   ❌ Tabella non trovata (Verificare URL o Blocco IP).")
-                continue
+            # Verifica se il campionato ha 2 gironi
+            if comp.get("dual_tables"):
+                print("   📊 Campionato con 2 gironi - unisco in classifica unica...")
                 
-            rows = table_div.find("tbody").find_all("tr")
-            standing_table = []
-            found_ids_count = 0
+                # Zona A
+                table_a = scrape_single_table(soup, table_index=0, force_grid_view=True)
+                
+                # Zona B
+                table_b = scrape_single_table(soup, table_index=1, force_grid_view=True)
+                
+                # Unisci entrambe le zone in una classifica unica
+                if table_a and table_b:
+                    combined_table = table_a + table_b  # 30 squadre totali
+                    
+                    filter_query = {"country": country, "league": league_name}
+                    update_doc = {
+                        "$set": {
+                            "country": country,
+                            "league": league_name,
+                            "last_updated": time.time(),
+                            "source": "transfermarkt",
+                            "table": combined_table
+                        }
+                    }
+                    rankings_collection.update_one(filter_query, update_doc, upsert=True)
+                    print(f"   ✅ Salvate {len(combined_table)} squadre in classifica unica")
+                else:
+                    print("   ⚠️ Errore: impossibile unire le zone")
+
             
-            for row in rows:
-                try:
-                    # 1. POSIZIONE (Rank)
-                    rank_cell = row.find("td", {"class": "rechts hauptlink"}) 
-                    if not rank_cell: rank_cell = row.find_all("td")[0] # Fallback
-                    
-                    rank_text = rank_cell.get_text(strip=True).replace('.', '')
-                    if not rank_text.isdigit(): continue
-                    rank = int(rank_text)
-
-                    # 2. NOME SQUADRA
-                    name_cell = row.find("td", {"class": "no-border-links hauptlink"})
-                    if not name_cell: name_cell = row.find("td", {"class": "hauptlink"})
-                    if not name_cell: continue
-                    
-                    team_link = name_cell.find("a")
-                    team_name = team_link.get_text(strip=True) # es. "Inter Milan"
-                    
-                    # 3. PUNTI
-                    points_cells = row.find_all("td", {"class": "zentriert"})
-                    if points_cells:
-                        points = to_int(points_cells[-1].get_text(strip=True).split(':')[0])
-                        played = to_int(points_cells[0].get_text(strip=True))
-                    else:
-                        points = 0; played = 0
-
-                    # --- 4. RICERCA NEL TUO DB (Nome -> ID) ---
-                    # Cerchiamo il nome scaricato dentro 'teams' per ottenere i TUOI dati
-                    tm_id_from_db, _ = find_db_data(team_name) # Usiamo _ perché internal_id non ci serve più
-                    
-                    if tm_id_from_db:
-                        found_ids_count += 1
-
-                    team_data = {
-                        "rank": rank,
-                        "team": team_name,                 # Nome scaricato
-                        "transfermarkt_id": tm_id_from_db, # Il numeretto preso dal TUO DB teams           # Il tuo ID interno
-                        "points": points,
-                        "played": played
-                    }
-                    standing_table.append(team_data)
-                    
-                except Exception:
-                    continue
-
-            # --- SALVATAGGIO ---
-            if len(standing_table) > 0:
-                filter_query = {"country": country, "league": league_name}
-                update_doc = {
-                    "$set": {
-                        "country": country,
-                        "league": league_name,
-                        "last_updated": time.time(),
-                        "source": "transfermarkt",
-                        "table": standing_table
-                    }
-                }
-                rankings_collection.update_one(filter_query, update_doc, upsert=True)
-                print(f"   ✅ Salvate {len(standing_table)} squadre (ID trovati: {found_ids_count}).")
             else:
-                print("   ⚠️ Nessuna squadra estratta.")
+                # Classifica unica (funzionamento normale)
+                standing_table = scrape_single_table(soup, table_index=0)
+                
+                if len(standing_table) > 0:
+                    filter_query = {"country": country, "league": league_name}
+                    update_doc = {
+                        "$set": {
+                            "country": country,
+                            "league": league_name,
+                            "last_updated": time.time(),
+                            "source": "transfermarkt",
+                            "table": standing_table
+                        }
+                    }
+                    rankings_collection.update_one(filter_query, update_doc, upsert=True)
+                    print(f"   ✅ Salvate {len(standing_table)} squadre")
+                else:
+                    print("  ⚠️ Nessuna squadra estratta.")
+
 
         except Exception as e:
             print(f"   ❌ Errore: {e}")

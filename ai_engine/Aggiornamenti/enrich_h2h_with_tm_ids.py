@@ -25,29 +25,34 @@ except ImportError:
 H2H_COLLECTION = "h2h_by_round"
 TEAMS_COLLECTION = "teams"
 
-def find_team_in_db(team_name):
+def find_team_in_db(team_name, league=None):
     """
-    Cerca una squadra nella collezione 'teams' per nome.
-    Controlla i campi: name, aliases, aliases_transfermarkt
-    Ritorna: transfermarkt_id se trovato, altrimenti None
+    Cerca squadra con filtro per lega
     """
+    base_filter = {}
+    if league:
+        base_filter["league"] = league
     
-    # Ricerca esatta nel campo 'name'
-    team = db[TEAMS_COLLECTION].find_one({"name": team_name})
+    # Cerca nel nome
+    query = {**base_filter, "name": team_name}
+    team = db[TEAMS_COLLECTION].find_one(query)
     if team and "transfermarkt_id" in team:
         return team["transfermarkt_id"]
     
-    # Ricerca in 'aliases' (array di nomi alternativi)
-    team = db[TEAMS_COLLECTION].find_one({"aliases": team_name})
+    # Cerca negli aliases
+    query = {**base_filter, "aliases": team_name}
+    team = db[TEAMS_COLLECTION].find_one(query)
     if team and "transfermarkt_id" in team:
         return team["transfermarkt_id"]
     
-    # Ricerca in 'aliases_transfermarkt'
-    team = db[TEAMS_COLLECTION].find_one({"aliases_transfermarkt": team_name})
+    # Cerca in aliases_transfermarkt
+    query = {**base_filter, "aliases_transfermarkt": team_name}
+    team = db[TEAMS_COLLECTION].find_one(query)
     if team and "transfermarkt_id" in team:
         return team["transfermarkt_id"]
     
     return None
+
 
 def enrich_h2h_with_ids():
     """
@@ -86,24 +91,35 @@ def enrich_h2h_with_ids():
             total_matches_processed += 1
             
             # Ricerca ID per squadra CASA
-            home_id = find_team_in_db(home_team)
+            home_id = find_team_in_db(home_team, league=league)
             if home_id:
+                old_id = match.get("home_tm_id")
                 if "home_tm_id" not in match or match["home_tm_id"] != home_id:
                     match["home_tm_id"] = home_id
                     modified = True
                     enriched_count += 1
+                    if old_id and old_id != home_id:
+                        print(f"   🔄 {home_team}: {old_id} → {home_id}")
+                    else:
+                        print(f"   ➕ {home_team}: aggiunto ID {home_id}")
             else:
                 not_found_teams.add(home_team)
-            
+
             # Ricerca ID per squadra TRASFERTA
-            away_id = find_team_in_db(away_team)
+            away_id = find_team_in_db(away_team, league=league)
             if away_id:
+                old_id = match.get("away_tm_id")
                 if "away_tm_id" not in match or match["away_tm_id"] != away_id:
                     match["away_tm_id"] = away_id
                     modified = True
                     enriched_count += 1
+                    if old_id and old_id != away_id:
+                        print(f"   🔄 {away_team}: {old_id} → {away_id}")
+                    else:
+                        print(f"   ➕ {away_team}: aggiunto ID {away_id}")
             else:
                 not_found_teams.add(away_team)
+
         
         # Salva il documento se modificato
         if modified:

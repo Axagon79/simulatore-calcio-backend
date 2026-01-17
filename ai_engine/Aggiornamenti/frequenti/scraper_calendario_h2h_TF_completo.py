@@ -32,42 +32,42 @@ HEADERS = {
 
 LEAGUES_TM = [
     # ITALIA
-    # {"name": "Serie A", "url": f"https://www.transfermarkt.it/serie-a/gesamtspielplan/wettbewerb/IT1"},
-    # {"name": "Serie B", "url": f"https://www.transfermarkt.it/serie-b/gesamtspielplan/wettbewerb/IT2"},
-    # {"name": "Serie C - Girone A", "url": f"https://www.transfermarkt.it/serie-c-girone-a/gesamtspielplan/wettbewerb/IT3A"},
-    # {"name": "Serie C - Girone B", "url": f"https://www.transfermarkt.it/serie-c-girone-b/gesamtspielplan/wettbewerb/IT3B"},
-    # {"name": "Serie C - Girone C", "url": f"https://www.transfermarkt.it/serie-c-girone-c/gesamtspielplan/wettbewerb/IT3C"},
+    {"name": "Serie A", "url": f"https://www.transfermarkt.it/serie-a/gesamtspielplan/wettbewerb/IT1"},
+    {"name": "Serie B", "url": f"https://www.transfermarkt.it/serie-b/gesamtspielplan/wettbewerb/IT2"},
+    {"name": "Serie C - Girone A", "url": f"https://www.transfermarkt.it/serie-c-girone-a/gesamtspielplan/wettbewerb/IT3A"},
+    {"name": "Serie C - Girone B", "url": f"https://www.transfermarkt.it/serie-c-girone-b/gesamtspielplan/wettbewerb/IT3B"},
+    {"name": "Serie C - Girone C", "url": f"https://www.transfermarkt.it/serie-c-girone-c/gesamtspielplan/wettbewerb/IT3C"},
     
-    # # EUROPA TOP
-    # {"name": "Premier League", "url": f"https://www.transfermarkt.it/premier-league/gesamtspielplan/wettbewerb/GB1"},
-    # {"name": "La Liga", "url": f"https://www.transfermarkt.it/laliga/gesamtspielplan/wettbewerb/ES1"},
-    # {"name": "Bundesliga", "url": f"https://www.transfermarkt.it/bundesliga/gesamtspielplan/wettbewerb/L1"},
-    # {"name": "Ligue 1", "url": f"https://www.transfermarkt.it/ligue-1/gesamtspielplan/wettbewerb/FR1"},
-    # {"name": "Eredivisie", "url": f"https://www.transfermarkt.it/eredivisie/gesamtspielplan/wettbewerb/NL1"},
-    # {"name": "Liga Portugal", "url": f"https://www.transfermarkt.it/liga-nos/gesamtspielplan/wettbewerb/PO1"},
+    # EUROPA TOP
+    {"name": "Premier League", "url": f"https://www.transfermarkt.it/premier-league/gesamtspielplan/wettbewerb/GB1"},
+    {"name": "La Liga", "url": f"https://www.transfermarkt.it/laliga/gesamtspielplan/wettbewerb/ES1"},
+    {"name": "Bundesliga", "url": f"https://www.transfermarkt.it/bundesliga/gesamtspielplan/wettbewerb/L1"},
+    {"name": "Ligue 1", "url": f"https://www.transfermarkt.it/ligue-1/gesamtspielplan/wettbewerb/FR1"},
+    {"name": "Eredivisie", "url": f"https://www.transfermarkt.it/eredivisie/gesamtspielplan/wettbewerb/NL1"},
+    {"name": "Liga Portugal", "url": f"https://www.transfermarkt.it/liga-nos/gesamtspielplan/wettbewerb/PO1"},
     
-    # # 🆕 EUROPA SERIE B
-    # {"name": "Championship", "url": f"https://www.transfermarkt.it/championship/gesamtspielplan/wettbewerb/GB2"},
-    # {"name": "LaLiga 2", "url": f"https://www.transfermarkt.it/laliga2/gesamtspielplan/wettbewerb/ES2"},
-    # {"name": "2. Bundesliga", "url": f"https://www.transfermarkt.it/2-bundesliga/gesamtspielplan/wettbewerb/L2"},
-    # {"name": "Ligue 2", "url": f"https://www.transfermarkt.it/ligue-2/gesamtspielplan/wettbewerb/FR2"},
+    # 🆕 EUROPA SERIE B
+    {"name": "Championship", "url": f"https://www.transfermarkt.it/championship/gesamtspielplan/wettbewerb/GB2"},
+    {"name": "LaLiga 2", "url": f"https://www.transfermarkt.it/laliga2/gesamtspielplan/wettbewerb/ES2"},
+    {"name": "2. Bundesliga", "url": f"https://www.transfermarkt.it/2-bundesliga/gesamtspielplan/wettbewerb/L2"},
+    {"name": "Ligue 2", "url": f"https://www.transfermarkt.it/ligue-2/gesamtspielplan/wettbewerb/FR2"},
     
-    # # 🆕 EUROPA NORDICI + EXTRA
-    # {"name": "Scottish Premiership", "url": f"https://www.transfermarkt.it/premiership/gesamtspielplan/wettbewerb/SC1"},
-    # {"name": "Allsvenskan", "url": f"https://www.transfermarkt.it/allsvenskan/gesamtspielplan/wettbewerb/SE1"},
-    # {"name": "Eliteserien", "url": f"https://www.transfermarkt.it/eliteserien/gesamtspielplan/wettbewerb/NO1"},
-    # {"name": "Superligaen", "url": f"https://www.transfermarkt.it/superligaen/gesamtspielplan/wettbewerb/DK1"},
-    # {"name": "Jupiler Pro League", "url": f"https://www.transfermarkt.it/jupiler-pro-league/gesamtspielplan/wettbewerb/BE1"},
-    # {"name": "Süper Lig", "url": f"https://www.transfermarkt.it/super-lig/gesamtspielplan/wettbewerb/TR1"},
-    # {"name": "League of Ireland Premier Division", "url": f"https://www.transfermarkt.it/league-of-ireland-premier-division/gesamtspielplan/wettbewerb/IR1"},
+    # 🆕 EUROPA NORDICI + EXTRA
+    {"name": "Scottish Premiership", "url": f"https://www.transfermarkt.it/premiership/gesamtspielplan/wettbewerb/SC1"},
+    {"name": "Allsvenskan", "url": f"https://www.transfermarkt.it/allsvenskan/gesamtspielplan/wettbewerb/SE1"},
+    {"name": "Eliteserien", "url": f"https://www.transfermarkt.it/eliteserien/gesamtspielplan/wettbewerb/NO1"},
+    {"name": "Superligaen", "url": f"https://www.transfermarkt.it/superligaen/gesamtspielplan/wettbewerb/DK1"},
+    {"name": "Jupiler Pro League", "url": f"https://www.transfermarkt.it/jupiler-pro-league/gesamtspielplan/wettbewerb/BE1"},
+    {"name": "Süper Lig", "url": f"https://www.transfermarkt.it/super-lig/gesamtspielplan/wettbewerb/TR1"},
+    {"name": "League of Ireland Premier Division", "url": f"https://www.transfermarkt.it/league-of-ireland-premier-division/gesamtspielplan/wettbewerb/IR1"},
     
     # 🆕 AMERICHE
     {"name": "Brasileirão Serie A", "url": f"https://www.transfermarkt.it/campeonato-brasileiro-serie-a/gesamtspielplan/wettbewerb/BRA1"},
-    # {"name": "Primera División", "url": f"https://www.transfermarkt.it/torneo-inicial/gesamtspielplan/wettbewerb/ARG1"},
-    # {"name": "Major League Soccer", "url": f"https://www.transfermarkt.it/major-league-soccer/gesamtspielplan/wettbewerb/MLS1"},
+    {"name": "Primera División", "url": f"https://www.transfermarkt.it/torneo-inicial/gesamtspielplan/wettbewerb/ARG1"},
+    {"name": "Major League Soccer", "url": f"https://www.transfermarkt.it/major-league-soccer/gesamtspielplan/wettbewerb/MLS1"},
     
-    # # 🆕 ASIA
-    # {"name": "J1 League", "url": f"https://www.transfermarkt.it/j1-100-year-vision-league/gesamtspielplan/pokalwettbewerb/J1YV"},
+    # 🆕 ASIA
+    {"name": "J1 League", "url": f"https://www.transfermarkt.it/j1-100-year-vision-league/gesamtspielplan/pokalwettbewerb/J1YV"},
 ]
 
 def parse_tm_date(date_str):

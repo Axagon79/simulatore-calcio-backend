@@ -90,72 +90,72 @@ def create_team_template(name, country, league, transfermarkt_id, transfermarkt_
 
 NEW_LEAGUES = {
     # EUROPA SERIE B
-    "Championship": {
-        "country": "England",
-        "url_value": "https://www.transfermarkt.it/championship/startseite/wettbewerb/GB2"
-    },
-    "LaLiga 2": {
-        "country": "Spain",
-        "url_value": "https://www.transfermarkt.it/laliga2/startseite/wettbewerb/ES2"
-    },
-    "2. Bundesliga": {
-        "country": "Germany",
-        "url_value": "https://www.transfermarkt.it/2-bundesliga/startseite/wettbewerb/L2"
-    },
-    "Ligue 2": {
-        "country": "France",
-        "url_value": "https://www.transfermarkt.it/ligue-2/startseite/wettbewerb/FR2"
-    },
+    # "Championship": {
+    #     "country": "England",
+    #     "url_value": "https://www.transfermarkt.it/championship/startseite/wettbewerb/GB2"
+    # },
+    # "LaLiga 2": {
+    #     "country": "Spain",
+    #     "url_value": "https://www.transfermarkt.it/laliga2/startseite/wettbewerb/ES2"
+    # },
+    # "2. Bundesliga": {
+    #     "country": "Germany",
+    #     "url_value": "https://www.transfermarkt.it/2-bundesliga/startseite/wettbewerb/L2"
+    # },
+    # "Ligue 2": {
+    #     "country": "France",
+    #     "url_value": "https://www.transfermarkt.it/ligue-2/startseite/wettbewerb/FR2"
+    # },
     
-    # EUROPA NORDICI + EXTRA
-    "Scottish Premiership": {
-        "country": "Scotland",
-        "url_value": "https://www.transfermarkt.it/premiership/startseite/wettbewerb/SC1"
-    },
-    "Allsvenskan": {
-        "country": "Sweden",
-        "url_value": "https://www.transfermarkt.it/allsvenskan/startseite/wettbewerb/SE1"
-    },
-    "Eliteserien": {
-        "country": "Norway",
-        "url_value": "https://www.transfermarkt.it/eliteserien/startseite/wettbewerb/NO1"
-    },
-    "Superligaen": {
-        "country": "Denmark",
-        "url_value": "https://www.transfermarkt.it/superligaen/startseite/wettbewerb/DK1"
-    },
-    "Jupiler Pro League": {
-        "country": "Belgium",
-        "url_value": "https://www.transfermarkt.it/jupiler-pro-league/startseite/wettbewerb/BE1"
-    },
-    "Süper Lig": {
-        "country": "Turkey",
-        "url_value": "https://www.transfermarkt.it/super-lig/startseite/wettbewerb/TR1"
-    },
-    "League of Ireland Premier Division": {
-        "country": "Ireland",
-        "url_value": "https://www.transfermarkt.it/premier-league/startseite/wettbewerb/IR1"
-    },
+    # # EUROPA NORDICI + EXTRA
+    # "Scottish Premiership": {
+    #     "country": "Scotland",
+    #     "url_value": "https://www.transfermarkt.it/premiership/startseite/wettbewerb/SC1"
+    # },
+    # "Allsvenskan": {
+    #     "country": "Sweden",
+    #     "url_value": "https://www.transfermarkt.it/allsvenskan/startseite/wettbewerb/SE1"
+    # },
+    # "Eliteserien": {
+    #     "country": "Norway",
+    #     "url_value": "https://www.transfermarkt.it/eliteserien/startseite/wettbewerb/NO1"
+    # },
+    # "Superligaen": {
+    #     "country": "Denmark",
+    #     "url_value": "https://www.transfermarkt.it/superligaen/startseite/wettbewerb/DK1"
+    # },
+    # "Jupiler Pro League": {
+    #     "country": "Belgium",
+    #     "url_value": "https://www.transfermarkt.it/jupiler-pro-league/startseite/wettbewerb/BE1"
+    # },
+    # "Süper Lig": {
+    #     "country": "Turkey",
+    #     "url_value": "https://www.transfermarkt.it/super-lig/startseite/wettbewerb/TR1"
+    # },
+    # "League of Ireland Premier Division": {
+    #     "country": "Ireland",
+    #     "url_value": "https://www.transfermarkt.it/premier-league/startseite/wettbewerb/IR1"
+    # },
     
     # AMERICHE
     "Brasileirão Serie A": {
         "country": "Brazil",
         "url_value": "https://www.transfermarkt.it/campeonato-brasileiro-serie-a/startseite/wettbewerb/BRA1"
     },
-    "Primera División": {
-        "country": "Argentina",
-        "url_value": "https://www.transfermarkt.it/primera-division/startseite/wettbewerb/AR1N"
-    },
-    "Major League Soccer": {
-        "country": "USA",
-        "url_value": "https://www.transfermarkt.it/major-league-soccer/startseite/wettbewerb/MLS1"
-    },
+    # "Primera División": {
+    #     "country": "Argentina",
+    #     "url_value": "https://www.transfermarkt.it/torneo-inicial/startseite/wettbewerb/ARG1"
+    # },
+    # "Major League Soccer": {
+    #     "country": "USA",
+    #     "url_value": "https://www.transfermarkt.it/major-league-soccer/startseite/wettbewerb/MLS1"
+    # },
     
-    # ASIA
-    "J1 League": {
-        "country": "Japan",
-        "url_value": "https://www.transfermarkt.it/j1-100-year-vision-league/teilnehmer/pokalwettbewerb/J1YV"
-    }
+    # # ASIA
+    # "J1 League": {
+    #     "country": "Japan",
+    #     "url_value": "https://www.transfermarkt.it/j1-100-year-vision-league/teilnehmer/pokalwettbewerb/J1YV"
+    # }
 }
 
 # ═══════════════════════════════════════════════════════════
