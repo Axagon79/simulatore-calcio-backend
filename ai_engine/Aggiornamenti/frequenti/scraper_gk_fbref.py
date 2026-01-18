@@ -1,7 +1,6 @@
 import os
 import sys
-import os
-import sys
+import gestore_accessi_fbref  # <--- AGGIUNGI QUESTA RIGA
 
 # --- FIX PERCORSI UNIVERSALE ---
 current_path = os.path.dirname(os.path.abspath(__file__))
@@ -169,14 +168,19 @@ LEAGUES = [
 # ================== UTILS FBREF ==================
 
 def create_scraper():
-    scraper = cloudscraper.create_scraper(
-        browser={
-            "browser": "chrome",
-            "platform": "windows",
-            "desktop": True,
-        }
-    )
-    return scraper
+    # --- VECCHIO CODICE (DISATTIVATO) ---
+    # scraper = cloudscraper.create_scraper(
+    #     browser={
+    #         "browser": "chrome",
+    #         "platform": "windows",
+    #         "desktop": True,
+    #     }
+    # )
+    # return scraper
+
+    # --- NUOVO CODICE (ATTIVATO) ---
+    print("🤖 Sto aprendo l'Apriscatole (Chrome)...")
+    return gestore_accessi_fbref.crea_scraper_intelligente()
 
 
 def extract_table_from_comments_or_dom(html: str, id_regex: str):

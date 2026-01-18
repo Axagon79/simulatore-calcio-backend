@@ -3,6 +3,7 @@ import sys
 import time
 import random
 import re
+import gestore_accessi_fbref
 from bs4 import BeautifulSoup
 import cloudscraper
 from dotenv import load_dotenv
@@ -155,8 +156,10 @@ LEAGUES_CONFIG = [
 ]
 
 def create_scraper():
-    return cloudscraper.create_scraper(browser={'browser': 'chrome', 'platform': 'windows', 'desktop': True})
-
+    # return cloudscraper.create_scraper(browser={'browser': 'chrome', 'platform': 'windows', 'desktop': True})
+    # --- NUOVO SISTEMA DI ACCESSO (APRISCATOLE) ---
+    print("🤖 Sto aprendo l'Apriscatole...")
+    return gestore_accessi_fbref.crea_scraper_intelligente()
 # --- PARTE 1: SCARICA LE MEDIE (IL FAMOSO 2.77) ---
 def scrape_team_stats(scraper):
     print("\n📊 PARTE 1: Aggiornamento Medie Stagionali (xG/90)...")

@@ -1,0 +1,524 @@
+{
+  "timestamp": "2026-01-18 06:17:21",
+  "summary": {
+    "total_matches": 30,
+    "updated": 0,
+    "not_updated": 30,
+    "success_rate": 0.0
+  },
+  "leagues": [
+    {
+      "name": "Major League Soccer",
+      "processed": 30,
+      "updated": 0
+    },
+    {
+      "name": "J1 League",
+      "processed": 0,
+      "updated": 0
+    }
+  ],
+  "issues": [
+    {
+      "partita": "New York vs New England",
+      "lega": "Major League Soccer",
+      "giornata": 2,
+      "timestamp": "2026-01-18T06:17:33.110450",
+      "motivi": [
+        "SQUADRE_IN_RIGHE_DIVERSE"
+      ],
+      "dettagli": {
+        "alias_casa": [
+          "new york rb",
+          "ny red bulls",
+          "new york",
+          "new york red bulls",
+          "york"
+        ],
+        "alias_trasferta": [
+          "new england revolution",
+          "england",
+          "ne revolution",
+          "new england"
+        ]
+      }
+    },
+    {
+      "partita": "Chicago vs Montréal",
+      "lega": "Major League Soccer",
+      "giornata": 2,
+      "timestamp": "2026-01-18T06:17:33.231309",
+      "motivi": [
+        "SQUADRE_IN_RIGHE_DIVERSE"
+      ],
+      "dettagli": {
+        "alias_casa": [
+          "chicago fire",
+          "chicago"
+        ],
+        "alias_trasferta": [
+          "montréal",
+          "montreal",
+          "cf montreal"
+        ]
+      }
+    },
+    {
+      "partita": "Minnesota vs Cincinnati",
+      "lega": "Major League Soccer",
+      "giornata": 2,
+      "timestamp": "2026-01-18T06:17:33.338150",
+      "motivi": [
+        "SQUADRE_IN_RIGHE_DIVERSE"
+      ],
+      "dettagli": {
+        "alias_casa": [
+          "minnesota",
+          "minnesota united fc",
+          "minnesota utd"
+        ],
+        "alias_trasferta": [
+          "fc cincinnati",
+          "cincinnati"
+        ]
+      }
+    },
+    {
+      "partita": "Colorado vs Portland",
+      "lega": "Major League Soccer",
+      "giornata": 2,
+      "timestamp": "2026-01-18T06:17:33.444290",
+      "motivi": [
+        "SQUADRE_IN_RIGHE_DIVERSE"
+      ],
+      "dettagli": {
+        "alias_casa": [
+          "colorado rapids",
+          "colorado"
+        ],
+        "alias_trasferta": [
+          "portland timbers",
+          "portland"
+        ]
+      }
+    },
+    {
+      "partita": "Orlando vs Miami",
+      "lega": "Major League Soccer",
+      "giornata": 2,
+      "timestamp": "2026-01-18T06:17:33.561674",
+      "motivi": [
+        "SQUADRE_IN_RIGHE_DIVERSE"
+      ],
+      "dettagli": {
+        "alias_casa": [
+          "orlando",
+          "orlando city"
+        ],
+        "alias_trasferta": [
+          "inter miami",
+          "inter miami cf",
+          "miami"
+        ]
+      }
+    },
+    {
+      "partita": "SJ Earthquakes vs Atlanta",
+      "lega": "Major League Soccer",
+      "giornata": 2,
+      "timestamp": "2026-01-18T06:17:33.668260",
+      "motivi": [
+        "SQUADRE_IN_RIGHE_DIVERSE"
+      ],
+      "dettagli": {
+        "alias_casa": [
+          "san jose earthquakes",
+          "earthquakes",
+          "sj earthquakes"
+        ],
+        "alias_trasferta": [
+          "atlanta",
+          "atlanta united",
+          "atlanta utd"
+        ]
+      }
+    },
+    {
+      "partita": "Salt Lake vs Seattle",
+      "lega": "Major League Soccer",
+      "giornata": 2,
+      "timestamp": "2026-01-18T06:17:33.774973",
+      "motivi": [
+        "SQUADRE_IN_RIGHE_DIVERSE"
+      ],
+      "dettagli": {
+        "alias_casa": [
+          "lake",
+          "salt lake",
+          "salt",
+          "real salt lake"
+        ],
+        "alias_trasferta": [
+          "seattle",
+          "seattle sounders"
+        ]
+      }
+    },
+    {
+      "partita": "Dallas vs Nashville",
+      "lega": "Major League Soccer",
+      "giornata": 2,
+      "timestamp": "2026-01-18T06:17:33.881211",
+      "motivi": [
+        "SQUADRE_IN_RIGHE_DIVERSE"
+      ],
+      "dettagli": {
+        "alias_casa": [
+          "fc dallas",
+          "dallas"
+        ],
+        "alias_trasferta": [
+          "nashville"
+        ]
+      }
+    },
+    {
+      "partita": "Houston vs LAFC",
+      "lega": "Major League Soccer",
+      "giornata": 2,
+      "timestamp": "2026-01-18T06:17:33.987401",
+      "motivi": [
+        "SQUADRE_IN_RIGHE_DIVERSE"
+      ],
+      "dettagli": {
+        "alias_casa": [
+          "houston dynamo",
+          "houston"
+        ],
+        "alias_trasferta": [
+          "los angeles",
+          "los angeles fc",
+          "lafc",
+          "la fc",
+          "la"
+        ]
+      }
+    },
+    {
+      "partita": "Kansas City vs Columbus",
+      "lega": "Major League Soccer",
+      "giornata": 2,
+      "timestamp": "2026-01-18T06:17:34.107377",
+      "motivi": [
+        "SQUADRE_IN_RIGHE_DIVERSE"
+      ],
+      "dettagli": {
+        "alias_casa": [
+          "sporting kansas",
+          "sporting kansas city",
+          "kansas",
+          "city",
+          "sporting kc",
+          "kansas city"
+        ],
+        "alias_trasferta": [
+          "columbus",
+          "columbus crew"
+        ]
+      }
+    },
+    {
+      "partita": "San Diego vs St. Louis CITY",
+      "lega": "Major League Soccer",
+      "giornata": 2,
+      "timestamp": "2026-01-18T06:17:34.225061",
+      "motivi": [
+        "SQUADRE_IN_RIGHE_DIVERSE"
+      ],
+      "dettagli": {
+        "alias_casa": [
+          "san diego",
+          "diego",
+          "san diego fc"
+        ],
+        "alias_trasferta": [
+          "city",
+          "st. louis city",
+          "st. louis",
+          "louis"
+        ]
+      }
+    },
+    {
+      "partita": "Vancouver vs Toronto",
+      "lega": "Major League Soccer",
+      "giornata": 2,
+      "timestamp": "2026-01-18T06:17:34.330964",
+      "motivi": [
+        "SQUADRE_IN_RIGHE_DIVERSE"
+      ],
+      "dettagli": {
+        "alias_casa": [
+          "vancouver whitecaps",
+          "vancouver w'caps",
+          "vancouver"
+        ],
+        "alias_trasferta": [
+          "toronto",
+          "toronto fc"
+        ]
+      }
+    },
+    {
+      "partita": "LA Galaxy vs Charlotte",
+      "lega": "Major League Soccer",
+      "giornata": 2,
+      "timestamp": "2026-01-18T06:17:34.442776",
+      "motivi": [
+        "SQUADRE_IN_RIGHE_DIVERSE"
+      ],
+      "dettagli": {
+        "alias_casa": [
+          "galaxy",
+          "la galaxy",
+          "los angeles galaxy"
+        ],
+        "alias_trasferta": [
+          "charlotte",
+          "charlotte fc"
+        ]
+      }
+    },
+    {
+      "partita": "Austin vs D.C. United",
+      "lega": "Major League Soccer",
+      "giornata": 2,
+      "timestamp": "2026-01-18T06:17:34.523222",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "2 22-02\n02:30 Austin FC - Minnesota United FC"
+      }
+    },
+    {
+      "partita": "Philadelphia vs New York City",
+      "lega": "Major League Soccer",
+      "giornata": 2,
+      "timestamp": "2026-01-18T06:17:34.651604",
+      "motivi": [
+        "SQUADRE_IN_RIGHE_DIVERSE"
+      ],
+      "dettagli": {
+        "alias_casa": [
+          "philadelphia",
+          "philadelphia union"
+        ],
+        "alias_trasferta": [
+          "new york city fc",
+          "nycfc",
+          "new york",
+          "new york city",
+          "city",
+          "york"
+        ]
+      }
+    },
+    {
+      "partita": "New York City vs Orlando",
+      "lega": "Major League Soccer",
+      "giornata": 3,
+      "timestamp": "2026-01-18T06:17:37.095390",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "3 02-03\n01:00 Orlando City - Inter Miami CF"
+      }
+    },
+    {
+      "partita": "New England vs Houston",
+      "lega": "Major League Soccer",
+      "giornata": 3,
+      "timestamp": "2026-01-18T06:17:37.210080",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "3 07-03\n20:30 New England Revolution - Houston Dynamo"
+      }
+    },
+    {
+      "partita": "D.C. United vs Miami",
+      "lega": "Major League Soccer",
+      "giornata": 3,
+      "timestamp": "2026-01-18T06:17:37.289741",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "3 07-03\n22:30 DC United - Inter Miami CF"
+      }
+    },
+    {
+      "partita": "Philadelphia vs SJ Earthquakes",
+      "lega": "Major League Soccer",
+      "giornata": 3,
+      "timestamp": "2026-01-18T06:17:37.396040",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "3 08-03\n01:30 Philadelphia Union - San Jose Earthquakes"
+      }
+    },
+    {
+      "partita": "Charlotte vs Austin",
+      "lega": "Major League Soccer",
+      "giornata": 3,
+      "timestamp": "2026-01-18T06:17:37.502100",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "3 08-03\n01:30 Charlotte FC - Austin FC"
+      }
+    },
+    {
+      "partita": "Columbus vs Chicago",
+      "lega": "Major League Soccer",
+      "giornata": 3,
+      "timestamp": "2026-01-18T06:17:37.617190",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "3 08-03\n01:30 Columbus Crew - Chicago Fire"
+      }
+    },
+    {
+      "partita": "Atlanta vs Salt Lake",
+      "lega": "Major League Soccer",
+      "giornata": 3,
+      "timestamp": "2026-01-18T06:17:37.723532",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "3 08-03\n01:30 Atlanta United - Real Salt Lake"
+      }
+    },
+    {
+      "partita": "Kansas City vs San Diego",
+      "lega": "Major League Soccer",
+      "giornata": 3,
+      "timestamp": "2026-01-18T06:17:37.833995",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "3 02-03\n03:00 San Diego FC - St. Louis City"
+      }
+    },
+    {
+      "partita": "St. Louis CITY vs Seattle",
+      "lega": "Major League Soccer",
+      "giornata": 3,
+      "timestamp": "2026-01-18T06:17:37.951377",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "3 08-03\n02:30 St. Louis City - Seattle Sounders"
+      }
+    },
+    {
+      "partita": "Nashville vs Minnesota",
+      "lega": "Major League Soccer",
+      "giornata": 3,
+      "timestamp": "2026-01-18T06:17:38.069442",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "3 08-03\n02:30 Nashville - Minnesota United FC"
+      }
+    },
+    {
+      "partita": "Colorado vs LA Galaxy",
+      "lega": "Major League Soccer",
+      "giornata": 3,
+      "timestamp": "2026-01-18T06:17:38.185951",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "3 08-03\n03:30 Colorado Rapids - Los Angeles Galaxy"
+      }
+    },
+    {
+      "partita": "LAFC vs Dallas",
+      "lega": "Major League Soccer",
+      "giornata": 3,
+      "timestamp": "2026-01-18T06:17:38.292207",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "3 01-03\n02:30 FC Dallas - Nashville"
+      }
+    },
+    {
+      "partita": "Portland vs Vancouver",
+      "lega": "Major League Soccer",
+      "giornata": 3,
+      "timestamp": "2026-01-18T06:17:38.409605",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "3 08-03\n04:30 Portland Timbers - Vancouver Whitecaps"
+      }
+    },
+    {
+      "partita": "New York vs Montréal",
+      "lega": "Major League Soccer",
+      "giornata": 3,
+      "timestamp": "2026-01-18T06:17:38.526202",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "3 08-03\n21:30 New York Red Bulls - CF Montreal"
+      }
+    },
+    {
+      "partita": "Cincinnati vs Toronto",
+      "lega": "Major League Soccer",
+      "giornata": 3,
+      "timestamp": "2026-01-18T06:17:38.639626",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "3 09-03\n00:00 FC Cincinnati - Toronto FC"
+      }
+    }
+  ]
+}

@@ -2,6 +2,7 @@ import os
 import sys
 import os
 import sys
+import gestore_accessi_fbref
 
 # --- FIX PERCORSI UNIVERSALE ---
 current_path = os.path.dirname(os.path.abspath(__file__))
@@ -212,24 +213,29 @@ LEAGUES = [
 # ================== UTILS FBREF ==================
 
 def create_scraper():
-    scraper = cloudscraper.create_scraper(
-        browser={
-            "browser": "chrome",
-            "platform": "windows",
-            "desktop": True,
-        },
-        delay=10,
-    )
-    scraper.headers.update({
-        "Accept-Language": "en-US,en;q=0.9,it;q=0.8",
-        "Accept-Encoding": "gzip, deflate, br",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-        "Referer": "https://www.google.com/",
-        "DNT": "1",
-        "Connection": "keep-alive",
-        "Upgrade-Insecure-Requests": "1",
-    })
-    return scraper
+    # scraper = cloudscraper.create_scraper(
+    #     browser={
+    #         "browser": "chrome",
+    #         "platform": "windows",
+    #         "desktop": True,
+    #     },
+    #     delay=10,
+    # )
+    # scraper.headers.update({
+    #     "Accept-Language": "en-US,en;q=0.9,it;q=0.8",
+    #     "Accept-Encoding": "gzip, deflate, br",
+    #     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    #     "Referer": "https://www.google.com/",
+    #     "DNT": "1",
+    #     "Connection": "keep-alive",
+    #     "Upgrade-Insecure-Requests": "1",
+    # })
+    # return scraper
+ 
+    # --- NUOVO SISTEMA (APRISCATOLE) ---
+    # Non usiamo più cloudscraper, ma il nostro browser intelligente
+    print("🤖 Sto aprendo l'Apriscatole (Chrome)...")
+    return gestore_accessi_fbref.crea_scraper_intelligente()
 
 
 def extract_table_from_comments_or_dom(html: str, id_regex: str):
