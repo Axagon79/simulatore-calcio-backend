@@ -491,3 +491,247 @@ def save_tuning(request: https_fn.Request) -> https_fn.Response:
             mimetype='application/json',
             headers=headers
         )
+        
+@https_fn.on_request(
+    memory=options.MemoryOption.MB_256,
+    timeout_sec=10,
+    region="us-central1"
+)
+def list_presets(request: https_fn.Request) -> https_fn.Response:
+    """
+    Endpoint per LISTARE tutti i preset salvati.
+    """
+    headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Content-Type': 'application/json'
+    }
+    
+    if request.method == 'OPTIONS':
+        return https_fn.Response('', status=204, headers=headers)
+    
+    try:
+        try:
+            from config import db
+        except ImportError:
+            from ai_engine.config import db
+        
+        # Recupera tutti i preset
+        presets = list(db["tuning_presets"].find({}, {"_id": 0}))
+        
+        return https_fn.Response(
+            json.dumps({"success": True, "presets": presets}, ensure_ascii=False),
+            mimetype='application/json',
+            headers=headers
+        )
+    except Exception as e:
+        print(f"❌ Errore list_presets: {str(e)}", file=sys.stderr)
+        return https_fn.Response(
+            json.dumps({"success": False, "error": str(e)}),
+            status=500,
+            mimetype='application/json',
+            headers=headers
+        )
+        
+@https_fn.on_request(
+    memory=options.MemoryOption.MB_256,
+    timeout_sec=10,
+    region="us-central1"
+)
+def save_preset(request: https_fn.Request) -> https_fn.Response:
+    """
+    Endpoint per SALVARE un preset con nome.
+    """
+    headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Content-Type': 'application/json'
+    }
+    
+    if request.method == 'OPTIONS':
+        return https_fn.Response('', status=204, headers=headers)
+    
+    try:
+        try:
+            from config import db
+        except ImportError:
+            from ai_engine.config import db
+        
+        # Leggi payload
+        if hasattr(request, 'get_json'):
+            payload = request.get_json(silent=True) or {}
+        else:
+            payload = {}
+        
+        preset_name = payload.get('name')
+        preset_config = payload.get('config')
+        
+        if not preset_name or not preset_config:
+            return https_fn.Response(
+                json.dumps({"success": False, "error": "Missing name or config"}),
+                status=400,
+                mimetype='application/json',
+                headers=headers
+            )
+        
+        # Salva o aggiorna preset
+        result = db["tuning_presets"].update_one(
+            {"name": preset_name},
+            {"$set": {"name": preset_name, "config": preset_config}},
+            upsert=True
+        )
+        
+        return https_fn.Response(
+            json.dumps({
+                "success": True,
+                "message": f"Preset '{preset_name}' salvato",
+                "upserted": result.upserted_id is not None
+            }, ensure_ascii=False),
+            mimetype='application/json',
+            headers=headers
+        )
+    except Exception as e:
+        print(f"❌ Errore save_preset: {str(e)}", file=sys.stderr)
+        return https_fn.Response(
+            json.dumps({"success": False, "error": str(e)}),
+            status=500,
+            mimetype='application/json',
+            headers=headers
+        )
+
+
+@https_fn.on_request(
+    memory=options.MemoryOption.MB_256,
+    timeout_sec=10,
+    region="us-central1"
+)
+def load_preset(request: https_fn.Request) -> https_fn.Response:
+    """
+    Endpoint per CARICARE un preset salvato.
+    """
+    headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Content-Type': 'application/json'
+    }
+    
+    if request.method == 'OPTIONS':
+        return https_fn.Response('', status=204, headers=headers)
+    
+    try:
+        try:
+            from config import db
+        except ImportError:
+            from ai_engine.config import db
+        
+        # Leggi payload
+        if hasattr(request, 'get_json'):
+            payload = request.get_json(silent=True) or {}
+        else:
+            payload = {}
+        
+        preset_name = payload.get('name')
+        
+        if not preset_name:
+            return https_fn.Response(
+                json.dumps({"success": False, "error": "Missing preset name"}),
+                status=400,
+                mimetype='application/json',
+                headers=headers
+            )
+        
+        # Carica preset
+        preset = db["tuning_presets"].find_one({"name": preset_name}, {"_id": 0})
+        
+        if not preset:
+            return https_fn.Response(
+                json.dumps({"success": False, "error": f"Preset '{preset_name}' non trovato"}),
+                status=404,
+                mimetype='application/json',
+                headers=headers
+            )
+        
+        return https_fn.Response(
+            json.dumps({"success": True, "preset": preset}, ensure_ascii=False),
+            mimetype='application/json',
+            headers=headers
+        )
+    except Exception as e:
+        print(f"❌ Errore load_preset: {str(e)}", file=sys.stderr)
+        return https_fn.Response(
+            json.dumps({"success": False, "error": str(e)}),
+            status=500,
+            mimetype='application/json',
+            headers=headers
+        )
+
+
+@https_fn.on_request(
+    memory=options.MemoryOption.MB_256,
+    timeout_sec=10,
+    region="us-central1"
+)
+def delete_preset(request: https_fn.Request) -> https_fn.Response:
+    """
+    Endpoint per ELIMINARE un preset.
+    """
+    headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Content-Type': 'application/json'
+    }
+    
+    if request.method == 'OPTIONS':
+        return https_fn.Response('', status=204, headers=headers)
+    
+    try:
+        try:
+            from config import db
+        except ImportError:
+            from ai_engine.config import db
+        
+        # Leggi payload
+        if hasattr(request, 'get_json'):
+            payload = request.get_json(silent=True) or {}
+        else:
+            payload = {}
+        
+        preset_name = payload.get('name')
+        
+        if not preset_name:
+            return https_fn.Response(
+                json.dumps({"success": False, "error": "Missing preset name"}),
+                status=400,
+                mimetype='application/json',
+                headers=headers
+            )
+        
+        # Elimina preset
+        result = db["tuning_presets"].delete_one({"name": preset_name})
+        
+        if result.deleted_count == 0:
+            return https_fn.Response(
+                json.dumps({"success": False, "error": f"Preset '{preset_name}' non trovato"}),
+                status=404,
+                mimetype='application/json',
+                headers=headers
+            )
+        
+        return https_fn.Response(
+            json.dumps({"success": True, "message": f"Preset '{preset_name}' eliminato"}, ensure_ascii=False),
+            mimetype='application/json',
+            headers=headers
+        )
+    except Exception as e:
+        print(f"❌ Errore delete_preset: {str(e)}", file=sys.stderr)
+        return https_fn.Response(
+            json.dumps({"success": False, "error": str(e)}),
+            status=500,
+            mimetype='application/json',
+            headers=headers
+        )
+
