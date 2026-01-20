@@ -292,7 +292,12 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
             return str(min_gol)
 
     # GOL CASA
-    for i in range(gh):
+    gol_segnati_casa = 0
+    tentativo_casa = 0
+    while gol_segnati_casa < gh and tentativo_casa < gh + 10:
+        tentativo_casa += 1
+        gol_annullato = False
+
         if gol_nel_recupero():
             if random.random() < 0.7 and recupero_st > 0:
                 min_gol = random.randint(91, 90 + recupero_st)
@@ -404,6 +409,7 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
                         "var_type": "rigore_on_field_review",
                         "testo": f"{min_display}' ❌ VAR: Nessun contatto sufficiente. Si prosegue!"
                     })
+                    gol_annullato = True
             
             else:
                 # ═══════════════════════════════════════════════════
@@ -470,6 +476,7 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
                             "var_type": "rigore",
                             "testo": f"{min_display}' {frase_annullato}"
                         })
+                        gol_annullato = True
                     else:  # 70% confermato
                         # 🆕 VARIANTI RIGORE CONFERMATO
                         frase_confermato = random.choice([
@@ -577,6 +584,7 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
                         "var_type": "gol",
                         "testo": f"{min_display}' {frase_gol_annullato}"
                     })
+                    gol_annullato = True
                 else:  # 70% confermato
                     # 🆕 VARIANTI GOL CONFERMATO
                     frase_gol_valido = random.choice([
@@ -600,11 +608,19 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
                         "testo": f"{min_display}' {frase_gol_valido}"
                     })
 
+        if not gol_annullato:
+            gol_segnati_casa += 1
 
 
 
     # GOL OSPITE
-    for i in range(ga):
+    gol_segnati_ospite = 0
+    tentativo_ospite = 0
+    while gol_segnati_ospite < ga and tentativo_ospite < ga + 10:
+        tentativo_ospite += 1
+        gol_annullato = False
+
+
         if gol_nel_recupero():
             if random.random() < 0.7 and recupero_st > 0:
                 min_gol = random.randint(91, 90 + recupero_st)
@@ -716,6 +732,7 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
                         "var_type": "rigore_on_field_review",
                         "testo": f"{min_display}' ❌ VAR: Nessun contatto sufficiente. Si prosegue!"
                     })
+                    gol_annullato = True
             
             else:
                 # ═══════════════════════════════════════════════════
@@ -782,6 +799,7 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
                             "var_type": "rigore",
                             "testo": f"{min_display}' {frase_annullato}"
                         })
+                        gol_annullato = True
                     else:  # 70% confermato
                         # 🆕 VARIANTI RIGORE CONFERMATO
                         frase_confermato = random.choice([
@@ -889,6 +907,7 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
                         "var_type": "gol",
                         "testo": f"{min_display}' {frase_gol_annullato}"
                     })
+                    gol_annullato = True
                 else:  # 70% confermato
                     # 🆕 VARIANTI GOL CONFERMATO
                     frase_gol_valido = random.choice([
@@ -911,6 +930,11 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
                         "var_type": "gol",
                         "testo": f"{min_display}' {frase_gol_valido}"
                     })
+                    
+        # Incrementa solo se il gol non è stato annullato
+        if not gol_annullato:
+            gol_segnati_ospite += 1
+
 
 
             
