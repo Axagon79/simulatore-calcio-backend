@@ -82,6 +82,7 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
 
     cronaca = []
     minuti_usati = set()
+
     
     minuti_recupero_extra = 0
 
@@ -335,7 +336,7 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
             var_chiama_arbitro = random.random() < 0.35  # 35% VAR "inventa" il rigore
             
             if var_chiama_arbitro:
-                minutirecuperoextra += 2
+                minuti_recupero_extra += 2
                 
                 # 🆕 VARIANTI PER ON-FIELD REVIEW
                 frase_var_check = random.choice([
@@ -426,7 +427,7 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
                 
                 # 2️⃣ VAR CHECK (30% probabilità - verifica la decisione)
                 if random.random() < 0.30:
-                    minutirecuperoextra += 2
+                    minuti_recupero_extra += 2
                     
                     # 🆕 VARIANTI PER VERIFICA RIGORE FISCHIATO
                     frase_var_verifica = random.choice([
@@ -647,7 +648,7 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
             var_chiama_arbitro = random.random() < 0.35  # 35% VAR "inventa" il rigore
             
             if var_chiama_arbitro:
-                minutirecuperoextra += 2
+                minuti_recupero_extra += 2
                 
                 # 🆕 VARIANTI PER ON-FIELD REVIEW
                 frase_var_check = random.choice([
@@ -738,7 +739,7 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
                 
                 # 2️⃣ VAR CHECK (30% probabilità - verifica la decisione)
                 if random.random() < 0.30:
-                    minutirecuperoextra += 2
+                    minuti_recupero_extra += 2
                     
                     # 🆕 VARIANTI PER VERIFICA RIGORE FISCHIATO
                     frase_var_verifica = random.choice([
