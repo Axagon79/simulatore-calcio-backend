@@ -330,274 +330,274 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
             elif min_display.startswith("90+"):
                 prefisso = rand(frasi_recupero)
 
-                if is_penalty:
-                    # Decidiamo: VAR chiama arbitro (35%) o arbitro fischia direttamente (65%)
-                    var_chiama_arbitro = random.random() < 0.35  # 35% VAR "inventa" il rigore
-                    
-                    if var_chiama_arbitro:
-                        minutirecuperoextra += 2
-                        
-                        # 🆕 VARIANTI PER ON-FIELD REVIEW
-                        frase_var_check = random.choice([
-                            "🖥️ VAR: Possibile contatto in area! L'arbitro viene richiamato al monitor...",
-                            "🖥️ VAR: Episodio dubbio in area! Il direttore di gara va a rivedere l'azione...",
-                            "🖥️ VAR: Segnalazione dalla sala VAR! L'arbitro si dirige verso il monitor...",
-                            "🖥️ VAR: L'arbitro viene richiamato! Possibile penalty non visto...",
-                            "🖥️ VAR: On-Field Review! Il direttore di gara rivede l'episodio sul monitor a bordocampo...",
-                            "🖥️ VAR: Il VAR richiama l'attenzione dell'arbitro su un possibile fallo in area...",
-                            "🖥️ VAR: Momento cruciale! L'arbitro va al monitor per valutare il contatto..."
-                        ])
-                        
-                        cronaca.append({
-                            "minuto": min_gol, 
-                            "squadra": "casa", 
-                            "tipo": "VAR_PROCESS",
-                            "var_type": "rigore_on_field_review",
-                            "testo": f"{min_display}' {frase_var_check}"
-                        })
-
-                        
-                        # 2️⃣ SENTENZA (70% rigore assegnato, 30% niente)
-                        if random.random() < 0.70:  # 70% diventa rigore
-                            frase_rigore = random.choice([
-                                "CALCIO DI RIGORE! Dopo la revisione, l'arbitro indica il dischetto!",
-                                "RIGORE ASSEGNATO! Contatto evidente rivisto al VAR!",
-                                "PENALTY! L'arbitro cambia decisione dopo il monitor!",
-                                "CALCIO DI RIGORE! Il VAR ha fatto luce sull'episodio!"
-                            ])
-                            
-                            cronaca.append({
-                                "minuto": min_gol,
-                                "squadra": "casa",
-                                "tipo": "VAR_VERDICT",
-                                "decision": "confermato",
-                                "var_type": "rigore_on_field_review",
-                                "testo": f"{min_display}' ✅ VAR: {frase_rigore}"
-                            })
-                            
-                            cronaca.append({
-                                "minuto": min_gol, 
-                                "squadra": "casa", 
-                                "tipo": "rigore_fischio", 
-                                "testo": f"{min_display}' 📢 {prefisso}[{h}] RIGORE! Fischiato dopo On-Field Review!"
-                            })
-                            
-                            # 3️⃣ GOL SU RIGORE
-                            min_gol_rigore = min_gol + 1
-                            if min_gol_rigore in minuti_usati:
-                                min_gol_rigore = trova_minuto_libero(minuti_usati, (min_gol + 1, min_gol + 3), allow_recupero=True)
-                            minuti_usati.add(min_gol_rigore)
-                            min_rig_display = format_minuto(min_gol_rigore)
-                            cronaca.append({
-                                "minuto": min_gol_rigore, 
-                                "squadra": "casa", 
-                                "tipo": "gol", 
-                                "testo": f"{min_rig_display}' 🎯 {prefisso}[{h}] GOAL SU RIGORE! {marcatore} - Freddissimo dagli undici metri!"
-                            })
-                        else:  # 30% niente rigore
-                            cronaca.append({
-                                "minuto": min_gol,
-                                "squadra": "casa",
-                                "tipo": "VAR_VERDICT",
-                                "decision": "annullato",
-                                "var_type": "rigore_on_field_review",
-                                "testo": f"{min_display}' ❌ VAR: Nessun contatto sufficiente. Si prosegue!"
-                            })
-                    
-                    else:
-                        # ═══════════════════════════════════════════════════
-                        # SCENARIO B: ARBITRO FISCHIA SUBITO (poi VAR controlla)
-                        # ═══════════════════════════════════════════════════
-                        
-                        # 1️⃣ FISCHIO RIGORE IMMEDIATO
-                        frase_rigore = random.choice([
-                            "CALCIO DI RIGORE! Il direttore di gara indica il dischetto!",
-                            "RIGORE! L'arbitro non ha dubbi e indica il dischetto!",
-                            "PENALTY! Fischio netto, è massima punizione!",
-                            "CALCIO DI RIGORE! L'arbitro indica senza esitazione!"
-                        ])
-                        
-                        cronaca.append({
-                            "minuto": min_gol, 
-                            "squadra": "casa",
-                            "tipo": "rigore_fischio", 
-                            "testo": f"{min_display}' 📢 {prefisso}[{h}] {frase_rigore}"
-                        })
-                        
-                        # 2️⃣ VAR CHECK (30% probabilità - verifica la decisione)
-                        if random.random() < 0.30:
-                            minutirecuperoextra += 2
-                            
-                            # 🆕 VARIANTI PER VERIFICA RIGORE FISCHIATO
-                            frase_var_verifica = random.choice([
-                                "🖥️ VAR: Verifica in corso sulla decisione arbitrale...",
-                                "🖥️ VAR: Check protocollo per confermare la decisione del rigore...",
-                                "🖥️ VAR: La sala VAR sta verificando l'episodio del penalty...",
-                                "🖥️ VAR: Controllo in corso per validare il calcio di rigore assegnato...",
-                                "🖥️ VAR: Il VAR rivede l'azione per confermare la decisione dell'arbitro...",
-                                "🖥️ VAR: Verifica protocollo in corso sul rigore fischiato...",
-                                "🖥️ VAR: Check sulla dinamica del contatto che ha portato al penalty..."
-                            ])
-                            
-                            cronaca.append({
-                                "minuto": min_gol, 
-                                "squadra": "casa", 
-                                "tipo": "VAR_PROCESS",
-                                "var_type": "rigore",
-                                "testo": f"{min_display}' {frase_var_verifica}"
-                            })
-
-                            
-                            # 3️⃣ SENTENZA (70% confermato, 30% annullato)
-                            if random.random() < 0.30:  # 30% annullato rarissimo
-                                # 🆕 VARIANTI RIGORE ANNULLATO
-                                frase_annullato = random.choice([
-                                    "❌ VAR: RIGORE ANNULLATO! Non c'è fallo, simulazione!",
-                                    "❌ VAR: RIGORE REVOCATO! Il VAR non rileva alcun contatto irregolare!",
-                                    "❌ VAR: PENALTY ANNULLATO! Chiara simulazione del giocatore!",
-                                    "❌ VAR: RIGORE TOLTO! Nessun fallo, l'attaccante si è buttato!",
-                                    "❌ VAR: DECISIONE RIBALTATA! Non c'è penalty, simulazione evidente!",
-                                    "❌ VAR: RIGORE ANNULLATO! Il VAR smentisce l'arbitro, niente fallo!",
-                                    "❌ VAR: PENALTY REVOCATO! Contatto troppo leggero, niente rigore!"
-                                ])
-                                
-                                cronaca.append({
-                                    "minuto": min_gol,
-                                    "squadra": "casa",
-                                    "tipo": "VAR_VERDICT",
-                                    "decision": "annullato",
-                                    "var_type": "rigore",
-                                    "testo": f"{min_display}' {frase_annullato}"
-                                })
-                            else:  # 70% confermato
-                                # 🆕 VARIANTI RIGORE CONFERMATO
-                                frase_confermato = random.choice([
-                                    "✅ VAR: RIGORE CONFERMATO! Decisione corretta.",
-                                    "✅ VAR: PENALTY CONFERMATO! Il VAR convalida la decisione arbitrale.",
-                                    "✅ VAR: RIGORE VALIDO! Contatto evidente, decisione giusta.",
-                                    "✅ VAR: CONFERMATO! L'arbitro aveva visto bene, è rigore!",
-                                    "✅ VAR: PENALTY VALIDATO! Nessun dubbio, il rigore c'è.",
-                                    "✅ VAR: DECISIONE CORRETTA! Il VAR conferma il calcio di rigore.",
-                                    "✅ VAR: RIGORE CONFERMATO! Fallo netto in area, decisione ineccepibile."
-                                ])
-                                
-                                cronaca.append({
-                                    "minuto": min_gol,
-                                    "squadra": "casa",
-                                    "tipo": "VAR_VERDICT",
-                                    "decision": "confermato",
-                                    "var_type": "rigore",
-                                    "testo": f"{min_display}' {frase_confermato}"
-                                })
-
-                                
-                                # 4️⃣ GOL SU RIGORE
-                                min_gol_rigore = min_gol + 1
-                                if min_gol_rigore in minuti_usati:
-                                    min_gol_rigore = trova_minuto_libero(minuti_usati, (min_gol + 1, min_gol + 3), allow_recupero=True)
-                                minuti_usati.add(min_gol_rigore)
-                                min_rig_display = format_minuto(min_gol_rigore)
-                                cronaca.append({
-                                    "minuto": min_gol_rigore, 
-                                    "squadra": "casa", 
-                                    "tipo": "gol", 
-                                    "testo": f"{min_rig_display}' 🎯 {prefisso}[{h}] GOAL SU RIGORE! {marcatore} - Freddissimo dagli undici metri!"
-                                })
-                        else:
-                            # Nessun VAR: gol diretto
-                            min_gol_rigore = min_gol + 1
-                            if min_gol_rigore in minuti_usati:
-                                min_gol_rigore = trova_minuto_libero(minuti_usati, (min_gol + 1, min_gol + 3), allow_recupero=True)
-                            minuti_usati.add(min_gol_rigore)
-                            min_rig_display = format_minuto(min_gol_rigore)
-                            cronaca.append({
-                                "minuto": min_gol_rigore, 
-                                "squadra": "casa", 
-                                "tipo": "gol", 
-                                "testo": f"{min_rig_display}' 🎯 {prefisso}[{h}] GOAL SU RIGORE! {marcatore} - Freddissimo dagli undici metri!"
-                            })
+        if is_penalty:
+            # Decidiamo: VAR chiama arbitro (35%) o arbitro fischia direttamente (65%)
+            var_chiama_arbitro = random.random() < 0.35  # 35% VAR "inventa" il rigore
+            
+            if var_chiama_arbitro:
+                minutirecuperoextra += 2
                 
-                else:
-                    # GOL DA AZIONE
-                    # 1️⃣ PRIMA: IL GOL
-                    tipo_gol = rand(["Conclusione potente!", "Di testa su cross!", "Azione corale!", "Tap-in vincente!"])
+                # 🆕 VARIANTI PER ON-FIELD REVIEW
+                frase_var_check = random.choice([
+                    "🖥️ VAR: Possibile contatto in area! L'arbitro viene richiamato al monitor...",
+                    "🖥️ VAR: Episodio dubbio in area! Il direttore di gara va a rivedere l'azione...",
+                    "🖥️ VAR: Segnalazione dalla sala VAR! L'arbitro si dirige verso il monitor...",
+                    "🖥️ VAR: L'arbitro viene richiamato! Possibile penalty non visto...",
+                    "🖥️ VAR: On-Field Review! Il direttore di gara rivede l'episodio sul monitor a bordocampo...",
+                    "🖥️ VAR: Il VAR richiama l'attenzione dell'arbitro su un possibile fallo in area...",
+                    "🖥️ VAR: Momento cruciale! L'arbitro va al monitor per valutare il contatto..."
+                ])
+                
+                cronaca.append({
+                    "minuto": min_gol, 
+                    "squadra": "casa", 
+                    "tipo": "VAR_PROCESS",
+                    "var_type": "rigore_on_field_review",
+                    "testo": f"{min_display}' {frase_var_check}"
+                })
+
+                
+                # 2️⃣ SENTENZA (70% rigore assegnato, 30% niente)
+                if random.random() < 0.70:  # 70% diventa rigore
+                    frase_rigore = random.choice([
+                        "CALCIO DI RIGORE! Dopo la revisione, l'arbitro indica il dischetto!",
+                        "RIGORE ASSEGNATO! Contatto evidente rivisto al VAR!",
+                        "PENALTY! L'arbitro cambia decisione dopo il monitor!",
+                        "CALCIO DI RIGORE! Il VAR ha fatto luce sull'episodio!"
+                    ])
+                    
+                    cronaca.append({
+                        "minuto": min_gol,
+                        "squadra": "casa",
+                        "tipo": "VAR_VERDICT",
+                        "decision": "confermato",
+                        "var_type": "rigore_on_field_review",
+                        "testo": f"{min_display}' ✅ VAR: {frase_rigore}"
+                    })
+                    
                     cronaca.append({
                         "minuto": min_gol, 
                         "squadra": "casa", 
-                        "tipo": "gol", 
-                        "testo": f"{min_display}' ⚽ {prefisso}[{h}] GOOOL! {marcatore} - {tipo_gol}"
+                        "tipo": "rigore_fischio", 
+                        "testo": f"{min_display}' 📢 {prefisso}[{h}] RIGORE! Fischiato dopo On-Field Review!"
                     })
                     
-                    # 2️⃣ POI: VAR CHECK (50% probabilità)
-                    if random.random() < 0.50:
-                        minuti_recupero_extra += 2
-                        
-                        # 🆕 VARIANTI CHECK GOL
-                        frase_check_gol = random.choice([
-                            "🖥️ VAR: Controllo in corso per possibile fuorigioco...",
-                            "🖥️ VAR: Check protocollo sul gol! Possibile posizione irregolare...",
-                            "🖥️ VAR: Verifica in corso sulla validità della rete...",
-                            "🖥️ VAR: La sala VAR sta controllando la posizione degli attaccanti...",
-                            "🖥️ VAR: Controllo per possibile fallo in attacco prima del gol...",
-                            "🖥️ VAR: Check sulla dinamica dell'azione! Possibile fuorigioco...",
-                            "🖥️ VAR: Verifica della posizione! Il gol potrebbe essere annullato...",
-                            "🖥️ VAR: Controllo millimetrico sulla linea del fuorigioco...",
-                            "🖥️ VAR: La sala VAR rivede l'azione per verificare la regolarità della rete..."
+                    # 3️⃣ GOL SU RIGORE
+                    min_gol_rigore = min_gol + 1
+                    if min_gol_rigore in minuti_usati:
+                        min_gol_rigore = trova_minuto_libero(minuti_usati, (min_gol + 1, min_gol + 3), allow_recupero=True)
+                    minuti_usati.add(min_gol_rigore)
+                    min_rig_display = format_minuto(min_gol_rigore)
+                    cronaca.append({
+                        "minuto": min_gol_rigore, 
+                        "squadra": "casa", 
+                        "tipo": "gol", 
+                        "testo": f"{min_rig_display}' 🎯 {prefisso}[{h}] GOAL SU RIGORE! {marcatore} - Freddissimo dagli undici metri!"
+                    })
+                else:  # 30% niente rigore
+                    cronaca.append({
+                        "minuto": min_gol,
+                        "squadra": "casa",
+                        "tipo": "VAR_VERDICT",
+                        "decision": "annullato",
+                        "var_type": "rigore_on_field_review",
+                        "testo": f"{min_display}' ❌ VAR: Nessun contatto sufficiente. Si prosegue!"
+                    })
+            
+            else:
+                # ═══════════════════════════════════════════════════
+                # SCENARIO B: ARBITRO FISCHIA SUBITO (poi VAR controlla)
+                # ═══════════════════════════════════════════════════
+                
+                # 1️⃣ FISCHIO RIGORE IMMEDIATO
+                frase_rigore = random.choice([
+                    "CALCIO DI RIGORE! Il direttore di gara indica il dischetto!",
+                    "RIGORE! L'arbitro non ha dubbi e indica il dischetto!",
+                    "PENALTY! Fischio netto, è massima punizione!",
+                    "CALCIO DI RIGORE! L'arbitro indica senza esitazione!"
+                ])
+                
+                cronaca.append({
+                    "minuto": min_gol, 
+                    "squadra": "casa",
+                    "tipo": "rigore_fischio", 
+                    "testo": f"{min_display}' 📢 {prefisso}[{h}] {frase_rigore}"
+                })
+                
+                # 2️⃣ VAR CHECK (30% probabilità - verifica la decisione)
+                if random.random() < 0.30:
+                    minutirecuperoextra += 2
+                    
+                    # 🆕 VARIANTI PER VERIFICA RIGORE FISCHIATO
+                    frase_var_verifica = random.choice([
+                        "🖥️ VAR: Verifica in corso sulla decisione arbitrale...",
+                        "🖥️ VAR: Check protocollo per confermare la decisione del rigore...",
+                        "🖥️ VAR: La sala VAR sta verificando l'episodio del penalty...",
+                        "🖥️ VAR: Controllo in corso per validare il calcio di rigore assegnato...",
+                        "🖥️ VAR: Il VAR rivede l'azione per confermare la decisione dell'arbitro...",
+                        "🖥️ VAR: Verifica protocollo in corso sul rigore fischiato...",
+                        "🖥️ VAR: Check sulla dinamica del contatto che ha portato al penalty..."
+                    ])
+                    
+                    cronaca.append({
+                        "minuto": min_gol, 
+                        "squadra": "casa", 
+                        "tipo": "VAR_PROCESS",
+                        "var_type": "rigore",
+                        "testo": f"{min_display}' {frase_var_verifica}"
+                    })
+
+                    
+                    # 3️⃣ SENTENZA (70% confermato, 30% annullato)
+                    if random.random() < 0.30:  # 30% annullato rarissimo
+                        # 🆕 VARIANTI RIGORE ANNULLATO
+                        frase_annullato = random.choice([
+                            "❌ VAR: RIGORE ANNULLATO! Non c'è fallo, simulazione!",
+                            "❌ VAR: RIGORE REVOCATO! Il VAR non rileva alcun contatto irregolare!",
+                            "❌ VAR: PENALTY ANNULLATO! Chiara simulazione del giocatore!",
+                            "❌ VAR: RIGORE TOLTO! Nessun fallo, l'attaccante si è buttato!",
+                            "❌ VAR: DECISIONE RIBALTATA! Non c'è penalty, simulazione evidente!",
+                            "❌ VAR: RIGORE ANNULLATO! Il VAR smentisce l'arbitro, niente fallo!",
+                            "❌ VAR: PENALTY REVOCATO! Contatto troppo leggero, niente rigore!"
                         ])
                         
                         cronaca.append({
-                            "minuto": min_gol, 
-                            "squadra": "casa", 
-                            "tipo": "VAR_PROCESS",
-                            "var_type": "gol",
-                            "testo": f"{min_display}' {frase_check_gol}"
+                            "minuto": min_gol,
+                            "squadra": "casa",
+                            "tipo": "VAR_VERDICT",
+                            "decision": "annullato",
+                            "var_type": "rigore",
+                            "testo": f"{min_display}' {frase_annullato}"
                         })
+                    else:  # 70% confermato
+                        # 🆕 VARIANTI RIGORE CONFERMATO
+                        frase_confermato = random.choice([
+                            "✅ VAR: RIGORE CONFERMATO! Decisione corretta.",
+                            "✅ VAR: PENALTY CONFERMATO! Il VAR convalida la decisione arbitrale.",
+                            "✅ VAR: RIGORE VALIDO! Contatto evidente, decisione giusta.",
+                            "✅ VAR: CONFERMATO! L'arbitro aveva visto bene, è rigore!",
+                            "✅ VAR: PENALTY VALIDATO! Nessun dubbio, il rigore c'è.",
+                            "✅ VAR: DECISIONE CORRETTA! Il VAR conferma il calcio di rigore.",
+                            "✅ VAR: RIGORE CONFERMATO! Fallo netto in area, decisione ineccepibile."
+                        ])
                         
-                        # 3️⃣ SENTENZA VAR (70% confermato, 30% annullato)
-                        if random.random() < 0.30:  # 30% annullato
-                            # 🆕 VARIANTI GOL ANNULLATO
-                            frase_gol_annullato = random.choice([
-                                "❌ VAR: GOL ANNULLATO per fuorigioco!",
-                                "❌ VAR: RETE ANNULLATA! Posizione irregolare confermata dal VAR!",
-                                "❌ VAR: GOL CANCELLATO! Fuorigioco millimetrico ma netto!",
-                                "❌ VAR: RETE NON VALIDA! L'attaccante era oltre la linea!",
-                                "❌ VAR: GOL ANNULLATO! Il VAR rileva un fuorigioco nell'azione!",
-                                "❌ VAR: RETE CANCELLATA! Fallo in attacco prima della conclusione!",
-                                "❌ VAR: GOL NON VALIDO! Posizione di fuorigioco confermata!",
-                                "❌ VAR: ANNULLATO! Il VAR boccia la rete per irregolarità!",
-                                "❌ VAR: RETE ANNULLATA! Tocco di mano prima del gol!"
-                            ])
-                            
-                            cronaca.append({
-                                "minuto": min_gol,
-                                "squadra": "casa",
-                                "tipo": "VAR_VERDICT",
-                                "decision": "annullato",
-                                "var_type": "gol",
-                                "testo": f"{min_display}' {frase_gol_annullato}"
-                            })
-                        else:  # 70% confermato
-                            # 🆕 VARIANTI GOL CONFERMATO
-                            frase_gol_valido = random.choice([
-                                "✅ VAR: GOL CONFERMATO!",
-                                "✅ VAR: RETE VALIDA! Posizione regolare!",
-                                "✅ VAR: GOL CONVALIDATO! Tutto regolare!",
-                                "✅ VAR: CONFERMATO! La rete è valida!",
-                                "✅ VAR: GOL BUONO! Nessun fuorigioco!",
-                                "✅ VAR: RETE VALIDATA! Azione regolare!",
-                                "✅ VAR: GOL VALIDO! Il VAR conferma la decisione!",
-                                "✅ VAR: CONVALIDATO! Nessuna irregolarità, il gol vale!",
-                                "✅ VAR: TUTTO REGOLARE! La rete è buona!"
-                            ])
-                            
-                            cronaca.append({
-                                "minuto": min_gol,
-                                "squadra": "casa",
-                                "tipo": "VAR_VERDICT",
-                                "decision": "confermato",
-                                "var_type": "gol",
-                                "testo": f"{min_display}' {frase_gol_valido}"
-                            })
+                        cronaca.append({
+                            "minuto": min_gol,
+                            "squadra": "casa",
+                            "tipo": "VAR_VERDICT",
+                            "decision": "confermato",
+                            "var_type": "rigore",
+                            "testo": f"{min_display}' {frase_confermato}"
+                        })
+
+                        
+                        # 4️⃣ GOL SU RIGORE
+                        min_gol_rigore = min_gol + 1
+                        if min_gol_rigore in minuti_usati:
+                            min_gol_rigore = trova_minuto_libero(minuti_usati, (min_gol + 1, min_gol + 3), allow_recupero=True)
+                        minuti_usati.add(min_gol_rigore)
+                        min_rig_display = format_minuto(min_gol_rigore)
+                        cronaca.append({
+                            "minuto": min_gol_rigore, 
+                            "squadra": "casa", 
+                            "tipo": "gol", 
+                            "testo": f"{min_rig_display}' 🎯 {prefisso}[{h}] GOAL SU RIGORE! {marcatore} - Freddissimo dagli undici metri!"
+                        })
+                else:
+                    # Nessun VAR: gol diretto
+                    min_gol_rigore = min_gol + 1
+                    if min_gol_rigore in minuti_usati:
+                        min_gol_rigore = trova_minuto_libero(minuti_usati, (min_gol + 1, min_gol + 3), allow_recupero=True)
+                    minuti_usati.add(min_gol_rigore)
+                    min_rig_display = format_minuto(min_gol_rigore)
+                    cronaca.append({
+                        "minuto": min_gol_rigore, 
+                        "squadra": "casa", 
+                        "tipo": "gol", 
+                        "testo": f"{min_rig_display}' 🎯 {prefisso}[{h}] GOAL SU RIGORE! {marcatore} - Freddissimo dagli undici metri!"
+                    })
+        
+        else:
+            # GOL DA AZIONE
+            # 1️⃣ PRIMA: IL GOL
+            tipo_gol = rand(["Conclusione potente!", "Di testa su cross!", "Azione corale!", "Tap-in vincente!"])
+            cronaca.append({
+                "minuto": min_gol, 
+                "squadra": "casa", 
+                "tipo": "gol", 
+                "testo": f"{min_display}' ⚽ {prefisso}[{h}] GOOOL! {marcatore} - {tipo_gol}"
+            })
+            
+            # 2️⃣ POI: VAR CHECK (50% probabilità)
+            if random.random() < 0.50:
+                minuti_recupero_extra += 2
+                
+                # 🆕 VARIANTI CHECK GOL
+                frase_check_gol = random.choice([
+                    "🖥️ VAR: Controllo in corso per possibile fuorigioco...",
+                    "🖥️ VAR: Check protocollo sul gol! Possibile posizione irregolare...",
+                    "🖥️ VAR: Verifica in corso sulla validità della rete...",
+                    "🖥️ VAR: La sala VAR sta controllando la posizione degli attaccanti...",
+                    "🖥️ VAR: Controllo per possibile fallo in attacco prima del gol...",
+                    "🖥️ VAR: Check sulla dinamica dell'azione! Possibile fuorigioco...",
+                    "🖥️ VAR: Verifica della posizione! Il gol potrebbe essere annullato...",
+                    "🖥️ VAR: Controllo millimetrico sulla linea del fuorigioco...",
+                    "🖥️ VAR: La sala VAR rivede l'azione per verificare la regolarità della rete..."
+                ])
+                
+                cronaca.append({
+                    "minuto": min_gol, 
+                    "squadra": "casa", 
+                    "tipo": "VAR_PROCESS",
+                    "var_type": "gol",
+                    "testo": f"{min_display}' {frase_check_gol}"
+                })
+                
+                # 3️⃣ SENTENZA VAR (70% confermato, 30% annullato)
+                if random.random() < 0.30:  # 30% annullato
+                    # 🆕 VARIANTI GOL ANNULLATO
+                    frase_gol_annullato = random.choice([
+                        "❌ VAR: GOL ANNULLATO per fuorigioco!",
+                        "❌ VAR: RETE ANNULLATA! Posizione irregolare confermata dal VAR!",
+                        "❌ VAR: GOL CANCELLATO! Fuorigioco millimetrico ma netto!",
+                        "❌ VAR: RETE NON VALIDA! L'attaccante era oltre la linea!",
+                        "❌ VAR: GOL ANNULLATO! Il VAR rileva un fuorigioco nell'azione!",
+                        "❌ VAR: RETE CANCELLATA! Fallo in attacco prima della conclusione!",
+                        "❌ VAR: GOL NON VALIDO! Posizione di fuorigioco confermata!",
+                        "❌ VAR: ANNULLATO! Il VAR boccia la rete per irregolarità!",
+                        "❌ VAR: RETE ANNULLATA! Tocco di mano prima del gol!"
+                    ])
+                    
+                    cronaca.append({
+                        "minuto": min_gol,
+                        "squadra": "casa",
+                        "tipo": "VAR_VERDICT",
+                        "decision": "annullato",
+                        "var_type": "gol",
+                        "testo": f"{min_display}' {frase_gol_annullato}"
+                    })
+                else:  # 70% confermato
+                    # 🆕 VARIANTI GOL CONFERMATO
+                    frase_gol_valido = random.choice([
+                        "✅ VAR: GOL CONFERMATO!",
+                        "✅ VAR: RETE VALIDA! Posizione regolare!",
+                        "✅ VAR: GOL CONVALIDATO! Tutto regolare!",
+                        "✅ VAR: CONFERMATO! La rete è valida!",
+                        "✅ VAR: GOL BUONO! Nessun fuorigioco!",
+                        "✅ VAR: RETE VALIDATA! Azione regolare!",
+                        "✅ VAR: GOL VALIDO! Il VAR conferma la decisione!",
+                        "✅ VAR: CONVALIDATO! Nessuna irregolarità, il gol vale!",
+                        "✅ VAR: TUTTO REGOLARE! La rete è buona!"
+                    ])
+                    
+                    cronaca.append({
+                        "minuto": min_gol,
+                        "squadra": "casa",
+                        "tipo": "VAR_VERDICT",
+                        "decision": "confermato",
+                        "var_type": "gol",
+                        "testo": f"{min_display}' {frase_gol_valido}"
+                    })
 
 
 
@@ -642,274 +642,274 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
             elif min_display.startswith("90+"):
                 prefisso = rand(frasi_recupero)
 
-                if is_penalty:
-                    # Decidiamo: VAR chiama arbitro (35%) o arbitro fischia direttamente (65%)
-                    var_chiama_arbitro = random.random() < 0.35  # 35% VAR "inventa" il rigore
-                    
-                    if var_chiama_arbitro:
-                        minutirecuperoextra += 2
-                        
-                        # 🆕 VARIANTI PER ON-FIELD REVIEW
-                        frase_var_check = random.choice([
-                            "🖥️ VAR: Possibile contatto in area! L'arbitro viene richiamato al monitor...",
-                            "🖥️ VAR: Episodio dubbio in area! Il direttore di gara va a rivedere l'azione...",
-                            "🖥️ VAR: Segnalazione dalla sala VAR! L'arbitro si dirige verso il monitor...",
-                            "🖥️ VAR: L'arbitro viene richiamato! Possibile penalty non visto...",
-                            "🖥️ VAR: On-Field Review! Il direttore di gara rivede l'episodio sul monitor a bordocampo...",
-                            "🖥️ VAR: Il VAR richiama l'attenzione dell'arbitro su un possibile fallo in area...",
-                            "🖥️ VAR: Momento cruciale! L'arbitro va al monitor per valutare il contatto..."
-                        ])
-                        
-                        cronaca.append({
-                            "minuto": min_gol, 
-                            "squadra": "ospite", 
-                            "tipo": "VAR_PROCESS",
-                            "var_type": "rigore_on_field_review",
-                            "testo": f"{min_display}' {frase_var_check}"
-                        })
-
-                        
-                        # 2️⃣ SENTENZA (70% rigore assegnato, 30% niente)
-                        if random.random() < 0.70:  # 70% diventa rigore
-                            frase_rigore = random.choice([
-                                "CALCIO DI RIGORE! Dopo la revisione, l'arbitro indica il dischetto!",
-                                "RIGORE ASSEGNATO! Contatto evidente rivisto al VAR!",
-                                "PENALTY! L'arbitro cambia decisione dopo il monitor!",
-                                "CALCIO DI RIGORE! Il VAR ha fatto luce sull'episodio!"
-                            ])
-                            
-                            cronaca.append({
-                                "minuto": min_gol,
-                                "squadra": "ospite",
-                                "tipo": "VAR_VERDICT",
-                                "decision": "confermato",
-                                "var_type": "rigore_on_field_review",
-                                "testo": f"{min_display}' ✅ VAR: {frase_rigore}"
-                            })
-                            
-                            cronaca.append({
-                                "minuto": min_gol, 
-                                "squadra": "ospite", 
-                                "tipo": "rigore_fischio", 
-                                "testo": f"{min_display}' 📢 {prefisso}[{a}] RIGORE! Fischiato dopo On-Field Review!"
-                            })
-                            
-                            # 3️⃣ GOL SU RIGORE
-                            min_gol_rigore = min_gol + 1
-                            if min_gol_rigore in minuti_usati:
-                                min_gol_rigore = trova_minuto_libero(minuti_usati, (min_gol + 1, min_gol + 3), allow_recupero=True)
-                            minuti_usati.add(min_gol_rigore)
-                            min_rig_display = format_minuto(min_gol_rigore)
-                            cronaca.append({
-                                "minuto": min_gol_rigore, 
-                                "squadra": "ospite", 
-                                "tipo": "gol", 
-                                "testo": f"{min_rig_display}' 🎯 {prefisso}[{a}] GOAL SU RIGORE! {marcatore} - Freddissimo dagli undici metri!"
-                            })
-                        else:  # 30% niente rigore
-                            cronaca.append({
-                                "minuto": min_gol,
-                                "squadra": "ospite",
-                                "tipo": "VAR_VERDICT",
-                                "decision": "annullato",
-                                "var_type": "rigore_on_field_review",
-                                "testo": f"{min_display}' ❌ VAR: Nessun contatto sufficiente. Si prosegue!"
-                            })
-                    
-                    else:
-                        # ═══════════════════════════════════════════════════
-                        # SCENARIO B: ARBITRO FISCHIA SUBITO (poi VAR controlla)
-                        # ═══════════════════════════════════════════════════
-                        
-                        # 1️⃣ FISCHIO RIGORE IMMEDIATO
-                        frase_rigore = random.choice([
-                            "CALCIO DI RIGORE! Il direttore di gara indica il dischetto!",
-                            "RIGORE! L'arbitro non ha dubbi e indica il dischetto!",
-                            "PENALTY! Fischio netto, è massima punizione!",
-                            "CALCIO DI RIGORE! L'arbitro indica senza esitazione!"
-                        ])
-                        
-                        cronaca.append({
-                            "minuto": min_gol, 
-                            "squadra": "ospite",
-                            "tipo": "rigore_fischio", 
-                            "testo": f"{min_display}' 📢 {prefisso}[{a}] {frase_rigore}"
-                        })
-                        
-                        # 2️⃣ VAR CHECK (30% probabilità - verifica la decisione)
-                        if random.random() < 0.30:
-                            minutirecuperoextra += 2
-                            
-                            # 🆕 VARIANTI PER VERIFICA RIGORE FISCHIATO
-                            frase_var_verifica = random.choice([
-                                "🖥️ VAR: Verifica in corso sulla decisione arbitrale...",
-                                "🖥️ VAR: Check protocollo per confermare la decisione del rigore...",
-                                "🖥️ VAR: La sala VAR sta verificando l'episodio del penalty...",
-                                "🖥️ VAR: Controllo in corso per validare il calcio di rigore assegnato...",
-                                "🖥️ VAR: Il VAR rivede l'azione per confermare la decisione dell'arbitro...",
-                                "🖥️ VAR: Verifica protocollo in corso sul rigore fischiato...",
-                                "🖥️ VAR: Check sulla dinamica del contatto che ha portato al penalty..."
-                            ])
-                            
-                            cronaca.append({
-                                "minuto": min_gol, 
-                                "squadra": "ospite", 
-                                "tipo": "VAR_PROCESS",
-                                "var_type": "rigore",
-                                "testo": f"{min_display}' {frase_var_verifica}"
-                            })
-
-                            
-                            # 3️⃣ SENTENZA (70% confermato, 30% annullato)
-                            if random.random() < 0.30:  # 30% annullato rarissimo
-                                # 🆕 VARIANTI RIGORE ANNULLATO
-                                frase_annullato = random.choice([
-                                    "❌ VAR: RIGORE ANNULLATO! Non c'è fallo, simulazione!",
-                                    "❌ VAR: RIGORE REVOCATO! Il VAR non rileva alcun contatto irregolare!",
-                                    "❌ VAR: PENALTY ANNULLATO! Chiara simulazione del giocatore!",
-                                    "❌ VAR: RIGORE TOLTO! Nessun fallo, l'attaccante si è buttato!",
-                                    "❌ VAR: DECISIONE RIBALTATA! Non c'è penalty, simulazione evidente!",
-                                    "❌ VAR: RIGORE ANNULLATO! Il VAR smentisce l'arbitro, niente fallo!",
-                                    "❌ VAR: PENALTY REVOCATO! Contatto troppo leggero, niente rigore!"
-                                ])
-                                
-                                cronaca.append({
-                                    "minuto": min_gol,
-                                    "squadra": "ospite",
-                                    "tipo": "VAR_VERDICT",
-                                    "decision": "annullato",
-                                    "var_type": "rigore",
-                                    "testo": f"{min_display}' {frase_annullato}"
-                                })
-                            else:  # 70% confermato
-                                # 🆕 VARIANTI RIGORE CONFERMATO
-                                frase_confermato = random.choice([
-                                    "✅ VAR: RIGORE CONFERMATO! Decisione corretta.",
-                                    "✅ VAR: PENALTY CONFERMATO! Il VAR convalida la decisione arbitrale.",
-                                    "✅ VAR: RIGORE VALIDO! Contatto evidente, decisione giusta.",
-                                    "✅ VAR: CONFERMATO! L'arbitro aveva visto bene, è rigore!",
-                                    "✅ VAR: PENALTY VALIDATO! Nessun dubbio, il rigore c'è.",
-                                    "✅ VAR: DECISIONE CORRETTA! Il VAR conferma il calcio di rigore.",
-                                    "✅ VAR: RIGORE CONFERMATO! Fallo netto in area, decisione ineccepibile."
-                                ])
-                                
-                                cronaca.append({
-                                    "minuto": min_gol,
-                                    "squadra": "ospite",
-                                    "tipo": "VAR_VERDICT",
-                                    "decision": "confermato",
-                                    "var_type": "rigore",
-                                    "testo": f"{min_display}' {frase_confermato}"
-                                })
-
-                                
-                                # 4️⃣ GOL SU RIGORE
-                                min_gol_rigore = min_gol + 1
-                                if min_gol_rigore in minuti_usati:
-                                    min_gol_rigore = trova_minuto_libero(minuti_usati, (min_gol + 1, min_gol + 3), allow_recupero=True)
-                                minuti_usati.add(min_gol_rigore)
-                                min_rig_display = format_minuto(min_gol_rigore)
-                                cronaca.append({
-                                    "minuto": min_gol_rigore, 
-                                    "squadra": "ospite", 
-                                    "tipo": "gol", 
-                                    "testo": f"{min_rig_display}' 🎯 {prefisso}[{a}] GOAL SU RIGORE! {marcatore} - Freddissimo dagli undici metri!"
-                                })
-                        else:
-                            # Nessun VAR: gol diretto
-                            min_gol_rigore = min_gol + 1
-                            if min_gol_rigore in minuti_usati:
-                                min_gol_rigore = trova_minuto_libero(minuti_usati, (min_gol + 1, min_gol + 3), allow_recupero=True)
-                            minuti_usati.add(min_gol_rigore)
-                            min_rig_display = format_minuto(min_gol_rigore)
-                            cronaca.append({
-                                "minuto": min_gol_rigore, 
-                                "squadra": "ospite", 
-                                "tipo": "gol", 
-                                "testo": f"{min_rig_display}' 🎯 {prefisso}[{a}] GOAL SU RIGORE! {marcatore} - Freddissimo dagli undici metri!"
-                            })
+        if is_penalty:
+            # Decidiamo: VAR chiama arbitro (35%) o arbitro fischia direttamente (65%)
+            var_chiama_arbitro = random.random() < 0.35  # 35% VAR "inventa" il rigore
+            
+            if var_chiama_arbitro:
+                minutirecuperoextra += 2
                 
-                else:
-                    # GOL DA AZIONE
-                    # 1️⃣ PRIMA: IL GOL
-                    tipo_gol = rand(["Conclusione potente!", "Di testa su cross!", "Azione corale!", "Tap-in vincente!"])
+                # 🆕 VARIANTI PER ON-FIELD REVIEW
+                frase_var_check = random.choice([
+                    "🖥️ VAR: Possibile contatto in area! L'arbitro viene richiamato al monitor...",
+                    "🖥️ VAR: Episodio dubbio in area! Il direttore di gara va a rivedere l'azione...",
+                    "🖥️ VAR: Segnalazione dalla sala VAR! L'arbitro si dirige verso il monitor...",
+                    "🖥️ VAR: L'arbitro viene richiamato! Possibile penalty non visto...",
+                    "🖥️ VAR: On-Field Review! Il direttore di gara rivede l'episodio sul monitor a bordocampo...",
+                    "🖥️ VAR: Il VAR richiama l'attenzione dell'arbitro su un possibile fallo in area...",
+                    "🖥️ VAR: Momento cruciale! L'arbitro va al monitor per valutare il contatto..."
+                ])
+                
+                cronaca.append({
+                    "minuto": min_gol, 
+                    "squadra": "ospite", 
+                    "tipo": "VAR_PROCESS",
+                    "var_type": "rigore_on_field_review",
+                    "testo": f"{min_display}' {frase_var_check}"
+                })
+
+                
+                # 2️⃣ SENTENZA (70% rigore assegnato, 30% niente)
+                if random.random() < 0.70:  # 70% diventa rigore
+                    frase_rigore = random.choice([
+                        "CALCIO DI RIGORE! Dopo la revisione, l'arbitro indica il dischetto!",
+                        "RIGORE ASSEGNATO! Contatto evidente rivisto al VAR!",
+                        "PENALTY! L'arbitro cambia decisione dopo il monitor!",
+                        "CALCIO DI RIGORE! Il VAR ha fatto luce sull'episodio!"
+                    ])
+                    
+                    cronaca.append({
+                        "minuto": min_gol,
+                        "squadra": "ospite",
+                        "tipo": "VAR_VERDICT",
+                        "decision": "confermato",
+                        "var_type": "rigore_on_field_review",
+                        "testo": f"{min_display}' ✅ VAR: {frase_rigore}"
+                    })
+                    
                     cronaca.append({
                         "minuto": min_gol, 
                         "squadra": "ospite", 
-                        "tipo": "gol", 
-                        "testo": f"{min_display}' ⚽ {prefisso}[{a}] GOOOL! {marcatore} - {tipo_gol}"
+                        "tipo": "rigore_fischio", 
+                        "testo": f"{min_display}' 📢 {prefisso}[{a}] RIGORE! Fischiato dopo On-Field Review!"
                     })
                     
-                    # 2️⃣ POI: VAR CHECK (50% probabilità)
-                    if random.random() < 0.50:
-                        minuti_recupero_extra += 2
-                        
-                        # 🆕 VARIANTI CHECK GOL
-                        frase_check_gol = random.choice([
-                            "🖥️ VAR: Controllo in corso per possibile fuorigioco...",
-                            "🖥️ VAR: Check protocollo sul gol! Possibile posizione irregolare...",
-                            "🖥️ VAR: Verifica in corso sulla validità della rete...",
-                            "🖥️ VAR: La sala VAR sta controllando la posizione degli attaccanti...",
-                            "🖥️ VAR: Controllo per possibile fallo in attacco prima del gol...",
-                            "🖥️ VAR: Check sulla dinamica dell'azione! Possibile fuorigioco...",
-                            "🖥️ VAR: Verifica della posizione! Il gol potrebbe essere annullato...",
-                            "🖥️ VAR: Controllo millimetrico sulla linea del fuorigioco...",
-                            "🖥️ VAR: La sala VAR rivede l'azione per verificare la regolarità della rete..."
+                    # 3️⃣ GOL SU RIGORE
+                    min_gol_rigore = min_gol + 1
+                    if min_gol_rigore in minuti_usati:
+                        min_gol_rigore = trova_minuto_libero(minuti_usati, (min_gol + 1, min_gol + 3), allow_recupero=True)
+                    minuti_usati.add(min_gol_rigore)
+                    min_rig_display = format_minuto(min_gol_rigore)
+                    cronaca.append({
+                        "minuto": min_gol_rigore, 
+                        "squadra": "ospite", 
+                        "tipo": "gol", 
+                        "testo": f"{min_rig_display}' 🎯 {prefisso}[{a}] GOAL SU RIGORE! {marcatore} - Freddissimo dagli undici metri!"
+                    })
+                else:  # 30% niente rigore
+                    cronaca.append({
+                        "minuto": min_gol,
+                        "squadra": "ospite",
+                        "tipo": "VAR_VERDICT",
+                        "decision": "annullato",
+                        "var_type": "rigore_on_field_review",
+                        "testo": f"{min_display}' ❌ VAR: Nessun contatto sufficiente. Si prosegue!"
+                    })
+            
+            else:
+                # ═══════════════════════════════════════════════════
+                # SCENARIO B: ARBITRO FISCHIA SUBITO (poi VAR controlla)
+                # ═══════════════════════════════════════════════════
+                
+                # 1️⃣ FISCHIO RIGORE IMMEDIATO
+                frase_rigore = random.choice([
+                    "CALCIO DI RIGORE! Il direttore di gara indica il dischetto!",
+                    "RIGORE! L'arbitro non ha dubbi e indica il dischetto!",
+                    "PENALTY! Fischio netto, è massima punizione!",
+                    "CALCIO DI RIGORE! L'arbitro indica senza esitazione!"
+                ])
+                
+                cronaca.append({
+                    "minuto": min_gol, 
+                    "squadra": "ospite",
+                    "tipo": "rigore_fischio", 
+                    "testo": f"{min_display}' 📢 {prefisso}[{a}] {frase_rigore}"
+                })
+                
+                # 2️⃣ VAR CHECK (30% probabilità - verifica la decisione)
+                if random.random() < 0.30:
+                    minutirecuperoextra += 2
+                    
+                    # 🆕 VARIANTI PER VERIFICA RIGORE FISCHIATO
+                    frase_var_verifica = random.choice([
+                        "🖥️ VAR: Verifica in corso sulla decisione arbitrale...",
+                        "🖥️ VAR: Check protocollo per confermare la decisione del rigore...",
+                        "🖥️ VAR: La sala VAR sta verificando l'episodio del penalty...",
+                        "🖥️ VAR: Controllo in corso per validare il calcio di rigore assegnato...",
+                        "🖥️ VAR: Il VAR rivede l'azione per confermare la decisione dell'arbitro...",
+                        "🖥️ VAR: Verifica protocollo in corso sul rigore fischiato...",
+                        "🖥️ VAR: Check sulla dinamica del contatto che ha portato al penalty..."
+                    ])
+                    
+                    cronaca.append({
+                        "minuto": min_gol, 
+                        "squadra": "ospite", 
+                        "tipo": "VAR_PROCESS",
+                        "var_type": "rigore",
+                        "testo": f"{min_display}' {frase_var_verifica}"
+                    })
+
+                    
+                    # 3️⃣ SENTENZA (70% confermato, 30% annullato)
+                    if random.random() < 0.30:  # 30% annullato rarissimo
+                        # 🆕 VARIANTI RIGORE ANNULLATO
+                        frase_annullato = random.choice([
+                            "❌ VAR: RIGORE ANNULLATO! Non c'è fallo, simulazione!",
+                            "❌ VAR: RIGORE REVOCATO! Il VAR non rileva alcun contatto irregolare!",
+                            "❌ VAR: PENALTY ANNULLATO! Chiara simulazione del giocatore!",
+                            "❌ VAR: RIGORE TOLTO! Nessun fallo, l'attaccante si è buttato!",
+                            "❌ VAR: DECISIONE RIBALTATA! Non c'è penalty, simulazione evidente!",
+                            "❌ VAR: RIGORE ANNULLATO! Il VAR smentisce l'arbitro, niente fallo!",
+                            "❌ VAR: PENALTY REVOCATO! Contatto troppo leggero, niente rigore!"
                         ])
                         
                         cronaca.append({
-                            "minuto": min_gol, 
-                            "squadra": "ospite", 
-                            "tipo": "VAR_PROCESS",
-                            "var_type": "gol",
-                            "testo": f"{min_display}' {frase_check_gol}"
+                            "minuto": min_gol,
+                            "squadra": "ospite",
+                            "tipo": "VAR_VERDICT",
+                            "decision": "annullato",
+                            "var_type": "rigore",
+                            "testo": f"{min_display}' {frase_annullato}"
                         })
+                    else:  # 70% confermato
+                        # 🆕 VARIANTI RIGORE CONFERMATO
+                        frase_confermato = random.choice([
+                            "✅ VAR: RIGORE CONFERMATO! Decisione corretta.",
+                            "✅ VAR: PENALTY CONFERMATO! Il VAR convalida la decisione arbitrale.",
+                            "✅ VAR: RIGORE VALIDO! Contatto evidente, decisione giusta.",
+                            "✅ VAR: CONFERMATO! L'arbitro aveva visto bene, è rigore!",
+                            "✅ VAR: PENALTY VALIDATO! Nessun dubbio, il rigore c'è.",
+                            "✅ VAR: DECISIONE CORRETTA! Il VAR conferma il calcio di rigore.",
+                            "✅ VAR: RIGORE CONFERMATO! Fallo netto in area, decisione ineccepibile."
+                        ])
                         
-                        # 3️⃣ SENTENZA VAR (70% confermato, 30% annullato)
-                        if random.random() < 0.30:  # 30% annullato
-                            # 🆕 VARIANTI GOL ANNULLATO
-                            frase_gol_annullato = random.choice([
-                                "❌ VAR: GOL ANNULLATO per fuorigioco!",
-                                "❌ VAR: RETE ANNULLATA! Posizione irregolare confermata dal VAR!",
-                                "❌ VAR: GOL CANCELLATO! Fuorigioco millimetrico ma netto!",
-                                "❌ VAR: RETE NON VALIDA! L'attaccante era oltre la linea!",
-                                "❌ VAR: GOL ANNULLATO! Il VAR rileva un fuorigioco nell'azione!",
-                                "❌ VAR: RETE CANCELLATA! Fallo in attacco prima della conclusione!",
-                                "❌ VAR: GOL NON VALIDO! Posizione di fuorigioco confermata!",
-                                "❌ VAR: ANNULLATO! Il VAR boccia la rete per irregolarità!",
-                                "❌ VAR: RETE ANNULLATA! Tocco di mano prima del gol!"
-                            ])
-                            
-                            cronaca.append({
-                                "minuto": min_gol,
-                                "squadra": "ospite",
-                                "tipo": "VAR_VERDICT",
-                                "decision": "annullato",
-                                "var_type": "gol",
-                                "testo": f"{min_display}' {frase_gol_annullato}"
-                            })
-                        else:  # 70% confermato
-                            # 🆕 VARIANTI GOL CONFERMATO
-                            frase_gol_valido = random.choice([
-                                "✅ VAR: GOL CONFERMATO!",
-                                "✅ VAR: RETE VALIDA! Posizione regolare!",
-                                "✅ VAR: GOL CONVALIDATO! Tutto regolare!",
-                                "✅ VAR: CONFERMATO! La rete è valida!",
-                                "✅ VAR: GOL BUONO! Nessun fuorigioco!",
-                                "✅ VAR: RETE VALIDATA! Azione regolare!",
-                                "✅ VAR: GOL VALIDO! Il VAR conferma la decisione!",
-                                "✅ VAR: CONVALIDATO! Nessuna irregolarità, il gol vale!",
-                                "✅ VAR: TUTTO REGOLARE! La rete è buona!"
-                            ])
-                            
-                            cronaca.append({
-                                "minuto": min_gol,
-                                "squadra": "ospite",
-                                "tipo": "VAR_VERDICT",
-                                "decision": "confermato",
-                                "var_type": "gol",
-                                "testo": f"{min_display}' {frase_gol_valido}"
-                            })
+                        cronaca.append({
+                            "minuto": min_gol,
+                            "squadra": "ospite",
+                            "tipo": "VAR_VERDICT",
+                            "decision": "confermato",
+                            "var_type": "rigore",
+                            "testo": f"{min_display}' {frase_confermato}"
+                        })
+
+                        
+                        # 4️⃣ GOL SU RIGORE
+                        min_gol_rigore = min_gol + 1
+                        if min_gol_rigore in minuti_usati:
+                            min_gol_rigore = trova_minuto_libero(minuti_usati, (min_gol + 1, min_gol + 3), allow_recupero=True)
+                        minuti_usati.add(min_gol_rigore)
+                        min_rig_display = format_minuto(min_gol_rigore)
+                        cronaca.append({
+                            "minuto": min_gol_rigore, 
+                            "squadra": "ospite", 
+                            "tipo": "gol", 
+                            "testo": f"{min_rig_display}' 🎯 {prefisso}[{a}] GOAL SU RIGORE! {marcatore} - Freddissimo dagli undici metri!"
+                        })
+                else:
+                    # Nessun VAR: gol diretto
+                    min_gol_rigore = min_gol + 1
+                    if min_gol_rigore in minuti_usati:
+                        min_gol_rigore = trova_minuto_libero(minuti_usati, (min_gol + 1, min_gol + 3), allow_recupero=True)
+                    minuti_usati.add(min_gol_rigore)
+                    min_rig_display = format_minuto(min_gol_rigore)
+                    cronaca.append({
+                        "minuto": min_gol_rigore, 
+                        "squadra": "ospite", 
+                        "tipo": "gol", 
+                        "testo": f"{min_rig_display}' 🎯 {prefisso}[{a}] GOAL SU RIGORE! {marcatore} - Freddissimo dagli undici metri!"
+                    })
+        
+        else:
+            # GOL DA AZIONE
+            # 1️⃣ PRIMA: IL GOL
+            tipo_gol = rand(["Conclusione potente!", "Di testa su cross!", "Azione corale!", "Tap-in vincente!"])
+            cronaca.append({
+                "minuto": min_gol, 
+                "squadra": "ospite", 
+                "tipo": "gol", 
+                "testo": f"{min_display}' ⚽ {prefisso}[{a}] GOOOL! {marcatore} - {tipo_gol}"
+            })
+            
+            # 2️⃣ POI: VAR CHECK (50% probabilità)
+            if random.random() < 0.50:
+                minuti_recupero_extra += 2
+                
+                # 🆕 VARIANTI CHECK GOL
+                frase_check_gol = random.choice([
+                    "🖥️ VAR: Controllo in corso per possibile fuorigioco...",
+                    "🖥️ VAR: Check protocollo sul gol! Possibile posizione irregolare...",
+                    "🖥️ VAR: Verifica in corso sulla validità della rete...",
+                    "🖥️ VAR: La sala VAR sta controllando la posizione degli attaccanti...",
+                    "🖥️ VAR: Controllo per possibile fallo in attacco prima del gol...",
+                    "🖥️ VAR: Check sulla dinamica dell'azione! Possibile fuorigioco...",
+                    "🖥️ VAR: Verifica della posizione! Il gol potrebbe essere annullato...",
+                    "🖥️ VAR: Controllo millimetrico sulla linea del fuorigioco...",
+                    "🖥️ VAR: La sala VAR rivede l'azione per verificare la regolarità della rete..."
+                ])
+                
+                cronaca.append({
+                    "minuto": min_gol, 
+                    "squadra": "ospite", 
+                    "tipo": "VAR_PROCESS",
+                    "var_type": "gol",
+                    "testo": f"{min_display}' {frase_check_gol}"
+                })
+                
+                # 3️⃣ SENTENZA VAR (70% confermato, 30% annullato)
+                if random.random() < 0.30:  # 30% annullato
+                    # 🆕 VARIANTI GOL ANNULLATO
+                    frase_gol_annullato = random.choice([
+                        "❌ VAR: GOL ANNULLATO per fuorigioco!",
+                        "❌ VAR: RETE ANNULLATA! Posizione irregolare confermata dal VAR!",
+                        "❌ VAR: GOL CANCELLATO! Fuorigioco millimetrico ma netto!",
+                        "❌ VAR: RETE NON VALIDA! L'attaccante era oltre la linea!",
+                        "❌ VAR: GOL ANNULLATO! Il VAR rileva un fuorigioco nell'azione!",
+                        "❌ VAR: RETE CANCELLATA! Fallo in attacco prima della conclusione!",
+                        "❌ VAR: GOL NON VALIDO! Posizione di fuorigioco confermata!",
+                        "❌ VAR: ANNULLATO! Il VAR boccia la rete per irregolarità!",
+                        "❌ VAR: RETE ANNULLATA! Tocco di mano prima del gol!"
+                    ])
+                    
+                    cronaca.append({
+                        "minuto": min_gol,
+                        "squadra": "ospite",
+                        "tipo": "VAR_VERDICT",
+                        "decision": "annullato",
+                        "var_type": "gol",
+                        "testo": f"{min_display}' {frase_gol_annullato}"
+                    })
+                else:  # 70% confermato
+                    # 🆕 VARIANTI GOL CONFERMATO
+                    frase_gol_valido = random.choice([
+                        "✅ VAR: GOL CONFERMATO!",
+                        "✅ VAR: RETE VALIDA! Posizione regolare!",
+                        "✅ VAR: GOL CONVALIDATO! Tutto regolare!",
+                        "✅ VAR: CONFERMATO! La rete è valida!",
+                        "✅ VAR: GOL BUONO! Nessun fuorigioco!",
+                        "✅ VAR: RETE VALIDATA! Azione regolare!",
+                        "✅ VAR: GOL VALIDO! Il VAR conferma la decisione!",
+                        "✅ VAR: CONVALIDATO! Nessuna irregolarità, il gol vale!",
+                        "✅ VAR: TUTTO REGOLARE! La rete è buona!"
+                    ])
+                    
+                    cronaca.append({
+                        "minuto": min_gol,
+                        "squadra": "ospite",
+                        "tipo": "VAR_VERDICT",
+                        "decision": "confermato",
+                        "var_type": "gol",
+                        "testo": f"{min_display}' {frase_gol_valido}"
+                    })
 
 
             
