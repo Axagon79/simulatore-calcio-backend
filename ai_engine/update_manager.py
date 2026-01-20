@@ -32,56 +32,54 @@ CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 SCRAPER_SEQUENCE = [
     
       # ( FA AGGIORNAMENTO STAGIONALE MEDIE GOL CAMPIONATI )
-      ("aggiorna_media_gol_partita_tutti_campionati.py", "📊 [0/13] Media Gol Partita (Campionati)", "Mancano media gol per campionato", FREQUENT_DIR),
+    #   ("aggiorna_media_gol_partita_tutti_campionati.py", "📊 [0/13] Media Gol Partita (Campionati)", "Mancano media gol per campionato", FREQUENT_DIR),
       
-      ("scraper_results_fbref.py", "📊 [1/13] Risultati & xG (FBref)", "Mancano risultati recenti e xG", FREQUENT_DIR),
+    #   ("scraper_results_fbref.py", "📊 [1/13] Risultati & xG (FBref)", "Mancano risultati recenti e xG", FREQUENT_DIR),
       
-      ("scrape_lucifero_betexplorer_safe.py", "🔥 [2/13] Affidabilità squadre (BetExplorer)", "Affidabilità assente", FREQUENT_DIR),
+    #   ("scrape_lucifero_betexplorer_safe.py", "🔥 [2/13] Affidabilità squadre (BetExplorer)", "Affidabilità assente", FREQUENT_DIR),
       
-    # ("scraper_quote_storiche_betexplorer.py", "💰 [3/13] Quote Storiche", "Calcolo Affidabilità/BVS impossibile", FREQUENT_DIR),
-      ("scraper_soccerstats_ranking_unified.py", "🏆 [4/13] Classifica & Gol", "Calcolo Forza Attacco/Difesa sballato", FREQUENT_DIR),
+   
+    #   ("scraper_soccerstats_ranking_unified.py", "🏆 [4/13] Classifica & Gol", "Calcolo Forza Attacco/Difesa sballato", FREQUENT_DIR),
     
-      ("fbref_scraper_att.py", "⚽ [5/13] Stats Attaccanti", "Analisi attacco imprecisa", FREQUENT_DIR),
+    #   ("fbref_scraper_att.py", "⚽ [5/13] Stats Attaccanti", "Analisi attacco imprecisa", FREQUENT_DIR),
       ("fbref_scraper_mid.py", "🧠 [6/13] Stats Centrocampisti", "Analisi centrocampo imprecisa", FREQUENT_DIR),
       ("fbref_scraper_def.py", "🛡️ [7/13] Stats Difensori", "Analisi difesa imprecisa", FREQUENT_DIR),
       ("scraper_gk_fbref.py", "🧤 [8/13] Stats Portieri", "Analisi portieri imprecisa", FREQUENT_DIR),
     
-      ("scraper_tm_multi_campionato.py", "🚑 [9/13] Infortuni (TM)", "Si rischia di puntare su assenti", FREQUENT_DIR),
-      ("scraper_calendario_h2h_TF_completo.py", "📅 [10/13] Calendario H2H", "Analisi scontri diretti incompleta", FREQUENT_DIR),
+    #   ("scraper_tm_multi_campionato.py", "🚑 [9/13] Infortuni (TM)", "Si rischia di puntare su assenti", FREQUENT_DIR),
+    #   ("scraper_calendario_h2h_TF_completo.py", "📅 [10/13] Calendario H2H", "Analisi scontri diretti incompleta", FREQUENT_DIR),
     
-      # ⭐ Questo sta nella cartella calculators
-      ("calculate_h2h_v2.py", "🧠 [11/13] Elaborazione H2H Pro", "Mancano medie gol e punteggi storici", CALCULATORS_DIR),
+    #   # ⭐ Questo sta nella cartella calculators
+    #   ("calculate_h2h_v2.py", "🧠 [11/13] Elaborazione H2H Pro", "Mancano medie gol e punteggi storici", CALCULATORS_DIR),
     
-    # ("scraper_fixtures.py", "📆 [12/13] Partite Future", "Il motore non saprà cosa simulare", FREQUENT_DIR),
-    
-    # ("scraper_odds_oddsmath.py", "💎 [13/13] Quote Future", "Manca confronto con bookmaker", FREQUENT_DIR), 
+ 
       
-      # ⭐ NUOVO SCRIPT AGGIUNTO QUI ALLA FINE NELLA CARTELLA FREQUENTI
-      ("nowgoal_scraper.py", "🚀 [14/14] Quote H2H Arricchite (NowGoal)", "Mancano le quote precise nel CSV", FREQUENT_DIR),
+    #   # ⭐ NUOVO SCRIPT AGGIUNTO QUI ALLA FINE NELLA CARTELLA FREQUENTI
+    #   ("nowgoal_scraper.py", "🚀 [14/14] Quote H2H Arricchite (NowGoal)", "Mancano le quote precise nel CSV", FREQUENT_DIR),
       
-      # ⭐ NUOVO SCRIPT DI DEBUG PER FIX MATCHING QUOTE NOWGOAL
-      ("debug_nowgoal_scraper.py", "🚀 [14/14] Fix Quote H2H Debug (NowGoal)", "Mancano le quote precise nel CSV", FREQUENT_DIR),
+    #   # ⭐ NUOVO SCRIPT DI DEBUG PER FIX MATCHING QUOTE NOWGOAL
+    #   ("debug_nowgoal_scraper.py", "🚀 [14/14] Fix Quote H2H Debug (NowGoal)", "Mancano le quote precise nel CSV", FREQUENT_DIR),
       
-      # NUOVO SCRIPT DI DEBUG PER AGGIORNARE SOLO IL LUCIFERO
-      ("cron_update_lucifero.py", "🔥 [15/15] Aggiorna Solo Lucifero (Debug)", "Aggiorna solo il punteggio Lucifero", FREQUENT_DIR),
+    #   # NUOVO SCRIPT DI DEBUG PER AGGIORNARE SOLO IL LUCIFERO
+    #   ("cron_update_lucifero.py", "🔥 [15/15] Aggiorna Solo Lucifero (Debug)", "Aggiorna solo il punteggio Lucifero", FREQUENT_DIR),
       
-      # NUOVO SCRIPT DI DEBUG PER AGGIORNARE SOLO IL BVS
-      ("db_updater_bvs.py", "💎 [16/16] Aggiorna Solo BVS (Debug)", "Aggiorna solo il punteggio BVS", FREQUENT_DIR),
+    #   # NUOVO SCRIPT DI DEBUG PER AGGIORNARE SOLO IL BVS
+    #   ("db_updater_bvs.py", "💎 [16/16] Aggiorna Solo BVS (Debug)", "Aggiorna solo il punteggio BVS", FREQUENT_DIR),
       
-      # NUOVO SCRIPT DI DEBUG PER AGGIORNARE SOLO LE CLASSIFICHE
-      ("scraper_classifiche_standings.py", "🏆 [18/18] Aggiorna Solo Classifiche (Debug)", "Aggiorna solo le classifiche", FREQUENT_DIR),
+    #   # NUOVO SCRIPT DI DEBUG PER AGGIORNARE SOLO LE CLASSIFICHE
+    #   ("scraper_classifiche_standings.py", "🏆 [18/18] Aggiorna Solo Classifiche (Debug)", "Aggiorna solo le classifiche", FREQUENT_DIR),
       
-      # NUOVO SCRIPT DI DEBUG PER AGGIORNARE IL DNA System (ATT/DEF/TEC/VAL) e le FORMAZIONI
-      ("run_all_injectors.py", "🎩 [17/17] Aggiorna DNA System Completo (Debug)", "Aggiorna ATT/DEF/TEC/VAL e FORMAZIONI", FREQUENT_DIR),
+    #   # NUOVO SCRIPT DI DEBUG PER AGGIORNARE IL DNA System (ATT/DEF/TEC/VAL) e le FORMAZIONI
+    #   ("run_all_injectors.py", "🎩 [17/17] Aggiorna DNA System Completo (Debug)", "Aggiorna ATT/DEF/TEC/VAL e FORMAZIONI", FREQUENT_DIR),
       
-      # NUOVO SCRIPT DI DEBUG PER AGGIORNARE IL FATT. CAMPO
-      ("update_fattore_campo.py", "🏟️ [18/18] Aggiorna Fattore Campo (Debug)", "Aggiorna il fattore campo per tutte le partite", FREQUENT_DIR),
+    #   # NUOVO SCRIPT DI DEBUG PER AGGIORNARE IL FATT. CAMPO
+    #   ("update_fattore_campo.py", "🏟️ [18/18] Aggiorna Fattore Campo (Debug)", "Aggiorna il fattore campo per tutte le partite", FREQUENT_DIR),
       
-      # NUOVO SCRIPT DI DEBUG PER AGGIORNARE L'AFFIDABILITÀ
-      ("update_affidabilità.py", "🔥 [19/19] Aggiorna Affidabilità (Debug)", "Aggiorna l'affidabilità delle squadre", FREQUENT_DIR),
+    #   # NUOVO SCRIPT DI DEBUG PER AGGIORNARE L'AFFIDABILITÀ
+    #   ("update_affidabilità.py", "🔥 [19/19] Aggiorna Affidabilità (Debug)", "Aggiorna l'affidabilità delle squadre", FREQUENT_DIR),
       
-      # ⭐ NUOVO SCRIPT DI DEBUG PER AGGIORNARE SOLO I RISULTATI
-      ("per_agg_pianificato_update_results_only.py", "🔄 [20/20] Aggiorna Solo Risultati (Debug)", "Aggiorna solo i risultati senza toccare altro", FREQUENT_DIR),
+    #   # ⭐ NUOVO SCRIPT DI DEBUG PER AGGIORNARE SOLO I RISULTATI
+    #   ("per_agg_pianificato_update_results_only.py", "🔄 [20/20] Aggiorna Solo Risultati (Debug)", "Aggiorna solo i risultati senza toccare altro", FREQUENT_DIR),
 ]
 
 
@@ -108,10 +106,21 @@ def run_single_script(filename, description, folder_path):
         env["PYTHONIOENCODING"] = "utf-8"
         # ----------------------------
 
+        # Costruzione del comando base
+        cmd = [sys.executable, full_path]
+        
+        # SBLOCCO AUTOMATICO: Se è il calcolatore H2H, passiamo "all" per saltare il menu
+        if filename == "calculate_h2h_v2.py":
+            cmd.append("all")
+
         # Esecuzione script
         subprocess.run(
-            [sys.executable, full_path], 
-            check=True, capture_output=False, text=True, encoding='utf-8', errors='replace',
+            cmd, 
+            check=True, 
+            capture_output=False, 
+            text=True, 
+            encoding='utf-8', 
+            errors='replace',
             env=env
         )
         

@@ -1,4 +1,13 @@
-# test_match_h2h.py
+import sys
+import os
+
+# --- CONFIGURAZIONE PERCORSI ---
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+grandparent_dir = os.path.dirname(parent_dir)
+sys.path.insert(0, grandparent_dir) 
+sys.path.insert(0, parent_dir)
+sys.path.insert(0, current_dir)
 from config import db
 
 # Cerca ESATTAMENTE Genoa vs Inter

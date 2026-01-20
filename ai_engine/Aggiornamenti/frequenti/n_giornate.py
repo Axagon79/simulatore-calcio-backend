@@ -1,47 +1,37 @@
 import os
 import sys
+from dotenv import load_dotenv
 
-# Trova config.py
-currentpath = os.path.dirname(os.path.abspath(__file__))
-while not os.path.exists(os.path.join(currentpath, 'config.py')):
-    parent = os.path.dirname(currentpath)
-    if parent == currentpath:
-        raise FileNotFoundError("Impossibile trovare config.py!")
-    currentpath = parent
-sys.path.append(currentpath)
+# Fix percorsi
+current_path = os.path.dirname(os.path.abspath(__file__))
+while not os.path.exists(os.path.join(current_path, 'config.py')):
+    parent = os.path.dirname(current_path)
+    if parent == current_path: break
+    current_path = parent
+sys.path.append(current_path)
 
 from config import db
 
-# Collezione h2h_by_round
-col = db['h2h_by_round']
+def trova_squadre_rotte():
+    print("🔍 Cerco squadre senza campo 'league'...")
+    count = 0
+    # Cerca documenti dove 'league' non esiste o è null o è stringa vuota
+    cursor = db.teams.find({
+        "$or": [
+            {"league": {"$exists": False}},
+            {"league": None},
+            {"league": ""}
+        ]
+    })
+    
+    for team in cursor:
+        print(f"❌ Squadra corrotta: {team.get('name')} (ID: {team.get('_id')})")
+        count += 1
+        
+    if count == 0:
+        print("✅ Nessuna squadra corrotta trovata.")
+    else:
+        print(f"⚠️ Trovate {count} squadre senza lega. Eliminale o correggile nel DB.")
 
-# Trova tutti i documenti del Brasileirão senza campo country
-query = {
-    "league": "Brasileirão Serie A",
-    "country": {"$exists": False}
-}
-
-# Conta documenti da aggiornare
-count = col.count_documents(query)
-print(f"Documenti trovati senza campo 'country': {count}")
-
-if count > 0:
-    # Aggiorna aggiungendo il campo country
-    result = col.update_many(
-        query,
-        {"$set": {"country": "Brazil"}}
-    )
-
-    print(f"✓ Aggiornati {result.modified_count} documenti")
-    print(f"  - League: Brasileirão Serie A")
-    print(f"  - Country aggiunto: Brazil")
-
-    # Verifica
-    verify = col.count_documents({"league": "Brasileirão Serie A", "country": "Brazil"})
-    print(f"\n✓ Verifica: {verify} documenti ora hanno country='Brazil'")
-else:
-    print("Nessun documento da aggiornare (tutti hanno già il campo country)")
-
-print("\n" + "="*60)
-print("COMPLETATO - Riavvia il web simulator per vedere Brazil nel menu")
-print("="*60)
+if __name__ == "__main__":
+    trova_squadre_rotte()

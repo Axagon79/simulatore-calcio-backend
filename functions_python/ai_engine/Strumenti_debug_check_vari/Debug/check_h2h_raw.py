@@ -1,6 +1,15 @@
-# test_h2h_genoa_inter.py
+
+import sys
+import os
+# --- CONFIGURAZIONE PERCORSI ---
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+grandparent_dir = os.path.dirname(parent_dir)
+sys.path.insert(0, grandparent_dir) 
+sys.path.insert(0, parent_dir)
+sys.path.insert(0, current_dir)
 from config import db
-from ai_engine.calculators.calculate_h2h_v2 import get_h2h_score_v2
+from calculators.calculate_h2h_v2 import get_h2h_score_v2
 
 # ID reali da db.teams
 genoa_id = "69242272d4d47773ce4edbda"

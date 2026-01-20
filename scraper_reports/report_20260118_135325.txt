@@ -1,0 +1,288 @@
+================================================================================
+REPORT SCRAPER QUOTE CALCIO
+================================================================================
+
+Data: 2026-01-18 13:49:23
+Partite totali: 637
+Partite aggiornate: 447
+Successo: 70.2%
+
+================================================================================
+🚨 SQUADRE CON PROBLEMI DI MATCHING
+================================================================================
+
+Totale squadre uniche con problemi: 46
+
+❌ São Paulo (1 partite mancanti)
+   Alias usati: paulo, são paulo, sao paulo
+
+❌ Sport Recife (1 partite mancanti)
+   Alias usati: sport, recife, sport recife
+
+❌ Cruzeiro (1 partite mancanti)
+   Alias usati: cruzeiro, juventude
+
+❌ Mirassol-SP (1 partite mancanti)
+   Alias usati: mirassol-sp, mirassol
+
+❌ Grêmio (1 partite mancanti)
+   Alias usati: gremio, grêmio
+
+❌ Atlético-MG (1 partite mancanti)
+   Alias usati: atlético-mg, atlético mineiro, madrid-mg, atletico mg, atletico madrid-mg
+
+❌ Fortaleza (1 partite mancanti)
+   Alias usati: fortaleza
+
+❌ Fluminense (1 partite mancanti)
+   Alias usati: fluminense
+
+❌ Juventude (1 partite mancanti)
+   Alias usati: juventude
+
+❌ EC Vitória (1 partite mancanti)
+   Alias usati: ec vitoria, vitória, vitoria, ec vitória
+
+❌ Flamengo (1 partite mancanti)
+   Alias usati: flamengo
+
+❌ Internacional (1 partite mancanti)
+   Alias usati: internacional
+
+❌ Palmeiras (1 partite mancanti)
+   Alias usati: palmeiras
+
+❌ Botafogo (1 partite mancanti)
+   Alias usati: botafogo (rj), botafogo
+
+❌ Vasco da Gama (1 partite mancanti)
+   Alias usati: vasco, vasco da gama, gama
+
+❌ Santos (1 partite mancanti)
+   Alias usati: santos
+
+❌ RB Bragantino (1 partite mancanti)
+   Alias usati: rb bragantino, bragantino
+
+❌ Ceará SC (1 partite mancanti)
+   Alias usati: ceará sc, ceara, ceara sc, ceará
+
+❌ New York (1 partite mancanti)
+   Alias usati: new york red bulls, york, new york, new york rb, ny red bulls
+
+❌ New England (1 partite mancanti)
+   Alias usati: england, new england, ne revolution, new england revolution
+
+❌ Chicago (1 partite mancanti)
+   Alias usati: chicago, chicago fire
+
+❌ Montréal (1 partite mancanti)
+   Alias usati: cf montreal, montreal, montréal
+
+❌ Minnesota (1 partite mancanti)
+   Alias usati: minnesota, minnesota utd, minnesota united fc
+
+❌ Cincinnati (1 partite mancanti)
+   Alias usati: fc cincinnati, cincinnati
+
+❌ Colorado (1 partite mancanti)
+   Alias usati: colorado, colorado rapids
+
+❌ Portland (1 partite mancanti)
+   Alias usati: portland, portland timbers
+
+❌ Orlando (1 partite mancanti)
+   Alias usati: orlando city, orlando
+
+❌ Miami (1 partite mancanti)
+   Alias usati: inter miami cf, inter miami, miami
+
+❌ SJ Earthquakes (1 partite mancanti)
+   Alias usati: earthquakes, sj earthquakes, san jose earthquakes
+
+❌ Atlanta (1 partite mancanti)
+   Alias usati: atlanta, atlanta utd, atlanta united
+
+❌ Salt Lake (1 partite mancanti)
+   Alias usati: salt, real salt lake, lake, salt lake
+
+❌ Seattle (1 partite mancanti)
+   Alias usati: seattle sounders, seattle
+
+❌ Dallas (1 partite mancanti)
+   Alias usati: fc dallas, dallas
+
+❌ Nashville (1 partite mancanti)
+   Alias usati: nashville
+
+❌ Houston (1 partite mancanti)
+   Alias usati: houston, houston dynamo
+
+❌ LAFC (1 partite mancanti)
+   Alias usati: la fc, lafc, los angeles, la, los angeles fc
+
+❌ Kansas City (1 partite mancanti)
+   Alias usati: sporting kansas, city, kansas city, sporting kc, kansas
+
+❌ Columbus (1 partite mancanti)
+   Alias usati: columbus, columbus crew
+
+❌ San Diego (1 partite mancanti)
+   Alias usati: san diego fc, diego, san diego
+
+❌ St. Louis CITY (1 partite mancanti)
+   Alias usati: louis, city, st. louis city, st. louis
+
+❌ Vancouver (1 partite mancanti)
+   Alias usati: vancouver whitecaps, vancouver, vancouver w'caps
+
+❌ Toronto (1 partite mancanti)
+   Alias usati: toronto, toronto fc
+
+❌ LA Galaxy (1 partite mancanti)
+   Alias usati: galaxy, los angeles galaxy, la galaxy
+
+❌ Charlotte (1 partite mancanti)
+   Alias usati: charlotte, charlotte fc
+
+❌ Philadelphia (1 partite mancanti)
+   Alias usati: philadelphia union, philadelphia
+
+❌ New York City (1 partite mancanti)
+   Alias usati: new york city fc, york, city, new york, new york city
+
+
+💡 SUGGERIMENTI:
+1. Vai sul sito NowGoal e cerca queste squadre
+2. Annota il nome ESATTO usato sul sito
+3. Aggiungi il nome del sito come alias nel database
+4. Se il nome è molto diverso, aggiorna normalize_name()
+
+================================================================================
+DETTAGLIO PARTITE NON TROVATE
+================================================================================
+
+
+SOLO_CASA_TROVATA (2 partite)
+--------------------------------------------------------------------------------
+  • São Paulo vs Sport Recife
+    Lega: Brasileirão Serie A - Giornata: 1
+
+    📄 RIGA SUL SITO:
+    1 28-01
+22:00 Sao Paulo - Flamengo
+3.60 3.25 2.00
+    💡 Cerca 'Sport Recife' in questa riga per vedere come si chiama sul sito
+    ⚠️ Casa trovata in altre righe
+
+  • RB Bragantino vs Ceará SC
+    Lega: Brasileirão Serie A - Giornata: 1
+
+    📄 RIGA SUL SITO:
+    1 28-01
+22:00 Coritiba PR - Bragantino
+2.25 3.10 3.20
+    💡 Cerca 'Ceará SC' in questa riga per vedere come si chiama sul sito
+    ⚠️ Casa trovata in altre righe
+
+
+SQUADRE_IN_RIGHE_DIVERSE (19 partite)
+--------------------------------------------------------------------------------
+  • Cruzeiro vs Mirassol-SP
+    Lega: Brasileirão Serie A - Giornata: 1
+
+  • Grêmio vs Atlético-MG
+    Lega: Brasileirão Serie A - Giornata: 1
+
+  • Flamengo vs Internacional
+    Lega: Brasileirão Serie A - Giornata: 1
+
+  • Palmeiras vs Botafogo
+    Lega: Brasileirão Serie A - Giornata: 1
+
+  • Vasco da Gama vs Santos
+    Lega: Brasileirão Serie A - Giornata: 1
+
+  • New York vs New England
+    Lega: Major League Soccer - Giornata: 2
+
+  • Chicago vs Montréal
+    Lega: Major League Soccer - Giornata: 2
+
+  • Minnesota vs Cincinnati
+    Lega: Major League Soccer - Giornata: 2
+
+  • Colorado vs Portland
+    Lega: Major League Soccer - Giornata: 2
+
+  • Orlando vs Miami
+    Lega: Major League Soccer - Giornata: 2
+
+  ... e altre 9 partite
+
+SOLO_TRASFERTA_TROVATA (2 partite)
+--------------------------------------------------------------------------------
+  • Fortaleza vs Fluminense
+    Lega: Brasileirão Serie A - Giornata: 1
+
+    📄 RIGA SUL SITO:
+    1 28-01
+22:00 Fluminense RJ - Gremio (RS)
+1.70 3.50 4.75
+    💡 Cerca 'Fortaleza' in questa riga per vedere come si chiama sul sito
+    ⚠️ Trasferta trovata in altre righe
+
+  • Juventude vs EC Vitória
+    Lega: Brasileirão Serie A - Giornata: 1
+
+    📄 RIGA SUL SITO:
+    1 28-01
+22:00 Vitoria BA - Remo Belem (PA)
+1.80 3.40 4.50
+    💡 Cerca 'Juventude' in questa riga per vedere come si chiama sul sito
+    ⚠️ Trasferta trovata in altre righe
+
+
+
+================================================================================
+ℹ️ PARTITE TROVATE MA SENZA QUOTE (NORMALE)
+================================================================================
+
+Totale: 167 partite
+Queste partite sono sul sito ma le quote non sono ancora pubblicate.
+Riprova più tardi, specialmente vicino alla data della partita.
+
+
+Serie B: 10 partite
+
+Serie C - Girone A: 10 partite
+
+Serie C - Girone B: 9 partite
+
+Serie C - Girone C: 10 partite
+
+Eredivisie: 1 partite
+
+Liga Portugal: 9 partite
+
+LaLiga 2: 11 partite
+
+2. Bundesliga: 9 partite
+
+Ligue 2: 2 partite
+
+Allsvenskan: 16 partite
+
+Eliteserien: 16 partite
+
+Superligaen: 6 partite
+
+Jupiler Pro League: 8 partite
+
+Süper Lig: 9 partite
+
+League of Ireland Premier Division: 10 partite
+
+Primera División: 15 partite
+
+Major League Soccer: 16 partite

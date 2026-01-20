@@ -7,6 +7,10 @@ from tqdm import tqdm
 import sys
 import os
 import re
+from colorama import Fore, Style, init
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+init(autoreset=True)
 
 # --- FIX PERCORSI UNIVERSALE ---
 current_path = os.path.dirname(os.path.abspath(__file__))
@@ -23,286 +27,151 @@ HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
 }
 
+# --- CACHE GLOBALE TEAM ---
+print(f"{Fore.YELLOW}🧠 Caricamento cache squadre...")
+all_teams = list(db.teams.find())
+TEAM_CACHE_BY_ID = {t.get("transfermarkt_id"): t for t in all_teams if t.get("transfermarkt_id")}
+TEAM_CACHE_BY_NAME = {t.get("name").lower(): t for t in all_teams}
+
+for t in all_teams:
+    for field in ["aliases_transfermarkt", "aliases"]:
+        val = t.get(field, [])
+        if isinstance(val, list):
+            for a in val: TEAM_CACHE_BY_NAME[a.lower()] = t
+        elif isinstance(val, str):
+            TEAM_CACHE_BY_NAME[val.lower()] = t
+
 def extract_team_and_pos(td_element):
-    """Estrae nome e posizione (es. '(20.) Triestina' -> 'Triestina', 20)."""
     if not td_element: return None, None
     text_full = td_element.get_text(strip=True)
     pos = None
     match = re.search(r'\((\d+)\.\)', text_full)
-    if match:
-        pos = int(match.group(1))
+    if match: pos = int(match.group(1))
     link = td_element.find("a")
     name = link.get_text(strip=True) if link else text_full
-    if match:
-        name = name.replace(match.group(0), "").strip()
+    if match: name = name.replace(match.group(0), "").strip()
     return name, pos
 
-def find_team_smart(name):
-    """Cerca una squadra nel DB in modo intelligente."""
-    t = db.teams.find_one({"name": name})
-    if t: return t
-    t = db.teams.find_one({"aliases_transfermarkt": name})
-    if t: return t
-    t = db.teams.find_one({"aliases": name})
-    if t: return t
-    t = db.teams.find_one({"aliases_transfermarkt": {"$regex": f"^{name}$", "$options": "i"}})
-    if t: return t
-    t = db.teams.find_one({"name": {"$regex": name, "$options": "i"}})
-    if t: return t
-    return None
+def find_team_optimized(tm_id, name):
+    if tm_id and int(tm_id) in TEAM_CACHE_BY_ID: return TEAM_CACHE_BY_ID[int(tm_id)]
+    return TEAM_CACHE_BY_NAME.get(name.lower() if name else "")
 
-def download_and_save_h2h(home_name, away_name):
-    """Scarica lo storico e salva in raw_h2h_data_v2."""
-    home_team = find_team_smart(home_name)
-    away_team = find_team_smart(away_name)
+def download_and_save_h2h(match_data):
+    """Unità di lavoro per ThreadPoolExecutor"""
+    home_id = match_data.get("home_tm_id")
+    away_id = match_data.get("away_tm_id")
+    home_team = find_team_optimized(home_id, match_data.get("home"))
+    away_team = find_team_optimized(away_id, match_data.get("away"))
+
+    if not home_team or not away_team: return False
     
-    if not home_team: return False, f"Squadra HOME non trovata: {home_name}"
-    if not away_team: return False, f"Squadra AWAY non trovata: {away_name}"
+    id_h, id_a = home_team["transfermarkt_id"], away_team["transfermarkt_id"]
+    slug_h = home_team["transfermarkt_slug"]
     
-    id_home = home_team.get("transfermarkt_id")
-    slug_home = home_team.get("transfermarkt_slug")
-    id_away = away_team.get("transfermarkt_id")
-    
-    if not id_home or not id_away: return False, "ID mancante"
-    
-    url = (
-        f"https://www.transfermarkt.it/{slug_home}/bilanzdetail/verein/{id_home}"
-        f"/saison_id/0/wettbewerb_id//datum_von/0000-00-00/datum_bis/0000-00-00"
-        f"/gegner_id/{id_away}/day/0/plus/1"
-    )
+    url = f"https://www.transfermarkt.it/{slug_h}/bilanzdetail/verein/{id_h}/saison_id/0/wettbewerb_id//datum_von/0000-00-00/datum_bis/0000-00-00/gegner_id/{id_a}/day/0/plus/1"
     
     try:
-        time.sleep(random.uniform(3, 6))
-        resp = requests.get(url, headers=HEADERS, timeout=60)
-        if resp.status_code != 200: return False, f"HTTP {resp.status_code}"
+        # Pausa tra i thread per simulare comportamento umano
+        time.sleep(random.uniform(1.2, 2.5)) 
+        resp = requests.get(url, headers=HEADERS, timeout=25)
+        if resp.status_code != 200: return False
         
         soup = BeautifulSoup(resp.content, "html.parser")
         table = soup.find("table", class_="items")
-        if not table: return False, "Tabella non trovata"
+        if not table: return False
         
-        rows = table.find_all("tr", class_=["odd", "even"])
         matches_history = []
-        
-        for row in rows:
+        for row in table.find_all("tr", class_=["odd", "even"]):
             cols = row.find_all("td")
             if len(cols) < 12: continue
+            score = cols[9].get_text(strip=True)
+            h_n, h_p = extract_team_and_pos(cols[7])
+            a_n, a_p = extract_team_and_pos(cols[11])
             
-            date_text = cols[5].get_text(strip=True)
-            score_text = cols[9].get_text(strip=True)
-            home_name_scraped, home_pos = extract_team_and_pos(cols[7])
-            away_name_scraped, away_pos = extract_team_and_pos(cols[11])
-            
-            winner = "-"
-            final_score_str = score_text
-            
-            if ":" in score_text and score_text != "-:-":
+            winner = "Draw"
+            if ":" in score and score != "-:-":
                 try:
-                    parts = score_text.split(":")
-                    score_home = int(parts[0])
-                    score_away = int(parts[1])
-                    final_score_str = f"{score_home}:{score_away}"
-                    
-                    if score_home > score_away:
-                        winner = home_name_scraped
-                    elif score_away > score_home:
-                        winner = away_name_scraped
-                    else:
-                        winner = "Draw"
-                except:
-                    pass
-            
+                    s1, s2 = map(int, score.split(":"))
+                    if s1 > s2: winner = h_n
+                    elif s2 > s1: winner = a_n
+                except: pass
+
             matches_history.append({
-                "date": date_text,
-                "score": final_score_str,
-                "competition": "Unknown",
-                "winner": winner,
-                "home_team": home_name_scraped,
-                "away_team": away_name_scraped,
-                "home_pos": home_pos,
-                "away_pos": away_pos
+                "date": cols[5].get_text(strip=True), "score": score,
+                "winner": winner, "home_team": h_n, "away_team": a_n,
+                "home_pos": h_p, "away_pos": a_p
             })
-        
-        doc_id = f"{home_team['name']}_vs_{away_team['name']}"
         
         db.raw_h2h_data_v2.update_one(
-            {"_id": doc_id},
-            {
-                "$set": {
-                    "team_a": home_team["name"],
-                    "team_b": away_team["name"],
-                    "matches": matches_history,
-                    "last_updated": datetime.now(),
-                    "v2_ready": True
-                }
-            },
-            upsert=True
+            {"_id": f"{home_team['name']}_vs_{away_team['name']}"},
+            {"$set": {
+                "team_a": home_team["name"], "team_b": away_team["name"],
+                "tm_id_a": id_h, "tm_id_b": id_a,
+                "matches": matches_history, "last_updated": datetime.now(), "v2_ready": True
+            }}, upsert=True
         )
-        
-        return True, f"Salvati {len(matches_history)} precedenti (v2)"
-        
-    except Exception as e:
-        return False, str(e)
-
-def show_menu():
-    """Mostra il menu per scegliere i campionati."""
-    print("="*80)
-    print("🚀 SCRAPER H2H v2.0 - MENU INTERATTIVO")
-    print("="*80)
-    print()
-    
-    # Trova tutti i campionati disponibili nel database
-    all_leagues = sorted(db.h2h_by_round.distinct("league"))
-    
-    print("📊 CAMPIONATI DISPONIBILI:\n")
-    
-    for i, league in enumerate(all_leagues, 1):
-        # Conta le giornate per campionato
-        rounds_count = db.h2h_by_round.count_documents({"league": league})
-        print(f"   {i:2d}. {league:45s} ({rounds_count} giornate)")
-    
-    print()
-    print(f"   {len(all_leagues) + 1:2d}. 🌍 TUTTI I CAMPIONATI")
-    print()
-    print("="*80)
-    print()
-    
-    while True:
-        choice = input("🎯 Scegli un'opzione (numero o numeri separati da virgola, es: 1,3,5): ").strip()
-        
-        if not choice:
-            print("❌ Devi inserire almeno un numero!")
-            continue
-        
-        # Parsing della scelta
-        try:
-            if "," in choice:
-                # Selezione multipla: 1,3,5
-                indices = [int(x.strip()) for x in choice.split(",")]
-            else:
-                # Selezione singola
-                indices = [int(choice)]
-            
-            # Verifica range
-            if any(idx < 1 or idx > len(all_leagues) + 1 for idx in indices):
-                print(f"❌ Numero non valido! Scegli tra 1 e {len(all_leagues) + 1}")
-                continue
-            
-            # Opzione "TUTTI"
-            if (len(all_leagues) + 1) in indices:
-                selected_leagues = all_leagues
-                print(f"\n✅ Selezionati TUTTI i {len(all_leagues)} campionati")
-            else:
-                selected_leagues = [all_leagues[idx - 1] for idx in indices]
-                print(f"\n✅ Selezionati {len(selected_leagues)} campionati:")
-                for league in selected_leagues:
-                    print(f"   • {league}")
-            
-            print()
-            confirm = input("⏸️  Confermi? (s/n): ").strip().lower()
-            
-            if confirm == 's':
-                return selected_leagues
-            else:
-                print("\n🔄 Riprova...\n")
-                continue
-                
-        except ValueError:
-            print("❌ Formato non valido! Usa numeri separati da virgola (es: 1,3,5)")
-            continue
+        return True
+    except: return False
 
 def run_mass_scraper():
-    # Mostra menu e ottieni selezione
-    selected_leagues = show_menu()
+    # 1. Recupero Leghe e Menu
+    all_leagues = sorted(db.h2h_by_round.distinct("league"))
+    print("\n" + "="*60)
+    print(f"{Fore.CYAN}🚀 TURBO SCRAPER H2H MULTI-THREAD")
+    print("="*60)
+    for i, l in enumerate(all_leagues, 1):
+        print(f"   {i:2d}. {l}")
+    print(f"   {len(all_leagues) + 1:2d}. 🔥 TUTTI I CAMPIONATI")
+    print("="*60)
     
-    print()
-    print("="*80)
-    print(f"🎯 Campionati selezionati: {len(selected_leagues)}")
-    print("="*80)
-    print()
+    choice = input(f"\n🎯 Scelta (es: 1 o 1,2,5 o {len(all_leagues)+1}): ").strip()
+    if not choice: return
+
+    # Logica selezione multipla o Tutti
+    if choice == str(len(all_leagues) + 1):
+        selected_leagues = all_leagues
+    else:
+        try:
+            indices = [int(x.strip()) - 1 for x in choice.split(",") if x.strip().isdigit()]
+            selected_leagues = [all_leagues[i] for i in indices if 0 <= i < len(all_leagues)]
+        except:
+            print(f"{Fore.RED}❌ Scelta non valida."); return
+
+    # 2. Cache ID esistenti per evitare download inutili
+    print(f"\n{Fore.YELLOW}🧠 Controllo match già presenti nel DB...")
+    existing_pairs = set()
+    for doc in db.raw_h2h_data_v2.find({}, {"tm_id_a": 1, "tm_id_b": 1}):
+        if "tm_id_a" in doc and "tm_id_b" in doc:
+            existing_pairs.add(tuple(sorted([int(doc["tm_id_a"]), int(doc["tm_id_b"])])))
     
-    # Filtra solo i round dei campionati selezionati
-    rounds = list(db.h2h_by_round.find({"league": {"$in": selected_leagues}}))
+    # 3. Analisi Match da scaricare
+    pairs_to_process = {}
+    print(f"🔍 Analisi {len(selected_leagues)} campionati in corso...")
     
-    unique_pairs = set()
-    
-    print("📋 Analisi partite da scaricare...")
-    
-    for r in rounds:
-        league = r.get("league")
+    for r in db.h2h_by_round.find({"league": {"$in": selected_leagues}}):
         for m in r.get("matches", []):
-            h = m.get("home_canonical", m.get("home"))
-            a = m.get("away_canonical", m.get("away"))
-            if h and a:
-                pair = tuple(sorted([h, a]))
-                unique_pairs.add((pair, league))
+            id_h, id_a = m.get("home_tm_id"), m.get("away_tm_id")
+            if id_h and id_a:
+                pk = tuple(sorted([int(id_h), int(id_a)]))
+                if pk not in existing_pairs and pk not in pairs_to_process:
+                    pairs_to_process[pk] = m
+
+    if not pairs_to_process:
+        print(f"{Fore.GREEN}✅ Database già aggiornato per i campionati selezionati."); return
+
+    print(f"🎯 Nuove coppie trovate: {len(pairs_to_process)}")
+    print(f"🚀 Avvio download parallelo (3 Thread)...\n")
     
-    pairs_list = sorted(list(unique_pairs))
-    
-    print(f"🎯 Trovate {len(pairs_list)} coppie uniche.\n")
-    
-    # Statistiche per campionato
-    by_league = {}
-    for (pair, league) in pairs_list:
-        by_league[league] = by_league.get(league, 0) + 1
-    
-    print("📊 Distribuzione per campionato:")
-    for league in selected_leagues:
-        count = by_league.get(league, 0)
-        print(f"   • {league:45s} → {count:3d} coppie")
-    
-    print()
-    input("⏸️  Premi INVIO per iniziare il download...")
-    print()
-    
-    skips = 0
-    downloaded = 0
-    errors = 0
-    
-    with tqdm(pairs_list, desc="Download H2H") as pbar:
-        for (home_raw, away_raw), league in pbar:
-            # Trova i team ufficiali
-            home_team = find_team_smart(home_raw)
-            away_team = find_team_smart(away_raw)
-            
-            if not home_team or not away_team:
-                errors += 1
-                pbar.set_postfix_str(f"⚠️ Skip: Squadre non trovate ({home_raw}/{away_raw})")
-                continue
-            
-            home_official = home_team['name']
-            away_official = away_team['name']
-            
-            # Controlla se esiste
-            exists = db.raw_h2h_data_v2.find_one({
-                "$or": [
-                    {"team_a": home_official, "team_b": away_official},
-                    {"team_a": away_official, "team_b": home_official}
-                ]
-            })
-            
-            if exists:
-                skips += 1
-                pbar.set_postfix_str(f"⏩ {skips} skip | ✅ {downloaded} OK | ❌ {errors} err")
-                continue
-            
-            # Scarica
-            pbar.set_postfix_str(f"📥 {league[:20]}: {home_official[:15]}-{away_official[:15]}")
-            success, msg = download_and_save_h2h(home_raw, away_raw)
-            
-            if success:
-                downloaded += 1
-            else:
-                errors += 1
-    
-    print()
-    print("="*80)
-    print("✅ COMPLETATO!")
-    print("="*80)
-    print(f"   ✅ Scaricati:           {downloaded}")
-    print(f"   ⏩ Già presenti:        {skips}")
-    print(f"   ❌ Errori:              {errors}")
-    print(f"   📊 Totale processati:   {len(pairs_list)}")
-    print("="*80)
+    # 4. CORE MULTI-THREAD
+    with ThreadPoolExecutor(max_workers=3) as executor:
+        # Creazione dei compiti
+        futures = {executor.submit(download_and_save_h2h, m): m for m in pairs_to_process.values()}
+        
+        # tqdm gestisce la barra di progresso in tempo reale
+        for _ in tqdm(as_completed(futures), total=len(futures), desc="Scraping in corso"):
+            pass
+
+    print(f"\n{Fore.CYAN}🏁 Operazione completata!")
 
 if __name__ == "__main__":
     run_mass_scraper()
