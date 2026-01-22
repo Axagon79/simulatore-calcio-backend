@@ -139,19 +139,23 @@ def analyze_odds(match):
         return f"{s1} | {sx} | {s2}", fav_sign, True
     except:
         return '<span class="text-muted">Err</span>', None, False
-def run_single_algo(algo_id, preloaded_data, home_name="Home", away_name="Away", settings_cache=None, debug_mode=True):
+def run_single_algo(algo_id, preloaded_data, home_name="Home", away_name="Away", settings_cache=None, debug_mode=False):
     """Esegue una singola simulazione (Ora supporta Turbo e Silenziatore)"""
     s_h, s_a, r_h, r_a = predict_match("", "", mode=algo_id, preloaded_data=preloaded_data)
     if s_h is None:
         return 0, 0
 
+    # ✅ Controlla se è una coppa
+    is_cup = preloaded_data.get('is_cup', False) if preloaded_data else False
+    
     result = calculate_goals_from_engine(
         s_h, s_a, r_h, r_a, 
         algo_mode=algo_id, 
         home_name=home_name, 
         away_name=away_name,
         settings_cache=settings_cache,
-        debug_mode=debug_mode
+        debug_mode=debug_mode,
+        is_cup=is_cup
     )
     
     # ✅ RITORNA TUTTI I 9 VALORI (non scartare i lambda!)
@@ -170,13 +174,17 @@ def run_single_algo_montecarlo(algo_id, preloaded_data, home_team, away_team, cy
             if s_h is None:
                 continue
             
+            # ✅ Controlla se è una coppa
+            is_cup = preloaded_data.get('is_cup', False) if preloaded_data else False
+            
             result = calculate_goals_from_engine(
                 s_h, s_a, r_h, r_a, 
                 algo_mode=algo_id, 
                 home_name=home_team, 
                 away_name=away_team,
                 settings_cache=settings_in_ram,
-                debug_mode=False
+                debug_mode=False,
+                is_cup=is_cup
             )
             
             # ✅ ESTRAI I LAMBDA (posizione 2 e 3)
@@ -257,13 +265,17 @@ def run_monte_carlo_verdict_detailed(preloaded_data, home_team, away_team, analy
                     continue
                 
                 # ✅ ESTRAI TUTTI I 9 VALORI (inclusi lambda_h e lambda_a)
+                # ✅ Controlla se è una coppa
+                is_cup = preloaded_data.get('is_cup', False) if preloaded_data else False
+                
                 result = calculate_goals_from_engine(
                     s_h, s_a, r_h, r_a, 
                     algo_mode=aid, 
                     home_name=home_team, 
                     away_name=away_team,
                     settings_cache=settings_in_ram,
-                    debug_mode=False
+                    debug_mode=False,
+                    is_cup=is_cup
                 )
                 
                 gh, ga, lambda_h, lambda_a, xg_info, pesi_dettagliati, parametri, scontrino_casa, scontrino_ospite = result

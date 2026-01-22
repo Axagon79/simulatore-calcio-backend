@@ -225,7 +225,7 @@ def get_team_fbref_data(team_name):
  #   S = load_tuning(algo_mode)   ---
 
 # 1. Nella riga qui sotto ho aggiunto ', settings_cache=None' alla fine
-def calculate_goals_from_engine(home_score, away_score, home_data, away_data, algo_mode=5, league_name="Unknown", home_name="Home", away_name="Away", debug_mode=True, settings_cache=None):
+def calculate_goals_from_engine(home_score, away_score, home_data, away_data, algo_mode=5, league_name="Unknown", home_name="Home", away_name="Away", debug_mode=True, settings_cache=None, is_cup=False):
     """
     MOTORE V11: PESI CONDIVISI MA RUOLI DIVERSI
     I pesi lavorano su entrambi i motori (Win & Gol) dove ha senso.
@@ -267,52 +267,84 @@ def calculate_goals_from_engine(home_score, away_score, home_data, away_data, al
     S.setdefault("IMPATTO_DIFESA_TATTICA", 15.0)
     S.setdefault("TETTO_MAX_GOL_ATTESI", 3.8)
     S.setdefault("PESO_RATING_ROSA", 1.0) # Default per i pesi motore se mancano
+    
+    
+# --- A. ESTRAZIONE DATI COMPLETI ---
 
-        # --- A. ESTRAZIONE DATI COMPLETI ---
+    # 🏆 CONTROLLO TIPO COMPETIZIONE
+    if is_cup:
+        h_rat = float(home_data.get('rating', 12.5))
+        a_rat = float(away_data.get('rating', 12.5))
+        
+        h_att = float(home_data.get('attack', 5.0))
+        a_att = float(away_data.get('attack', 5.0))
+        h_def = float(home_data.get('defense', 5.0))
+        a_def = float(away_data.get('defense', 5.0))
+        
+        # ✅ RENDI ANCHE QUESTI PROPORZIONALI AL RATING
+        h_rosa = float(home_data.get('strength_score', 5.0))
+        a_rosa = float(away_data.get('strength_score', 5.0))
+        h_mot = 10.0 + (h_rat - 12.5) / 5.0  # ✅ Motivazione proporzionale
+        a_mot = 10.0 + (a_rat - 12.5) / 5.0  # ✅ Motivazione proporzionale
+        vol_h = 2.0 + (h_rat / 25.0) * 2.0   # ✅ Volume 2.0-4.0
+        vol_a = 2.0 + (a_rat / 25.0) * 2.0   # ✅ Volume 2.0-4.0
+        
+        # DEFAULT per campi non disponibili
+        h_bvs = a_bvs = 0.0
+        h_luc = a_luc = 12.5
+        h_h2h_win = a_h2h_win = 0.0
+        h_h2h_g = a_h2h_g = 1.2
+        h_fld = a_fld = 3.5
+        h_rel = a_rel = 5.0
+        h_tec = h_att + h_def
+        a_tec = a_att + a_def
+    else:   
 
-    # Rating (Forza Rosa 5-25) -> Default 12.5
-    h_rat = float(home_data.get('rating', 12.5))
-    a_rat = float(away_data.get('rating', 12.5))
-    
-    # BVS (Valore Quote vs Picchetto) -> Default 0.0
-    h_bvs = float(home_data.get('bvs', 0.0))
-    a_bvs = float(away_data.get('bvs', 0.0))
-    
-    # Motivazione (5-15) & Fattore Campo (0-7)
-    h_mot = float(home_data.get('motivation', 10.0))
-    a_mot = float(away_data.get('motivation', 10.0))
-    h_fld = float(home_data.get('field_factor', 3.5))
-    a_fld = float(away_data.get('field_factor', 3.5))
-    
-    # Lucifero (Forma Recente 0-25) & Affidabilità (0-10)
-    h_luc = float(home_data.get('lucifero', 12.5)) 
-    a_luc = float(away_data.get('lucifero', 12.5))
-    h_rel = float(home_data.get('reliability', 5.0))
-    a_rel = float(away_data.get('reliability', 5.0))
-    
-    # Valore Rosa (3-10) -> NUOVO, Default 4.5
-    h_rosa = float(home_data.get('strength_score', 4.5))
-    a_rosa = float(away_data.get('strength_score', 4.5))
+            # --- A. ESTRAZIONE DATI COMPLETI ---
 
-    # H2H (Punteggio Vittoria & Media Gol Storica)
-    # ✅ Usa il voto H2H puro passato dall'engine dentro home_data/away_data
-    h_h2h_win = float(home_data.get('h2h_score', 5.0))
-    a_h2h_win = float(away_data.get('h2h_score', 5.0))
-    h_h2h_g = float(home_data.get('h2h_avg_goals', 1.2))
-    a_h2h_g = float(away_data.get('h2h_avg_goals', 1.0))
-    
-    # Dati Tecnici (Attacco 0-15 / Difesa 0-10 / Volume FBRef)
-    vol_h = get_team_fbref_data(home_name)
-    vol_a = get_team_fbref_data(away_name)
-    h_att = float(home_data.get('attack', 7.5))
-    a_att = float(away_data.get('attack', 7.5))
-    h_def = float(home_data.get('defense', 5.0))
-    a_def = float(away_data.get('defense', 5.0))
-    
-    # Tecnica Totale (Att+Dif) -> NUOVO CALCOLO
-    # Range: 0-25 (Att 0-15 + Dif 0-10) -> Default Medio: 12.5
-    h_tec = h_att + h_def
-    a_tec = a_att + a_def
+        # Rating (Forza Rosa 5-25) -> Default 12.5
+        h_rat = float(home_data.get('rating', 12.5))
+        a_rat = float(away_data.get('rating', 12.5))
+        
+        # BVS (Valore Quote vs Picchetto) -> Default 0.0
+        h_bvs = float(home_data.get('bvs', 0.0))
+        a_bvs = float(away_data.get('bvs', 0.0))
+        
+        # Motivazione (5-15) & Fattore Campo (0-7)
+        h_mot = float(home_data.get('motivation', 10.0))
+        a_mot = float(away_data.get('motivation', 10.0))
+        h_fld = float(home_data.get('field_factor', 3.5))
+        a_fld = float(away_data.get('field_factor', 3.5))
+        
+        # Lucifero (Forma Recente 0-25) & Affidabilità (0-10)
+        h_luc = float(home_data.get('lucifero', 12.5)) 
+        a_luc = float(away_data.get('lucifero', 12.5))
+        h_rel = float(home_data.get('reliability', 5.0))
+        a_rel = float(away_data.get('reliability', 5.0))
+        
+        # Valore Rosa (3-10) -> NUOVO, Default 4.5
+        h_rosa = float(home_data.get('strength_score', 4.5))
+        a_rosa = float(away_data.get('strength_score', 4.5))
+
+        # H2H (Punteggio Vittoria & Media Gol Storica)
+        # ✅ Usa il voto H2H puro passato dall'engine dentro home_data/away_data
+        h_h2h_win = float(home_data.get('h2h_score', 5.0))
+        a_h2h_win = float(away_data.get('h2h_score', 5.0))
+        h_h2h_g = float(home_data.get('h2h_avg_goals', 1.2))
+        a_h2h_g = float(away_data.get('h2h_avg_goals', 1.0))
+        
+        # Dati Tecnici (Attacco 0-15 / Difesa 0-10 / Volume FBRef)
+        vol_h = get_team_fbref_data(home_name)
+        vol_a = get_team_fbref_data(away_name)
+        h_att = float(home_data.get('attack', 7.5))
+        a_att = float(away_data.get('attack', 7.5))
+        h_def = float(home_data.get('defense', 5.0))
+        a_def = float(away_data.get('defense', 5.0))
+        
+        # Tecnica Totale (Att+Dif) -> NUOVO CALCOLO
+        # Range: 0-25 (Att 0-15 + Dif 0-10) -> Default Medio: 12.5
+        h_tec = h_att + h_def
+        a_tec = a_att + a_def
 
 
 

@@ -60,7 +60,7 @@ def load_tuning_db():
     try:
         doc = db['tuning_settings'].find_one({"_id": "main_config"})
         if doc and "config" in doc:
-            print("✅ [ENGINE] Tuning caricato da MongoDB")
+            
             return doc["config"]
     except Exception as e:
         print(f"⚠️ [ENGINE] MongoDB tuning non disponibile: {e}")
@@ -396,13 +396,20 @@ def predict_match(home_team, away_team, mode=ALGO_MODE, preloaded_data=None):
             print(f"   🔍 Identità Risolta: '{away_team}' -> '{a_id['official_name']}'")
 
     if preloaded_data:
+        # ✅ CHECK SE È UNA COPPA
+        is_cup = preloaded_data.get('is_cup', False)
+        
         home_raw = preloaded_data['home_raw']
         away_raw = preloaded_data['away_raw']
-        h2h_h = preloaded_data['h2h_h']
-        h2h_a = preloaded_data['h2h_a']
-        base_val = preloaded_data['base_val']
-        home_raw['h2h_score'] = h2h_h
-        away_raw['h2h_score'] = h2h_a
+        h2h_h = preloaded_data.get('h2h_h', 0)
+        h2h_a = preloaded_data.get('h2h_a', 0)
+        base_val = preloaded_data.get('base_val', 2.5)
+        
+        # ✅ SOLO se home_raw è un dict (non per coppe dove è già completo)
+        if isinstance(home_raw, dict):
+            home_raw['h2h_score'] = h2h_h
+            away_raw['h2h_score'] = h2h_a
+        
         H_OFF, A_OFF = h_id['official_name'], a_id['official_name']
     else:
         if db is None:

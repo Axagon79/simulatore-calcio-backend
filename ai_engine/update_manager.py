@@ -31,6 +31,9 @@ CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 SCRAPER_SEQUENCE = [
     
+      # ( FA GLI AGGIORNAMENTI PER LE COPPE EUROPEE )
+      ("update_cups_data.py", "🥇 [12/13] Classifica Coppa Europea", "Mancano i dati delle coppe europee", FREQUENT_DIR),
+    
       # ( FA AGGIORNAMENTO STAGIONALE MEDIE GOL CAMPIONATI )
       ("aggiorna_media_gol_partita_tutti_campionati.py", "📊 [0/13] Media Gol Partita (Campionati)", "Mancano media gol per campionato", FREQUENT_DIR),
       
