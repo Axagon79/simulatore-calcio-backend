@@ -72,7 +72,7 @@ def load_tuning(algo_mode="GLOBAL"):
         doc = db['tuning_settings'].find_one({"_id": "main_config"})
         if doc and "config" in doc:
             full_data = doc["config"]
-            print("✅ [TUNING] Caricato da MongoDB")
+            
     except Exception as e:
         print(f"⚠️ [TUNING] MongoDB non disponibile: {e}")
     

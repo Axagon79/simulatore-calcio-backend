@@ -42,6 +42,7 @@ try:
     )
     from ai_engine.deep_analysis import DeepAnalyzer
     from config import db
+    from ai_engine.calculators.bulk_manager import get_all_data_bulk_cups
 except ImportError as e:
     print(json.dumps({"success": False, "error": f"Import Error: {e}"}), flush=True)
     sys.exit(1)
@@ -140,13 +141,10 @@ def sanitize_data(data):
     return data
 
 
-def build_cup_preloaded_data(team_h_doc, team_a_doc, match_doc, rosa_min, rosa_max, competition):
-    
-    
-    
+def build_cup_preloaded_data(team_h_doc, team_a_doc, match_doc, rosa_min, rosa_max, competition, bulk_cache):
     """
     Costruisce il dizionario preloaded_data per le coppe
-    Simile al bulk_cache dei campionati ma specifico per coppe
+    USANDO IL BULK_CACHE come i campionati (chiave della velocità!)
     """
     
     # Calcola rating usando la formula 20-40-40
@@ -163,11 +161,19 @@ def build_cup_preloaded_data(team_h_doc, team_a_doc, match_doc, rosa_min, rosa_m
     rating_h = calculate_cup_rating(valore_rosa_h, elo_h, quota_h, rosa_min, rosa_max)
     rating_a = calculate_cup_rating(valore_rosa_a, elo_a, quota_a, rosa_min, rosa_max)
     
+    # ✅ USA MASTER_DATA DAL BULK_CACHE (come i campionati!)
+    home_name = team_h_doc.get('name')
+    away_name = team_a_doc.get('name')
+    
+    master_data = bulk_cache.get('MASTER_DATA', {})
+    team_h_master = master_data.get(home_name, {})
+    team_a_master = master_data.get(away_name, {})
+    
     # Costruisci preloaded_data compatibile con engine_core
     preloaded_data = {
         "league": competition,
-        "home_team": team_h_doc.get('name'),
-        "away_team": team_a_doc.get('name'),
+        "home_team": home_name,
+        "away_team": away_name,
         
         # Rating calcolati
         "rating_home": rating_h,
@@ -175,13 +181,13 @@ def build_cup_preloaded_data(team_h_doc, team_a_doc, match_doc, rosa_min, rosa_m
         
         # Dati squadre
         "team_h": {
-            "name": team_h_doc.get('name'),
+            "name": home_name,
             "valore_rosa": valore_rosa_h,
             "elo_rating": elo_h,
             "country": team_h_doc.get('country', 'Unknown')
         },
         "team_a": {
-            "name": team_a_doc.get('name'),
+            "name": away_name,
             "valore_rosa": valore_rosa_a,
             "elo_rating": elo_a,
             "country": team_a_doc.get('country', 'Unknown')
@@ -200,34 +206,37 @@ def build_cup_preloaded_data(team_h_doc, team_a_doc, match_doc, rosa_min, rosa_m
         "h2h_a": 0,
         "base_val": 2.5,
         
+        # ✅ AGGIUNGI BULK_CACHE (come i campionati!)
+        "bulk_cache": bulk_cache,
+        
         # Campi raw necessari per engine_core (DICT COMPLETO)
         "home_raw": {
-            'power': rating_h * 3,              # ✅ Proporzionale al rating (scala ~30-75)
-            'attack': rating_h / 2.5,           # ✅ Proporzionale al rating (scala ~2-10)
-            'defense': rating_h / 5.0,          # ✅ Proporzionale al rating (scala ~1-5)
-            'motivation': 10.0,                 # Motivazione media
-            'strength_score': rating_h / 5.0,   # ✅ Usa rating (scala ~1-5)
-            'rating': rating_h,                 # ✅ Rating principale
-            'reliability': 5.0,                 # Affidabilità media
-            'bvs': 0.0,                         # Non usiamo BVS per coppe
-            'field_factor': 3.5,                # Fattore campo neutro
-            'lucifero': 12.5,                   # Forma media (scala 0-25)
-            'h2h_score': 0,                     # Nessuno storico H2H
-            'h2h_avg_goals': 1.2                # Media gol casa
+            'power': rating_h * 3,
+            'attack': rating_h / 2.5,
+            'defense': rating_h / 5.0,
+            'motivation': 10.0,
+            'strength_score': rating_h / 5.0,
+            'rating': rating_h,
+            'reliability': 5.0,
+            'bvs': 0.0,
+            'field_factor': 3.5,
+            'lucifero': 12.5,
+            'h2h_score': 0,
+            'h2h_avg_goals': 1.2
         },
         "away_raw": {
-            'power': rating_a * 3,              # ✅ Proporzionale al rating (scala ~30-75)
-            'attack': rating_a / 2.5,           # ✅ Proporzionale al rating (scala ~2-10)
-            'defense': rating_a / 5.0,          # ✅ Proporzionale al rating (scala ~1-5)
-            'motivation': 10.0,                 # Motivazione media
-            'strength_score': rating_a / 5.0,   # ✅ Usa rating (scala ~1-5)
-            'rating': rating_a,                 # ✅ Rating principale
-            'reliability': 5.0,                 # Affidabilità media
-            'bvs': 0.0,                         # Non usiamo BVS per coppe
-            'field_factor': 3.5,                # Fattore campo neutro
-            'lucifero': 12.5,                   # Forma media (scala 0-25)
-            'h2h_score': 0,                     # Nessuno storico H2H
-            'h2h_avg_goals': 1.0                # Media gol trasferta
+            'power': rating_a * 3,
+            'attack': rating_a / 2.5,
+            'defense': rating_a / 5.0,
+            'motivation': 10.0,
+            'strength_score': rating_a / 5.0,
+            'rating': rating_a,
+            'reliability': 5.0,
+            'bvs': 0.0,
+            'field_factor': 3.5,
+            'lucifero': 12.5,
+            'h2h_score': 0,
+            'h2h_avg_goals': 1.0
         },
         
         # H2H vuoto (non abbiamo storico coppe)
@@ -247,13 +256,7 @@ def build_cup_preloaded_data(team_h_doc, team_a_doc, match_doc, rosa_min, rosa_m
         "match_date": match_doc.get('match_date', 'Unknown'),
         "is_cup": True
     }
-    print(f"\n🔍 DEBUG PRELOADED DATA:")
-    print(f"   Home Power: {preloaded_data['home_raw']['power']}")
-    print(f"   Away Power: {preloaded_data['away_raw']['power']}")
-    print(f"   Home Attack: {preloaded_data['home_raw']['attack']}")
-    print(f"   Away Attack: {preloaded_data['away_raw']['attack']}")
-    print(f"   Home Rating: {preloaded_data['home_raw']['rating']}")
-    print(f"   Away Rating: {preloaded_data['away_raw']['rating']}\n")
+    
     return preloaded_data
 
 
@@ -283,13 +286,35 @@ def run_cup_simulation(competition, home_team, away_team, algo_id, cycles):
         
         config = COMPETITIONS_CONFIG[competition]
         
-        # 1. TROVA LA PARTITA NEL DB
-        matches_coll = db[config['matches_collection']]
-        match_doc = matches_coll.find_one({
-            "home_team": home_team,
-            "away_team": away_team,
-            "season": "2025-2026"
-        })
+        # ✅ 1. CARICA BULK_CACHE (UNA VOLTA SOLA - CHIAVE DELLA VELOCITÀ!)
+        print(f"📦 [CUPS] Caricamento bulk_cache per {competition}...", file=sys.stderr)
+        bulk_cache = get_all_data_bulk_cups(home_team, away_team, competition)
+        
+        if not bulk_cache:
+            return {
+                "success": False,
+                "error": "Errore nel caricamento bulk_cache"
+            }
+        
+        # ✅ 2. ESTRAI DATI DAL BULK_CACHE (già caricati, zero latenza DB!)
+        team_h_doc = None
+        team_a_doc = None
+        
+        for team in bulk_cache['TEAMS']:
+            name = team.get('name')
+            aliases = team.get('aliases', [])
+            if name == home_team or home_team in aliases:
+                team_h_doc = team
+            if name == away_team or away_team in aliases:
+                team_a_doc = team
+        
+        if not team_h_doc or not team_a_doc:
+            return {
+                "success": False,
+                "error": f"Squadre non trovate: {home_team} o {away_team}"
+            }
+        
+        match_doc = bulk_cache['MATCH_DATA']
         
         if not match_doc:
             return {
@@ -297,79 +322,32 @@ def run_cup_simulation(competition, home_team, away_team, algo_id, cycles):
                 "error": f"Partita non trovata: {home_team} vs {away_team} in {config['name']}"
             }
         
-        # 2. CARICA DATI SQUADRE
-        teams_coll = db[config['teams_collection']]
+        normalization = bulk_cache['NORMALIZATION']
         
-        team_h_doc = teams_coll.find_one({
-            "$or": [
-                {"name": home_team},
-                {"aliases": home_team}
-            ]
-        })
-        team_a_doc = teams_coll.find_one({
-            "$or": [
-                {"name": away_team},
-                {"aliases": away_team}
-            ]
-        })
-        
-        if not team_h_doc or not team_a_doc:
-            return {
-                "success": False,
-                "error": f"Squadre non trovate nel DB: {home_team} o {away_team}"
-            }
-        
-        # 3. CALCOLA MIN/MAX VALORE ROSA DELLA COMPETIZIONE
-        all_teams = list(teams_coll.find({
-            "valore_rosa_transfermarkt": {"$exists": True, "$gt": 0}
-        }))
-        
-        if not all_teams:
-            return {
-                "success": False,
-                "error": "Nessuna squadra con valore rosa trovata nel DB"
-            }
-        
-        values = [t['valore_rosa_transfermarkt'] for t in all_teams]
-        rosa_min = min(values)
-        rosa_max = max(values)
-        
-        # 4. COSTRUISCI PRELOADED_DATA
+        # ✅ 3. COSTRUISCI PRELOADED_DATA usando dati del bulk_cache
         preloaded_data = build_cup_preloaded_data(
-            team_h_doc, team_a_doc, match_doc, 
-            rosa_min, rosa_max, competition
+            team_h_doc, 
+            team_a_doc, 
+            match_doc,
+            normalization['rosa_min'],
+            normalization['rosa_max'],
+            competition,
+            bulk_cache  # ✅ AGGIUNGI!
         )
         
-        # 5. ESEGUI SIMULAZIONE
-        if algo_id == 6:  # MonteCarlo
-            result = run_single_algo_montecarlo(
-                algo_id, 
-                preloaded_data,
-                home_team=home_team,
-                away_team=away_team,
-                cycles=cycles
-            )
-            # ✅ run_single_algo_montecarlo restituisce (gh, ga, top3, sim_list)
-            gh, ga, top3, sim_list = result
-        else:
-            # Singolo algoritmo
-            sim_list = []
-            for _ in range(cycles):
-                result = run_single_algo(
-                    algo_id,
-                    preloaded_data,
-                    home_name=home_team,
-                    away_name=away_team
-                )
-                # ✅ run_single_algo restituisce 9 valori, prendiamo solo i primi 2 (gol)
-                gh_temp, ga_temp = result[0], result[1]
-                sim_list.append(f"{gh_temp}-{ga_temp}")
-            
-            # Trova risultato più comune
-            from collections import Counter
-            counter = Counter(sim_list)
-            most_common_score = counter.most_common(1)[0][0]
-            gh, ga = map(int, most_common_score.split('-'))
+        # ✅ 4. CARICA I SETTINGS UNA VOLTA SOLA (CACHE)
+        settings_cache = load_tuning(algo_id)
+        
+        # ✅ 5. ESEGUI SIMULAZIONE (identica ai campionati - veloce!)
+        gh, ga, top3, sim_list = run_single_algo_montecarlo(
+            algo_id=algo_id,
+            preloaded_data=preloaded_data,
+            home_team=home_team,
+            away_team=away_team,
+            cycles=cycles,
+            analyzer=None,
+            settings_cache=settings_cache
+        )
         
         # 6. COSTRUISCI RISULTATO
         execution_time = time.time() - start_time

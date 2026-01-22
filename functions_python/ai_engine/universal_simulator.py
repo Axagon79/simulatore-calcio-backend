@@ -161,12 +161,12 @@ def run_single_algo(algo_id, preloaded_data, home_name="Home", away_name="Away",
     # ✅ RITORNA TUTTI I 9 VALORI (non scartare i lambda!)
     return result
 
-def run_single_algo_montecarlo(algo_id, preloaded_data, home_team, away_team, cycles=500, analyzer=None):
+def run_single_algo_montecarlo(algo_id, preloaded_data, home_team, away_team, cycles=500, analyzer=None, settings_cache=None):
     """MonteCarlo per SINGOLO algoritmo"""
     local_results = []
     valid_cycles = 0
     
-    settings_in_ram = load_tuning(algo_id)
+    settings_in_ram = settings_cache if settings_cache else load_tuning(algo_id)
 
     for cycle_idx in range(cycles):
         with suppress_stdout():

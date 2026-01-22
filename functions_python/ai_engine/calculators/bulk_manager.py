@@ -244,3 +244,179 @@ def get_all_data_bulk(home_team, away_team, league_name):
     print(f"📦 [BULK] RIEPILOGO: TEAMS={len(raw_teams)}, MASTER_DATA_KEYS={len(master_map)}, ROUNDS={len(raw_rounds)}", file=sys.stderr)
     
     return bulk_cache
+
+def get_all_data_bulk_cups(home_team, away_team, competition):
+    """
+    BULK CACHE PER COPPE EUROPEE
+    Versione ottimizzata per Champions League e Europa League.
+    Carica tutti i dati necessari UNA VOLTA SOLA per velocizzare le simulazioni.
+    
+    Args:
+        home_team: nome squadra casa
+        away_team: nome squadra trasferta  
+        competition: "UCL" o "UEL"
+    
+    Returns:
+        bulk_cache: dizionario con tutti i dati pre-caricati
+    """
+    t_start = time.time()
+    
+    # Mappa competizione -> collezione
+    teams_map = {
+        "UCL": "teams_champions_league",
+        "UEL": "teams_europa_league"
+    }
+
+    matches_map = {
+        "UCL": "matches_champions_league",
+        "UEL": "matches_europa_league"
+    }
+
+    teams_collection = teams_map.get(competition)
+    matches_collection = matches_map.get(competition)
+    
+    if not teams_collection:
+        print(f"❌ [BULK CUPS] Competizione non valida: {competition}", file=sys.stderr)
+        return None
+    
+    print(f"🏆 [BULK CUPS] INPUT: home={home_team}, away={away_team}, competition={competition}", file=sys.stderr)
+    print(f"🏆 [BULK CUPS] Collections: teams={teams_collection}, matches={matches_collection}", file=sys.stderr)
+    
+    # 1. CARICA TEAMS (con aliases!)
+    team_query = {
+        "$or": [
+            {"name": {"$in": [home_team, away_team]}},
+            {"aliases": {"$in": [home_team, away_team]}}
+        ]
+    }
+    
+    raw_teams = list(db[teams_collection].find(team_query, {"_id": 0}))
+    print(f"🏆 [BULK CUPS] Teams trovati: {len(raw_teams)}", file=sys.stderr)
+    
+    for team in raw_teams:
+        name = team.get("name")
+        elo = team.get("elo_rating", 0)
+        rosa = team.get("valore_rosa_transfermarkt", 0)
+        print(f"  - {name}: ELO={elo}, Rosa={rosa}", file=sys.stderr)
+    
+    # 2. CARICA MATCH DATA (per odds e info partita)
+    # Crea lista di TUTTI i possibili nomi (reale + aliases) per ogni squadra
+    home_names = [home_team]
+    away_names = [away_team]
+
+    for team in raw_teams:
+        name = team.get('name')
+        aliases = team.get('aliases', [])
+        
+        if name == home_team or home_team in aliases:
+            home_names.append(name)
+            home_names.extend(aliases)
+        
+        if name == away_team or away_team in aliases:
+            away_names.append(name)
+            away_names.extend(aliases)
+
+    # Rimuovi duplicati
+    home_names = list(set(home_names))
+    away_names = list(set(away_names))
+
+    print(f"🔍 [BULK CUPS] Nomi possibili Home: {home_names}", file=sys.stderr)
+    print(f"🔍 [BULK CUPS] Nomi possibili Away: {away_names}", file=sys.stderr)
+
+    # Cerca con TUTTI i nomi possibili
+    match_query = {
+        "home_team": {"$in": home_names},
+        "away_team": {"$in": away_names},
+        "season": "2025-2026"
+    }
+
+    match_doc = db[matches_collection].find_one(match_query, {"_id": 0})
+    
+    
+    
+    if match_doc:
+        print(f"✅ [BULK CUPS] Match trovato: {match_doc.get('homeTeam')} vs {match_doc.get('awayTeam')}", file=sys.stderr)
+        odds = match_doc.get('odds', {})
+        print(f"  Odds: Home={odds.get('home')}, Draw={odds.get('draw')}, Away={odds.get('away')}", file=sys.stderr)
+    else:
+        print(f"❌ [BULK CUPS] NESSUN MATCH TROVATO!", file=sys.stderr)
+        match_doc = {}
+    
+    # 3. CARICA TUTTI I TEAM DELLA COMPETIZIONE (per normalizzazione)
+    all_teams_competition = list(db[teams_collection].find({}, {"_id": 0, "valore_rosa_transfermarkt": 1, "elo_rating": 1}))
+    print(f"🏆 [BULK CUPS] Teams totali in competizione: {len(all_teams_competition)}", file=sys.stderr)
+    
+    # Calcola min/max per normalizzazione
+    rosa_values = [t.get("valore_rosa_transfermarkt", 0) for t in all_teams_competition if t.get("valore_rosa_transfermarkt")]
+    elo_values = [t.get("elo_rating", 1500) for t in all_teams_competition if t.get("elo_rating")]
+    
+    rosa_min = min(rosa_values) if rosa_values else 0
+    rosa_max = max(rosa_values) if rosa_values else 1000000000
+    elo_min = min(elo_values) if elo_values else 1400
+    elo_max = max(elo_values) if elo_values else 2000
+    
+    print(f"📊 [BULK CUPS] Rosa range: {rosa_min:,.0f} - {rosa_max:,.0f}", file=sys.stderr)
+    print(f"📊 [BULK CUPS] ELO range: {elo_min} - {elo_max}", file=sys.stderr)
+    
+    # 4. COSTRUISCI MASTER_DATA (simile ai campionati)
+    master_map = {}
+    
+    for team in raw_teams:
+        name = team.get("name")
+        
+        # Per le coppe non abbiamo power/attack/defense pre-calcolati
+        # Li calcoleremo dal rating in preload_match_data
+        team_entry = {
+            "valore_rosa": team.get("valore_rosa_transfermarkt", 0),
+            "elo_rating": team.get("elo_rating", 1500),
+            "country": team.get("country", "Unknown"),
+            "status": team.get("status", "active")
+        }
+        
+        master_map[name] = team_entry
+        
+        # Aggiungi aliases
+        for alias in team.get("aliases", []):
+            master_map[alias] = team_entry
+    
+    print(f"🏆 [BULK CUPS] MASTER_DATA chiavi totali: {len(master_map)}", file=sys.stderr)
+    
+    # 5. COSTRUISCI BULK_CACHE
+    bulk_cache = {
+        "TEAMS": raw_teams,
+        "MASTER_DATA": master_map,
+        "MATCH_DATA": match_doc,
+        "ALL_TEAMS_COMPETITION": all_teams_competition,
+        "NORMALIZATION": {
+            "rosa_min": rosa_min,
+            "rosa_max": rosa_max,
+            "elo_min": elo_min,
+            "elo_max": elo_max
+        },
+        "COMPETITION_INFO": {
+            "name": "Champions League" if competition == "UCL" else "Europa League",
+            "code": competition,
+            "teams_collection": teams_collection,
+            "matches_collection": matches_collection
+        },
+        # Placeholder per compatibilità con engine_core
+        "MATCH_H2H": {
+            "h_score": 0,
+            "a_score": 0,
+            "msg": "H2H non disponibile per coppe",
+            "extra": {"avg_goals_home": 1.5, "avg_goals_away": 1.2},
+            "quotes": match_doc.get("odds", {})
+        },
+        "LEAGUE_STATS": {
+            "league": competition,
+            "avg_home_league": 1.50,  # Media europea
+            "avg_away_league": 1.20
+        },
+        "H2H_HISTORICAL": None  # Non disponibile per coppe
+    }
+    
+    t_end = time.time() - t_start
+    print(f"📦 [BULK CUPS] Pacco completo pronto in {t_end:.3f}s", file=sys.stderr)
+    print(f"📦 [BULK CUPS] RIEPILOGO: TEAMS={len(raw_teams)}, MASTER_DATA_KEYS={len(master_map)}, ALL_TEAMS={len(all_teams_competition)}", file=sys.stderr)
+    
+    return bulk_cache

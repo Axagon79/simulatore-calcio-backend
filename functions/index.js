@@ -342,6 +342,52 @@ app.get('/leagues', (req, res) => {
 });
 
 
+// ============================================
+// ENDPOINT: /cups
+// ============================================
+
+app.get('/cups', (req, res) => {
+  const cupsData = [
+    { id: 'UCL', name: 'UEFA Champions League' },
+    { id: 'UEL', name: 'UEFA Europa League' }
+  ];
+  
+  console.log('✅ Cups list requested');
+  res.json(cupsData);
+});
+
+
+// ============================================
+// ENDPOINT: /cup-matches
+// ============================================
+
+app.get('/cup-matches', async (req, res) => {
+  try {
+    const cupId = req.query.cup;
+    
+    const cupMap = {
+      'UCL': 'matches_champions_league',
+      'UEL': 'matches_europa_league'
+    };
+    
+    const collectionName = cupMap[cupId];
+    if (!collectionName) {
+      return res.json([]);
+    }
+
+    const matches = await db.collection(collectionName)
+      .find({})
+      .toArray();
+
+    console.log(`✅ Cup matches ${cupId}: ${matches.length} partite`);
+    res.json(matches);
+    
+  } catch (error) {
+    console.error('Cup matches error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.use('/simulation', simulationRoutes);
 
 

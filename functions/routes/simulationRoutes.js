@@ -163,4 +163,82 @@ router.post('/dev-simulate-match', async (req, res) => {
   });
 });
 
+
+// 🏆 ENDPOINT SIMULAZIONE COPPE
+router.post('/simulate-cup', async (req, res) => {
+  const {
+    competition = 'UCL',  // 'UCL' o 'UEL'
+    home = null,
+    away = null,
+    algo_id = 5,
+    cycles = 100
+  } = req.body;
+
+  console.log('🏆 [CUPS] Simulazione coppa:', {
+    competition, home, away, algo_id, cycles
+  });
+
+  // Path allo script Python per le coppe
+  const pythonScriptCups = path.join(__dirname, '../../functions_python/ai_engine/cups/cups_engine/web_simulator_CUPS.py');
+  
+  console.log('📂 [CUPS] Script path:', pythonScriptCups);
+
+  const python = spawn('python', [
+    pythonScriptCups,
+    '4',                    // main_mode (sempre 4 = singola partita)
+    'null',                 // round (non usato per coppe)
+    competition,            // UCL o UEL
+    home || 'null',
+    away || 'null',
+    'null',                 // parametro non usato
+    algo_id.toString(),
+    cycles.toString()
+  ]);
+
+  let result = '';
+  let errorOutput = '';
+
+  python.stdout.on('data', (data) => {
+    const chunk = data.toString();
+    result += chunk;
+  });
+
+  python.stderr.on('data', (data) => {
+    const msg = data.toString();
+    errorOutput += msg;
+    console.error('⚠️ [CUPS] Python stderr:', msg);
+  });
+
+  python.on('close', (code) => {
+    console.log('🔚 [CUPS] Python exit code:', code);
+    
+    const lines = result.split(/\r?\n/).filter(l => l.trim() !== '');
+    const lastLine = lines[lines.length - 1] || '';
+    
+    if (code !== 0) {
+      return res.status(500).json({
+        error: 'Simulazione coppa fallita',
+        details: errorOutput || lastLine || 'Errore Python CUPS',
+        pythonPath: pythonScriptCups,
+        params: req.body
+      });
+    }
+    
+    try {
+      const json = JSON.parse(lastLine);
+      return res.json(json);
+    } catch (e) {
+      console.error('❌ [CUPS] Errore parsing JSON:', e.message);
+      return res.status(500).json({
+        error: 'Output Python CUPS non valido',
+        details: result || '(vuoto)',
+        pythonPath: pythonScriptCups,
+        params: req.body
+      });
+    }
+  });
+});
+
+module.exports = router;
+
 module.exports = router;
