@@ -239,6 +239,137 @@ router.post('/simulate-cup', async (req, res) => {
   });
 });
 
+// 🏆 ENDPOINT: Lista squadre coppe
+router.get('/cup-teams', async (req, res) => {
+  const { competition } = req.query; // 'UCL' o 'UEL'
+  
+  if (!competition || !['UCL', 'UEL'].includes(competition)) {
+    return res.status(400).json({
+      error: 'Parametro competition mancante o non valido',
+      hint: 'Usa ?competition=UCL o ?competition=UEL'
+    });
+  }
+
+  console.log('🏆 [CUPS] Richiesta teams per:', competition);
+
+  // Path allo script Python per ottenere teams
+  const pythonScript = path.join(__dirname, '../../functions_python/ai_engine/cups/get_cup_teams.py');
+  
+  const python = spawn('python', [pythonScript, competition]);
+
+  let result = '';
+  let errorOutput = '';
+
+  python.stdout.on('data', (data) => {
+    result += data.toString();
+  });
+
+  python.stderr.on('data', (data) => {
+    errorOutput += data.toString();
+    console.error('⚠️ [CUPS-TEAMS] Python stderr:', data.toString());
+  });
+
+  python.on('close', (code) => {
+    if (code !== 0) {
+      return res.status(500).json({
+        error: 'Errore nel recupero teams',
+        details: errorOutput,
+        competition
+      });
+    }
+
+    try {
+      const json = JSON.parse(result);
+      return res.json(json);
+    } catch (e) {
+      console.error('❌ [CUPS-TEAMS] Errore parsing JSON:', e.message);
+      return res.status(500).json({
+        error: 'Output Python non valido',
+        details: result
+      });
+    }
+  });
+});
+
+
+// 🏆 ENDPOINT: Lista partite coppe
+router.get('/cup-matches', async (req, res) => {
+  const { competition } = req.query; // 'UCL' o 'UEL'
+  
+  if (!competition || !['UCL', 'UEL'].includes(competition)) {
+    return res.status(400).json({
+      error: 'Parametro competition mancante o non valido',
+      hint: 'Usa ?competition=UCL o ?competition=UEL'
+    });
+  }
+
+  console.log('🏆 [CUPS] Richiesta matches per:', competition);
+
+  // Path allo script Python per ottenere matches
+  const pythonScript = path.join(__dirname, '../../functions_python/ai_engine/cups/get_cup_matches.py');
+  
+  const python = spawn('python', [pythonScript, competition]);
+
+  let result = '';
+  let errorOutput = '';
+
+  python.stdout.on('data', (data) => {
+    result += data.toString();
+  });
+
+  python.stderr.on('data', (data) => {
+    errorOutput += data.toString();
+    console.error('⚠️ [CUPS-MATCHES] Python stderr:', data.toString());
+  });
+
+  python.on('close', (code) => {
+    if (code !== 0) {
+      return res.status(500).json({
+        error: 'Errore nel recupero matches',
+        details: errorOutput,
+        competition
+      });
+    }
+
+    try {
+      const json = JSON.parse(result);
+      return res.json(json);
+    } catch (e) {
+      console.error('❌ [CUPS-MATCHES] Errore parsing JSON:', e.message);
+      return res.status(500).json({
+        error: 'Output Python non valido',
+        details: result
+      });
+    }
+  });
+});
+
+
+// 🏆 ENDPOINT: Info competizioni disponibili
+router.get('/cups-info', async (req, res) => {
+  res.json({
+    success: true,
+    competitions: [
+      {
+        code: 'UCL',
+        name: 'Champions League',
+        teams_count: 36,
+        teams_collection: 'teams_champions_league',
+        matches_collection: 'matches_champions_league'
+      },
+      {
+        code: 'UEL',
+        name: 'Europa League',
+        teams_count: 36,
+        teams_collection: 'teams_europa_league',
+        matches_collection: 'matches_europa_league'
+      }
+    ]
+  });
+});
+
 module.exports = router;
 
 module.exports = router;
+
+
