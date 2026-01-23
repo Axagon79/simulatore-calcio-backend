@@ -55,7 +55,7 @@ from pymongo import UpdateOne
 SEASON = "2025-2026"
 
 # CONFIGURAZIONE MONGO CLUSTER (UGUALE AL RESTO DEL PROGETTO)
-MONGO_COLLECTION_NAME = "players_stats_fbref_mid"
+
 
 LEAGUES = [
     # ITALIA
@@ -230,6 +230,22 @@ LEAGUES = [
         "defense_url": "https://fbref.com/en/comps/25/defense/J1-League-Stats",
         "misc_url": "https://fbref.com/en/comps/25/misc/J1-League-Stats",
     },
+    
+    # 🆕 COPPE EUROPEE
+    {
+        "name": "Champions League", "code": "UCL", "comp_id": 8,
+        "standard_url": "https://fbref.com/en/comps/8/stats/Champions-League-Stats",
+        "passing_url": "https://fbref.com/en/comps/8/passing/Champions-League-Stats",
+        "defense_url": "https://fbref.com/en/comps/8/defense/Champions-League-Stats",
+        "misc_url": "https://fbref.com/en/comps/8/misc/Champions-League-Stats",
+    },
+    {
+        "name": "Europa League", "code": "UEL", "comp_id": 19,
+        "standard_url": "https://fbref.com/en/comps/19/stats/Europa-League-Stats",
+        "passing_url": "https://fbref.com/en/comps/19/passing/Europa-League-Stats",
+        "defense_url": "https://fbref.com/en/comps/19/defense/Europa-League-Stats",
+        "misc_url": "https://fbref.com/en/comps/19/misc/Europa-League-Stats",
+    },
 ]
 
 
@@ -398,7 +414,9 @@ def scrape_standard_mids(scraper, url: str) -> Dict[tuple, Dict[str, Any]]:
             continue
 
         player_name = player_cell.get_text(strip=True)
-        team_name   = team_cell.get_text(strip=True)
+        # ✅ Estrai solo dal link <a>, non dalla bandierina
+        team_link = team_cell.find("a") if team_cell else None
+        team_name = team_link.get_text(strip=True) if team_link else (team_cell.get_text(strip=True) if team_cell else "")
         pos_raw     = pos_cell.get_text(strip=True)
 
         role = classify_role(pos_raw)
@@ -468,7 +486,9 @@ def scrape_passing(scraper, url: str, mids: Dict[tuple, Dict[str, Any]]) -> None
             continue
 
         player_name = player_cell.get_text(strip=True)
-        team_name   = team_cell.get_text(strip=True)
+        # ✅ Estrai solo dal link <a>, non dalla bandierina
+        team_link = team_cell.find("a") if team_cell else None
+        team_name = team_link.get_text(strip=True) if team_link else (team_cell.get_text(strip=True) if team_cell else "")
         key = (player_name, team_name)
         if key not in mids:
             continue
@@ -501,7 +521,9 @@ def scrape_defense(scraper, url: str, mids: Dict[tuple, Dict[str, Any]]) -> None
             continue
 
         player_name = player_cell.get_text(strip=True)
-        team_name   = team_cell.get_text(strip=True)
+        # ✅ Estrai solo dal link <a>, non dalla bandierina
+        team_link = team_cell.find("a") if team_cell else None
+        team_name = team_link.get_text(strip=True) if team_link else (team_cell.get_text(strip=True) if team_cell else "")
         key = (player_name, team_name)
         if key not in mids:
             continue
@@ -542,7 +564,9 @@ def scrape_misc(scraper, url: str, mids: Dict[tuple, Dict[str, Any]]) -> None:
             continue
 
         player_name = player_cell.get_text(strip=True)
-        team_name   = team_cell.get_text(strip=True)
+        # ✅ Estrai solo dal link <a>, non dalla bandierina
+        team_link = team_cell.find("a") if team_cell else None
+        team_name = team_link.get_text(strip=True) if team_link else (team_cell.get_text(strip=True) if team_cell else "")
         key = (player_name, team_name)
         if key not in mids:
             continue
@@ -567,13 +591,20 @@ def scrape_misc(scraper, url: str, mids: Dict[tuple, Dict[str, Any]]) -> None:
 # ================== MAIN SCRAPER ==================
 
 def main():
-    collection = db[MONGO_COLLECTION_NAME]
     scraper = create_scraper()
 
     for lg in LEAGUES:
         print("\n" + "=" * 40)
         print(f"🏆 LEGA: {lg['name']} ({lg['code']})")
         print("=" * 40)
+        
+        # ✅ Collezione dinamica in base al code
+        if lg['code'] == 'UCL':
+            collection = db["players_stats_fbref_mid_ucl"]
+        elif lg['code'] == 'UEL':
+            collection = db["players_stats_fbref_mid_uel"]
+        else:
+            collection = db["players_stats_fbref_mid"]
 
         # --- STANDARD ---
         print(f"➡️  Scarico STANDARD: {lg['standard_url']}")

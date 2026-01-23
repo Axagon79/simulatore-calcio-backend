@@ -43,6 +43,17 @@ try:
     from ai_engine.deep_analysis import DeepAnalyzer
     from config import db
     from ai_engine.calculators.bulk_manager import get_all_data_bulk_cups
+    
+    # ✅ IMPORT CRONACA (da web_simulator_A)
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(
+        "web_simulator_A",
+        os.path.join(AI_ENGINE_DIR, "web_simulator_A.py")  # ✅ CORRETTO
+    )
+    web_sim_a = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(web_sim_a)
+    genera_match_report_completo = web_sim_a.genera_match_report_completo
+    
 except ImportError as e:
     print(json.dumps({"success": False, "error": f"Import Error: {e}"}), flush=True)
     sys.exit(1)
@@ -349,6 +360,52 @@ def run_cup_simulation(competition, home_team, away_team, algo_id, cycles):
             settings_cache=settings_cache
         )
         
+        # ✅ 6. GENERA CRONACA E STATISTICHE
+        try:
+            # Prepara h2h_data nel formato atteso
+            h2h_data_formatted = {
+                "formazioni": preloaded_data.get("formazioni", {}),
+                "home_team": home_team,
+                "away_team": away_team
+            }
+            
+            # Crea deep_stats mock con TUTTI i campi necessari
+            deep_stats_mock = {
+                'under_over': {},
+                'exact_scores': {},
+                'confidence': {
+                    'global_confidence': 50,
+                    'total_std': 2.0
+                },
+                'sign_1': {'pct': 0, 'count': 0},
+                'sign_x': {'pct': 0, 'count': 0},
+                'sign_2': {'pct': 0, 'count': 0},
+                'gg': {'pct': 0, 'count': 0},
+                'ng': {'pct': 0, 'count': 0},        # ✅ AGGIUNGI (No Goal)
+                'gg_yes': {'pct': 0, 'count': 0},
+                'gg_no': {'pct': 0, 'count': 0},
+                'total_simulations': len(sim_list),
+                'top_10_scores': []
+            }
+            
+            anatomy = genera_match_report_completo(
+                gh, ga,
+                h2h_data_formatted,  # h2h_data formattato
+                team_h_doc,          # team_h_doc
+                team_a_doc,          # team_a_doc
+                sim_list,            # sim_list
+                deep_stats_mock,     # deep_stats con struttura minima
+                bulkcache=bulk_cache
+            )
+        except Exception as e:
+            import traceback
+            print(f"⚠️ [CUPS] Errore generazione cronaca: {e}", file=sys.stderr)
+            print(traceback.format_exc(), file=sys.stderr)
+            anatomy = {"statistiche": {}, "cronaca": []}
+        
+        # 7. COSTRUISCI RISULTATO
+        execution_time = time.time() - start_time
+        
         # 6. COSTRUISCI RISULTATO
         execution_time = time.time() - start_time
         
@@ -363,6 +420,9 @@ def run_cup_simulation(competition, home_team, away_team, algo_id, cycles):
             "cycles_requested": cycles,
             "cycles_executed": len(sim_list),
             "execution_time": round(execution_time, 3),
+            # ✅ AGGIUNGI CRONACA E STATISTICHE
+            "statistiche": anatomy.get("statistiche", {}),
+            "cronaca": anatomy.get("cronaca", []),
             "match_info": {
                 "home_team": home_team,
                 "away_team": away_team,

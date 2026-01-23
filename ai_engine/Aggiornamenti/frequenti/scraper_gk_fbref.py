@@ -33,7 +33,7 @@ from pymongo import UpdateOne
 
 SEASON = "2025-2026"
 
-MONGO_COLLECTION_NAME = "players_stats_fbref_gk"
+
 
 LEAGUES = [
     # ITALIA
@@ -162,6 +162,18 @@ LEAGUES = [
         "keepers_url": "https://fbref.com/en/comps/25/keepers/J1-League-Stats",
         "keepersadv_url": "https://fbref.com/en/comps/25/keepersadv/J1-League-Stats",
     },
+    
+    # 🆕 COPPE EUROPEE
+    {
+        "name": "Champions League", "code": "UCL", "comp_id": 8,
+        "keepers_url": "https://fbref.com/en/comps/8/keepers/Champions-League-Stats",
+        "keepersadv_url": "https://fbref.com/en/comps/8/keepersadv/Champions-League-Stats",
+    },
+    {
+        "name": "Europa League", "code": "UEL", "comp_id": 19,
+        "keepers_url": "https://fbref.com/en/comps/19/keepers/Europa-League-Stats",
+        "keepersadv_url": "https://fbref.com/en/comps/19/keepersadv/Europa-League-Stats",
+    },
 ]
 
 
@@ -275,7 +287,9 @@ def scrape_keepers_table(table) -> Dict[tuple, Dict[str, Any]]:
             continue
 
         player_name = player_cell.get_text(strip=True)
-        team_name = team_cell.get_text(strip=True)
+        # ✅ Estrai solo dal link <a>, non dalla bandierina
+        team_link = team_cell.find("a") if team_cell else None
+        team_name = team_link.get_text(strip=True) if team_link else (team_cell.get_text(strip=True) if team_cell else "")
 
         data = {}
         for cell in r.find_all(["th", "td"]):
@@ -317,7 +331,9 @@ def scrape_keepersadv_table(table) -> Dict[tuple, Dict[str, Any]]:
             continue
 
         player_name = player_cell.get_text(strip=True)
-        team_name = team_cell.get_text(strip=True)
+        # ✅ Estrai solo dal link <a>, non dalla bandierina
+        team_link = team_cell.find("a") if team_cell else None
+        team_name = team_link.get_text(strip=True) if team_link else (team_cell.get_text(strip=True) if team_cell else "")
 
         data = {}
         for cell in r.find_all(["th", "td"]):
@@ -335,13 +351,20 @@ def scrape_keepersadv_table(table) -> Dict[tuple, Dict[str, Any]]:
 # ================== MAIN SCRAPER ==================
 
 def main():
-    collection = db[MONGO_COLLECTION_NAME]
     scraper = create_scraper()
 
     for lg in LEAGUES:
         print("\n" + "=" * 40)
         print(f"🏆 LEGA: {lg['name']} ({lg['code']})")
         print("=" * 40)
+        
+        # ✅ Collezione dinamica in base al code
+        if lg['code'] == 'UCL':
+            collection = db["players_stats_fbref_gk_ucl"]
+        elif lg['code'] == 'UEL':
+            collection = db["players_stats_fbref_gk_uel"]
+        else:
+            collection = db["players_stats_fbref_gk"]
 
         # --- KEEPERS ---
         print(f"➡️  Scarico KEEPERS: {lg['keepers_url']}")

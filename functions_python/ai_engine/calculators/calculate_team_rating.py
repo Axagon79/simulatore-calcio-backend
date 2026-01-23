@@ -26,10 +26,25 @@ DEFAULT_FORMATION = "4-3-3"
 
 
 teams_col = db["teams"]
+teams_ucl_col = db["teams_champions_league"]
+teams_uel_col = db["teams_europa_league"]
+
+# Collezioni giocatori - Campionati
 gk_col = db["players_stats_fbref_gk"]
 def_col = db["players_stats_fbref_def"]
 mid_col = db["players_stats_fbref_mid"]
 att_col = db["players_stats_fbref_att"]
+
+# Collezioni giocatori - Coppe
+gk_ucl_col = db["players_stats_fbref_gk_ucl"]
+def_ucl_col = db["players_stats_fbref_def_ucl"]
+mid_ucl_col = db["players_stats_fbref_mid_ucl"]
+att_ucl_col = db["players_stats_fbref_att_ucl"]
+
+gk_uel_col = db["players_stats_fbref_gk_uel"]
+def_uel_col = db["players_stats_fbref_def_uel"]
+mid_uel_col = db["players_stats_fbref_mid_uel"]
+att_uel_col = db["players_stats_fbref_att_uel"]
 
 
 # ==================== FUNZIONI ====================
@@ -130,16 +145,30 @@ def get_team_aliases(team_doc):
 def get_gk_by_minutes(league, team_aliases):
     """
     ⭐ AGGIORNATO: Recupera GK ordinati per MINUTES_90S (non rating)
+    Cerca in campionati + UCL + UEL
     """
-    players = list(gk_col.find(
-        {
-            "team_name_fbref": {"$in": team_aliases},
-            "league_name": league,
-            "gk_rating.rating_puro": {"$gte": 4, "$lte": 10, "$ne": None},
-            "minutes_90s": {"$gte": 0, "$ne": None}  # ⭐ Filtra anche per minuti
-        },
-        {"player_name_fbref": 1, "gk_rating.rating_puro": 1, "minutes_90s": 1, "_id": 0}
-    ).sort("minutes_90s", -1))  # ⭐ ORDINA PER MINUTI (non rating!)
+    # Filtro base
+    filter_query = {
+        "team_name_fbref": {"$in": team_aliases},
+        "gk_rating.rating_puro": {"$gte": 4, "$lte": 10, "$ne": None},
+        "minutes_90s": {"$gte": 0, "$ne": None}
+    }
+    
+    # Aggiungi filtro league solo se non è N/A
+    if league and league != "N/A":
+        filter_query["league_name"] = league
+    
+    # ⭐ CERCA IN TUTTE LE COLLEZIONI (campionati + coppe)
+    all_players = []
+    for col in [gk_col, gk_ucl_col, gk_uel_col]:
+        players = list(col.find(
+            filter_query,
+            {"player_name_fbref": 1, "gk_rating.rating_puro": 1, "minutes_90s": 1, "_id": 0}
+        ))
+        all_players.extend(players)
+    
+    # Ordina per minuti
+    players = sorted(all_players, key=lambda x: x.get("minutes_90s", 0), reverse=True)
     
     result = []
     for p in players:
@@ -152,17 +181,33 @@ def get_gk_by_minutes(league, team_aliases):
     return result
 
 
-def get_players_by_minutes(league, role_collection, rating_field, team_aliases):
-    """Recupera giocatori ordinati per minutes_90s"""
-    players = list(role_collection.find(
-        {
-            "team_name_fbref": {"$in": team_aliases},
-            "league_name": league,
-            f"{rating_field}.rating_puro": {"$gte": 4, "$lte": 10, "$ne": None},
-            "minutes_90s": {"$gte": 0, "$ne": None}
-        },
-        {"player_name_fbref": 1, rating_field: 1, "minutes_90s": 1, "_id": 0}
-    ).sort("minutes_90s", -1))
+def get_players_by_minutes(league, role_collections, rating_field, team_aliases):
+    """
+    Recupera giocatori ordinati per minutes_90s
+    role_collections è ora una LISTA di collezioni da cercare
+    """
+    # Filtro base
+    filter_query = {
+        "team_name_fbref": {"$in": team_aliases},
+        f"{rating_field}.rating_puro": {"$gte": 4, "$lte": 10, "$ne": None},
+        "minutes_90s": {"$gte": 0, "$ne": None}
+    }
+    
+    # Aggiungi filtro league solo se non è N/A
+    if league and league != "N/A":
+        filter_query["league_name"] = league
+    
+    # ⭐ CERCA IN TUTTE LE COLLEZIONI
+    all_players = []
+    for col in role_collections:
+        players = list(col.find(
+            filter_query,
+            {"player_name_fbref": 1, f"{rating_field}.rating_puro": 1, "minutes_90s": 1, "_id": 0}
+        ))
+        all_players.extend(players)
+    
+    # Ordina per minuti
+    players = sorted(all_players, key=lambda x: x.get("minutes_90s", 0), reverse=True)
     
     result = []
     for p in players:
@@ -217,7 +262,15 @@ def calculate_team_rating(team_name, verbose=True, bulk_cache=None):
                 break
     else:
         # Fallback DB
+        # Cerca in teams (campionati)
         team = teams_col.find_one({"name": team_name}) or teams_col.find_one({"aliases": team_name})
+
+        # Se non trovata, cerca nelle coppe
+        if not team:
+            team = teams_ucl_col.find_one({"name": team_name}) or teams_ucl_col.find_one({"aliases": team_name})
+
+        if not team:
+            team = teams_uel_col.find_one({"name": team_name}) or teams_uel_col.find_one({"aliases": team_name})
 
     if not team:
         if verbose:
@@ -276,9 +329,9 @@ def calculate_team_rating(team_name, verbose=True, bulk_cache=None):
         all_att = [{"player": p["player_name_fbref"], "rating": p.get("att_rating", {}).get("rating_puro", 0), "minutes_90s": p.get("minutes_90s", 0)} for p in filter_bulk("ATT")]
     else:
         all_gk = get_gk_by_minutes(league, team_aliases)
-        all_def = get_players_by_minutes(league, def_col, "def_rating", team_aliases)
-        all_mid = get_players_by_minutes(league, mid_col, "mid_rating", team_aliases)
-        all_att = get_players_by_minutes(league, att_col, "att_rating", team_aliases)
+        all_def = get_players_by_minutes(league, [def_col, def_ucl_col, def_uel_col], "def_rating", team_aliases)
+        all_mid = get_players_by_minutes(league, [mid_col, mid_ucl_col, mid_uel_col], "mid_rating", team_aliases)
+        all_att = get_players_by_minutes(league, [att_col, att_ucl_col, att_uel_col], "att_rating", team_aliases)
     
     print(f"\n👥 Giocatori:")
     print(f"   GK:  {len(all_gk)} (per minuti)")  # ⭐ CAMBIATO testo

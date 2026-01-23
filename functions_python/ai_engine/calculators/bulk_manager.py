@@ -335,9 +335,15 @@ def get_all_data_bulk_cups(home_team, away_team, competition):
     
     
     if match_doc:
-        print(f"✅ [BULK CUPS] Match trovato: {match_doc.get('homeTeam')} vs {match_doc.get('awayTeam')}", file=sys.stderr)
+        print(f"✅ [BULK CUPS] Match trovato: {match_doc.get('home_team')} vs {match_doc.get('away_team')}", file=sys.stderr)
         odds = match_doc.get('odds', {})
         print(f"  Odds: Home={odds.get('home')}, Draw={odds.get('draw')}, Away={odds.get('away')}", file=sys.stderr)
+        
+        # ✅ ESTRAI FORMAZIONI DA matches[0].h2h_data.formazioni
+        if 'matches' in match_doc and len(match_doc['matches']) > 0:
+            h2h_data = match_doc['matches'][0].get('h2h_data', {})
+            match_doc['formazioni'] = h2h_data.get('formazioni', {})
+            print(f"  📋 Formazioni estratte da matches[0].h2h_data", file=sys.stderr)
     else:
         print(f"❌ [BULK CUPS] NESSUN MATCH TROVATO!", file=sys.stderr)
         match_doc = {}
@@ -358,11 +364,23 @@ def get_all_data_bulk_cups(home_team, away_team, competition):
     print(f"📊 [BULK CUPS] Rosa range: {rosa_min:,.0f} - {rosa_max:,.0f}", file=sys.stderr)
     print(f"📊 [BULK CUPS] ELO range: {elo_min} - {elo_max}", file=sys.stderr)
     
-    # 4. COSTRUISCI MASTER_DATA (simile ai campionati)
+    # 4. COSTRUISCI MASTER_DATA (con formazioni dal match_doc!)
     master_map = {}
+    
+    # ✅ ESTRAI FORMAZIONI DAL MATCH_DOC
+    formazioni_match = match_doc.get("formazioni", {})
+    formazioni_home = formazioni_match.get("home_squad", {})
+    formazioni_away = formazioni_match.get("away_squad", {})
+    
+    print(f"🏆 [BULK CUPS] Formazioni disponibili: home={bool(formazioni_home)}, away={bool(formazioni_away)}", file=sys.stderr)
     
     for team in raw_teams:
         name = team.get("name")
+        aliases = team.get("aliases", [])
+        
+        # ✅ DETERMINA SE È HOME O AWAY per assegnare la formazione corretta
+        is_home = (name in home_names or any(alias in home_names for alias in aliases))
+        formazioni_team = formazioni_home if is_home else formazioni_away
         
         # Per le coppe non abbiamo power/attack/defense pre-calcolati
         # Li calcoleremo dal rating in preload_match_data
@@ -370,8 +388,12 @@ def get_all_data_bulk_cups(home_team, away_team, competition):
             "valore_rosa": team.get("valore_rosa_transfermarkt", 0),
             "elo_rating": team.get("elo_rating", 1500),
             "country": team.get("country", "Unknown"),
-            "status": team.get("status", "active")
+            "status": team.get("status", "active"),
+            # ✅ AGGIUNGI FORMAZIONI
+            "formazioni": formazioni_team
         }
+        
+        print(f"  - {name}: formazioni={bool(formazioni_team)}, titolari={len(formazioni_team.get('titolari', []))}", file=sys.stderr)
         
         master_map[name] = team_entry
         

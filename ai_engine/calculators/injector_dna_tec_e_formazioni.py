@@ -45,6 +45,11 @@ def select_leagues_interactive(h2h_col):
     # Nota: Assumiamo che nei documenti h2h_by_round ci sia il campo "league"
     available_leagues = sorted(h2h_col.distinct("league"))
     
+    # ✅ Aggiungi Champions ed Europa League al menu
+    available_leagues.append("Champions League")
+    available_leagues.append("Europa League")
+    available_leagues = sorted(available_leagues)
+    
     if not available_leagues:
         print("⚠️  Nessun campo 'league' trovato in h2h_by_round.")
         print("   -> Procedo con l'elaborazione di TUTTO il database.")
@@ -89,6 +94,8 @@ def select_leagues_interactive(h2h_col):
 def run_injection(interactive=True):
     teams_col = db["teams"]
     h2h_col = db["h2h_by_round"]
+    ucl_col = db["matches_champions_league"]
+    uel_col = db["matches_europa_league"]
 
 # --- 1. GESTIONE MENU / AUTOMATICO ---
     if interactive:
@@ -113,26 +120,37 @@ def run_injection(interactive=True):
     failed_teams_log = {}
     data_cache = {}
 
-    def find_team_document(tm_id, team_name_str):
+    def find_team_document(tm_id, team_name_str, is_cup=False):
+        # Se è una coppa, cerca anche nelle collezioni coppe
+        collections_to_search = [teams_col]
+        
+        if is_cup:
+            collections_to_search.extend([
+                db["teams_champions_league"],
+                db["teams_europa_league"]
+            ])
+        
         # 1. ID
         if tm_id:
             try:
-                doc = teams_col.find_one({"transfermarkt_id": int(tm_id)})
-                if doc: return doc, "ID"
+                for col in collections_to_search:
+                    doc = col.find_one({"transfermarkt_id": int(tm_id)})
+                    if doc: return doc, "ID"
             except: pass
         
         # 2. NOME
         if team_name_str:
-            doc = teams_col.find_one({"name": team_name_str})
-            if doc: return doc, "NAME"
-            
-            # 3. ALIAS
-            doc = teams_col.find_one({"aliases": team_name_str})
-            if doc: return doc, "ALIAS"
-            
-            # 4. REGEX
-            doc = teams_col.find_one({"name": {"$regex": f"^{team_name_str}$", "$options": "i"}})
-            if doc: return doc, "REGEX"
+            for col in collections_to_search:
+                doc = col.find_one({"name": team_name_str})
+                if doc: return doc, "NAME"
+                
+                # 3. ALIAS
+                doc = col.find_one({"aliases": team_name_str})
+                if doc: return doc, "ALIAS"
+                
+                # 4. REGEX
+                doc = col.find_one({"name": {"$regex": f"^{team_name_str}$", "$options": "i"}})
+                if doc: return doc, "REGEX"
 
         return None, None
 
@@ -142,7 +160,8 @@ def run_injection(interactive=True):
         if cache_key in data_cache:
             return data_cache[cache_key]
 
-        team_doc, method = find_team_document(tm_id, team_name_str)
+        # Determina se è una coppa guardando il nome della squadra o contesto
+        team_doc, method = find_team_document(tm_id, team_name_str, is_cup=True)
         
         if not team_doc:
             failed_teams_log[team_name_str] = "❌ NON TROVATA NEL DB (Controlla nomi/ID teams)"
@@ -177,24 +196,57 @@ def run_injection(interactive=True):
         
         return None
 
-    # --- 2. RECUPERO ROUND FILTRATI ---
-    all_rounds = list(h2h_col.find(query_filter))
-    total_rounds = len(all_rounds)
+    # --- 2. RECUPERO DOCUMENTI FILTRATI (Campionati + Coppe) ---
+    all_docs = []
     
-    if total_rounds == 0:
-        print("❌ Nessun round trovato con i criteri selezionati.")
+    # Determina quali collezioni processare in base al filtro
+    if not query_filter:  # Tutto
+        all_docs.extend(list(h2h_col.find({})))
+        all_docs.extend(list(ucl_col.find({})))
+        all_docs.extend(list(uel_col.find({})))
+    elif "league" in query_filter and "$in" in query_filter["league"]:
+        # Filtra per campionati specifici
+        selected = query_filter["league"]["$in"]
+        
+        # Campionati normali
+        if any(s not in ["Champions League", "Europa League"] for s in selected):
+            league_filter = [s for s in selected if s not in ["Champions League", "Europa League"]]
+            if league_filter:
+                all_docs.extend(list(h2h_col.find({"league": {"$in": league_filter}})))
+        
+        # Champions League
+        if "Champions League" in selected:
+            all_docs.extend(list(ucl_col.find({})))
+        
+        # Europa League
+        if "Europa League" in selected:
+            all_docs.extend(list(uel_col.find({})))
+    
+    total_docs = len(all_docs)
+    
+    if total_docs == 0:
+        print("❌ Nessun documento trovato con i criteri selezionati.")
         return
 
     # Ciclo principale
-    for i, round_doc in enumerate(all_rounds):
-        progress = (i + 1) / total_rounds * 100
-        # Aggiungiamo info sulla lega corrente nel print di progresso
-        current_league = round_doc.get("league", "Sconosciuta")
-        print(f"\r⏳ [{current_league}] Round {i+1}/{total_rounds} ({progress:.1f}%) - Match OK: {stats['processed_matches']}", end="")
+    for i, doc in enumerate(all_docs):
+        progress = (i + 1) / total_docs * 100
+        current_league = doc.get("league") or doc.get("competition", "Coppa")
+        print(f"\r⏳ [{current_league}] Doc {i+1}/{total_docs} ({progress:.1f}%) - Match OK: {stats['processed_matches']}", end="")
 
-        round_id = round_doc["_id"]
-        matches = round_doc.get("matches", [])
+        doc_id = doc["_id"]
+        matches = doc.get("matches", [])
         modified = False
+        
+        # Determina quale collezione aggiornare
+        if "league" in doc:
+            target_col = h2h_col
+        elif doc.get("competition") == "UCL":
+            target_col = ucl_col
+        elif doc.get("competition") == "UEL":
+            target_col = uel_col
+        else:
+            continue
         
         for match in matches:
             id_home = match.get("home_tm_id")
@@ -228,8 +280,8 @@ def run_injection(interactive=True):
             stats["processed_matches"] += 1
 
         if modified:
-            h2h_col.update_one(
-                {"_id": round_id},
+            target_col.update_one(
+                {"_id": doc_id},
                 {"$set": {"matches": matches, "last_tec_formazioni_update": datetime.now()}}
             )
 

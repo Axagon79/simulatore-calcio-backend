@@ -1,0 +1,183 @@
+======================================================================
+🔍 DEBUG SCRAPER DIFENSORI - CHAMPIONS LEAGUE
+======================================================================
+
+📡 URL: https://fbref.com/en/comps/8/defense/Champions-League-Stats
+✅ Status Code: 200
+✅ Tabella 'stats_defense' trovata!
+📊 Righe trovate nel tbody: 850
+
+──────────────────────────────────────────────────────────────────────
+🎯 CERCO GIOCATORI DELLE SQUADRE PROBLEMATICHE:
+──────────────────────────────────────────────────────────────────────
+   - Qarabağ
+   - Slavia Prague
+   - Olympiacos
+   - FC Kairat
+──────────────────────────────────────────────────────────────────────
+
+======================================================================
+📊 RISULTATI PER SQUADRE PROBLEMATICHE
+======================================================================
+
+🏟️  Qarabağ:
+   📊 Totale giocatori trovati: 20
+   🛡️  Difensori: 7
+
+   📋 DETTAGLIO GIOCATORI:
+      ⚽ Emmanuel Addai - MF
+      ⚽ Leandro Andrade - MF
+      ⚽ Nəriman Axundzadə - FW
+      🛡️ Toral Bayramov - DF
+      ⚽ Pedro Bicalho - MF
+      🛡️ Dani Bolt - DF
+      ⚽ Kady Borges - MF
+      🛡️ Elvin Cafarguliyev - DF
+      ⚽ Chriso - MF
+      ⚽ Marko Janković - MF
+      ⚽ Oleksii Kashchuk - MF
+      ⚽ Mateusz Kochalski - GK
+      ⚽ Camilo Marques - FW,MF
+      🛡️ Kevin Medina - DF
+      🛡️ Samy Mmaee - DF
+      ⚽ Joni Montiel - MF
+      🛡️ Bəhlul Mustafazadə - DF
+      ⚽ Musa Qurbanlı - FW
+      🛡️ Matheus Silva - DF
+      ⚽ Abdellah Zoubir - MF
+
+🏟️  Slavia Prague:
+   📊 Totale giocatori trovati: 23
+   🛡️  Difensori: 10
+
+   📋 DETTAGLIO GIOCATORI:
+      🛡️ Jan Bořil - DF
+      🛡️ Štěpán Chaloupek - DF,MF
+      ⚽ Muhammed Cham - MF
+      ⚽ Tomáš Chorý - FW
+      ⚽ Mojmir Chytil - FW
+      🛡️ Oscar Dorley - MF,DF
+      🛡️ David Doudera - MF,DF
+      ⚽ Daiki Hashioka - MF
+      🛡️ Tomáš Holeš - DF
+      🛡️ Ogbu Igoh - DF
+      ⚽ Vasil Kušej - MF,FW
+      ⚽ Jakub Markovič - GK
+      🛡️ Youssoupha Mbodji - MF,DF
+      🛡️ David Moses - MF,DF
+      ⚽ Erik Prekop - FW,MF
+      ⚽ Lukáš Provod - MF,FW
+      ⚽ Michal Sadílek - MF
+      ⚽ Youssoupha Sanyang - MF,FW
+      ⚽ Ivan Schranz - FW,MF
+      ⚽ Jindřich Staněk - GK
+      🛡️ Tomáš Vlček - DF
+      ⚽ Christos Zafeiris - MF
+      🛡️ David Zima - DF
+
+🏟️  Olympiacos:
+   📊 Totale giocatori trovati: 22
+   🛡️  Difensori: 7
+
+   📋 DETTAGLIO GIOCATORI:
+      🛡️ Giulian Biancone - DF
+      ⚽ Chiquinho - MF
+      🛡️ Costinha - DF
+      ⚽ Dani García - MF
+      ⚽ Santiago Hezze - MF
+      ⚽ Ayoub El Kaabi - FW
+      ⚽ Gelson Martins - MF
+      ⚽ Christos Mouzakitis - MF
+      ⚽ Diogo Nascimento - MF
+      🛡️ Bruno Onyemaechi - DF,MF
+      🛡️ Francisco Ortega - DF
+      ⚽ Alexandros Paschalakis - GK
+      🛡️ Lorenzo Pirola - DF
+      ⚽ Stavros Pnevmonidis - MF
+      ⚽ Daniel Podence - MF
+      🛡️ Panagiotis Retsos - DF
+      🛡️ Rodinei - DF,MF
+      ⚽ Lorenzo Scipioni - MF
+      ⚽ Gabriel Strefezza - MF
+      ⚽ Mehdi Taremi - FW
+      ⚽ Kostas Tzolakis - GK
+      ⚽ Roman Yaremchuk - FW,MF
+
+🏟️  FC Kairat:
+   📊 Totale giocatori trovati: 24
+   🛡️  Difensori: 8
+
+   📋 DETTAGLIO GIOCATORI:
+      ⚽ Mukhamedali Abish - MF
+      ⚽ Temirlan Anarbekov - GK
+      ⚽ Ofri Arad - MF
+      ⚽ Olzhas Baibek - MF
+      ⚽ Mansur Birkurmanov - MF
+      ⚽ Jorginho Costa - MF,FW
+      ⚽ Edimilson Filho - FW,MF
+      ⚽ Dan Glazer - MF
+      ⚽ Valeriy Gromyko - MF,FW
+      ⚽ Sherhan Kalmurza - GK
+      🛡️ Damir Kasabulat - MF,DF
+      🛡️ Lev Kurgin - DF
+      🛡️ Alyaksandr Martynovich - DF
+      🛡️ Luís Mata - DF
+      🛡️ Alexandr Mrynskiy - MF,DF
+      ⚽ Ricardinho - MF,FW
+      ⚽ Adilet Sadybekov - MF
+      ⚽ Dastan Satpayev - MF,FW
+      🛡️ Aleksandr Shirobokov - DF
+      🛡️ Yegor Sorokin - DF
+      ⚽ Jug Stanojev - MF
+      🛡️ Erkin Tapalov - DF,MF
+      ⚽ Azamat Tuyakbaev - FW
+      ⚽ Giorgi Zaria - MF
+
+======================================================================
+🌍 TUTTE LE SQUADRE TROVATE NELLA TABELLA (36):
+======================================================================
+      Ajax
+      Arsenal
+      Atalanta
+      Athletic Club
+      Atlético Madrid
+      Barcelona
+      Bayern Munich
+      Benfica
+      Bodø/Glimt
+      Chelsea
+      Club Brugge
+      Dortmund
+      Eintracht Frankfurt
+      FC Copenhagen
+   🎯 FC Kairat
+      Galatasaray
+      Inter
+      Juventus
+      Leverkusen
+      Liverpool
+      Manchester City
+      Marseille
+      Monaco
+      Napoli
+      Newcastle United
+   🎯 Olympiacos
+      PSV
+      Pafos FC
+      Paris Saint-Germain
+   🎯 Qarabağ
+      Real Madrid
+   🎯 Slavia Prague
+      Sporting CP
+      Tottenham Hotspur
+      Union SG
+      Villarreal
+
+======================================================================
+📊 RIEPILOGO FINALE
+======================================================================
+✅ Totale difensori trovati per squadre target: 32
+📋 Totale squadre nella tabella: 36
+
+======================================================================
+
