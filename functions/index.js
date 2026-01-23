@@ -391,9 +391,9 @@ app.get('/cup-matches', async (req, res) => {
 app.use('/simulation', simulationRoutes);
 
 
-// ============================================
+// =============================================
 // ROOT E ESPORTAZIONE
-// ============================================
+// =============================================
 
 app.get('/', (req, res) => {
   res.send('Simulatore Calcio API is running... ⚽');

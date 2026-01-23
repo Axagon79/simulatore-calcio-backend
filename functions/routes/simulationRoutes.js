@@ -241,7 +241,7 @@ router.post('/simulate-cup', async (req, res) => {
 
 // 🏆 ENDPOINT: Lista squadre coppe
 router.get('/cup-teams', async (req, res) => {
-  const { competition } = req.query; // 'UCL' o 'UEL'
+  const { competition } = req.query;
   
   if (!competition || !['UCL', 'UEL'].includes(competition)) {
     return res.status(400).json({
@@ -252,49 +252,26 @@ router.get('/cup-teams', async (req, res) => {
 
   console.log('🏆 [CUPS] Richiesta teams per:', competition);
 
-  // Path allo script Python per ottenere teams
-  const pythonScript = path.join(__dirname, '../../functions_python/ai_engine/cups/get_cup_teams.py');
-  
-  const python = spawn('python', [pythonScript, competition]);
-
-  let result = '';
-  let errorOutput = '';
-
-  python.stdout.on('data', (data) => {
-    result += data.toString();
-  });
-
-  python.stderr.on('data', (data) => {
-    errorOutput += data.toString();
-    console.error('⚠️ [CUPS-TEAMS] Python stderr:', data.toString());
-  });
-
-  python.on('close', (code) => {
-    if (code !== 0) {
-      return res.status(500).json({
-        error: 'Errore nel recupero teams',
-        details: errorOutput,
-        competition
-      });
-    }
-
-    try {
-      const json = JSON.parse(result);
-      return res.json(json);
-    } catch (e) {
-      console.error('❌ [CUPS-TEAMS] Errore parsing JSON:', e.message);
-      return res.status(500).json({
-        error: 'Output Python non valido',
-        details: result
-      });
-    }
-  });
+  try {
+    const response = await fetch(
+      `https://get-cup-teams-6b34yfzjia-uc.a.run.app?competition=${competition}`
+    );
+    
+    const data = await response.json();
+    return res.json(data);
+  } catch (error) {
+    console.error('❌ [CUPS-TEAMS] Errore:', error);
+    return res.status(500).json({
+      error: 'Errore nel recupero teams',
+      details: error.message
+    });
+  }
 });
 
 
 // 🏆 ENDPOINT: Lista partite coppe
 router.get('/cup-matches', async (req, res) => {
-  const { competition } = req.query; // 'UCL' o 'UEL'
+  const { competition } = req.query;
   
   if (!competition || !['UCL', 'UEL'].includes(competition)) {
     return res.status(400).json({
@@ -305,43 +282,20 @@ router.get('/cup-matches', async (req, res) => {
 
   console.log('🏆 [CUPS] Richiesta matches per:', competition);
 
-  // Path allo script Python per ottenere matches
-  const pythonScript = path.join(__dirname, '../../functions_python/ai_engine/cups/get_cup_matches.py');
-  
-  const python = spawn('python', [pythonScript, competition]);
-
-  let result = '';
-  let errorOutput = '';
-
-  python.stdout.on('data', (data) => {
-    result += data.toString();
-  });
-
-  python.stderr.on('data', (data) => {
-    errorOutput += data.toString();
-    console.error('⚠️ [CUPS-MATCHES] Python stderr:', data.toString());
-  });
-
-  python.on('close', (code) => {
-    if (code !== 0) {
-      return res.status(500).json({
-        error: 'Errore nel recupero matches',
-        details: errorOutput,
-        competition
-      });
-    }
-
-    try {
-      const json = JSON.parse(result);
-      return res.json(json);
-    } catch (e) {
-      console.error('❌ [CUPS-MATCHES] Errore parsing JSON:', e.message);
-      return res.status(500).json({
-        error: 'Output Python non valido',
-        details: result
-      });
-    }
-  });
+  try {
+    const response = await fetch(
+      `https://get-cup-matches-6b34yfzjia-uc.a.run.app?competition=${competition}`
+    );
+    
+    const data = await response.json();
+    return res.json(data);
+  } catch (error) {
+    console.error('❌ [CUPS-MATCHES] Errore:', error);
+    return res.status(500).json({
+      error: 'Errore nel recupero matches',
+      details: error.message
+    });
+  }
 });
 
 
@@ -369,7 +323,3 @@ router.get('/cups-info', async (req, res) => {
 });
 
 module.exports = router;
-
-module.exports = router;
-
-
