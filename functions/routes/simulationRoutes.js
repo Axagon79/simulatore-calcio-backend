@@ -283,12 +283,77 @@ router.get('/cup-matches', async (req, res) => {
   console.log('🏆 [CUPS] Richiesta matches per:', competition);
 
   try {
-    const response = await fetch(
-      `https://get-cup-matches-6b34yfzjia-uc.a.run.app?competition=${competition}`
-    );
+    const collectionMap = {
+      'UCL': 'matches_champions_league',
+      'UEL': 'matches_europa_league'
+    };
     
-    const data = await response.json();
-    return res.json(data);
+    const collectionName = collectionMap[competition];
+    
+    // Query DIRETTA MongoDB (come i campionati!)
+    const matches = await req.db.collection(collectionName)
+      .find(
+        { season: "2025-2026" },
+        {
+          projection: {
+            _id: 0,
+            home_team: 1,
+            away_team: 1,
+            match_date: 1,
+            status: 1,
+            result: 1,
+            odds: 1
+          }
+        }
+      )
+      .toArray();
+
+    // Separa e filtra: ultima giocata + prossima per squadra
+    const played = matches.filter(m => m.status === 'finished');
+    const upcoming = matches.filter(m => m.status === 'scheduled');
+
+    // Ordina per data
+    played.sort((a, b) => {
+      const dateA = a.match_date?.split(' ')[0].split('-').reverse().join('-') || '';
+      const dateB = b.match_date?.split(' ')[0].split('-').reverse().join('-') || '';
+      return dateB.localeCompare(dateA); // Più recente prima
+    });
+
+    upcoming.sort((a, b) => {
+      const dateA = a.match_date?.split(' ')[0].split('-').reverse().join('-') || '';
+      const dateB = b.match_date?.split(' ')[0].split('-').reverse().join('-') || '';
+      return dateA.localeCompare(dateB); // Più vicina prima
+    });
+
+    // Filtra: 1 partita per squadra
+    const teamsPlayed = new Set();
+    const finalPlayed = [];
+    for (const match of played) {
+      if (!teamsPlayed.has(match.home_team) || !teamsPlayed.has(match.away_team)) {
+        finalPlayed.push(match);
+        teamsPlayed.add(match.home_team);
+        teamsPlayed.add(match.away_team);
+      }
+    }
+
+    const teamsUpcoming = new Set();
+    const finalUpcoming = [];
+    for (const match of upcoming) {
+      if (!teamsUpcoming.has(match.home_team) || !teamsUpcoming.has(match.away_team)) {
+        finalUpcoming.push(match);
+        teamsUpcoming.add(match.home_team);
+        teamsUpcoming.add(match.away_team);
+      }
+    }
+
+    console.log(`✅ Cup matches ${competition}: ${matches.length} partite`);
+    
+    return res.json({
+      success: true,
+      matches: { played: finalPlayed, upcoming: finalUpcoming },
+      count: { played: finalPlayed.length, upcoming: finalUpcoming.length, total: finalPlayed.length + finalUpcoming.length }
+    });
+    
   } catch (error) {
     console.error('❌ [CUPS-MATCHES] Errore:', error);
     return res.status(500).json({

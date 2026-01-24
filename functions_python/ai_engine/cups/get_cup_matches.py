@@ -50,7 +50,15 @@ def get_cup_matches(competition):
         # Recupera tutte le partite della stagione corrente
         matches_cursor = db[collection_name].find(
             {"season": "2025-2026"},
-            {"_id": 0}
+            {
+                "_id": 0,
+                "home_team": 1,
+                "away_team": 1,
+                "match_date": 1,
+                "status": 1,
+                "result": 1,
+                "odds": 1
+            }
         )
         matches_raw = list(matches_cursor)
         

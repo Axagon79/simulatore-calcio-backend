@@ -221,35 +221,38 @@ def get_nations(request: https_fn.Request) -> https_fn.Response:
         except ImportError:
             from ai_engine.config import db
         
-        # Recupera le league attive
-        leagues = list(db["leagues"].find({"active": True}, {"_id": 0, "nation": 1}))
+        # 🎯 ACCESSO DIRETTO ALLA COLLEZIONE
+        collection = db["h2h_by_round"]
+        nations = collection.distinct("country")
         
-        # Estrai le nazioni uniche
-        nations = list(set([league["nation"] for league in leagues if "nation" in league]))
-        nations.sort()  # Ordina alfabeticamente
+        # Pulizia: eliminiamo valori nulli e convertiamo in stringhe
+        valid_nations = sorted([str(n) for n in nations if n])
+        
+        print(f"DEBUG: Trovate nazioni: {valid_nations}", file=sys.stderr)
         
         return https_fn.Response(
-            json.dumps({"success": True, "nations": nations}, ensure_ascii=False),
+            json.dumps(valid_nations, ensure_ascii=False), 
             mimetype='application/json',
             headers=headers
         )
     except Exception as e:
-        print(f"❌ Errore get_nations: {str(e)}", file=sys.stderr)
-        return https_fn.Response(
-            json.dumps({"success": False, "error": str(e)}),
-            status=500,
-            mimetype='application/json',
-            headers=headers
-        )
-
+        print(f"❌ Errore critico get_nations: {str(e)}", file=sys.stderr)
+        return https_fn.Response(json.dumps([]), status=500, headers=headers)
+    
 @https_fn.on_request(
     memory=options.MemoryOption.MB_256,
+    timeout_sec=10,  # Velocissimo, solo query DB
     region="us-central1"
 )
 def get_formations(request: https_fn.Request) -> https_fn.Response:
+    """
+    Endpoint VELOCE per recuperare le formazioni di una partita.
+    Usato per mostrare i giocatori durante il "riscaldamento" mentre la simulazione carica.
+    """
+    # --- GESTIONE CORS ---
     headers = {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, OPTIONS',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type',
         'Content-Type': 'application/json'
     }
@@ -258,19 +261,102 @@ def get_formations(request: https_fn.Request) -> https_fn.Response:
         return https_fn.Response('', status=204, headers=headers)
 
     try:
+        # --- IMPORTA DB ---
         try:
             from config import db
         except ImportError:
             from ai_engine.config import db
         
-        # Recupera le formazioni dal database
-        formations = list(db["formazioni_disponibili"].find({}, {"_id": 0}))
+        # --- LEGGI PARAMETRI ---
+        if hasattr(request, 'get_json'):
+            payload = request.get_json(silent=True) or {}
+        else:
+            payload = {}
+        
+        home_team = payload.get('home', '')
+        away_team = payload.get('away', '')
+        league = payload.get('league', 'Serie A')
+        
+        if not home_team or not away_team:
+            return https_fn.Response(
+                json.dumps({"success": False, "error": "Missing home or away team"}),
+                status=400,
+                mimetype='application/json',
+                headers=headers
+            )
+        
+        # --- PULIZIA NOME LEGA ---
+        league_clean = league.replace('_', ' ').title()
+        if league_clean == "Serie A":
+            league_clean = "Serie A"
+        
+        # --- CERCA LA PARTITA IN TUTTE LE GIORNATE  ---
+        match_data = {}
+        h2h_data = {}
+        
+        all_rounds = db.h2h_by_round.find({"league": league_clean})
+        for round_doc in all_rounds:
+            for m in round_doc.get('matches', []):
+                if m.get('home') == home_team and m.get('away') == away_team:
+                    match_data = m
+                    h2h_data = m.get('h2h_data', {})
+                    break
+            if match_data:
+                break
+        
+        if not match_data:
+            return https_fn.Response(
+                json.dumps({"success": False, "error": f"Match {home_team} vs {away_team} not found"}),
+                status=404,
+                mimetype='application/json',
+                headers=headers
+            )
+        
+        # --- ESTRAI FORMAZIONI ---
+        formazioni = h2h_data.get('formazioni', {})
+        home_squad = formazioni.get('home_squad', {})
+        away_squad = formazioni.get('away_squad', {})
+        
+        # --- PREPARA RISPOSTA ---
+        response_data = {
+            "success": True,
+            "home_team": home_team,
+            "away_team": away_team,
+            "home_formation": {
+                "modulo": home_squad.get('modulo', 'N/A'),
+                "titolari": [
+                    {
+                        "role": p.get('role', 'N/A'),
+                        "player": p.get('player', 'N/A'),
+                        "rating": round(p.get('rating', 0), 1)
+                    }
+                    for p in home_squad.get('titolari', [])
+                ]
+            },
+            "away_formation": {
+                "modulo": away_squad.get('modulo', 'N/A'),
+                "titolari": [
+                    {
+                        "role": p.get('role', 'N/A'),
+                        "player": p.get('player', 'N/A'),
+                        "rating": round(p.get('rating', 0), 1)
+                    }
+                    for p in away_squad.get('titolari', [])
+                ]
+            },
+            # Aggiungi anche info extra utili
+            "home_rank": h2h_data.get('home_rank'),
+            "away_rank": h2h_data.get('away_rank'),
+            "home_points": h2h_data.get('home_points'),
+            "away_points": h2h_data.get('away_points')
+        }
         
         return https_fn.Response(
-            json.dumps({"success": True, "formations": formations}, ensure_ascii=False),
+            json.dumps(response_data, ensure_ascii=False),
             mimetype='application/json',
             headers=headers
         )
+        
     except Exception as e:
         print(f"❌ Errore get_formations: {str(e)}", file=sys.stderr)
         return https_fn.Response(
@@ -279,7 +365,7 @@ def get_formations(request: https_fn.Request) -> https_fn.Response:
             mimetype='application/json',
             headers=headers
         )
-
+        
 @https_fn.on_request(
     memory=options.MemoryOption.MB_256,
     timeout_sec=10,
@@ -287,40 +373,44 @@ def get_formations(request: https_fn.Request) -> https_fn.Response:
 )
 def get_tuning(request: https_fn.Request) -> https_fn.Response:
     """
-    Endpoint per ottenere i parametri di tuning correnti.
+    Endpoint per LEGGERE i parametri di tuning da MongoDB.
+    Usato dal mixer online per mostrare i valori attuali.
     """
+    # --- GESTIONE CORS ---
     headers = {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, OPTIONS',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type',
         'Content-Type': 'application/json'
     }
-    
+
     if request.method == 'OPTIONS':
         return https_fn.Response('', status=204, headers=headers)
-    
+
     try:
+        # --- IMPORTA DB ---
         try:
             from config import db
         except ImportError:
             from ai_engine.config import db
+
+        # --- LEGGI DA MONGODB ---
+        doc = db['tuning_settings'].find_one({"_id": "main_config"})
         
-        # Recupera il tuning corrente
-        tuning = db["tuning_params"].find_one({}, {"_id": 0})
-        
-        if not tuning:
+        if doc and "config" in doc:
             return https_fn.Response(
-                json.dumps({"success": False, "error": "Tuning parameters not found"}),
+                json.dumps({"success": True, "config": doc["config"]}, ensure_ascii=False),
+                mimetype='application/json',
+                headers=headers
+            )
+        else:
+            return https_fn.Response(
+                json.dumps({"success": False, "error": "Tuning config not found"}),
                 status=404,
                 mimetype='application/json',
                 headers=headers
             )
-        
-        return https_fn.Response(
-            json.dumps({"success": True, "tuning": tuning}, ensure_ascii=False),
-            mimetype='application/json',
-            headers=headers
-        )
+
     except Exception as e:
         print(f"❌ Errore get_tuning: {str(e)}", file=sys.stderr)
         return https_fn.Response(
@@ -330,6 +420,7 @@ def get_tuning(request: https_fn.Request) -> https_fn.Response:
             headers=headers
         )
 
+
 @https_fn.on_request(
     memory=options.MemoryOption.MB_256,
     timeout_sec=10,
@@ -337,52 +428,61 @@ def get_tuning(request: https_fn.Request) -> https_fn.Response:
 )
 def save_tuning(request: https_fn.Request) -> https_fn.Response:
     """
-    Endpoint per salvare i parametri di tuning.
+    Endpoint per SALVARE i parametri di tuning su MongoDB.
+    Usato dal mixer online per aggiornare i valori.
     """
+    # --- GESTIONE CORS ---
     headers = {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type',
         'Content-Type': 'application/json'
     }
-    
+
     if request.method == 'OPTIONS':
         return https_fn.Response('', status=204, headers=headers)
-    
+
     try:
+        # --- IMPORTA DB ---
         try:
             from config import db
         except ImportError:
             from ai_engine.config import db
-        
-        # Leggi payload
+
+        # --- LEGGI PAYLOAD ---
         if hasattr(request, 'get_json'):
             payload = request.get_json(silent=True) or {}
         else:
             payload = {}
+
+        config_data = payload.get('config')
         
-        tuning_params = payload.get('tuning')
-        
-        if not tuning_params:
+        if not config_data:
             return https_fn.Response(
-                json.dumps({"success": False, "error": "Missing tuning parameters"}),
+                json.dumps({"success": False, "error": "Missing 'config' in request body"}),
                 status=400,
                 mimetype='application/json',
                 headers=headers
             )
-        
-        # Salva o aggiorna tuning
-        result = db["tuning_params"].replace_one({}, tuning_params, upsert=True)
-        
+
+        # --- SALVA SU MONGODB ---
+        result = db['tuning_settings'].update_one(
+            {"_id": "main_config"},
+            {"$set": {"config": config_data}},
+            upsert=True
+        )
+
         return https_fn.Response(
             json.dumps({
                 "success": True,
-                "message": "Tuning parameters saved",
+                "message": "Tuning saved successfully",
+                "modified": result.modified_count,
                 "upserted": result.upserted_id is not None
             }, ensure_ascii=False),
             mimetype='application/json',
             headers=headers
         )
+
     except Exception as e:
         print(f"❌ Errore save_tuning: {str(e)}", file=sys.stderr)
         return https_fn.Response(
@@ -391,7 +491,7 @@ def save_tuning(request: https_fn.Request) -> https_fn.Response:
             mimetype='application/json',
             headers=headers
         )
-
+        
 @https_fn.on_request(
     memory=options.MemoryOption.MB_256,
     timeout_sec=10,
@@ -399,11 +499,11 @@ def save_tuning(request: https_fn.Request) -> https_fn.Response:
 )
 def list_presets(request: https_fn.Request) -> https_fn.Response:
     """
-    Endpoint per listare tutti i preset salvati.
+    Endpoint per LISTARE tutti i preset salvati.
     """
     headers = {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, OPTIONS',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type',
         'Content-Type': 'application/json'
     }
@@ -634,13 +734,7 @@ def delete_preset(request: https_fn.Request) -> https_fn.Response:
             mimetype='application/json',
             headers=headers
         )
-
-
-@https_fn.on_request(
-    memory=options.MemoryOption.MB_512,
-    timeout_sec=30,
-    region="us-central1"
-)
+        
 def get_cup_teams(request: https_fn.Request) -> https_fn.Response:
     """
     Endpoint per ottenere le squadre di una competizione europea (UCL/UEL).
@@ -790,3 +884,4 @@ def get_cup_matches(request: https_fn.Request) -> https_fn.Response:
             mimetype='application/json',
             headers=headers
         )
+
