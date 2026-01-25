@@ -248,6 +248,10 @@ def get_formations(request: https_fn.Request) -> https_fn.Response:
     """
     Endpoint VELOCE per recuperare le formazioni di una partita.
     Usato per mostrare i giocatori durante il "riscaldamento" mentre la simulazione carica.
+    
+    SUPPORTA:
+    - Campionati (Serie A, Premier League, etc.)
+    - Coppe Europee (UCL, UEL)
     """
     # --- GESTIONE CORS ---
     headers = {
@@ -285,28 +289,60 @@ def get_formations(request: https_fn.Request) -> https_fn.Response:
                 headers=headers
             )
         
-        # --- PULIZIA NOME LEGA ---
-        league_clean = league.replace('_', ' ').title()
-        if league_clean == "Serie A":
-            league_clean = "Serie A"
+        # --- DETERMINA SE È UNA COPPA ---
+        is_cup = league in ['UCL', 'UEL']
         
-        # --- CERCA LA PARTITA IN TUTTE LE GIORNATE  ---
         match_data = {}
         h2h_data = {}
         
-        all_rounds = db.h2h_by_round.find({"league": league_clean})
-        for round_doc in all_rounds:
-            for m in round_doc.get('matches', []):
-                if m.get('home') == home_team and m.get('away') == away_team:
-                    match_data = m
-                    h2h_data = m.get('h2h_data', {})
+        if is_cup:
+            # ========================================
+            # LOGICA PER LE COPPE EUROPEE
+            # ========================================
+            # Determina quale collection usare
+            collection_name = 'matches_champions_league' if league == 'UCL' else 'matches_europa_league'
+            
+            # Accedi alla collection corretta
+            cup_collection = db[collection_name]
+            
+            # Cerca la partita in tutti i round
+            all_rounds = cup_collection.find({})
+            
+            for round_doc in all_rounds:
+                for m in round_doc.get('matches', []):
+                    # Usa le stesse chiavi dei campionati: 'home' e 'away'
+                    if m.get('home') == home_team and m.get('away') == away_team:
+                        match_data = m
+                        h2h_data = m.get('h2h_data', {})
+                        break
+                if match_data:
                     break
-            if match_data:
-                break
+        else:
+            # ========================================
+            # LOGICA PER I CAMPIONATI (ORIGINALE)
+            # ========================================
+            league_clean = league.replace('_', ' ').title()
+            if league_clean == "Serie A":
+                league_clean = "Serie A"
+            
+            # Cerca la partita in tutte le giornate
+            all_rounds = db.h2h_by_round.find({"league": league_clean})
+            for round_doc in all_rounds:
+                for m in round_doc.get('matches', []):
+                    if m.get('home') == home_team and m.get('away') == away_team:
+                        match_data = m
+                        h2h_data = m.get('h2h_data', {})
+                        break
+                if match_data:
+                    break
         
+        # --- VERIFICA SE LA PARTITA È STATA TROVATA ---
         if not match_data:
             return https_fn.Response(
-                json.dumps({"success": False, "error": f"Match {home_team} vs {away_team} not found"}),
+                json.dumps({
+                    "success": False, 
+                    "error": f"Match {home_team} vs {away_team} not found in {league}"
+                }),
                 status=404,
                 mimetype='application/json',
                 headers=headers
@@ -317,29 +353,50 @@ def get_formations(request: https_fn.Request) -> https_fn.Response:
         home_squad = formazioni.get('home_squad', {})
         away_squad = formazioni.get('away_squad', {})
         
+        # Se non ci sono formazioni, crea una struttura vuota
+        if not home_squad or not away_squad:
+            # Formazioni placeholder se non disponibili
+            home_squad = {
+                'modulo': '4-3-3',
+                'titolari': [
+                    {'role': 'GK', 'player': 'Portiere', 'rating': 6.5},
+                    {'role': 'DEF', 'player': 'Difensore', 'rating': 6.5},
+                    {'role': 'DEF', 'player': 'Difensore', 'rating': 6.5},
+                    {'role': 'DEF', 'player': 'Difensore', 'rating': 6.5},
+                    {'role': 'DEF', 'player': 'Difensore', 'rating': 6.5},
+                    {'role': 'MID', 'player': 'Centrocampista', 'rating': 6.5},
+                    {'role': 'MID', 'player': 'Centrocampista', 'rating': 6.5},
+                    {'role': 'MID', 'player': 'Centrocampista', 'rating': 6.5},
+                    {'role': 'ATT', 'player': 'Attaccante', 'rating': 6.5},
+                    {'role': 'ATT', 'player': 'Attaccante', 'rating': 6.5},
+                    {'role': 'ATT', 'player': 'Attaccante', 'rating': 6.5},
+                ]
+            }
+            away_squad = home_squad.copy()
+        
         # --- PREPARA RISPOSTA ---
         response_data = {
             "success": True,
             "home_team": home_team,
             "away_team": away_team,
             "home_formation": {
-                "modulo": home_squad.get('modulo', 'N/A'),
+                "modulo": home_squad.get('modulo', '4-3-3'),
                 "titolari": [
                     {
                         "role": p.get('role', 'N/A'),
                         "player": p.get('player', 'N/A'),
-                        "rating": round(p.get('rating', 0), 1)
+                        "rating": round(p.get('rating', 6.5), 1)
                     }
                     for p in home_squad.get('titolari', [])
                 ]
             },
             "away_formation": {
-                "modulo": away_squad.get('modulo', 'N/A'),
+                "modulo": away_squad.get('modulo', '4-3-3'),
                 "titolari": [
                     {
                         "role": p.get('role', 'N/A'),
                         "player": p.get('player', 'N/A'),
-                        "rating": round(p.get('rating', 0), 1)
+                        "rating": round(p.get('rating', 6.5), 1)
                     }
                     for p in away_squad.get('titolari', [])
                 ]
@@ -348,7 +405,8 @@ def get_formations(request: https_fn.Request) -> https_fn.Response:
             "home_rank": h2h_data.get('home_rank'),
             "away_rank": h2h_data.get('away_rank'),
             "home_points": h2h_data.get('home_points'),
-            "away_points": h2h_data.get('away_points')
+            "away_points": h2h_data.get('away_points'),
+            "is_cup": is_cup
         }
         
         return https_fn.Response(
@@ -359,6 +417,8 @@ def get_formations(request: https_fn.Request) -> https_fn.Response:
         
     except Exception as e:
         print(f"❌ Errore get_formations: {str(e)}", file=sys.stderr)
+        import traceback
+        traceback.print_exc()
         return https_fn.Response(
             json.dumps({"success": False, "error": str(e)}),
             status=500,
@@ -371,6 +431,7 @@ def get_formations(request: https_fn.Request) -> https_fn.Response:
     timeout_sec=10,
     region="us-central1"
 )
+
 def get_tuning(request: https_fn.Request) -> https_fn.Response:
     """
     Endpoint per LEGGERE i parametri di tuning da MongoDB.

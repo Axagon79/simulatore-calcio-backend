@@ -536,8 +536,8 @@ def genera_cronaca_live_densa(gh, ga, team_h, team_a, h2h_data):
                 "testo": f"{min_display}' ⚽ {prefisso}[{h}] GOOOL! {marcatore} - {tipo_gol}"
             })
             
-            # 2️⃣ POI: VAR CHECK (50% probabilità)
-            if random.random() < 0.50:
+            # 2️⃣ POI: VAR CHECK (35% probabilità)
+            if random.random() < 0.35:
                 minuti_recupero_extra += 2
                 
                 # 🆕 VARIANTI CHECK GOL

@@ -180,6 +180,14 @@ def build_cup_preloaded_data(team_h_doc, team_a_doc, match_doc, rosa_min, rosa_m
     team_h_master = master_data.get(home_name, {})
     team_a_master = master_data.get(away_name, {})
     
+    # ✅ DEBUG AGGIUNTIVO
+    print(f"🔍 [DEBUG BUILD] home_name='{home_name}', away_name='{away_name}'", file=sys.stderr)
+    print(f"🔍 [DEBUG BUILD] MASTER_DATA keys: {list(master_data.keys())}", file=sys.stderr)
+    print(f"🔍 [DEBUG BUILD] team_h_master keys: {list(team_h_master.keys())}", file=sys.stderr)
+    print(f"🔍 [DEBUG BUILD] team_a_master keys: {list(team_a_master.keys())}", file=sys.stderr)
+    print(f"🔍 [DEBUG BUILD] team_h_master formazioni: {team_h_master.get('formazioni', 'MISSING')}", file=sys.stderr)
+    print(f"🔍 [DEBUG BUILD] team_a_master formazioni: {team_a_master.get('formazioni', 'MISSING')}", file=sys.stderr)
+    
     # Costruisci preloaded_data compatibile con engine_core
     preloaded_data = {
         "league": competition,
@@ -219,8 +227,12 @@ def build_cup_preloaded_data(team_h_doc, team_a_doc, match_doc, rosa_min, rosa_m
         
         # ✅ AGGIUNGI BULK_CACHE (come i campionati!)
         "bulk_cache": bulk_cache,
-        
-        # Campi raw necessari per engine_core (DICT COMPLETO)
+        # ✅ FORMAZIONI (dal MASTER_DATA nel bulk_cache)
+        # Cerca nel MASTER_DATA usando anche gli alias
+        "formazioni": {
+            "home_squad": team_h_master.get('formazioni', {}),
+            "away_squad": team_a_master.get('formazioni', {})
+        },
         "home_raw": {
             'power': rating_h * 3,
             'attack': rating_h / 2.5,
@@ -258,9 +270,6 @@ def build_cup_preloaded_data(team_h_doc, team_a_doc, match_doc, rosa_min, rosa_m
             "avg_goals_home": 1.5,
             "avg_goals_away": 1.2
         },
-        
-        # Formazioni vuote (non disponibili)
-        "formazioni": {},
         
         # Metadati
         "competition": competition,
@@ -387,7 +396,10 @@ def run_cup_simulation(competition, home_team, away_team, algo_id, cycles):
                 'total_simulations': len(sim_list),
                 'top_10_scores': []
             }
-            
+            # ✅ DEBUG: Verifica formazioni
+            print(f"🔍 [DEBUG] preloaded_data keys: {list(preloaded_data.keys())}", file=sys.stderr)
+            print(f"🔍 [DEBUG] formazioni in preloaded_data: {preloaded_data.get('formazioni', 'MISSING')}", file=sys.stderr)
+            print(f"🔍 [DEBUG] h2h_data_formatted: {h2h_data_formatted}", file=sys.stderr)
             anatomy = genera_match_report_completo(
                 gh, ga,
                 h2h_data_formatted,  # h2h_data formattato
