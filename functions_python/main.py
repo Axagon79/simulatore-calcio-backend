@@ -58,11 +58,16 @@ def run_simulation(request: https_fn.Request) -> https_fn.Response:
         # 1. CASO SIMULAZIONE SINGOLA (Frontend/API)
         # ---------------------------------------------------------
         if payload and (payload.get('home') or payload.get('match_id') or payload.get('main_mode')):
+    
+            league = payload.get('league', 'Serie A')
+            
+            # ✅ DETERMINA SE È UNA COPPA
+            is_cup = league in ['UCL', 'UEL'] or payload.get('is_cup', False)
             
             script_args = [
                 str(payload.get('main_mode', 4)),
-                payload.get('nation', 'ITALIA'),
-                payload.get('league', 'Serie A'),
+                payload.get('nation', 'EUROPE' if is_cup else 'ITALIA'),
+                league,
                 payload.get('home', 'null'),
                 payload.get('away', 'null'),
                 payload.get('round', 'null'),
@@ -71,7 +76,11 @@ def run_simulation(request: https_fn.Request) -> https_fn.Response:
                 str(payload.get('save_db', False)).lower()
             ]
 
-            cmd = [sys.executable, "-m", "ai_engine.web_simulator_A"] + script_args
+            # ✅ USA SCRIPT DIVERSO PER COPPE
+            if is_cup:
+                cmd = [sys.executable, "-m", "ai_engine.cups.cups_engine.web_simulator_CUPS"] + script_args
+            else:
+                cmd = [sys.executable, "-m", "ai_engine.web_simulator_A"] + script_args
             
             # 2. SUBITO DOPO (prima del try), incolla queste due righe:
             env = os.environ.copy()
