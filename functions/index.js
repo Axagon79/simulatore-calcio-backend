@@ -38,6 +38,8 @@ app.use(async (req, res, next) => {
   }
 });
 
+app.use('/simulation', simulationRoutes);
+
 // ============================================
 // UTILITY FUNCTIONS
 // ============================================
@@ -366,29 +368,50 @@ app.get('/cup-matches', async (req, res) => {
     const cupId = req.query.cup;
     
     const cupMap = {
-      'UCL': 'matches_champions_league',
-      'UEL': 'matches_europa_league'
+      'UCL': { matches: 'matches_champions_league', teams: 'teams_champions_league' },
+      'UEL': { matches: 'matches_europa_league', teams: 'teams_europa_league' }
     };
     
-    const collectionName = cupMap[cupId];
-    if (!collectionName) {
+    const collections = cupMap[cupId];
+    if (!collections) {
       return res.json([]);
     }
 
-    const matches = await db.collection(collectionName)
+    // Carica tutte le squadre per creare una mappa nome -> _id
+    const teams = await db.collection(collections.teams).find({}).toArray();
+    
+    // Mappa: nome squadra (e aliases) -> MongoDB _id
+    const teamIdMap = {};
+    teams.forEach(team => {
+      teamIdMap[team.name.toLowerCase()] = team._id.toString();
+      // Aggiungi anche gli aliases
+      if (team.aliases && Array.isArray(team.aliases)) {
+        team.aliases.forEach(alias => {
+          teamIdMap[alias.toLowerCase()] = team._id.toString();
+        });
+      }
+    });
+
+    // Carica i match e aggiungi gli ID MongoDB
+    const matches = await db.collection(collections.matches)
       .find({})
       .toArray();
 
-    console.log(`✅ Cup matches ${cupId}: ${matches.length} partite`);
-    res.json(matches);
+    // Aggiungi home_team_id e away_team_id
+    const matchesWithIds = matches.map(match => ({
+      ...match,
+      home_team_id: teamIdMap[match.home_team.toLowerCase()] || null,
+      away_team_id: teamIdMap[match.away_team.toLowerCase()] || null
+    }));
+
+    console.log(`✅ Cup matches ${cupId}: ${matchesWithIds.length} partite`);
+    res.json(matchesWithIds);
     
   } catch (error) {
     console.error('Cup matches error:', error);
     res.status(500).json({ error: error.message });
   }
 });
-
-app.use('/simulation', simulationRoutes);
 
 
 // =============================================

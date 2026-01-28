@@ -267,6 +267,8 @@ router.get('/cup-matches', async (req, res) => {
             _id: 0,
             home_team: 1,
             away_team: 1,
+            home_mongo_id: 1,
+            away_mongo_id: 1,
             match_date: 1,
             status: 1,
             result: 1,
