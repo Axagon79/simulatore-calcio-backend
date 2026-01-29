@@ -2,6 +2,7 @@ import os
 import sys
 import gestore_accessi_fbref  # <--- AGGIUNGI QUESTA RIGA
 
+
 # --- FIX PERCORSI UNIVERSALE ---
 current_path = os.path.dirname(os.path.abspath(__file__))
 while not os.path.exists(os.path.join(current_path, 'config.py')):

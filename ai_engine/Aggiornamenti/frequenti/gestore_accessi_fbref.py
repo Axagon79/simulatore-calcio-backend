@@ -1,6 +1,7 @@
 import time
 import random
 import sys
+import winreg # Libreria standard di Windows per leggere il registro
 import undetected_chromedriver as uc
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -18,17 +19,67 @@ class BrowserIntelligente:
     def __init__(self):
         print("🤖 [Gestore Accessi] Avvio Chrome (Modalità Pulita)...")
         
+        # Opzioni per il PRIMO TENTATIVO
         options = uc.ChromeOptions()
         options.add_argument("--disable-blink-features=AutomationControlled")
         options.add_argument("--start-maximized")
         options.add_argument("--no-sandbox")
         
+        # --- BLOCCO AVVIO SMART (Auto-Correzione Versione) ---
         try:
-            # Nessun user-data-dir, quindi nessun profilo salvato
+            # 1. Prova l'avvio normale
             self.driver = uc.Chrome(options=options, headless=False)
+        
         except Exception as e:
-            print(f"❌ Errore critico avvio Chrome: {e}")
-            sys.exit(1)
+            error_msg = str(e).lower()
+            
+            # Se l'errore è di versione o sessione non creata
+            if "version" in error_msg or "session" in error_msg:
+                print(f"⚠️ [Browser] Conflitto versioni. Cerco la versione installata nel registro...")
+
+                # Funzione interna per leggere il registro di Windows
+                def get_real_chrome_version():
+                    try:
+                        import winreg 
+                        key_path = r"Software\Google\Chrome\BLBeacon"
+                        try:
+                            with winreg.OpenKey(winreg.HKEY_CURRENT_USER, key_path) as key:
+                                ver, _ = winreg.QueryValueEx(key, "version")
+                                return int(ver.split('.')[0])
+                        except:
+                            pass
+                        try:
+                            with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, key_path) as key:
+                                ver, _ = winreg.QueryValueEx(key, "version")
+                                return int(ver.split('.')[0])
+                        except:
+                            return None
+                    except:
+                        return None
+
+                # Eseguiamo il rilevamento
+                detected_version = get_real_chrome_version()
+
+                # --- FIX CRUCIALE: RICREIAMO LE OPZIONI PERCHÉ LE VECCHIE SONO BRUCIATE ---
+                new_options = uc.ChromeOptions()
+                new_options.add_argument("--disable-blink-features=AutomationControlled")
+                new_options.add_argument("--start-maximized")
+                new_options.add_argument("--no-sandbox")
+                # --------------------------------------------------------------------------
+
+                if detected_version:
+                    print(f"✅ [Browser] Trovata versione reale: {detected_version}")
+                    print(f"🔄 [Browser] Riavvio driver forzando versione {detected_version}...")
+                    # Usiamo new_options qui sotto!
+                    self.driver = uc.Chrome(options=new_options, headless=False, version_main=detected_version)
+                else:
+                    print("⚠️ [Browser] Versione non rilevata. Uso salvagente (144).")
+                    # Usiamo new_options qui sotto!
+                    self.driver = uc.Chrome(options=new_options, headless=False, version_main=144)
+            else:
+                print(f"❌ Errore critico avvio Chrome: {e}")
+                sys.exit(1)
+        # -----------------------------------------------------
 
     def tecnica_raggi_x(self):
         """Cerca il checkbox nascosto dentro gli Shadow DOM con JavaScript"""
