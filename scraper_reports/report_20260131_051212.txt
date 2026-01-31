@@ -1,0 +1,237 @@
+================================================================================
+REPORT SCRAPER QUOTE CALCIO
+================================================================================
+
+Data: 2026-01-31 05:07:58
+Partite totali: 650
+Partite aggiornate: 478
+Successo: 73.5%
+
+================================================================================
+🚨 SQUADRE CON PROBLEMI DI MATCHING
+================================================================================
+
+Totale squadre uniche con problemi: 32
+
+❌ Athletico-PR (3 partite mancanti)
+   Alias usati: athletico-pr, fortaleza
+
+❌ Corinthians (1 partite mancanti)
+   Alias usati: corinthians
+
+❌ Internacional (1 partite mancanti)
+   Alias usati: internacional
+
+❌ Santos (1 partite mancanti)
+   Alias usati: santos
+
+❌ New York (1 partite mancanti)
+   Alias usati: new york rb, new york red bulls, new york, york, ny red bulls
+
+❌ New England (1 partite mancanti)
+   Alias usati: new england revolution, new england, england, ne revolution
+
+❌ Chicago (1 partite mancanti)
+   Alias usati: chicago, chicago fire
+
+❌ Montréal (1 partite mancanti)
+   Alias usati: cf montreal, montreal, montréal
+
+❌ Minnesota (1 partite mancanti)
+   Alias usati: minnesota united fc, minnesota utd, minnesota
+
+❌ Cincinnati (1 partite mancanti)
+   Alias usati: fc cincinnati, cincinnati
+
+❌ Colorado (1 partite mancanti)
+   Alias usati: colorado, colorado rapids
+
+❌ Portland (1 partite mancanti)
+   Alias usati: portland, portland timbers
+
+❌ Orlando (1 partite mancanti)
+   Alias usati: orlando, orlando city
+
+❌ Miami (1 partite mancanti)
+   Alias usati: inter miami cf, inter miami, miami
+
+❌ SJ Earthquakes (1 partite mancanti)
+   Alias usati: sj earthquakes, san jose earthquakes, earthquakes
+
+❌ Atlanta (1 partite mancanti)
+   Alias usati: atlanta united, atlanta utd, atlanta
+
+❌ Salt Lake (1 partite mancanti)
+   Alias usati: salt, lake, real salt lake, salt lake
+
+❌ Seattle (1 partite mancanti)
+   Alias usati: seattle sounders, seattle
+
+❌ Dallas (1 partite mancanti)
+   Alias usati: dallas, fc dallas
+
+❌ Nashville (1 partite mancanti)
+   Alias usati: nashville
+
+❌ Houston (1 partite mancanti)
+   Alias usati: houston, houston dynamo
+
+❌ LAFC (1 partite mancanti)
+   Alias usati: los angeles fc, la, la fc, los angeles, lafc
+
+❌ Kansas City (1 partite mancanti)
+   Alias usati: sporting kc, sporting kansas city, kansas city, city, kansas
+
+❌ Columbus (1 partite mancanti)
+   Alias usati: columbus, columbus crew
+
+❌ San Diego (1 partite mancanti)
+   Alias usati: diego, san diego fc, san diego
+
+❌ St. Louis CITY (1 partite mancanti)
+   Alias usati: louis, city, st. louis, st. louis city
+
+❌ Vancouver (1 partite mancanti)
+   Alias usati: vancouver whitecaps, vancouver w'caps, vancouver
+
+❌ Toronto (1 partite mancanti)
+   Alias usati: toronto fc, toronto
+
+❌ LA Galaxy (1 partite mancanti)
+   Alias usati: los angeles galaxy, la galaxy, galaxy
+
+❌ Charlotte (1 partite mancanti)
+   Alias usati: charlotte fc, charlotte
+
+❌ Philadelphia (1 partite mancanti)
+   Alias usati: philadelphia, philadelphia union
+
+❌ New York City (1 partite mancanti)
+   Alias usati: new york city, new york city fc, nycfc, new york, york
+
+
+💡 SUGGERIMENTI:
+1. Vai sul sito NowGoal e cerca queste squadre
+2. Annota il nome ESATTO usato sul sito
+3. Aggiungi il nome del sito come alias nel database
+4. Se il nome è molto diverso, aggiorna normalize_name()
+
+================================================================================
+DETTAGLIO PARTITE NON TROVATE
+================================================================================
+
+
+SOLO_TRASFERTA_TROVATA (2 partite)
+--------------------------------------------------------------------------------
+  • Athletico-PR vs Corinthians
+    Lega: Brasileirão Serie A - Giornata: 2
+
+    📄 RIGA SUL SITO:
+    2 18-02
+23:30 Atletico Paranaense - Corinthians Paulista (SP)
+    💡 Cerca 'Athletico-PR' in questa riga per vedere come si chiama sul sito
+    ⚠️ Trasferta trovata in altre righe
+
+  • Athletico-PR vs Santos
+    Lega: Brasileirão Serie A - Giornata: 3
+
+    📄 RIGA SUL SITO:
+    3 12-02
+23:00 Atletico Paranaense - Santos
+2.40 3.25 2.88
+    💡 Cerca 'Athletico-PR' in questa riga per vedere come si chiama sul sito
+    ⚠️ Trasferta trovata in altre righe
+
+
+SOLO_CASA_TROVATA (1 partite)
+--------------------------------------------------------------------------------
+  • Internacional vs Athletico-PR
+    Lega: Brasileirão Serie A - Giornata: 1
+
+    📄 RIGA SUL SITO:
+    1 28-01
+23:00 Internacional RS[16]
+0-1
+Atletico Paranaense[Bra PL-4]
+1.83 3.30 4.33    0-1
+    💡 Cerca 'Athletico-PR' in questa riga per vedere come si chiama sul sito
+    ⚠️ Casa trovata in altre righe
+
+
+SQUADRE_IN_RIGHE_DIVERSE (14 partite)
+--------------------------------------------------------------------------------
+  • New York vs New England
+    Lega: Major League Soccer - Giornata: 2
+
+  • Chicago vs Montréal
+    Lega: Major League Soccer - Giornata: 2
+
+  • Minnesota vs Cincinnati
+    Lega: Major League Soccer - Giornata: 2
+
+  • Colorado vs Portland
+    Lega: Major League Soccer - Giornata: 2
+
+  • Orlando vs Miami
+    Lega: Major League Soccer - Giornata: 2
+
+  • SJ Earthquakes vs Atlanta
+    Lega: Major League Soccer - Giornata: 2
+
+  • Salt Lake vs Seattle
+    Lega: Major League Soccer - Giornata: 2
+
+  • Dallas vs Nashville
+    Lega: Major League Soccer - Giornata: 2
+
+  • Houston vs LAFC
+    Lega: Major League Soccer - Giornata: 2
+
+  • Kansas City vs Columbus
+    Lega: Major League Soccer - Giornata: 2
+
+  ... e altre 4 partite
+
+
+================================================================================
+ℹ️ PARTITE TROVATE MA SENZA QUOTE (NORMALE)
+================================================================================
+
+Totale: 155 partite
+Queste partite sono sul sito ma le quote non sono ancora pubblicate.
+Riprova più tardi, specialmente vicino alla data della partita.
+
+
+Serie A: 1 partite
+
+Serie B: 10 partite
+
+Serie C - Girone A: 10 partite
+
+Serie C - Girone B: 9 partite
+
+Serie C - Girone C: 10 partite
+
+Eredivisie: 1 partite
+
+Liga Portugal: 9 partite
+
+Championship: 12 partite
+
+2. Bundesliga: 9 partite
+
+Ligue 2: 9 partite
+
+Allsvenskan: 16 partite
+
+Eliteserien: 16 partite
+
+Superligaen: 6 partite
+
+Jupiler Pro League: 8 partite
+
+Süper Lig: 9 partite
+
+League of Ireland Premier Division: 5 partite
+
+Major League Soccer: 15 partite

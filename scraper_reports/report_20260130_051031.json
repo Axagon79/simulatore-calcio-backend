@@ -1,0 +1,2640 @@
+{
+  "timestamp": "2026-01-30 05:06:18",
+  "summary": {
+    "total_matches": 656,
+    "updated": 474,
+    "not_updated": 182,
+    "success_rate": 72.2560975609756
+  },
+  "leagues": [
+    {
+      "name": "Serie A",
+      "processed": 30,
+      "updated": 29
+    },
+    {
+      "name": "Serie B",
+      "processed": 30,
+      "updated": 20
+    },
+    {
+      "name": "Serie C - Girone A",
+      "processed": 30,
+      "updated": 20
+    },
+    {
+      "name": "Serie C - Girone B",
+      "processed": 27,
+      "updated": 18
+    },
+    {
+      "name": "Serie C - Girone C",
+      "processed": 30,
+      "updated": 20
+    },
+    {
+      "name": "Premier League",
+      "processed": 30,
+      "updated": 30
+    },
+    {
+      "name": "La Liga",
+      "processed": 30,
+      "updated": 30
+    },
+    {
+      "name": "Bundesliga",
+      "processed": 27,
+      "updated": 27
+    },
+    {
+      "name": "Ligue 1",
+      "processed": 27,
+      "updated": 27
+    },
+    {
+      "name": "Eredivisie",
+      "processed": 27,
+      "updated": 26
+    },
+    {
+      "name": "Liga Portugal",
+      "processed": 27,
+      "updated": 18
+    },
+    {
+      "name": "Championship",
+      "processed": 36,
+      "updated": 24
+    },
+    {
+      "name": "LaLiga 2",
+      "processed": 33,
+      "updated": 22
+    },
+    {
+      "name": "2. Bundesliga",
+      "processed": 27,
+      "updated": 18
+    },
+    {
+      "name": "Ligue 2",
+      "processed": 27,
+      "updated": 18
+    },
+    {
+      "name": "Scottish Premiership",
+      "processed": 12,
+      "updated": 12
+    },
+    {
+      "name": "Allsvenskan",
+      "processed": 16,
+      "updated": 0
+    },
+    {
+      "name": "Eliteserien",
+      "processed": 16,
+      "updated": 0
+    },
+    {
+      "name": "Superligaen",
+      "processed": 18,
+      "updated": 12
+    },
+    {
+      "name": "Jupiler Pro League",
+      "processed": 24,
+      "updated": 16
+    },
+    {
+      "name": "Süper Lig",
+      "processed": 27,
+      "updated": 18
+    },
+    {
+      "name": "League of Ireland Premier Division",
+      "processed": 10,
+      "updated": 5
+    },
+    {
+      "name": "Brasileirão Serie A",
+      "processed": 20,
+      "updated": 18
+    },
+    {
+      "name": "Primera División",
+      "processed": 45,
+      "updated": 45
+    },
+    {
+      "name": "Major League Soccer",
+      "processed": 30,
+      "updated": 1
+    },
+    {
+      "name": "J1 League",
+      "processed": 0,
+      "updated": 0
+    }
+  ],
+  "issues": [
+    {
+      "partita": "Milan vs Como",
+      "lega": "Serie A",
+      "giornata": 24,
+      "timestamp": "2026-01-30T05:06:34.321232",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "24 08-02\n15:00 AC Milan - Como"
+      }
+    },
+    {
+      "partita": "Cesena vs Pescara",
+      "lega": "Serie B",
+      "giornata": 23,
+      "timestamp": "2026-01-30T05:06:44.354637",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "23 06-02\n20:30 Cesena - Pescara"
+      }
+    },
+    {
+      "partita": "Carrarese vs Südtirol",
+      "lega": "Serie B",
+      "giornata": 23,
+      "timestamp": "2026-01-30T05:06:44.429853",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "23 07-02\n15:00 Carrarese - SudTirol"
+      }
+    },
+    {
+      "partita": "Catanzaro vs Reggiana",
+      "lega": "Serie B",
+      "giornata": 23,
+      "timestamp": "2026-01-30T05:06:44.479861",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "23 07-02\n15:00 Catanzaro - A.C. Reggiana 1919"
+      }
+    },
+    {
+      "partita": "Frosinone vs Venezia",
+      "lega": "Serie B",
+      "giornata": 23,
+      "timestamp": "2026-01-30T05:06:44.529758",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "23 07-02\n15:00 Frosinone - Venezia"
+      }
+    },
+    {
+      "partita": "Juve Stabia vs Padova",
+      "lega": "Serie B",
+      "giornata": 23,
+      "timestamp": "2026-01-30T05:06:44.579643",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "23 07-02\n15:00 Juve Stabia - Padova"
+      }
+    },
+    {
+      "partita": "Mantova vs Bari",
+      "lega": "Serie B",
+      "giornata": 23,
+      "timestamp": "2026-01-30T05:06:44.629836",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "23 07-02\n15:00 Mantova - Bari"
+      }
+    },
+    {
+      "partita": "Modena vs Sampdoria",
+      "lega": "Serie B",
+      "giornata": 23,
+      "timestamp": "2026-01-30T05:06:44.695503",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "23 07-02\n15:00 Modena - Sampdoria"
+      }
+    },
+    {
+      "partita": "Palermo vs Empoli",
+      "lega": "Serie B",
+      "giornata": 23,
+      "timestamp": "2026-01-30T05:06:44.745372",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "23 07-02\n17:15 Palermo - Empoli"
+      }
+    },
+    {
+      "partita": "Spezia vs Virtus Entella",
+      "lega": "Serie B",
+      "giornata": 23,
+      "timestamp": "2026-01-30T05:06:44.820595",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "23 07-02\n19:30 Spezia - ACD Virtus Entella"
+      }
+    },
+    {
+      "partita": "Monza vs Avellino",
+      "lega": "Serie B",
+      "giornata": 23,
+      "timestamp": "2026-01-30T05:06:44.870742",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "23 08-02\n15:00 Monza - Avellino"
+      }
+    },
+    {
+      "partita": "Lumezzane vs Cittadella",
+      "lega": "Serie C - Girone A",
+      "giornata": 25,
+      "timestamp": "2026-01-30T05:06:53.754630",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "25 08-02\n18:30 Lumezzane - Cittadella"
+      }
+    },
+    {
+      "partita": "Novara vs Union Brescia",
+      "lega": "Serie C - Girone A",
+      "giornata": 25,
+      "timestamp": "2026-01-30T05:06:53.804582",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "25 08-02\n18:30 Novara - Brescia"
+      }
+    },
+    {
+      "partita": "Alcione vs Arzignano",
+      "lega": "Serie C - Girone A",
+      "giornata": 25,
+      "timestamp": "2026-01-30T05:06:53.854280",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "25 08-02\n18:30 ASD Alcione - Arzignano Valchiampo"
+      }
+    },
+    {
+      "partita": "Virtus Verona vs Giana Erminio",
+      "lega": "Serie C - Girone A",
+      "giornata": 25,
+      "timestamp": "2026-01-30T05:06:53.911876",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "25 08-02\n18:30 USD Virtus Verona - Giana"
+      }
+    },
+    {
+      "partita": "Pergolettese vs Trento",
+      "lega": "Serie C - Girone A",
+      "giornata": 25,
+      "timestamp": "2026-01-30T05:06:53.962140",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "25 08-02\n18:30 US Pergolettese 1932 - Trento"
+      }
+    },
+    {
+      "partita": "Triestina vs Inter U23",
+      "lega": "Serie C - Girone A",
+      "giornata": 25,
+      "timestamp": "2026-01-30T05:06:54.012091",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "25 08-02\n18:30 Triestina - Inter Milan U23"
+      }
+    },
+    {
+      "partita": "AlbinoLeffe vs Pro Patria",
+      "lega": "Serie C - Girone A",
+      "giornata": 25,
+      "timestamp": "2026-01-30T05:06:54.070872",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "25 08-02\n18:30 Albinoleffe - Pro Patria"
+      }
+    },
+    {
+      "partita": "Lecco vs Pro Vercelli",
+      "lega": "Serie C - Girone A",
+      "giornata": 25,
+      "timestamp": "2026-01-30T05:06:54.128507",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "25 08-02\n18:30 Lecco - Pro Vercelli"
+      }
+    },
+    {
+      "partita": "Ospitaletto vs Renate",
+      "lega": "Serie C - Girone A",
+      "giornata": 25,
+      "timestamp": "2026-01-30T05:06:54.177963",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "25 08-02\n18:30 A.C. Ospitaletto - Renate AC"
+      }
+    },
+    {
+      "partita": "Vicenza vs Dolomiti",
+      "lega": "Serie C - Girone A",
+      "giornata": 25,
+      "timestamp": "2026-01-30T05:06:54.253218",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "25 08-02\n18:30 Vicenza - AC Dolomiti Bellunesi"
+      }
+    },
+    {
+      "partita": "Ravenna vs Carpi",
+      "lega": "Serie C - Girone B",
+      "giornata": 25,
+      "timestamp": "2026-01-30T05:07:03.157124",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "25 08-02\n18:30 Ravenna - Athletic Carpi"
+      }
+    },
+    {
+      "partita": "Torres vs Juve Next Gen",
+      "lega": "Serie C - Girone B",
+      "giornata": 25,
+      "timestamp": "2026-01-30T05:07:03.234477",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "25 08-02\n18:30 Sassari Torres - JuventusU23"
+      }
+    },
+    {
+      "partita": "Pontedera vs Ternana",
+      "lega": "Serie C - Girone B",
+      "giornata": 25,
+      "timestamp": "2026-01-30T05:07:03.284124",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "25 08-02\n18:30 Pontedera - Ternana"
+      }
+    },
+    {
+      "partita": "Gubbio vs Campobasso",
+      "lega": "Serie C - Girone B",
+      "giornata": 25,
+      "timestamp": "2026-01-30T05:07:03.333977",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "25 08-02\n18:30 Gubbio - Nuovo Campobasso"
+      }
+    },
+    {
+      "partita": "Sambenedettese vs Perugia",
+      "lega": "Serie C - Girone B",
+      "giornata": 25,
+      "timestamp": "2026-01-30T05:07:03.383856",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "25 08-02\n18:30 Sambenedettese - Perugia"
+      }
+    },
+    {
+      "partita": "Pineto vs Ascoli",
+      "lega": "Serie C - Girone B",
+      "giornata": 25,
+      "timestamp": "2026-01-30T05:07:03.433804",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "25 08-02\n18:30 Asd Pineto Calcio - Ascoli"
+      }
+    },
+    {
+      "partita": "Livorno vs Bra",
+      "lega": "Serie C - Girone B",
+      "giornata": 25,
+      "timestamp": "2026-01-30T05:07:03.512766",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "25 08-02\n18:30 Livorno - A.S.D. Bra"
+      }
+    },
+    {
+      "partita": "Arezzo vs Pianese",
+      "lega": "Serie C - Girone B",
+      "giornata": 25,
+      "timestamp": "2026-01-30T05:07:03.562449",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "25 08-02\n18:30 Arezzo - US Pianese"
+      }
+    },
+    {
+      "partita": "Vis Pesaro vs Forlì",
+      "lega": "Serie C - Girone B",
+      "giornata": 25,
+      "timestamp": "2026-01-30T05:07:03.642699",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "25 08-02\n18:30 Vis Pesaro - Forli"
+      }
+    },
+    {
+      "partita": "Benevento vs Picerno",
+      "lega": "Serie C - Girone C",
+      "giornata": 25,
+      "timestamp": "2026-01-30T05:07:12.594775",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "25 08-02\n18:30 Benevento - AZ Picerno ASD"
+      }
+    },
+    {
+      "partita": "Latina vs Cavese",
+      "lega": "Serie C - Girone C",
+      "giornata": 25,
+      "timestamp": "2026-01-30T05:07:12.644854",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "25 08-02\n18:30 Latina - Cavese"
+      }
+    },
+    {
+      "partita": "Team Altamura vs Monopoli",
+      "lega": "Serie C - Girone C",
+      "giornata": 25,
+      "timestamp": "2026-01-30T05:07:12.730704",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "25 08-02\n18:30 Team Altamura - AC Monopoli"
+      }
+    },
+    {
+      "partita": "Cerignola vs Salernitana",
+      "lega": "Serie C - Girone C",
+      "giornata": 25,
+      "timestamp": "2026-01-30T05:07:12.805536",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "25 08-02\n18:30 Audace Cerignola - Salernitana"
+      }
+    },
+    {
+      "partita": "Catania vs Trapani",
+      "lega": "Serie C - Girone C",
+      "giornata": 25,
+      "timestamp": "2026-01-30T05:07:12.855373",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "25 08-02\n18:30 Catania - Trapani"
+      }
+    },
+    {
+      "partita": "Crotone vs Atalanta U23",
+      "lega": "Serie C - Girone C",
+      "giornata": 25,
+      "timestamp": "2026-01-30T05:07:12.930143",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "25 08-02\n18:30 Crotone - Atalanta U23"
+      }
+    },
+    {
+      "partita": "Giugliano vs Cosenza",
+      "lega": "Serie C - Girone C",
+      "giornata": 25,
+      "timestamp": "2026-01-30T05:07:12.980278",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "25 08-02\n18:30 Giugliano - Cosenza Calcio 1914"
+      }
+    },
+    {
+      "partita": "Casertana vs Foggia",
+      "lega": "Serie C - Girone C",
+      "giornata": 25,
+      "timestamp": "2026-01-30T05:07:13.043108",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "25 08-02\n18:30 US Casertana 1908 - Foggia"
+      }
+    },
+    {
+      "partita": "Casarano vs Sorrento",
+      "lega": "Serie C - Girone C",
+      "giornata": 25,
+      "timestamp": "2026-01-30T05:07:13.092781",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "25 08-02\n18:30 Casarano - AS Sorrento Calcio"
+      }
+    },
+    {
+      "partita": "Potenza vs Siracusa",
+      "lega": "Serie C - Girone C",
+      "giornata": 25,
+      "timestamp": "2026-01-30T05:07:13.142824",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "25 08-02\n18:30 Potenza - US Siracusa"
+      }
+    },
+    {
+      "partita": "Go Ahead Eagles vs Heerenveen",
+      "lega": "Eredivisie",
+      "giornata": 20,
+      "timestamp": "2026-01-30T05:07:59.524712",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "20 11-02\n18:45 Go Ahead Eagles[13] - SC Heerenveen[9]"
+      }
+    },
+    {
+      "partita": "Moreirense vs Gil Vicente",
+      "lega": "Liga Portugal",
+      "giornata": 21,
+      "timestamp": "2026-01-30T05:08:10.434339",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 07-02\n16:30 Moreirense - Gil Vicente"
+      }
+    },
+    {
+      "partita": "Estrela Amadora vs Santa Clara",
+      "lega": "Liga Portugal",
+      "giornata": 21,
+      "timestamp": "2026-01-30T05:08:10.484325",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 07-02\n16:30 Estrela da Amadora - Santa Clara"
+      }
+    },
+    {
+      "partita": "Estoril vs Tondela",
+      "lega": "Liga Portugal",
+      "giornata": 21,
+      "timestamp": "2026-01-30T05:08:10.534079",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 07-02\n19:00 Estoril - CD Tondela"
+      }
+    },
+    {
+      "partita": "Arouca vs Vit. Guimarães",
+      "lega": "Liga Portugal",
+      "giornata": 21,
+      "timestamp": "2026-01-30T05:08:10.611925",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 07-02\n21:30 FC Arouca - Vitoria Guimaraes"
+      }
+    },
+    {
+      "partita": "Nacional vs Casa Pia",
+      "lega": "Liga Portugal",
+      "giornata": 21,
+      "timestamp": "2026-01-30T05:08:10.662151",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 08-02\n16:30 Nacional da Madeira - Casa Pia AC"
+      }
+    },
+    {
+      "partita": "SC Braga vs Rio Ave",
+      "lega": "Liga Portugal",
+      "giornata": 21,
+      "timestamp": "2026-01-30T05:08:10.737189",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 08-02\n19:00 Sporting Braga - Rio Ave"
+      }
+    },
+    {
+      "partita": "Benfica vs Alverca",
+      "lega": "Liga Portugal",
+      "giornata": 21,
+      "timestamp": "2026-01-30T05:08:10.792678",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 08-02\n21:30 Benfica - Alverca"
+      }
+    },
+    {
+      "partita": "Famalicão vs Avs FS",
+      "lega": "Liga Portugal",
+      "giornata": 21,
+      "timestamp": "2026-01-30T05:08:10.892750",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 09-02\n19:45 FC Famalicao - AVS Futebol SAD"
+      }
+    },
+    {
+      "partita": "FC Porto vs Sporting",
+      "lega": "Liga Portugal",
+      "giornata": 21,
+      "timestamp": "2026-01-30T05:08:10.972575",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 09-02\n21:45 FC Porto - Sporting CP"
+      }
+    },
+    {
+      "partita": "Charlton vs QPR",
+      "lega": "Championship",
+      "giornata": 31,
+      "timestamp": "2026-01-30T05:08:20.334754",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "31 06-02\n21:00 Charlton Athletic - Queens Park Rangers (QPR)"
+      }
+    },
+    {
+      "partita": "Derby vs Ipswich",
+      "lega": "Championship",
+      "giornata": 31,
+      "timestamp": "2026-01-30T05:08:20.385103",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "31 07-02\n13:30 Derby County - Ipswich Town"
+      }
+    },
+    {
+      "partita": "Norwich vs Blackburn",
+      "lega": "Championship",
+      "giornata": 31,
+      "timestamp": "2026-01-30T05:08:20.435324",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "31 07-02\n13:30 Norwich City - Blackburn Rovers"
+      }
+    },
+    {
+      "partita": "Southampton vs Watford",
+      "lega": "Championship",
+      "giornata": 31,
+      "timestamp": "2026-01-30T05:08:20.485191",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "31 07-02\n13:30 Southampton - Watford"
+      }
+    },
+    {
+      "partita": "Birmingham vs Leicester City",
+      "lega": "Championship",
+      "giornata": 31,
+      "timestamp": "2026-01-30T05:08:20.535166",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "31 07-02\n16:00 Birmingham City - Leicester City"
+      }
+    },
+    {
+      "partita": "Coventry City vs Oxford United",
+      "lega": "Championship",
+      "giornata": 31,
+      "timestamp": "2026-01-30T05:08:20.585443",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "31 07-02\n16:00 Coventry City - Oxford United"
+      }
+    },
+    {
+      "partita": "Hull City vs Bristol City",
+      "lega": "Championship",
+      "giornata": 31,
+      "timestamp": "2026-01-30T05:08:20.635472",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "31 07-02\n13:30 Norwich City - Blackburn Rovers"
+      }
+    },
+    {
+      "partita": "Preston NE vs FC Portsmouth",
+      "lega": "Championship",
+      "giornata": 31,
+      "timestamp": "2026-01-30T05:08:20.685454",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "31 07-02\n16:00 Preston North End - Portsmouth"
+      }
+    },
+    {
+      "partita": "West Brom vs Stoke City",
+      "lega": "Championship",
+      "giornata": 31,
+      "timestamp": "2026-01-30T05:08:20.741746",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "31 07-02\n16:00 West Bromwich(WBA) - Stoke City"
+      }
+    },
+    {
+      "partita": "Wrexham vs Millwall",
+      "lega": "Championship",
+      "giornata": 31,
+      "timestamp": "2026-01-30T05:08:20.791765",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "31 07-02\n16:00 Wrexham - Millwall"
+      }
+    },
+    {
+      "partita": "Swansea City vs Sheff Wed",
+      "lega": "Championship",
+      "giornata": 31,
+      "timestamp": "2026-01-30T05:08:20.847345",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "31 08-02\n13:00 Swansea City - Sheffield Wednesday"
+      }
+    },
+    {
+      "partita": "Sheff Utd vs Middlesbrough",
+      "lega": "Championship",
+      "giornata": 31,
+      "timestamp": "2026-01-30T05:08:20.897373",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "31 09-02\n21:00 Sheffield United - Middlesbrough"
+      }
+    },
+    {
+      "partita": "CD Leganés vs Granada",
+      "lega": "LaLiga 2",
+      "giornata": 25,
+      "timestamp": "2026-01-30T05:08:30.007195",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "25 06-02\n20:30 Leganes - Granada CF"
+      }
+    },
+    {
+      "partita": "FC Andorra vs Real Sociedad B",
+      "lega": "LaLiga 2",
+      "giornata": 25,
+      "timestamp": "2026-01-30T05:08:30.057391",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "25 07-02\n14:00 Andorra FC - Real Sociedad B"
+      }
+    },
+    {
+      "partita": "Las Palmas vs Burgos CF",
+      "lega": "LaLiga 2",
+      "giornata": 25,
+      "timestamp": "2026-01-30T05:08:30.107447",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "25 07-02\n16:15 Las Palmas - Burgos"
+      }
+    },
+    {
+      "partita": "Real Saragozza vs Eibar",
+      "lega": "LaLiga 2",
+      "giornata": 25,
+      "timestamp": "2026-01-30T05:08:30.157538",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "25 07-02\n18:30 Real Zaragoza - Eibar"
+      }
+    },
+    {
+      "partita": "Cádiz vs UD Almería",
+      "lega": "LaLiga 2",
+      "giornata": 25,
+      "timestamp": "2026-01-30T05:08:30.208064",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "25 07-02\n21:00 Cadiz - Almeria"
+      }
+    },
+    {
+      "partita": "Real Valladolid vs Castellón",
+      "lega": "LaLiga 2",
+      "giornata": 25,
+      "timestamp": "2026-01-30T05:08:30.265333",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "25 08-02\n14:00 Real Valladolid - Castellon"
+      }
+    },
+    {
+      "partita": "AD Ceuta vs Córdoba CF",
+      "lega": "LaLiga 2",
+      "giornata": 25,
+      "timestamp": "2026-01-30T05:08:30.315799",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "25 08-02\n16:15 AD Ceuta - Cordoba"
+      }
+    },
+    {
+      "partita": "Dep. La Coruña vs Albacete",
+      "lega": "LaLiga 2",
+      "giornata": 25,
+      "timestamp": "2026-01-30T05:08:30.371863",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "25 08-02\n16:15 Deportivo La Coruna - Albacete"
+      }
+    },
+    {
+      "partita": "Sporting Gijón vs SD Huesca",
+      "lega": "LaLiga 2",
+      "giornata": 25,
+      "timestamp": "2026-01-30T05:08:30.422227",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "25 08-02\n18:30 Sporting Gijon - SD Huesca"
+      }
+    },
+    {
+      "partita": "Málaga CF vs CyD Leonesa",
+      "lega": "LaLiga 2",
+      "giornata": 25,
+      "timestamp": "2026-01-30T05:08:30.472709",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "25 08-02\n21:00 Malaga - Cultural Leonesa"
+      }
+    },
+    {
+      "partita": "Racing vs Mirandés",
+      "lega": "LaLiga 2",
+      "giornata": 25,
+      "timestamp": "2026-01-30T05:08:30.539321",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "25 09-02\n20:30 Racing Santander - Mirandes"
+      }
+    },
+    {
+      "partita": "Greuther Fürth vs Magdeburgo",
+      "lega": "2. Bundesliga",
+      "giornata": 21,
+      "timestamp": "2026-01-30T05:08:39.279358",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 06-02\n18:30 Greuther Furth - Magdeburg"
+      }
+    },
+    {
+      "partita": "Pr. Münster vs VfL Bochum",
+      "lega": "2. Bundesliga",
+      "giornata": 21,
+      "timestamp": "2026-01-30T05:08:39.340417",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 06-02\n18:30 Preuben Munster - VfL Bochum"
+      }
+    },
+    {
+      "partita": "Elversberg vs Hertha BSC",
+      "lega": "2. Bundesliga",
+      "giornata": 21,
+      "timestamp": "2026-01-30T05:08:39.390554",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 07-02\n13:00 SV Elversberg - Hertha Berlin"
+      }
+    },
+    {
+      "partita": "Paderborn vs Norimberga",
+      "lega": "2. Bundesliga",
+      "giornata": 21,
+      "timestamp": "2026-01-30T05:08:39.440619",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 07-02\n13:00 SC Paderborn 07 - Nurnberg"
+      }
+    },
+    {
+      "partita": "Schalke 04 vs Dynamo Dresda",
+      "lega": "2. Bundesliga",
+      "giornata": 21,
+      "timestamp": "2026-01-30T05:08:39.495137",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 07-02\n13:00 Schalke 04 - Dynamo Dresden"
+      }
+    },
+    {
+      "partita": "Darmstadt vs 1.FC K'lautern",
+      "lega": "2. Bundesliga",
+      "giornata": 21,
+      "timestamp": "2026-01-30T05:08:39.555680",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 07-02\n20:30 Darmstadt - Kaiserslautern"
+      }
+    },
+    {
+      "partita": "Karlsruher SC vs Düsseldorf",
+      "lega": "2. Bundesliga",
+      "giornata": 21,
+      "timestamp": "2026-01-30T05:08:39.605785",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 08-02\n13:30 Karlsruher SC - Fortuna Dusseldorf"
+      }
+    },
+    {
+      "partita": "Hannover 96 vs Holstein Kiel",
+      "lega": "2. Bundesliga",
+      "giornata": 21,
+      "timestamp": "2026-01-30T05:08:39.658797",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 08-02\n13:30 Hannover 96 - Holstein Kiel"
+      }
+    },
+    {
+      "partita": "Arm. Bielefeld vs E. Braunschweig",
+      "lega": "2. Bundesliga",
+      "giornata": 21,
+      "timestamp": "2026-01-30T05:08:39.709326",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 08-02\n13:30 Arminia Bielefeld - Eintracht Braunschweig"
+      }
+    },
+    {
+      "partita": "US Boulogne vs Rodez",
+      "lega": "Ligue 2",
+      "giornata": 22,
+      "timestamp": "2026-01-30T05:08:49.404166",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "22 06-02\n20:00 Boulogne - Rodez Aveyron"
+      }
+    },
+    {
+      "partita": "Annecy vs Grenoble",
+      "lega": "Ligue 2",
+      "giornata": 22,
+      "timestamp": "2026-01-30T05:08:49.504473",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "22 06-02\n20:00 FC Annecy - Grenoble"
+      }
+    },
+    {
+      "partita": "USL Dunkerque vs Guingamp",
+      "lega": "Ligue 2",
+      "giornata": 22,
+      "timestamp": "2026-01-30T05:08:49.579534",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "22 06-02\n20:00 USL Dunkerque - Guingamp"
+      }
+    },
+    {
+      "partita": "Red Star FC vs Pau",
+      "lega": "Ligue 2",
+      "giornata": 22,
+      "timestamp": "2026-01-30T05:08:49.654725",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "22 06-02\n20:00 Red Star FC 93 - Pau FC"
+      }
+    },
+    {
+      "partita": "Stade Reims vs SC Bastia",
+      "lega": "Ligue 2",
+      "giornata": 22,
+      "timestamp": "2026-01-30T05:08:49.705029",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "22 06-02\n20:00 Reims - Bastia"
+      }
+    },
+    {
+      "partita": "Le Mans FC vs Stade Lavallois",
+      "lega": "Ligue 2",
+      "giornata": 22,
+      "timestamp": "2026-01-30T05:08:49.755492",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "22 07-02\n14:00 Le Mans - Stade Lavallois MFC"
+      }
+    },
+    {
+      "partita": "AS Nancy vs Troyes",
+      "lega": "Ligue 2",
+      "giornata": 22,
+      "timestamp": "2026-01-30T05:08:49.866359",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "22 07-02\n14:00 Nancy - Troyes"
+      }
+    },
+    {
+      "partita": "Saint-Étienne vs Montpellier",
+      "lega": "Ligue 2",
+      "giornata": 22,
+      "timestamp": "2026-01-30T05:08:49.967283",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "22 07-02\n20:00 Saint Etienne - Montpellier"
+      }
+    },
+    {
+      "partita": "Amiens vs Clermont Foot",
+      "lega": "Ligue 2",
+      "giornata": 22,
+      "timestamp": "2026-01-30T05:08:50.068086",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "22 09-02\n20:45 Amiens - Clermont"
+      }
+    },
+    {
+      "partita": "Hammarby vs Mjällby AIF",
+      "lega": "Allsvenskan",
+      "giornata": 1,
+      "timestamp": "2026-01-30T05:09:03.571073",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "1 05-04\n14:00 Hammarby - Mjallby AIF"
+      }
+    },
+    {
+      "partita": "Degerfors vs Sirius",
+      "lega": "Allsvenskan",
+      "giornata": 1,
+      "timestamp": "2026-01-30T05:09:03.621115",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "1 05-04\n14:00 Degerfors IF - IK Sirius FK"
+      }
+    },
+    {
+      "partita": "AIK vs Halmstads BK",
+      "lega": "Allsvenskan",
+      "giornata": 1,
+      "timestamp": "2026-01-30T05:09:03.671121",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "1 05-04\n14:00 AIK Solna - Halmstads"
+      }
+    },
+    {
+      "partita": "Kalmar FF vs Västerås SK",
+      "lega": "Allsvenskan",
+      "giornata": 1,
+      "timestamp": "2026-01-30T05:09:03.731601",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "1 05-04\n14:00 Kalmar - Vasteras SK FK"
+      }
+    },
+    {
+      "partita": "Örgryte vs Malmö FF",
+      "lega": "Allsvenskan",
+      "giornata": 1,
+      "timestamp": "2026-01-30T05:09:03.781889",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "1 05-04\n14:00 Orgryte - Malmo FF"
+      }
+    },
+    {
+      "partita": "Häcken vs Brommapojkarna",
+      "lega": "Allsvenskan",
+      "giornata": 1,
+      "timestamp": "2026-01-30T05:09:03.835488",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "1 05-04\n14:00 Hacken - Brommapojkarna"
+      }
+    },
+    {
+      "partita": "Elfsborg vs IFK Göteborg",
+      "lega": "Allsvenskan",
+      "giornata": 1,
+      "timestamp": "2026-01-30T05:09:03.885588",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "1 05-04\n14:00 Elfsborg - IFK Goteborg"
+      }
+    },
+    {
+      "partita": "GAIS vs Djurgården",
+      "lega": "Allsvenskan",
+      "giornata": 1,
+      "timestamp": "2026-01-30T05:09:03.936035",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "1 05-04\n14:00 GAIS - Djurgardens"
+      }
+    },
+    {
+      "partita": "IFK Göteborg vs Häcken",
+      "lega": "Allsvenskan",
+      "giornata": 2,
+      "timestamp": "2026-01-30T05:09:05.389348",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "2 12-04\n14:00 IFK Goteborg - Hacken"
+      }
+    },
+    {
+      "partita": "Mjällby AIF vs Örgryte",
+      "lega": "Allsvenskan",
+      "giornata": 2,
+      "timestamp": "2026-01-30T05:09:05.439761",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "2 12-04\n14:00 Mjallby AIF - Orgryte"
+      }
+    },
+    {
+      "partita": "Västerås SK vs Elfsborg",
+      "lega": "Allsvenskan",
+      "giornata": 2,
+      "timestamp": "2026-01-30T05:09:05.490049",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "2 12-04\n14:00 Vasteras SK FK - Elfsborg"
+      }
+    },
+    {
+      "partita": "Djurgården vs Kalmar FF",
+      "lega": "Allsvenskan",
+      "giornata": 2,
+      "timestamp": "2026-01-30T05:09:05.540448",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "2 12-04\n14:00 Djurgardens - Kalmar"
+      }
+    },
+    {
+      "partita": "Halmstads BK vs Degerfors",
+      "lega": "Allsvenskan",
+      "giornata": 2,
+      "timestamp": "2026-01-30T05:09:05.591209",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "2 12-04\n14:00 Halmstads - Degerfors IF"
+      }
+    },
+    {
+      "partita": "Malmö FF vs GAIS",
+      "lega": "Allsvenskan",
+      "giornata": 2,
+      "timestamp": "2026-01-30T05:09:05.645030",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "2 12-04\n14:00 Malmo FF - GAIS"
+      }
+    },
+    {
+      "partita": "Brommapojkarna vs AIK",
+      "lega": "Allsvenskan",
+      "giornata": 2,
+      "timestamp": "2026-01-30T05:09:05.695479",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "2 12-04\n14:00 Brommapojkarna - AIK Solna"
+      }
+    },
+    {
+      "partita": "Sirius vs Hammarby",
+      "lega": "Allsvenskan",
+      "giornata": 2,
+      "timestamp": "2026-01-30T05:09:05.745673",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "2 12-04\n14:00 IK Sirius FK - Hammarby"
+      }
+    },
+    {
+      "partita": "HamKam vs Viking",
+      "lega": "Eliteserien",
+      "giornata": 1,
+      "timestamp": "2026-01-30T05:09:10.850196",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "1 14-03\n16:00 Ham-Kam - Viking"
+      }
+    },
+    {
+      "partita": "Molde vs Rosenborg",
+      "lega": "Eliteserien",
+      "giornata": 1,
+      "timestamp": "2026-01-30T05:09:10.900186",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "1 14-03\n18:00 Molde - Rosenborg BK"
+      }
+    },
+    {
+      "partita": "Kristiansund vs Brann",
+      "lega": "Eliteserien",
+      "giornata": 1,
+      "timestamp": "2026-01-30T05:09:10.950369",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "1 15-03\n14:30 Kristiansund BK - Brann"
+      }
+    },
+    {
+      "partita": "KFUM vs Start",
+      "lega": "Eliteserien",
+      "giornata": 1,
+      "timestamp": "2026-01-30T05:09:11.011839",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "1 15-03\n17:00 KFUM Oslo - Start Kristiansand"
+      }
+    },
+    {
+      "partita": "Sarpsborg 08 vs Bodø/Glimt",
+      "lega": "Eliteserien",
+      "giornata": 1,
+      "timestamp": "2026-01-30T05:09:11.062174",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "1 15-03\n17:00 Sarpsborg 08 - Bodo Glimt"
+      }
+    },
+    {
+      "partita": "Vålerenga vs Sandefjord",
+      "lega": "Eliteserien",
+      "giornata": 1,
+      "timestamp": "2026-01-30T05:09:11.112245",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "1 15-03\n17:00 Valerenga - Sandefjord"
+      }
+    },
+    {
+      "partita": "Aalesund vs Lillestrøm",
+      "lega": "Eliteserien",
+      "giornata": 1,
+      "timestamp": "2026-01-30T05:09:11.162389",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "1 15-03\n17:00 Aalesund FK - Lillestrom"
+      }
+    },
+    {
+      "partita": "Tromsø vs Fredrikstad",
+      "lega": "Eliteserien",
+      "giornata": 1,
+      "timestamp": "2026-01-30T05:09:11.212894",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "1 15-03\n19:15 Tromso IL - Fredrikstad"
+      }
+    },
+    {
+      "partita": "Start vs Aalesund",
+      "lega": "Eliteserien",
+      "giornata": 2,
+      "timestamp": "2026-01-30T05:09:12.686501",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "2 21-03\n16:00 Start Kristiansand - Aalesund FK"
+      }
+    },
+    {
+      "partita": "Viking vs Molde",
+      "lega": "Eliteserien",
+      "giornata": 2,
+      "timestamp": "2026-01-30T05:09:12.744395",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "2 21-03\n18:00 Viking - Molde"
+      }
+    },
+    {
+      "partita": "Rosenborg vs Vålerenga",
+      "lega": "Eliteserien",
+      "giornata": 2,
+      "timestamp": "2026-01-30T05:09:12.795097",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "2 22-03\n14:30 Rosenborg BK - Valerenga"
+      }
+    },
+    {
+      "partita": "Brann vs Tromsø",
+      "lega": "Eliteserien",
+      "giornata": 2,
+      "timestamp": "2026-01-30T05:09:12.845331",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "2 22-03\n17:00 Brann - Tromso IL"
+      }
+    },
+    {
+      "partita": "Fredrikstad vs KFUM",
+      "lega": "Eliteserien",
+      "giornata": 2,
+      "timestamp": "2026-01-30T05:09:12.895897",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "2 22-03\n17:00 Fredrikstad - KFUM Oslo"
+      }
+    },
+    {
+      "partita": "Lillestrøm vs Kristiansund",
+      "lega": "Eliteserien",
+      "giornata": 2,
+      "timestamp": "2026-01-30T05:09:12.960555",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "2 22-03\n17:00 Lillestrom - Kristiansund BK"
+      }
+    },
+    {
+      "partita": "Sandefjord vs Sarpsborg 08",
+      "lega": "Eliteserien",
+      "giornata": 2,
+      "timestamp": "2026-01-30T05:09:13.011256",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "2 22-03\n17:00 Sandefjord - Sarpsborg 08"
+      }
+    },
+    {
+      "partita": "Bodø/Glimt vs HamKam",
+      "lega": "Eliteserien",
+      "giornata": 2,
+      "timestamp": "2026-01-30T05:09:13.061454",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "2 22-03\n19:15 Bodo Glimt - Ham-Kam"
+      }
+    },
+    {
+      "partita": "Randers FC vs Vejle BK",
+      "lega": "Superligaen",
+      "giornata": 20,
+      "timestamp": "2026-01-30T05:09:21.281712",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "20 13-02\n19:00 Randers FC - Vejle"
+      }
+    },
+    {
+      "partita": "Copenhagen vs Nordsjaelland",
+      "lega": "Superligaen",
+      "giornata": 20,
+      "timestamp": "2026-01-30T05:09:21.335415",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "20 14-02\n17:00 FC Copenhagen - Nordsjaelland"
+      }
+    },
+    {
+      "partita": "FC Fredericia vs Aarhus GF",
+      "lega": "Superligaen",
+      "giornata": 20,
+      "timestamp": "2026-01-30T05:09:21.386082",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "20 15-02\n14:00 Fredericia - Aarhus AGF"
+      }
+    },
+    {
+      "partita": "Odense BK vs FC Midtjylland",
+      "lega": "Superligaen",
+      "giornata": 20,
+      "timestamp": "2026-01-30T05:09:21.436274",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "20 15-02\n16:00 Odense BK - Midtjylland"
+      }
+    },
+    {
+      "partita": "Viborg FF vs Bröndby IF",
+      "lega": "Superligaen",
+      "giornata": 20,
+      "timestamp": "2026-01-30T05:09:21.486396",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "20 15-02\n18:00 Viborg - Brondby IF"
+      }
+    },
+    {
+      "partita": "Sönderjyske vs Silkeborg IF",
+      "lega": "Superligaen",
+      "giornata": 20,
+      "timestamp": "2026-01-30T05:09:21.536746",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "20 16-02\n19:00 Sonderjyske - Silkeborg IF"
+      }
+    },
+    {
+      "partita": "KVC Westerlo vs VV Sint-Truiden",
+      "lega": "Jupiler Pro League",
+      "giornata": 24,
+      "timestamp": "2026-01-30T05:09:30.008060",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "24 06-02\n20:45 Westerlo - Sint-Truidense"
+      }
+    },
+    {
+      "partita": "Zulte Waregem vs FCV Dender EH",
+      "lega": "Jupiler Pro League",
+      "giornata": 24,
+      "timestamp": "2026-01-30T05:09:30.059103",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "24 07-02\n16:00 Zulte-Waregem - FCV Dender EH"
+      }
+    },
+    {
+      "partita": "R Charleroi SC vs Cercle Bruges",
+      "lega": "Jupiler Pro League",
+      "giornata": 24,
+      "timestamp": "2026-01-30T05:09:30.109255",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "24 07-02\n18:15 Charleroi - Cercle Brugge"
+      }
+    },
+    {
+      "partita": "KAA Gent vs OH Leuven",
+      "lega": "Jupiler Pro League",
+      "giornata": 24,
+      "timestamp": "2026-01-30T05:09:30.159426",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "24 07-02\n20:45 KAA Gent - Oud-Heverlee Leuven"
+      }
+    },
+    {
+      "partita": "KRC Genk vs RSC Anderlecht",
+      "lega": "Jupiler Pro League",
+      "giornata": 24,
+      "timestamp": "2026-01-30T05:09:30.220261",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "24 08-02\n13:30 Racing Genk - Anderlecht"
+      }
+    },
+    {
+      "partita": "Union SG vs La Louvière",
+      "lega": "Jupiler Pro League",
+      "giornata": 24,
+      "timestamp": "2026-01-30T05:09:30.270918",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "24 08-02\n16:00 Saint Gilloise - LaLouviere"
+      }
+    },
+    {
+      "partita": "Club Bruges vs Standard Liegi",
+      "lega": "Jupiler Pro League",
+      "giornata": 24,
+      "timestamp": "2026-01-30T05:09:30.324327",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "24 08-02\n18:30 Club Brugge - Standard Liege"
+      }
+    },
+    {
+      "partita": "KV Mechelen vs Anversa",
+      "lega": "Jupiler Pro League",
+      "giornata": 24,
+      "timestamp": "2026-01-30T05:09:30.374613",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "24 08-02\n19:15 Mechelen - Royal Antwerp"
+      }
+    },
+    {
+      "partita": "Karagümrük vs Antalyaspor",
+      "lega": "Süper Lig",
+      "giornata": 21,
+      "timestamp": "2026-01-30T05:09:39.203492",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 07-02\n12:30 Karagumruk - Antalyaspor"
+      }
+    },
+    {
+      "partita": "Samsunspor vs Trabzonspor",
+      "lega": "Süper Lig",
+      "giornata": 21,
+      "timestamp": "2026-01-30T05:09:39.253707",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 07-02\n18:00 Samsunspor - Trabzonspor"
+      }
+    },
+    {
+      "partita": "Eyüpspor vs Basaksehir",
+      "lega": "Süper Lig",
+      "giornata": 21,
+      "timestamp": "2026-01-30T05:09:39.304032",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 08-02\n12:30 Eyupspor - Istanbul Basaksehir"
+      }
+    },
+    {
+      "partita": "Konyaspor vs Göztepe",
+      "lega": "Süper Lig",
+      "giornata": 21,
+      "timestamp": "2026-01-30T05:09:39.355065",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 08-02\n15:00 Konyaspor - Goztepe"
+      }
+    },
+    {
+      "partita": "C. Rizespor vs Galatasaray",
+      "lega": "Süper Lig",
+      "giornata": 21,
+      "timestamp": "2026-01-30T05:09:39.405230",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 08-02\n15:00 Caykur Rizespor - Galatasaray"
+      }
+    },
+    {
+      "partita": "Besiktas vs Alanyaspor",
+      "lega": "Süper Lig",
+      "giornata": 21,
+      "timestamp": "2026-01-30T05:09:39.455492",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 08-02\n18:00 Besiktas JK - Alanyaspor"
+      }
+    },
+    {
+      "partita": "Kayserispor vs Kocaelispor",
+      "lega": "Süper Lig",
+      "giornata": 21,
+      "timestamp": "2026-01-30T05:09:39.505614",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 09-02\n15:00 Kayserispor - Kocaelispor"
+      }
+    },
+    {
+      "partita": "Gaziantep FK vs Kasimpasa",
+      "lega": "Süper Lig",
+      "giornata": 21,
+      "timestamp": "2026-01-30T05:09:39.563721",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 09-02\n18:00 Gazisehir Gaziantep - Kasimpasa"
+      }
+    },
+    {
+      "partita": "Fenerbahce vs Genclerbirligi",
+      "lega": "Süper Lig",
+      "giornata": 21,
+      "timestamp": "2026-01-30T05:09:39.627331",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "21 09-02\n18:00 Fenerbahce - Genclerbirligi"
+      }
+    },
+    {
+      "partita": "Drogheda United vs Waterford FC",
+      "lega": "League of Ireland Premier Division",
+      "giornata": 2,
+      "timestamp": "2026-01-30T05:09:46.253482",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "2 13-02\n20:45 Drogheda United - Waterford United"
+      }
+    },
+    {
+      "partita": "St. Pat's vs Galway United",
+      "lega": "League of Ireland Premier Division",
+      "giornata": 2,
+      "timestamp": "2026-01-30T05:09:46.304943",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "2 13-02\n20:45 St. Patricks Athletic - Galway United"
+      }
+    },
+    {
+      "partita": "Derry City vs Dundalk FC",
+      "lega": "League of Ireland Premier Division",
+      "giornata": 2,
+      "timestamp": "2026-01-30T05:09:46.355438",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "2 10-04\n19:45 Dundalk - Derry City"
+      }
+    },
+    {
+      "partita": "Shelbourne vs Shamrock Rovers",
+      "lega": "League of Ireland Premier Division",
+      "giornata": 2,
+      "timestamp": "2026-01-30T05:09:46.405579",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "2 13-02\n21:00 Shelbourne - Shamrock Rovers"
+      }
+    },
+    {
+      "partita": "Sligo Rovers vs Bohemians",
+      "lega": "League of Ireland Premier Division",
+      "giornata": 2,
+      "timestamp": "2026-01-30T05:09:46.456111",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "2 14-02\n20:45 Sligo Rovers - Bohemians"
+      }
+    },
+    {
+      "partita": "Internacional vs Athletico-PR",
+      "lega": "Brasileirão Serie A",
+      "giornata": 1,
+      "timestamp": "2026-01-30T05:09:51.790427",
+      "motivi": [
+        "SOLO_CASA_TROVATA"
+      ],
+      "dettagli": {
+        "righe_casa": [
+          2
+        ],
+        "riga_esempio": "1 28-01\n23:00 Internacional RS[16]\n0-1\nAtletico Paranaense[Bra PL-4]\n1.83 3.30 4.33    0-1",
+        "suggerimento": "Cerca 'Athletico-PR' in questa riga per vedere come si chiama sul sito",
+        "alias_casa": [
+          "internacional"
+        ],
+        "alias_trasferta": [
+          "fortaleza",
+          "athletico-pr"
+        ]
+      }
+    },
+    {
+      "partita": "Athletico-PR vs Corinthians",
+      "lega": "Brasileirão Serie A",
+      "giornata": 2,
+      "timestamp": "2026-01-30T05:09:54.236527",
+      "motivi": [
+        "SOLO_TRASFERTA_TROVATA"
+      ],
+      "dettagli": {
+        "righe_trasferta": [
+          9
+        ],
+        "riga_esempio": "2 18-02\n23:30 Atletico Paranaense - Corinthians Paulista (SP)",
+        "suggerimento": "Cerca 'Athletico-PR' in questa riga per vedere come si chiama sul sito",
+        "alias_casa": [
+          "fortaleza",
+          "athletico-pr"
+        ],
+        "alias_trasferta": [
+          "corinthians"
+        ]
+      }
+    },
+    {
+      "partita": "New York vs New England",
+      "lega": "Major League Soccer",
+      "giornata": 2,
+      "timestamp": "2026-01-30T05:10:17.684137",
+      "motivi": [
+        "SQUADRE_IN_RIGHE_DIVERSE"
+      ],
+      "dettagli": {
+        "alias_casa": [
+          "ny red bulls",
+          "new york red bulls",
+          "york",
+          "new york rb",
+          "new york"
+        ],
+        "alias_trasferta": [
+          "ne revolution",
+          "new england revolution",
+          "new england",
+          "england"
+        ]
+      }
+    },
+    {
+      "partita": "Chicago vs Montréal",
+      "lega": "Major League Soccer",
+      "giornata": 2,
+      "timestamp": "2026-01-30T05:10:17.785395",
+      "motivi": [
+        "SQUADRE_IN_RIGHE_DIVERSE"
+      ],
+      "dettagli": {
+        "alias_casa": [
+          "chicago fire",
+          "chicago"
+        ],
+        "alias_trasferta": [
+          "cf montreal",
+          "montréal",
+          "montreal"
+        ]
+      }
+    },
+    {
+      "partita": "Minnesota vs Cincinnati",
+      "lega": "Major League Soccer",
+      "giornata": 2,
+      "timestamp": "2026-01-30T05:10:17.907729",
+      "motivi": [
+        "SQUADRE_IN_RIGHE_DIVERSE"
+      ],
+      "dettagli": {
+        "alias_casa": [
+          "minnesota united fc",
+          "minnesota utd",
+          "minnesota"
+        ],
+        "alias_trasferta": [
+          "cincinnati",
+          "fc cincinnati"
+        ]
+      }
+    },
+    {
+      "partita": "Colorado vs Portland",
+      "lega": "Major League Soccer",
+      "giornata": 2,
+      "timestamp": "2026-01-30T05:10:18.027855",
+      "motivi": [
+        "SQUADRE_IN_RIGHE_DIVERSE"
+      ],
+      "dettagli": {
+        "alias_casa": [
+          "colorado rapids",
+          "colorado"
+        ],
+        "alias_trasferta": [
+          "portland timbers",
+          "portland"
+        ]
+      }
+    },
+    {
+      "partita": "Orlando vs Miami",
+      "lega": "Major League Soccer",
+      "giornata": 2,
+      "timestamp": "2026-01-30T05:10:18.133227",
+      "motivi": [
+        "SQUADRE_IN_RIGHE_DIVERSE"
+      ],
+      "dettagli": {
+        "alias_casa": [
+          "orlando",
+          "orlando city"
+        ],
+        "alias_trasferta": [
+          "miami",
+          "inter miami cf",
+          "inter miami"
+        ]
+      }
+    },
+    {
+      "partita": "SJ Earthquakes vs Atlanta",
+      "lega": "Major League Soccer",
+      "giornata": 2,
+      "timestamp": "2026-01-30T05:10:18.234328",
+      "motivi": [
+        "SQUADRE_IN_RIGHE_DIVERSE"
+      ],
+      "dettagli": {
+        "alias_casa": [
+          "sj earthquakes",
+          "san jose earthquakes",
+          "earthquakes"
+        ],
+        "alias_trasferta": [
+          "atlanta utd",
+          "atlanta",
+          "atlanta united"
+        ]
+      }
+    },
+    {
+      "partita": "Salt Lake vs Seattle",
+      "lega": "Major League Soccer",
+      "giornata": 2,
+      "timestamp": "2026-01-30T05:10:18.335604",
+      "motivi": [
+        "SQUADRE_IN_RIGHE_DIVERSE"
+      ],
+      "dettagli": {
+        "alias_casa": [
+          "salt lake",
+          "salt",
+          "lake",
+          "real salt lake"
+        ],
+        "alias_trasferta": [
+          "seattle",
+          "seattle sounders"
+        ]
+      }
+    },
+    {
+      "partita": "Dallas vs Nashville",
+      "lega": "Major League Soccer",
+      "giornata": 2,
+      "timestamp": "2026-01-30T05:10:18.436611",
+      "motivi": [
+        "SQUADRE_IN_RIGHE_DIVERSE"
+      ],
+      "dettagli": {
+        "alias_casa": [
+          "fc dallas",
+          "dallas"
+        ],
+        "alias_trasferta": [
+          "nashville"
+        ]
+      }
+    },
+    {
+      "partita": "Houston vs LAFC",
+      "lega": "Major League Soccer",
+      "giornata": 2,
+      "timestamp": "2026-01-30T05:10:18.537202",
+      "motivi": [
+        "SQUADRE_IN_RIGHE_DIVERSE"
+      ],
+      "dettagli": {
+        "alias_casa": [
+          "houston",
+          "houston dynamo"
+        ],
+        "alias_trasferta": [
+          "la",
+          "los angeles fc",
+          "los angeles",
+          "lafc",
+          "la fc"
+        ]
+      }
+    },
+    {
+      "partita": "Kansas City vs Columbus",
+      "lega": "Major League Soccer",
+      "giornata": 2,
+      "timestamp": "2026-01-30T05:10:18.638682",
+      "motivi": [
+        "SQUADRE_IN_RIGHE_DIVERSE"
+      ],
+      "dettagli": {
+        "alias_casa": [
+          "sporting kc",
+          "kansas",
+          "city",
+          "sporting kansas city",
+          "kansas city",
+          "sporting kansas"
+        ],
+        "alias_trasferta": [
+          "columbus crew",
+          "columbus"
+        ]
+      }
+    },
+    {
+      "partita": "San Diego vs St. Louis CITY",
+      "lega": "Major League Soccer",
+      "giornata": 2,
+      "timestamp": "2026-01-30T05:10:18.740014",
+      "motivi": [
+        "SQUADRE_IN_RIGHE_DIVERSE"
+      ],
+      "dettagli": {
+        "alias_casa": [
+          "diego",
+          "san diego fc",
+          "san diego"
+        ],
+        "alias_trasferta": [
+          "st. louis city",
+          "louis",
+          "st. louis",
+          "city"
+        ]
+      }
+    },
+    {
+      "partita": "Vancouver vs Toronto",
+      "lega": "Major League Soccer",
+      "giornata": 2,
+      "timestamp": "2026-01-30T05:10:18.854662",
+      "motivi": [
+        "SQUADRE_IN_RIGHE_DIVERSE"
+      ],
+      "dettagli": {
+        "alias_casa": [
+          "vancouver w'caps",
+          "vancouver whitecaps",
+          "vancouver"
+        ],
+        "alias_trasferta": [
+          "toronto",
+          "toronto fc"
+        ]
+      }
+    },
+    {
+      "partita": "LA Galaxy vs Charlotte",
+      "lega": "Major League Soccer",
+      "giornata": 2,
+      "timestamp": "2026-01-30T05:10:18.955596",
+      "motivi": [
+        "SQUADRE_IN_RIGHE_DIVERSE"
+      ],
+      "dettagli": {
+        "alias_casa": [
+          "los angeles galaxy",
+          "la galaxy",
+          "galaxy"
+        ],
+        "alias_trasferta": [
+          "charlotte",
+          "charlotte fc"
+        ]
+      }
+    },
+    {
+      "partita": "Philadelphia vs New York City",
+      "lega": "Major League Soccer",
+      "giornata": 2,
+      "timestamp": "2026-01-30T05:10:19.132209",
+      "motivi": [
+        "SQUADRE_IN_RIGHE_DIVERSE"
+      ],
+      "dettagli": {
+        "alias_casa": [
+          "philadelphia",
+          "philadelphia union"
+        ],
+        "alias_trasferta": [
+          "york",
+          "city",
+          "nycfc",
+          "new york",
+          "new york city fc",
+          "new york city"
+        ]
+      }
+    },
+    {
+      "partita": "New York City vs Orlando",
+      "lega": "Major League Soccer",
+      "giornata": 3,
+      "timestamp": "2026-01-30T05:10:21.557789",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "3 02-03\n01:00 Orlando City - Inter Miami CF"
+      }
+    },
+    {
+      "partita": "New England vs Houston",
+      "lega": "Major League Soccer",
+      "giornata": 3,
+      "timestamp": "2026-01-30T05:10:21.673206",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "3 07-03\n20:30 New England Revolution - Houston Dynamo"
+      }
+    },
+    {
+      "partita": "D.C. United vs Miami",
+      "lega": "Major League Soccer",
+      "giornata": 3,
+      "timestamp": "2026-01-30T05:10:21.759929",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "3 07-03\n22:30 DC United - Inter Miami CF"
+      }
+    },
+    {
+      "partita": "Philadelphia vs SJ Earthquakes",
+      "lega": "Major League Soccer",
+      "giornata": 3,
+      "timestamp": "2026-01-30T05:10:21.860711",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "3 08-03\n01:30 Philadelphia Union - San Jose Earthquakes"
+      }
+    },
+    {
+      "partita": "Charlotte vs Austin",
+      "lega": "Major League Soccer",
+      "giornata": 3,
+      "timestamp": "2026-01-30T05:10:21.961740",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "3 08-03\n01:30 Charlotte FC - Austin FC"
+      }
+    },
+    {
+      "partita": "Columbus vs Chicago",
+      "lega": "Major League Soccer",
+      "giornata": 3,
+      "timestamp": "2026-01-30T05:10:22.063092",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "3 08-03\n01:30 Columbus Crew - Chicago Fire"
+      }
+    },
+    {
+      "partita": "Atlanta vs Salt Lake",
+      "lega": "Major League Soccer",
+      "giornata": 3,
+      "timestamp": "2026-01-30T05:10:22.164003",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "3 08-03\n01:30 Atlanta United - Real Salt Lake"
+      }
+    },
+    {
+      "partita": "Kansas City vs San Diego",
+      "lega": "Major League Soccer",
+      "giornata": 3,
+      "timestamp": "2026-01-30T05:10:22.265267",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "3 02-03\n03:00 San Diego FC - St. Louis City"
+      }
+    },
+    {
+      "partita": "St. Louis CITY vs Seattle",
+      "lega": "Major League Soccer",
+      "giornata": 3,
+      "timestamp": "2026-01-30T05:10:22.366206",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "3 08-03\n02:30 St. Louis City - Seattle Sounders"
+      }
+    },
+    {
+      "partita": "Nashville vs Minnesota",
+      "lega": "Major League Soccer",
+      "giornata": 3,
+      "timestamp": "2026-01-30T05:10:22.481314",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "3 08-03\n02:30 Nashville - Minnesota United FC"
+      }
+    },
+    {
+      "partita": "Colorado vs LA Galaxy",
+      "lega": "Major League Soccer",
+      "giornata": 3,
+      "timestamp": "2026-01-30T05:10:22.582619",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "3 08-03\n03:30 Colorado Rapids - Los Angeles Galaxy"
+      }
+    },
+    {
+      "partita": "LAFC vs Dallas",
+      "lega": "Major League Soccer",
+      "giornata": 3,
+      "timestamp": "2026-01-30T05:10:22.683893",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "3 01-03\n02:30 FC Dallas - Nashville"
+      }
+    },
+    {
+      "partita": "Portland vs Vancouver",
+      "lega": "Major League Soccer",
+      "giornata": 3,
+      "timestamp": "2026-01-30T05:10:22.804923",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "3 08-03\n04:30 Portland Timbers - Vancouver Whitecaps"
+      }
+    },
+    {
+      "partita": "New York vs Montréal",
+      "lega": "Major League Soccer",
+      "giornata": 3,
+      "timestamp": "2026-01-30T05:10:22.906148",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "3 08-03\n21:30 New York Red Bulls - CF Montreal"
+      }
+    },
+    {
+      "partita": "Cincinnati vs Toronto",
+      "lega": "Major League Soccer",
+      "giornata": 3,
+      "timestamp": "2026-01-30T05:10:23.006825",
+      "motivi": [
+        "PARTITA_TROVATA_SENZA_QUOTE"
+      ],
+      "dettagli": {
+        "nota": "La partita è presente sul sito ma le quote non sono ancora disponibili",
+        "riga_trovata": "3 09-03\n00:00 FC Cincinnati - Toronto FC"
+      }
+    }
+  ]
+}

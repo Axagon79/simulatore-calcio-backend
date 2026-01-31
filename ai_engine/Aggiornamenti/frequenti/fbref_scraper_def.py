@@ -2,6 +2,21 @@ import os
 import sys
 import os
 import sys
+# --- LOGICA FALLBACK: Se non trovi le librerie, prova altrove ---
+percorsi_da_controllare = [
+    # Posto 1: La cartella del tuo ambiente virtuale
+    os.path.join(os.getcwd(), ".venv", "Lib", "site-packages"),
+    # Posto 2: Il Python globale di Windows (dove abbiamo installato prima)
+    r"C:\Users\lollo\AppData\Local\Programs\Python\Python313\Lib\site-packages",
+    # Posto 3: La cartella dove si trova lo script (per i file locali)
+    os.path.dirname(os.path.abspath(__file__))
+]
+
+for p in percorsi_da_controllare:
+    if p not in sys.path and os.path.exists(p):
+        sys.path.append(p)
+# --------------------------------------------------------------
+
 import gestore_accessi_fbref
 
 # --- FIX PERCORSI UNIVERSALE ---
@@ -59,154 +74,154 @@ SEASON = "2025-2026"
 
 LEAGUES = [
     # ITALIA
-    # {
-    #     "name": "Serie A", "code": "ITA1", "comp_id": 11,
-    #     "defense_url": "https://fbref.com/en/comps/11/defense/Serie-A-Stats",
-    #     "misc_url": "https://fbref.com/en/comps/11/misc/Serie-A-Stats",
-    #     "playingtime_url": "https://fbref.com/en/comps/11/playingtime/Serie-A-Stats",
-    # },
-    # {
-    #     "name": "Serie B", "code": "ITA2", "comp_id": 18,
-    #     "defense_url": "https://fbref.com/en/comps/18/defense/Serie-B-Stats",
-    #     "misc_url": "https://fbref.com/en/comps/18/misc/Serie-B-Stats",
-    #     "playingtime_url": "https://fbref.com/en/comps/18/playingtime/Serie-B-Stats",
-    # },
+    {
+        "name": "Serie A", "code": "ITA1", "comp_id": 11,
+        "defense_url": "https://fbref.com/en/comps/11/defense/Serie-A-Stats",
+        "misc_url": "https://fbref.com/en/comps/11/misc/Serie-A-Stats",
+        "playingtime_url": "https://fbref.com/en/comps/11/playingtime/Serie-A-Stats",
+    },
+    {
+        "name": "Serie B", "code": "ITA2", "comp_id": 18,
+        "defense_url": "https://fbref.com/en/comps/18/defense/Serie-B-Stats",
+        "misc_url": "https://fbref.com/en/comps/18/misc/Serie-B-Stats",
+        "playingtime_url": "https://fbref.com/en/comps/18/playingtime/Serie-B-Stats",
+    },
     
-    # # EUROPA TOP
-    # {
-    #     "name": "Premier League", "code": "ENG1", "comp_id": 9,
-    #     "defense_url": "https://fbref.com/en/comps/9/defense/Premier-League-Stats",
-    #     "misc_url": "https://fbref.com/en/comps/9/misc/Premier-League-Stats",
-    #     "playingtime_url": "https://fbref.com/en/comps/9/playingtime/Premier-League-Stats",
-    # },
-    # {
-    #     "name": "La Liga", "code": "ESP1", "comp_id": 12,
-    #     "defense_url": "https://fbref.com/en/comps/12/defense/La-Liga-Stats",
-    #     "misc_url": "https://fbref.com/en/comps/12/misc/La-Liga-Stats",
-    #     "playingtime_url": "https://fbref.com/en/comps/12/playingtime/La-Liga-Stats",
-    # },
-    # {
-    #     "name": "Bundesliga", "code": "GER1", "comp_id": 20,
-    #     "defense_url": "https://fbref.com/en/comps/20/defense/Bundesliga-Stats",
-    #     "misc_url": "https://fbref.com/en/comps/20/misc/Bundesliga-Stats",
-    #     "playingtime_url": "https://fbref.com/en/comps/20/playingtime/Bundesliga-Stats",
-    # },
-    # {
-    #     "name": "Ligue 1", "code": "FRA1", "comp_id": 13,
-    #     "defense_url": "https://fbref.com/en/comps/13/defense/Ligue-1-Stats",
-    #     "misc_url": "https://fbref.com/en/comps/13/misc/Ligue-1-Stats",
-    #     "playingtime_url": "https://fbref.com/en/comps/13/playingtime/Ligue-1-Stats",
-    # },
-    # {
-    #     "name": "Eredivisie", "code": "NED1", "comp_id": 23,
-    #     "defense_url": "https://fbref.com/en/comps/23/defense/Eredivisie-Stats",
-    #     "misc_url": "https://fbref.com/en/comps/23/misc/Eredivisie-Stats",
-    #     "playingtime_url": "https://fbref.com/en/comps/23/playingtime/Eredivisie-Stats",
-    # },
-    # {
-    #     "name": "Liga Portugal", "code": "POR1", "comp_id": 32,
-    #     "defense_url": "https://fbref.com/en/comps/32/defense/Primeira-Liga-Stats",
-    #     "misc_url": "https://fbref.com/en/comps/32/misc/Primeira-Liga-Stats",
-    #     "playingtime_url": "https://fbref.com/en/comps/32/playingtime/Primeira-Liga-Stats",
-    # },
+    # EUROPA TOP
+    {
+        "name": "Premier League", "code": "ENG1", "comp_id": 9,
+        "defense_url": "https://fbref.com/en/comps/9/defense/Premier-League-Stats",
+        "misc_url": "https://fbref.com/en/comps/9/misc/Premier-League-Stats",
+        "playingtime_url": "https://fbref.com/en/comps/9/playingtime/Premier-League-Stats",
+    },
+    {
+        "name": "La Liga", "code": "ESP1", "comp_id": 12,
+        "defense_url": "https://fbref.com/en/comps/12/defense/La-Liga-Stats",
+        "misc_url": "https://fbref.com/en/comps/12/misc/La-Liga-Stats",
+        "playingtime_url": "https://fbref.com/en/comps/12/playingtime/La-Liga-Stats",
+    },
+    {
+        "name": "Bundesliga", "code": "GER1", "comp_id": 20,
+        "defense_url": "https://fbref.com/en/comps/20/defense/Bundesliga-Stats",
+        "misc_url": "https://fbref.com/en/comps/20/misc/Bundesliga-Stats",
+        "playingtime_url": "https://fbref.com/en/comps/20/playingtime/Bundesliga-Stats",
+    },
+    {
+        "name": "Ligue 1", "code": "FRA1", "comp_id": 13,
+        "defense_url": "https://fbref.com/en/comps/13/defense/Ligue-1-Stats",
+        "misc_url": "https://fbref.com/en/comps/13/misc/Ligue-1-Stats",
+        "playingtime_url": "https://fbref.com/en/comps/13/playingtime/Ligue-1-Stats",
+    },
+    {
+        "name": "Eredivisie", "code": "NED1", "comp_id": 23,
+        "defense_url": "https://fbref.com/en/comps/23/defense/Eredivisie-Stats",
+        "misc_url": "https://fbref.com/en/comps/23/misc/Eredivisie-Stats",
+        "playingtime_url": "https://fbref.com/en/comps/23/playingtime/Eredivisie-Stats",
+    },
+    {
+        "name": "Liga Portugal", "code": "POR1", "comp_id": 32,
+        "defense_url": "https://fbref.com/en/comps/32/defense/Primeira-Liga-Stats",
+        "misc_url": "https://fbref.com/en/comps/32/misc/Primeira-Liga-Stats",
+        "playingtime_url": "https://fbref.com/en/comps/32/playingtime/Primeira-Liga-Stats",
+    },
     
-    # # 🆕 EUROPA SERIE B
-    # {
-    #     "name": "Championship", "code": "ENG2", "comp_id": 10,
-    #     "defense_url": "https://fbref.com/en/comps/10/defense/Championship-Stats",
-    #     "misc_url": "https://fbref.com/en/comps/10/misc/Championship-Stats",
-    #     "playingtime_url": "https://fbref.com/en/comps/10/playingtime/Championship-Stats",
-    # },
-    # {
-    #     "name": "LaLiga 2", "code": "ESP2", "comp_id": 17,
-    #     "defense_url": "https://fbref.com/en/comps/17/defense/La-Liga-2-Stats",
-    #     "misc_url": "https://fbref.com/en/comps/17/misc/La-Liga-2-Stats",
-    #     "playingtime_url": "https://fbref.com/en/comps/17/playingtime/La-Liga-2-Stats",
-    # },
-    # {
-    #     "name": "2. Bundesliga", "code": "GER2", "comp_id": 33,
-    #     "defense_url": "https://fbref.com/en/comps/33/defense/2-Bundesliga-Stats",
-    #     "misc_url": "https://fbref.com/en/comps/33/misc/2-Bundesliga-Stats",
-    #     "playingtime_url": "https://fbref.com/en/comps/33/playingtime/2-Bundesliga-Stats",
-    # },
-    # {
-    #     "name": "Ligue 2", "code": "FRA2", "comp_id": 60,
-    #     "defense_url": "https://fbref.com/en/comps/60/defense/Ligue-2-Stats",
-    #     "misc_url": "https://fbref.com/en/comps/60/misc/Ligue-2-Stats",
-    #     "playingtime_url": "https://fbref.com/en/comps/60/playingtime/Ligue-2-Stats",
-    # },
+    # 🆕 EUROPA SERIE B
+    {
+        "name": "Championship", "code": "ENG2", "comp_id": 10,
+        "defense_url": "https://fbref.com/en/comps/10/defense/Championship-Stats",
+        "misc_url": "https://fbref.com/en/comps/10/misc/Championship-Stats",
+        "playingtime_url": "https://fbref.com/en/comps/10/playingtime/Championship-Stats",
+    },
+    {
+        "name": "LaLiga 2", "code": "ESP2", "comp_id": 17,
+        "defense_url": "https://fbref.com/en/comps/17/defense/La-Liga-2-Stats",
+        "misc_url": "https://fbref.com/en/comps/17/misc/La-Liga-2-Stats",
+        "playingtime_url": "https://fbref.com/en/comps/17/playingtime/La-Liga-2-Stats",
+    },
+    {
+        "name": "2. Bundesliga", "code": "GER2", "comp_id": 33,
+        "defense_url": "https://fbref.com/en/comps/33/defense/2-Bundesliga-Stats",
+        "misc_url": "https://fbref.com/en/comps/33/misc/2-Bundesliga-Stats",
+        "playingtime_url": "https://fbref.com/en/comps/33/playingtime/2-Bundesliga-Stats",
+    },
+    {
+        "name": "Ligue 2", "code": "FRA2", "comp_id": 60,
+        "defense_url": "https://fbref.com/en/comps/60/defense/Ligue-2-Stats",
+        "misc_url": "https://fbref.com/en/comps/60/misc/Ligue-2-Stats",
+        "playingtime_url": "https://fbref.com/en/comps/60/playingtime/Ligue-2-Stats",
+    },
     
-    # # 🆕 EUROPA NORDICI + EXTRA
-    # {
-    #     "name": "Scottish Premiership", "code": "SCO1", "comp_id": 40,
-    #     "defense_url": "https://fbref.com/en/comps/40/defense/Scottish-Premiership-Stats",
-    #     "misc_url": "https://fbref.com/en/comps/40/misc/Scottish-Premiership-Stats",
-    #     "playingtime_url": "https://fbref.com/en/comps/40/playingtime/Scottish-Premiership-Stats",
-    # },
-    # {
-    #     "name": "Allsvenskan", "code": "SWE1", "comp_id": 29,
-    #     "defense_url": "https://fbref.com/en/comps/29/defense/Allsvenskan-Stats",
-    #     "misc_url": "https://fbref.com/en/comps/29/misc/Allsvenskan-Stats",
-    #     "playingtime_url": "https://fbref.com/en/comps/29/playingtime/Allsvenskan-Stats",
-    # },
-    # {
-    #     "name": "Eliteserien", "code": "NOR1", "comp_id": 28,
-    #     "defense_url": "https://fbref.com/en/comps/28/defense/Eliteserien-Stats",
-    #     "misc_url": "https://fbref.com/en/comps/28/misc/Eliteserien-Stats",
-    #     "playingtime_url": "https://fbref.com/en/comps/28/playingtime/Eliteserien-Stats",
-    # },
-    # {
-    #     "name": "Superligaen", "code": "DEN1", "comp_id": 50,
-    #     "defense_url": "https://fbref.com/en/comps/50/defense/Superligaen-Stats",
-    #     "misc_url": "https://fbref.com/en/comps/50/misc/Superligaen-Stats",
-    #     "playingtime_url": "https://fbref.com/en/comps/50/playingtime/Superligaen-Stats",
-    # },
-    # {
-    #     "name": "Jupiler Pro League", "code": "BEL1", "comp_id": 37,
-    #     "defense_url": "https://fbref.com/en/comps/37/defense/Belgian-Pro-League-Stats",
-    #     "misc_url": "https://fbref.com/en/comps/37/misc/Belgian-Pro-League-Stats",
-    #     "playingtime_url": "https://fbref.com/en/comps/37/playingtime/Belgian-Pro-League-Stats",
-    # },
-    # {
-    #     "name": "Süper Lig", "code": "TUR1", "comp_id": 26,
-    #     "defense_url": "https://fbref.com/en/comps/26/defense/Super-Lig-Stats",
-    #     "misc_url": "https://fbref.com/en/comps/26/misc/Super-Lig-Stats",
-    #     "playingtime_url": "https://fbref.com/en/comps/26/playingtime/Super-Lig-Stats",
-    # },
-    # {
-    #     "name": "League of Ireland Premier Division", "code": "IRL1", "comp_id": 80,
-    #     "defense_url": "https://fbref.com/en/comps/80/defense/League-of-Ireland-Premier-Division-Stats",
-    #     "misc_url": "https://fbref.com/en/comps/80/misc/League-of-Ireland-Premier-Division-Stats",
-    #     "playingtime_url": "https://fbref.com/en/comps/80/playingtime/League-of-Ireland-Premier-Division-Stats",
-    # },
+    # 🆕 EUROPA NORDICI + EXTRA
+    {
+        "name": "Scottish Premiership", "code": "SCO1", "comp_id": 40,
+        "defense_url": "https://fbref.com/en/comps/40/defense/Scottish-Premiership-Stats",
+        "misc_url": "https://fbref.com/en/comps/40/misc/Scottish-Premiership-Stats",
+        "playingtime_url": "https://fbref.com/en/comps/40/playingtime/Scottish-Premiership-Stats",
+    },
+    {
+        "name": "Allsvenskan", "code": "SWE1", "comp_id": 29,
+        "defense_url": "https://fbref.com/en/comps/29/defense/Allsvenskan-Stats",
+        "misc_url": "https://fbref.com/en/comps/29/misc/Allsvenskan-Stats",
+        "playingtime_url": "https://fbref.com/en/comps/29/playingtime/Allsvenskan-Stats",
+    },
+    {
+        "name": "Eliteserien", "code": "NOR1", "comp_id": 28,
+        "defense_url": "https://fbref.com/en/comps/28/defense/Eliteserien-Stats",
+        "misc_url": "https://fbref.com/en/comps/28/misc/Eliteserien-Stats",
+        "playingtime_url": "https://fbref.com/en/comps/28/playingtime/Eliteserien-Stats",
+    },
+    {
+        "name": "Superligaen", "code": "DEN1", "comp_id": 50,
+        "defense_url": "https://fbref.com/en/comps/50/defense/Superligaen-Stats",
+        "misc_url": "https://fbref.com/en/comps/50/misc/Superligaen-Stats",
+        "playingtime_url": "https://fbref.com/en/comps/50/playingtime/Superligaen-Stats",
+    },
+    {
+        "name": "Jupiler Pro League", "code": "BEL1", "comp_id": 37,
+        "defense_url": "https://fbref.com/en/comps/37/defense/Belgian-Pro-League-Stats",
+        "misc_url": "https://fbref.com/en/comps/37/misc/Belgian-Pro-League-Stats",
+        "playingtime_url": "https://fbref.com/en/comps/37/playingtime/Belgian-Pro-League-Stats",
+    },
+    {
+        "name": "Süper Lig", "code": "TUR1", "comp_id": 26,
+        "defense_url": "https://fbref.com/en/comps/26/defense/Super-Lig-Stats",
+        "misc_url": "https://fbref.com/en/comps/26/misc/Super-Lig-Stats",
+        "playingtime_url": "https://fbref.com/en/comps/26/playingtime/Super-Lig-Stats",
+    },
+    {
+        "name": "League of Ireland Premier Division", "code": "IRL1", "comp_id": 80,
+        "defense_url": "https://fbref.com/en/comps/80/defense/League-of-Ireland-Premier-Division-Stats",
+        "misc_url": "https://fbref.com/en/comps/80/misc/League-of-Ireland-Premier-Division-Stats",
+        "playingtime_url": "https://fbref.com/en/comps/80/playingtime/League-of-Ireland-Premier-Division-Stats",
+    },
     
-    # # 🆕 AMERICHE
-    # {
-    #     "name": "Brasileirão Serie A", "code": "BRA1", "comp_id": 24,
-    #     "defense_url": "https://fbref.com/en/comps/24/defense/Serie-A-Stats",
-    #     "misc_url": "https://fbref.com/en/comps/24/misc/Serie-A-Stats",
-    #     "playingtime_url": "https://fbref.com/en/comps/24/playingtime/Serie-A-Stats",
-    # },
-    # {
-    #     "name": "Primera División", "code": "ARG1", "comp_id": 21,
-    #     "defense_url": "https://fbref.com/en/comps/21/defense/Primera-Division-Stats",
-    #     "misc_url": "https://fbref.com/en/comps/21/misc/Primera-Division-Stats",
-    #     "playingtime_url": "https://fbref.com/en/comps/21/playingtime/Primera-Division-Stats",
-    # },
-    # {
-    #     "name": "Major League Soccer", "code": "USA1", "comp_id": 22,
-    #     "defense_url": "https://fbref.com/en/comps/22/defense/Major-League-Soccer-Stats",
-    #     "misc_url": "https://fbref.com/en/comps/22/misc/Major-League-Soccer-Stats",
-    #     "playingtime_url": "https://fbref.com/en/comps/22/playingtime/Major-League-Soccer-Stats",
-    # },
+    # 🆕 AMERICHE
+    {
+        "name": "Brasileirão Serie A", "code": "BRA1", "comp_id": 24,
+        "defense_url": "https://fbref.com/en/comps/24/defense/Serie-A-Stats",
+        "misc_url": "https://fbref.com/en/comps/24/misc/Serie-A-Stats",
+        "playingtime_url": "https://fbref.com/en/comps/24/playingtime/Serie-A-Stats",
+    },
+    {
+        "name": "Primera División", "code": "ARG1", "comp_id": 21,
+        "defense_url": "https://fbref.com/en/comps/21/defense/Primera-Division-Stats",
+        "misc_url": "https://fbref.com/en/comps/21/misc/Primera-Division-Stats",
+        "playingtime_url": "https://fbref.com/en/comps/21/playingtime/Primera-Division-Stats",
+    },
+    {
+        "name": "Major League Soccer", "code": "USA1", "comp_id": 22,
+        "defense_url": "https://fbref.com/en/comps/22/defense/Major-League-Soccer-Stats",
+        "misc_url": "https://fbref.com/en/comps/22/misc/Major-League-Soccer-Stats",
+        "playingtime_url": "https://fbref.com/en/comps/22/playingtime/Major-League-Soccer-Stats",
+    },
     
-    # # 🆕 ASIA
-    # {
-    #     "name": "J1 League", "code": "JAP1", "comp_id": 25,
-    #     "defense_url": "https://fbref.com/en/comps/25/defense/J1-League-Stats",
-    #     "misc_url": "https://fbref.com/en/comps/25/misc/J1-League-Stats",
-    #     "playingtime_url": "https://fbref.com/en/comps/25/playingtime/J1-League-Stats",
-    # },
+    # 🆕 ASIA
+    {
+        "name": "J1 League", "code": "JAP1", "comp_id": 25,
+        "defense_url": "https://fbref.com/en/comps/25/defense/J1-League-Stats",
+        "misc_url": "https://fbref.com/en/comps/25/misc/J1-League-Stats",
+        "playingtime_url": "https://fbref.com/en/comps/25/playingtime/J1-League-Stats",
+    },
     
     # 🆕 COPPE EUROPEE
     {

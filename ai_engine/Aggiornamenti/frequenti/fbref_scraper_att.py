@@ -2,6 +2,21 @@ import os
 import sys
 import os
 import sys
+# --- LOGICA FALLBACK: Se non trovi le librerie, prova altrove ---
+percorsi_da_controllare = [
+    # Posto 1: La cartella del tuo ambiente virtuale
+    os.path.join(os.getcwd(), ".venv", "Lib", "site-packages"),
+    # Posto 2: Il Python globale di Windows (dove abbiamo installato prima)
+    r"C:\Users\lollo\AppData\Local\Programs\Python\Python313\Lib\site-packages",
+    # Posto 3: La cartella dove si trova lo script (per i file locali)
+    os.path.dirname(os.path.abspath(__file__))
+]
+
+for p in percorsi_da_controllare:
+    if p not in sys.path and os.path.exists(p):
+        sys.path.append(p)
+# --------------------------------------------------------------
+
 import gestore_accessi_fbref
 
 # --- FIX PERCORSI UNIVERSALE ---
