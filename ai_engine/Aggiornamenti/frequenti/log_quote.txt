@@ -1,0 +1,26 @@
+ config.py eseguito da: C:\Progetti\simulatore-calcio-backend\config.py
+ Directory corrente: C:\Progetti\simulatore-calcio-backend
+ Python path: ['C:\\Progetti\\simulatore-calcio-backend', 'C:\\Progetti\\simulatore-calcio-backend\\ai_engine', 'C:\\Progetti\\simulatore-calcio-backend\\ai_engine\\Aggiornamenti\\frequenti']
+ BASE_DIR: C:\Progetti\simulatore-calcio-backend
+ ENV_PATH: C:\Progetti\simulatore-calcio-backend\.env
+ .env trovato in: C:\Progetti\simulatore-calcio-backend\.env
+ Connessione MongoDB...
+ Connesso a MongoDB: football_simulator_db
+ Database: football_simulator_db
+    teams: 494 documenti
+    matches_history_betexplorer: 3842 documenti
+    raw_h2h_data_v2: 5844 documenti
+    h2h_by_round: 835 documenti
+ Configurazione completata con successo
+✅ DB Connesso: football_simulator_db
+✅ DB Connesso: football_simulator_db
+
+=======================================================
+ 📊 DIRETTORE QUOTE (NOWGOAL) - SISTEMA ATTIVO 
+=======================================================
+ ⌨️  Premi 'H' per NASCONDERE questa finestra
+ ⌨️  Premi 'CTRL+C' per terminare il processo
+
+
+🚀 AVVIO SCARICO QUOTE NOWGOAL
+ ✅ [QUOTE ATTIVE] ❤️ Ultimo check: 21:59:08 | Prossimo tra 60 min...   ✅ [QUOTE ATTIVE]     Ultimo check: 21:59:18 | Prossimo tra 60 min...   ✅ [QUOTE ATTIVE] ❤️ Ultimo check: 21:59:28 | Prossimo tra 60 min...   ✅ [QUOTE ATTIVE]     Ultimo check: 21:59:38 | Prossimo tra 60 min...   ✅ [QUOTE ATTIVE] ❤️ Ultimo check: 21:59:48 | Prossimo tra 60 min...  

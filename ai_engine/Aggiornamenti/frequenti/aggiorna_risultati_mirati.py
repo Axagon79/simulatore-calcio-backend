@@ -1,0 +1,229 @@
+import os
+import sys
+import time
+import subprocess
+import ctypes  # // aggiunto per: nascondere la finestra
+import msvcrt  # // aggiunto per: leggere i tasti senza bloccare il ciclo
+import importlib.util
+import re
+from datetime import datetime, timedelta
+from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+# --- CONFIGURAZIONE PERCORSI ---
+current_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.dirname(os.path.dirname(os.path.dirname(current_dir)))
+sys.path.append(project_root)
+
+try:
+    spec = importlib.util.spec_from_file_location("config", os.path.join(project_root, "config.py"))
+    config_module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(config_module)
+    db = config_module.db
+except Exception as e:
+    print(f"❌ Errore Config: {e}")
+    sys.exit()
+
+# --- TARGET_CONFIG UNIFICATO ---
+# // modificato per: contenere tutte le chiavi richieste dalle funzioni originali
+TARGET_CONFIG = {
+    "Serie A": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/italy/serie-a/results/", "id_prefix": "SerieA", "league_name": "Serie A"},
+    "Serie B": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/italy/serie-b/results/", "id_prefix": "SerieB", "league_name": "Serie B"},
+    "Serie C - Girone A": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/italy/serie-c-group-a/results/", "id_prefix": "SerieC-GironeA", "league_name": "Serie C - Girone A"},
+    "Serie C - Girone B": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/italy/serie-c-group-b/results/", "id_prefix": "SerieC-GironeB", "league_name": "Serie C - Girone B"},
+    "Serie C - Girone C": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/italy/serie-c-group-c/results/", "id_prefix": "SerieC-GironeC", "league_name": "Serie C - Girone C"},
+    "Premier League": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/england/premier-league/results/", "id_prefix": "PremierLeague", "league_name": "Premier League"},
+    "La Liga": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/spain/laliga/results/", "id_prefix": "LaLiga", "league_name": "La Liga"},
+    "Bundesliga": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/germany/bundesliga/results/", "id_prefix": "Bundesliga", "league_name": "Bundesliga"},
+    "Ligue 1": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/france/ligue-1/results/", "id_prefix": "Ligue1", "league_name": "Ligue 1"},
+    "Eredivisie": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/netherlands/eredivisie/results/", "id_prefix": "Eredivisie", "league_name": "Eredivisie"},
+    "Liga Portugal": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/portugal/liga-portugal/results/", "id_prefix": "LigaPortugal", "league_name": "Liga Portugal"},
+    "Championship": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/england/championship/results/", "id_prefix": "Championship", "league_name": "Championship"},
+    "LaLiga 2": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/spain/laliga2/results/", "id_prefix": "LaLiga2", "league_name": "LaLiga 2"},
+    "2. Bundesliga": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/germany/2-bundesliga/results/", "id_prefix": "2.Bundesliga", "league_name": "2. Bundesliga"},
+    "Ligue 2": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/france/ligue-2/results/", "id_prefix": "Ligue2", "league_name": "Ligue 2"},
+    "Scottish Premiership": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/scotland/premiership/results/", "id_prefix": "ScottishPremiership", "league_name": "Scottish Premiership"},
+    "Allsvenskan": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/sweden/allsvenskan/results/", "id_prefix": "Allsvenskan", "league_name": "Allsvenskan"},
+    "Eliteserien": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/norway/eliteserien/results/", "id_prefix": "Eliteserien", "league_name": "Eliteserien"},
+    "Superligaen": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/denmark/superliga/results/", "id_prefix": "Superligaen", "league_name": "Superligaen"},
+    "Jupiler Pro League": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/belgium/jupiler-pro-league/results/", "id_prefix": "JupilerProLeague", "league_name": "Jupiler Pro League"},
+    "Süper Lig": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/turkey/super-lig/results/", "id_prefix": "SüperLig", "league_name": "Süper Lig"},
+    "League of Ireland Premier Division": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/ireland/premier-division/results/", "id_prefix": "LeagueOfIreland", "league_name": "League of Ireland Premier Division"},
+    "Brasileirão Serie A": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/brazil/serie-a-betano/results/", "id_prefix": "Brasileirao", "league_name": "Brasileirão Serie A"},
+    "Primera División": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/argentina/liga-profesional/results//", "id_prefix": "PrimeraDivision", "league_name": "Primera División"},
+    "Major League Soccer": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/usa/mls/results/", "id_prefix": "MLS", "league_name": "Major League Soccer"},
+    "J1 League": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/japan/j1-league/results/", "id_prefix": "J1League", "league_name": "J1 League"},
+    "UCL": {"tipo": "coppa", "matches_collection": "matches_champions_league", "nowgoal_url": "https://football.nowgoal26.com/cupmatch/103", "name": "Champions League", "season": "2025-2026"},
+    "UEL": {"tipo": "coppa", "matches_collection": "matches_europa_league", "nowgoal_url": "https://football.nowgoal26.com/cupmatch/113", "name": "Europa League", "season": "2025-2026"}
+}
+
+# --- FUNZIONI ORIGINALI CAMPIONATI (da per_agg_pianificato_update_results_only.py) ---
+
+def find_team_tm_id(team_name):
+    teams_col = db["teams"]
+    team = teams_col.find_one({"$or": [{"name": team_name}, {"aliases": team_name}, {"aliases_transfermarkt": team_name}]})
+    return str(team["transfermarkt_id"]) if team and "transfermarkt_id" in team else None
+
+def extract_round_number(text):
+    if not text: return None
+    match = re.search(r'(\d+)', text)
+    return match.group(1) if match else None
+
+def parse_betexplorer_html(html_content):
+    soup = BeautifulSoup(html_content, 'html.parser')
+    results_by_round = {}
+    current_round = None
+    rows = soup.find_all('tr')
+    for row in rows:
+        th = row.find('th', class_='h-text-left')
+        if th:
+            round_num = extract_round_number(th.get_text(strip=True))
+            if round_num:
+                current_round = round_num
+                if current_round not in results_by_round: results_by_round[current_round] = []
+            continue
+        if current_round is None: continue
+        cells = row.find_all('td')
+        if len(cells) < 2: continue
+        first_cell = cells[0]
+        match_link = first_cell.find('a')
+        if not match_link: continue
+        spans = match_link.find_all('span')
+        if len(spans) < 2: continue
+        home_team, away_team = spans[0].get_text(strip=True), spans[-1].get_text(strip=True)
+        score_link = cells[1].find('a')
+        if not score_link: continue
+        score_text = score_link.get_text(strip=True)
+        if not re.match(r'^\d+:\d+$', score_text): continue
+        results_by_round[current_round].append({"home": home_team, "away": away_team, "score": score_text})
+    return results_by_round
+
+def process_league(driver, league_config):
+    h2h_col = db["h2h_by_round"]
+    driver.get(league_config['url'])
+    time.sleep(2)
+    results = parse_betexplorer_html(driver.page_source)
+    for round_num, matches in results.items():
+        doc_id = f"{league_config['id_prefix']}_{round_num}Giornata"
+        db_doc = h2h_col.find_one({"_id": doc_id})
+        if not db_doc: continue
+        db_matches = db_doc.get("matches", [])
+        modified = False
+        for be_match in matches:
+            h_id, a_id = find_team_tm_id(be_match["home"]), find_team_tm_id(be_match["away"])
+            if not h_id or not a_id: continue
+            for db_m in db_matches:
+                if str(db_m.get('home_tm_id')) == h_id and str(db_m.get('away_tm_id')) == a_id:
+                    if db_m.get('real_score') != be_match["score"]:
+                        db_m['real_score'], db_m['status'], modified = be_match["score"], "Finished", True
+                    break
+        if modified:
+            h2h_col.update_one({"_id": doc_id}, {"$set": {"matches": db_matches, "last_updated": datetime.now()}})
+    print(f"✅ Risultati {league_config['league_name']} aggiornati.")
+
+# --- FUNZIONI ORIGINALI COPPE (da update_cups_data.py) ---
+
+def scrape_nowgoal_matches(config):
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+    driver = webdriver.Chrome(options=chrome_options)
+    driver.get(config['nowgoal_url'])
+    time.sleep(5)
+    soup = BeautifulSoup(driver.page_source, "html.parser")
+    table = soup.find("table", id="Table3")
+    if not table: return
+    rows = table.find_all("tr")
+    matches_data = []
+    for row in rows:
+        team_links = row.find_all("a", href=re.compile(r"/team/"))
+        if len(team_links) < 2: continue
+        home, away = team_links[0].get_text(strip=True), team_links[1].get_text(strip=True)
+        score_cell = row.find("div", class_="point")
+        if score_cell:
+            fonts = score_cell.find_all("font")
+            if len(fonts) >= 2:
+                h_s, a_s = fonts[0].get_text(strip=True).replace("-",""), fonts[1].get_text(strip=True).replace("-","")
+                matches_data.append({"home_team": home, "away_team": away, "status": "finished", "result": {"home_score": int(h_s), "away_score": int(a_s)}})
+    if matches_data:
+        coll = db[config['matches_collection']]
+        for m in matches_data:
+            coll.update_one({"home_team": m['home_team'], "away_team": m['away_team'], "season": config['season']}, {"$set": m}, upsert=True)
+    driver.quit()
+    print(f"✅ Risultati {config['name']} aggiornati.")
+
+# --- LOGICA DIRETTORE ---
+
+# // modificato per: aggiungere dashboard visiva e battito cardiaco (heartbeat)
+def run_director_loop():
+    print(f"\n{'='*50}")
+    print(f" 🚀 DIRETTORE RISULTATI - SISTEMA ATTIVO ")
+    print(f"{'='*50}")
+    print(" Premere CTRL+C per fermare, o usa il comando HIDE per lo sfondo.\n")
+    
+    heartbeat = ["❤️", "   "] # Simula il battito
+    step = 0
+
+    while True:
+        ora = datetime.now()
+        
+        # Gestione Pausa Notturna
+        if 2 <= ora.hour < 8:
+            sys.stdout.write(f"\r 💤 [PAUSA] Il Direttore riposa. Sveglia alle 08:00...          ")
+            sys.stdout.flush()
+            time.sleep(1800)
+            continue
+        agenda = set()
+        soglia = datetime.now() - timedelta(minutes=120)
+        # Check campionati
+        for doc in db["h2h_by_round"].find():
+            for m in doc.get("matches", []):
+                if m.get("status") == "Scheduled" and m.get("date_obj") and m["date_obj"] <= soglia:
+                    agenda.add(doc.get("league")); break
+        # Check coppe
+        for name, cfg in TARGET_CONFIG.items():
+            if cfg['tipo'] == "coppa":
+                for p in db[cfg['matches_collection']].find({"status": {"$ne": "finished"}}):
+                    if datetime.strptime(p.get("match_date", "01-01-2000 00:00"), "%d-%m-%Y %H:%M") <= soglia:
+                        agenda.add(name); break
+        if agenda:
+            for target in agenda: subprocess.run([sys.executable, __file__, target])
+        # // modificato per: heartbeat visivo e funzione NASCONDI (Tasto H)
+        print("\n" + "-"*50)
+        print(" ⌨️  Premi 'H' per NASCONDERE questa finestra (il bot continuerà)")
+        print("-"*50)
+        
+        for i in range(60): 
+            # Controllo se è stato premuto un tasto
+            if msvcrt.kbhit():
+                tasto = msvcrt.getch().decode('utf-8').lower()
+                if tasto == 'h':
+                    # Nasconde la finestra di Windows
+                    ctypes.windll.user32.ShowWindow(ctypes.windll.kernel32.GetConsoleWindow(), 0)
+                    print("\n👻 Finestra nascosta! Il bot continua a lavorare in background.")
+
+            h = heartbeat[i % 2]
+            orario_live = datetime.now().strftime("%H:%M:%S")
+            min_rimanenti = 10 - (i*10 // 60)
+            sys.stdout.write(f"\r ✅ [OPERATIVO] {h} Ultimo check: {orario_live} | Prossimo tra {min_rimanenti} min...  ")
+            sys.stdout.flush()
+            time.sleep(10)
+
+def main():
+    if len(sys.argv) > 1:
+        t = sys.argv[1]
+        if t in TARGET_CONFIG:
+            cfg = TARGET_CONFIG[t]
+            chrome_options = Options()
+            chrome_options.add_argument("--headless")
+            driver = webdriver.Chrome(options=chrome_options)
+            if cfg['tipo'] == "lega": process_league(driver, cfg)
+            else: scrape_nowgoal_matches(cfg)
+            driver.quit()
+    else: run_director_loop()
+
+if __name__ == "__main__":
+    main()
