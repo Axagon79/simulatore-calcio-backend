@@ -74,7 +74,7 @@ LEAGUES_CONFIG = [
     
     # 🆕 AMERICHE
     {"league_name": "Brasileirão Serie A", "id_prefix": "Brasileirao", "url": "https://www.betexplorer.com/it/football/brazil/serie-a-betano/results/"},
-    {"league_name": "Primera División", "id_prefix": "PrimeraDivision", "url": "https://www.betexplorer.com/it/football/argentina/liga-profesional/results//"},
+    {"league_name": "Primera División", "id_prefix": "PrimeraDivisión", "url": "https://www.betexplorer.com/it/football/argentina/liga-profesional/results//"},
     {"league_name": "Major League Soccer", "id_prefix": "MLS", "url": "https://www.betexplorer.com/it/football/usa/mls/results/"},
     
     # 🆕 ASIA

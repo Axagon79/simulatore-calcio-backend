@@ -54,7 +54,7 @@ TARGET_CONFIG = {
     "Süper Lig": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/turkey/super-lig/results/", "id_prefix": "SüperLig", "league_name": "Süper Lig"},
     "League of Ireland Premier Division": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/ireland/premier-division/results/", "id_prefix": "LeagueOfIreland", "league_name": "League of Ireland Premier Division"},
     "Brasileirão Serie A": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/brazil/serie-a-betano/results/", "id_prefix": "Brasileirao", "league_name": "Brasileirão Serie A"},
-    "Primera División": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/argentina/liga-profesional/results//", "id_prefix": "PrimeraDivision", "league_name": "Primera División"},
+    "Primera División": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/argentina/liga-profesional/results//", "id_prefix": "PrimeraDivisión", "league_name": "Primera División"},
     "Major League Soccer": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/usa/mls/results/", "id_prefix": "MLS", "league_name": "Major League Soccer"},
     "J1 League": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/japan/j1-league/results/", "id_prefix": "J1League", "league_name": "J1 League"},
     "UCL": {"tipo": "coppa", "matches_collection": "matches_champions_league", "nowgoal_url": "https://football.nowgoal26.com/cupmatch/103", "name": "Champions League", "season": "2025-2026"},
@@ -103,27 +103,47 @@ def parse_betexplorer_html(html_content):
     return results_by_round
 
 def process_league(driver, league_config):
+    # // modificato per: distinguere tra scansione a vuoto e aggiornamento reale
     h2h_col = db["h2h_by_round"]
     driver.get(league_config['url'])
     time.sleep(2)
     results = parse_betexplorer_html(driver.page_source)
+    
+    totale_aggiornati = 0  # Contatore globale per la lega
+
     for round_num, matches in results.items():
         doc_id = f"{league_config['id_prefix']}_{round_num}Giornata"
         db_doc = h2h_col.find_one({"_id": doc_id})
         if not db_doc: continue
+        
         db_matches = db_doc.get("matches", [])
         modified = False
+        
         for be_match in matches:
             h_id, a_id = find_team_tm_id(be_match["home"]), find_team_tm_id(be_match["away"])
             if not h_id or not a_id: continue
+            
             for db_m in db_matches:
                 if str(db_m.get('home_tm_id')) == h_id and str(db_m.get('away_tm_id')) == a_id:
-                    if db_m.get('real_score') != be_match["score"]:
-                        db_m['real_score'], db_m['status'], modified = be_match["score"], "Finished", True
+                    # Verifica se il punteggio è cambiato o se lo stato non è ancora 'Finished'
+                    if db_m.get('real_score') != be_match["score"] or db_m.get('status') != "Finished":
+                        db_m['real_score'] = be_match["score"]
+                        db_m['status'] = "Finished"
+                        modified = True
+                        totale_aggiornati += 1
                     break
+        
         if modified:
-            h2h_col.update_one({"_id": doc_id}, {"$set": {"matches": db_matches, "last_updated": datetime.now()}})
-    print(f"✅ Risultati {league_config['league_name']} aggiornati.")
+            h2h_col.update_one(
+                {"_id": doc_id}, 
+                {"$set": {"matches": db_matches, "last_updated": datetime.now()}}
+            )
+
+    # Log differenziato in base all'attività svolta
+    if totale_aggiornati > 0:
+        print(f"✅ {league_config['league_name']}: Aggiornati {totale_aggiornati} risultati nel database.")
+    else:
+        print(f"☕ {league_config['league_name']}: Scansione completata. Nessun nuovo risultato da inserire.")
 
 # --- FUNZIONI ORIGINALI COPPE (da update_cups_data.py) ---
 
@@ -155,55 +175,77 @@ def scrape_nowgoal_matches(config):
     driver.quit()
     print(f"✅ Risultati {config['name']} aggiornati.")
 
-# --- LOGICA DIRETTORE ---
+# --- LOGICA DIRETTORE AGGIORNATA ---
 
-# // modificato per: aggiungere dashboard visiva e battito cardiaco (heartbeat)
 def run_director_loop():
     print(f"\n{'='*50}")
     print(f" 🚀 DIRETTORE RISULTATI - SISTEMA ATTIVO ")
     print(f"{'='*50}")
-    print(" Premere CTRL+C per fermare, o usa il comando HIDE per lo sfondo.\n")
+    print(" ⌨️  Premi 'H' per NASCONDERE questa finestra")
     
-    heartbeat = ["❤️", "   "] # Simula il battito
-    step = 0
+    heartbeat = ["❤️", "   "] 
 
     while True:
-        ora = datetime.now()
+        ora_attuale = datetime.now()
         
         # Gestione Pausa Notturna
-        if 2 <= ora.hour < 8:
+        if 2 <= ora_attuale.hour < 8:
             sys.stdout.write(f"\r 💤 [PAUSA] Il Direttore riposa. Sveglia alle 08:00...          ")
             sys.stdout.flush()
             time.sleep(1800)
             continue
+
         agenda = set()
-        soglia = datetime.now() - timedelta(minutes=120)
+        
+        # --- DEFINIZIONE FINESTRA TEMPORALE ---
+        # // modificato per: ignorare il passato e guardare solo oggi/ieri
+        soglia_fine = ora_attuale - timedelta(minutes=120)  # Iniziata da almeno 2 ore
+        soglia_inizio = ora_attuale - timedelta(days=2)      # Non più vecchia di 48 ore
+
         # Check campionati
-        for doc in db["h2h_by_round"].find():
+        # Cerchiamo solo documenti che hanno almeno un match nel range temporale corretto
+        query_leagues = {
+            "matches.status": "Scheduled",
+            "matches.date_obj": {"$gte": soglia_inizio, "$lte": soglia_fine}
+        }
+        
+        for doc in db["h2h_by_round"].find(query_leagues):
             for m in doc.get("matches", []):
-                if m.get("status") == "Scheduled" and m.get("date_obj") and m["date_obj"] <= soglia:
-                    agenda.add(doc.get("league")); break
+                if (m.get("status") == "Scheduled" and 
+                    m.get("date_obj") and 
+                    soglia_inizio <= m["date_obj"] <= soglia_fine):
+                    agenda.add(doc.get("league"))
+                    break
+
         # Check coppe
         for name, cfg in TARGET_CONFIG.items():
             if cfg['tipo'] == "coppa":
+                # Anche per le coppe, filtriamo per data
                 for p in db[cfg['matches_collection']].find({"status": {"$ne": "finished"}}):
-                    if datetime.strptime(p.get("match_date", "01-01-2000 00:00"), "%d-%m-%Y %H:%M") <= soglia:
-                        agenda.add(name); break
+                    try:
+                        match_date = datetime.strptime(p.get("match_date", "01-01-2000 00:00"), "%d-%m-%Y %H:%M")
+                        if soglia_inizio <= match_date <= soglia_fine:
+                            agenda.add(name)
+                            break
+                    except:
+                        continue
+
+        # Esecuzione aggiornamenti
         if agenda:
-            for target in agenda: subprocess.run([sys.executable, __file__, target])
-        # // modificato per: heartbeat visivo e funzione NASCONDI (Tasto H)
+            print(f"\n🎯 Aggiornamento in corso per: {list(agenda)}")
+            for target in agenda: 
+                subprocess.run([sys.executable, __file__, target])
+        
+        # --- DASHBOARD VISIVA E ATTESA ---
         print("\n" + "-"*50)
-        print(" ⌨️  Premi 'H' per NASCONDERE questa finestra (il bot continuerà)")
+        print(" ⌨️  Premi 'H' per NASCONDERE questa finestra")
         print("-"*50)
         
         for i in range(60): 
-            # Controllo se è stato premuto un tasto
             if msvcrt.kbhit():
-                tasto = msvcrt.getch().decode('utf-8').lower()
-                if tasto == 'h':
-                    # Nasconde la finestra di Windows
+                if msvcrt.getch().decode('utf-8').lower() == 'h':
                     ctypes.windll.user32.ShowWindow(ctypes.windll.kernel32.GetConsoleWindow(), 0)
-                    print("\n👻 Finestra nascosta! Il bot continua a lavorare in background.")
+                    print("\n👻 Finestra nascosta! Il bot continua a lavorare.")
 
             h = heartbeat[i % 2]
             orario_live = datetime.now().strftime("%H:%M:%S")
