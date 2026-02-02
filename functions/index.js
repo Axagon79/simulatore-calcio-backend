@@ -40,6 +40,9 @@ app.use(async (req, res, next) => {
 
 app.use('/simulation', simulationRoutes);
 
+const predictionsRoutes = require('./routes/predictionsRoutes');
+app.use('/simulation', predictionsRoutes);
+
 // ============================================
 // UTILITY FUNCTIONS
 // ============================================
