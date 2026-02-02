@@ -611,10 +611,10 @@ def score_media_gol(home_team_doc, away_team_doc, match_data):
     Gol fatti/subiti casa e trasferta.
     """
     score_over = 50  # Neutro
-    score_under = 50
+  
     
     if not home_team_doc or not away_team_doc:
-        return score_over, 'neutro'
+        return 50, 'neutro', 2.5, False
     
     h_ranking = home_team_doc.get('ranking', {})
     a_ranking = away_team_doc.get('ranking', {})
@@ -626,7 +626,7 @@ def score_media_gol(home_team_doc, away_team_doc, match_data):
     a_played = a_away.get('played', 0)
     
     if h_played == 0 or a_played == 0:
-        return 50, 'neutro'
+        return 50, 'neutro', 2.5, False
     
     # Media gol fatti e subiti
     h_gf_avg = h_home.get('goalsFor', 0) / h_played  # Gol fatti casa
@@ -1209,12 +1209,12 @@ def generate_comment(match_data, segno_result, gol_result, decision_result):
         'lucifero_sfi': lucifero_sfi,
         'trust_fav': trust_fav,
         'trust_sfi': trust_sfi,
-        'field_home': h2h.get('field_home', 0),
+        'field_home': h2h.get('fattore_campo', {}).get('field_home', 0) if isinstance(h2h.get('fattore_campo'), dict) else h2h.get('field_home', 0),
         'h2h_score_fav': max(h2h.get('home_score', 5), h2h.get('away_score', 5)),
         'h2h_score_sfi': min(h2h.get('home_score', 5), h2h.get('away_score', 5)),
         'h2h_total': h2h.get('total_matches', 0),
-        'mot_fav': home_team_doc.get('stats', {}).get('motivation', 10) if q1 < q2 else away_team_doc.get('stats', {}).get('motivation', 10),
-        'mot_sfi': away_team_doc.get('stats', {}).get('motivation', 10) if q1 < q2 else home_team_doc.get('stats', {}).get('motivation', 10),
+        'mot_fav': (home_team_doc.get('stats', {}).get('motivation') or 10) if q1 < q2 else (away_team_doc.get('stats', {}).get('motivation') or 10),
+        'mot_sfi': (away_team_doc.get('stats', {}).get('motivation') or 10) if q1 < q2 else (home_team_doc.get('stats', {}).get('motivation') or 10),
         'dna_fav': dna_home.get('val', 50) if q1 < q2 else dna_away.get('val', 50),
         'dna_sfi': dna_away.get('val', 50) if q1 < q2 else dna_home.get('val', 50),
         'quota_fav': quota_fav,
@@ -1226,7 +1226,7 @@ def generate_comment(match_data, segno_result, gol_result, decision_result):
         'def_away': a_scores.get('defense_away', 0),
         'xg_combined': gol_result.get('expected_total', 0) or 0,
         'league_avg': gol_result.get('league_avg', 2.5),
-        'h2h_avg_goals': h2h.get('avg_goals_total', 0),
+        'h2h_avg_goals': h2h.get('avg_total_goals', 0),
         'h2h_over_pct': 0,
         'h2h_under_pct': 0,
         'h2h_btts_pct': 0,
@@ -1302,6 +1302,47 @@ def generate_comment(match_data, segno_result, gol_result, decision_result):
 
     return comments
 
+def generate_bomba_comment(match_data, bomba_result, home_team_doc, away_team_doc):
+    """Genera commento per le bombe usando il pool JSON."""
+    h2h = match_data.get('h2h_data', {})
+    odds = match_data.get('odds', {})
+    q1 = float(odds.get('1', 99))
+    q2 = float(odds.get('2', 99))
+    
+    if q1 > q2:
+        lucifero_sfi = h2h.get('lucifero_home', 0)
+        lucifero_fav = h2h.get('lucifero_away', 0)
+        trust_fav = h2h.get('trust_away_letter', 'C')
+        trust_sfi = h2h.get('trust_home_letter', 'C')
+        mot_sfi = (home_team_doc or {}).get('stats', {}).get('motivation') or 10
+    else:
+        lucifero_sfi = h2h.get('lucifero_away', 0)
+        lucifero_fav = h2h.get('lucifero_home', 0)
+        trust_fav = h2h.get('trust_home_letter', 'C')
+        trust_sfi = h2h.get('trust_away_letter', 'C')
+        mot_sfi = (away_team_doc or {}).get('stats', {}).get('motivation') or 10
+
+    placeholders = {
+        'bvs_index': h2h.get('bvs_match_index', 0),
+        'classification': h2h.get('classification', 'N/A'),
+        'lucifero_fav': lucifero_fav,
+        'lucifero_sfi': lucifero_sfi,
+        'trust_fav': trust_fav,
+        'trust_sfi': trust_sfi,
+        'mot_sfi': mot_sfi,
+        'h2h_score_sfi': min(h2h.get('home_score', 5), h2h.get('away_score', 5)),
+    }
+
+    for k, v in placeholders.items():
+        if v is None:
+            placeholders[k] = 0
+
+    template = random.choice(COMMENTS_POOL.get('BOMBA', ['Anomalia statistica rilevata']))
+    try:
+        return template.format(**placeholders)
+    except (KeyError, ValueError):
+        return 'Anomalia statistica rilevata'
+
 
 # ==================== MAIN ====================
 
@@ -1359,7 +1400,7 @@ def run_daily_predictions():
                 print(f"   💣 BOMBA! {bomba_result['sfavorita']} ({bomba_result['score']}/100)")
                 
                 bomba_doc = {
-                    'date': datetime.now(timezone.utc).strftime('%Y-%m-%d') if 'timezone' in dir() else datetime.utcnow().strftime('%Y-%m-%d'),
+                    'date': datetime.now(timezone.utc).strftime('%Y-%m-%d'),
                     'home': match.get('home', '???'),
                     'away': match.get('away', '???'),
                     'league': league,
@@ -1370,7 +1411,7 @@ def run_daily_predictions():
                     'stars': calculate_stars(bomba_result['score']),
                     'dettaglio': bomba_result['dettaglio'],
                     'odds': match.get('odds', {}),
-                    'comment': '',
+                    'comment': generate_bomba_comment(match, bomba_result, home_team_doc, away_team_doc),
                     'created_at': datetime.now(timezone.utc),
                 }
                 bombs.append(bomba_doc)

@@ -275,5 +275,37 @@
       "xG combinato {xg_combined}, media lega {league_avg} — profilo strutturalmente NoGoal",
       "Attacco trasferta {att_away}/15 non sufficiente contro difesa casa {def_home}/10",
       "H2H {h2h_nogoal_pct}% NoGoal, difesa {def_home}/10 — convergenza storica e stagionale"
-    ]
+    ],
+    "BOMBA": [
+        "BVS {classification} — statistiche e mercato non allineati, Lucifero sfavorita {lucifero_sfi}/25",
+        "Lucifero sfavorita {lucifero_sfi}/25 vs favorita {lucifero_fav}/25 — forma superiore nonostante la quota",
+        "Affidabilità favorita {trust_fav}, classificazione BVS {classification} — profilo anomalo",
+        "BVS {classification} con indice {bvs_index}, affidabilità entrambe bassa — partita imprevedibile",
+        "Lucifero sfavorita {lucifero_sfi}/25 in crescita, BVS {classification} — segnali controcorrente",
+        "Motivazione sfavorita {mot_sfi}/15, Lucifero {lucifero_sfi}/25 — pressione e forma a favore",
+        "BVS {classification}, Lucifero {lucifero_sfi}/25, affidabilità favorita {trust_fav} — tripla anomalia",
+        "Affidabilità favorita {trust_fav}, sfavorita con Lucifero {lucifero_sfi}/25 — i dati non seguono la quota",
+        "Classificazione BVS {classification}, indice {bvs_index} — il mercato non riflette i numeri",
+        "Lucifero {lucifero_sfi}/25 per la sfavorita, H2H {h2h_score_sfi}/10 — segnali da monitorare",
+        "BVS {classification} e affidabilità bassa per entrambe — contesto favorevole alla sorpresa",
+        "Motivazione {mot_sfi}/15 e Lucifero {lucifero_sfi}/25 — la sfavorita ha argomenti nei dati",
+        "Affidabilità {trust_fav} per la favorita, BVS {classification} — il rendimento non è garantito",
+        "Lucifero sfavorita {lucifero_sfi}/25, motivazione {mot_sfi}/15 — forma e pressione convergono",
+        "BVS {classification}, indice {bvs_index}, Lucifero {lucifero_sfi}/25 — anomalia statistica rilevante",
+        "H2H {h2h_score_sfi}/10 per la sfavorita, BVS {classification} — i precedenti non confermano il pronostico",
+        "Affidabilità entrambe bassa, Lucifero sfavorita {lucifero_sfi}/25 — equilibrio nascosto",
+        "BVS {classification}, motivazione sfavorita {mot_sfi}/15 — la quota non racconta tutto",
+        "Lucifero {lucifero_sfi}/25 vs {lucifero_fav}/25, classificazione {classification} — divario forma invertito",
+        "Affidabilità favorita {trust_fav}, indice BVS {bvs_index} — dati non convincenti per la favorita",
+        "Motivazione {mot_sfi}/15, affidabilità favorita {trust_fav} — contesto a favore della sorpresa",
+        "BVS {classification} con Lucifero sfavorita {lucifero_sfi}/25 — il rendimento recente ribalta la lettura",
+        "H2H {h2h_score_sfi}/10, Lucifero {lucifero_sfi}/25, BVS {classification} — convergenza anomala",
+        "Affidabilità {trust_fav} e {trust_sfi}, Lucifero {lucifero_sfi}/25 — rendimenti instabili da entrambe le parti",
+        "BVS {classification}, indice {bvs_index} — il disallineamento tra dati e quota è significativo",
+        "Lucifero sfavorita {lucifero_sfi}/25 nettamente superiore, classificazione {classification}",
+        "Motivazione sfavorita {mot_sfi}/15, BVS {classification} — pressione stagionale e dati anomali",
+        "Affidabilità bassa combinata, Lucifero {lucifero_sfi}/25 — partita aperta a qualsiasi risultato",
+        "BVS {classification}, H2H sfavorita {h2h_score_sfi}/10 — storico e statistica non premiano la favorita",
+        "Lucifero {lucifero_sfi}/25, motivazione {mot_sfi}/15, affidabilità {trust_fav} — triplo segnale bomba"
+      ]
   }
