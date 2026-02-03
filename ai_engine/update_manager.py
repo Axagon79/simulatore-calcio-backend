@@ -61,8 +61,8 @@ SCRAPER_SEQUENCE = [
       ("nowgoal_scraper.py", "🚀 [14/14] Quote H2H Arricchite (NowGoal)", "Mancano le quote precise nel CSV", FREQUENT_DIR),
       
       # ⭐ NUOVO SCRIPT DI DEBUG PER FIX MATCHING QUOTE NOWGOAL
-      ("debug_nowgoal_scraper.py", "🚀 [14/14] Fix Quote H2H Debug (NowGoal)", "Mancano le quote precise nel CSV", FREQUENT_DIR),
-      
+      ("nowgoal_scraper_single.py", "🚀 [14/14] Fix Quote H2H Debug (NowGoal)", "Mancano le quote precise nel CSV", FREQUENT_DIR),
+    
       # NUOVO SCRIPT DI DEBUG PER AGGIORNARE SOLO IL LUCIFERO
       ("cron_update_lucifero.py", "🔥 [15/15] Aggiorna Solo Lucifero (Debug)", "Aggiorna solo il punteggio Lucifero", FREQUENT_DIR),
       

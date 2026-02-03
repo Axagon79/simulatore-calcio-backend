@@ -1,0 +1,78 @@
+========================================== 
+🚀 AVVIO PRONOSTICI GIORNALIERI: 03/02/2026  1:28:53,88 
+========================================== 
+[+] Ambiente virtuale attivato. 
+[+] Elaborazione script in corso... 
+ config.py eseguito da: C:\Progetti\simulatore-calcio-backend\functions_python\ai_engine\config.py
+ Directory corrente: C:\Progetti\simulatore-calcio-backend
+ Python path: ['C:\\Progetti\\simulatore-calcio-backend\\functions_python\\ai_engine\\calculators', 'C:\\Users\\lollo\\AppData\\Local\\Programs\\Python\\Python313\\python313.zip', 'C:\\Users\\lollo\\AppData\\Local\\Programs\\Python\\Python313\\DLLs']
+ BASE_DIR: C:\Progetti\simulatore-calcio-backend\functions_python\ai_engine
+ ENV_PATH: C:\Progetti\simulatore-calcio-backend\functions_python\ai_engine\.env
+ .env trovato in: C:\Progetti\simulatore-calcio-backend\functions_python\ai_engine\.env
+ Connessione MongoDB...
+ Connesso a MongoDB: football_simulator_db
+ Database: football_simulator_db
+    teams: 494 documenti
+    matches_history_betexplorer: 3924 documenti
+    raw_h2h_data_v2: 5844 documenti
+    h2h_by_round: 835 documenti
+ Configurazione completata con successo
+
+======================================================================
+🔮 DAILY PREDICTIONS - Algoritmo di Scrematura
+======================================================================
+
+📅 Trovate 7 partite per oggi (2026-02-03)
+
+──────────────────────────────────────────────────
+⚽ Bologna vs Milan (Serie A)
+   ✅ SEGNO
+      → 2 (68/100, 3.0⭐)
+      💬 {'segno': 'Affidabilità A stagionale, MAP 3.48 — i numeri indicano una direzione'}
+
+──────────────────────────────────────────────────
+⚽ Hull City vs Watford (Championship)
+   ❌ SCARTATA (Segno: 30.1, Gol: 59.4)
+
+──────────────────────────────────────────────────
+⚽ FC Portsmouth vs Ipswich (Championship)
+   ❌ SCARTATA (Segno: 44.2, Gol: 52.7)
+
+──────────────────────────────────────────────────
+⚽ Sheff Utd vs Oxford United (Championship)
+   ✅ GOL
+      → Over 1.5 (65/100, 2.8⭐)
+      💬 {'gol': 'xG combinato 2.52, difesa trasferta 5.1/10 — i numeri indicano gol'}
+
+──────────────────────────────────────────────────
+⚽ Unión Santa Fe vs Gimnasia (M) (Primera División)
+   ✅ GOL
+      → Under 3.5 (60/100, 2.5⭐)
+      💬 {'gol': 'Attacco trasferta 7.5/15 tra i meno produttivi, xG combinato 2.5'}
+
+──────────────────────────────────────────────────
+⚽ Argentinos Jrs. vs Belgrano (Primera División)
+   ✅ GOL
+      → Under 2.5 (65/100, 2.8⭐)
+      💬 {'gol': 'xG combinato 2.0, entrambe sotto la media offensiva del campionato'}
+
+──────────────────────────────────────────────────
+⚽ Banfield vs Estudiantes RC (Primera División)
+   ✅ GOL
+      → Under 3.5 (60/100, 2.5⭐)
+      → NoGoal (60/100, 2.5⭐)
+      💬 {'gol': 'H2H Under nel 100% dei casi, difesa casa 5.0/10 — dato doppio', 'gol_extra': 'H2H NoGoal 100%, media 0.5 — una squadra resta spesso a secco'}
+
+======================================================================
+✅ COMPLETATO!
+   📊 Partite analizzate: 7
+   ✅ Pronostici salvati: 5
+   ❌ Scartate: 2
+   📅 Data: 2026-02-03
+======================================================================
+
+   💣 Nessuna bomba oggi
+ 
+========================================== 
+✅ FINE ELABORAZIONE: 03/02/2026  1:28:59,64 
+========================================== 

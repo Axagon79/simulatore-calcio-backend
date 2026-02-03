@@ -82,8 +82,8 @@ THRESHOLD_BOMBA = 65
 # ==================== UTILITY ====================
 
 def get_today_range():
-    """Restituisce inizio e fine della giornata odierna (UTC)."""
-    today = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=None)
+    """Restituisce (inizio_oggi, inizio_domani) in ora locale italiana"""
+    today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
     tomorrow = today + timedelta(days=1)
     return today, tomorrow
 
@@ -1400,7 +1400,7 @@ def run_daily_predictions():
                 print(f"   💣 BOMBA! {bomba_result['sfavorita']} ({bomba_result['score']}/100)")
                 
                 bomba_doc = {
-                    'date': datetime.now(timezone.utc).strftime('%Y-%m-%d'),
+                    'date': datetime.now().strftime('%Y-%m-%d'),
                     'home': match.get('home', '???'),
                     'away': match.get('away', '???'),
                     'league': league,
@@ -1412,7 +1412,7 @@ def run_daily_predictions():
                     'dettaglio': bomba_result['dettaglio'],
                     'odds': match.get('odds', {}),
                     'comment': generate_bomba_comment(match, bomba_result, home_team_doc, away_team_doc),
-                    'created_at': datetime.now(timezone.utc),
+                    'created_at': datetime.now(),
                 }
                 bombs.append(bomba_doc)
             
@@ -1426,7 +1426,7 @@ def run_daily_predictions():
         
         # Prepara documento per DB
         prediction_doc = {
-            'date': datetime.now(timezone.utc).strftime('%Y-%m-%d'),
+            'date': datetime.now().strftime('%Y-%m-%d'),
             'home': home,
             'away': away,
             'league': league,
@@ -1446,7 +1446,7 @@ def run_daily_predictions():
             'gol_directions': gol_result.get('directions', {}),
             'expected_total_goals': gol_result.get('expected_total'),
             'league_avg_goals': gol_result.get('league_avg'),
-            'created_at': datetime.now(timezone.utc),
+            'created_at': datetime.now(),
         }
         
         results.append(prediction_doc)
@@ -1454,7 +1454,7 @@ def run_daily_predictions():
     # 3. Salva nel DB
     if results:
         # Cancella previsioni vecchie per oggi
-        today_str = datetime.now(timezone.utc).strftime('%Y-%m-%d')
+        today_str = datetime.now().strftime('%Y-%m-%d')
         predictions_collection.delete_many({'date': today_str})
         
         # Inserisci nuove
@@ -1472,7 +1472,7 @@ def run_daily_predictions():
 
     # Salva bombe
     if bombs:
-        today_str = datetime.now(timezone.utc).strftime('%Y-%m-%d')
+        today_str = datetime.now().strftime('%Y-%m-%d')
         bombs_collection.delete_many({'date': today_str})
         bombs_collection.insert_many(bombs)
         print(f"   💣 Bombe salvate: {len(bombs)}")

@@ -12,26 +12,25 @@ sys.path.append(current_path)
 
 from config import db
 
-def trova_squadre_rotte():
-    print("🔍 Cerco squadre senza campo 'league'...")
-    count = 0
-    # Cerca documenti dove 'league' non esiste o è null o è stringa vuota
-    cursor = db.teams.find({
-        "$or": [
-            {"league": {"$exists": False}},
-            {"league": None},
-            {"league": ""}
-        ]
-    })
-    
-    for team in cursor:
-        print(f"❌ Squadra corrotta: {team.get('name')} (ID: {team.get('_id')})")
-        count += 1
-        
-    if count == 0:
-        print("✅ Nessuna squadra corrotta trovata.")
-    else:
-        print(f"⚠️ Trovate {count} squadre senza lega. Eliminale o correggile nel DB.")
+aliases_da_aggiungere = [
+    ("Atl. Tucumán", "Atl. Tucuman"),
+    ("Barracas C.", "Barracas Central"),
+    ("Defensa", "Defensa y Justicia"),
+    ("Estudiantes LP", "Estudiantes L.P."),
+    ("Estudiantes RC", "Estudiantes Rio Cuarto"),
+    ("Gimnasia", "Gimnasia L.P."),
+    ("Gimnasia (M)", "Gimnasia Mendoza"),
+    ("Newell's", "Newells Old Boys"),
+    ("CA Talleres", "Talleres Cordoba"),
+    ("Unión Santa Fe", "Union de Santa Fe"),
+]
 
-if __name__ == "__main__":
-    trova_squadre_rotte()
+for nome_db, nuovo_alias in aliases_da_aggiungere:
+    result = db["teams"].update_one(
+        {"name": nome_db},
+        {"$addToSet": {"aliases": nuovo_alias}}
+    )
+    if result.modified_count:
+        print(f"✅ Aggiunto '{nuovo_alias}' a {nome_db}")
+    else:
+        print(f"⚠️ {nome_db} non trovato o alias già presente")

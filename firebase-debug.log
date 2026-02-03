@@ -1,0 +1,315 @@
+[debug] [2026-02-03T00:21:55.858Z] ----------------------------------------------------------------------
+[debug] [2026-02-03T00:21:55.861Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\lollo\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js emulators:start --only functions
+[debug] [2026-02-03T00:21:55.861Z] CLI Version:   15.1.0
+[debug] [2026-02-03T00:21:55.861Z] Platform:      win32
+[debug] [2026-02-03T00:21:55.861Z] Node Version:  v22.12.0
+[debug] [2026-02-03T00:21:55.862Z] Time:          Tue Feb 03 2026 01:21:55 GMT+0100 (Ora standard dell’Europa centrale)
+[debug] [2026-02-03T00:21:55.862Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-02-03T00:21:58.494Z] Field "/functions" in "firebase.json" is possibly invalid: must be object
+[debug] [2026-02-03T00:21:58.494Z] Field "/functions" in "firebase.json" is possibly invalid: must be object
+[debug] [2026-02-03T00:21:58.494Z] Object "/functions/0" in "firebase.json" has unknown property: {"additionalProperty":"include"}
+[debug] [2026-02-03T00:21:58.494Z] Object "/functions/0" in "firebase.json" is missing required property: {"missingProperty":"remoteSource"}
+[debug] [2026-02-03T00:21:58.494Z] Field "/functions/0" in "firebase.json" is possibly invalid: must match a schema in anyOf
+[debug] [2026-02-03T00:21:58.494Z] Field "/functions" in "firebase.json" is possibly invalid: must match a schema in anyOf
+[debug] [2026-02-03T00:21:58.502Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-02-03T00:21:58.502Z] > authorizing via signed-in user (lollotj@gmail.com)
+[info] i  emulators: Starting emulators: functions {"metadata":{"emulator":{"name":"hub"},"message":"Starting emulators: functions"}}
+[debug] [2026-02-03T00:21:58.515Z] [logging] Logging Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2026-02-03T00:21:58.516Z] assigned listening specs for emulators {"user":{"hub":[{"address":"127.0.0.1","family":"IPv4","port":4400},{"address":"::1","family":"IPv6","port":4400}],"ui":[{"address":"127.0.0.1","family":"IPv4","port":4000},{"address":"::1","family":"IPv6","port":4000}],"logging":[{"address":"127.0.0.1","family":"IPv4","port":4500}]},"metadata":{"message":"assigned listening specs for emulators"}}
+[debug] [2026-02-03T00:21:58.523Z] Emulator locator file path: C:\Users\lollo\AppData\Local\Temp\hub-puppals-456c7.json
+[debug] [2026-02-03T00:21:58.523Z] [hub] writing locator at C:\Users\lollo\AppData\Local\Temp\hub-puppals-456c7.json
+[debug] [2026-02-03T00:21:58.543Z] [functions] Functions Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2026-02-03T00:21:58.543Z] [eventarc] Eventarc Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2026-02-03T00:21:58.543Z] [tasks] Cloud Tasks Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2026-02-03T00:21:58.543Z] late-assigned ports for functions and eventarc emulators {"user":{"hub":[{"address":"127.0.0.1","family":"IPv4","port":4400},{"address":"::1","family":"IPv6","port":4400}],"ui":[{"address":"127.0.0.1","family":"IPv4","port":4000},{"address":"::1","family":"IPv6","port":4000}],"logging":[{"address":"127.0.0.1","family":"IPv4","port":4500}],"functions":[{"address":"127.0.0.1","family":"IPv4","port":5001}],"eventarc":[{"address":"127.0.0.1","family":"IPv4","port":9299}],"tasks":[{"address":"127.0.0.1","family":"IPv4","port":9499}]},"metadata":{"message":"late-assigned ports for functions and eventarc emulators"}}
+[warn] !  functions: The following emulators are not running, calls to these services from the Functions emulator will affect production: apphosting, auth, firestore, database, hosting, pubsub, storage, dataconnect {"metadata":{"emulator":{"name":"functions"},"message":"The following emulators are not running, calls to these services from the Functions emulator will affect production: \u001b[1mapphosting, auth, firestore, database, hosting, pubsub, storage, dataconnect\u001b[22m"}}
+[warn] !  functions: Application Default Credentials detected. Non-emulated services will access production using these credentials. Be careful! {"metadata":{"emulator":{"name":"functions"},"message":"Application Default Credentials detected. Non-emulated services will access production using these credentials. Be careful!"}}
+[debug] [2026-02-03T00:22:12.683Z] Checked if tokens are valid: false, expires at: 1770064873669
+[debug] [2026-02-03T00:22:12.683Z] Checked if tokens are valid: false, expires at: 1770064873669
+[debug] [2026-02-03T00:22:12.684Z] > refreshing access token with scopes: []
+[debug] [2026-02-03T00:22:12.686Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-02-03T00:22:12.686Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-02-03T00:22:12.804Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2026-02-03T00:22:12.805Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-02-03T00:22:12.811Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/puppals-456c7/adminSdkConfig [none]
+[debug] [2026-02-03T00:22:13.356Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/puppals-456c7/adminSdkConfig 200
+[debug] [2026-02-03T00:22:13.356Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/puppals-456c7/adminSdkConfig {"projectId":"puppals-456c7","storageBucket":"puppals-456c7.firebasestorage.app"}
+[info] i  functions: Watching "C:\Progetti\simulatore-calcio-backend\functions" for Cloud Functions... {"metadata":{"emulator":{"name":"functions"},"message":"Watching \"C:\\Progetti\\simulatore-calcio-backend\\functions\" for Cloud Functions..."}}
+[debug] [2026-02-03T00:22:13.393Z] Validating nodejs source
+[warn] !  functions: package.json indicates an outdated version of firebase-functions. Please upgrade using npm install --save firebase-functions@latest in your functions directory. 
+[warn] !  functions: Please note that there will be breaking changes when you upgrade. 
+[debug] [2026-02-03T00:22:14.671Z] > [functions] package.json contents: {
+  "name": "functions",
+  "description": "Cloud Functions for Firebase",
+  "scripts": {
+    "lint": "eslint .",
+    "serve": "firebase emulators:start --only functions",
+    "shell": "firebase functions:shell",
+    "start": "yarn run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log",
+    "lint:fix": "eslint . --fix",
+    "predeploy": "yarn run lint"
+  },
+  "engines": {
+    "node": "20"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "@google-cloud/vertexai": "^1.9.2",
+    "@google/generative-ai": "^0.21.0",
+    "@types/cors": "^2.8.17",
+    "axios": "^1.7.9",
+    "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.3",
+    "cors": "^2.8.5",
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.6.1",
+    "express": "^4.21.2",
+    "firebase-admin": "^13.0.2",
+    "firebase-functions": "^6.2.0",
+    "gcp-metadata": "^5.3.0",
+    "google-auth-library": "^9.15.0",
+    "googleapis": "^144.0.0",
+    "helmet": "^8.0.0",
+    "https": "^1.0.0",
+    "jest": "^29.7.0",
+    "joi": "^17.13.3",
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.21.0",
+    "mongoose": "^8.20.3",
+    "multer": "^1.4.5-lts.1",
+    "path": "^0.12.7",
+    "winston": "^3.17.0"
+  },
+  "devDependencies": {
+    "eslint": "^9.17.0",
+    "eslint-config-google": "^0.14.0",
+    "eslint-plugin-import": "^2.29.1",
+    "firebase-functions-test": "^3.4.0"
+  },
+  "private": true
+}
+[debug] [2026-02-03T00:22:14.672Z] Building nodejs source
+[debug] [2026-02-03T00:22:14.672Z] Failed to find version of module node: reached end of search path C:\Progetti\simulatore-calcio-backend\functions\node_modules
+[warn] !  functions: Your requested "node" version "20" doesn't match your global version "22". Using node@22 from host. 
+[debug] [2026-02-03T00:22:14.675Z] Could not find functions.yaml. Must use http discovery
+[debug] [2026-02-03T00:22:14.682Z] Found firebase-functions binary at 'C:\Progetti\simulatore-calcio-backend\functions\node_modules\.bin\firebase-functions'
+[info] Serving at port 8502
+
+[info] 📂 [simulationRoutes] Base: C:\Progetti\simulatore-calcio-backend\ai_engine\web_simulator_A.py
+📂 [simulationRoutes] DEV: C:\Progetti\simulatore-calcio-backend\ai_engine\web_simulator_A.py
+
+[error] (node:10844) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+[debug] [2026-02-03T00:22:15.721Z] Got response from /__/functions.yaml {"endpoints":{"api":{"availableMemoryMb":256,"timeoutSeconds":60,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","region":["us-central1"],"labels":{},"httpsTrigger":{"invoker":["public"]},"entryPoint":"api"}},"specVersion":"v1alpha1","requiredAPIs":[],"extensions":{}}
+[info] +  functions: Loaded functions definitions from source: api. {"metadata":{"emulator":{"name":"functions"},"message":"Loaded functions definitions from source: api."}}
+[info] +  functions[us-central1-api]: http function initialized (http://127.0.0.1:5001/puppals-456c7/us-central1/api). {"metadata":{"emulator":{"name":"functions"},"message":"\u001b[1mhttp\u001b[22m function initialized (http://127.0.0.1:5001/puppals-456c7/us-central1/api)."}}
+[info] i  functions: Watching "C:\Progetti\simulatore-calcio-backend\functions_python" for Cloud Functions... {"metadata":{"emulator":{"name":"functions"},"message":"Watching \"C:\\Progetti\\simulatore-calcio-backend\\functions_python\" for Cloud Functions..."}}
+[debug] [2026-02-03T00:22:19.758Z] Customer code is not Node
+[debug] [2026-02-03T00:22:19.758Z] Validating python source
+[debug] [2026-02-03T00:22:19.758Z] Building python source
+[info] i  functions: Loaded environment variables from .env. 
+[debug] [2026-02-03T00:22:19.761Z] Could not find functions.yaml. Must use http discovery
+[debug] [2026-02-03T00:22:19.765Z] Running command with virtualenv: command="C:\Progetti\simulatore-calcio-backend\functions_python\venv\Scripts\activate.bat", args=["","&&","python.exe","-c","\"import firebase_functions; import os; print(os.path.dirname(firebase_functions.__file__))\""]
+[debug] [2026-02-03T00:22:20.040Z] stdout: C:\Progetti\simulatore-calcio-backend\functions_python\venv\Lib\site-packages\firebase_functions
+
+[debug] [2026-02-03T00:22:20.049Z] Running admin server with args: ["python.exe","\"C:\\Progetti\\simulatore-calcio-backend\\functions_python\\venv\\Lib\\site-packages\\firebase_functions\\private\\serving.py\""] and env: {"GCLOUD_PROJECT":"puppals-456c7","K_REVISION":"1","PORT":"80","GOOGLE_CLOUD_QUOTA_PROJECT":"puppals-456c7","FUNCTIONS_EMULATOR":"true","TZ":"UTC","FIREBASE_DEBUG_MODE":"true","FIREBASE_DEBUG_FEATURES":"{\"skipTokenVerification\":true,\"enableCors\":true}","FIREBASE_EMULATOR_HUB":"127.0.0.1:4400","CLOUD_EVENTARC_EMULATOR_HOST":"http://127.0.0.1:9299","CLOUD_TASKS_EMULATOR_HOST":"127.0.0.1:9499","FIREBASE_CONFIG":"{\"storageBucket\":\"puppals-456c7.firebasestorage.app\",\"projectId\":\"puppals-456c7\"}","ADMIN_PORT":"8081"} in C:\Progetti\simulatore-calcio-backend\functions_python
+[debug] [2026-02-03T00:22:20.049Z] Running command with virtualenv: command="C:\Progetti\simulatore-calcio-backend\functions_python\venv\Scripts\activate.bat", args=["","&&","python.exe","\"C:\\Progetti\\simulatore-calcio-backend\\functions_python\\venv\\Lib\\site-packages\\firebase_functions\\private\\serving.py\""]
+[info]  * Serving Flask app 'serving'
+ * Debug mode: off
+
+[error] WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://127.0.0.1:8081
+
+[error] Press CTRL+C to quit
+
+[error] 127.0.0.1 - - [03/Feb/2026 00:22:20] "GET /__/functions.yaml HTTP/1.1" 200 -
+
+[debug] [2026-02-03T00:22:20.716Z] Got response from /__/functions.yaml endpoints:
+  delete_preset:
+    availableMemoryMb: 256
+    concurrency: null
+    entryPoint: delete_preset
+    httpsTrigger: {}
+    ingressSettings: null
+    labels: {}
+    maxInstances: null
+    minInstances: null
+    platform: gcfv2
+    region:
+    - us-central1
+    secretEnvironmentVariables: []
+    serviceAccountEmail: null
+    timeoutSeconds: 10
+  get_cup_matches:
+    availableMemoryMb: 512
+    concurrency: null
+    entryPoint: get_cup_matches
+    httpsTrigger: {}
+    ingressSettings: null
+    labels: {}
+    maxInstances: null
+    minInstances: null
+    platform: gcfv2
+    region:
+    - us-central1
+    secretEnvironmentVariables: []
+    serviceAccountEmail: null
+    timeoutSeconds: 30
+  get_formations:
+    availableMemoryMb: 256
+    concurrency: null
+    entryPoint: get_formations
+    httpsTrigger: {}
+    ingressSettings: null
+    labels: {}
+    maxInstances: null
+    minInstances: null
+    platform: gcfv2
+    region:
+    - us-central1
+    secretEnvironmentVariables: []
+    serviceAccountEmail: null
+    timeoutSeconds: 10
+  get_nations:
+    availableMemoryMb: 256
+    concurrency: null
+    entryPoint: get_nations
+    httpsTrigger: {}
+    ingressSettings: null
+    labels: {}
+    maxInstances: null
+    minInstances: null
+    platform: gcfv2
+    region:
+    - us-central1
+    secretEnvironmentVariables: []
+    serviceAccountEmail: null
+    timeoutSeconds: null
+  get_tuning:
+    availableMemoryMb: 256
+    concurrency: null
+    entryPoint: get_tuning
+    httpsTrigger: {}
+    ingressSettings: null
+    labels: {}
+    maxInstances: null
+    minInstances: null
+    platform: gcfv2
+    region:
+    - us-central1
+    secretEnvironmentVariables: []
+    serviceAccountEmail: null
+    timeoutSeconds: 10
+  list_presets:
+    availableMemoryMb: 256
+    concurrency: null
+    entryPoint: list_presets
+    httpsTrigger: {}
+    ingressSettings: null
+    labels: {}
+    maxInstances: null
+    minInstances: null
+    platform: gcfv2
+    region:
+    - us-central1
+    secretEnvironmentVariables: []
+    serviceAccountEmail: null
+    timeoutSeconds: 10
+  load_preset:
+    availableMemoryMb: 256
+    concurrency: null
+    entryPoint: load_preset
+    httpsTrigger: {}
+    ingressSettings: null
+    labels: {}
+    maxInstances: null
+    minInstances: null
+    platform: gcfv2
+    region:
+    - us-central1
+    secretEnvironmentVariables: []
+    serviceAccountEmail: null
+    timeoutSeconds: 10
+  run_simulation:
+    availableMemoryMb: 2048
+    concurrency: null
+    entryPoint: run_simulation
+    httpsTrigger: {}
+    ingressSettings: null
+    labels: {}
+    maxInstances: null
+    minInstances: null
+    platform: gcfv2
+    region:
+    - us-central1
+    secretEnvironmentVariables: []
+    serviceAccountEmail: null
+    timeoutSeconds: 540
+  save_preset:
+    availableMemoryMb: 256
+    concurrency: null
+    entryPoint: save_preset
+    httpsTrigger: {}
+    ingressSettings: null
+    labels: {}
+    maxInstances: null
+    minInstances: null
+    platform: gcfv2
+    region:
+    - us-central1
+    secretEnvironmentVariables: []
+    serviceAccountEmail: null
+    timeoutSeconds: 10
+  save_tuning:
+    availableMemoryMb: 256
+    concurrency: null
+    entryPoint: save_tuning
+    httpsTrigger: {}
+    ingressSettings: null
+    labels: {}
+    maxInstances: null
+    minInstances: null
+    platform: gcfv2
+    region:
+    - us-central1
+    secretEnvironmentVariables: []
+    serviceAccountEmail: null
+    timeoutSeconds: 10
+params: []
+requiredAPIs: []
+specVersion: v1alpha1
+
+[error] 127.0.0.1 - - [03/Feb/2026 00:22:20] "GET /__/quitquitquit HTTP/1.1" 200 -
+
+[info] +  functions: Loaded functions definitions from source: delete_preset, get_cup_matches, get_formations, get_nations, get_tuning, list_presets, load_preset, run_simulation, save_preset, save_tuning. {"metadata":{"emulator":{"name":"functions"},"message":"Loaded functions definitions from source: delete_preset, get_cup_matches, get_formations, get_nations, get_tuning, list_presets, load_preset, run_simulation, save_preset, save_tuning."}}
+[info] +  functions[us-central1-delete_preset]: http function initialized (http://127.0.0.1:5001/puppals-456c7/us-central1/delete_preset). {"metadata":{"emulator":{"name":"functions"},"message":"\u001b[1mhttp\u001b[22m function initialized (http://127.0.0.1:5001/puppals-456c7/us-central1/delete_preset)."}}
+[info] +  functions[us-central1-get_cup_matches]: http function initialized (http://127.0.0.1:5001/puppals-456c7/us-central1/get_cup_matches). {"metadata":{"emulator":{"name":"functions"},"message":"\u001b[1mhttp\u001b[22m function initialized (http://127.0.0.1:5001/puppals-456c7/us-central1/get_cup_matches)."}}
+[info] +  functions[us-central1-get_formations]: http function initialized (http://127.0.0.1:5001/puppals-456c7/us-central1/get_formations). {"metadata":{"emulator":{"name":"functions"},"message":"\u001b[1mhttp\u001b[22m function initialized (http://127.0.0.1:5001/puppals-456c7/us-central1/get_formations)."}}
+[info] +  functions[us-central1-get_nations]: http function initialized (http://127.0.0.1:5001/puppals-456c7/us-central1/get_nations). {"metadata":{"emulator":{"name":"functions"},"message":"\u001b[1mhttp\u001b[22m function initialized (http://127.0.0.1:5001/puppals-456c7/us-central1/get_nations)."}}
+[info] +  functions[us-central1-get_tuning]: http function initialized (http://127.0.0.1:5001/puppals-456c7/us-central1/get_tuning). {"metadata":{"emulator":{"name":"functions"},"message":"\u001b[1mhttp\u001b[22m function initialized (http://127.0.0.1:5001/puppals-456c7/us-central1/get_tuning)."}}
+[info] +  functions[us-central1-list_presets]: http function initialized (http://127.0.0.1:5001/puppals-456c7/us-central1/list_presets). {"metadata":{"emulator":{"name":"functions"},"message":"\u001b[1mhttp\u001b[22m function initialized (http://127.0.0.1:5001/puppals-456c7/us-central1/list_presets)."}}
+[info] +  functions[us-central1-load_preset]: http function initialized (http://127.0.0.1:5001/puppals-456c7/us-central1/load_preset). {"metadata":{"emulator":{"name":"functions"},"message":"\u001b[1mhttp\u001b[22m function initialized (http://127.0.0.1:5001/puppals-456c7/us-central1/load_preset)."}}
+[info] +  functions[us-central1-run_simulation]: http function initialized (http://127.0.0.1:5001/puppals-456c7/us-central1/run_simulation). {"metadata":{"emulator":{"name":"functions"},"message":"\u001b[1mhttp\u001b[22m function initialized (http://127.0.0.1:5001/puppals-456c7/us-central1/run_simulation)."}}
+[info] +  functions[us-central1-save_preset]: http function initialized (http://127.0.0.1:5001/puppals-456c7/us-central1/save_preset). {"metadata":{"emulator":{"name":"functions"},"message":"\u001b[1mhttp\u001b[22m function initialized (http://127.0.0.1:5001/puppals-456c7/us-central1/save_preset)."}}
+[info] +  functions[us-central1-save_tuning]: http function initialized (http://127.0.0.1:5001/puppals-456c7/us-central1/save_tuning). {"metadata":{"emulator":{"name":"functions"},"message":"\u001b[1mhttp\u001b[22m function initialized (http://127.0.0.1:5001/puppals-456c7/us-central1/save_tuning)."}}
+[debug] [2026-02-03T00:22:20.754Z] Could not find VSCode notification endpoint: FetchError: request to http://localhost:40001/vscode/notify failed, reason: connect ECONNREFUSED ::1:40001. If you are not running the Firebase Data Connect VSCode extension, this is expected and not an issue.
+[info] 
+┌─────────────────────────────────────────────────────────────┐
+│ ✔  All emulators ready! It is now safe to connect your app. │
+│ i  View Emulator UI at http://127.0.0.1:4000/               │
+└─────────────────────────────────────────────────────────────┘
+
+┌───────────┬────────────────┬─────────────────────────────────┐
+│ Emulator  │ Host:Port      │ View in Emulator UI             │
+├───────────┼────────────────┼─────────────────────────────────┤
+│ Functions │ 127.0.0.1:5001 │ http://127.0.0.1:4000/functions │
+└───────────┴────────────────┴─────────────────────────────────┘
+  Emulator Hub host: 127.0.0.1 port: 4400
+  Other reserved ports: 4500
+
+Issues? Report them at https://github.com/firebase/firebase-tools/issues and attach the *-debug.log files.
+ 
