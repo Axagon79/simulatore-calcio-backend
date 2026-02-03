@@ -106,9 +106,13 @@ def calculate_stars(score):
 
 # ==================== FASE 1: RACCOLTA DATI ====================
 
-def get_today_matches():
+def get_today_matches(target_date=None):
     """Recupera tutte le partite del giorno da h2h_by_round (qualsiasi status)."""
-    today, tomorrow = get_today_range()
+    if target_date:
+        today = target_date.replace(hour=0, minute=0, second=0, microsecond=0)
+        tomorrow = today + timedelta(days=1)
+    else:
+        today, tomorrow = get_today_range()
     
     matches = []
     
@@ -123,14 +127,14 @@ def get_today_matches():
             if not date_obj:
                 continue
             
-            # Controlla se la partita è oggi (qualsiasi status)
+            # Controlla se la partita è nel giorno target (qualsiasi status)
             if isinstance(date_obj, datetime):
                 if today <= date_obj < tomorrow:
                     match['_league'] = league
                     match['_round_id'] = round_doc.get('_id')
                     matches.append(match)
     
-    print(f"\n📅 Trovate {len(matches)} partite per oggi ({today.strftime('%Y-%m-%d')})")
+    print(f"\n📅 Trovate {len(matches)} partite per {today.strftime('%Y-%m-%d')}")
     return matches
 
 
@@ -594,12 +598,94 @@ def analyze_segno(match_data, home_team_doc, away_team_doc):
         doppia_chance = '12'
         doppia_chance_quota = round(dc_12, 2)
     
+    # --- RACCOLTA DATI GREZZI PER FRONTEND ---
+    # BVS
+    bvs_home = h2h.get('bvs_index', 0)
+    bvs_away = h2h.get('bvs_away', 0)
+    
+    # Quote -> Probabilità senza aggio, con metà pareggio distribuita
+    prob_1_raw = 1/q1 if q1 < 99 else 0
+    prob_x_raw = 1/qx if qx < 99 else 0
+    prob_2_raw = 1/q2 if q2 < 99 else 0
+    total_prob = prob_1_raw + prob_x_raw + prob_2_raw
+    if total_prob > 0:
+        prob_1_norm = (prob_1_raw / total_prob) * 100
+        prob_x_norm = (prob_x_raw / total_prob) * 100
+        prob_2_norm = (prob_2_raw / total_prob) * 100
+        # Distribuisci metà del pareggio a ciascuna squadra
+        quote_home = round(prob_1_norm + prob_x_norm / 2, 1)
+        quote_away = round(prob_2_norm + prob_x_norm / 2, 1)
+    else:
+        quote_home = 50.0
+        quote_away = 50.0
+    
+    # Lucifero
+    lucifero_home = h2h.get('lucifero_home', 12.5)
+    lucifero_away = h2h.get('lucifero_away', 12.5)
+    
+    # Affidabilità
+    trust_home = h2h.get('trust_home_letter', 'C')
+    trust_away = h2h.get('trust_away_letter', 'C')
+    aff_home_num = h2h.get('affidabilità_casa', 5.0)
+    aff_away_num = h2h.get('affidabilità_trasferta', 5.0)
+    
+    # DNA
+    dna_home = h2h.get('home_dna', {})
+    dna_away = h2h.get('away_dna', {})
+    dna_home_power = (
+        dna_home.get('att', 50) * 0.35 +
+        dna_home.get('def', 50) * 0.25 +
+        dna_home.get('tec', 50) * 0.25 +
+        dna_home.get('val', 50) * 0.15
+    ) if dna_home else 50
+    dna_away_power = (
+        dna_away.get('att', 50) * 0.35 +
+        dna_away.get('def', 50) * 0.25 +
+        dna_away.get('tec', 50) * 0.25 +
+        dna_away.get('val', 50) * 0.15
+    ) if dna_away else 50
+    
+    # Motivazioni
+    mot_home = 10
+    mot_away = 10
+    if home_team_doc:
+        mot_home = home_team_doc.get('stats', {}).get('motivation', 10) or 10
+    if away_team_doc:
+        mot_away = away_team_doc.get('stats', {}).get('motivation', 10) or 10
+    
+    # H2H
+    h2h_home_score = h2h.get('home_score', 5.0)
+    h2h_away_score = h2h.get('away_score', 5.0)
+    h2h_total_matches = h2h.get('total_matches', 0)
+    
+    # Fattore Campo
+    fc = h2h.get('fattore_campo', {})
+    if isinstance(fc, dict):
+        field_home = fc.get('field_home', 3.5)
+        field_away = fc.get('field_away', 3.5)
+    else:
+        field_home = h2h.get('field_home', 3.5)
+        field_away = h2h.get('field_away', 3.5)
+    
+    # Costruisci dettaglio_raw
+    dettaglio_raw = {
+        'bvs': {'home': bvs_home, 'away': bvs_away, 'scala': '±7'},
+        'quote': {'home': quote_home, 'away': quote_away, 'scala': '%'},
+        'lucifero': {'home': lucifero_home, 'away': lucifero_away, 'scala': '/25'},
+        'affidabilita': {'home': trust_home, 'away': trust_away, 'home_num': aff_home_num, 'away_num': aff_away_num, 'scala': 'A-D'},
+        'dna': {'home': round(dna_home_power, 1), 'away': round(dna_away_power, 1), 'scala': '/100'},
+        'motivazioni': {'home': mot_home, 'away': mot_away, 'scala': '/15'},
+        'h2h': {'home': h2h_home_score, 'away': h2h_away_score, 'matches': h2h_total_matches, 'scala': '/10'},
+        'campo': {'home': field_home, 'away': field_away, 'scala': '/7'},
+    }
+    
     return {
         'score': round(total, 1),
         'segno': segno,
         'doppia_chance': doppia_chance,
         'doppia_chance_quota': doppia_chance_quota,
-        'dettaglio': scores
+        'dettaglio': scores,
+        'dettaglio_raw': dettaglio_raw
     }
 
 
@@ -940,7 +1026,7 @@ def analyze_gol(match_data, home_team_doc, away_team_doc, league_name):
             'xg': xg_dir,
             'h2h_gol': h2h_dir,
             'media_lega': ml_dir,
-            'dna': dna_dir
+            'dna_off_def': dna_dir
         },
         'h2h_patterns': h2h_patterns,
     }
@@ -1346,15 +1432,18 @@ def generate_bomba_comment(match_data, bomba_result, home_team_doc, away_team_do
 
 # ==================== MAIN ====================
 
-def run_daily_predictions():
+def run_daily_predictions(target_date=None):
     """Esegue l'intero processo di previsione giornaliera."""
     
+    # Definisci la data target subito
+    target_str = (target_date or datetime.now()).strftime('%Y-%m-%d')
+    
     print("\n" + "=" * 70)
-    print("🔮 DAILY PREDICTIONS - Algoritmo di Scrematura")
+    print(f"🔮 DAILY PREDICTIONS - {target_str}")
     print("=" * 70)
     
     # 1. Recupera partite del giorno
-    matches = get_today_matches()
+    matches = get_today_matches(target_date)
     
     if not matches:
         print("⚠️  Nessuna partita oggi.")
@@ -1400,7 +1489,7 @@ def run_daily_predictions():
                 print(f"   💣 BOMBA! {bomba_result['sfavorita']} ({bomba_result['score']}/100)")
                 
                 bomba_doc = {
-                    'date': datetime.now().strftime('%Y-%m-%d'),
+                    'date': target_str,
                     'home': match.get('home', '???'),
                     'away': match.get('away', '???'),
                     'league': league,
@@ -1426,7 +1515,7 @@ def run_daily_predictions():
         
         # Prepara documento per DB
         prediction_doc = {
-            'date': datetime.now().strftime('%Y-%m-%d'),
+            'date': target_str,
             'home': home,
             'away': away,
             'league': league,
@@ -1446,6 +1535,7 @@ def run_daily_predictions():
             'gol_directions': gol_result.get('directions', {}),
             'expected_total_goals': gol_result.get('expected_total'),
             'league_avg_goals': gol_result.get('league_avg'),
+            'segno_dettaglio_raw': segno_result.get('dettaglio_raw', {}),
             'created_at': datetime.now(),
         }
         
@@ -1454,8 +1544,8 @@ def run_daily_predictions():
     # 3. Salva nel DB
     if results:
         # Cancella previsioni vecchie per oggi
-        today_str = datetime.now().strftime('%Y-%m-%d')
-        predictions_collection.delete_many({'date': today_str})
+        
+        predictions_collection.delete_many({'date': target_str})
         
         # Inserisci nuove
         predictions_collection.insert_many(results)
@@ -1465,15 +1555,15 @@ def run_daily_predictions():
         print(f"   📊 Partite analizzate: {len(matches)}")
         print(f"   ✅ Pronostici salvati: {len(results)}")
         print(f"   ❌ Scartate: {scartate}")
-        print(f"   📅 Data: {today_str}")
+        print(f"   📅 Data: {target_str}")
         print(f"{'=' * 70}\n")
     else:
         print(f"\n⚠️  Nessuna partita ha superato i filtri oggi.")
 
     # Salva bombe
     if bombs:
-        today_str = datetime.now().strftime('%Y-%m-%d')
-        bombs_collection.delete_many({'date': today_str})
+        
+        bombs_collection.delete_many({'date': target_str})
         bombs_collection.insert_many(bombs)
         print(f"   💣 Bombe salvate: {len(bombs)}")
     else:
@@ -1484,4 +1574,9 @@ def run_daily_predictions():
 # ==================== ENTRY POINT ====================
 
 if __name__ == "__main__":
-    run_daily_predictions()
+    for i in range(7):  # 0=oggi, 1=domani, 2=dopodomani, ... 6=tra 6 giorni
+        target = datetime.now() + timedelta(days=i)
+        print("\n" + "=" * 70)
+        print(f"📅 ELABORAZIONE: {target.strftime('%Y-%m-%d')}")
+        print("=" * 70)
+        run_daily_predictions(target_date=target)

@@ -64,7 +64,8 @@ async function getFinishedResults(db) {
       .find({}, {
         projection: {
           'matches.home': 1, 'matches.away': 1,
-          'matches.real_score': 1, 'matches.status': 1
+          'matches.real_score': 1, 'matches.status': 1,
+          'matches.date_obj': 1
         }
       })
       .toArray();
@@ -73,8 +74,9 @@ async function getFinishedResults(db) {
     for (const doc of docs) {
       if (!doc.matches) continue;
       for (const m of doc.matches) {
-        if (m.status === 'Finished' && m.real_score) {
-          resultsMap[`${m.home}|||${m.away}`] = m.real_score;
+        if (m.status === 'Finished' && m.real_score && m.date_obj) {
+          const dateStr = new Date(m.date_obj).toISOString().split('T')[0];
+          resultsMap[`${m.home}|||${m.away}|||${dateStr}`] = m.real_score;
         }
       }
     }
@@ -102,7 +104,7 @@ router.get('/daily-predictions', async (req, res) => {
 
     // Cross-match con risultati reali
     for (const pred of predictions) {
-      const realScore = resultsMap[`${pred.home}|||${pred.away}`] || null;
+      const realScore = resultsMap[`${pred.home}|||${pred.away}|||${pred.date}`] || null;
       pred.real_score = realScore;
 
       if (realScore) {
@@ -165,7 +167,7 @@ router.get('/daily-bombs', async (req, res) => {
     ]);
 
     for (const bomb of bombs) {
-      const realScore = resultsMap[`${bomb.home}|||${bomb.away}`] || null;
+      const realScore = resultsMap[`${bomb.home}|||${bomb.away}|||${bomb.date}`] || null;
       bomb.real_score = realScore;
       if (realScore) {
         const parsed = parseScore(realScore);
