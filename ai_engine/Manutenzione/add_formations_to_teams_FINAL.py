@@ -3,13 +3,20 @@ AGGIUNGI MODULI ALLE SQUADRE - VERSIONE FINALE
 Con tutti i nomi esatti dal database
 """
 
-import pymongo
+import os
+import sys
 
-MONGO_URI = "mongodb+srv://Database_User:LPmYAZkzEVxjSaAd@pup-pals-cluster.y1h2r.mongodb.net/"
-DB_NAME = "pup_pals_db"
+# FIX PERCORSI - Trova la root del progetto
+current_path = os.path.dirname(os.path.abspath(__file__))
+while not os.path.exists(os.path.join(current_path, 'config.py')):
+    parent = os.path.dirname(current_path)
+    if parent == current_path:
+        raise FileNotFoundError("Impossibile trovare config.py!")
+    current_path = parent
+sys.path.insert(0, current_path)
 
-client = pymongo.MongoClient(MONGO_URI)
-db = client[DB_NAME]
+from config import db
+
 teams_col = db["teams"]
 
 
@@ -248,45 +255,370 @@ FORMATIONS = {
     "Manchester City": "4-3-3",
     "Aston Villa": "4-2-3-1",
     "Crystal Palace": "4-2-3-1",
+
+    # CHAMPIONSHIP (Inghilterra Serie B)
+    "Charlton": "4-2-3-1",
+    "QPR": "4-3-3",
+    "Derby": "4-2-3-1",
+    "Ipswich": "4-2-3-1",
+    "Norwich": "4-3-3",
+    "Blackburn": "4-2-3-1",
+    "Southampton": "4-3-3",
+    "Watford": "4-2-3-1",
+    "Birmingham": "4-3-3",
+    "Leicester City": "4-2-3-1",
+    "Coventry City": "4-3-3",
+    "Oxford United": "4-4-2",
+    "Hull City": "4-2-3-1",
+    "Bristol City": "3-5-2",
+    "Preston NE": "4-2-3-1",
+    "FC Portsmouth": "4-3-3",
+    "West Brom": "4-2-3-1",
+    "Stoke City": "4-3-3",
+    "Wrexham": "4-4-2",
+    "Millwall": "4-2-3-1",
+    "Swansea City": "4-3-3",
+    "Sheff Wed": "4-4-2",
+    "Sheff Utd": "3-5-2",
+    "Middlesbrough": "4-2-3-1",
+    "Cardiff City": "4-3-3",
+    "Burnley": "4-4-2",
+    "Sunderland": "4-3-3",
+    "Leeds Utd": "4-3-3",
+
+    # LALIGA 2 (Spagna Serie B)
+    "Almería": "4-2-3-1",
+    "Castellón": "4-4-2",
+    "Córdoba": "4-2-3-1",
+    "Granada": "4-3-3",
+    "Las Palmas": "4-3-3",
+    "Logroñés": "4-4-2",
+    "Mirandés": "4-4-2",
+    "Oviedo": "4-2-3-1",
+    "Racing Santander": "4-3-3",
+    "Sporting Gijón": "4-2-3-1",
+    "Tenerife": "4-4-2",
+    "Real Valladolid": "4-3-3",
+    "Real Zaragoza": "4-2-3-1",
+    "Cartagena": "4-4-2",
+    "Eldense": "4-3-3",
+    "Eibar": "4-2-3-1",
+    "Burgos": "4-4-2",
+    "Racing Ferrol": "4-3-3",
+    "Albacete": "4-4-2",
+    "Huesca": "4-3-3",
+    "Real Sociedad B": "4-3-3",
+    "Deportivo": "4-3-3",
+
+    # 2. BUNDESLIGA (Germania Serie B)
+    "Greuther Fürth": "4-2-3-1",
+    "Magdeburgo": "4-4-2",
+    "Pr. Münster": "4-3-3",
+    "VfL Bochum": "4-3-3",
+    "Elversberg": "4-4-2",
+    "Hertha BSC": "4-2-3-1",
+    "Paderborn": "4-2-3-1",
+    "Norimberga": "4-2-3-1",
+    "Schalke 04": "4-2-3-1",
+    "Dynamo Dresda": "4-4-2",
+    "Darmstadt": "4-3-3",
+    "1.FC K'lautern": "4-2-3-1",
+    "Karlsruher SC": "4-3-3",
+    "Düsseldorf": "4-3-3",
+    "Hannover 96": "4-2-3-1",
+    "Holstein Kiel": "4-3-3",
+    "Arm. Bielefeld": "4-3-3",
+    "E. Braunschweig": "4-4-2",
+
+    # LIGUE 2 (Francia Serie B)
+    "US Boulogne": "4-3-3",
+    "Rodez": "4-4-2",
+    "Annecy": "4-3-3",
+    "Grenoble": "4-2-3-1",
+    "USL Dunkerque": "4-4-2",
+    "Guingamp": "4-3-3",
+    "Red Star FC": "4-3-3",
+    "Pau": "4-2-3-1",
+    "Stade Reims": "4-2-3-1",
+    "SC Bastia": "4-3-3",
+    "Le Mans FC": "4-4-2",
+    "Stade Lavallois": "4-3-3",
+    "AS Nancy": "4-2-3-1",
+    "Troyes": "4-3-3",
+    "Saint-Étienne": "4-2-3-1",
+    "Montpellier": "4-2-3-1",
+    "Amiens": "4-3-3",
+    "Clermont Foot": "4-3-3",
+
+    # SCOTTISH PREMIERSHIP (Scozia)
+    "Celtic": "4-3-3",
+    "Rangers": "4-3-3",
+    "Aberdeen": "4-2-3-1",
+    "Hearts": "4-3-3",
+    "Hibernian": "4-2-3-1",
+    "Motherwell": "4-4-2",
+    "Dundee United": "4-3-3",
+    "Dundee": "4-4-2",
+    "Kilmarnock": "4-4-2",
+    "St Mirren": "4-3-3",
+    "Ross County": "4-4-2",
+    "St Johnstone": "4-4-2",
+
+    # ALLSVENSKAN (Svezia)
+    "Hammarby": "4-3-3",
+    "Mjällby AIF": "4-4-2",
+    "Degerfors": "4-4-2",
+    "Sirius": "4-3-3",
+    "AIK": "4-2-3-1",
+    "Halmstads BK": "4-4-2",
+    "Kalmar FF": "4-3-3",
+    "Västerås SK": "4-4-2",
+    "Örgryte": "4-3-3",
+    "Malmö FF": "4-3-3",
+    "Häcken": "4-2-3-1",
+    "Brommapojkarna": "4-4-2",
+    "Elfsborg": "4-3-3",
+    "IFK Göteborg": "4-3-3",
+    "GAIS": "4-4-2",
+    "Djurgården": "4-2-3-1",
+
+    # ELITESERIEN (Norvegia)
+    "HamKam": "4-4-2",
+    "Viking": "4-3-3",
+    "Molde": "4-3-3",
+    "Rosenborg": "4-2-3-1",
+    "Kristiansund": "4-4-2",
+    "Brann": "4-3-3",
+    "KFUM": "4-4-2",
+    "Start": "4-3-3",
+    "Sarpsborg 08": "4-4-2",
+    "Bodø/Glimt": "4-3-3",
+    "Vålerenga": "4-2-3-1",
+    "Sandefjord": "4-4-2",
+    "Aalesund": "4-3-3",
+    "Lillestrøm": "4-3-3",
+    "Tromsø": "4-4-2",
+    "Fredrikstad": "4-3-3",
+
+    # SUPERLIGAEN (Danimarca)
+    "Randers FC": "4-3-3",
+    "Vejle BK": "4-4-2",
+    "Copenhagen": "4-3-3",
+    "Nordsjaelland": "4-3-3",
+    "FC Fredericia": "4-4-2",
+    "Aarhus GF": "4-3-3",
+    "Odense BK": "4-3-3",
+    "FC Midtjylland": "4-2-3-1",
+    "Viborg FF": "4-4-2",
+    "Bröndby IF": "4-3-3",
+    "Sönderjyske": "4-4-2",
+    "Silkeborg IF": "4-3-3",
+
+    # JUPILER PRO LEAGUE (Belgio)
+    "KVC Westerlo": "4-3-3",
+    "VV Sint-Truiden": "4-4-2",
+    "Zulte Waregem": "4-3-3",
+    "FCV Dender EH": "4-4-2",
+    "R Charleroi SC": "4-2-3-1",
+    "Cercle Bruges": "4-3-3",
+    "KAA Gent": "4-3-3",
+    "OH Leuven": "4-2-3-1",
+    "KRC Genk": "4-3-3",
+    "RSC Anderlecht": "4-3-3",
+    "Union SG": "3-5-2",
+    "La Louvière": "4-4-2",
+    "Club Bruges": "4-3-3",
+    "Standard Liegi": "4-2-3-1",
+    "KV Mechelen": "4-3-3",
+    "Anversa": "4-3-3",
+
+    # SÜPER LIG (Turchia)
+    "Karagümrük": "4-2-3-1",
+    "Antalyaspor": "4-4-2",
+    "Samsunspor": "4-3-3",
+    "Trabzonspor": "4-2-3-1",
+    "Eyüpspor": "4-4-2",
+    "Basaksehir": "4-2-3-1",
+    "Konyaspor": "4-4-2",
+    "Göztepe": "4-3-3",
+    "C. Rizespor": "4-4-2",
+    "Galatasaray": "4-2-3-1",
+    "Besiktas": "4-3-3",
+    "Alanyaspor": "4-4-2",
+    "Kayserispor": "4-4-2",
+    "Kocaelispor": "4-3-3",
+    "Gaziantep FK": "4-4-2",
+    "Kasimpasa": "4-3-3",
+    "Fenerbahce": "4-2-3-1",
+    "Genclerbirligi": "4-4-2",
+
+    # LEAGUE OF IRELAND PREMIER DIVISION
+    "Drogheda United": "4-4-2",
+    "Waterford FC": "4-3-3",
+    "St. Pat's": "4-3-3",
+    "Galway United": "4-4-2",
+    "Derry City": "4-3-3",
+    "Dundalk FC": "4-2-3-1",
+    "Shelbourne": "4-3-3",
+    "Shamrock Rovers": "4-3-3",
+    "Sligo Rovers": "4-4-2",
+    "Bohemians": "4-3-3",
+
+    # BRASILEIRÃO SERIE A
+    "Athletico-PR": "4-2-3-1",
+    "Corinthians": "4-2-3-1",
+    "Internacional": "4-3-3",
+    "Santos": "4-3-3",
+    "Flamengo": "4-4-2",
+    "Palmeiras": "4-3-3",
+    "São Paulo": "4-2-3-1",
+    "Botafogo": "4-3-3",
+    "Fluminense": "4-2-3-1",
+    "Cruzeiro": "4-3-3",
+    "Atlético Mineiro": "4-3-3",
+    "Grêmio": "4-2-3-1",
+    "Vasco da Gama": "4-3-3",
+    "Fortaleza": "4-3-3",
+    "Bahia": "4-2-3-1",
+    "Bragantino": "4-3-3",
+    "Cuiabá": "4-4-2",
+    "Juventude": "4-4-2",
+    "Vitória": "4-3-3",
+    "Ceará": "4-4-2",
+
+    # PRIMERA DIVISIÓN (Argentina)
+    "River Plate": "4-3-3",
+    "Boca Juniors": "4-2-3-1",
+    "Racing Club": "4-3-3",
+    "Independiente": "4-2-3-1",
+    "San Lorenzo": "4-4-2",
+    "Vélez Sarsfield": "4-3-3",
+    "Estudiantes": "4-4-2",
+    "Lanús": "4-2-3-1",
+    "Argentinos Juniors": "4-4-2",
+    "Talleres": "4-3-3",
+    "Belgrano": "4-4-2",
+    "Instituto": "4-4-2",
+    "Newells Old Boys": "4-3-3",
+    "Rosario Central": "4-3-3",
+    "Huracán": "4-4-2",
+    "Tigre": "4-3-3",
+    "Platense": "4-4-2",
+    "Defensa y Justicia": "4-3-3",
+    "Unión Santa Fe": "4-4-2",
+    "Colón": "4-4-2",
+    "Banfield": "4-3-3",
+    "Gimnasia LP": "4-4-2",
+    "Central Córdoba": "4-4-2",
+    "Sarmiento": "4-4-2",
+    "Barracas Central": "4-4-2",
+    "Godoy Cruz": "4-3-3",
+    "Atlético Tucumán": "4-4-2",
+    "Riestra": "4-4-2",
+
+    # MAJOR LEAGUE SOCCER (USA)
+    "New York": "4-2-3-1",
+    "New England": "4-4-2",
+    "Chicago": "4-3-3",
+    "Montréal": "4-2-3-1",
+    "Minnesota": "4-3-3",
+    "Cincinnati": "4-3-3",
+    "Colorado": "4-4-2",
+    "Portland": "4-2-3-1",
+    "Orlando": "4-2-3-1",
+    "Miami": "4-3-3",
+    "SJ Earthquakes": "4-4-2",
+    "Atlanta": "4-3-3",
+    "Salt Lake": "4-3-3",
+    "Seattle": "4-2-3-1",
+    "Dallas": "4-3-3",
+    "Nashville": "4-2-3-1",
+    "Houston": "4-3-3",
+    "LAFC": "4-3-3",
+    "Kansas City": "4-3-3",
+    "Columbus": "4-2-3-1",
+    "San Diego": "4-3-3",
+    "St. Louis CITY": "4-3-3",
+    "Vancouver": "4-3-3",
+    "Toronto": "4-2-3-1",
+    "LA Galaxy": "4-3-3",
+    "Charlotte": "4-3-3",
+    "Philadelphia": "4-3-3",
+    "New York City": "4-3-3",
+    "D.C. United": "4-2-3-1",
+    "Austin": "4-3-3",
+
+    # J1 LEAGUE (Giappone)
+    "Vissel Kobe": "4-3-3",
+    "Yokohama F. Marinos": "4-3-3",
+    "Urawa Red Diamonds": "4-2-3-1",
+    "Kawasaki Frontale": "4-3-3",
+    "Kashima Antlers": "4-2-3-1",
+    "FC Tokyo": "4-3-3",
+    "Nagoya Grampus": "4-2-3-1",
+    "Cerezo Osaka": "4-3-3",
+    "Gamba Osaka": "4-2-3-1",
+    "Sanfrecce Hiroshima": "3-4-2-1",
+    "Kashiwa Reysol": "4-3-3",
+    "Sagan Tosu": "4-4-2",
+    "Shonan Bellmare": "3-4-2-1",
+    "Albirex Niigata": "4-3-3",
+    "Consadole Sapporo": "4-4-2",
+    "Avispa Fukuoka": "4-2-3-1",
+    "Kyoto Sanga": "4-3-3",
+    "Tokyo Verdy": "4-4-2",
+    "Machida Zelvia": "4-4-2",
+    "Jubilo Iwata": "4-3-3",
 }
 
 
 def add_formations():
-    """Aggiunge il campo formation a tutte le squadre."""
-    
+    """Aggiunge il campo formation a tutte le squadre (solo se mancante o diverso)."""
+
     print("\n" + "="*60)
     print("⚽ AGGIUNGI MODULI ALLE SQUADRE - VERSIONE FINALE")
     print("="*60)
-    
+
     total_teams = teams_col.count_documents({})
     print(f"\n📊 Squadre totali nel database: {total_teams}")
-    
+
     updated = 0
+    skipped = 0
     not_found = []
-    
+
     # Itera su tutte le squadre
     for team in teams_col.find({}):
         team_name = team.get("name", "")
-        
-        formation = FORMATIONS.get(team_name)
-        
-        if formation:
-            teams_col.update_one(
-                {"_id": team["_id"]},
-                {"$set": {"formation": formation}}
-            )
-            updated += 1
-            print(f"✅ {team_name}: {formation}")
+        current_formation = team.get("formation")
+
+        new_formation = FORMATIONS.get(team_name)
+
+        if new_formation:
+            # Controlla se il modulo è già uguale
+            if current_formation == new_formation:
+                skipped += 1
+                print(f"⏭️  {team_name}: già {new_formation}")
+            else:
+                teams_col.update_one(
+                    {"_id": team["_id"]},
+                    {"$set": {"formation": new_formation}}
+                )
+                updated += 1
+                if current_formation:
+                    print(f"✅ {team_name}: {current_formation} → {new_formation}")
+                else:
+                    print(f"✅ {team_name}: (vuoto) → {new_formation}")
         else:
             not_found.append(team_name)
-            print(f"❌ {team_name}: MANCA")
-    
+            print(f"❌ {team_name}: MANCA nel dizionario")
+
     print("\n" + "="*60)
     print(f"✅ COMPLETATO!")
-    print(f"   Aggiornate: {updated}/{total_teams}")
-    print(f"   Mancanti: {len(not_found)}")
+    print(f"   Aggiornate: {updated}")
+    print(f"   Già corrette: {skipped}")
+    print(f"   Mancanti nel dizionario: {len(not_found)}")
     print("="*60)
-    
+
     if not_found:
         print(f"\n⚠️  Squadre ancora senza modulo:")
         for name in not_found:
