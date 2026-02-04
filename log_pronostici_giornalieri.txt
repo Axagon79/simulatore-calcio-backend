@@ -1,5 +1,5 @@
 ========================================== 
-🚀 AVVIO PRONOSTICI GIORNALIERI: 03/02/2026  1:28:53,88 
+🚀 AVVIO PRONOSTICI GIORNALIERI: 04/02/2026  1:00:01,89 
 ========================================== 
 [+] Ambiente virtuale attivato. 
 [+] Elaborazione script in corso... 
@@ -13,66 +13,1430 @@
  Connesso a MongoDB: football_simulator_db
  Database: football_simulator_db
     teams: 494 documenti
-    matches_history_betexplorer: 3924 documenti
+    matches_history_betexplorer: 3999 documenti
     raw_h2h_data_v2: 5844 documenti
     h2h_by_round: 835 documenti
  Configurazione completata con successo
 
 ======================================================================
-🔮 DAILY PREDICTIONS - Algoritmo di Scrematura
+📅 ELABORAZIONE: 2026-02-04
 ======================================================================
 
-📅 Trovate 7 partite per oggi (2026-02-03)
+======================================================================
+🔮 DAILY PREDICTIONS - 2026-02-04
+======================================================================
+
+📅 Trovate 10 partite per 2026-02-04
 
 ──────────────────────────────────────────────────
-⚽ Bologna vs Milan (Serie A)
+⚽ Aberdeen FC vs Celtic Glasgow (Scottish Premiership)
+   ❌ SCARTATA (Segno: 54.4, Gol: 57.7)
+
+──────────────────────────────────────────────────
+⚽ Dundee FC vs Motherwell FC (Scottish Premiership)
    ✅ SEGNO
-      → 2 (68/100, 3.0⭐)
-      💬 {'segno': 'Affidabilità A stagionale, MAP 3.48 — i numeri indicano una direzione'}
+      → 2 (61/100, 2.6⭐)
+      💬 {'segno': 'Motivazione 10/15 vs 10/15, DNA 50/100 — pressione e qualità'}
 
 ──────────────────────────────────────────────────
-⚽ Hull City vs Watford (Championship)
-   ❌ SCARTATA (Segno: 30.1, Gol: 59.4)
-
-──────────────────────────────────────────────────
-⚽ FC Portsmouth vs Ipswich (Championship)
-   ❌ SCARTATA (Segno: 44.2, Gol: 52.7)
-
-──────────────────────────────────────────────────
-⚽ Sheff Utd vs Oxford United (Championship)
+⚽ Hibernian FC vs Dundee United (Scottish Premiership)
    ✅ GOL
-      → Over 1.5 (65/100, 2.8⭐)
-      💬 {'gol': 'xG combinato 2.52, difesa trasferta 5.1/10 — i numeri indicano gol'}
+      → Over 2.5 (62/100, 2.6⭐)
+      → Goal (62/100, 2.6⭐)
+      💬 {'gol': "Attacco casa 10.68/15, media campionato 2.56 — fattori convergenti sull'Over", 'gol_extra': 'H2H: 70% entrambe a segno, xG 2.96 — aspettativa bilanciata'}
 
 ──────────────────────────────────────────────────
-⚽ Unión Santa Fe vs Gimnasia (M) (Primera División)
-   ✅ GOL
-      → Under 3.5 (60/100, 2.5⭐)
-      💬 {'gol': 'Attacco trasferta 7.5/15 tra i meno produttivi, xG combinato 2.5'}
+⚽ Livingston FC vs Falkirk FC (Scottish Premiership)
+   ❌ SCARTATA (Segno: 40.2, Gol: 59.2)
 
 ──────────────────────────────────────────────────
-⚽ Argentinos Jrs. vs Belgrano (Primera División)
-   ✅ GOL
-      → Under 2.5 (65/100, 2.8⭐)
-      💬 {'gol': 'xG combinato 2.0, entrambe sotto la media offensiva del campionato'}
+⚽ Glasgow Rangers vs Kilmarnock FC (Scottish Premiership)
+   ❌ SCARTATA (Segno: 0, Gol: 54.8)
 
 ──────────────────────────────────────────────────
-⚽ Banfield vs Estudiantes RC (Primera División)
+⚽ St. Mirren vs Heart of Midl. (Scottish Premiership)
+   ✅ SEGNO
+      → 2 (75/100, 3.4⭐)
+      💬 {'segno': 'Lucifero 19.84/25 e DNA 50/100 — forma e qualità tecnica allineate'}
+
+──────────────────────────────────────────────────
+⚽ Instituto ACC vs Lanús (Primera División)
+   ❌ SCARTATA (Segno: 46.3, Gol: 70.0)
+
+──────────────────────────────────────────────────
+⚽ Ind. Rivadavia vs Sarmiento Junín (Primera División)
    ✅ GOL
-      → Under 3.5 (60/100, 2.5⭐)
-      → NoGoal (60/100, 2.5⭐)
-      💬 {'gol': 'H2H Under nel 100% dei casi, difesa casa 5.0/10 — dato doppio', 'gol_extra': 'H2H NoGoal 100%, media 0.5 — una squadra resta spesso a secco'}
+      → Under 2.5 (71/100, 3.2⭐)
+      → NoGoal (71/100, 3.2⭐)
+      💬 {'gol': 'Difesa casa 5.0/10, media lega 1.88 — muro interno in campionato contenuto', 'gol_extra': 'Difesa 5.0/10 impenetrabile in casa, xG avversario sotto la media'}
+
+──────────────────────────────────────────────────
+⚽ Flamengo vs Internacional (Brasileirão Serie A)
+   ❌ SCARTATA (Segno: 29.3, Gol: 57.9)
+
+──────────────────────────────────────────────────
+⚽ RB Bragantino vs Atlético-MG (Brasileirão Serie A)
+   ❌ SCARTATA (Segno: 51.2, Gol: 59.8)
 
 ======================================================================
 ✅ COMPLETATO!
-   📊 Partite analizzate: 7
-   ✅ Pronostici salvati: 5
-   ❌ Scartate: 2
-   📅 Data: 2026-02-03
+   📊 Partite analizzate: 10
+   ✅ Pronostici salvati: 4
+   ❌ Scartate: 6
+   📅 Data: 2026-02-04
+======================================================================
+
+   💣 Nessuna bomba oggi
+
+======================================================================
+📅 ELABORAZIONE: 2026-02-05
+======================================================================
+
+======================================================================
+🔮 DAILY PREDICTIONS - 2026-02-05
+======================================================================
+
+📅 Trovate 5 partite per 2026-02-05
+
+──────────────────────────────────────────────────
+⚽ Santos vs São Paulo (Brasileirão Serie A)
+   ❌ SCARTATA (Segno: 55.8, Gol: 61.1)
+
+──────────────────────────────────────────────────
+⚽ Remo vs Mirassol-SP (Brasileirão Serie A)
+   ❌ SCARTATA (Segno: 47.6, Gol: 54.8)
+
+──────────────────────────────────────────────────
+⚽ Palmeiras vs EC Vitória (Brasileirão Serie A)
+   ❌ SCARTATA (Segno: 0, Gol: 50.9)
+
+──────────────────────────────────────────────────
+⚽ Grêmio vs Botafogo (Brasileirão Serie A)
+   ❌ SCARTATA (Segno: 55.5, Gol: 58.1)
+
+──────────────────────────────────────────────────
+⚽ EC Bahia vs Fluminense (Brasileirão Serie A)
+   ✅ GOL
+      → Under 3.5 (61/100, 2.6⭐)
+      💬 {'doppia_chance': 'MAP 0, segnali presenti ma non unanimi — 1X a 1.31 consigliata', 'gol': 'Media lega 2.5, xG combinato 2.5 — contesto non favorevole ai gol'}
+
+======================================================================
+✅ COMPLETATO!
+   📊 Partite analizzate: 5
+   ✅ Pronostici salvati: 1
+   ❌ Scartate: 4
+   📅 Data: 2026-02-05
+======================================================================
+
+   💣 Nessuna bomba oggi
+
+======================================================================
+📅 ELABORAZIONE: 2026-02-06
+======================================================================
+
+======================================================================
+🔮 DAILY PREDICTIONS - 2026-02-06
+======================================================================
+
+📅 Trovate 28 partite per 2026-02-06
+
+──────────────────────────────────────────────────
+⚽ Verona vs Pisa (Serie A)
+   ✅ GOL
+      → Over 2.5 (72/100, 3.3⭐)
+      → NoGoal (72/100, 3.3⭐)
+      💬 {'gol': 'H2H: 2.25 gol di media su 68 precedenti, tendenza consolidata', 'gol_extra': 'Attacco trasferta 9.39/15 con produzione ridotta fuori casa, difesa interna 2.84/10'}
+
+──────────────────────────────────────────────────
+⚽ Cesena vs Pescara (Serie B)
+   ✅ GOL
+      → Over 2.5 (68/100, 3.0⭐)
+      💬 {'gol': 'Difese 5.24/10 e 1.42/10, xG combinato 3.05 — struttura orientata ai gol'}
+
+──────────────────────────────────────────────────
+⚽ Benevento vs Picerno (Serie C - Girone C)
+   ✅ GOL
+      → Over 2.5 (65/100, 2.8⭐)
+      → Goal (65/100, 2.8⭐)
+      💬 {'gol': 'Attacco casa 14.03/15, campionato con media 2.51 — ambiente favorevole', 'gol_extra': 'xG distribuito: casa produce e trasferta risponde, media scontri 2.0'}
+
+──────────────────────────────────────────────────
+⚽ Latina vs Cavese (Serie C - Girone C)
+   ✅ GOL
+      → Under 2.5 (68/100, 3.0⭐)
+      → NoGoal (68/100, 3.0⭐)
+      💬 {'gol': 'H2H su 22 precedenti con media 1.64 — tendenza stabile nel tempo', 'gol_extra': "xG combinato 1.96 concentrato su una sola squadra — l'altra fatica"}
+
+──────────────────────────────────────────────────
+⚽ Team Altamura vs Monopoli (Serie C - Girone C)
+   ✅ GOL
+      → Over 1.5 (62/100, 2.6⭐)
+      💬 {'gol': 'Attacco 6.17/15 vs difesa 5.88/10, xG 2.5 — multipli indicatori Over'}
+
+──────────────────────────────────────────────────
+⚽ Cerignola vs Salernitana (Serie C - Girone C)
+   ❌ SCARTATA (Segno: 35.7, Gol: 56.9)
+
+──────────────────────────────────────────────────
+⚽ Leeds vs Nott'm Forest (Premier League)
+   ❌ SCARTATA (Segno: 55.1, Gol: 63.1)
+
+──────────────────────────────────────────────────
+⚽ Celta de Vigo vs CA Osasuna (La Liga)
+   ✅ SEGNO+GOL
+      → 1 (66/100, 2.9⭐)
+      → Under 3.5 (62/100, 2.7⭐)
+      → NoGoal (62/100, 2.7⭐)
+      💬 {'segno': 'Rendimento interno 41/7, affidabilità A — contesto casalingo rilevante', 'gol': "DNA difensivo combinato superiore all'offensivo — struttura tecnica orientata alla fase difensiva", 'gol_extra': 'H2H NoGoal nel 65% su 76 gare — dato statisticamente robusto'}
+
+──────────────────────────────────────────────────
+⚽ Union Berlino vs Eintracht (Bundesliga)
+   ✅ GOL
+      → Over 2.5 (71/100, 3.2⭐)
+      → Goal (71/100, 3.2⭐)
+      💬 {'doppia_chance': 'H2H 6.72/10, dato non netto — 1X a 1.38 come approccio conservativo', 'gol': 'Media gol scontri diretti 3.09 su 22 gare — campione statistico ampio', 'gol_extra': 'Attacchi 6.96/15 e 11.78/15, DNA offensivi 50/100 e 50/100'}
+
+──────────────────────────────────────────────────
+⚽ Metz vs Lille (Ligue 1)
+   ✅ GOL
+      → Over 2.5 (64/100, 2.8⭐)
+      💬 {'gol': 'H2H: Over 2.5 nel 45% degli scontri su 100 precedenti'}
+
+──────────────────────────────────────────────────
+⚽ NAC Breda vs Excelsior (Eredivisie)
+   ✅ GOL
+      → Over 2.5 (72/100, 3.3⭐)
+      → Goal (72/100, 3.3⭐)
+      💬 {'gol': 'H2H: 2.64 gol di media su 67 precedenti, tendenza consolidata', 'gol_extra': 'Attacchi 4.98/15 e 5.73/15, DNA offensivi 50/100 e 50/100'}
+
+──────────────────────────────────────────────────
+⚽ Charlton vs QPR (Championship)
+   ❌ SCARTATA (Segno: 53.6, Gol: 56.9)
+
+──────────────────────────────────────────────────
+⚽ CD Leganés vs Granada (LaLiga 2)
+   ✅ GOL
+      → Under 3.5 (63/100, 2.7⭐)
+      → NoGoal (63/100, 2.7⭐)
+      💬 {'gol': 'Media lega 2.52 tra le più basse, contesto campionato difensivo', 'gol_extra': 'H2H 89% NoGoal, difesa 5.41/10 — convergenza storica e stagionale'}
+
+──────────────────────────────────────────────────
+⚽ Greuther Fürth vs Magdeburgo (2. Bundesliga)
+   ✅ GOL
+      → Over 2.5 (63/100, 2.7⭐)
+      → Goal (63/100, 2.7⭐)
+      💬 {'gol': 'Difesa casa 1.05/10 e trasferta 5.58/10 — doppia fragilità difensiva', 'gol_extra': 'Attacchi 6.37/15 e 6.78/15, xG 2.86 — entrambe generano xG significativo'}
+
+──────────────────────────────────────────────────
+⚽ Pr. Münster vs VfL Bochum (2. Bundesliga)
+   ✅ GOL
+      → Over 1.5 (68/100, 3.0⭐)
+      → Goal (68/100, 3.0⭐)
+      💬 {'gol': 'DNA offensivo casa 50/100, trasferta 50/100 — qualità tecnica in avanti', 'gol_extra': 'Attacco casa 7.13/15 tra i più attivi, trasferta 6.91/15 non si copre'}
+
+──────────────────────────────────────────────────
+⚽ US Boulogne vs Rodez (Ligue 2)
+   ✅ GOL
+      → Over 2.5 (66/100, 2.9⭐)
+      💬 {'doppia_chance': 'Indicazione presente ma classificazione MAP: NON_BVS — 1X a 1.3 come tutela', 'gol': 'Media lega 2.48, xG combinato 3.15, H2H 2.33 — tripla conferma'}
+
+──────────────────────────────────────────────────
+⚽ Annecy vs Grenoble (Ligue 2)
+   ✅ SEGNO
+      → 1 (70/100, 3.1⭐)
+      💬 {'segno': 'Affidabilità A e MAP: PURO — segnali concordi sulla direzione'}
+
+──────────────────────────────────────────────────
+⚽ USL Dunkerque vs Guingamp (Ligue 2)
+   ✅ GOL
+      → Over 2.5 (69/100, 3.1⭐)
+      → NoGoal (69/100, 3.1⭐)
+      💬 {'gol': 'Difesa trasferta 3.46/10, H2H con media 1.98 gol — vulnerabilità confermata', 'gol_extra': 'Attacco trasferta 10.2/15 con produzione ridotta fuori casa, difesa interna 4.98/10'}
+
+──────────────────────────────────────────────────
+⚽ Red Star FC vs Pau (Ligue 2)
+   ❌ SCARTATA (Segno: 34.6, Gol: 57.8)
+   💣 BOMBA! Pau (71.2/100)
+
+──────────────────────────────────────────────────
+⚽ Stade Reims vs SC Bastia (Ligue 2)
+   ✅ SEGNO
+      → 1 (71/100, 3.2⭐)
+      💬 {'segno': 'Lucifero 18.65/25 con trend crescente, quota 1.62 in fascia ottimale'}
+
+──────────────────────────────────────────────────
+⚽ Aarhus GF vs Odense BK (Superligaen)
+   ✅ GOL
+      → Over 2.5 (67/100, 2.9⭐)
+      → Goal (67/100, 2.9⭐)
+      💬 {'gol': 'H2H 3.14 gol di media, attacco casa 7.18/15 — convergenza dati', 'gol_extra': 'Attacchi 7.18/15 e 8.44/15, xG 3.11 — entrambe generano xG significativo'}
+
+──────────────────────────────────────────────────
+⚽ KVC Westerlo vs VV Sint-Truiden (Jupiler Pro League)
+   ❌ SCARTATA (Segno: 35.0, Gol: 60.0)
+
+──────────────────────────────────────────────────
+⚽ Galway United vs Drogheda United (League of Ireland Premier Division)
+   ❌ SCARTATA (Segno: 38.0, Gol: 61.1)
+
+──────────────────────────────────────────────────
+⚽ Waterford FC vs Shelbourne (League of Ireland Premier Division)
+   ❌ SCARTATA (Segno: 38.7, Gol: 55.0)
+
+──────────────────────────────────────────────────
+⚽ Derry City vs Sligo Rovers (League of Ireland Premier Division)
+   ❌ SCARTATA (Segno: 39.5, Gol: 59.1)
+
+──────────────────────────────────────────────────
+⚽ Shamrock Rovers vs Dundalk FC (League of Ireland Premier Division)
+   ❌ SCARTATA (Segno: 29.9, Gol: 58.6)
+
+──────────────────────────────────────────────────
+⚽ Vasco da Gama vs Chapecoense (Brasileirão Serie A)
+   ❌ SCARTATA (Segno: 56.9, Gol: 51.9)
+
+──────────────────────────────────────────────────
+⚽ Cruzeiro vs Coritiba FC (Brasileirão Serie A)
+   ❌ SCARTATA (Segno: 35.3, Gol: 55.6)
+
+======================================================================
+✅ COMPLETATO!
+   📊 Partite analizzate: 28
+   ✅ Pronostici salvati: 17
+   ❌ Scartate: 11
+   📅 Data: 2026-02-06
+======================================================================
+
+   💣 Bombe salvate: 1
+
+======================================================================
+📅 ELABORAZIONE: 2026-02-07
+======================================================================
+
+======================================================================
+🔮 DAILY PREDICTIONS - 2026-02-07
+======================================================================
+
+📅 Trovate 79 partite per 2026-02-07
+
+──────────────────────────────────────────────────
+⚽ Genoa vs Napoli (Serie A)
+   ❌ SCARTATA (Segno: 52.9, Gol: 59.0)
+
+──────────────────────────────────────────────────
+⚽ Fiorentina vs Torino (Serie A)
+   ✅ GOL
+      → Over 2.5 (61/100, 2.5⭐)
+      💬 {'gol': 'Attacco casa 8.53/15, campionato con media 2.4 — ambiente favorevole'}
+
+──────────────────────────────────────────────────
+⚽ Carrarese vs Südtirol (Serie B)
+   ✅ GOL
+      → Under 3.5 (64/100, 2.7⭐)
+      💬 {'gol': 'Difesa casa 5.72/10, H2H media 2.0 — solidità e storico concordi'}
+
+──────────────────────────────────────────────────
+⚽ Catanzaro vs Reggiana (Serie B)
+   ✅ SEGNO
+      → 1 (62/100, 2.7⭐)
+      💬 {'segno': 'Quota 1.71 con classificazione MAP: PURO — il mercato conferma i dati'}
+
+──────────────────────────────────────────────────
+⚽ Frosinone vs Venezia (Serie B)
+   ❌ SCARTATA (Segno: 46.5, Gol: 59.4)
+
+──────────────────────────────────────────────────
+⚽ Juve Stabia vs Padova (Serie B)
+   ✅ SEGNO+GOL
+      → 1 (70/100, 3.1⭐)
+      → Under 2.5 (68/100, 3.0⭐)
+      💬 {'segno': 'MAP: PURO con indice 1.64, Lucifero 17.06 vs 3.97 — divario netto', 'gol': 'xG combinato 1.73 in un campionato con media 2.45 — aspettativa bassa'}
+
+──────────────────────────────────────────────────
+⚽ Mantova vs Bari (Serie B)
+   ✅ GOL
+      → Over 2.5 (66/100, 2.8⭐)
+      → NoGoal (66/100, 2.8⭐)
+      💬 {'gol': 'Attacco casa 6.32/15, attacco trasferta 3.57/15 — entrambe producono occasioni', 'gol_extra': 'Attacco casa 6.32/15 produce ma difesa casa 1.91/10 non concede — partita a senso unico'}
+
+──────────────────────────────────────────────────
+⚽ Modena vs Sampdoria (Serie B)
+   ✅ SEGNO
+      → 1 (64/100, 2.8⭐)
+      💬 {'segno': 'Fattore campo 53/7, DNA 50/100 — vantaggio strutturale misurabile'}
+
+──────────────────────────────────────────────────
+⚽ Palermo vs Empoli (Serie B)
+   ❌ SCARTATA (Segno: 56.4, Gol: 51.1)
+
+──────────────────────────────────────────────────
+⚽ Spezia vs Virtus Entella (Serie B)
+   ✅ GOL
+      → Under 3.5 (62/100, 2.6⭐)
+      💬 {'gol': 'Attacco trasferta 4.28/15, DNA offensivo 50/100 — produzione limitata'}
+
+──────────────────────────────────────────────────
+⚽ Lumezzane vs Cittadella (Serie C - Girone A)
+   ✅ GOL
+      → Under 3.5 (64/100, 2.7⭐)
+      → NoGoal (64/100, 2.7⭐)
+      💬 {'gol': 'Attacchi 8.09/15 e 6.55/15 sotto la media, xG 2.22 lo conferma', 'gol_extra': 'H2H NoGoal nel 68% su 20 gare — dato statisticamente robusto'}
+
+──────────────────────────────────────────────────
+⚽ Novara vs Union Brescia (Serie C - Girone A)
+   ❌ SCARTATA (Segno: 32.0, Gol: 57.2)
+
+──────────────────────────────────────────────────
+⚽ Alcione vs Arzignano (Serie C - Girone A)
+   ❌ SCARTATA (Segno: 35.3, Gol: 56.0)
+
+──────────────────────────────────────────────────
+⚽ Virtus Verona vs Giana Erminio (Serie C - Girone A)
+   ✅ GOL
+      → Under 2.5 (66/100, 2.9⭐)
+      💬 {'gol': 'H2H Under 70% su 12 gare — campione ampio e coerente'}
+
+──────────────────────────────────────────────────
+⚽ Pergolettese vs Trento (Serie C - Girone A)
+   ❌ SCARTATA (Segno: 32.9, Gol: 52.4)
+
+──────────────────────────────────────────────────
+⚽ Ravenna vs Carpi (Serie C - Girone B)
+   ❌ SCARTATA (Segno: 32.4, Gol: 57.1)
+
+──────────────────────────────────────────────────
+⚽ Crotone vs Atalanta U23 (Serie C - Girone C)
+   ✅ GOL
+      → Under 3.5 (61/100, 2.6⭐)
+      💬 {'gol': 'H2H su 2 precedenti con media 1.5 — tendenza stabile nel tempo'}
+
+──────────────────────────────────────────────────
+⚽ Giugliano vs Cosenza (Serie C - Girone C)
+   ❌ SCARTATA (Segno: 33.1, Gol: 54.4)
+
+──────────────────────────────────────────────────
+⚽ Casertana vs Foggia (Serie C - Girone C)
+   ❌ SCARTATA (Segno: 28.5, Gol: 56.4)
+
+──────────────────────────────────────────────────
+⚽ Casarano vs Sorrento (Serie C - Girone C)
+   ✅ GOL
+      → Under 3.5 (64/100, 2.8⭐)
+      → NoGoal (64/100, 2.8⭐)
+      💬 {'gol': 'Media campionato 2.51, xG 2.13, H2H 2.17 — tripla conferma Under', 'gol_extra': 'H2H NoGoal nel 64% su 12 gare — dato statisticamente robusto'}
+
+──────────────────────────────────────────────────
+⚽ Potenza vs Siracusa (Serie C - Girone C)
+   ❌ SCARTATA (Segno: 30.5, Gol: 56.4)
+
+──────────────────────────────────────────────────
+⚽ Catania vs Trapani (Serie C - Girone C)
+   ❌ SCARTATA (Segno: 33.3, Gol: 53.2)
+
+──────────────────────────────────────────────────
+⚽ Manchester Utd. vs Tottenham (Premier League)
+   ✅ SEGNO
+      → 1 (66/100, 2.8⭐)
+      💬 {'segno': 'MAP PURO confermato da Lucifero 20.24/25 e affidabilità B'}
+
+──────────────────────────────────────────────────
+⚽ Arsenal vs Sunderland (Premier League)
+   ❌ SCARTATA (Segno: 0, Gol: 52.2)
+
+──────────────────────────────────────────────────
+⚽ Bournemouth vs Aston Villa (Premier League)
+   ✅ GOL
+      → Over 1.5 (70/100, 3.1⭐)
+      → Goal (70/100, 3.1⭐)
+      💬 {'doppia_chance': 'Lucifero 18.65 vs 9.52, divario non ampio — 1X a 1.46 più prudente', 'gol': 'Attacco casa 6.94/15, attacco trasferta 8.57/15 — entrambe producono occasioni', 'gol_extra': 'xG distribuito: casa produce e trasferta risponde, media scontri 2.53'}
+
+──────────────────────────────────────────────────
+⚽ Burnley vs West Ham Utd. (Premier League)
+   ✅ GOL
+      → Over 1.5 (65/100, 2.8⭐)
+      → Goal (65/100, 2.8⭐)
+      💬 {'doppia_chance': 'Affidabilità C vs E, profili vicini — 1X a 1.41 appropriata', 'gol': 'Attacco trasferta 6.28/15, la squadra ospite mantiene volumi offensivi anche fuori casa', 'gol_extra': 'Attacco trasferta 6.28/15 tra i più insidiosi fuori casa del campionato'}
+
+──────────────────────────────────────────────────
+⚽ FC Fulham vs Everton (Premier League)
+   ✅ GOL
+      → Over 1.5 (63/100, 2.7⭐)
+      💬 {'gol': 'H2H 2.5 gol, difesa trasferta 6.82/10 — storico e dato stagionale allineati'}
+
+──────────────────────────────────────────────────
+⚽ Wolverhampton vs Chelsea (Premier League)
+   ✅ SEGNO+GOL
+      → 2 (70/100, 3.2⭐)
+      → Over 2.5 (70/100, 3.1⭐)
+      → Goal (70/100, 3.1⭐)
+      💬 {'segno': 'Lucifero stabile sopra 19.05 nelle ultime giornate, continuità di rendimento', 'gol': 'Attacco trasferta 10.85/15, la squadra ospite mantiene volumi offensivi anche fuori casa', 'gol_extra': 'Difesa trasferta 6.24/10 vulnerabile, ma anche difesa casa 0.36/10 concede'}
+
+──────────────────────────────────────────────────
+⚽ Newcastle vs Brentford (Premier League)
+   ✅ GOL
+      → Over 2.5 (67/100, 3.0⭐)
+      → Goal (67/100, 3.0⭐)
+      💬 {'gol': 'Difesa trasferta 4.21/10, attacco casa 9.55/15 — squilibrio misurabile', 'gol_extra': 'Attacco casa 9.55/15 prolifico, trasferta 6.86/15 reattiva — Goal atteso'}
+
+──────────────────────────────────────────────────
+⚽ Rayo Vallecano vs Real Oviedo (La Liga)
+   ❌ SCARTATA (Segno: 59.8, Gol: 56.9)
+
+──────────────────────────────────────────────────
+⚽ Barcellona vs RCD Mallorca (La Liga)
+   ✅ GOL
+      → Over 2.5 (67/100, 2.9⭐)
+      💬 {'gol': 'H2H Over 65% su 77 precedenti — percentuale significativa'}
+
+──────────────────────────────────────────────────
+⚽ Siviglia vs Girona FC (La Liga)
+   ❌ SCARTATA (Segno: 38.8, Gol: 56.8)
+
+──────────────────────────────────────────────────
+⚽ Real Sociedad vs Elche (La Liga)
+   ✅ SEGNO+GOL
+      → 1 (72/100, 3.3⭐)
+      → Over 2.5 (62/100, 2.6⭐)
+      💬 {'segno': 'H2H 6.75 vs 5.41, affidabilità A — indicatori convergenti', 'gol': 'xG combinato 3.0, difesa trasferta 3.99/10 — i numeri indicano gol'}
+
+──────────────────────────────────────────────────
+⚽ Friburgo vs Werder Brema (Bundesliga)
+   ✅ SEGNO+GOL
+      → 1 (67/100, 2.9⭐)
+      → Over 2.5 (60/100, 2.5⭐)
+      💬 {'segno': 'Fattore campo 66/7 combinato con Lucifero 11.11/25 — doppia conferma', 'gol': 'Difesa trasferta 4.12/10, H2H Over 45% — vulnerabilità e precedenti concordi'}
+
+──────────────────────────────────────────────────
+⚽ Magonza vs Augusta (Bundesliga)
+   ✅ GOL
+      → Over 1.5 (70/100, 3.1⭐)
+      → Goal (70/100, 3.1⭐)
+      💬 {'gol': 'xG combinato 2.71, media scontri diretti 2.72 — numeri consistenti', 'gol_extra': 'xG 2.71 distribuito equamente, difese permeabili da entrambi i lati'}
+
+──────────────────────────────────────────────────
+⚽ Wolfsburg vs Dortmund (Bundesliga)
+   ✅ SEGNO+GOL
+      → 2 (76/100, 3.5⭐)
+      → Over 2.5 (67/100, 2.9⭐)
+      → NoGoal (67/100, 2.9⭐)
+      💬 {'segno': 'Lucifero 23.41/25 con trend crescente, quota 1.75 in fascia ottimale', 'gol': 'xG 3.35 nettamente sopra la soglia, campionato con media 3.2', 'gol_extra': 'Difesa casa 2.83/10 solida, attacco trasferta 9.1/15 in difficoltà fuori casa'}
+
+──────────────────────────────────────────────────
+⚽ St. Pauli vs Stoccarda (Bundesliga)
+   ✅ SEGNO+GOL
+      → 2 (66/100, 2.8⭐)
+      → Over 2.5 (67/100, 3.0⭐)
+      💬 {'segno': 'Motivazione 6.86/15 in un momento chiave della stagione, dati a supporto', 'gol': 'DNA offensivo casa 50/100, trasferta 50/100 — qualità tecnica in avanti'}
+
+──────────────────────────────────────────────────
+⚽ Heidenheim vs Amburgo (Bundesliga)
+   ✅ GOL
+      → Over 2.5 (66/100, 2.9⭐)
+      💬 {'doppia_chance': 'Dati convergenti ma margine ridotto, X2 a 1.34 come gestione del rischio', 'gol': 'Attacco 4.64/15 vs difesa 3.74/10, xG 2.82 — multipli indicatori Over'}
+
+──────────────────────────────────────────────────
+⚽ Bor. M'gladbach vs Leverkusen (Bundesliga)
+   ✅ GOL
+      → Over 2.5 (65/100, 2.8⭐)
+      → Goal (65/100, 2.8⭐)
+      💬 {'doppia_chance': 'MAP 2.46 e affidabilità A, segnali positivi ma non dominanti — X2', 'gol': 'H2H 3.18 gol, difesa trasferta 4.78/10 — storico e dato stagionale allineati', 'gol_extra': 'Difese 3.55/10 e 4.78/10, xG 3.49 — profili che concedono a vicenda'}
+
+──────────────────────────────────────────────────
+⚽ Lens vs Stade Rennes (Ligue 1)
+   ✅ SEGNO+GOL
+      → 1 (71/100, 3.2⭐)
+      → Over 1.5 (68/100, 3.0⭐)
+      💬 {'segno': 'Indice MAP: 4.93 nel range positivo, classificazione PURO', 'gol': 'xG combinato 2.65, media scontri diretti 2.53 — numeri consistenti'}
+
+──────────────────────────────────────────────────
+⚽ Brest vs Lorient (Ligue 1)
+   ✅ SEGNO+GOL
+      → 1 (65/100, 2.8⭐)
+      → Over 1.5 (66/100, 2.8⭐)
+      💬 {'segno': 'Indice MAP: -1.31, H2H 6.42/10 — storico e statistica allineati', 'gol': 'H2H Over 68% e media 2.57, campionato 2.85 — dati omogenei'}
+
+──────────────────────────────────────────────────
+⚽ FC Nantes vs Olymp. Lione (Ligue 1)
+   ✅ SEGNO+GOL
+      → 2 (77/100, 3.6⭐)
+      → Over 2.5 (64/100, 2.7⭐)
+      💬 {'segno': 'DNA 50/100, Lucifero 23.81/25 — qualità e forma convergono', 'gol': 'xG combinato 3.0, media scontri diretti 2.62 — numeri consistenti'}
+
+──────────────────────────────────────────────────
+⚽ NEC Nijmegen vs Heracles Almelo (Eredivisie)
+   ✅ SEGNO+GOL
+      → 1 (62/100, 2.6⭐)
+      → Over 2.5 (74/100, 3.4⭐)
+      → Goal (74/100, 3.4⭐)
+      💬 {'segno': 'Lucifero 21.03 vs 7.14, trend in crescita per la favorita', 'gol': 'Media lega 3.24, attacchi 11.94/15 e 4.07/15 — potenziale offensivo combinato', 'gol_extra': 'Attacco casa 11.94/15 prolifico, trasferta 4.07/15 reattiva — Goal atteso'}
+
+──────────────────────────────────────────────────
+⚽ PEC Zwolle vs FC Volendam (Eredivisie)
+   ✅ GOL
+      → Over 1.5 (69/100, 3.1⭐)
+      → Goal (69/100, 3.1⭐)
+      💬 {'gol': 'xG combinato 2.7, rendimento offensivo costante per entrambe le formazioni', 'gol_extra': 'Media scontri diretti 2.69 con Goal nel 65% — distribuzione gol bilanciata'}
+
+──────────────────────────────────────────────────
+⚽ FC Twente vs Heerenveen (Eredivisie)
+   ✅ GOL
+      → Over 1.5 (68/100, 3.0⭐)
+      💬 {'gol': 'Difesa trasferta 6.31/10 tra le più permeabili, attacco casa 6.0/15 ne può approfittare'}
+
+──────────────────────────────────────────────────
+⚽ Fortuna Sittard vs Sparta R. (Eredivisie)
+   ✅ GOL
+      → Over 2.5 (69/100, 3.1⭐)
+      💬 {'doppia_chance': "Lucifero 9.52 vs 23.81, la forma c'è ma non schiacciante — 1X a 1.31", 'gol': 'Attacco casa 7.06/15 e trasferta 5.73/15, xG 3.1 — volume atteso elevato'}
+
+──────────────────────────────────────────────────
+⚽ Moreirense vs Gil Vicente (Liga Portugal)
+   ❌ SCARTATA (Segno: 35.7, Gol: 54.8)
+   💣 BOMBA! Moreirense (66.2/100)
+
+──────────────────────────────────────────────────
+⚽ Estrela Amadora vs Santa Clara (Liga Portugal)
+   ❌ SCARTATA (Segno: 30.8, Gol: 66.9)
+
+──────────────────────────────────────────────────
+⚽ Estoril vs Tondela (Liga Portugal)
+   ✅ SEGNO+GOL
+      → 1 (76/100, 3.5⭐)
+      → Over 2.5 (63/100, 2.7⭐)
+      💬 {'segno': 'Lucifero 21.43/25 stabile, MAP 5.76 — continuità nei numeri', 'gol': 'Media lega 2.77, attacchi 9.77/15 e 3.95/15 — potenziale offensivo combinato'}
+
+──────────────────────────────────────────────────
+⚽ Arouca vs Vit. Guimarães (Liga Portugal)
+   ✅ GOL
+      → Over 1.5 (63/100, 2.7⭐)
+      → Goal (63/100, 2.7⭐)
+      💬 {'gol': 'xG combinato 2.66 con media campionato 2.77 — numeri sopra la media', 'gol_extra': 'xG combinato 2.66, nessuna delle due domina difensivamente'}
+
+──────────────────────────────────────────────────
+⚽ Derby vs Ipswich (Championship)
+   ❌ SCARTATA (Segno: 57.7, Gol: 55.9)
+
+──────────────────────────────────────────────────
+⚽ Norwich vs Blackburn (Championship)
+   ❌ SCARTATA (Segno: 50.0, Gol: 58.4)
+
+──────────────────────────────────────────────────
+⚽ Southampton vs Watford (Championship)
+   ✅ SEGNO
+      → 1 (60/100, 2.5⭐)
+      💬 {'segno': 'MAP PURO confermato da Lucifero 14.29/25 e affidabilità B'}
+
+──────────────────────────────────────────────────
+⚽ Birmingham vs Leicester City (Championship)
+   ✅ SEGNO+GOL
+      → 1 (66/100, 2.9⭐)
+      → Over 2.5 (63/100, 2.7⭐)
+      → Goal (63/100, 2.7⭐)
+      💬 {'segno': 'Indice MAP: -2.17, fattore campo 65/7 — struttura statistica solida', 'gol': 'Attacco casa 11.02/15 vs difesa trasferta 3.68/10 — mismatch rilevante', 'gol_extra': 'Difese 5.75/10 e 3.68/10 non dominanti, attacchi presenti — Goal come esito naturale'}
+
+──────────────────────────────────────────────────
+⚽ Coventry City vs Oxford United (Championship)
+   ❌ SCARTATA (Segno: 55.3, Gol: 59.7)
+
+──────────────────────────────────────────────────
+⚽ Hull City vs Bristol City (Championship)
+   ✅ SEGNO
+      → 1 (64/100, 2.7⭐)
+      💬 {'segno': 'DNA 50/100, Lucifero 22.62/25 — qualità e forma convergono'}
+
+──────────────────────────────────────────────────
+⚽ Preston NE vs FC Portsmouth (Championship)
+   ✅ SEGNO
+      → 1 (69/100, 3.0⭐)
+      💬 {'segno': 'Lucifero 5.95/25 con trend crescente, quota 2.15 in fascia ottimale'}
+
+──────────────────────────────────────────────────
+⚽ West Brom vs Stoke City (Championship)
+   ✅ GOL
+      → Under 3.5 (61/100, 2.6⭐)
+      💬 {'gol': 'H2H: Under 2.5 nel 60% degli scontri su 100 precedenti'}
+
+──────────────────────────────────────────────────
+⚽ Wrexham vs Millwall (Championship)
+   ✅ GOL
+      → Over 1.5 (61/100, 2.5⭐)
+      💬 {'doppia_chance': "MAP: NON_BVS ma Lucifero 14.68/25 dell'avversaria non trascurabile — 1X a 1.36", 'gol': 'Media gol lega 2.59, attacco casa 9.47/15 — contesto produttivo'}
+
+──────────────────────────────────────────────────
+⚽ FC Andorra vs Real Sociedad B (LaLiga 2)
+   ✅ GOL
+      → Over 1.5 (62/100, 2.7⭐)
+      → Goal (62/100, 2.7⭐)
+      💬 {'gol': 'H2H Over nel 60% dei casi, media campionato 2.52 a supporto', 'gol_extra': 'xG combinato 2.55, nessuna delle due domina difensivamente'}
+
+──────────────────────────────────────────────────
+⚽ Las Palmas vs Burgos CF (LaLiga 2)
+   ❌ SCARTATA (Segno: 37.3, Gol: 56.8)
+
+──────────────────────────────────────────────────
+⚽ Real Saragozza vs Eibar (LaLiga 2)
+   ❌ SCARTATA (Segno: 38.3, Gol: 59.9)
+
+──────────────────────────────────────────────────
+⚽ Cádiz vs UD Almería (LaLiga 2)
+   ❌ SCARTATA (Segno: 34.1, Gol: 59.9)
+
+──────────────────────────────────────────────────
+⚽ Elversberg vs Hertha BSC (2. Bundesliga)
+   ✅ GOL
+      → Over 1.5 (71/100, 3.2⭐)
+      💬 {'gol': 'xG combinato 2.67, media scontri diretti 3.71 — numeri consistenti'}
+
+──────────────────────────────────────────────────
+⚽ Paderborn vs Norimberga (2. Bundesliga)
+   ❌ SCARTATA (Segno: 59.5, Gol: 58.5)
+
+──────────────────────────────────────────────────
+⚽ Schalke 04 vs Dynamo Dresda (2. Bundesliga)
+   ✅ SEGNO
+      → 1 (62/100, 2.6⭐)
+      💬 {'segno': 'Lucifero stabile sopra 7.14 nelle ultime giornate, continuità di rendimento'}
+
+──────────────────────────────────────────────────
+⚽ Darmstadt vs 1.FC K'lautern (2. Bundesliga)
+   ✅ SEGNO
+      → 1 (68/100, 3.0⭐)
+      💬 {'segno': 'Indice MAP: 5.72 con Lucifero 14.68/25, dati convergenti'}
+
+──────────────────────────────────────────────────
+⚽ Le Mans FC vs Stade Lavallois (Ligue 2)
+   ✅ SEGNO+GOL
+      → 1 (67/100, 2.9⭐)
+      → Under 2.5 (68/100, 3.0⭐)
+      💬 {'segno': 'Quota 1.65 con classificazione MAP: PURO — il mercato conferma i dati', 'gol': 'xG combinato 1.68, entrambe sotto la media offensiva del campionato'}
+
+──────────────────────────────────────────────────
+⚽ AS Nancy vs Troyes (Ligue 2)
+   ✅ GOL
+      → Under 2.5 (63/100, 2.7⭐)
+      💬 {'gol': 'Attacco casa 4.21/15, attacco trasferta 7.06/15 — volumi offensivi ridotti'}
+
+──────────────────────────────────────────────────
+⚽ Saint-Étienne vs Montpellier (Ligue 2)
+   ❌ SCARTATA (Segno: 36.3, Gol: 56.6)
+
+──────────────────────────────────────────────────
+⚽ Zulte Waregem vs FCV Dender EH (Jupiler Pro League)
+   ❌ SCARTATA (Segno: 29.6, Gol: 54.7)
+
+──────────────────────────────────────────────────
+⚽ R Charleroi SC vs Cercle Bruges (Jupiler Pro League)
+   ✅ GOL
+      → Under 2.5 (65/100, 2.8⭐)
+      💬 {'gol': 'Attacco casa 6.47/15, attacco trasferta 6.58/15 — volumi offensivi ridotti'}
+
+──────────────────────────────────────────────────
+⚽ KAA Gent vs OH Leuven (Jupiler Pro League)
+   ❌ SCARTATA (Segno: 38.8, Gol: 52.8)
+
+──────────────────────────────────────────────────
+⚽ Karagümrük vs Antalyaspor (Süper Lig)
+   ✅ GOL
+      → Under 3.5 (64/100, 2.8⭐)
+      💬 {'gol': "Difesa casa 3.11/10, attacco trasferta 4.52/15 — confronto sfavorevole all'Over"}
+
+──────────────────────────────────────────────────
+⚽ Samsunspor vs Trabzonspor (Süper Lig)
+   ✅ GOL
+      → Over 1.5 (62/100, 2.6⭐)
+      → Goal (62/100, 2.6⭐)
+      💬 {'gol': 'H2H Over 85% su 66 precedenti — percentuale significativa', 'gol_extra': 'H2H Goal nel 70% su 66 precedenti, dato statisticamente significativo'}
+
+──────────────────────────────────────────────────
+⚽ River Plate vs Tigre (Primera División)
+   ✅ GOL
+      → Under 2.5 (68/100, 3.0⭐)
+      💬 {'gol': 'Difesa casa 5.0/10 e trasferta 5.0/10 — doppia solidità difensiva'}
+
+──────────────────────────────────────────────────
+⚽ Central Córdoba vs Unión Santa Fe (Primera División)
+   ✅ GOL
+      → Under 2.5 (67/100, 3.0⭐)
+      → NoGoal (67/100, 3.0⭐)
+      💬 {'gol': "Difesa casa 5.0/10, attacco trasferta 7.5/15 — confronto sfavorevole all'Over", 'gol_extra': 'Attacco trasferta 7.5/15 tra i meno prolifici, difesa casa 5.0/10 solida'}
+
+──────────────────────────────────────────────────
+⚽ Aldosivi vs Rosario Central (Primera División)
+   ✅ GOL
+      → Under 2.5 (73/100, 3.3⭐)
+      💬 {'doppia_chance': 'Quota segno 2.38, X2 a 1.35 — rapporto rischio/copertura favorevole', 'gol': 'Difesa casa 5.0/10 e trasferta 5.0/10 — doppia solidità difensiva'}
+
+──────────────────────────────────────────────────
+⚽ Racing vs Argentinos Jrs. (Primera División)
+   ✅ SEGNO+GOL
+      → 1 (67/100, 2.9⭐)
+      → Under 2.5 (65/100, 2.8⭐)
+      → NoGoal (65/100, 2.8⭐)
+      💬 {'segno': 'Motivazione 10/15, zona classifica rilevante per la favorita', 'gol': 'Media scontri diretti 2.33 gol, campionato con media 1.88', 'gol_extra': 'Difesa casa 4.31/10 tra le migliori, attacco trasferta 7.5/15 sotto la media'}
+
+======================================================================
+✅ COMPLETATO!
+   📊 Partite analizzate: 79
+   ✅ Pronostici salvati: 53
+   ❌ Scartate: 26
+   📅 Data: 2026-02-07
+======================================================================
+
+   💣 Bombe salvate: 1
+
+======================================================================
+📅 ELABORAZIONE: 2026-02-08
+======================================================================
+
+======================================================================
+🔮 DAILY PREDICTIONS - 2026-02-08
+======================================================================
+
+📅 Trovate 65 partite per 2026-02-08
+
+──────────────────────────────────────────────────
+⚽ Bologna vs Parma (Serie A)
+   ✅ GOL
+      → Under 3.5 (65/100, 2.8⭐)
+      💬 {'gol': 'H2H 2.04 gol, difesa casa 6.02/10 — solidità confermata dai precedenti'}
+
+──────────────────────────────────────────────────
+⚽ Lecce vs Udinese (Serie A)
+   ❌ SCARTATA (Segno: 57.0, Gol: 51.1)
+
+──────────────────────────────────────────────────
+⚽ Sassuolo vs Inter (Serie A)
+   ❌ SCARTATA (Segno: 51.2, Gol: 58.0)
+
+──────────────────────────────────────────────────
+⚽ Juventus vs Lazio (Serie A)
+   ✅ SEGNO+GOL
+      → 1 (67/100, 2.9⭐)
+      → Under 2.5 (61/100, 2.6⭐)
+      💬 {'segno': 'Lucifero 19.44 vs 13.49 con trend positivo nelle ultime 3 uscite', 'gol': 'H2H Under 50% su 100 precedenti, media 2.48 — dato robusto'}
+
+──────────────────────────────────────────────────
+⚽ Monza vs Avellino (Serie B)
+   ✅ SEGNO
+      → 1 (65/100, 2.8⭐)
+      💬 {'segno': 'Affidabilità B, motivazione 6.16/15 — fattori extra-campo a supporto'}
+
+──────────────────────────────────────────────────
+⚽ Triestina vs Inter U23 (Serie C - Girone A)
+   ❌ SCARTATA (Segno: 38.0, Gol: 55.5)
+
+──────────────────────────────────────────────────
+⚽ AlbinoLeffe vs Pro Patria (Serie C - Girone A)
+   ❌ SCARTATA (Segno: 39.8, Gol: 57.0)
+
+──────────────────────────────────────────────────
+⚽ Lecco vs Pro Vercelli (Serie C - Girone A)
+   ❌ SCARTATA (Segno: 32.1, Gol: 57.7)
+
+──────────────────────────────────────────────────
+⚽ Ospitaletto vs Renate (Serie C - Girone A)
+   ✅ GOL
+      → Under 2.5 (63/100, 2.7⭐)
+      💬 {'gol': 'DNA difensivo 50/100 e 50/100 — qualità tecnica in fase di non possesso'}
+
+──────────────────────────────────────────────────
+⚽ Vicenza vs Dolomiti (Serie C - Girone A)
+   ✅ GOL
+      → Over 2.5 (64/100, 2.7⭐)
+      → Goal (64/100, 2.7⭐)
+      💬 {'gol': 'H2H su 2 precedenti con 1.5 gol medi — dato consolidato nel tempo', 'gol_extra': 'Attacchi 13.28/15 e 7.2/15, DNA offensivi 50/100 e 50/100'}
+
+──────────────────────────────────────────────────
+⚽ Torres vs Juve Next Gen (Serie C - Girone B)
+   ❌ SCARTATA (Segno: 33.1, Gol: 55.6)
+
+──────────────────────────────────────────────────
+⚽ Pontedera vs Ternana (Serie C - Girone B)
+   ❌ SCARTATA (Segno: 33.9, Gol: 50.7)
+
+──────────────────────────────────────────────────
+⚽ Gubbio vs Campobasso (Serie C - Girone B)
+   ❌ SCARTATA (Segno: 33.9, Gol: 56.0)
+
+──────────────────────────────────────────────────
+⚽ Sambenedettese vs Perugia (Serie C - Girone B)
+   ✅ GOL
+      → Under 3.5 (62/100, 2.6⭐)
+      💬 {'gol': "Difesa casa 5.25/10, attacco trasferta 7.13/15 — confronto sfavorevole all'Over"}
+
+──────────────────────────────────────────────────
+⚽ Pineto vs Ascoli (Serie C - Girone B)
+   ❌ SCARTATA (Segno: 33.2, Gol: 50.7)
+
+──────────────────────────────────────────────────
+⚽ Livorno vs Bra (Serie C - Girone B)
+   ❌ SCARTATA (Segno: 36.6, Gol: 59.0)
+
+──────────────────────────────────────────────────
+⚽ Arezzo vs Pianese (Serie C - Girone B)
+   ✅ GOL
+      → Under 2.5 (68/100, 3.0⭐)
+      💬 {'gol': 'Media lega 2.24 tra le più basse, contesto campionato difensivo'}
+
+──────────────────────────────────────────────────
+⚽ Vis Pesaro vs Forlì (Serie C - Girone B)
+   ✅ GOL
+      → Under 3.5 (64/100, 2.7⭐)
+      → NoGoal (64/100, 2.7⭐)
+      💬 {'gol': 'H2H Under 83% su 19 gare — campione ampio e coerente', 'gol_extra': 'H2H NoGoal 72%, media 1.58 — una squadra resta spesso a secco'}
+
+──────────────────────────────────────────────────
+⚽ Brighton vs Crystal Palace (Premier League)
+   ✅ GOL
+      → Over 1.5 (67/100, 2.9⭐)
+      → Goal (67/100, 2.9⭐)
+      💬 {'gol': 'Attacco 8.59/15 vs difesa 6.24/10, media lega 2.79 — tutto indica volume', 'gol_extra': 'Difesa trasferta 6.24/10 vulnerabile, ma anche difesa casa 5.39/10 concede'}
+
+──────────────────────────────────────────────────
+⚽ Liverpool vs Man City (Premier League)
+   ✅ GOL
+      → Over 1.5 (62/100, 2.6⭐)
+      → Goal (62/100, 2.6⭐)
+      💬 {'doppia_chance': 'MAP: NON_BVS con quota 2.3, X2 a 1.4 bilancia il rischio', 'gol': 'Attacco casa 6.94/15 e trasferta 10.28/15, xG 2.79 — volume atteso elevato', 'gol_extra': 'H2H Goal 68%, campionato con media 2.79 — contesto favorevole'}
+
+──────────────────────────────────────────────────
+⚽ Alavés vs Getafe CF (La Liga)
+   ❌ SCARTATA (Segno: 48.8, Gol: 59.5)
+
+──────────────────────────────────────────────────
+⚽ Athletic Club vs Levante (La Liga)
+   ✅ GOL
+      → Over 1.5 (61/100, 2.5⭐)
+      → Goal (61/100, 2.5⭐)
+      💬 {'gol': 'Media lega 2.62, attacchi 5.07/15 e 8.0/15 — potenziale offensivo combinato', 'gol_extra': 'H2H Goal nel 58% su 38 precedenti, dato statisticamente significativo'}
+
+──────────────────────────────────────────────────
+⚽ Atlético vs Real Betis (La Liga)
+   ✅ SEGNO
+      → 1 (64/100, 2.7⭐)
+      💬 {'segno': 'Quota 1.62 sostenuta da un indice MAP di 1.04 — valore presente'}
+
+──────────────────────────────────────────────────
+⚽ Valencia vs Real Madrid (La Liga)
+   ✅ GOL
+      → Over 1.5 (64/100, 2.7⭐)
+      → Goal (64/100, 2.7⭐)
+      💬 {'gol': 'Media gol scontri diretti 3.08, xG combinato 2.68', 'gol_extra': 'xG distribuito: casa produce e trasferta risponde, media scontri 3.08'}
+
+──────────────────────────────────────────────────
+⚽ Colonia vs Lipsia (Bundesliga)
+   ✅ SEGNO+GOL
+      → 2 (63/100, 2.7⭐)
+      → X2 (63/100, 2.7⭐)
+      → Over 2.5 (72/100, 3.3⭐)
+      → Goal (72/100, 3.3⭐)
+      💬 {'segno': 'H2H 6.74 vs 4.8 su 16 precedenti — tendenza consolidata', 'doppia_chance': 'Indice MAP: 3.33, trend Lucifero stabile — X2 a 1.36 come compromesso ottimale', 'gol': 'DNA offensivo casa 50/100, trasferta 50/100 — qualità tecnica in avanti', 'gol_extra': 'Attacco casa 7.89/15 prolifico, trasferta 7.04/15 reattiva — Goal atteso'}
+
+──────────────────────────────────────────────────
+⚽ Bayern vs Hoffenheim (Bundesliga)
+   ✅ GOL
+      → Over 2.5 (70/100, 3.1⭐)
+      → Goal (70/100, 3.1⭐)
+      💬 {'gol': 'Attacco casa 15.0/15 e trasferta 8.96/15, xG 3.9 — volume atteso elevato', 'gol_extra': 'xG distribuito: casa produce e trasferta risponde, media scontri 3.46'}
+
+──────────────────────────────────────────────────
+⚽ Nizza vs Monaco (Ligue 1)
+   ✅ GOL
+      → Over 1.5 (66/100, 2.8⭐)
+      → Goal (66/100, 2.8⭐)
+      💬 {'doppia_chance': "MAP: NON_BVS, DNA 50/100 — indicazione c'è, X2 a 1.33 la consolida", 'gol': 'Media lega 2.85, DNA offensivi 50/100 e 50/100 — contesto produttivo', 'gol_extra': 'H2H Goal 60%, campionato con media 2.85 — contesto favorevole'}
+
+──────────────────────────────────────────────────
+⚽ Le Havre vs Strasburgo (Ligue 1)
+   ❌ SCARTATA (Segno: 40.9, Gol: 67.9)
+
+──────────────────────────────────────────────────
+⚽ AJ Auxerre vs Paris FC (Ligue 1)
+   ✅ GOL
+      → Over 1.5 (69/100, 3.1⭐)
+      💬 {'doppia_chance': "Affidabilità B stagionale, H2H 5.92/10 — 1X consolida l'indicazione", 'gol': 'H2H su 23 precedenti con 2.04 gol medi — dato consolidato nel tempo'}
+
+──────────────────────────────────────────────────
+⚽ Angers SCO vs Tolosa (Ligue 1)
+   ❌ SCARTATA (Segno: 41.7, Gol: 58.7)
+
+──────────────────────────────────────────────────
+⚽ PSG vs Marsiglia (Ligue 1)
+   ✅ GOL
+      → Over 2.5 (69/100, 3.1⭐)
+      → NoGoal (69/100, 3.1⭐)
+      💬 {'gol': 'DNA offensivo casa 50/100, trasferta 50/100 — qualità tecnica in avanti', 'gol_extra': 'H2H NoGoal 68%, xG 2.94 — i dati convergono su una porta inviolata'}
+
+──────────────────────────────────────────────────
+⚽ FC Utrecht vs Feyenoord (Eredivisie)
+   ✅ GOL
+      → Over 2.5 (64/100, 2.7⭐)
+      → Goal (64/100, 2.7⭐)
+      💬 {'gol': 'xG combinato 3.2 in un campionato con media 3.24 — aspettativa alta', 'gol_extra': 'Difesa trasferta 6.62/10 vulnerabile, ma anche difesa casa 6.6/10 concede'}
+
+──────────────────────────────────────────────────
+⚽ AZ Alkmaar vs Ajax (Eredivisie)
+   ✅ GOL
+      → Over 2.5 (70/100, 3.1⭐)
+      → NoGoal (70/100, 3.1⭐)
+      💬 {'doppia_chance': 'Motivazione 6.0/15, contesto favorevole ma avversaria in ripresa — 1X a 1.36', 'gol': 'Attacco casa 9.86/15 in crescita nelle ultime giornate, xG 4.05', 'gol_extra': 'H2H: almeno una porta inviolata nel 70% degli scontri recenti'}
+
+──────────────────────────────────────────────────
+⚽ Go Ahead Eagles vs Telstar (Eredivisie)
+   ✅ GOL
+      → Over 1.5 (71/100, 3.2⭐)
+      → Goal (71/100, 3.2⭐)
+      💬 {'gol': 'Attacco casa 6.92/15 e trasferta 3.96/15, xG 2.6 — volume atteso elevato', 'gol_extra': 'Difesa casa 5.47/10 e trasferta 6.92/10 — entrambe concedono occasioni'}
+
+──────────────────────────────────────────────────
+⚽ FC Groningen vs PSV (Eredivisie)
+   ✅ SEGNO+GOL
+      → 2 (64/100, 2.7⭐)
+      → Over 2.5 (64/100, 2.7⭐)
+      💬 {'segno': 'MAP: SEMI, rendimento Lucifero 21.03/25 nelle ultime 6 gare', 'gol': 'DNA offensivo casa 50/100, trasferta 50/100 — qualità tecnica in avanti'}
+
+──────────────────────────────────────────────────
+⚽ Nacional vs Casa Pia (Liga Portugal)
+   ✅ GOL
+      → Over 2.5 (65/100, 2.8⭐)
+      💬 {'gol': 'xG combinato 3.33 con media campionato 2.77 — numeri sopra la media'}
+
+──────────────────────────────────────────────────
+⚽ SC Braga vs Rio Ave (Liga Portugal)
+   ❌ SCARTATA (Segno: 39.9, Gol: 58.0)
+
+──────────────────────────────────────────────────
+⚽ Benfica vs Alverca (Liga Portugal)
+   ✅ GOL
+      → Over 2.5 (68/100, 3.0⭐)
+      → Goal (68/100, 3.0⭐)
+      💬 {'gol': 'Attacco trasferta 7.41/15 tra i più attivi, H2H con media 3.08', 'gol_extra': 'H2H: 64% entrambe a segno, xG 3.11 — aspettativa bilanciata'}
+
+──────────────────────────────────────────────────
+⚽ Swansea City vs Sheff Wed (Championship)
+   ✅ GOL
+      → Under 3.5 (62/100, 2.6⭐)
+      → NoGoal (62/100, 2.6⭐)
+      💬 {'gol': 'Difesa casa 4.84/10 tra le migliori del campionato, xG combinato 2.61', 'gol_extra': 'H2H NoGoal nel 65% su 24 gare — dato statisticamente robusto'}
+
+──────────────────────────────────────────────────
+⚽ Real Valladolid vs Castellón (LaLiga 2)
+   ✅ GOL
+      → Under 2.5 (67/100, 2.9⭐)
+      💬 {'gol': 'H2H Under 75% con media 2.28 — dato storico coerente'}
+
+──────────────────────────────────────────────────
+⚽ AD Ceuta vs Córdoba CF (LaLiga 2)
+   ❌ SCARTATA (Segno: 40.5, Gol: 58.4)
+   💣 BOMBA! Córdoba CF (66.2/100)
+
+──────────────────────────────────────────────────
+⚽ Dep. La Coruña vs Albacete (LaLiga 2)
+   ❌ SCARTATA (Segno: 35.7, Gol: 57.6)
+
+──────────────────────────────────────────────────
+⚽ Sporting Gijón vs SD Huesca (LaLiga 2)
+   ❌ SCARTATA (Segno: 33.0, Gol: 58.5)
+
+──────────────────────────────────────────────────
+⚽ Málaga CF vs CyD Leonesa (LaLiga 2)
+   ✅ GOL
+      → Over 2.5 (60/100, 2.5⭐)
+      → NoGoal (60/100, 2.5⭐)
+      💬 {'gol': 'Media lega 2.52 tra le più alte, contesto campionato favorevole ai gol', 'gol_extra': 'H2H su 2 precedenti: NoGoal 100%, dato ricorrente'}
+
+──────────────────────────────────────────────────
+⚽ Karlsruher SC vs Düsseldorf (2. Bundesliga)
+   ❌ SCARTATA (Segno: 34.3, Gol: 59.6)
+
+──────────────────────────────────────────────────
+⚽ Hannover 96 vs Holstein Kiel (2. Bundesliga)
+   ✅ SEGNO+GOL
+      → 1 (66/100, 2.9⭐)
+      → Over 2.5 (71/100, 3.2⭐)
+      → Goal (71/100, 3.2⭐)
+      💬 {'segno': 'Fattore campo 59/7 combinato con Lucifero 14.29/25 — doppia conferma', 'gol': 'Attacco trasferta 6.91/15 vs difesa casa 4.82/10, anche il secondo confronto è sbilanciato', 'gol_extra': 'Media gol scontri 3.3, Goal nel 55% — storico a supporto'}
+
+──────────────────────────────────────────────────
+⚽ Arm. Bielefeld vs E. Braunschweig (2. Bundesliga)
+   ❌ SCARTATA (Segno: 57.5, Gol: 58.3)
+   💣 BOMBA! E. Braunschweig (67.8/100)
+
+──────────────────────────────────────────────────
+⚽ Nordsjaelland vs Sönderjyske (Superligaen)
+   ✅ GOL
+      → Over 2.5 (73/100, 3.3⭐)
+      → Goal (73/100, 3.3⭐)
+      💬 {'gol': 'Media gol scontri diretti 3.04, xG combinato 3.11', 'gol_extra': 'Difese 6.25/10 e 5.21/10 sotto la media, attacchi entrambi produttivi'}
+
+──────────────────────────────────────────────────
+⚽ Silkeborg IF vs Viborg FF (Superligaen)
+   ✅ SEGNO+GOL
+      → 2 (61/100, 2.6⭐)
+      → X2 (61/100, 2.6⭐)
+      → Over 1.5 (67/100, 3.0⭐)
+      → Goal (67/100, 3.0⭐)
+      💬 {'segno': 'Lucifero 15.48/25 e DNA 50/100 — forma e qualità tecnica allineate', 'doppia_chance': 'Lucifero 15.48/25 buono, trend avversaria in ripresa — X2 a 1.44 come cautela', 'gol': 'Difesa trasferta 6.49/10 tra le più permeabili, attacco casa 4.79/15 ne può approfittare', 'gol_extra': 'Difesa trasferta 6.49/10 vulnerabile, ma anche difesa casa 5.12/10 concede'}
+
+──────────────────────────────────────────────────
+⚽ FC Midtjylland vs Copenhagen (Superligaen)
+   ✅ GOL
+      → Over 2.5 (73/100, 3.3⭐)
+      💬 {'gol': 'Media gol scontri diretti 2.93 su 88 gare — campione statistico ampio'}
+
+──────────────────────────────────────────────────
+⚽ Bröndby IF vs Randers FC (Superligaen)
+   ✅ GOL
+      → Over 2.5 (71/100, 3.2⭐)
+      → Goal (71/100, 3.2⭐)
+      💬 {'gol': 'Difesa casa 4.75/10 e trasferta 6.17/10 — entrambe sotto la media difensiva', 'gol_extra': 'xG 3.0 distribuito su entrambe, difese 4.75/10 e 6.17/10 permeabili'}
+
+──────────────────────────────────────────────────
+⚽ KRC Genk vs RSC Anderlecht (Jupiler Pro League)
+   ❌ SCARTATA (Segno: 35.0, Gol: 55.0)
+
+──────────────────────────────────────────────────
+⚽ Union SG vs La Louvière (Jupiler Pro League)
+   ❌ SCARTATA (Segno: 38.6, Gol: 58.2)
+
+──────────────────────────────────────────────────
+⚽ Club Bruges vs Standard Liegi (Jupiler Pro League)
+   ✅ GOL
+      → Over 1.5 (60/100, 2.5⭐)
+      → Goal (60/100, 2.5⭐)
+      💬 {'gol': 'Attacco casa 10.25/15 in crescita nelle ultime giornate, xG 2.68', 'gol_extra': 'xG distribuito: casa produce e trasferta risponde, media scontri 2.76'}
+
+──────────────────────────────────────────────────
+⚽ KV Mechelen vs Anversa (Jupiler Pro League)
+   ✅ GOL
+      → Under 2.5 (64/100, 2.7⭐)
+      💬 {'gol': 'Media lega 2.52, xG combinato 1.91 — contesto non favorevole ai gol'}
+
+──────────────────────────────────────────────────
+⚽ Eyüpspor vs Basaksehir (Süper Lig)
+   ❌ SCARTATA (Segno: 37.3, Gol: 52.1)
+
+──────────────────────────────────────────────────
+⚽ Konyaspor vs Göztepe (Süper Lig)
+   ✅ GOL
+      → Under 3.5 (61/100, 2.5⭐)
+      💬 {'gol': "DNA difensivo combinato superiore all'offensivo — struttura tecnica orientata alla fase difensiva"}
+
+──────────────────────────────────────────────────
+⚽ C. Rizespor vs Galatasaray (Süper Lig)
+   ❌ SCARTATA (Segno: 42.5, Gol: 58.6)
+   💣 BOMBA! Galatasaray (66.2/100)
+
+──────────────────────────────────────────────────
+⚽ Besiktas vs Alanyaspor (Süper Lig)
+   ❌ SCARTATA (Segno: 40.2, Gol: 55.4)
+
+──────────────────────────────────────────────────
+⚽ Bohemians vs St. Pat's (League of Ireland Premier Division)
+   ❌ SCARTATA (Segno: 30.0, Gol: 60.2)
+
+──────────────────────────────────────────────────
+⚽ Newell's vs Defensa (Primera División)
+   ✅ GOL
+      → Under 2.5 (77/100, 3.6⭐)
+      → NoGoal (77/100, 3.6⭐)
+      💬 {'doppia_chance': 'MAP 0, segnali presenti ma non unanimi — 1X a 1.34 consigliata', 'gol': 'Media gol scontri diretti 1.47, tendenza Under consolidata', 'gol_extra': 'Attacco trasferta 7.5/15 con produzione ridotta fuori casa, difesa interna 5.0/10'}
+
+──────────────────────────────────────────────────
+⚽ Belgrano vs Banfield (Primera División)
+   ✅ GOL
+      → Under 2.5 (73/100, 3.3⭐)
+      💬 {'gol': 'Attacco casa 7.5/15 sotto la media, difesa trasferta 5.0/10 solida'}
+
+──────────────────────────────────────────────────
+⚽ Platense vs Independiente (Primera División)
+   ✅ GOL
+      → Over 1.5 (69/100, 3.0⭐)
+      → Goal (69/100, 3.0⭐)
+      💬 {'gol': 'xG combinato 2.5, entrambe sopra la media del campionato', 'gol_extra': 'Difese 5.0/10 e 5.0/10 sotto la media, attacchi entrambi produttivi'}
+
+──────────────────────────────────────────────────
+⚽ Sarmiento Junín vs Atl. Tucumán (Primera División)
+   ✅ GOL
+      → Under 2.5 (67/100, 2.9⭐)
+      → NoGoal (67/100, 2.9⭐)
+      💬 {'gol': 'Difesa trasferta 5.0/10 resistente, attacco casa 7.5/15 non prolifico', 'gol_extra': 'Difesa 5.0/10 impenetrabile in casa, xG avversario sotto la media'}
+
+──────────────────────────────────────────────────
+⚽ Huracán vs San Lorenzo (Primera División)
+   ✅ GOL
+      → Under 2.5 (75/100, 3.4⭐)
+      → NoGoal (75/100, 3.4⭐)
+      💬 {'gol': 'Difese 5.0/10 e 5.0/10, entrambe sopra la media difensiva', 'gol_extra': 'xG 2.0 sbilanciato, la squadra in difficoltà offensiva non produce abbastanza'}
+
+======================================================================
+✅ COMPLETATO!
+   📊 Partite analizzate: 65
+   ✅ Pronostici salvati: 40
+   ❌ Scartate: 25
+   📅 Data: 2026-02-08
+======================================================================
+
+   💣 Bombe salvate: 3
+
+======================================================================
+📅 ELABORAZIONE: 2026-02-09
+======================================================================
+
+======================================================================
+🔮 DAILY PREDICTIONS - 2026-02-09
+======================================================================
+
+📅 Trovate 17 partite per 2026-02-09
+
+──────────────────────────────────────────────────
+⚽ Atalanta vs Cremonese (Serie A)
+   ✅ GOL
+      → Under 3.5 (62/100, 2.6⭐)
+      💬 {'gol': 'Media lega 2.4, xG combinato 2.17 — contesto non favorevole ai gol'}
+
+──────────────────────────────────────────────────
+⚽ Roma vs Cagliari (Serie A)
+   ❌ SCARTATA (Segno: 42.9, Gol: 49.6)
+
+──────────────────────────────────────────────────
+⚽ Villarreal vs Espanyol (La Liga)
+   ✅ GOL
+      → Over 1.5 (63/100, 2.7⭐)
+      → Goal (63/100, 2.7⭐)
+      💬 {'gol': 'H2H: 2.36 gol di media su 56 precedenti, tendenza consolidata', 'gol_extra': 'Difese 6.84/10 e 7.0/10, xG 2.6 — profili che concedono a vicenda'}
+
+──────────────────────────────────────────────────
+⚽ Famalicão vs Avs FS (Liga Portugal)
+   ✅ GOL
+      → Over 2.5 (66/100, 2.9⭐)
+      💬 {'gol': 'Media gol scontri diretti 2.75 su 4 gare — campione statistico ampio'}
+
+──────────────────────────────────────────────────
+⚽ FC Porto vs Sporting (Liga Portugal)
+   ✅ GOL
+      → Over 1.5 (63/100, 2.7⭐)
+      → Goal (63/100, 2.7⭐)
+      💬 {'doppia_chance': 'Fattore campo 98/7 rilevante ma rendimento trasferta avversario non negativo — 1X', 'gol': 'Attacco trasferta 13.17/15 vs difesa casa 9.01/10, anche il secondo confronto è sbilanciato', 'gol_extra': 'Difesa casa 9.01/10, attacco trasferta 13.17/15 — la trasfertante ha le armi per segnare'}
+
+──────────────────────────────────────────────────
+⚽ Sheff Utd vs Middlesbrough (Championship)
+   ❌ SCARTATA (Segno: 43.3, Gol: 59.4)
+   💣 BOMBA! Middlesbrough (75.5/100)
+
+──────────────────────────────────────────────────
+⚽ Racing vs Mirandés (LaLiga 2)
+   ✅ GOL
+      → Over 2.5 (65/100, 2.8⭐)
+      💬 {'gol': "Attacco casa 12.45/15, media campionato 2.52 — fattori convergenti sull'Over"}
+
+──────────────────────────────────────────────────
+⚽ Amiens vs Clermont Foot (Ligue 2)
+   ✅ GOL
+      → Under 3.5 (63/100, 2.7⭐)
+      💬 {'gol': 'Difesa casa 3.96/10 e trasferta 4.77/10 — doppia solidità difensiva'}
+
+──────────────────────────────────────────────────
+⚽ Vejle BK vs FC Fredericia (Superligaen)
+   ✅ GOL
+      → Over 2.5 (68/100, 3.0⭐)
+      💬 {'gol': 'H2H: 35% Over, 2.18 gol medi su 28 gare — base statistica solida'}
+
+──────────────────────────────────────────────────
+⚽ Kayserispor vs Kocaelispor (Süper Lig)
+   ❌ SCARTATA (Segno: 30.3, Gol: 56.7)
+
+──────────────────────────────────────────────────
+⚽ Gaziantep FK vs Kasimpasa (Süper Lig)
+   ✅ GOL
+      → Over 1.5 (63/100, 2.7⭐)
+      → Goal (63/100, 2.7⭐)
+      💬 {'gol': 'xG combinato 2.7, rendimento offensivo costante per entrambe le formazioni', 'gol_extra': 'xG 2.7 distribuito equamente, difese permeabili da entrambi i lati'}
+
+──────────────────────────────────────────────────
+⚽ Fenerbahce vs Genclerbirligi (Süper Lig)
+   ✅ GOL
+      → Over 1.5 (62/100, 2.6⭐)
+      → Goal (62/100, 2.6⭐)
+      💬 {'gol': 'Attacco casa 13.6/15 in crescita nelle ultime giornate, xG 2.66', 'gol_extra': 'Difese 6.61/10 e 4.91/10 sotto la media, attacchi entrambi produttivi'}
+
+──────────────────────────────────────────────────
+⚽ Gimnasia (M) vs Instituto ACC (Primera División)
+   ✅ GOL
+      → Under 3.5 (61/100, 2.6⭐)
+      💬 {'gol': 'xG combinato 2.5, entrambe sotto la media offensiva del campionato'}
+
+──────────────────────────────────────────────────
+⚽ Vélez Sarsfield vs Boca Juniors (Primera División)
+   ❌ SCARTATA (Segno: 36.4, Gol: 71.1)
+
+──────────────────────────────────────────────────
+⚽ Barracas C. vs Gimnasia (Primera División)
+   ✅ GOL
+      → Under 2.5 (71/100, 3.2⭐)
+      💬 {'doppia_chance': 'Avversaria con affidabilità C in trasferta, dato da considerare — 1X a 1.35', 'gol': 'H2H Under 71% con media 1.75 — dato storico coerente'}
+
+──────────────────────────────────────────────────
+⚽ Lanús vs CA Talleres (Primera División)
+   ❌ SCARTATA (Segno: 55.0, Gol: 69.6)
+
+──────────────────────────────────────────────────
+⚽ Estudiantes LP vs Dep. Riestra (Primera División)
+   ❌ SCARTATA (Segno: 51.6, Gol: 58.9)
+
+======================================================================
+✅ COMPLETATO!
+   📊 Partite analizzate: 17
+   ✅ Pronostici salvati: 11
+   ❌ Scartate: 6
+   📅 Data: 2026-02-09
+======================================================================
+
+   💣 Bombe salvate: 1
+
+======================================================================
+📅 ELABORAZIONE: 2026-02-10
+======================================================================
+
+======================================================================
+🔮 DAILY PREDICTIONS - 2026-02-10
+======================================================================
+
+📅 Trovate 24 partite per 2026-02-10
+
+──────────────────────────────────────────────────
+⚽ Sampdoria vs Palermo (Serie B)
+   ❌ SCARTATA (Segno: 32.7, Gol: 55.6)
+
+──────────────────────────────────────────────────
+⚽ Padova vs Carrarese (Serie B)
+   ✅ GOL
+      → Over 2.5 (64/100, 2.8⭐)
+      → NoGoal (64/100, 2.8⭐)
+      💬 {'gol': 'Attacco trasferta 10.0/15 tra i più attivi, H2H con media 2.18', 'gol_extra': 'Difesa casa 3.81/10, H2H NoGoal 69% — solidità confermata nei precedenti'}
+
+──────────────────────────────────────────────────
+⚽ Pescara vs Catanzaro (Serie B)
+   ❌ SCARTATA (Segno: 27.9, Gol: 58.2)
+
+──────────────────────────────────────────────────
+⚽ Reggiana vs Mantova (Serie B)
+   ✅ GOL
+      → Under 3.5 (64/100, 2.8⭐)
+      💬 {'gol': 'Media campionato 2.45, xG 2.27, H2H 1.79 — tripla conferma Under'}
+
+──────────────────────────────────────────────────
+⚽ Venezia vs Modena (Serie B)
+   ❌ SCARTATA (Segno: 40.2, Gol: 51.1)
+
+──────────────────────────────────────────────────
+⚽ Virtus Entella vs Cesena (Serie B)
+   ❌ SCARTATA (Segno: 28.7, Gol: 58.2)
+
+──────────────────────────────────────────────────
+⚽ Trapani vs Benevento (Serie C - Girone C)
+   ✅ GOL
+      → Under 3.5 (67/100, 2.9⭐)
+      → NoGoal (67/100, 2.9⭐)
+      💬 {'gol': 'H2H 1.69 gol, difesa casa 6.72/10 — solidità confermata dai precedenti', 'gol_extra': 'H2H: NoGoal nel 70% degli scontri su 29 precedenti'}
+
+──────────────────────────────────────────────────
+⚽ Sorrento vs Giugliano (Serie C - Girone C)
+   ❌ SCARTATA (Segno: 34.0, Gol: 53.2)
+
+──────────────────────────────────────────────────
+⚽ Team Altamura vs Latina (Serie C - Girone C)
+   ❌ SCARTATA (Segno: 34.4, Gol: 57.9)
+
+──────────────────────────────────────────────────
+⚽ Cavese vs Monopoli (Serie C - Girone C)
+   ✅ GOL
+      → Under 3.5 (62/100, 2.6⭐)
+      💬 {'gol': 'xG combinato 2.13, H2H Under 79% — aspettativa e storico concordi'}
+
+──────────────────────────────────────────────────
+⚽ Catania vs Cerignola (Serie C - Girone C)
+   ❌ SCARTATA (Segno: 33.3, Gol: 52.6)
+
+──────────────────────────────────────────────────
+⚽ Foggia vs Picerno (Serie C - Girone C)
+   ❌ SCARTATA (Segno: 37.7, Gol: 58.4)
+
+──────────────────────────────────────────────────
+⚽ Salernitana vs Casarano (Serie C - Girone C)
+   ✅ GOL
+      → Over 2.5 (67/100, 2.9⭐)
+      💬 {'gol': 'xG combinato 3.04, H2H Over 20% — aspettativa e storico concordi'}
+
+──────────────────────────────────────────────────
+⚽ Casertana vs Crotone (Serie C - Girone C)
+   ❌ SCARTATA (Segno: 39.4, Gol: 58.5)
+
+──────────────────────────────────────────────────
+⚽ Atalanta U23 vs Potenza (Serie C - Girone C)
+   ✅ GOL
+      → Over 2.5 (65/100, 2.8⭐)
+      → NoGoal (65/100, 2.8⭐)
+      💬 {'gol': 'Attacco casa 10.81/15, DNA offensivo 50/100 — produzione offensiva confermata', 'gol_extra': 'Difese organizzate, attacco trasferta 7.67/15 sotto media — profilo NoGoal'}
+
+──────────────────────────────────────────────────
+⚽ Cosenza vs Siracusa (Serie C - Girone C)
+   ❌ SCARTATA (Segno: 35.4, Gol: 58.6)
+
+──────────────────────────────────────────────────
+⚽ Chelsea vs Leeds (Premier League)
+   ❌ SCARTATA (Segno: 48.9, Gol: 58.6)
+
+──────────────────────────────────────────────────
+⚽ Everton vs Bournemouth (Premier League)
+   ✅ GOL
+      → Over 2.5 (73/100, 3.3⭐)
+      → Goal (73/100, 3.3⭐)
+      💬 {'doppia_chance': "Lucifero 11.51 vs 18.65, la forma c'è ma non schiacciante — 1X a 1.37", 'gol': 'Difesa trasferta 0.77/10, H2H Over 65% — vulnerabilità e precedenti concordi', 'gol_extra': 'Media gol scontri 3.13, Goal nel 55% — storico a supporto'}
+
+──────────────────────────────────────────────────
+⚽ Tottenham vs Newcastle (Premier League)
+   ✅ GOL
+      → Over 1.5 (65/100, 2.8⭐)
+      → Goal (65/100, 2.8⭐)
+      💬 {'doppia_chance': 'Lucifero 8.73/25 buono, trend avversaria in ripresa — X2 a 1.4 come cautela', 'gol': 'Attacco trasferta 6.28/15, la squadra ospite mantiene volumi offensivi anche fuori casa', 'gol_extra': 'Attacchi 5.64/15 e 6.28/15, xG 2.42 — entrambe generano xG significativo'}
+
+──────────────────────────────────────────────────
+⚽ West Ham Utd. vs Manchester Utd. (Premier League)
+   ✅ GOL
+      → Over 2.5 (67/100, 2.9⭐)
+      💬 {'gol': 'Attacco casa 5.64/15 vs difesa trasferta 4.5/10 — mismatch rilevante'}
+
+──────────────────────────────────────────────────
+⚽ Leicester City vs Southampton (Championship)
+   ✅ GOL
+      → Over 2.5 (66/100, 2.9⭐)
+      💬 {'gol': 'H2H: Over 2.5 nel 68% degli scontri su 81 precedenti'}
+
+──────────────────────────────────────────────────
+⚽ Oxford United vs Norwich (Championship)
+   ❌ SCARTATA (Segno: 36.4, Gol: 48.1)
+
+──────────────────────────────────────────────────
+⚽ Birmingham vs West Brom (Championship)
+   ❌ SCARTATA (Segno: 41.5, Gol: 57.7)
+
+──────────────────────────────────────────────────
+⚽ Estudiantes RC vs Ind. Rivadavia (Primera División)
+   ✅ GOL
+      → Under 3.5 (63/100, 2.7⭐)
+      💬 {'doppia_chance': 'Lucifero 4.55/25 in leggero calo nelle ultime 2, 1X a 1.33 per cautela', 'gol': 'Attacco trasferta 7.5/15, produzione offensiva limitata fuori casa'}
+
+======================================================================
+✅ COMPLETATO!
+   📊 Partite analizzate: 24
+   ✅ Pronostici salvati: 11
+   ❌ Scartate: 13
+   📅 Data: 2026-02-10
 ======================================================================
 
    💣 Nessuna bomba oggi
  
 ========================================== 
-✅ FINE ELABORAZIONE: 03/02/2026  1:28:59,64 
+✅ FINE ELABORAZIONE: 04/02/2026  1:01:03,37 
 ========================================== 
