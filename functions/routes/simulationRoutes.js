@@ -252,14 +252,26 @@ router.get('/cup-matches', async (req, res) => {
 
   try {
     const collectionMap = {
-      'UCL': 'matches_champions_league',
-      'UEL': 'matches_europa_league'
+      'UCL': { matches: 'matches_champions_league', teams: 'teams_champions_league' },
+      'UEL': { matches: 'matches_europa_league', teams: 'teams_europa_league' }
     };
-    
-    const collectionName = collectionMap[competition];
-    
-    // Query DIRETTA MongoDB (come i campionati!)
-    const matches = await req.db.collection(collectionName)
+
+    const collections = collectionMap[competition];
+
+    // Carica squadre per mapping nome -> _id (come /cup-matches in index.js)
+    const teams = await req.db.collection(collections.teams).find({}).toArray();
+    const teamIdMap = {};
+    teams.forEach(team => {
+      teamIdMap[team.name.toLowerCase()] = team._id.toString();
+      if (team.aliases && Array.isArray(team.aliases)) {
+        team.aliases.forEach(alias => {
+          teamIdMap[alias.toLowerCase()] = team._id.toString();
+        });
+      }
+    });
+
+    // Query DIRETTA MongoDB
+    const matches = await req.db.collection(collections.matches)
       .find(
         { season: "2025-2026" },
         {
@@ -267,8 +279,6 @@ router.get('/cup-matches', async (req, res) => {
             _id: 0,
             home_team: 1,
             away_team: 1,
-            home_mongo_id: 1,
-            away_mongo_id: 1,
             match_date: 1,
             status: 1,
             result: 1,
@@ -277,6 +287,12 @@ router.get('/cup-matches', async (req, res) => {
         }
       )
       .toArray();
+
+    // Arricchisci ogni match con home_mongo_id e away_mongo_id
+    matches.forEach(match => {
+      match.home_mongo_id = teamIdMap[(match.home_team || '').toLowerCase()] || null;
+      match.away_mongo_id = teamIdMap[(match.away_team || '').toLowerCase()] || null;
+    });
 
     // Separa e filtra: ultima giocata + prossima per squadra
     const played = matches.filter(m => m.status === 'finished');
