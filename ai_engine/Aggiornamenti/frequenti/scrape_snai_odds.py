@@ -378,15 +378,23 @@ def find_and_update_odds(league_name, ou_data, gg_data):
         league_patterns = ["Serie C - Girone A", "Serie C - Girone B", "Serie C - Girone C"]
 
     updated = 0
+    matched_snai_pairs = set()
+
+    # Tutti i nomi SNAI scrappati (per calcolo unmatched)
+    all_snai_pairs = set()
+    for (sh, sa) in ou_data.keys():
+        all_snai_pairs.add((sh, sa))
+    for (sh, sa) in gg_data.keys():
+        all_snai_pairs.add((sh, sa))
 
     # Pre-compute chiavi normalizzate per matching veloce
     ou_keys_norm = []
     for (sh, sa), data in ou_data.items():
-        ou_keys_norm.append((normalize_name(sh), normalize_name(sa), sh.lower(), sa.lower(), data))
+        ou_keys_norm.append((normalize_name(sh), normalize_name(sa), sh.lower(), sa.lower(), sh, sa, data))
 
     gg_keys_norm = []
     for (sh, sa), data in gg_data.items():
-        gg_keys_norm.append((normalize_name(sh), normalize_name(sa), sh.lower(), sa.lower(), data))
+        gg_keys_norm.append((normalize_name(sh), normalize_name(sa), sh.lower(), sa.lower(), sh, sa, data))
 
     for league_pat in league_patterns:
         rounds = list(db.h2h_by_round.find({"league": league_pat}))
@@ -401,6 +409,13 @@ def find_and_update_odds(league_name, ou_data, gg_data):
                 if not home_db or not away_db:
                     continue
 
+                # Filtro data: aggiorna solo partite tra -2 e +30 giorni da oggi
+                date_obj = m.get('date_obj')
+                if date_obj:
+                    diff_days = (date_obj.replace(tzinfo=None) - datetime.now()).days
+                    if diff_days < -2 or diff_days > 30:
+                        continue
+
                 home_doc = db.teams.find_one({"name": home_db})
                 away_doc = db.teams.find_one({"name": away_db})
                 home_aliases = get_team_aliases(home_db, home_doc)
@@ -410,7 +425,7 @@ def find_and_update_odds(league_name, ou_data, gg_data):
                 now = datetime.now()
 
                 # Cerca match O/U
-                for sh_norm, sa_norm, sh_low, sa_low, ou in ou_keys_norm:
+                for sh_norm, sa_norm, sh_low, sa_low, sh_orig, sa_orig, ou in ou_keys_norm:
                     home_found = any(
                         a in sh_norm or a in sh_low or sh_norm in a or sh_low in a
                         for a in home_aliases
@@ -420,13 +435,14 @@ def find_and_update_odds(league_name, ou_data, gg_data):
                         for a in away_aliases
                     )
                     if home_found and away_found:
+                        matched_snai_pairs.add((sh_orig, sa_orig))
                         for key in ['under_15', 'over_15', 'under_25', 'over_25', 'under_35', 'over_35']:
                             if ou.get(key) is not None:
                                 new_fields[key] = ou[key]
                         break
 
                 # Cerca match GG/NG
-                for sh_norm, sa_norm, sh_low, sa_low, gg in gg_keys_norm:
+                for sh_norm, sa_norm, sh_low, sa_low, sh_orig, sa_orig, gg in gg_keys_norm:
                     home_found = any(
                         a in sh_norm or a in sh_low or sh_norm in a or sh_low in a
                         for a in home_aliases
@@ -436,6 +452,7 @@ def find_and_update_odds(league_name, ou_data, gg_data):
                         for a in away_aliases
                     )
                     if home_found and away_found:
+                        matched_snai_pairs.add((sh_orig, sa_orig))
                         if gg.get('gg') is not None:
                             new_fields['gg'] = gg['gg']
                         if gg.get('ng') is not None:
@@ -457,7 +474,8 @@ def find_and_update_odds(league_name, ou_data, gg_data):
                     {"$set": {"matches": round_doc["matches"]}}
                 )
 
-    return updated
+    unmatched = all_snai_pairs - matched_snai_pairs
+    return updated, unmatched
 
 
 # ============================================================
@@ -486,7 +504,7 @@ def scrape_league(driver, league, is_first=False):
 
     if not matches:
         print(f"  [{name}] 0 partite (fuori stagione?), skip")
-        return 0, 0
+        return 0, 0, set()
 
     print(f"  [{name}] {len(matches)} partite trovate")
 
@@ -508,13 +526,52 @@ def scrape_league(driver, league, is_first=False):
 
     if not ou_data and not gg_data:
         print(f"  [{name}] Nessuna quota estratta, skip")
-        return len(matches), 0
+        return len(matches), 0, set()
 
     # Match con DB e aggiorna
-    updated = find_and_update_odds(name, ou_data, gg_data)
+    updated, unmatched = find_and_update_odds(name, ou_data, gg_data)
     print(f"  [{name}] Aggiornate: {updated}")
+    if unmatched:
+        print(f"  [{name}] ⚠️  {len(unmatched)} partite SNAI senza match DB")
 
-    return len(matches), updated
+    return len(matches), updated, unmatched
+
+
+def _append_unmatched_log(all_unmatched):
+    """
+    Appende nomi SNAI non matchati al log cumulativo.
+    NON sovrascrive: ogni run aggiunge solo le nuove entry.
+    Il file accumula dati nel tempo perché ogni run vede solo le partite in programma.
+    """
+    log_path = os.path.join(current_dir, "snai_unmatched_log.txt")
+
+    # Carica entry esistenti per evitare duplicati
+    existing = set()
+    if os.path.exists(log_path):
+        with open(log_path, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith("#") and not line.startswith("="):
+                    existing.add(line)
+
+    # Prepara nuove entry
+    new_entries = []
+    for league, (home, away) in all_unmatched:
+        entry = f"[{league}] {home} vs {away}"
+        if entry not in existing:
+            new_entries.append(entry)
+
+    if not new_entries:
+        print(f"\n  Log unmatched: nessuna nuova entry da aggiungere")
+        return
+
+    # Append al file
+    with open(log_path, "a", encoding="utf-8") as f:
+        f.write(f"\n# --- Run {datetime.now().strftime('%Y-%m-%d %H:%M')} ---\n")
+        for entry in new_entries:
+            f.write(entry + "\n")
+
+    print(f"\n  Log unmatched: {len(new_entries)} nuove entry aggiunte → snai_unmatched_log.txt")
 
 
 def run_scraper():
@@ -526,23 +583,32 @@ def run_scraper():
     driver = init_driver()
     total_matches = 0
     total_updated = 0
+    all_unmatched = []
 
     try:
         for i, league in enumerate(LEAGUES_CONFIG):
             try:
-                found, updated = scrape_league(driver, league, is_first=(i == 0))
+                found, updated, unmatched = scrape_league(driver, league, is_first=(i == 0))
                 total_matches += found
                 total_updated += updated
+                for pair in unmatched:
+                    all_unmatched.append((league['name'], pair))
             except Exception as e:
                 print(f"  [{league['name']}] ERRORE: {e}")
                 continue
     finally:
         driver.quit()
 
+    # Log cumulativo nomi non matchati
+    if all_unmatched:
+        _append_unmatched_log(all_unmatched)
+
     print(f"\n{'='*55}")
     print(f"  COMPLETATO")
     print(f"  Partite trovate: {total_matches}")
     print(f"  Quote aggiornate: {total_updated}")
+    if all_unmatched:
+        print(f"  ⚠️  Partite SNAI senza match: {len(all_unmatched)}")
     print(f"  {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print(f"{'='*55}")
 
