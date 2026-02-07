@@ -43,42 +43,42 @@ DEBUG_MODE = True
 # --- CONFIGURAZIONE LEGHE ---
 LEAGUES_CONFIG = [
     # ITALIA
-    # {"league_name": "Serie A", "id_prefix": "SerieA", "url": "https://www.betexplorer.com/it/football/italy/serie-a/results/"},
-    # {"league_name": "Serie B", "id_prefix": "SerieB", "url": "https://www.betexplorer.com/it/football/italy/serie-b/results/"},
-    # {"league_name": "Serie C - Girone A", "id_prefix": "SerieC-GironeA", "url": "https://www.betexplorer.com/it/football/italy/serie-c-group-a/results/"},
-    # {"league_name": "Serie C - Girone B", "id_prefix": "SerieC-GironeB", "url": "https://www.betexplorer.com/it/football/italy/serie-c-group-b/results/"},
-    # {"league_name": "Serie C - Girone C", "id_prefix": "SerieC-GironeC", "url": "https://www.betexplorer.com/it/football/italy/serie-c-group-c/results/"},
+    {"league_name": "Serie A", "id_prefix": "SerieA", "url": "https://www.betexplorer.com/it/football/italy/serie-a/results/"},
+    {"league_name": "Serie B", "id_prefix": "SerieB", "url": "https://www.betexplorer.com/it/football/italy/serie-b/results/"},
+    {"league_name": "Serie C - Girone A", "id_prefix": "SerieC-GironeA", "url": "https://www.betexplorer.com/it/football/italy/serie-c-group-a/results/"},
+    {"league_name": "Serie C - Girone B", "id_prefix": "SerieC-GironeB", "url": "https://www.betexplorer.com/it/football/italy/serie-c-group-b/results/"},
+    {"league_name": "Serie C - Girone C", "id_prefix": "SerieC-GironeC", "url": "https://www.betexplorer.com/it/football/italy/serie-c-group-c/results/"},
     
-    # # EUROPA TOP
-    # {"league_name": "Premier League", "id_prefix": "PremierLeague", "url": "https://www.betexplorer.com/it/football/england/premier-league/results/"},
-    # {"league_name": "La Liga", "id_prefix": "LaLiga", "url": "https://www.betexplorer.com/it/football/spain/laliga/results/"},
-    # {"league_name": "Bundesliga", "id_prefix": "Bundesliga", "url": "https://www.betexplorer.com/it/football/germany/bundesliga/results/"},
-    # {"league_name": "Ligue 1", "id_prefix": "Ligue1", "url": "https://www.betexplorer.com/it/football/france/ligue-1/results/"},
-    # {"league_name": "Eredivisie", "id_prefix": "Eredivisie", "url": "https://www.betexplorer.com/it/football/netherlands/eredivisie/results/"},
-    # {"league_name": "Liga Portugal", "id_prefix": "LigaPortugal", "url": "https://www.betexplorer.com/it/football/portugal/liga-portugal/results/"},
+    # EUROPA TOP
+    {"league_name": "Premier League", "id_prefix": "PremierLeague", "url": "https://www.betexplorer.com/it/football/england/premier-league/results/"},
+    {"league_name": "La Liga", "id_prefix": "LaLiga", "url": "https://www.betexplorer.com/it/football/spain/laliga/results/"},
+    {"league_name": "Bundesliga", "id_prefix": "Bundesliga", "url": "https://www.betexplorer.com/it/football/germany/bundesliga/results/"},
+    {"league_name": "Ligue 1", "id_prefix": "Ligue1", "url": "https://www.betexplorer.com/it/football/france/ligue-1/results/"},
+    {"league_name": "Eredivisie", "id_prefix": "Eredivisie", "url": "https://www.betexplorer.com/it/football/netherlands/eredivisie/results/"},
+    {"league_name": "Liga Portugal", "id_prefix": "LigaPortugal", "url": "https://www.betexplorer.com/it/football/portugal/liga-portugal/results/"},
     
-    # # 🆕 EUROPA SERIE B
-    # {"league_name": "Championship", "id_prefix": "Championship", "url": "https://www.betexplorer.com/it/football/england/championship/results/"},
-    # {"league_name": "LaLiga 2", "id_prefix": "LaLiga2", "url": "https://www.betexplorer.com/it/football/spain/laliga2/results/"},
-    # {"league_name": "2. Bundesliga", "id_prefix": "2.Bundesliga", "url": "https://www.betexplorer.com/it/football/germany/2-bundesliga/results/"},
-    # {"league_name": "Ligue 2", "id_prefix": "Ligue2", "url": "https://www.betexplorer.com/it/football/france/ligue-2/results/"},
+    # 🆕 EUROPA SERIE B
+    {"league_name": "Championship", "id_prefix": "Championship", "url": "https://www.betexplorer.com/it/football/england/championship/results/"},
+    {"league_name": "LaLiga 2", "id_prefix": "LaLiga2", "url": "https://www.betexplorer.com/it/football/spain/laliga2/results/"},
+    {"league_name": "2. Bundesliga", "id_prefix": "2.Bundesliga", "url": "https://www.betexplorer.com/it/football/germany/2-bundesliga/results/"},
+    {"league_name": "Ligue 2", "id_prefix": "Ligue2", "url": "https://www.betexplorer.com/it/football/france/ligue-2/results/"},
     
-    # # 🆕 EUROPA NORDICI + EXTRA
-    # {"league_name": "Scottish Premiership", "id_prefix": "ScottishPremiership", "url": "https://www.betexplorer.com/it/football/scotland/premiership/results/"},
-    # {"league_name": "Allsvenskan", "id_prefix": "Allsvenskan", "url": "https://www.betexplorer.com/it/football/sweden/allsvenskan/results/"},
-    # {"league_name": "Eliteserien", "id_prefix": "Eliteserien", "url": "https://www.betexplorer.com/it/football/norway/eliteserien/results/"},
-    # {"league_name": "Superligaen", "id_prefix": "Superligaen", "url": "https://www.betexplorer.com/it/football/denmark/superliga/results/"},
-    # {"league_name": "Jupiler Pro League", "id_prefix": "JupilerProLeague", "url": "https://www.betexplorer.com/it/football/belgium/jupiler-pro-league/results/"},
-    # {"league_name": "Süper Lig", "id_prefix": "SüperLig", "url": "https://www.betexplorer.com/it/football/turkey/super-lig/results/"},
+    # 🆕 EUROPA NORDICI + EXTRA
+    {"league_name": "Scottish Premiership", "id_prefix": "ScottishPremiership", "url": "https://www.betexplorer.com/it/football/scotland/premiership/results/"},
+    {"league_name": "Allsvenskan", "id_prefix": "Allsvenskan", "url": "https://www.betexplorer.com/it/football/sweden/allsvenskan/results/"},
+    {"league_name": "Eliteserien", "id_prefix": "Eliteserien", "url": "https://www.betexplorer.com/it/football/norway/eliteserien/results/"},
+    {"league_name": "Superligaen", "id_prefix": "Superligaen", "url": "https://www.betexplorer.com/it/football/denmark/superliga/results/"},
+    {"league_name": "Jupiler Pro League", "id_prefix": "JupilerProLeague", "url": "https://www.betexplorer.com/it/football/belgium/jupiler-pro-league/results/"},
+    {"league_name": "Süper Lig", "id_prefix": "SüperLig", "url": "https://www.betexplorer.com/it/football/turkey/super-lig/results/"},
     {"league_name": "League of Ireland Premier Division", "id_prefix": "LeagueofIrelandPremierDivision", "url": "https://www.betexplorer.com/it/football/ireland/premier-division/results/"},
     
-    # # 🆕 AMERICHE
-    # {"league_name": "Brasileirão Serie A", "id_prefix": "Brasileirao", "url": "https://www.betexplorer.com/it/football/brazil/serie-a-betano/results/"},
-    # {"league_name": "Primera División", "id_prefix": "PrimeraDivisión", "url": "https://www.betexplorer.com/it/football/argentina/liga-profesional/results//"},
-    # {"league_name": "Major League Soccer", "id_prefix": "MLS", "url": "https://www.betexplorer.com/it/football/usa/mls/results/"},
+    # 🆕 AMERICHE
+    {"league_name": "Brasileirão Serie A", "id_prefix": "Brasileirao", "url": "https://www.betexplorer.com/it/football/brazil/serie-a-betano/results/"},
+    {"league_name": "Primera División", "id_prefix": "PrimeraDivisión", "url": "https://www.betexplorer.com/it/football/argentina/liga-profesional/results//"},
+    {"league_name": "Major League Soccer", "id_prefix": "MLS", "url": "https://www.betexplorer.com/it/football/usa/mls/results/"},
     
-    # # 🆕 ASIA
-    # {"league_name": "J1 League", "id_prefix": "J1League", "url": "https://www.betexplorer.com/it/football/japan/j1-league/results/"},
+    # 🆕 ASIA
+    {"league_name": "J1 League", "id_prefix": "J1League", "url": "https://www.betexplorer.com/it/football/japan/j1-league/results/"},
 ]
 
 # --- FUNZIONI UTILS ---

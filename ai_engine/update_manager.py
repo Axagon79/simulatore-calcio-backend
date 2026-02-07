@@ -85,7 +85,10 @@ SCRAPER_SEQUENCE = [
       ("update_affidabilità.py", "🔥 [21/22] Aggiorna Affidabilità (Debug)", "Aggiorna l'affidabilità delle squadre", FREQUENT_DIR),
 
       # ⭐ NUOVO SCRIPT DI DEBUG PER AGGIORNARE SOLO I RISULTATI
-      ("per_agg_pianificato_update_results_only.py", "🔄 [22/22] Aggiorna Solo Risultati (Debug)", "Aggiorna solo i risultati senza toccare altro", FREQUENT_DIR),
+      ("per_agg_pianificato_update_results_only.py", "🔄 [22/23] Aggiorna Solo Risultati (Debug)", "Aggiorna solo i risultati senza toccare altro", FREQUENT_DIR),
+
+      # ⭐ SCRAPER QUOTE O/U + GG/NG DA SNAI (Selenium)
+      ("scrape_snai_odds.py", "🎰 [23/23] Quote O/U + GG/NG (SNAI)", "Mancano quote Over/Under e Goal/NoGoal", FREQUENT_DIR),
 ]
 
 

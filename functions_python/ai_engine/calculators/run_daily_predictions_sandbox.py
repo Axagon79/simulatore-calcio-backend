@@ -722,6 +722,7 @@ def analyze_segno(match_data, home_team_doc, away_team_doc):
         'segno': segno,
         'doppia_chance': doppia_chance,
         'doppia_chance_quota': doppia_chance_quota,
+        'odds': {'1': q1, 'X': qx, '2': q2},
         'dettaglio': scores,
         'dettaglio_raw': dettaglio_raw
     }
@@ -1098,6 +1099,7 @@ def make_decision(segno_result, gol_result):
         pronostici.append({
             'tipo': 'SEGNO',
             'pronostico': segno_result['segno'],
+            'quota': segno_result.get('odds', {}).get(segno_result['segno']),
             'confidence': s_score,
             'stars': calculate_stars(s_score),
         })
