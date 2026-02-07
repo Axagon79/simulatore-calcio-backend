@@ -1,0 +1,11 @@
+{
+  "model": "claude-opus-4-6",
+  "permissions": {
+    "allow": [
+      "Bash(dir:*)",
+      "Bash(npm run build:*)",
+      "Bash(git -C \"c:/Progetti/simulatore-calcio-frontend\" status)",
+      "Bash(git -C \"c:/Progetti/simulatore-calcio-frontend\" diff --stat)"
+    ]
+  }
+}

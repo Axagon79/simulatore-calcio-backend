@@ -203,4 +203,169 @@ router.get('/daily-bombs', async (req, res) => {
   }
 });
 
+// 📊 ENDPOINT: Track Record — Aggregazione storica accuratezza pronostici
+router.get('/track-record', async (req, res) => {
+  const { from, to, league, market, min_confidence } = req.query;
+
+  if (!from || !to) {
+    return res.status(400).json({ error: 'Parametri from e to (YYYY-MM-DD) obbligatori' });
+  }
+
+  console.log(`📊 [TRACK-RECORD] Richiesta: ${from} → ${to} | league=${league || 'tutte'} | market=${market || 'tutti'}`);
+
+  try {
+    // 1. Query predictions nel range di date
+    const query = { date: { $gte: from, $lte: to } };
+    if (league) query.league = { $regex: new RegExp(league, 'i') };
+
+    const [predictions, resultsMap] = await Promise.all([
+      req.db.collection('daily_predictions').find(query, { projection: { _id: 0 } }).toArray(),
+      getFinishedResults(req.db)
+    ]);
+
+    // 2. Cross-match con risultati reali + verifica hit/miss
+    const verified = [];
+    for (const pred of predictions) {
+      const realScore = resultsMap[`${pred.home}|||${pred.away}|||${pred.date}`] || null;
+      if (!realScore) continue; // solo partite finite
+
+      const parsed = parseScore(realScore);
+      if (!parsed || !pred.pronostici || pred.pronostici.length === 0) continue;
+
+      for (const p of pred.pronostici) {
+        const hit = checkPronostico(p.pronostico, p.tipo, parsed);
+        if (hit === null) continue; // pronostico non verificabile
+
+        // Splitta tipo "GOL" in OVER_UNDER vs GG_NG
+        let tipoEffettivo = p.tipo;
+        if (p.tipo === 'GOL') {
+          const pLower = (p.pronostico || '').toLowerCase();
+          if (pLower.startsWith('over') || pLower.startsWith('under')) {
+            tipoEffettivo = 'OVER_UNDER';
+          } else if (pLower === 'goal' || pLower === 'nogoal') {
+            tipoEffettivo = 'GG_NG';
+          }
+        }
+
+        // Filtro per mercato se specificato
+        if (market && tipoEffettivo.toUpperCase() !== market.toUpperCase()) continue;
+        // Filtro per confidence minima
+        if (min_confidence && (p.confidence || 0) < parseFloat(min_confidence)) continue;
+
+        verified.push({
+          date: pred.date,
+          league: pred.league || 'N/A',
+          tipo: tipoEffettivo,
+          pronostico: p.pronostico,
+          confidence: p.confidence || 0,
+          stars: p.stars || 0,
+          hit
+        });
+      }
+    }
+
+    // 3. Aggregazioni
+    const hitRate = (items) => {
+      const total = items.length;
+      const hits = items.filter(i => i.hit).length;
+      return {
+        total, hits, misses: total - hits,
+        hit_rate: total > 0 ? Math.round((hits / total) * 1000) / 10 : null
+      };
+    };
+
+    // Globale
+    const globale = hitRate(verified);
+
+    // Per mercato (tipo)
+    const byMarket = {};
+    for (const v of verified) {
+      if (!byMarket[v.tipo]) byMarket[v.tipo] = [];
+      byMarket[v.tipo].push(v);
+    }
+    const breakdown_mercato = {};
+    for (const [tipo, items] of Object.entries(byMarket)) {
+      breakdown_mercato[tipo] = hitRate(items);
+    }
+
+    // Per campionato
+    const byLeague = {};
+    for (const v of verified) {
+      if (!byLeague[v.league]) byLeague[v.league] = [];
+      byLeague[v.league].push(v);
+    }
+    const breakdown_campionato = {};
+    for (const [lg, items] of Object.entries(byLeague)) {
+      breakdown_campionato[lg] = hitRate(items);
+    }
+
+    // Per fascia confidence
+    const confBands = { '60-70': [], '70-80': [], '80-90': [], '90+': [] };
+    for (const v of verified) {
+      if (v.confidence >= 90) confBands['90+'].push(v);
+      else if (v.confidence >= 80) confBands['80-90'].push(v);
+      else if (v.confidence >= 70) confBands['70-80'].push(v);
+      else confBands['60-70'].push(v);
+    }
+    const breakdown_confidence = {};
+    for (const [band, items] of Object.entries(confBands)) {
+      breakdown_confidence[band] = hitRate(items);
+    }
+
+    // Per fascia stelle
+    const starBands = { '2.5-3': [], '3-4': [], '4-5': [] };
+    for (const v of verified) {
+      if (v.stars >= 4) starBands['4-5'].push(v);
+      else if (v.stars >= 3) starBands['3-4'].push(v);
+      else starBands['2.5-3'].push(v);
+    }
+    const breakdown_stelle = {};
+    for (const [band, items] of Object.entries(starBands)) {
+      breakdown_stelle[band] = hitRate(items);
+    }
+
+    // Serie temporale giornaliera
+    const byDate = {};
+    for (const v of verified) {
+      if (!byDate[v.date]) byDate[v.date] = [];
+      byDate[v.date].push(v);
+    }
+    const serie_temporale = Object.entries(byDate)
+      .map(([date, items]) => ({ date, ...hitRate(items) }))
+      .sort((a, b) => a.date.localeCompare(b.date));
+
+    // Incrocio mercato × campionato
+    const breakdown_mercato_campionato = {};
+    for (const v of verified) {
+      const key = `${v.tipo}|||${v.league}`;
+      if (!breakdown_mercato_campionato[key]) breakdown_mercato_campionato[key] = [];
+      breakdown_mercato_campionato[key].push(v);
+    }
+    const cross_mercato_campionato = {};
+    for (const [key, items] of Object.entries(breakdown_mercato_campionato)) {
+      const [tipo, lg] = key.split('|||');
+      if (!cross_mercato_campionato[tipo]) cross_mercato_campionato[tipo] = {};
+      cross_mercato_campionato[tipo][lg] = hitRate(items);
+    }
+
+    console.log(`✅ [TRACK-RECORD] ${verified.length} pronostici verificati, hit rate globale: ${globale.hit_rate}%`);
+
+    return res.json({
+      success: true,
+      periodo: { from, to },
+      filtri: { league: league || null, market: market || null, min_confidence: min_confidence || null },
+      globale,
+      breakdown_mercato,
+      breakdown_campionato,
+      breakdown_confidence,
+      breakdown_stelle,
+      cross_mercato_campionato,
+      serie_temporale
+    });
+  } catch (error) {
+    console.error('❌ [TRACK-RECORD] Errore:', error);
+    return res.status(500).json({ error: 'Errore nel calcolo track record', details: error.message });
+  }
+});
+
 module.exports = router;

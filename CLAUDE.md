@@ -12,11 +12,20 @@ Questo è un simulatore di calcio con:
 - MongoDB come database
 - 6 algoritmi di simulazione: Statistico, Dinamico, Tattico, Caos, Master, Monte Carlo
 
+Frontend del simulatore di calcio con:
+- React + TypeScript + Vite
+- Componenti per simulazioni, predictions e classifiche
+- Integrazione con Firebase Functions (API backend)
+- Gestione loghi squadre e dati real-time da MongoDB
+- Struttura: /components (UI), /services (API), /types (TypeScript), /utils (helper functions)
+
 ## Regole operative
 - Non modificare MAI nessun file senza chiedere prima conferma esplicita
 - Prima di ogni modifica, mostra cosa intendi cambiare e aspetta l'approvazione
 - Non eseguire comandi nel terminale senza spiegare prima cosa faranno
 
 ## Preferenze
-- Usa Sonnet per task quotidiani, Opus solo per task complessi
 - Non creare file README o documentazione se non richiesto esplicitamente
+- Mantieni sempre le spiegazioni brevi e concise
+- Prima di scrivere un file completo chiedi sempre prima l'autorizzazione da parte mia
+- Quando non sai qualcosa chiedi o fai una ricerca sul web
