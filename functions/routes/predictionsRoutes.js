@@ -203,6 +203,119 @@ router.get('/daily-bombs', async (req, res) => {
   }
 });
 
+// 🧪 ENDPOINT: Pronostici SANDBOX del giorno
+router.get('/daily-predictions-sandbox', async (req, res) => {
+  const { date } = req.query;
+  if (!date) return res.status(400).json({ error: 'Parametro date mancante' });
+
+  console.log('🧪 [PREDICTIONS SANDBOX] Richiesta per:', date);
+
+  try {
+    const [predictions, resultsMap] = await Promise.all([
+      req.db.collection('daily_predictions_sandbox')
+        .find({ date }, { projection: { _id: 0 } })
+        .toArray(),
+      getFinishedResults(req.db)
+    ]);
+
+    for (const pred of predictions) {
+      const realScore = resultsMap[`${pred.home}|||${pred.away}|||${pred.date}`] || null;
+      pred.real_score = realScore;
+
+      if (realScore) {
+        const parsed = parseScore(realScore);
+        pred.real_sign = parsed ? parsed.sign : null;
+
+        if (pred.pronostici && pred.pronostici.length > 0) {
+          for (const p of pred.pronostici) {
+            p.hit = checkPronostico(p.pronostico, p.tipo, parsed);
+          }
+          pred.hit = pred.pronostici.some(p => p.hit === true);
+        } else {
+          pred.hit = null;
+        }
+      } else {
+        pred.real_sign = null;
+        pred.hit = null;
+      }
+    }
+
+    predictions.sort((a, b) => (a.match_time || '').localeCompare(b.match_time || ''));
+
+    const finished = predictions.filter(p => p.real_score !== null);
+    const hits = finished.filter(p => p.hit === true).length;
+
+    console.log(`✅ [PREDICTIONS SANDBOX] ${predictions.length} pronostici, ${hits}/${finished.length} azzeccati`);
+
+    return res.json({
+      success: true, date, predictions, count: predictions.length,
+      stats: {
+        total: predictions.length,
+        finished: finished.length,
+        hits,
+        misses: finished.filter(p => p.hit === false).length,
+        pending: predictions.length - finished.length,
+        hit_rate: finished.length > 0 ? Math.round((hits / finished.length) * 1000) / 10 : null
+      }
+    });
+  } catch (error) {
+    console.error('❌ [PREDICTIONS SANDBOX] Errore:', error);
+    return res.status(500).json({ error: 'Errore nel recupero pronostici sandbox', details: error.message });
+  }
+});
+
+// 🧪 ENDPOINT: Bombe SANDBOX del giorno
+router.get('/daily-bombs-sandbox', async (req, res) => {
+  const { date } = req.query;
+  if (!date) return res.status(400).json({ error: 'Parametro date mancante' });
+
+  console.log('🧪 [BOMBS SANDBOX] Richiesta per:', date);
+
+  try {
+    const [bombs, resultsMap] = await Promise.all([
+      req.db.collection('daily_bombs_sandbox')
+        .find({ date }, { projection: { _id: 0 } })
+        .toArray(),
+      getFinishedResults(req.db)
+    ]);
+
+    for (const bomb of bombs) {
+      const realScore = resultsMap[`${bomb.home}|||${bomb.away}|||${bomb.date}`] || null;
+      bomb.real_score = realScore;
+      if (realScore) {
+        const parsed = parseScore(realScore);
+        bomb.real_sign = parsed ? parsed.sign : null;
+        bomb.hit = bomb.segno_bomba ? (bomb.segno_bomba === (parsed ? parsed.sign : null)) : null;
+      } else {
+        bomb.real_sign = null;
+        bomb.hit = null;
+      }
+    }
+
+    bombs.sort((a, b) => (b.stars || 0) - (a.stars || 0));
+
+    const finished = bombs.filter(b => b.real_score !== null);
+    const hits = finished.filter(b => b.hit === true).length;
+
+    console.log(`✅ [BOMBS SANDBOX] ${bombs.length} bombe, ${hits}/${finished.length} azzeccate`);
+
+    return res.json({
+      success: true, date, bombs, count: bombs.length,
+      stats: {
+        total: bombs.length,
+        finished: finished.length,
+        hits,
+        misses: finished.filter(b => b.hit === false).length,
+        pending: bombs.length - finished.length,
+        hit_rate: finished.length > 0 ? Math.round((hits / finished.length) * 1000) / 10 : null
+      }
+    });
+  } catch (error) {
+    console.error('❌ [BOMBS SANDBOX] Errore:', error);
+    return res.status(500).json({ error: 'Errore nel recupero bombe sandbox', details: error.message });
+  }
+});
+
 // 📊 ENDPOINT: Track Record — Aggregazione storica accuratezza pronostici
 router.get('/track-record', async (req, res) => {
   const { from, to, league, market, min_confidence } = req.query;

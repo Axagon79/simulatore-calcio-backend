@@ -804,7 +804,282 @@ def delete_preset(request: https_fn.Request) -> https_fn.Response:
             mimetype='application/json',
             headers=headers
         )
-        
+
+
+# ===== PREDICTION TUNING (per Predictions Mixer Sandbox) =====
+
+@https_fn.on_request(
+    memory=options.MemoryOption.MB_256,
+    timeout_sec=10,
+    region="us-central1"
+)
+def get_prediction_tuning(request: https_fn.Request) -> https_fn.Response:
+    """Legge i parametri di tuning delle daily predictions da MongoDB."""
+    headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Content-Type': 'application/json'
+    }
+    if request.method == 'OPTIONS':
+        return https_fn.Response('', status=204, headers=headers)
+    try:
+        try:
+            from config import db
+        except ImportError:
+            from ai_engine.config import db
+        doc = db['prediction_tuning_settings'].find_one({"_id": "main_config"})
+        if doc and "config" in doc:
+            return https_fn.Response(
+                json.dumps({"success": True, "config": doc["config"]}, ensure_ascii=False),
+                mimetype='application/json', headers=headers
+            )
+        else:
+            return https_fn.Response(
+                json.dumps({"success": False, "error": "Prediction tuning config not found"}),
+                status=404, mimetype='application/json', headers=headers
+            )
+    except Exception as e:
+        print(f"❌ Errore get_prediction_tuning: {str(e)}", file=sys.stderr)
+        return https_fn.Response(
+            json.dumps({"success": False, "error": str(e)}),
+            status=500, mimetype='application/json', headers=headers
+        )
+
+
+@https_fn.on_request(
+    memory=options.MemoryOption.MB_256,
+    timeout_sec=10,
+    region="us-central1"
+)
+def save_prediction_tuning(request: https_fn.Request) -> https_fn.Response:
+    """Salva i parametri di tuning delle daily predictions su MongoDB."""
+    headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Content-Type': 'application/json'
+    }
+    if request.method == 'OPTIONS':
+        return https_fn.Response('', status=204, headers=headers)
+    try:
+        try:
+            from config import db
+        except ImportError:
+            from ai_engine.config import db
+        if hasattr(request, 'get_json'):
+            payload = request.get_json(silent=True) or {}
+        else:
+            payload = {}
+        config_data = payload.get('config')
+        if not config_data:
+            return https_fn.Response(
+                json.dumps({"success": False, "error": "Missing 'config' in request body"}),
+                status=400, mimetype='application/json', headers=headers
+            )
+        result = db['prediction_tuning_settings'].update_one(
+            {"_id": "main_config"},
+            {"$set": {"config": config_data}},
+            upsert=True
+        )
+        return https_fn.Response(
+            json.dumps({
+                "success": True,
+                "message": "Prediction tuning saved successfully",
+                "modified": result.modified_count,
+                "upserted": result.upserted_id is not None
+            }, ensure_ascii=False),
+            mimetype='application/json', headers=headers
+        )
+    except Exception as e:
+        print(f"❌ Errore save_prediction_tuning: {str(e)}", file=sys.stderr)
+        return https_fn.Response(
+            json.dumps({"success": False, "error": str(e)}),
+            status=500, mimetype='application/json', headers=headers
+        )
+
+
+@https_fn.on_request(
+    memory=options.MemoryOption.MB_256,
+    timeout_sec=10,
+    region="us-central1"
+)
+def list_prediction_presets(request: https_fn.Request) -> https_fn.Response:
+    """Lista tutti i preset di prediction tuning."""
+    headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Content-Type': 'application/json'
+    }
+    if request.method == 'OPTIONS':
+        return https_fn.Response('', status=204, headers=headers)
+    try:
+        try:
+            from config import db
+        except ImportError:
+            from ai_engine.config import db
+        presets = list(db["prediction_tuning_presets"].find({}, {"_id": 0}))
+        return https_fn.Response(
+            json.dumps({"success": True, "presets": presets}, ensure_ascii=False),
+            mimetype='application/json', headers=headers
+        )
+    except Exception as e:
+        print(f"❌ Errore list_prediction_presets: {str(e)}", file=sys.stderr)
+        return https_fn.Response(
+            json.dumps({"success": False, "error": str(e)}),
+            status=500, mimetype='application/json', headers=headers
+        )
+
+
+@https_fn.on_request(
+    memory=options.MemoryOption.MB_256,
+    timeout_sec=10,
+    region="us-central1"
+)
+def save_prediction_preset(request: https_fn.Request) -> https_fn.Response:
+    """Salva un preset di prediction tuning con nome."""
+    headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Content-Type': 'application/json'
+    }
+    if request.method == 'OPTIONS':
+        return https_fn.Response('', status=204, headers=headers)
+    try:
+        try:
+            from config import db
+        except ImportError:
+            from ai_engine.config import db
+        if hasattr(request, 'get_json'):
+            payload = request.get_json(silent=True) or {}
+        else:
+            payload = {}
+        preset_name = payload.get('name')
+        preset_config = payload.get('config')
+        if not preset_name or not preset_config:
+            return https_fn.Response(
+                json.dumps({"success": False, "error": "Missing name or config"}),
+                status=400, mimetype='application/json', headers=headers
+            )
+        result = db["prediction_tuning_presets"].update_one(
+            {"name": preset_name},
+            {"$set": {"name": preset_name, "config": preset_config}},
+            upsert=True
+        )
+        return https_fn.Response(
+            json.dumps({
+                "success": True,
+                "message": f"Preset '{preset_name}' salvato",
+                "upserted": result.upserted_id is not None
+            }, ensure_ascii=False),
+            mimetype='application/json', headers=headers
+        )
+    except Exception as e:
+        print(f"❌ Errore save_prediction_preset: {str(e)}", file=sys.stderr)
+        return https_fn.Response(
+            json.dumps({"success": False, "error": str(e)}),
+            status=500, mimetype='application/json', headers=headers
+        )
+
+
+@https_fn.on_request(
+    memory=options.MemoryOption.MB_256,
+    timeout_sec=10,
+    region="us-central1"
+)
+def load_prediction_preset(request: https_fn.Request) -> https_fn.Response:
+    """Carica un preset di prediction tuning."""
+    headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Content-Type': 'application/json'
+    }
+    if request.method == 'OPTIONS':
+        return https_fn.Response('', status=204, headers=headers)
+    try:
+        try:
+            from config import db
+        except ImportError:
+            from ai_engine.config import db
+        if hasattr(request, 'get_json'):
+            payload = request.get_json(silent=True) or {}
+        else:
+            payload = {}
+        preset_name = payload.get('name')
+        if not preset_name:
+            return https_fn.Response(
+                json.dumps({"success": False, "error": "Missing preset name"}),
+                status=400, mimetype='application/json', headers=headers
+            )
+        preset = db["prediction_tuning_presets"].find_one({"name": preset_name}, {"_id": 0})
+        if not preset:
+            return https_fn.Response(
+                json.dumps({"success": False, "error": f"Preset '{preset_name}' non trovato"}),
+                status=404, mimetype='application/json', headers=headers
+            )
+        return https_fn.Response(
+            json.dumps({"success": True, "preset": preset}, ensure_ascii=False),
+            mimetype='application/json', headers=headers
+        )
+    except Exception as e:
+        print(f"❌ Errore load_prediction_preset: {str(e)}", file=sys.stderr)
+        return https_fn.Response(
+            json.dumps({"success": False, "error": str(e)}),
+            status=500, mimetype='application/json', headers=headers
+        )
+
+
+@https_fn.on_request(
+    memory=options.MemoryOption.MB_256,
+    timeout_sec=10,
+    region="us-central1"
+)
+def delete_prediction_preset(request: https_fn.Request) -> https_fn.Response:
+    """Elimina un preset di prediction tuning."""
+    headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Content-Type': 'application/json'
+    }
+    if request.method == 'OPTIONS':
+        return https_fn.Response('', status=204, headers=headers)
+    try:
+        try:
+            from config import db
+        except ImportError:
+            from ai_engine.config import db
+        if hasattr(request, 'get_json'):
+            payload = request.get_json(silent=True) or {}
+        else:
+            payload = {}
+        preset_name = payload.get('name')
+        if not preset_name:
+            return https_fn.Response(
+                json.dumps({"success": False, "error": "Missing preset name"}),
+                status=400, mimetype='application/json', headers=headers
+            )
+        result = db["prediction_tuning_presets"].delete_one({"name": preset_name})
+        if result.deleted_count == 0:
+            return https_fn.Response(
+                json.dumps({"success": False, "error": f"Preset '{preset_name}' non trovato"}),
+                status=404, mimetype='application/json', headers=headers
+            )
+        return https_fn.Response(
+            json.dumps({"success": True, "message": f"Preset '{preset_name}' eliminato"}, ensure_ascii=False),
+            mimetype='application/json', headers=headers
+        )
+    except Exception as e:
+        print(f"❌ Errore delete_prediction_preset: {str(e)}", file=sys.stderr)
+        return https_fn.Response(
+            json.dumps({"success": False, "error": str(e)}),
+            status=500, mimetype='application/json', headers=headers
+        )
+
+
 def get_cup_teams(request: https_fn.Request) -> https_fn.Response:
     """
     Endpoint per ottenere le squadre di una competizione europea (UCL/UEL).
