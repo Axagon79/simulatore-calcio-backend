@@ -129,20 +129,23 @@ router.get('/daily-predictions', async (req, res) => {
 
     predictions.sort((a, b) => (a.match_time || '').localeCompare(b.match_time || ''));
 
-    const finished = predictions.filter(p => p.real_score !== null);
-    const hits = finished.filter(p => p.hit === true).length;
+    // Conteggio per singolo pronostico (non per partita)
+    const allP = predictions.flatMap(p => p.pronostici || []);
+    const verifiedP = allP.filter(p => p.hit === true || p.hit === false);
+    const hitsP = allP.filter(p => p.hit === true).length;
 
-    console.log(`✅ [PREDICTIONS] ${predictions.length} pronostici, ${hits}/${finished.length} azzeccati`);
+    console.log(`✅ [PREDICTIONS] ${predictions.length} partite, ${allP.length} pronostici, ${hitsP}/${verifiedP.length} azzeccati`);
 
     return res.json({
       success: true, date, predictions, count: predictions.length,
       stats: {
-        total: predictions.length,
-        finished: finished.length,
-        hits,
-        misses: finished.filter(p => p.hit === false).length,
-        pending: predictions.length - finished.length,
-        hit_rate: finished.length > 0 ? Math.round((hits / finished.length) * 1000) / 10 : null
+        total: allP.length,
+        total_matches: predictions.length,
+        finished: verifiedP.length,
+        hits: hitsP,
+        misses: verifiedP.length - hitsP,
+        pending: allP.length - verifiedP.length,
+        hit_rate: verifiedP.length > 0 ? Math.round((hitsP / verifiedP.length) * 1000) / 10 : null
       }
     });
   } catch (error) {
@@ -242,20 +245,23 @@ router.get('/daily-predictions-sandbox', async (req, res) => {
 
     predictions.sort((a, b) => (a.match_time || '').localeCompare(b.match_time || ''));
 
-    const finished = predictions.filter(p => p.real_score !== null);
-    const hits = finished.filter(p => p.hit === true).length;
+    // Conteggio per singolo pronostico (non per partita)
+    const allP = predictions.flatMap(p => p.pronostici || []);
+    const verifiedP = allP.filter(p => p.hit === true || p.hit === false);
+    const hitsP = allP.filter(p => p.hit === true).length;
 
-    console.log(`✅ [PREDICTIONS SANDBOX] ${predictions.length} pronostici, ${hits}/${finished.length} azzeccati`);
+    console.log(`✅ [PREDICTIONS SANDBOX] ${predictions.length} partite, ${allP.length} pronostici, ${hitsP}/${verifiedP.length} azzeccati`);
 
     return res.json({
       success: true, date, predictions, count: predictions.length,
       stats: {
-        total: predictions.length,
-        finished: finished.length,
-        hits,
-        misses: finished.filter(p => p.hit === false).length,
-        pending: predictions.length - finished.length,
-        hit_rate: finished.length > 0 ? Math.round((hits / finished.length) * 1000) / 10 : null
+        total: allP.length,
+        total_matches: predictions.length,
+        finished: verifiedP.length,
+        hits: hitsP,
+        misses: verifiedP.length - hitsP,
+        pending: allP.length - verifiedP.length,
+        hit_rate: verifiedP.length > 0 ? Math.round((hitsP / verifiedP.length) * 1000) / 10 : null
       }
     });
   } catch (error) {
