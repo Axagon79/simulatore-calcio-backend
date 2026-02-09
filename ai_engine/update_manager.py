@@ -20,6 +20,8 @@ FREQUENT_DIR = os.path.join(BASE_PROJECT_DIR, "ai_engine", "Aggiornamenti", "fre
 
 CALCULATORS_DIR = os.path.join(BASE_PROJECT_DIR, "ai_engine", "calculators")
 
+FP_CALCULATORS_DIR = os.path.join(BASE_PROJECT_DIR, "functions_python", "ai_engine", "calculators")
+
 # (Questa serve solo se qualche funzione vecchia la usa ancora)
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -49,7 +51,10 @@ SCRAPER_SEQUENCE = [
       ("fbref_scraper_def.py", "🛡️ [8/22] Stats Difensori", "Analisi difesa imprecisa", FREQUENT_DIR),
       ("scraper_gk_fbref.py", "🧤 [9/22] Stats Portieri", "Analisi portieri imprecisa", FREQUENT_DIR),
 
-      ("scraper_tm_multi_campionato.py", "🚑 [10/22] Infortuni (TM)", "Si rischia di puntare su assenti", FREQUENT_DIR),
+      # ⚠️ DISABILITATO (2026-02-09): impiega ~116 min e scrive solo in players_availability_tm
+      # che al momento NON viene letta da nessun file di produzione (né calculators, né frontend).
+      # Riabilitare quando verrà integrata nei pronostici.
+      # ("scraper_tm_multi_campionato.py", "🚑 [10/22] Infortuni (TM)", "Si rischia di puntare su assenti", FREQUENT_DIR),
       ("scraper_calendario_h2h_TF_completo.py", "📅 [11/22] Calendario H2H", "Analisi scontri diretti incompleta", FREQUENT_DIR),
 
       # ⭐ ( FA AGGIORNAMENTO ORARI E DATE )
@@ -88,7 +93,10 @@ SCRAPER_SEQUENCE = [
       ("per_agg_pianificato_update_results_only.py", "🔄 [22/23] Aggiorna Solo Risultati (Debug)", "Aggiorna solo i risultati senza toccare altro", FREQUENT_DIR),
 
       # ⭐ SCRAPER QUOTE O/U + GG/NG DA SNAI (Selenium)
-      ("scrape_snai_odds.py", "🎰 [23/23] Quote O/U + GG/NG (SNAI)", "Mancano quote Over/Under e Goal/NoGoal", FREQUENT_DIR),
+      ("scrape_snai_odds.py", "🎰 [23/24] Quote O/U + GG/NG (SNAI)", "Mancano quote Over/Under e Goal/NoGoal", FREQUENT_DIR),
+
+      # ⭐ GENERAZIONE PRONOSTICI GIORNALIERI (DEVE girare DOPO tutti gli aggiornamenti dati + quote)
+      ("run_daily_predictions.py", "🔮 [24/24] Pronostici Giornalieri", "Pronostici non generati o con quote mancanti", FP_CALCULATORS_DIR),
 ]
 
 

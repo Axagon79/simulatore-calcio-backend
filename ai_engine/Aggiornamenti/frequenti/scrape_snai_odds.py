@@ -14,7 +14,7 @@ Lo scraper scrolla incrementalmente e accumula dati per (home, away).
 import os
 import sys
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # Fix percorsi
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -41,41 +41,43 @@ from selenium.webdriver.common.by import By
 # ============================================================
 LEAGUES_CONFIG = [
     # ITALIA (3)
-    {"name": "Serie A", "url": "https://www.snai.it/sport/CALCIO/SERIE%20A"},
-    {"name": "Serie B", "url": "https://www.snai.it/sport/CALCIO/SERIE%20B"},
-    {"name": "Serie C", "url": "https://www.snai.it/sport/CALCIO/SERIE%20C"},
+    {"name": "Serie A", "url": "https://www.snai.it/sport/CALCIO/SERIE%20A", "sidebar": "ITALIA"},
+    {"name": "Serie B", "url": "https://www.snai.it/sport/CALCIO/SERIE%20B", "sidebar": "ITALIA"},
+    {"name": "Serie C", "url": "https://www.snai.it/sport/CALCIO/SERIE%20C", "sidebar": "ITALIA"},
 
     # EUROPA TOP (6)
-    {"name": "Premier League", "url": "https://www.snai.it/sport/CALCIO/PREMIER%20LEAGUE"},
-    {"name": "La Liga", "url": "https://www.snai.it/sport/CALCIO/LIGA"},
-    {"name": "Bundesliga", "url": "https://www.snai.it/sport/CALCIO/BUNDESLIGA"},
-    {"name": "Ligue 1", "url": "https://www.snai.it/sport/CALCIO/LIGUE%201"},
-    {"name": "Eredivisie", "url": "https://www.snai.it/sport/CALCIO/OLANDA%201"},
-    {"name": "Liga Portugal", "url": "https://www.snai.it/sport/CALCIO/PORTOGALLO%201"},
+    {"name": "Premier League", "url": "https://www.snai.it/sport/CALCIO/PREMIER%20LEAGUE", "sidebar": "INGHILTERRA"},
+    {"name": "La Liga", "url": "https://www.snai.it/sport/CALCIO/LIGA", "sidebar": "SPAGNA"},
+    {"name": "Bundesliga", "url": "https://www.snai.it/sport/CALCIO/BUNDESLIGA", "sidebar": "GERMANIA"},
+    {"name": "Ligue 1", "url": "https://www.snai.it/sport/CALCIO/LIGUE%201", "sidebar": "FRANCIA"},
+    {"name": "Eredivisie", "url": "https://www.snai.it/sport/CALCIO/OLANDA%201", "sidebar": "OLANDA"},
+    {"name": "Liga Portugal", "url": "https://www.snai.it/sport/CALCIO/PORTOGALLO%201", "sidebar": "PORTOGALLO"},
 
     # EUROPA SERIE B (4)
-    {"name": "Championship", "url": "https://www.snai.it/sport/CALCIO/CHAMPIONSHIP"},
-    {"name": "LaLiga 2", "url": "https://www.snai.it/sport/CALCIO/SPAGNA%202"},
-    {"name": "2. Bundesliga", "url": "https://www.snai.it/sport/CALCIO/GERMANIA%202"},
-    {"name": "Ligue 2", "url": "https://www.snai.it/sport/CALCIO/FRANCIA%202"},
+    {"name": "Championship", "url": "https://www.snai.it/sport/CALCIO/CHAMPIONSHIP", "sidebar": "INGHILTERRA"},
+    {"name": "LaLiga 2", "url": "https://www.snai.it/sport/CALCIO/SPAGNA%202", "sidebar": "SPAGNA"},
+    {"name": "2. Bundesliga", "url": "https://www.snai.it/sport/CALCIO/GERMANIA%202", "sidebar": "GERMANIA"},
+    {"name": "Ligue 2", "url": "https://www.snai.it/sport/CALCIO/FRANCIA%202", "sidebar": "FRANCIA"},
 
     # EUROPA NORDICI + EXTRA (7)
-    {"name": "Scottish Premiership", "url": "https://www.snai.it/sport/CALCIO/SCOZIA%201"},
-    {"name": "Allsvenskan", "url": "https://www.snai.it/sport/CALCIO/SVEZIA%201"},
-    {"name": "Eliteserien", "url": "https://www.snai.it/sport/CALCIO/NORVEGIA%201"},
-    {"name": "Superligaen", "url": "https://www.snai.it/sport/CALCIO/DANIMARCA%201"},
-    {"name": "Jupiler Pro League", "url": "https://www.snai.it/sport/CALCIO/BELGIO%201"},
-    {"name": "Super Lig", "url": "https://www.snai.it/sport/CALCIO/TURCHIA%201"},
-    {"name": "League of Ireland Premier Division", "url": "https://www.snai.it/sport/CALCIO/IRLANDA%201"},
+    {"name": "Scottish Premiership", "url": "https://www.snai.it/sport/CALCIO/SCOZIA%201", "sidebar": "SCOZIA"},
+    {"name": "Allsvenskan", "url": "https://www.snai.it/sport/CALCIO/SVEZIA%201", "sidebar": "SVEZIA"},
+    {"name": "Eliteserien", "url": "https://www.snai.it/sport/CALCIO/NORVEGIA%201", "sidebar": "NORVEGIA"},
+    {"name": "Superligaen", "url": "https://www.snai.it/sport/CALCIO/DANIMARCA%201", "sidebar": "DANIMARCA"},
+    {"name": "Jupiler Pro League", "url": "https://www.snai.it/sport/CALCIO/BELGIO%201", "sidebar": "BELGIO"},
+    {"name": "Süper Lig", "url": "https://www.snai.it/sport/CALCIO/TURCHIA%201", "sidebar": "TURCHIA"},
+    {"name": "League of Ireland Premier Division", "url": "https://www.snai.it/sport/CALCIO/IRLANDA%201", "sidebar": "IRLANDA"},
 
     # AMERICHE (3)
-    {"name": "Brasileirao Serie A", "url": "https://www.snai.it/sport/CALCIO/BRASILE%201"},
-    {"name": "Primera Division", "url": "https://www.snai.it/sport/CALCIO/ARGENTINA%201"},
-    {"name": "Major League Soccer", "url": "https://www.snai.it/sport/CALCIO/USA%20MLS"},
+    {"name": "Brasileirão Serie A", "url": "https://www.snai.it/sport/CALCIO/BRASILE%201", "sidebar": "BRASILE"},
+    {"name": "Primera División", "url": "https://www.snai.it/sport/CALCIO/ARGENTINA%201", "sidebar": "ARGENTINA"},
+    {"name": "Major League Soccer", "url": "https://www.snai.it/sport/CALCIO/USA%20MLS", "sidebar": "USA"},
 
     # ASIA (1)
-    {"name": "J1 League", "url": "https://www.snai.it/sport/CALCIO/GIAPPONE%201"},
+    {"name": "J1 League", "url": "https://www.snai.it/sport/CALCIO/GIAPPONE%201", "sidebar": "GIAPPONE"},
 ]
+
+MAX_RETRIES_EMPTY = 3  # Tentativi di reload se 0 partite trovate
 
 
 # ============================================================
@@ -130,6 +132,40 @@ def init_driver():
     options.add_argument('--window-size=1920,1080')
     options.add_argument('--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36')
     return webdriver.Chrome(options=options)
+
+
+def get_available_countries(driver):
+    """
+    Legge dalla sidebar di SNAI Calcio i nomi delle nazioni disponibili.
+    Scrolla il contenitore sidebar per caricare tutte le nazioni.
+    Ritorna un set di stringhe UPPERCASE (es. {"ITALIA", "INGHILTERRA", ...}).
+    """
+    driver.get("https://www.snai.it/sport/CALCIO")
+    time.sleep(5)
+    close_cookie_banner(driver)
+
+    countries = set()
+
+    # Finestra altissima → tutto il DOM della sidebar è visibile senza virtual scrolling
+    driver.set_window_size(1920, 10000)
+    time.sleep(2)
+
+    triggers = driver.find_elements(By.CSS_SELECTOR, '[class*="SportNavAccordionTrigger_text"]')
+    for t in triggers:
+        text = t.text.strip().upper()
+        if text:
+            countries.add(text)
+
+    # Ripristina dimensione normale per lo scraping delle quote
+    driver.set_window_size(1920, 1080)
+
+    # Fallback: se la sidebar non carica, non bloccare lo scraper
+    if not countries:
+        print("  ⚠️  Sidebar SNAI vuota — scraper procederà con tutte le leghe")
+    else:
+        print(f"  Nazioni sidebar: {', '.join(sorted(countries))}", flush=True)
+
+    return countries
 
 
 def close_cookie_banner(driver):
@@ -416,8 +452,15 @@ def find_and_update_odds(league_name, ou_data, gg_data):
                     if diff_days < -2 or diff_days > 30:
                         continue
 
-                home_doc = db.teams.find_one({"name": home_db})
-                away_doc = db.teams.find_one({"name": away_db})
+                # Freshness check: salta se quote O/U+GG aggiornate meno di 1 ora fa
+                existing_ts = m.get('odds', {}).get('ts_ou_gg')
+                if existing_ts:
+                    age_hours = (datetime.now() - existing_ts.replace(tzinfo=None)).total_seconds() / 3600
+                    if age_hours < 1:
+                        continue
+
+                home_doc = db.teams.find_one({"transfermarkt_id": m.get('home_tm_id')}) if m.get('home_tm_id') else db.teams.find_one({"name": home_db})
+                away_doc = db.teams.find_one({"transfermarkt_id": m.get('away_tm_id')}) if m.get('away_tm_id') else db.teams.find_one({"name": away_db})
                 home_aliases = get_team_aliases(home_db, home_doc)
                 away_aliases = get_team_aliases(away_db, away_doc)
 
@@ -468,6 +511,16 @@ def find_and_update_odds(league_name, ou_data, gg_data):
                     modified = True
                     updated += 1
 
+                    # Aggiorna anche daily_predictions (quote visibili subito nel frontend)
+                    if m.get('home_mongo_id') and m.get('away_mongo_id'):
+                        dp_update = {f"odds.{k}": v for k, v in new_fields.items()}
+                        dp_update["odds.src_ou_gg"] = "SNAI"
+                        dp_update["odds.ts_ou_gg"] = now
+                        db.daily_predictions.update_many(
+                            {"home_mongo_id": m['home_mongo_id'], "away_mongo_id": m['away_mongo_id']},
+                            {"$set": dp_update}
+                        )
+
             if modified:
                 db.h2h_by_round.update_one(
                     {"_id": round_doc["_id"]},
@@ -486,7 +539,7 @@ def scrape_league(driver, league, is_first=False):
     name = league['name']
     url = league['url']
 
-    print(f"\n  [{name}] Navigando...")
+    print(f"\n  [{name}] Navigando...", flush=True)
     driver.get(url)
     time.sleep(5)
 
@@ -496,17 +549,23 @@ def scrape_league(driver, league, is_first=False):
 
     disable_estesa(driver)
 
-    # Raccogli nomi partite (scroll per virtual list)
+    # Raccogli nomi partite (scroll per virtual list) — con retry + reload
     matches = scroll_and_collect_matches(driver)
     if not matches:
-        time.sleep(3)
-        matches = scroll_and_collect_matches(driver)
+        for attempt in range(2, MAX_RETRIES_EMPTY + 1):
+            print(f"  [{name}] 0 partite, tentativo {attempt}/{MAX_RETRIES_EMPTY} (reload)...", flush=True)
+            driver.get(url)
+            time.sleep(5)
+            disable_estesa(driver)
+            matches = scroll_and_collect_matches(driver)
+            if matches:
+                break
 
     if not matches:
-        print(f"  [{name}] 0 partite (fuori stagione?), skip")
+        print(f"  [{name}] 0 partite dopo {MAX_RETRIES_EMPTY} tentativi, skip")
         return 0, 0, set()
 
-    print(f"  [{name}] {len(matches)} partite trovate")
+    print(f"  [{name}] {len(matches)} partite trovate", flush=True)
 
     # Tab UNDER/OVER → estrai O/U (scroll per ogni livello)
     ou_data = {}
@@ -574,6 +633,37 @@ def _append_unmatched_log(all_unmatched):
     print(f"\n  Log unmatched: {len(new_entries)} nuove entry aggiunte → snai_unmatched_log.txt")
 
 
+def league_is_fresh(league_name, max_age_hours=1):
+    """
+    Controlla se la lega è stata aggiornata di recente.
+    Cerca il timestamp ts_ou_gg più recente: se < max_age_hours, skip.
+    """
+    league_patterns = [league_name]
+    if league_name == "Serie C":
+        league_patterns = ["Serie C - Girone A", "Serie C - Girone B", "Serie C - Girone C"]
+
+    soglia = datetime.now() - timedelta(hours=max_age_hours)
+    latest_ts = None
+
+    for league_pat in league_patterns:
+        for doc in db.h2h_by_round.find({"league": league_pat}):
+            for m in doc.get('matches', []):
+                ts = m.get('odds', {}).get('ts_ou_gg')
+                if ts:
+                    ts_naive = ts.replace(tzinfo=None)
+                    if latest_ts is None or ts_naive > latest_ts:
+                        latest_ts = ts_naive
+
+    if latest_ts is None:
+        print(f"    [freshness] {league_name}: nessun ts_ou_gg trovato")
+        return False
+
+    age_min = int((datetime.now() - latest_ts).total_seconds() / 60)
+    is_fresh = latest_ts > soglia
+    print(f"    [freshness] {league_name}: ultimo update {age_min} min fa → {'SKIP' if is_fresh else 'SCRAPE'}")
+    return is_fresh
+
+
 def run_scraper():
     print(f"\n{'='*55}")
     print(f"  SCRAPER SNAI — Quote O/U + GG/NG")
@@ -583,12 +673,34 @@ def run_scraper():
     driver = init_driver()
     total_matches = 0
     total_updated = 0
+    total_skipped = 0
     all_unmatched = []
 
     try:
-        for i, league in enumerate(LEAGUES_CONFIG):
+        # Leggi nazioni disponibili dalla sidebar SNAI
+        available = get_available_countries(driver)
+        if available:
+            print(f"  Sidebar SNAI: {len(available)} nazioni trovate")
+
+        first_league = True
+        for league in LEAGUES_CONFIG:
+            sidebar_country = league.get('sidebar', '')
+
+            # Skip se la nazione non è nella sidebar (fuori stagione / non disponibile)
+            if available and sidebar_country and sidebar_country not in available:
+                print(f"\n  [{league['name']}] ⏭️  {sidebar_country} non in sidebar, skip")
+                total_skipped += 1
+                continue
+
+            # Skip se tutte le partite hanno quote aggiornate da meno di 1 ora
+            if league_is_fresh(league['name']):
+                print(f"\n  [{league['name']}] ⏩ Quote già aggiornate (<1h), skip")
+                total_skipped += 1
+                continue
+
             try:
-                found, updated, unmatched = scrape_league(driver, league, is_first=(i == 0))
+                found, updated, unmatched = scrape_league(driver, league, is_first=first_league)
+                first_league = False
                 total_matches += found
                 total_updated += updated
                 for pair in unmatched:
@@ -607,6 +719,8 @@ def run_scraper():
     print(f"  COMPLETATO")
     print(f"  Partite trovate: {total_matches}")
     print(f"  Quote aggiornate: {total_updated}")
+    if total_skipped:
+        print(f"  ⏭️  Leghe saltate (non in sidebar): {total_skipped}")
     if all_unmatched:
         print(f"  ⚠️  Partite SNAI senza match: {len(all_unmatched)}")
     print(f"  {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")

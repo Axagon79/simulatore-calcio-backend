@@ -5,7 +5,7 @@ import re
 import ctypes  # // aggiunto per: nascondere la finestra
 import msvcrt  # // aggiunto per: tasto H e battito cardiaco
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Tuple
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -880,143 +880,75 @@ def run_scraper():
         print(f"   • {json_file}")
         print(f"   • {txt_file}")
         
-import os
-import sys
-import time
-import re
-import json
-import ctypes  # // aggiunto per: nascondere la finestra
-import msvcrt  # // aggiunto per: tasto H e battito cardiaco
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.by import By
+# --- CONFIGURAZIONE ORARI FISSI ---
+ORARI_RUN = [0, 2, 10, 12, 14, 16, 18, 20, 22]
 
-# FIX PERCORSI
-current_dir = os.path.dirname(os.path.abspath(__file__))
-ai_engine_dir = os.path.dirname(os.path.dirname(current_dir))
-project_root = os.path.dirname(ai_engine_dir)
 
-if ai_engine_dir not in sys.path: sys.path.insert(0, ai_engine_dir)
-if project_root not in sys.path: sys.path.insert(0, project_root)
+def prossimo_orario():
+    """Calcola il prossimo orario di esecuzione."""
+    now = datetime.now()
+    ora_corrente = now.hour * 60 + now.minute  # minuti dalla mezzanotte
 
-try:
-    from config import db
-    print(f"✅ DB Connesso: {db.name}")
-except ImportError:
-    sys.path.append(r"C:\Progetti\simulatore-calcio-backend\ai_engine")
-    try: 
-        from config import db
-    except: 
-        sys.exit(1)
+    for h in ORARI_RUN:
+        target = h * 60  # minuti dalla mezzanotte
+        if target > ora_corrente:
+            return now.replace(hour=h, minute=0, second=0, microsecond=0)
 
-try:
-    from selenium import webdriver
-    from selenium.webdriver.chrome.service import Service
-    from selenium.webdriver.chrome.options import Options
-    from webdriver_manager.chrome import ChromeDriverManager
-except ImportError:
-    print("❌ Errore Selenium.")
-    sys.exit(1)
+    # Se tutti gli orari di oggi sono passati, prendi il primo di domani
+    domani = now + timedelta(days=1)
+    return domani.replace(hour=ORARI_RUN[0], minute=0, second=0, microsecond=0)
 
-LEAGUES_CONFIG = [
-    # ITALIA
-    {"name": "Serie A", "url": "https://football.nowgoal26.com/subleague/34"},
-    {"name": "Serie B", "url": "https://football.nowgoal26.com/subleague/40"},
-    {"name": "Serie C - Girone A", "url": "https://football.nowgoal26.com/subleague/142"},
-    {"name": "Serie C - Girone B", "url": "https://football.nowgoal26.com/subleague/2025-2026/142/1526"},
-    {"name": "Serie C - Girone C", "url": "https://football.nowgoal26.com/subleague/2025-2026/142/1527"},
-    
-    # EUROPA TOP
-    {"name": "Premier League", "url": "https://football.nowgoal26.com/league/36"},
-    {"name": "La Liga", "url": "https://football.nowgoal26.com/league/31"},
-    {"name": "Bundesliga", "url": "https://football.nowgoal26.com/league/8"},
-    {"name": "Ligue 1", "url": "https://football.nowgoal26.com/league/11"},
-    {"name": "Eredivisie", "url": "https://football.nowgoal26.com/league/16"},
-    {"name": "Liga Portugal", "url": "https://football.nowgoal26.com/league/23"},
-    
-    # 🆕 EUROPA SERIE B
-    {"name": "Championship", "url": "https://football.nowgoal26.com/league/37"},
-    {"name": "LaLiga 2", "url": "https://football.nowgoal26.com/subleague/33"},
-    {"name": "2. Bundesliga", "url": "https://football.nowgoal26.com/league/9"},
-    {"name": "Ligue 2", "url": "https://football.nowgoal26.com/league/12"},
-    
-    # 🆕 EUROPA NORDICI + EXTRA
-    {"name": "Scottish Premiership", "url": "https://football.nowgoal26.com/subleague/29"},
-    {"name": "Allsvenskan", "url": "https://football.nowgoal26.com/subleague/26"},
-    {"name": "Eliteserien", "url": "https://football.nowgoal26.com/subleague/22"},
-    {"name": "Superligaen", "url": "https://football.nowgoal26.com/subleague/7"},
-    {"name": "Jupiler Pro League", "url": "https://football.nowgoal26.com/subleague/5"},
-    {"name": "Süper Lig", "url": "https://football.nowgoal26.com/subleague/30"},
-    {"name": "League of Ireland Premier Division", "url": "https://football.nowgoal26.com/subleague/1"},
-    
-    # 🆕 AMERICHE
-    {"name": "Brasileirão Serie A", "url": "https://football.nowgoal26.com/league/4"},
-    {"name": "Primera División", "url": "https://football.nowgoal26.com/subleague/2"},
-    {"name": "Major League Soccer", "url": "https://football.nowgoal26.com/subleague/21"},
-    
-    # 🆕 ASIA
-    {"name": "J1 League", "url": "https://football.nowgoal26.com/subleague/25"},
-]
-
-# ... (Mantieni tutte le tue funzioni normalize_name, get_team_aliases, ecc. invariate) ...
-
-def run_scraper():
-    """Funzione originale dello scraper"""
-    # // Questa funzione rimane identica alla tua versione originale
-    print("\n🚀 AVVIO SCARICO QUOTE NOWGOAL")
-    # ... (Resto del codice run_scraper originale) ...
-
-# --- LOGICA DIRETTORE QUOTE ---
 
 def run_odds_loop():
-    # // aggiunto per: gestire dashboard, heartbeat e funzione nascondi
+    orari_str = ", ".join(f"{h:02d}:00" for h in ORARI_RUN)
     print(f"\n{'='*55}")
-    print(f" 📊 DIRETTORE QUOTE (NOWGOAL) - SISTEMA ATTIVO ")
+    print(f" 📊 DIRETTORE QUOTE (NOWGOAL) - SISTEMA ATTIVO")
+    print(f" 📊 Orari fissi: {orari_str}")
     print(f"{'='*55}")
     print(" ⌨️  Premi 'H' per NASCONDERE questa finestra")
     print(" ⌨️  Premi 'CTRL+C' per terminare il processo\n")
-    
+
     heartbeat = ["❤️", "   "]
 
     while True:
-        ora_attuale = datetime.now()
-        
-        # --- PAUSA NOTTURNA SILENZIOSA (02:00 - 08:00) ---
-        if 2 <= ora_attuale.hour < 8:
-            sys.stdout.write(f"\r 💤 [NOTTE] Standby quote ({ora_attuale.strftime('%H:%M')}). Ripresa alle 08:00...          ")
-            sys.stdout.flush()
-            time.sleep(1800)
-            continue
+        # Calcola prossimo orario
+        target = prossimo_orario()
+        secondi_attesa = (target - datetime.now()).total_seconds()
 
-        # Esecuzione dello scraper
+        if secondi_attesa > 0:
+            print(f"\n ⏰ Prossimo run: {target.strftime('%H:%M')} (tra {int(secondi_attesa // 60)} min)")
+
+            # Attesa con heartbeat (cicli da 10 sec)
+            cicli = int(secondi_attesa / 10) + 1
+            for i in range(cicli):
+                # Controllo pressione tasto H
+                if msvcrt.kbhit():
+                    tasto = msvcrt.getch().decode('utf-8').lower()
+                    if tasto == 'h':
+                        ctypes.windll.user32.ShowWindow(
+                            ctypes.windll.kernel32.GetConsoleWindow(), 0
+                        )
+                        print("\n👻 Finestra nascosta! Il monitoraggio quote continua in background.")
+
+                # Controlla se è ora di partire
+                if datetime.now() >= target:
+                    break
+
+                h = heartbeat[i % 2]
+                orario_live = datetime.now().strftime("%H:%M:%S")
+                min_mancanti = max(0, int((target - datetime.now()).total_seconds() // 60))
+                sys.stdout.write(f"\r 📊 [NOWGOAL] {h} {orario_live} | Prossimo run alle {target.strftime('%H:%M')} (tra {min_mancanti} min)  ")
+                sys.stdout.flush()
+                time.sleep(10)
+
+        # --- ESECUZIONE SCRAPER ---
+        print(f"\n\n 🚀 Avvio scraper NowGoal — {datetime.now().strftime('%H:%M:%S')}")
         try:
             run_scraper()
         except Exception as e:
             print(f"\n❌ Errore durante lo scarico: {e}")
 
-        # --- CICLO DI ATTESA PULSANTE (60 minuti) ---
-        minuti_attesa = 60
-        for i in range(minuti_attesa * 6): # 6 cicli da 10 sec = 1 minuto
-            
-            # Controllo pressione tasto H
-            if msvcrt.kbhit():
-                tasto = msvcrt.getch().decode('utf-8').lower()
-                if tasto == 'h':
-                    ctypes.windll.user32.ShowWindow(ctypes.windll.kernel32.GetConsoleWindow(), 0)
-                    print("\n👻 Finestra nascosta! Il monitoraggio quote continua in background.")
-
-            h = heartbeat[i % 2]
-            orario_live = datetime.now().strftime("%H:%M:%S")
-            min_mancanti = minuti_attesa - (i // 6)
-            
-            sys.stdout.write(f"\r ✅ [QUOTE ATTIVE] {h} Ultimo check: {orario_live} | Prossimo tra {min_mancanti} min...  ")
-            sys.stdout.flush()
-            time.sleep(10)
+        print(f" ✅ Scraper completato — {datetime.now().strftime('%H:%M:%S')}")
 
 if __name__ == "__main__":
     run_odds_loop()
-
-if __name__ == "__main__":
-    run_scraper()

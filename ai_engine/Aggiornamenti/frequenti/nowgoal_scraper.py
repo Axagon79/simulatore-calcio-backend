@@ -50,26 +50,26 @@ LEAGUES_CONFIG = [
     
     # 🆕 EUROPA SERIE B
     {"name": "Championship", "url": "https://football.nowgoal26.com/league/37"},
-    {"name": "LaLiga 2", "url": "https://football.nowgoal26.com/league/32"},
+    {"name": "LaLiga 2", "url": "https://football.nowgoal26.com/subleague/33"},
     {"name": "2. Bundesliga", "url": "https://football.nowgoal26.com/league/9"},
     {"name": "Ligue 2", "url": "https://football.nowgoal26.com/league/12"},
     
     # 🆕 EUROPA NORDICI + EXTRA
-    {"name": "Scottish Premiership", "url": "https://football.nowgoal26.com/league/40"},
-    {"name": "Allsvenskan", "url": "https://football.nowgoal26.com/league/61"},
-    {"name": "Eliteserien", "url": "https://football.nowgoal26.com/league/59"},
-    {"name": "Superligaen", "url": "https://football.nowgoal26.com/league/54"},
-    {"name": "Jupiler Pro League", "url": "https://football.nowgoal26.com/league/49"},
-    {"name": "Süper Lig", "url": "https://football.nowgoal26.com/league/52"},
-    {"name": "League of Ireland Premier Division", "url": "https://football.nowgoal26.com/league/65"},
+    {"name": "Scottish Premiership", "url": "https://football.nowgoal26.com/subleague/29"},
+    {"name": "Allsvenskan", "url": "https://football.nowgoal26.com/subleague/26"},
+    {"name": "Eliteserien", "url": "https://football.nowgoal26.com/subleague/22"},
+    {"name": "Superligaen", "url": "https://football.nowgoal26.com/subleague/7"},
+    {"name": "Jupiler Pro League", "url": "https://football.nowgoal26.com/subleague/5"},
+    {"name": "Süper Lig", "url": "https://football.nowgoal26.com/subleague/30"},
+    {"name": "League of Ireland Premier Division", "url": "https://football.nowgoal26.com/subleague/1"},
     
     # 🆕 AMERICHE
-    {"name": "Brasileirão Serie A", "url": "https://football.nowgoal26.com/league/18"},
-    {"name": "Primera División", "url": "https://football.nowgoal26.com/league/19"},
-    {"name": "Major League Soccer", "url": "https://football.nowgoal26.com/league/42"},
+    {"name": "Brasileirão Serie A", "url": "https://football.nowgoal26.com/league/4"},
+    {"name": "Primera División", "url": "https://football.nowgoal26.com/subleague/2"},
+    {"name": "Major League Soccer", "url": "https://football.nowgoal26.com/subleague/21"},
     
     # 🆕 ASIA
-    {"name": "J1 League", "url": "https://football.nowgoal26.com/league/56"},
+    {"name": "J1 League", "url": "https://football.nowgoal26.com/subleague/25"},
 ]
 
 def normalize_name(name):

@@ -57,6 +57,22 @@ function checkPronostico(pronostico, tipo, parsed) {
   return null;
 }
 
+// --- HELPER: Deriva quota per pronostici GOL dal campo odds padre ---
+function getQuotaForPronostico(pronostico, tipo, parentOdds) {
+  if (tipo !== 'GOL') return null;
+  if (!parentOdds || typeof parentOdds !== 'object') return null;
+  const p = (pronostico || '').trim().toLowerCase();
+  const MAPPING = {
+    'over 1.5': 'over_15', 'over 2.5': 'over_25', 'over 3.5': 'over_35',
+    'under 1.5': 'under_15', 'under 2.5': 'under_25', 'under 3.5': 'under_35',
+    'goal': 'gg', 'nogoal': 'ng',
+  };
+  const key = MAPPING[p];
+  if (!key) return null;
+  const val = parseFloat(parentOdds[key]);
+  return isNaN(val) ? null : val;
+}
+
 // --- HELPER: Recupera risultati reali da h2h_by_round ---
 async function getFinishedResults(db) {
   try {
@@ -324,7 +340,7 @@ router.get('/daily-bombs-sandbox', async (req, res) => {
 
 // 📊 ENDPOINT: Track Record — Aggregazione storica accuratezza pronostici
 router.get('/track-record', async (req, res) => {
-  const { from, to, league, market, min_confidence } = req.query;
+  const { from, to, league, market, min_confidence, min_quota, max_quota } = req.query;
 
   if (!from || !to) {
     return res.status(400).json({ error: 'Parametri from e to (YYYY-MM-DD) obbligatori' });
@@ -371,6 +387,15 @@ router.get('/track-record', async (req, res) => {
         // Filtro per confidence minima
         if (min_confidence && (p.confidence || 0) < parseFloat(min_confidence)) continue;
 
+        // Risolvi quota: prima dal pronostico, poi dal parent odds (GOL)
+        let quota = p.quota != null ? parseFloat(p.quota) : null;
+        if (quota === null || isNaN(quota)) {
+          quota = getQuotaForPronostico(p.pronostico, p.tipo, pred.odds);
+        }
+        // Filtro per range quota
+        if (min_quota && (quota === null || quota < parseFloat(min_quota))) continue;
+        if (max_quota && (quota === null || quota > parseFloat(max_quota))) continue;
+
         verified.push({
           date: pred.date,
           league: pred.league || 'N/A',
@@ -378,6 +403,7 @@ router.get('/track-record', async (req, res) => {
           pronostico: p.pronostico,
           confidence: p.confidence || 0,
           stars: p.stars || 0,
+          quota,
           hit
         });
       }
@@ -443,6 +469,99 @@ router.get('/track-record', async (req, res) => {
       breakdown_stelle[band] = hitRate(items);
     }
 
+    // Per fascia quota (fasce strette)
+    const quotaBands = {
+      '1.01-1.20': [], '1.21-1.40': [], '1.41-1.60': [], '1.61-1.80': [],
+      '1.81-2.00': [], '2.01-2.20': [], '2.21-2.50': [], '2.51-3.00': [],
+      '3.01-3.50': [], '3.51-4.00': [], '4.01-5.00': [], '5.00+': [], 'N/D': []
+    };
+    for (const v of verified) {
+      if (v.quota === null || v.quota === undefined) { quotaBands['N/D'].push(v); continue; }
+      if (v.quota <= 1.20) quotaBands['1.01-1.20'].push(v);
+      else if (v.quota <= 1.40) quotaBands['1.21-1.40'].push(v);
+      else if (v.quota <= 1.60) quotaBands['1.41-1.60'].push(v);
+      else if (v.quota <= 1.80) quotaBands['1.61-1.80'].push(v);
+      else if (v.quota <= 2.00) quotaBands['1.81-2.00'].push(v);
+      else if (v.quota <= 2.20) quotaBands['2.01-2.20'].push(v);
+      else if (v.quota <= 2.50) quotaBands['2.21-2.50'].push(v);
+      else if (v.quota <= 3.00) quotaBands['2.51-3.00'].push(v);
+      else if (v.quota <= 3.50) quotaBands['3.01-3.50'].push(v);
+      else if (v.quota <= 4.00) quotaBands['3.51-4.00'].push(v);
+      else if (v.quota <= 5.00) quotaBands['4.01-5.00'].push(v);
+      else quotaBands['5.00+'].push(v);
+    }
+    // Helper: classifica quota in band
+    const getQuotaBand = (q) => {
+      if (q === null || q === undefined) return 'N/D';
+      if (q <= 1.20) return '1.01-1.20';
+      if (q <= 1.40) return '1.21-1.40';
+      if (q <= 1.60) return '1.41-1.60';
+      if (q <= 1.80) return '1.61-1.80';
+      if (q <= 2.00) return '1.81-2.00';
+      if (q <= 2.20) return '2.01-2.20';
+      if (q <= 2.50) return '2.21-2.50';
+      if (q <= 3.00) return '2.51-3.00';
+      if (q <= 3.50) return '3.01-3.50';
+      if (q <= 4.00) return '3.51-4.00';
+      if (q <= 5.00) return '4.01-5.00';
+      return '5.00+';
+    };
+
+    // Breakdown quota esteso con ROI
+    const breakdown_quota = {};
+    for (const [band, items] of Object.entries(quotaBands)) {
+      if (items.length === 0) continue;
+      const base = hitRate(items);
+      let totalProfit = 0;
+      const hitQuotas = [];
+      const missQuotas = [];
+      for (const v of items) {
+        if (v.hit && v.quota != null) { totalProfit += (v.quota - 1); hitQuotas.push(v.quota); }
+        else if (!v.hit) { totalProfit -= 1; if (v.quota != null) missQuotas.push(v.quota); }
+      }
+      breakdown_quota[band] = {
+        ...base,
+        roi: items.length > 0 ? Math.round((totalProfit / items.length) * 1000) / 10 : null,
+        profit: Math.round(totalProfit * 100) / 100,
+        avg_quota: items.filter(v => v.quota != null).length > 0
+          ? Math.round(items.filter(v => v.quota != null).reduce((s, v) => s + v.quota, 0) / items.filter(v => v.quota != null).length * 100) / 100
+          : null
+      };
+    }
+
+    // Stats globali quote
+    const quotaVerified = verified.filter(v => v.quota != null);
+    const quotaHits = quotaVerified.filter(v => v.hit);
+    const quotaMisses = quotaVerified.filter(v => !v.hit);
+    let roiGlobale = 0;
+    for (const v of quotaVerified) {
+      roiGlobale += v.hit ? (v.quota - 1) : -1;
+    }
+    const quota_stats = {
+      total_con_quota: quotaVerified.length,
+      total_senza_quota: verified.length - quotaVerified.length,
+      avg_quota_tutti: quotaVerified.length > 0 ? Math.round(quotaVerified.reduce((s, v) => s + v.quota, 0) / quotaVerified.length * 100) / 100 : null,
+      avg_quota_azzeccati: quotaHits.length > 0 ? Math.round(quotaHits.reduce((s, v) => s + v.quota, 0) / quotaHits.length * 100) / 100 : null,
+      avg_quota_sbagliati: quotaMisses.length > 0 ? Math.round(quotaMisses.reduce((s, v) => s + v.quota, 0) / quotaMisses.length * 100) / 100 : null,
+      roi_globale: quotaVerified.length > 0 ? Math.round((roiGlobale / quotaVerified.length) * 1000) / 10 : null,
+      profit_globale: Math.round(roiGlobale * 100) / 100,
+    };
+
+    // Incrocio quota × mercato
+    const crossQM = {};
+    for (const v of verified) {
+      const band = getQuotaBand(v.quota);
+      const key = `${band}|||${v.tipo}`;
+      if (!crossQM[key]) crossQM[key] = [];
+      crossQM[key].push(v);
+    }
+    const cross_quota_mercato = {};
+    for (const [key, items] of Object.entries(crossQM)) {
+      const [band, tipo] = key.split('|||');
+      if (!cross_quota_mercato[band]) cross_quota_mercato[band] = {};
+      cross_quota_mercato[band][tipo] = hitRate(items);
+    }
+
     // Serie temporale giornaliera
     const byDate = {};
     for (const v of verified) {
@@ -472,12 +591,15 @@ router.get('/track-record', async (req, res) => {
     return res.json({
       success: true,
       periodo: { from, to },
-      filtri: { league: league || null, market: market || null, min_confidence: min_confidence || null },
+      filtri: { league: league || null, market: market || null, min_confidence: min_confidence || null, min_quota: min_quota || null, max_quota: max_quota || null },
       globale,
       breakdown_mercato,
       breakdown_campionato,
       breakdown_confidence,
       breakdown_stelle,
+      breakdown_quota,
+      quota_stats,
+      cross_quota_mercato,
       cross_mercato_campionato,
       serie_temporale
     });

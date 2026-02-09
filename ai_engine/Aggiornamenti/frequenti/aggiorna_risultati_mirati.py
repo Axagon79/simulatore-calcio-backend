@@ -1,7 +1,7 @@
 import os
 import sys
 import time
-import subprocess
+
 import ctypes  # // aggiunto per: nascondere la finestra
 import msvcrt  # // aggiunto per: leggere i tasti senza bloccare il ciclo
 import importlib.util
@@ -143,7 +143,9 @@ def process_league(driver, league_config):
     if totale_aggiornati > 0:
         print(f"✅ {league_config['league_name']}: Aggiornati {totale_aggiornati} risultati nel database.")
     else:
-        print(f"☕ {league_config['league_name']}: Scansione completata. Nessun nuovo risultato da inserire.")
+        print(f"☕ {league_config['league_name']}: Nessun nuovo risultato.")
+
+    return totale_aggiornati
 
 # --- FUNZIONI ORIGINALI COPPE (da update_cups_data.py) ---
 
@@ -182,12 +184,14 @@ def run_director_loop():
     print(f" 🚀 DIRETTORE RISULTATI - SISTEMA ATTIVO ")
     print(f"{'='*50}")
     print(" ⌨️  Premi 'H' per NASCONDERE questa finestra")
-    
-    heartbeat = ["❤️", "   "] 
+
+    heartbeat = ["❤️", "   "]
+    last_empty_check = {}  # {league_name: datetime} — cooldown per leghe senza risultati
+    COOLDOWN_MIN = 30  # Minuti di attesa dopo check vuoto
 
     while True:
         ora_attuale = datetime.now()
-        
+
         # Gestione Pausa Notturna
         if 2 <= ora_attuale.hour < 8:
             sys.stdout.write(f"\r 💤 [PAUSA] Il Direttore riposa. Sveglia alle 08:00...          ")
@@ -196,23 +200,23 @@ def run_director_loop():
             continue
 
         agenda = set()
-        
+
         # --- DEFINIZIONE FINESTRA TEMPORALE ---
-        # // modificato per: ignorare il passato e guardare solo oggi/ieri
-        soglia_fine = ora_attuale - timedelta(minutes=120)  # Iniziata da almeno 2 ore
-        soglia_inizio = ora_attuale - timedelta(days=2)      # Non più vecchia di 48 ore
+        # Cerca partite iniziate tra 2h e 5h fa (2h partita + 3h margine per BetExplorer)
+        # Dopo 5h dal fischio d'inizio senza risultato → probabilmente posticipata
+        soglia_fine = ora_attuale - timedelta(hours=2)   # Iniziata da almeno 2 ore
+        soglia_inizio = ora_attuale - timedelta(hours=5)  # Non più vecchia di 5 ore
 
         # Check campionati
-        # Cerchiamo solo documenti che hanno almeno un match nel range temporale corretto
         query_leagues = {
             "matches.status": "Scheduled",
             "matches.date_obj": {"$gte": soglia_inizio, "$lte": soglia_fine}
         }
-        
+
         for doc in db["h2h_by_round"].find(query_leagues):
             for m in doc.get("matches", []):
-                if (m.get("status") == "Scheduled" and 
-                    m.get("date_obj") and 
+                if (m.get("status") == "Scheduled" and
+                    m.get("date_obj") and
                     soglia_inizio <= m["date_obj"] <= soglia_fine):
                     agenda.add(doc.get("league"))
                     break
@@ -220,7 +224,6 @@ def run_director_loop():
         # Check coppe
         for name, cfg in TARGET_CONFIG.items():
             if cfg['tipo'] == "coppa":
-                # Anche per le coppe, filtriamo per data
                 for p in db[cfg['matches_collection']].find({"status": {"$ne": "finished"}}):
                     try:
                         match_date = datetime.strptime(p.get("match_date", "01-01-2000 00:00"), "%d-%m-%Y %H:%M")
@@ -230,18 +233,56 @@ def run_director_loop():
                     except:
                         continue
 
-        # Esecuzione aggiornamenti
-        if agenda:
-            print(f"\n🎯 Aggiornamento in corso per: {list(agenda)}")
-            for target in agenda: 
-                subprocess.run([sys.executable, __file__, target])
-        
+        # Filtra per cooldown: skip leghe controllate di recente senza risultati
+        agenda_filtrata = set()
+        for target in agenda:
+            last = last_empty_check.get(target)
+            if last and (ora_attuale - last).total_seconds() < COOLDOWN_MIN * 60:
+                continue
+            agenda_filtrata.add(target)
+
+        # Esecuzione con SINGOLO Chrome driver (no subprocess)
+        if agenda_filtrata:
+            leghe = [t for t in agenda_filtrata if t in TARGET_CONFIG and TARGET_CONFIG[t]['tipo'] == 'lega']
+            coppe = [t for t in agenda_filtrata if t in TARGET_CONFIG and TARGET_CONFIG[t]['tipo'] == 'coppa']
+
+            print(f"\n🎯 Aggiornamento: {list(agenda_filtrata)}")
+
+            # Leghe: un solo Chrome driver per tutte
+            if leghe:
+                driver = None
+                try:
+                    chrome_options = Options()
+                    chrome_options.add_argument("--headless")
+                    driver = webdriver.Chrome(options=chrome_options)
+
+                    for target in leghe:
+                        cfg = TARGET_CONFIG[target]
+                        aggiornati = process_league(driver, cfg)
+                        if aggiornati == 0:
+                            last_empty_check[target] = datetime.now()
+                        else:
+                            # Risultati trovati: rimuovi dal cooldown (potrebbe finirne un'altra)
+                            last_empty_check.pop(target, None)
+                finally:
+                    if driver:
+                        driver.quit()
+
+            # Coppe: driver proprio (scrape_nowgoal_matches lo crea internamente)
+            for target in coppe:
+                cfg = TARGET_CONFIG[target]
+                scrape_nowgoal_matches(cfg)
+
+        elif agenda:
+            # Tutte in cooldown
+            print(f"\n⏳ {len(agenda)} leghe in agenda ma in cooldown (<{COOLDOWN_MIN}min)")
+
         # --- DASHBOARD VISIVA E ATTESA ---
         print("\n" + "-"*50)
         print(" ⌨️  Premi 'H' per NASCONDERE questa finestra")
         print("-"*50)
-        
-        for i in range(60): 
+
+        for i in range(60):
             if msvcrt.kbhit():
                 if msvcrt.getch().decode('utf-8').lower() == 'h':
                     ctypes.windll.user32.ShowWindow(ctypes.windll.kernel32.GetConsoleWindow(), 0)
@@ -254,18 +295,5 @@ def run_director_loop():
             sys.stdout.flush()
             time.sleep(10)
 
-def main():
-    if len(sys.argv) > 1:
-        t = sys.argv[1]
-        if t in TARGET_CONFIG:
-            cfg = TARGET_CONFIG[t]
-            chrome_options = Options()
-            chrome_options.add_argument("--headless")
-            driver = webdriver.Chrome(options=chrome_options)
-            if cfg['tipo'] == "lega": process_league(driver, cfg)
-            else: scrape_nowgoal_matches(cfg)
-            driver.quit()
-    else: run_director_loop()
-
 if __name__ == "__main__":
-    main()
+    run_director_loop()
