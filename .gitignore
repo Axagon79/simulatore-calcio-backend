@@ -3,3 +3,16 @@
 __pycache__/
 .vscode/
 *.egg-info/
+
+# Log files
+log_*.txt
+
+# Scraper reports
+scraper_reports/
+
+# Calibration snapshots
+calibration_snapshot_*.json
+
+# Debug/temp files
+debug_snai_sidebar.html
+temp_*.py
