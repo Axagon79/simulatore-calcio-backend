@@ -520,6 +520,10 @@ def find_and_update_odds(league_name, ou_data, gg_data):
                             {"home_mongo_id": m['home_mongo_id'], "away_mongo_id": m['away_mongo_id']},
                             {"$set": dp_update}
                         )
+                        db.daily_predictions_sandbox.update_many(
+                            {"home_mongo_id": m['home_mongo_id'], "away_mongo_id": m['away_mongo_id']},
+                            {"$set": dp_update}
+                        )
 
             if modified:
                 db.h2h_by_round.update_one(
@@ -633,6 +637,39 @@ def _append_unmatched_log(all_unmatched):
     print(f"\n  Log unmatched: {len(new_entries)} nuove entry aggiunte → snai_unmatched_log.txt")
 
 
+def propagate_to_sandbox(league_name):
+    """Propaga le quote SNAI già presenti in h2h_by_round a daily_predictions_sandbox."""
+    league_patterns = [league_name]
+    if league_name == "Serie C":
+        league_patterns = ["Serie C - Girone A", "Serie C - Girone B", "Serie C - Girone C"]
+
+    count = 0
+    for league_pat in league_patterns:
+        for doc in db.h2h_by_round.find({"league": league_pat}):
+            for m in doc.get('matches', []):
+                odds = m.get('odds', {})
+                if not odds.get('ts_ou_gg'):
+                    continue
+                if not m.get('home_mongo_id') or not m.get('away_mongo_id'):
+                    continue
+                snai_fields = {k: v for k, v in odds.items() if k in (
+                    'over_15', 'under_15', 'over_25', 'under_25', 'over_35', 'under_35', 'gg', 'ng'
+                )}
+                if not snai_fields:
+                    continue
+                dp_update = {f"odds.{k}": v for k, v in snai_fields.items()}
+                dp_update["odds.src_ou_gg"] = "SNAI"
+                dp_update["odds.ts_ou_gg"] = odds['ts_ou_gg']
+                result = db.daily_predictions_sandbox.update_many(
+                    {"home_mongo_id": m['home_mongo_id'], "away_mongo_id": m['away_mongo_id']},
+                    {"$set": dp_update}
+                )
+                count += result.modified_count
+    if count:
+        print(f"    → Sandbox: {count} pronostici aggiornati con quote esistenti")
+    return count
+
+
 def league_is_fresh(league_name, max_age_hours=1):
     """
     Controlla se la lega è stata aggiornata di recente.
@@ -674,6 +711,7 @@ def run_scraper():
     total_matches = 0
     total_updated = 0
     total_skipped = 0
+    total_sandbox_propagated = 0
     all_unmatched = []
 
     try:
@@ -695,6 +733,7 @@ def run_scraper():
             # Skip se tutte le partite hanno quote aggiornate da meno di 1 ora
             if league_is_fresh(league['name']):
                 print(f"\n  [{league['name']}] ⏩ Quote già aggiornate (<1h), skip")
+                total_sandbox_propagated += propagate_to_sandbox(league['name'])
                 total_skipped += 1
                 continue
 
@@ -719,6 +758,8 @@ def run_scraper():
     print(f"  COMPLETATO")
     print(f"  Partite trovate: {total_matches}")
     print(f"  Quote aggiornate: {total_updated}")
+    if total_sandbox_propagated:
+        print(f"  🧪 Sandbox aggiornati (da cache): {total_sandbox_propagated}")
     if total_skipped:
         print(f"  ⏭️  Leghe saltate (non in sidebar): {total_skipped}")
     if all_unmatched:

@@ -93,10 +93,13 @@ SCRAPER_SEQUENCE = [
       ("per_agg_pianificato_update_results_only.py", "🔄 [22/23] Aggiorna Solo Risultati (Debug)", "Aggiorna solo i risultati senza toccare altro", FREQUENT_DIR),
 
       # ⭐ SCRAPER QUOTE O/U + GG/NG DA SNAI (Selenium)
-      ("scrape_snai_odds.py", "🎰 [23/24] Quote O/U + GG/NG (SNAI)", "Mancano quote Over/Under e Goal/NoGoal", FREQUENT_DIR),
+      ("scrape_snai_odds.py", "🎰 [23/25] Quote O/U + GG/NG (SNAI)", "Mancano quote Over/Under e Goal/NoGoal", FREQUENT_DIR),
 
       # ⭐ GENERAZIONE PRONOSTICI GIORNALIERI (DEVE girare DOPO tutti gli aggiornamenti dati + quote)
-      ("run_daily_predictions.py", "🔮 [24/24] Pronostici Giornalieri", "Pronostici non generati o con quote mancanti", FP_CALCULATORS_DIR),
+      ("run_daily_predictions.py", "🔮 [24/25] Pronostici Giornalieri", "Pronostici non generati o con quote mancanti", FP_CALCULATORS_DIR),
+
+      # ⭐ SYNC QUOTE SNAI → SANDBOX (recupera quote mancanti da h2h_by_round + produzione)
+      ("sync_snai_odds_to_sandbox.py", "🧪 [25/25] Sync Quote SNAI → Sandbox", "Sandbox potrebbe avere quote SNAI mancanti", CURRENT_DIR),
 ]
 
 

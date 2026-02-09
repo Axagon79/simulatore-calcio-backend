@@ -734,11 +734,13 @@ def run_scraper():
                         
                         if has_odds:
                             # CASO 1: Partita trovata CON quote ✓
-                            match['odds'] = {
-                                **odds_dict,
-                                "src": "NowGoal",
-                                "ts": datetime.now()
-                            }
+                            if 'odds' not in match:
+                                match['odds'] = {}
+                            match['odds']['1'] = odds_dict['1']
+                            match['odds']['X'] = odds_dict['X']
+                            match['odds']['2'] = odds_dict['2']
+                            match['odds']['src'] = "NowGoal"
+                            match['odds']['ts'] = datetime.now()
                             
                             updated_count += 1
                             league_stats['updated'] += 1

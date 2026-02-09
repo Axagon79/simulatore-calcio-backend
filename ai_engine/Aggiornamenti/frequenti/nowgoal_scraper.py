@@ -312,7 +312,13 @@ def run_scraper():
                         # Se è fresca E uguale -> Salta (should_update resta False)
                     
                     if should_update:
-                        m['odds'] = new_odds_val
+                        if 'odds' not in m:
+                            m['odds'] = {}
+                        m['odds']['1'] = new_odds_val['1']
+                        m['odds']['X'] = new_odds_val['X']
+                        m['odds']['2'] = new_odds_val['2']
+                        m['odds']['src'] = new_odds_val['src']
+                        m['odds']['ts'] = new_odds_val['ts']
                         mod = True
                         match_count += 1
                 
