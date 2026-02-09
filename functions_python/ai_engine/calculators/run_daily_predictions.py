@@ -814,8 +814,8 @@ def score_xg(home_team_doc, away_team_doc, league_name):
     a_stats = get_seasonal_stats(away_name, league_name)
     
     if not h_stats or not a_stats:
-        return 50, 'neutro'
-    
+        return 50, 'neutro', 1.25, 1.25
+
     h_xg = h_stats.get('xg_avg', 1.25)
     a_xg = a_stats.get('xg_avg', 1.25)
     h_vol = h_stats.get('total_volume_avg', 2.5)
@@ -848,7 +848,7 @@ def score_xg(home_team_doc, away_team_doc, league_name):
     elif combined_vol <= 2.0:
         score -= 5
     
-    return round(max(0, min(100, score)), 1), direction
+    return round(max(0, min(100, score)), 1), direction, h_xg, a_xg
 
 
 def score_h2h_gol(match_data):
@@ -960,7 +960,7 @@ def analyze_gol(match_data, home_team_doc, away_team_doc, league_name):
     # Calcola ogni sotto-punteggio
     mg_score, mg_dir, expected_total, both_score = score_media_gol(home_team_doc, away_team_doc, match_data)
     avd_score, avd_dir, both_att_strong = score_att_vs_def(home_team_doc, away_team_doc)
-    xg_score, xg_dir = score_xg(home_team_doc, away_team_doc, league_name)
+    xg_score, xg_dir, h_xg, a_xg = score_xg(home_team_doc, away_team_doc, league_name)
     h2h_score, h2h_dir, h2h_patterns = score_h2h_gol(match_data)
     ml_score, ml_dir, league_avg = score_media_lega(league_name)
     dna_score, dna_dir = score_dna_off_def(match_data)
@@ -1013,11 +1013,121 @@ def analyze_gol(match_data, home_team_doc, away_team_doc, league_name):
     else:
         tipo_gol = None
         tipo_gol_extra = None
-    
+
+    # ====== CONFIDENCE SEPARATA per Goal/NoGoal (6 segnali) ======
+    # Ogni segnale: 0-100 (alto = probabile che entrambe segnino → Goal)
+
+    # 1. BTTS% dagli H2H (peso 0.25)
+    btts_h2h = h2h_patterns.get('btts_pct', 50) if isinstance(h2h_patterns, dict) else 50
+
+    # 2. Gol attesi squadra più debole (peso 0.20)
+    if home_team_doc and away_team_doc:
+        h_hs = home_team_doc.get('ranking', {}).get('homeStats', {})
+        a_as = away_team_doc.get('ranking', {}).get('awayStats', {})
+        hp, ap = h_hs.get('played', 0), a_as.get('played', 0)
+        if hp > 0 and ap > 0:
+            exp_h = (h_hs.get('goalsFor', 0) / hp + a_as.get('goalsAgainst', 0) / ap) / 2
+            exp_a = (a_as.get('goalsFor', 0) / ap + h_hs.get('goalsAgainst', 0) / hp) / 2
+            btts_exp = min(100, (min(exp_h, exp_a) / 1.4) * 100)
+        else:
+            btts_exp = 50
+    else:
+        btts_exp = 50
+
+    # 3. Forza attacco più debole (peso 0.15)
+    if home_team_doc and away_team_doc:
+        h_sc = home_team_doc.get('scores', {})
+        a_sc = away_team_doc.get('scores', {})
+        att_h_n = (h_sc.get('attack_home', 7.5) / 15) * 100
+        att_a_n = (a_sc.get('attack_away', 7.5) / 15) * 100
+        btts_att = min(att_h_n, att_a_n)
+    else:
+        btts_att = 50
+
+    # 4. xG squadra più debole (peso 0.20)
+    btts_xg = min(100, (min(h_xg, a_xg) / 1.4) * 100)
+
+    # 5. DNA offensivo più debole (peso 0.10)
+    h2h_d = match_data.get('h2h_data', {})
+    dna_h_att = h2h_d.get('home_dna', {}).get('att', 50) if h2h_d.get('home_dna') else 50
+    dna_a_att = h2h_d.get('away_dna', {}).get('att', 50) if h2h_d.get('away_dna') else 50
+    btts_dna = min(dna_h_att, dna_a_att)
+
+    # 6. Both score likely bonus (peso 0.10)
+    btts_both = 80 if both_score else 30
+
+    # Media pesata → 0-100 (alto = probabile BTTS/Goal)
+    btts_total = (
+        btts_h2h * 0.25 +
+        btts_exp * 0.20 +
+        btts_xg * 0.20 +
+        btts_att * 0.15 +
+        btts_dna * 0.10 +
+        btts_both * 0.10
+    )
+
+    # Confidence per Goal/NoGoal
+    if tipo_gol_extra == 'Goal':
+        confidence_gol_extra = round(btts_total, 1)
+    elif tipo_gol_extra == 'NoGoal':
+        confidence_gol_extra = round(100 - btts_total, 1)
+    else:
+        confidence_gol_extra = 0
+
+    # ====== RISOLUZIONE CONFLITTI: Over+NoGoal / Under+Goal ======
+    odds = match_data.get('odds', {})
+    quota_map = {
+        'Over 2.5': 'over_25', 'Over 1.5': 'over_15',
+        'Under 2.5': 'under_25', 'Under 3.5': 'under_35',
+        'Goal': 'gg', 'NoGoal': 'ng',
+    }
+
+    if tipo_gol and tipo_gol_extra:
+        is_conflict = ('Over' in tipo_gol and tipo_gol_extra == 'NoGoal') or \
+                      ('Under' in tipo_gol and tipo_gol_extra == 'Goal')
+        if is_conflict:
+            conf_ou = total  # Confidence Over/Under
+            conf_gg = confidence_gol_extra  # Confidence Goal/NoGoal
+            if abs(conf_ou - conf_gg) > 3:
+                # Confidence diversa → vince la più alta
+                if conf_ou >= conf_gg:
+                    tipo_gol_extra = None
+                    confidence_gol_extra = 0
+                else:
+                    tipo_gol = None
+            else:
+                # Parità confidence → confronta quote SNAI (la più bassa vince)
+                q_ou = odds.get(quota_map.get(tipo_gol)) if tipo_gol in quota_map else None
+                q_gg = odds.get(quota_map.get(tipo_gol_extra)) if tipo_gol_extra in quota_map else None
+                if q_ou is not None and q_gg is not None:
+                    if float(q_ou) <= float(q_gg):
+                        tipo_gol_extra = None
+                        confidence_gol_extra = 0
+                    else:
+                        tipo_gol = None
+                elif q_ou is not None:
+                    tipo_gol_extra = None
+                    confidence_gol_extra = 0
+                elif q_gg is not None:
+                    tipo_gol = None
+                else:
+                    # Nessuna quota → O/U (6 segnali) batte GG/NG
+                    tipo_gol_extra = None
+                    confidence_gol_extra = 0
+
+    # Blocco GOL se quota SNAI sotto 1.35 (come per il SEGNO)
+    for pronostico in [tipo_gol, tipo_gol_extra]:
+        if pronostico and pronostico in quota_map:
+            q = odds.get(quota_map[pronostico])
+            if q is not None and float(q) < 1.35:
+                total = 0
+                break
+
     return {
         'score': round(total, 1),
         'tipo_gol': tipo_gol,
         'tipo_gol_extra': tipo_gol_extra,
+        'confidence_gol_extra': confidence_gol_extra,
         'expected_total': round(expected_total, 2) if expected_total else None,
         'league_avg': league_avg,
         'dettaglio': scores,
@@ -1080,22 +1190,24 @@ def make_decision(segno_result, gol_result):
                 'stars': calculate_stars(s_score),
             })
     
-    # Gol
-    if g_score >= THRESHOLD_INCLUDE:
-        if gol_result['tipo_gol']:
-            pronostici.append({
-                'tipo': 'GOL',
-                'pronostico': gol_result['tipo_gol'],
-                'confidence': g_score,
-                'stars': calculate_stars(g_score),
-            })
-        if gol_result['tipo_gol_extra']:
-            pronostici.append({
-                'tipo': 'GOL',
-                'pronostico': gol_result['tipo_gol_extra'],
-                'confidence': g_score,
-                'stars': calculate_stars(g_score),
-            })
+    # Gol — Over/Under (usa g_score)
+    if g_score >= THRESHOLD_INCLUDE and gol_result['tipo_gol']:
+        pronostici.append({
+            'tipo': 'GOL',
+            'pronostico': gol_result['tipo_gol'],
+            'confidence': g_score,
+            'stars': calculate_stars(g_score),
+        })
+
+    # Gol — Goal/NoGoal (usa confidence separata)
+    conf_gg = gol_result.get('confidence_gol_extra', 0)
+    if conf_gg >= THRESHOLD_INCLUDE and gol_result['tipo_gol_extra']:
+        pronostici.append({
+            'tipo': 'GOL',
+            'pronostico': gol_result['tipo_gol_extra'],
+            'confidence': conf_gg,
+            'stars': calculate_stars(conf_gg),
+        })
     
     if not pronostici:
         return {
