@@ -5,7 +5,7 @@ const Team = require('../models/Team');
 // @access  Public
 exports.getTeams = async (req, res) => {
   try {
-    const teams = await Team.find();
+    const teams = await Team.find().select('name league country logoUrl');
     
     res.status(200).json({
       success: true,

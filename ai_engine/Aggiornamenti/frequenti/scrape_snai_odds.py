@@ -403,11 +403,12 @@ def scroll_and_collect_gg_ng(driver):
 # ============================================================
 #  MATCHING E UPDATE DB
 # ============================================================
-def find_and_update_odds(league_name, ou_data, gg_data):
+def find_and_update_odds(league_name, ou_data, gg_data, teams_by_tm_id=None, teams_by_name=None):
     """
     Trova le partite nel DB e aggiorna le odds con O/U e GG/NG.
     ou_data e gg_data sono dict con chiavi (scraped_home, scraped_away).
     Non sovrascrive 1/X/2 (NowGoal).
+    teams_by_tm_id/teams_by_name: cache pre-caricata (evita ~21.888 query singole).
     """
     league_patterns = [league_name]
     if league_name == "Serie C":
@@ -459,8 +460,13 @@ def find_and_update_odds(league_name, ou_data, gg_data):
                     if age_hours < 1:
                         continue
 
-                home_doc = db.teams.find_one({"transfermarkt_id": m.get('home_tm_id')}) if m.get('home_tm_id') else db.teams.find_one({"name": home_db})
-                away_doc = db.teams.find_one({"transfermarkt_id": m.get('away_tm_id')}) if m.get('away_tm_id') else db.teams.find_one({"name": away_db})
+                # Lookup da cache in memoria (se disponibile) invece di query DB
+                if teams_by_tm_id is not None:
+                    home_doc = teams_by_tm_id.get(m.get('home_tm_id')) or (teams_by_name or {}).get(home_db)
+                    away_doc = teams_by_tm_id.get(m.get('away_tm_id')) or (teams_by_name or {}).get(away_db)
+                else:
+                    home_doc = db.teams.find_one({"transfermarkt_id": m.get('home_tm_id')}) if m.get('home_tm_id') else db.teams.find_one({"name": home_db})
+                    away_doc = db.teams.find_one({"transfermarkt_id": m.get('away_tm_id')}) if m.get('away_tm_id') else db.teams.find_one({"name": away_db})
                 home_aliases = get_team_aliases(home_db, home_doc)
                 away_aliases = get_team_aliases(away_db, away_doc)
 
@@ -538,7 +544,7 @@ def find_and_update_odds(league_name, ou_data, gg_data):
 # ============================================================
 #  MAIN
 # ============================================================
-def scrape_league(driver, league, is_first=False):
+def scrape_league(driver, league, teams_by_tm_id, teams_by_name, is_first=False):
     """Scrapa una singola lega. Ritorna (partite_trovate, aggiornate)."""
     name = league['name']
     url = league['url']
@@ -592,7 +598,7 @@ def scrape_league(driver, league, is_first=False):
         return len(matches), 0, set()
 
     # Match con DB e aggiorna
-    updated, unmatched = find_and_update_odds(name, ou_data, gg_data)
+    updated, unmatched = find_and_update_odds(name, ou_data, gg_data, teams_by_tm_id, teams_by_name)
     print(f"  [{name}] Aggiornate: {updated}")
     if unmatched:
         print(f"  [{name}] ⚠️  {len(unmatched)} partite SNAI senza match DB")
@@ -606,7 +612,7 @@ def _append_unmatched_log(all_unmatched):
     NON sovrascrive: ogni run aggiunge solo le nuove entry.
     Il file accumula dati nel tempo perché ogni run vede solo le partite in programma.
     """
-    log_path = os.path.join(current_dir, "snai_unmatched_log.txt")
+    log_path = os.path.join(project_root, "log", "squadre-non-trovate-snai.txt")
 
     # Carica entry esistenti per evitare duplicati
     existing = set()
@@ -634,37 +640,42 @@ def _append_unmatched_log(all_unmatched):
         for entry in new_entries:
             f.write(entry + "\n")
 
-    print(f"\n  Log unmatched: {len(new_entries)} nuove entry aggiunte → snai_unmatched_log.txt")
+    print(f"\n  Log unmatched: {len(new_entries)} nuove entry aggiunte → log/squadre-non-trovate-snai.txt")
 
 
 def propagate_to_sandbox(league_name):
-    """Propaga le quote SNAI già presenti in h2h_by_round a daily_predictions_sandbox."""
+    """Propaga le quote SNAI già presenti in h2h_by_round a daily_predictions_sandbox.
+    Usa aggregation server-side per filtrare solo match con quote SNAI."""
     league_patterns = [league_name]
     if league_name == "Serie C":
         league_patterns = ["Serie C - Girone A", "Serie C - Girone B", "Serie C - Girone C"]
 
     count = 0
     for league_pat in league_patterns:
-        for doc in db.h2h_by_round.find({"league": league_pat}):
-            for m in doc.get('matches', []):
-                odds = m.get('odds', {})
-                if not odds.get('ts_ou_gg'):
-                    continue
-                if not m.get('home_mongo_id') or not m.get('away_mongo_id'):
-                    continue
-                snai_fields = {k: v for k, v in odds.items() if k in (
-                    'over_15', 'under_15', 'over_25', 'under_25', 'over_35', 'under_35', 'gg', 'ng'
-                )}
-                if not snai_fields:
-                    continue
-                dp_update = {f"odds.{k}": v for k, v in snai_fields.items()}
-                dp_update["odds.src_ou_gg"] = "SNAI"
-                dp_update["odds.ts_ou_gg"] = odds['ts_ou_gg']
-                result = db.daily_predictions_sandbox.update_many(
-                    {"home_mongo_id": m['home_mongo_id'], "away_mongo_id": m['away_mongo_id']},
-                    {"$set": dp_update}
-                )
-                count += result.modified_count
+        for doc in db.h2h_by_round.aggregate([
+            {"$match": {"league": league_pat}},
+            {"$unwind": "$matches"},
+            {"$match": {
+                "matches.odds.ts_ou_gg": {"$exists": True},
+                "matches.home_mongo_id": {"$exists": True, "$ne": None},
+                "matches.away_mongo_id": {"$exists": True, "$ne": None}
+            }},
+            {"$replaceRoot": {"newRoot": "$matches"}}
+        ]):
+            odds = doc.get('odds', {})
+            snai_fields = {k: v for k, v in odds.items() if k in (
+                'over_15', 'under_15', 'over_25', 'under_25', 'over_35', 'under_35', 'gg', 'ng'
+            )}
+            if not snai_fields:
+                continue
+            dp_update = {f"odds.{k}": v for k, v in snai_fields.items()}
+            dp_update["odds.src_ou_gg"] = "SNAI"
+            dp_update["odds.ts_ou_gg"] = odds['ts_ou_gg']
+            result = db.daily_predictions_sandbox.update_many(
+                {"home_mongo_id": doc['home_mongo_id'], "away_mongo_id": doc['away_mongo_id']},
+                {"$set": dp_update}
+            )
+            count += result.modified_count
     if count:
         print(f"    → Sandbox: {count} pronostici aggiornati con quote esistenti")
     return count
@@ -673,7 +684,7 @@ def propagate_to_sandbox(league_name):
 def league_is_fresh(league_name, max_age_hours=1):
     """
     Controlla se la lega è stata aggiornata di recente.
-    Cerca il timestamp ts_ou_gg più recente: se < max_age_hours, skip.
+    Usa aggregation MongoDB (server-side) per trovare il MAX ts_ou_gg.
     """
     league_patterns = [league_name]
     if league_name == "Serie C":
@@ -683,13 +694,15 @@ def league_is_fresh(league_name, max_age_hours=1):
     latest_ts = None
 
     for league_pat in league_patterns:
-        for doc in db.h2h_by_round.find({"league": league_pat}):
-            for m in doc.get('matches', []):
-                ts = m.get('odds', {}).get('ts_ou_gg')
-                if ts:
-                    ts_naive = ts.replace(tzinfo=None)
-                    if latest_ts is None or ts_naive > latest_ts:
-                        latest_ts = ts_naive
+        result = list(db.h2h_by_round.aggregate([
+            {"$match": {"league": league_pat}},
+            {"$unwind": "$matches"},
+            {"$group": {"_id": None, "max_ts": {"$max": "$matches.odds.ts_ou_gg"}}}
+        ]))
+        if result and result[0].get('max_ts'):
+            ts = result[0]['max_ts'].replace(tzinfo=None)
+            if latest_ts is None or ts > latest_ts:
+                latest_ts = ts
 
     if latest_ts is None:
         print(f"    [freshness] {league_name}: nessun ts_ou_gg trovato")
@@ -706,6 +719,22 @@ def run_scraper():
     print(f"  SCRAPER SNAI — Quote O/U + GG/NG")
     print(f"  {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print(f"{'='*55}")
+
+    # Indici MongoDB (idempotenti — se esistono già, noop)
+    db.h2h_by_round.create_index("league")
+    db.teams.create_index("transfermarkt_id")
+    print("  Indici MongoDB verificati (league, transfermarkt_id)")
+
+    # Batch loading teams — 1 query invece di ~21.888
+    all_teams = list(db.teams.find({}, {"name": 1, "transfermarkt_id": 1, "aliases": 1}))
+    teams_by_tm_id = {}
+    teams_by_name = {}
+    for t in all_teams:
+        if t.get('transfermarkt_id'):
+            teams_by_tm_id[t['transfermarkt_id']] = t
+        if t.get('name'):
+            teams_by_name[t['name']] = t
+    print(f"  Teams caricati in memoria: {len(all_teams)} ({len(teams_by_tm_id)} con tm_id)")
 
     driver = init_driver()
     total_matches = 0
@@ -738,7 +767,7 @@ def run_scraper():
                 continue
 
             try:
-                found, updated, unmatched = scrape_league(driver, league, is_first=first_league)
+                found, updated, unmatched = scrape_league(driver, league, teams_by_tm_id, teams_by_name, is_first=first_league)
                 first_league = False
                 total_matches += found
                 total_updated += updated

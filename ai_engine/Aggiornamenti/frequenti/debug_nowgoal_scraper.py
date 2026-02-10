@@ -6,6 +6,31 @@ import ctypes  # // aggiunto per: nascondere la finestra
 import msvcrt  # // aggiunto per: tasto H e battito cardiaco
 import json
 from datetime import datetime, timedelta
+
+# --- LOGGING: output su terminale + file log ---
+class _TeeOutput:
+    def __init__(self, log_path):
+        self.terminal = sys.stdout
+        self.log = open(log_path, 'w', encoding='utf-8')
+    def write(self, message):
+        self.terminal.write(message)
+        self.log.write(message)
+    def flush(self):
+        self.terminal.flush()
+        self.log.flush()
+
+_log_root = os.path.dirname(os.path.abspath(__file__))
+while not os.path.isdir(os.path.join(_log_root, 'log')):
+    _p = os.path.dirname(_log_root)
+    if _p == _log_root:
+        break
+    _log_root = _p
+sys.stdout = _TeeOutput(os.path.join(_log_root, 'log', 'quote-live-1x2-nowgoal.txt'))
+sys.stderr = sys.stdout
+print(f"{'='*50}")
+print(f"AVVIO DAEMON QUOTE 1X2 (NowGoal): {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}")
+print(f"{'='*50}\n")
+
 from typing import Dict, List, Optional, Tuple
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC

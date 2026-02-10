@@ -73,28 +73,44 @@ function getQuotaForPronostico(pronostico, tipo, parentOdds) {
   return isNaN(val) ? null : val;
 }
 
-// --- HELPER: Recupera risultati reali da h2h_by_round ---
-async function getFinishedResults(db) {
+// --- HELPER: Recupera risultati reali da h2h_by_round (filtrato per data) ---
+async function getFinishedResults(db, dateFilter) {
   try {
-    const docs = await db.collection('h2h_by_round')
-      .find({}, {
-        projection: {
-          'matches.home': 1, 'matches.away': 1,
-          'matches.real_score': 1, 'matches.status': 1,
-          'matches.date_obj': 1
-        }
-      })
-      .toArray();
+    const matchCondition = {
+      'matches.status': 'Finished',
+      'matches.real_score': { $ne: null }
+    };
+
+    // Filtro per data: stringa "YYYY-MM-DD" o oggetto { from, to }
+    if (typeof dateFilter === 'string') {
+      const startOfDay = new Date(dateFilter + 'T00:00:00.000Z');
+      const endOfDay = new Date(dateFilter + 'T23:59:59.999Z');
+      matchCondition['matches.date_obj'] = { $gte: startOfDay, $lte: endOfDay };
+    } else if (dateFilter && dateFilter.from && dateFilter.to) {
+      matchCondition['matches.date_obj'] = {
+        $gte: new Date(dateFilter.from + 'T00:00:00.000Z'),
+        $lte: new Date(dateFilter.to + 'T23:59:59.999Z')
+      };
+    }
+
+    const pipeline = [
+      { $unwind: '$matches' },
+      { $match: matchCondition },
+      { $project: {
+        _id: 0,
+        home: '$matches.home',
+        away: '$matches.away',
+        real_score: '$matches.real_score',
+        date_obj: '$matches.date_obj'
+      }}
+    ];
+
+    const results = await db.collection('h2h_by_round').aggregate(pipeline).toArray();
 
     const resultsMap = {};
-    for (const doc of docs) {
-      if (!doc.matches) continue;
-      for (const m of doc.matches) {
-        if (m.status === 'Finished' && m.real_score && m.date_obj) {
-          const dateStr = new Date(m.date_obj).toISOString().split('T')[0];
-          resultsMap[`${m.home}|||${m.away}|||${dateStr}`] = m.real_score;
-        }
-      }
+    for (const r of results) {
+      const dateStr = new Date(r.date_obj).toISOString().split('T')[0];
+      resultsMap[`${r.home}|||${r.away}|||${dateStr}`] = r.real_score;
     }
     return resultsMap;
   } catch (err) {
@@ -115,7 +131,7 @@ router.get('/daily-predictions', async (req, res) => {
       req.db.collection('daily_predictions')
         .find({ date }, { projection: { _id: 0 } })
         .toArray(),
-      getFinishedResults(req.db)
+      getFinishedResults(req.db, date)
     ]);
 
     // Cross-match con risultati reali
@@ -182,7 +198,7 @@ router.get('/daily-bombs', async (req, res) => {
       req.db.collection('daily_bombs')
         .find({ date }, { projection: { _id: 0 } })
         .toArray(),
-      getFinishedResults(req.db)
+      getFinishedResults(req.db, date)
     ]);
 
     for (const bomb of bombs) {
@@ -234,7 +250,7 @@ router.get('/daily-predictions-sandbox', async (req, res) => {
       req.db.collection('daily_predictions_sandbox')
         .find({ date }, { projection: { _id: 0 } })
         .toArray(),
-      getFinishedResults(req.db)
+      getFinishedResults(req.db, date)
     ]);
 
     for (const pred of predictions) {
@@ -298,7 +314,7 @@ router.get('/daily-bombs-sandbox', async (req, res) => {
       req.db.collection('daily_bombs_sandbox')
         .find({ date }, { projection: { _id: 0 } })
         .toArray(),
-      getFinishedResults(req.db)
+      getFinishedResults(req.db, date)
     ]);
 
     for (const bomb of bombs) {
@@ -355,7 +371,7 @@ router.get('/track-record', async (req, res) => {
 
     const [predictions, resultsMap] = await Promise.all([
       req.db.collection('daily_predictions').find(query, { projection: { _id: 0 } }).toArray(),
-      getFinishedResults(req.db)
+      getFinishedResults(req.db, { from, to })
     ]);
 
     // 2. Cross-match con risultati reali + verifica hit/miss

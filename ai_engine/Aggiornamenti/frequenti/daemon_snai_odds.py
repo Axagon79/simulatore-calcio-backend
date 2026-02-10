@@ -10,6 +10,30 @@ import ctypes
 import msvcrt
 from datetime import datetime, timedelta
 
+# --- LOGGING: output su terminale + file log ---
+class _TeeOutput:
+    def __init__(self, log_path):
+        self.terminal = sys.stdout
+        self.log = open(log_path, 'w', encoding='utf-8')
+    def write(self, message):
+        self.terminal.write(message)
+        self.log.write(message)
+    def flush(self):
+        self.terminal.flush()
+        self.log.flush()
+
+_log_root = os.path.dirname(os.path.abspath(__file__))
+while not os.path.isdir(os.path.join(_log_root, 'log')):
+    _p = os.path.dirname(_log_root)
+    if _p == _log_root:
+        break
+    _log_root = _p
+sys.stdout = _TeeOutput(os.path.join(_log_root, 'log', 'quote-snai-ou-gg.txt'))
+sys.stderr = sys.stdout
+print(f"{'='*50}")
+print(f"AVVIO DAEMON QUOTE SNAI: {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}")
+print(f"{'='*50}\n")
+
 # FIX PERCORSI
 current_dir = os.path.dirname(os.path.abspath(__file__))
 ai_engine_dir = os.path.dirname(os.path.dirname(current_dir))

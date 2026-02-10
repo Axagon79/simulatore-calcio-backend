@@ -12,6 +12,30 @@ import sys
 import math
 from datetime import datetime, timedelta, timezone
 
+# --- LOGGING: output su terminale + file log ---
+class _TeeOutput:
+    def __init__(self, log_path):
+        self.terminal = sys.stdout
+        self.log = open(log_path, 'w', encoding='utf-8')
+    def write(self, message):
+        self.terminal.write(message)
+        self.log.write(message)
+    def flush(self):
+        self.terminal.flush()
+        self.log.flush()
+
+_log_root = os.path.dirname(os.path.abspath(__file__))
+while not os.path.isdir(os.path.join(_log_root, 'log')):
+    _p = os.path.dirname(_log_root)
+    if _p == _log_root:
+        break
+    _log_root = _p
+sys.stdout = _TeeOutput(os.path.join(_log_root, 'log', 'pronostici-del-giorno-test.txt'))
+sys.stderr = sys.stdout
+print(f"{'='*50}")
+print(f"AVVIO PRONOSTICI SANDBOX: {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}")
+print(f"{'='*50}\n")
+
 # --- FIX PERCORSI UNIVERSALE ---
 current_path = os.path.dirname(os.path.abspath(__file__))
 while not os.path.exists(os.path.join(current_path, 'config.py')):
@@ -1732,7 +1756,7 @@ def run_daily_predictions(target_date=None):
 # ==================== ENTRY POINT ====================
 
 if __name__ == "__main__":
-    for i in range(1):  # 0=oggi, 1=domani, 2=dopodomani, ... 6=tra 6 giorni
+    for i in range(7):  # 0=oggi, 1=domani, 2=dopodomani, ... 6=tra 6 giorni
         target = datetime.now() + timedelta(days=i)
         print("\n" + "=" * 70)
         print(f"🧪 ELABORAZIONE SANDBOX: {target.strftime('%Y-%m-%d')}")
