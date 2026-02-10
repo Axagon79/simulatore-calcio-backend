@@ -301,6 +301,137 @@ app.get('/matches', async (req, res) => {
 });
 
 // ============================================
+// ENDPOINT: /matches-today
+// ============================================
+
+app.get('/matches-today', async (req, res) => {
+  try {
+    const dateParam = req.query.date; // "YYYY-MM-DD" oppure omesso → oggi
+    const targetDate = dateParam || new Date().toISOString().split('T')[0];
+
+    const startOfDay = new Date(targetDate + 'T00:00:00.000Z');
+    const endOfDay   = new Date(targetDate + 'T23:59:59.999Z');
+
+    // Mappa inversa: nome DB → { id frontend, country }
+    const reverseLeagueMap = {
+      'Serie A': { id: 'SERIE_A', country: 'Italy' },
+      'Serie B': { id: 'SERIE_B', country: 'Italy' },
+      'Serie C - Girone A': { id: 'SERIE_C_A', country: 'Italy' },
+      'Serie C - Girone B': { id: 'SERIE_C_B', country: 'Italy' },
+      'Serie C - Girone C': { id: 'SERIE_C_C', country: 'Italy' },
+      'Premier League': { id: 'PREMIER_LEAGUE', country: 'England' },
+      'La Liga': { id: 'LA_LIGA', country: 'Spain' },
+      'Bundesliga': { id: 'BUNDESLIGA', country: 'Germany' },
+      'Ligue 1': { id: 'LIGUE_1', country: 'France' },
+      'Eredivisie': { id: 'EREDIVISIE', country: 'Netherlands' },
+      'Liga Portugal': { id: 'LIGA_PORTUGAL', country: 'Portugal' },
+      'Championship': { id: 'CHAMPIONSHIP', country: 'England' },
+      'LaLiga 2': { id: 'LA_LIGA_2', country: 'Spain' },
+      '2. Bundesliga': { id: 'BUNDESLIGA_2', country: 'Germany' },
+      'Ligue 2': { id: 'LIGUE_2', country: 'France' },
+      'Scottish Premiership': { id: 'SCOTTISH_PREMIERSHIP', country: 'Scotland' },
+      'Allsvenskan': { id: 'ALLSVENSKAN', country: 'Sweden' },
+      'Eliteserien': { id: 'ELITESERIEN', country: 'Norway' },
+      'Superligaen': { id: 'SUPERLIGAEN', country: 'Denmark' },
+      'Jupiler Pro League': { id: 'JUPILER_PRO_LEAGUE', country: 'Belgium' },
+      'Süper Lig': { id: 'SUPER_LIG', country: 'Turkey' },
+      'League of Ireland Premier Division': { id: 'LEAGUE_OF_IRELAND', country: 'Ireland' },
+      'Brasileirão Serie A': { id: 'BRASILEIRAO', country: 'Brazil' },
+      'Primera División': { id: 'PRIMERA_DIVISION_ARG', country: 'Argentina' },
+      'Major League Soccer': { id: 'MLS', country: 'USA' },
+      'J1 League': { id: 'J1_LEAGUE', country: 'Japan' },
+    };
+
+    const pipeline = [
+      { $unwind: '$matches' },
+      { $match: {
+        'matches.date_obj': { $gte: startOfDay, $lte: endOfDay }
+      }},
+      { $project: {
+        _id: 0,
+        league: '$league',
+        match: '$matches'
+      }},
+      { $sort: { 'match.match_time': 1 } }
+    ];
+
+    const rawResults = await db.collection('h2h_by_round').aggregate(pipeline).toArray();
+
+    // Raggruppa per lega
+    const grouped = {};
+    for (const r of rawResults) {
+      const leagueName = r.league;
+      if (!grouped[leagueName]) {
+        const meta = reverseLeagueMap[leagueName] || { id: leagueName, country: 'Altro' };
+        grouped[leagueName] = {
+          league_name: leagueName,
+          league_id: meta.id,
+          country: meta.country,
+          matches: []
+        };
+      }
+      const m = r.match;
+      grouped[leagueName].matches.push({
+        ...m,
+        id: `today_${grouped[leagueName].league_id}_${grouped[leagueName].matches.length}`,
+        status: m.status || 'Finished'
+      });
+    }
+
+    const result = Object.values(grouped);
+    // Ordina: Italia prima, poi per numero di partite desc
+    result.sort((a, b) => {
+      if (a.country === 'Italy' && b.country !== 'Italy') return -1;
+      if (b.country === 'Italy' && a.country !== 'Italy') return 1;
+      return b.matches.length - a.matches.length;
+    });
+
+    console.log(`✅ Matches today ${targetDate}: ${rawResults.length} partite in ${result.length} leghe`);
+    res.json({ success: true, date: targetDate, leagues: result, total: rawResults.length });
+  } catch (error) {
+    console.error('Matches-today error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ============================================
+// ENDPOINT: /live-scores
+// ============================================
+
+app.get('/live-scores', async (req, res) => {
+  try {
+    const dateParam = req.query.date;
+    const targetDate = dateParam || new Date().toISOString().split('T')[0];
+
+    const startOfDay = new Date(targetDate + 'T00:00:00.000Z');
+    const endOfDay   = new Date(targetDate + 'T23:59:59.999Z');
+
+    const pipeline = [
+      { $unwind: '$matches' },
+      { $match: {
+        'matches.date_obj': { $gte: startOfDay, $lte: endOfDay },
+        'matches.live_status': { $in: ['Live', 'HT'] }
+      }},
+      { $project: {
+        _id: 0,
+        home: '$matches.home',
+        away: '$matches.away',
+        live_score: '$matches.live_score',
+        live_status: '$matches.live_status',
+        live_minute: '$matches.live_minute',
+        match_time: '$matches.match_time'
+      }}
+    ];
+
+    const scores = await db.collection('h2h_by_round').aggregate(pipeline).toArray();
+    res.json({ success: true, scores });
+  } catch (error) {
+    console.error('Live-scores error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ============================================
 // ENDPOINT: /leagues
 // ============================================
 
