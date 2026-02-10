@@ -66,6 +66,7 @@ except ImportError:
 # --- CONFIG ---
 LIVE_URL = "https://live4.nowgoal26.com/"
 CYCLE_SECONDS = 120       # Ogni 2 minuti
+_leagues_selected = False  # Flag: "Select All" leagues già cliccato
 PAGE_LOAD_WAIT = 5        # Secondi di attesa dopo navigazione
 HOUR_START = 10            # Inizio finestra operativa
 HOUR_END = 1               # Fine (giorno dopo, 01:00)
@@ -323,6 +324,30 @@ def run_cycle(driver):
         print(f"   Errore navigazione: {e}")
         return
 
+    # 3b. Al primo ciclo, clicca "Select All" per mostrare tutte le leghe
+    global _leagues_selected
+    if not _leagues_selected:
+        try:
+            filter_btn = driver.find_element(By.ID, "li_FilterLea")
+            filter_btn.click()
+            time.sleep(1)
+            links = driver.find_elements(By.CSS_SELECTOR, "#FilterLeaPop a, #FilterLeaPop span")
+            for link in links:
+                if "Select All" in link.text:
+                    link.click()
+                    break
+            time.sleep(0.5)
+            for link in links:
+                if "Confirm" in link.text:
+                    link.click()
+                    break
+            time.sleep(2)
+            _leagues_selected = True
+            print("   Filtro leghe: Select All applicato")
+        except Exception as e:
+            print(f"   Filtro leghe non trovato (proseguo): {e}")
+            _leagues_selected = True  # Non riprovare ogni ciclo
+
     nowgoal_matches = parse_nowgoal_live_page(driver)
     live_count = sum(1 for m in nowgoal_matches if m['status'] == 'Live')
     ht_count = sum(1 for m in nowgoal_matches if m['status'] == 'HT')
@@ -363,14 +388,20 @@ def run_cycle(driver):
         home = db_match.get('home', '?')
         away = db_match.get('away', '?')
 
-        # Update atomico con positional operator $ — tocca SOLO i campi live
+        # Update atomico con positional operator $
+        update_fields = {
+            "matches.$.live_score": new_score,
+            "matches.$.live_status": new_status,
+            "matches.$.live_minute": new_minute
+        }
+        # Se FT, scrivi anche real_score e status per risultato immediato
+        if new_status == "Finished":
+            update_fields["matches.$.real_score"] = new_score
+            update_fields["matches.$.status"] = "Finished"
+
         result = db.h2h_by_round.update_one(
             {"_id": round_id, "matches.home": home, "matches.away": away},
-            {"$set": {
-                "matches.$.live_score": new_score,
-                "matches.$.live_status": new_status,
-                "matches.$.live_minute": new_minute
-            }}
+            {"$set": update_fields}
         )
 
         if result.modified_count > 0:
