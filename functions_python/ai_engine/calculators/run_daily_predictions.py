@@ -131,33 +131,31 @@ def calculate_stars(score):
 # ==================== FASE 1: RACCOLTA DATI ====================
 
 def get_today_matches(target_date=None):
-    """Recupera tutte le partite del giorno da h2h_by_round (qualsiasi status)."""
+    """Recupera tutte le partite del giorno da h2h_by_round (aggregation pipeline)."""
     if target_date:
         today = target_date.replace(hour=0, minute=0, second=0, microsecond=0)
         tomorrow = today + timedelta(days=1)
     else:
         today, tomorrow = get_today_range()
-    
+
+    # Aggregation pipeline: filtra direttamente sul server MongoDB
+    pipeline = [
+        {"$unwind": "$matches"},
+        {"$match": {"matches.date_obj": {"$gte": today, "$lt": tomorrow}}},
+        {"$project": {
+            "league": 1,
+            "round_id": "$_id",
+            "match": "$matches"
+        }}
+    ]
+
     matches = []
-    
-    # Cerca in tutti i documenti h2h_by_round
-    all_rounds = h2h_collection.find({})
-    
-    for round_doc in all_rounds:
-        league = round_doc.get('league', 'Unknown')
-        
-        for match in round_doc.get('matches', []):
-            date_obj = match.get('date_obj')
-            if not date_obj:
-                continue
-            
-            # Controlla se la partita è nel giorno target (qualsiasi status)
-            if isinstance(date_obj, datetime):
-                if today <= date_obj < tomorrow:
-                    match['_league'] = league
-                    match['_round_id'] = round_doc.get('_id')
-                    matches.append(match)
-    
+    for doc in h2h_collection.aggregate(pipeline):
+        m = doc['match']
+        m['_league'] = doc.get('league', 'Unknown')
+        m['_round_id'] = doc.get('round_id')
+        matches.append(m)
+
     print(f"\n📅 Trovate {len(matches)} partite per {today.strftime('%Y-%m-%d')}")
     return matches
 
@@ -583,10 +581,9 @@ def analyze_segno(match_data, home_team_doc, away_team_doc):
     qx = float(odds.get('X', 99))
     q2 = float(odds.get('2', 99))
     
-    # Blocco segno se quota favorita sotto 1.35
+    # Blocco pronostico segno se quota favorita sotto 1.35 (ma analisi resta visibile)
     q_fav = min(q1, q2)
-    if q_fav < 1.35:
-        total = 0
+    segno_blocked = q_fav < 1.35
     
     h2h = match_data.get('h2h_data', {})
     tip_sign = h2h.get('tip_sign', '')
@@ -710,7 +707,8 @@ def analyze_segno(match_data, home_team_doc, away_team_doc):
         'doppia_chance_quota': doppia_chance_quota,
         'odds': {'1': q1, 'X': qx, '2': q2},
         'dettaglio': scores,
-        'dettaglio_raw': dettaglio_raw
+        'dettaglio_raw': dettaglio_raw,
+        'segno_blocked': segno_blocked
     }
 
 
@@ -1139,13 +1137,16 @@ def analyze_gol(match_data, home_team_doc, away_team_doc, league_name):
                     tipo_gol_extra = None
                     confidence_gol_extra = 0
 
-    # Blocco GOL se quota SNAI sotto 1.35 (come per il SEGNO)
-    for pronostico in [tipo_gol, tipo_gol_extra]:
-        if pronostico and pronostico in quota_map:
-            q = odds.get(quota_map[pronostico])
-            if q is not None and float(q) < 1.35:
-                total = 0
-                break
+    # Blocco pronostico GOL se quota SNAI sotto 1.35 (ma analisi resta visibile)
+    if tipo_gol and tipo_gol in quota_map:
+        q = odds.get(quota_map[tipo_gol])
+        if q is not None and float(q) < 1.35:
+            tipo_gol = None
+    if tipo_gol_extra and tipo_gol_extra in quota_map:
+        q = odds.get(quota_map[tipo_gol_extra])
+        if q is not None and float(q) < 1.35:
+            tipo_gol_extra = None
+            confidence_gol_extra = 0
 
     return {
         'score': round(total, 1),
@@ -1192,8 +1193,8 @@ def make_decision(segno_result, gol_result):
     
     pronostici = []
     
-    # Segno
-    if s_score >= THRESHOLD_INCLUDE:
+    # Segno (bloccato se quota < 1.35, ma analisi resta visibile)
+    if s_score >= THRESHOLD_INCLUDE and not segno_result.get('segno_blocked'):
         pronostici.append({
             'tipo': 'SEGNO',
             'pronostico': segno_result['segno'],

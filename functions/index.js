@@ -110,9 +110,10 @@ app.get('/rounds', async (req, res) => {
     const leagueName = leagueMap[leagueId];
     if (!leagueName) return res.json({ rounds: [], anchor: null });
 
-    // Recupera TUTTE le giornate
+    // Recupera TUTTE le giornate (solo campi necessari per calcolo anchor)
     const docs = await db.collection('h2h_by_round')
       .find({ league: leagueName })
+      .project({ round_name: 1, 'matches.status': 1, 'matches.date_obj': 1 })
       .toArray();
 
     if (docs.length === 0) {
