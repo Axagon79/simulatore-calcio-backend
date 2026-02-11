@@ -432,6 +432,156 @@ app.get('/live-scores', async (req, res) => {
 });
 
 // ============================================
+// ENDPOINT: /streaks
+// ============================================
+
+const ALL_STREAK_TYPES = [
+  'vittorie', 'sconfitte', 'imbattibilita', 'pareggi', 'senza_vittorie',
+  'over25', 'under25', 'gg', 'clean_sheet', 'senza_segnare', 'gol_subiti'
+];
+
+const STREAK_CURVES = {
+  vittorie:       {1: 0, 2: 0, 3: 2, 4: 3, 5: 0, 6: -1, 7: -3, 8: -6, '9+': -10},
+  sconfitte:      {1: 0, 2: 0, 3: 0, 4: -1, 5: -2, '6+': -5},
+  imbattibilita:  {'1-4': 0, '5-7': 2, '8-10': 0, '11+': -3},
+  pareggi:        {1: 0, 2: 0, 3: -1, 4: 0, 5: 1, '6+': -3},
+  senza_vittorie: {1: 0, 2: 0, 3: -1, 4: -2, 5: 0, 6: 1, '7+': 2},
+  over25:         {1: 0, 2: 0, 3: 3, 4: 3, 5: 0, 6: -1, '7+': -4},
+  under25:        {1: 0, 2: 0, 3: 3, 4: 3, 5: 0, 6: -1, '7+': -4},
+  gg:             {1: 0, 2: 0, 3: 2, 4: 2, 5: 0, '6+': -3},
+  clean_sheet:    {1: 0, 2: 0, 3: 2, 4: 3, 5: 0, 6: -1, '7+': -4},
+  senza_segnare:  {1: 0, 2: 1, 3: 2, 4: 0, 5: -1, '6+': -3},
+  gol_subiti:     {1: 0, 2: 0, 3: 2, 4: 3, 5: 2, 6: 1, '7+': -2},
+};
+
+function curveLookup(streakType, n) {
+  if (n <= 0) return 0;
+  const curve = STREAK_CURVES[streakType];
+  if (!curve) return 0;
+  if (curve[n] !== undefined) return curve[n];
+  for (const [key, value] of Object.entries(curve)) {
+    if (typeof key === 'string' && key.includes('+')) {
+      const minVal = parseInt(key.replace('+', ''));
+      if (n >= minVal) return value;
+    } else if (typeof key === 'string' && key.includes('-')) {
+      const [lo, hi] = key.split('-').map(Number);
+      if (n >= lo && n <= hi) return value;
+    }
+  }
+  return 0;
+}
+
+function checkStreakCondition(teamName, match, streakType) {
+  const score = match.real_score;
+  if (!score || !score.includes(':')) return false;
+  const parts = score.split(':');
+  const homeGoals = parseInt(parts[0].trim());
+  const awayGoals = parseInt(parts[1].trim());
+  if (isNaN(homeGoals) || isNaN(awayGoals)) return false;
+
+  const isHome = match.home === teamName;
+  const teamGoals = isHome ? homeGoals : awayGoals;
+  const oppGoals = isHome ? awayGoals : homeGoals;
+  const totalGoals = homeGoals + awayGoals;
+
+  switch (streakType) {
+    case 'vittorie':       return teamGoals > oppGoals;
+    case 'sconfitte':      return teamGoals < oppGoals;
+    case 'imbattibilita':  return teamGoals >= oppGoals;
+    case 'pareggi':        return teamGoals === oppGoals;
+    case 'senza_vittorie': return teamGoals <= oppGoals;
+    case 'over25':         return totalGoals >= 3;
+    case 'under25':        return totalGoals <= 2;
+    case 'gg':             return homeGoals > 0 && awayGoals > 0;
+    case 'clean_sheet':    return oppGoals === 0;
+    case 'senza_segnare':  return teamGoals === 0;
+    case 'gol_subiti':     return oppGoals > 0;
+    default: return false;
+  }
+}
+
+function calculateTeamStreaks(teamName, matches) {
+  const result = {};
+  for (const st of ALL_STREAK_TYPES) {
+    let count = 0;
+    for (const m of matches) {
+      if (checkStreakCondition(teamName, m, st)) {
+        count++;
+      } else {
+        break;
+      }
+    }
+    result[st] = count;
+  }
+  return result;
+}
+
+app.get('/streaks', async (req, res) => {
+  try {
+    const { home, away, league: leagueId } = req.query;
+    if (!home || !away || !leagueId) {
+      return res.status(400).json({ error: 'Missing home, away, or league parameter' });
+    }
+
+    // Converti ID lega → nome nel DB (stessa mappa di /matches)
+    const leagueMap = {
+      'SERIE_A': 'Serie A', 'SERIE_B': 'Serie B',
+      'SERIE_C_A': 'Serie C - Girone A', 'SERIE_C_B': 'Serie C - Girone B', 'SERIE_C_C': 'Serie C - Girone C',
+      'PREMIER_LEAGUE': 'Premier League', 'LA_LIGA': 'La Liga', 'BUNDESLIGA': 'Bundesliga',
+      'LIGUE_1': 'Ligue 1', 'EREDIVISIE': 'Eredivisie', 'LIGA_PORTUGAL': 'Liga Portugal',
+      'CHAMPIONSHIP': 'Championship', 'LA_LIGA_2': 'LaLiga 2', 'BUNDESLIGA_2': '2. Bundesliga', 'LIGUE_2': 'Ligue 2',
+      'SCOTTISH_PREMIERSHIP': 'Scottish Premiership', 'ALLSVENSKAN': 'Allsvenskan', 'ELITESERIEN': 'Eliteserien',
+      'SUPERLIGAEN': 'Superligaen', 'JUPILER_PRO_LEAGUE': 'Jupiler Pro League', 'SUPER_LIG': 'Süper Lig',
+      'LEAGUE_OF_IRELAND': 'League of Ireland Premier Division',
+      'BRASILEIRAO': 'Brasileirão Serie A', 'PRIMERA_DIVISION_ARG': 'Primera División', 'MLS': 'Major League Soccer',
+      'J1_LEAGUE': 'J1 League'
+    };
+    const leagueName = leagueMap[leagueId];
+    if (!leagueName) return res.json({ success: false, error: 'Unknown league: ' + leagueId });
+
+    const pipeline = [
+      { $match: { league: leagueName } },
+      { $unwind: '$matches' },
+      { $match: {
+        'matches.real_score': { $exists: true, $nin: ['-:-', '', null] }
+      }},
+      { $sort: { 'matches.date_obj': -1 } },
+      { $project: {
+        _id: 0,
+        home: '$matches.home',
+        away: '$matches.away',
+        real_score: '$matches.real_score',
+        date_obj: '$matches.date_obj'
+      }}
+    ];
+
+    const allMatches = await db.collection('h2h_by_round').aggregate(pipeline).toArray();
+
+    // Separa partite per squadra e contesto
+    const homeTotal = allMatches.filter(m => m.home === home || m.away === home);
+    const awayTotal = allMatches.filter(m => m.home === away || m.away === away);
+    const homeContext = allMatches.filter(m => m.home === home); // solo partite IN CASA
+    const awayContext = allMatches.filter(m => m.away === away); // solo partite IN TRASFERTA
+
+    const streak_home = calculateTeamStreaks(home, homeTotal);
+    const streak_away = calculateTeamStreaks(away, awayTotal);
+    const streak_home_context = calculateTeamStreaks(home, homeContext);
+    const streak_away_context = calculateTeamStreaks(away, awayContext);
+
+    res.json({
+      success: true,
+      streak_home,
+      streak_away,
+      streak_home_context,
+      streak_away_context
+    });
+  } catch (error) {
+    console.error('Streaks error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ============================================
 // ENDPOINT: /leagues
 // ============================================
 
