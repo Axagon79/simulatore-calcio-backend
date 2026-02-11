@@ -108,6 +108,7 @@ def build_weights_compartment(algo_id):
         "BVS": get_w("PESO_BVS_QUOTE", 1.0),
         "FIELD": get_w("PESO_FATTORE_CAMPO", 1.0),
         "LUCIFERO": get_w("PESO_FORMA_RECENTE", 1.0),
+        "STREAK": get_w("PESO_STREAK", 2.0),
         "DIVISORE_GOL": get_w("DIVISORE_MEDIA_GOL", 2.0),
         "WINSHIFT": get_w("POTENZA_FAVORITA_WINSHIFT", 0.40),
         "IMPATTO_DIF": get_w("IMPATTO_DIFESA_TATTICA", 15.0),
@@ -160,6 +161,114 @@ except Exception as e:
 
 
 DEFAULT_LEAGUE_AVG = 2.50
+
+# ==================== STRISCE — Curva a Campana (Sistema B) ====================
+_STREAK_CURVES = {
+    "vittorie":       {1: 0, 2: 0, 3: 2, 4: 3, 5: 0, 6: -1, 7: -3, 8: -6, "9+": -10},
+    "sconfitte":      {1: 0, 2: 0, 3: 0, 4: -1, 5: -2, "6+": -5},
+    "imbattibilita":  {"1-4": 0, "5-7": 2, "8-10": 0, "11+": -3},
+    "pareggi":        {1: 0, 2: 0, 3: -1, 4: 0, 5: 1, "6+": -3},
+    "senza_vittorie": {1: 0, 2: 0, 3: -1, 4: -2, 5: 0, 6: 1, "7+": 2},
+}
+_STREAK_SEGNO_MAX = 8    # somma max positivi
+_STREAK_SEGNO_MIN = -23  # somma min negativi
+_STREAK_MIN_MATCHDAYS = 5
+_streak_b_cache = {}     # {team_name: score_float}
+
+def _curve_lookup_b(streak_type, n):
+    if n <= 0:
+        return 0
+    curve = _STREAK_CURVES.get(streak_type, {})
+    if n in curve:
+        return curve[n]
+    for key, value in curve.items():
+        if isinstance(key, str):
+            if '+' in key and n >= int(key.replace('+', '')):
+                return value
+            elif '-' in key:
+                lo, hi = key.split('-')
+                if int(lo) <= n <= int(hi):
+                    return value
+    return 0
+
+def _calc_streak_score_b(team_name, league_name):
+    """Calcola streak score per Sistema B: scala -10 a +10 (SEGNO streaks)."""
+    if team_name in _streak_b_cache:
+        return _streak_b_cache[team_name]
+
+    if db is None:
+        _streak_b_cache[team_name] = 0.0
+        return 0.0
+
+    try:
+        pipeline = [
+            {"$match": {"league": league_name}},
+            {"$unwind": "$matches"},
+            {"$match": {"matches.real_score": {"$exists": True, "$ne": "-:-", "$ne": ""}}},
+            {"$sort": {"matches.date_obj": -1}},
+            {"$project": {
+                "home": "$matches.home", "away": "$matches.away",
+                "real_score": "$matches.real_score",
+            }}
+        ]
+        team_matches = []
+        for doc in db['h2h_by_round'].aggregate(pipeline):
+            h, a = doc.get('home', ''), doc.get('away', '')
+            if h == team_name:
+                team_matches.append({'score': doc['real_score'], 'is_home': True})
+            elif a == team_name:
+                team_matches.append({'score': doc['real_score'], 'is_home': False})
+
+        if len(team_matches) < _STREAK_MIN_MATCHDAYS:
+            _streak_b_cache[team_name] = 0.0
+            return 0.0
+
+        # Calcola strisce SEGNO (dal più recente)
+        streaks = {}
+        for st in _STREAK_CURVES:
+            count = 0
+            for m in team_matches:
+                score = m['score']
+                if ':' not in score:
+                    break
+                parts = score.split(':')
+                try:
+                    hg, ag = int(parts[0].strip()), int(parts[1].strip())
+                except (ValueError, IndexError):
+                    break
+                tg = hg if m['is_home'] else ag
+                og = ag if m['is_home'] else hg
+                ok = False
+                if st == 'vittorie':      ok = tg > og
+                elif st == 'sconfitte':   ok = tg < og
+                elif st == 'imbattibilita': ok = tg >= og
+                elif st == 'pareggi':     ok = tg == og
+                elif st == 'senza_vittorie': ok = tg <= og
+                if ok:
+                    count += 1
+                else:
+                    break
+            streaks[st] = count
+
+        # Somma curve
+        raw = sum(_curve_lookup_b(st, streaks[st]) for st in _STREAK_CURVES)
+
+        # Normalizza a -10/+10
+        if raw > 0:
+            normalized = min(raw / _STREAK_SEGNO_MAX, 1.0)
+        elif raw < 0:
+            normalized = max(raw / abs(_STREAK_SEGNO_MIN), -1.0)
+        else:
+            normalized = 0
+        score = round(normalized * 10, 2)
+
+    except Exception as e:
+        print(f"⚠️ [STREAK-B] Errore per {team_name}: {e}")
+        score = 0.0
+
+    _streak_b_cache[team_name] = score
+    return score
+
 
 def calculate_base_goals(league_name, bulk_cache=None):
     if bulk_cache and "LEAGUE_STATS" in bulk_cache:
@@ -311,6 +420,8 @@ def calculate_match_score(home_raw, away_raw, h2h_scores, base_val, algo_mode):
     a_field = away_raw.get('field_factor', 3.5)
     h_luc = home_raw.get('lucifero', 0.0)
     a_luc = away_raw.get('lucifero', 0.0)
+    h_streak = home_raw.get('streak', 0.0)
+    a_streak = away_raw.get('streak', 0.0)
 
     if algo_mode == 4:
         h_power, _ = apply_randomness(h_power)
@@ -328,9 +439,10 @@ def calculate_match_score(home_raw, away_raw, h2h_scores, base_val, algo_mode):
         (h_rel * W["RELIABILITY"]) +
         (h_bvs * W["BVS"]) +
         (h_field * W["FIELD"]) +
-        (h_luc * W["LUCIFERO"])
+        (h_luc * W["LUCIFERO"]) +
+        (h_streak * W["STREAK"])
     )
-    
+
     bonus_a = (
         (a_h2h_val * W["H2H"]) +
         (a_motiv * W["MOTIVATION"]) +
@@ -339,7 +451,8 @@ def calculate_match_score(home_raw, away_raw, h2h_scores, base_val, algo_mode):
         (a_rel * W["RELIABILITY"]) +
         (a_bvs * W["BVS"]) +
         (a_field * W["FIELD"]) +
-        (a_luc * W["LUCIFERO"])
+        (a_luc * W["LUCIFERO"]) +
+        (a_streak * W["STREAK"])
     )
     
     h_power_total = h_power + bonus_h
@@ -479,6 +592,9 @@ def predict_match(home_team, away_team, mode=ALGO_MODE, preloaded_data=None):
         else:
             h_luc, a_luc = 0.0, 0.0
 
+        h_streak_val = _calc_streak_score_b(H_OFF, competition)
+        a_streak_val = _calc_streak_score_b(A_OFF, competition)
+
         home_raw = {
             'power': h_data.get("home_power", 0),
             'attack': h_data.get("attack_home", 0),
@@ -489,9 +605,10 @@ def predict_match(home_team, away_team, mode=ALGO_MODE, preloaded_data=None):
             'reliability': h_rel,
             'bvs': h_bvs,
             'field_factor': h_field,
-            'lucifero': h_luc
+            'lucifero': h_luc,
+            'streak': h_streak_val
         }
-        
+
         away_raw = {
             'power': a_data.get("away_power", 0),
             'attack': a_data.get("attack_away", 0),
@@ -502,7 +619,8 @@ def predict_match(home_team, away_team, mode=ALGO_MODE, preloaded_data=None):
             'reliability': a_rel,
             'bvs': a_bvs,
             'field_factor': a_field,
-            'lucifero': a_luc
+            'lucifero': a_luc,
+            'streak': a_streak_val
         }
         
         print(f"📊 Motivazioni: {home_team}={home_raw['motivation']} | {away_team}={away_raw['motivation']}")
@@ -656,6 +774,10 @@ def preload_match_data(home_team, away_team,league=None, bulk_cache=None):
     h2h_a = h2h_data.get('a_score', 0)
     base_val, _ = calculate_base_goals(league, bulk_cache)
 
+    # Streak score (-10/+10) per Sistema B
+    h_streak_val = _calc_streak_score_b(home_team, league)
+    a_streak_val = _calc_streak_score_b(away_team, league)
+
     home_raw = {
         'power': h_scores['home_power'],
         'attack': h_scores['attack_home'],
@@ -667,9 +789,10 @@ def preload_match_data(home_team, away_team,league=None, bulk_cache=None):
         'bvs': h_bvs,
         'field_factor': h_field,
         'lucifero': h_luc,
+        'streak': h_streak_val,
         'h2h_score': h2h_h
     }
-    
+
     away_raw = {
         'power': a_scores['away_power'],
         'attack': a_scores['attack_away'],
@@ -681,6 +804,7 @@ def preload_match_data(home_team, away_team,league=None, bulk_cache=None):
         'bvs': a_bvs,
         'field_factor': a_field,
         'lucifero': a_luc,
+        'streak': a_streak_val,
         'h2h_score': h2h_a
     }
 

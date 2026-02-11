@@ -73,24 +73,26 @@ THRESHOLD_HIGH = 70
 
 # Pesi FASE SEGNO (totale 100%)
 PESI_SEGNO = {
-    'bvs':           0.25,
-    'quote':         0.18,
-    'lucifero':      0.18,
-    'affidabilita':  0.14,
-    'dna':           0.08,
-    'motivazioni':   0.08,
-    'h2h':           0.05,
+    'bvs':           0.23,
+    'quote':         0.16,
+    'lucifero':      0.16,
+    'affidabilita':  0.13,
+    'dna':           0.07,
+    'motivazioni':   0.07,
+    'h2h':           0.04,
     'campo':         0.04,
+    'strisce':       0.10,
 }
 
 # Pesi FASE GOL (totale 100%)
 PESI_GOL = {
-    'media_gol':     0.25,
-    'att_vs_def':    0.22,
-    'xg':            0.20,
-    'h2h_gol':       0.15,
-    'media_lega':    0.10,
-    'dna_off_def':   0.08,
+    'media_gol':     0.23,
+    'att_vs_def':    0.20,
+    'xg':            0.18,
+    'h2h_gol':       0.13,
+    'media_lega':    0.09,
+    'dna_off_def':   0.07,
+    'strisce':       0.10,
 }
 
 # Pesi FASE BOMBA (totale 100%)
@@ -104,6 +106,37 @@ PESI_BOMBA = {
 
 THRESHOLD_BOMBA = 65
 THRESHOLD_GGNG = 65  # Soglia specifica per Goal/NoGoal (separata da THRESHOLD_INCLUDE)
+
+# ==================== COSTANTI STRISCE (Curva a Campana) ====================
+STREAK_CURVES = {
+    "vittorie":       {1: 0, 2: 0, 3: 2, 4: 3, 5: 0, 6: -1, 7: -3, 8: -6, "9+": -10},
+    "sconfitte":      {1: 0, 2: 0, 3: 0, 4: -1, 5: -2, "6+": -5},
+    "imbattibilita":  {"1-4": 0, "5-7": 2, "8-10": 0, "11+": -3},
+    "pareggi":        {1: 0, 2: 0, 3: -1, 4: 0, 5: 1, "6+": -3},
+    "senza_vittorie": {1: 0, 2: 0, 3: -1, 4: -2, 5: 0, 6: 1, "7+": 2},
+    "over25":         {1: 0, 2: 0, 3: 3, 4: 3, 5: 0, 6: -1, "7+": -4},
+    "under25":        {1: 0, 2: 0, 3: 3, 4: 3, 5: 0, 6: -1, "7+": -4},
+    "gg":             {1: 0, 2: 0, 3: 2, 4: 2, 5: 0, "6+": -3},
+    "clean_sheet":    {1: 0, 2: 0, 3: 2, 4: 3, 5: 0, 6: -1, "7+": -4},
+    "senza_segnare":  {1: 0, 2: 1, 3: 2, 4: 0, 5: -1, "6+": -3},
+    "gol_subiti":     {1: 0, 2: 0, 3: 2, 4: 3, 5: 2, 6: 1, "7+": -2},
+}
+STREAK_MAX_PCT = 0.05          # ±5% moltiplicatore finale (ridotto, strisce sono anche segnale pesato)
+STREAK_MIN_MATCHDAYS = 5       # attivazione dopo 5 giornate
+STREAK_THEORETICAL = {
+    "SEGNO": {"max": 8, "min": -23},
+    "GOL":   {"max": 3, "min": -4},
+    "GGNG":  {"max": 10, "min": -12},
+}
+STREAK_MARKET_MAP = {
+    "SEGNO": ["vittorie", "sconfitte", "imbattibilita", "pareggi", "senza_vittorie"],
+    "GOL":   ["over25", "under25"],
+    "GGNG":  ["gg", "clean_sheet", "senza_segnare", "gol_subiti"],
+}
+ALL_STREAK_TYPES = [
+    "vittorie", "sconfitte", "imbattibilita", "pareggi", "senza_vittorie",
+    "over25", "under25", "gg", "clean_sheet", "senza_segnare", "gol_subiti",
+]
 
 
 def load_tuning_config():
@@ -122,8 +155,12 @@ def load_tuning_config():
 
             if 'PESI_SEGNO' in config:
                 PESI_SEGNO = config['PESI_SEGNO']
+                if 'strisce' not in PESI_SEGNO:
+                    PESI_SEGNO['strisce'] = 0.10
             if 'PESI_GOL' in config:
                 PESI_GOL = config['PESI_GOL']
+                if 'strisce' not in PESI_GOL:
+                    PESI_GOL['strisce'] = 0.10
             if 'PESI_BOMBA' in config:
                 PESI_BOMBA = config['PESI_BOMBA']
             if 'SOGLIE' in config:
@@ -167,6 +204,232 @@ def calculate_stars(score):
         return 0.0
     stars = 2.5 + (score - 60) * (2.5 / 40)
     return round(min(5.0, stars), 1)
+
+
+# ==================== STRISCE: Cache + Calcolo + Curva a Campana ====================
+
+_streak_cache = {}            # {team_name: {total: {...}, home: {...}, away: {...}}}
+_streak_cache_leagues = set()  # leghe già processate
+
+
+def build_streak_cache(league_name):
+    """Costruisce la cache strisce per tutte le squadre di una lega.
+    Esegue 1 query MongoDB per lega, poi calcola tutte le strisce."""
+    global _streak_cache, _streak_cache_leagues
+
+    if league_name in _streak_cache_leagues:
+        return
+
+    # Tutte le partite giocate della lega, ordinate per data (più recente prima)
+    pipeline = [
+        {"$match": {"league": league_name}},
+        {"$unwind": "$matches"},
+        {"$match": {"matches.real_score": {"$exists": True, "$ne": "-:-", "$ne": ""}}},
+        {"$sort": {"matches.date_obj": -1}},
+        {"$project": {
+            "home": "$matches.home",
+            "away": "$matches.away",
+            "real_score": "$matches.real_score",
+            "date_obj": "$matches.date_obj",
+        }}
+    ]
+
+    # Raggruppa per squadra
+    team_matches = {}
+    for doc in h2h_collection.aggregate(pipeline):
+        home = doc.get('home', '')
+        away = doc.get('away', '')
+        score = doc.get('real_score', '')
+        if not score or not home or not away:
+            continue
+
+        match_info = {'home': home, 'away': away, 'score': score, 'date': doc.get('date_obj')}
+
+        team_matches.setdefault(home, []).append({**match_info, 'is_home': True})
+        team_matches.setdefault(away, []).append({**match_info, 'is_home': False})
+
+    # Verifica minimo giornate
+    if not team_matches:
+        _streak_cache_leagues.add(league_name)
+        return
+
+    max_played = max(len(m) for m in team_matches.values())
+    if max_played < STREAK_MIN_MATCHDAYS:
+        print(f"   [STREAK] {league_name}: solo {max_played} giornate, skip (min={STREAK_MIN_MATCHDAYS})")
+        _streak_cache_leagues.add(league_name)
+        return
+
+    # Calcola strisce per ogni squadra
+    for team, matches in team_matches.items():
+        if team in _streak_cache:
+            continue
+
+        total_streaks = calculate_team_streaks(team, matches)
+        home_matches = [m for m in matches if m['is_home']]
+        away_matches = [m for m in matches if not m['is_home']]
+        home_streaks = calculate_team_streaks(team, home_matches)
+        away_streaks = calculate_team_streaks(team, away_matches)
+
+        _streak_cache[team] = {
+            'total': total_streaks,
+            'home': home_streaks,
+            'away': away_streaks,
+        }
+
+    _streak_cache_leagues.add(league_name)
+    print(f"   [STREAK] {league_name}: cache costruita per {len(team_matches)} squadre")
+
+
+def calculate_team_streaks(team_name, matches):
+    """Calcola la lunghezza di tutte le strisce per una squadra.
+    matches: lista ordinata dal più recente al più vecchio."""
+    result = {}
+    for streak_type in ALL_STREAK_TYPES:
+        count = 0
+        for match in matches:
+            if _check_streak_condition(team_name, match, streak_type):
+                count += 1
+            else:
+                break
+        result[streak_type] = count
+    return result
+
+
+def _check_streak_condition(team, match, streak_type):
+    """Verifica se una partita soddisfa la condizione di una striscia."""
+    score = match.get('score', '')
+    if not score or ':' not in score:
+        return False
+
+    parts = score.split(':')
+    try:
+        home_goals = int(parts[0].strip())
+        away_goals = int(parts[1].strip())
+    except (ValueError, IndexError):
+        return False
+
+    is_home = match.get('is_home', True)
+    team_goals = home_goals if is_home else away_goals
+    opp_goals = away_goals if is_home else home_goals
+    total_goals = home_goals + away_goals
+
+    if streak_type == 'vittorie':
+        return team_goals > opp_goals
+    elif streak_type == 'sconfitte':
+        return team_goals < opp_goals
+    elif streak_type == 'imbattibilita':
+        return team_goals >= opp_goals
+    elif streak_type == 'pareggi':
+        return team_goals == opp_goals
+    elif streak_type == 'senza_vittorie':
+        return team_goals <= opp_goals
+    elif streak_type == 'over25':
+        return total_goals >= 3
+    elif streak_type == 'under25':
+        return total_goals <= 2
+    elif streak_type == 'gg':
+        return home_goals > 0 and away_goals > 0
+    elif streak_type == 'clean_sheet':
+        return opp_goals == 0
+    elif streak_type == 'senza_segnare':
+        return team_goals == 0
+    elif streak_type == 'gol_subiti':
+        return opp_goals > 0
+    return False
+
+
+def _curve_lookup(streak_type, n):
+    """Lookup nella curva a campana: striscia tipo + lunghezza → bonus/malus."""
+    if n <= 0:
+        return 0
+
+    curve = STREAK_CURVES.get(streak_type, {})
+
+    # Lookup diretto per chiave numerica
+    if n in curve:
+        return curve[n]
+
+    # Range keys: "1-4", "5-7", "9+", "6+", "7+", "11+"
+    for key, value in curve.items():
+        if isinstance(key, str):
+            if '+' in key:
+                min_val = int(key.replace('+', ''))
+                if n >= min_val:
+                    return value
+            elif '-' in key:
+                lo, hi = key.split('-')
+                if int(lo) <= n <= int(hi):
+                    return value
+
+    return 0
+
+
+def _get_streak_normalized(streaks_total, streaks_context, market):
+    """Calcola il valore normalizzato delle strisce per un mercato.
+
+    Returns:
+        float: valore normalizzato da -1.0 a +1.0
+    """
+    applicable = STREAK_MARKET_MAP.get(market, [])
+    theoretical = STREAK_THEORETICAL.get(market, {"max": 1, "min": -1})
+
+    raw_total = sum(_curve_lookup(st, streaks_total.get(st, 0)) for st in applicable)
+    raw_context = sum(_curve_lookup(st, streaks_context.get(st, 0)) for st in applicable)
+
+    # Peso 50/50 tra totale e contesto
+    raw_combined = (raw_total * 0.5) + (raw_context * 0.5)
+
+    # Normalizzazione
+    if raw_combined > 0:
+        return min(raw_combined / theoretical['max'], 1.0) if theoretical['max'] > 0 else 0
+    elif raw_combined < 0:
+        return max(raw_combined / abs(theoretical['min']), -1.0) if theoretical['min'] != 0 else 0
+    return 0
+
+
+def get_streak_adjustment(streaks_total, streaks_context, market):
+    """Moltiplicatore finale strisce (±5%). Usato DOPO la media pesata."""
+    return _get_streak_normalized(streaks_total, streaks_context, market) * STREAK_MAX_PCT
+
+
+def score_strisce(home_name, away_name, market):
+    """Score strisce 0-100 per la media pesata.
+    50 = neutro, >50 = bonus, <50 = penalità."""
+    if home_name not in _streak_cache or away_name not in _streak_cache:
+        return 50  # neutro se dati non disponibili
+
+    h_data = _streak_cache[home_name]
+    a_data = _streak_cache[away_name]
+
+    norm_home = _get_streak_normalized(h_data['total'], h_data['home'], market)
+    norm_away = _get_streak_normalized(a_data['total'], a_data['away'], market)
+
+    # Media delle due squadre → scala 0-100
+    avg_normalized = (norm_home + norm_away) / 2
+    score = 50 + avg_normalized * 50
+
+    return max(0, min(100, round(score, 1)))
+
+
+def get_match_streak_data(home_name, away_name):
+    """Recupera i dati strisce per entrambe le squadre di una partita.
+    Returns: dict con streak_home, streak_away, oppure None se non disponibili."""
+    if home_name not in _streak_cache or away_name not in _streak_cache:
+        return None
+
+    home_data = _streak_cache[home_name]
+    away_data = _streak_cache[away_name]
+
+    return {
+        'home': {
+            'total': home_data['total'],
+            'home': home_data['home'],
+        },
+        'away': {
+            'total': away_data['total'],
+            'away': away_data['away'],
+        },
+    }
 
 
 # ==================== FASE 1: RACCOLTA DATI ====================
@@ -602,6 +865,9 @@ def analyze_segno(match_data, home_team_doc, away_team_doc):
     FASE 2: Calcola punteggio complessivo SEGNO (0-100) e determina quale segno.
     Include logica doppia chance (1X, X2, 12).
     """
+    home_name = match_data.get('home', '')
+    away_name = match_data.get('away', '')
+
     scores = {
         'bvs': score_bvs(match_data),
         'quote': score_quote(match_data),
@@ -611,10 +877,24 @@ def analyze_segno(match_data, home_team_doc, away_team_doc):
         'motivazioni': score_motivazioni(match_data, home_team_doc, away_team_doc),
         'h2h': score_h2h(match_data),
         'campo': score_campo(match_data),
+        'strisce': score_strisce(home_name, away_name, 'SEGNO'),
     }
 
-    # Media pesata
+    # Media pesata (include strisce come segnale)
     total = sum(scores[k] * PESI_SEGNO[k] for k in PESI_SEGNO)
+
+    # --- MOLTIPLICATORE STRISCE (±5%, spinta finale) ---
+    streak_adj_segno = 0.0
+    if home_name in _streak_cache and away_name in _streak_cache:
+        h_data = _streak_cache[home_name]
+        a_data = _streak_cache[away_name]
+        adj_home = get_streak_adjustment(h_data['total'], h_data['home'], 'SEGNO')
+        adj_away = get_streak_adjustment(a_data['total'], a_data['away'], 'SEGNO')
+        streak_adj_segno = adj_home + adj_away  # contributo indipendente
+        if streak_adj_segno != 0:
+            total = total * (1 + streak_adj_segno)
+            total = max(0.0, min(100.0, total))
+            print(f"   [STREAK SEGNO] Score: {scores['strisce']:.0f}/100 | Molt: {streak_adj_segno:+.2%}")
 
     # Determina QUALE segno
     odds = match_data.get('odds', {})
@@ -748,7 +1028,8 @@ def analyze_segno(match_data, home_team_doc, away_team_doc):
         'odds': {'1': q1, 'X': qx, '2': q2},
         'dettaglio': scores,
         'dettaglio_raw': dettaglio_raw,
-        'segno_blocked': segno_blocked
+        'segno_blocked': segno_blocked,
+        'streak_adjustment_segno': round(streak_adj_segno * 100, 2),
     }
 
 
@@ -1018,6 +1299,9 @@ def analyze_gol(match_data, home_team_doc, away_team_doc, league_name):
     FASE 3: Calcola punteggio complessivo GOL (0-100) e determina tipo pronostico.
     """
     # Calcola ogni sotto-punteggio
+    home_name = match_data.get('home', '')
+    away_name = match_data.get('away', '')
+
     mg_score, mg_dir, expected_total, both_score = score_media_gol(home_team_doc, away_team_doc, match_data)
     avd_score, avd_dir, both_att_strong = score_att_vs_def(home_team_doc, away_team_doc)
     xg_score, xg_dir, h_xg, a_xg = score_xg(home_team_doc, away_team_doc, league_name)
@@ -1032,10 +1316,24 @@ def analyze_gol(match_data, home_team_doc, away_team_doc, league_name):
         'h2h_gol': h2h_score,
         'media_lega': ml_score,
         'dna_off_def': dna_score,
+        'strisce': score_strisce(home_name, away_name, 'GOL'),
     }
 
-    # Media pesata
+    # Media pesata (include strisce come segnale)
     total = sum(scores[k] * PESI_GOL[k] for k in PESI_GOL)
+
+    # --- MOLTIPLICATORE STRISCE GOL (±5%, spinta finale) ---
+    streak_adj_gol = 0.0
+    if home_name in _streak_cache and away_name in _streak_cache:
+        h_data = _streak_cache[home_name]
+        a_data = _streak_cache[away_name]
+        adj_h_gol = get_streak_adjustment(h_data['total'], h_data['home'], 'GOL')
+        adj_a_gol = get_streak_adjustment(a_data['total'], a_data['away'], 'GOL')
+        streak_adj_gol = (adj_h_gol + adj_a_gol) / 2  # media
+        if streak_adj_gol != 0:
+            total = total * (1 + streak_adj_gol)
+            total = max(0.0, min(100.0, total))
+            print(f"   [STREAK GOL] Score: {scores['strisce']:.0f}/100 | Molt: {streak_adj_gol:+.2%}")
 
     # Determina direzione prevalente
     directions = [mg_dir, avd_dir, xg_dir, h2h_dir, ml_dir, dna_dir]
@@ -1113,18 +1411,35 @@ def analyze_gol(match_data, home_team_doc, away_team_doc, league_name):
     dna_a_att = h2h_d.get('away_dna', {}).get('att', 50) if h2h_d.get('away_dna') else 50
     btts_dna = min(dna_h_att, dna_a_att)
 
-    # 6. Both score likely bonus (peso 0.10)
+    # 6. Both score likely bonus (peso 0.09)
     btts_both = 80 if both_score else 30
 
-    # Media pesata → 0-100 (alto = probabile BTTS/Goal)
+    # 7. Strisce GG/NG (peso 0.10)
+    btts_strisce = score_strisce(home_name, away_name, 'GGNG')
+
+    # Media pesata → 0-100 (alto = probabile BTTS/Goal) — include strisce come segnale
     btts_total = (
-        btts_h2h * 0.25 +
-        btts_exp * 0.20 +
-        btts_xg * 0.20 +
-        btts_att * 0.15 +
-        btts_dna * 0.10 +
-        btts_both * 0.10
+        btts_h2h * 0.23 +
+        btts_exp * 0.18 +
+        btts_xg * 0.18 +
+        btts_att * 0.13 +
+        btts_dna * 0.09 +
+        btts_both * 0.09 +
+        btts_strisce * 0.10
     )
+
+    # --- MOLTIPLICATORE STRISCE GG/NG (±5%, spinta finale) ---
+    streak_adj_ggng = 0.0
+    if home_name in _streak_cache and away_name in _streak_cache:
+        h_data = _streak_cache[home_name]
+        a_data = _streak_cache[away_name]
+        adj_h_gg = get_streak_adjustment(h_data['total'], h_data['home'], 'GGNG')
+        adj_a_gg = get_streak_adjustment(a_data['total'], a_data['away'], 'GGNG')
+        streak_adj_ggng = (adj_h_gg + adj_a_gg) / 2  # media
+        if streak_adj_ggng != 0:
+            btts_total = btts_total * (1 + streak_adj_ggng)
+            btts_total = max(0.0, min(100.0, btts_total))
+            print(f"   [STREAK GG/NG] Score: {btts_strisce:.0f}/100 | Molt: {streak_adj_ggng:+.2%}")
 
     # Confidence per Goal/NoGoal
     if tipo_gol_extra == 'Goal':
@@ -1203,6 +1518,8 @@ def analyze_gol(match_data, home_team_doc, away_team_doc, league_name):
             'dna_off_def': dna_dir
         },
         'h2h_patterns': h2h_patterns,
+        'streak_adjustment_gol': round(streak_adj_gol * 100, 2),
+        'streak_adjustment_ggng': round(streak_adj_ggng * 100, 2),
     }
 
 
@@ -1634,6 +1951,12 @@ def run_daily_predictions(target_date=None):
         print("⚠️  Nessuna partita oggi.")
         return
 
+    # 1b. Costruisci cache strisce per tutte le leghe delle partite di oggi
+    leagues_today = set(m.get('_league', '') for m in matches if m.get('_league'))
+    for league in leagues_today:
+        build_streak_cache(league)
+    print(f"   📊 Streak cache: {len(_streak_cache)} squadre da {len(leagues_today)} campionati")
+
     # 2. Analizza ogni partita
     results = []
     scartate = 0
@@ -1721,6 +2044,13 @@ def run_daily_predictions(target_date=None):
             'expected_total_goals': gol_result.get('expected_total'),
             'league_avg_goals': gol_result.get('league_avg'),
             'segno_dettaglio_raw': segno_result.get('dettaglio_raw', {}),
+            'streak_adjustment_segno': segno_result.get('streak_adjustment_segno', 0),
+            'streak_adjustment_gol': gol_result.get('streak_adjustment_gol', 0),
+            'streak_adjustment_ggng': gol_result.get('streak_adjustment_ggng', 0),
+            'streak_home': _streak_cache.get(home, {}).get('total', {}),
+            'streak_away': _streak_cache.get(away, {}).get('total', {}),
+            'streak_home_context': _streak_cache.get(home, {}).get('home', {}),
+            'streak_away_context': _streak_cache.get(away, {}).get('away', {}),
             'created_at': datetime.now(),
         }
 

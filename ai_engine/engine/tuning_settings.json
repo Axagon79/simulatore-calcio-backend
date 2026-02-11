@@ -24,6 +24,9 @@
         "PESO_VALORE_ROSA": {
             "valore": 1.0
         },
+        "PESO_STREAK": {
+            "valore": 2.0
+        },
         "DIVISORE_MEDIA_GOL": {
             "valore": 1.1
         },
