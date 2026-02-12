@@ -250,7 +250,7 @@ def get_nations(request: https_fn.Request) -> https_fn.Response:
     
 @https_fn.on_request(
     memory=options.MemoryOption.MB_256,
-    timeout_sec=10,  # Velocissimo, solo query DB
+    timeout_sec=60,  # 60s per gestire cold start dopo deploy
     region="us-central1"
 )
 def get_formations(request: https_fn.Request) -> https_fn.Response:

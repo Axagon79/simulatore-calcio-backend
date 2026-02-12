@@ -82,7 +82,7 @@ def get_all_data_bulk(home_team, away_team, league_name):
         scores_keys = list(team.get("scores", {}).keys()) if has_scores else []
         print(f"  - {name} (league={league}): scores={has_scores}, keys={scores_keys}", file=sys.stderr)
     
-    raw_rounds = list(db["h2h_by_round"].find().sort("last_updated", -1))
+    raw_rounds = list(db["h2h_by_round"].find({"league": league_normalized}).sort("last_updated", -1))
     print(f"🔍 [BULK] Rounds totali caricati: {len(raw_rounds)}", file=sys.stderr)
 
     # 3. ESTRAZIONE DATI H2H SPECIFICI

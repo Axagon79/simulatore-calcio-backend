@@ -582,6 +582,297 @@ app.get('/streaks', async (req, res) => {
 });
 
 // ============================================
+// ENDPOINT: /gauge-data
+// 1. Cerca in daily_predictions (path veloce)
+// 2. Se non trova, calcola on-demand da h2h_by_round + teams
+// ============================================
+app.get('/gauge-data', async (req, res) => {
+  try {
+    const { home, away, league: leagueId } = req.query;
+    if (!home || !away) {
+      return res.status(400).json({ error: 'Missing home or away parameter' });
+    }
+
+    // --- PATH 1: Cerca in daily_predictions ---
+    const existing = await req.db.collection('daily_predictions')
+      .find(
+        { home, away },
+        {
+          projection: {
+            _id: 0,
+            segno_dettaglio: 1,
+            segno_dettaglio_raw: 1,
+            gol_dettaglio: 1,
+            gol_directions: 1,
+            expected_total_goals: 1,
+            date: 1
+          }
+        }
+      )
+      .sort({ date: -1 })
+      .limit(1)
+      .toArray();
+
+    if (existing.length > 0 && existing[0].segno_dettaglio_raw) {
+      return res.json(existing[0]);
+    }
+
+    // --- PATH 2: Calcolo on-demand ---
+    if (!leagueId) {
+      return res.json(null); // Senza lega non possiamo cercare nel DB
+    }
+
+    const leagueMap = {
+      'SERIE_A': 'Serie A', 'SERIE_B': 'Serie B',
+      'SERIE_C_GIRONE_A': 'Serie C - Girone A', 'SERIE_C_GIRONE_B': 'Serie C - Girone B', 'SERIE_C_GIRONE_C': 'Serie C - Girone C',
+      'PREMIER_LEAGUE': 'Premier League', 'LA_LIGA': 'La Liga', 'BUNDESLIGA': 'Bundesliga',
+      'LIGUE_1': 'Ligue 1', 'EREDIVISIE': 'Eredivisie', 'LIGA_PORTUGAL': 'Liga Portugal',
+      'CHAMPIONSHIP': 'Championship', 'LA_LIGA_2': 'LaLiga 2', 'BUNDESLIGA_2': '2. Bundesliga', 'LIGUE_2': 'Ligue 2',
+      'SCOTTISH_PREMIERSHIP': 'Scottish Premiership', 'ALLSVENSKAN': 'Allsvenskan', 'ELITESERIEN': 'Eliteserien',
+      'SUPERLIGAEN': 'Superligaen', 'JUPILER_PRO_LEAGUE': 'Jupiler Pro League', 'SUPER_LIG': 'Süper Lig',
+      'LEAGUE_OF_IRELAND': 'League of Ireland Premier Division',
+      'BRASILEIRAO': 'Brasileirão Serie A', 'PRIMERA_DIVISION_ARG': 'Primera División', 'MLS': 'Major League Soccer',
+      'J1_LEAGUE': 'J1 League'
+    };
+    const leagueName = leagueMap[leagueId];
+
+    // Cerca la partita in h2h_by_round
+    const matchPipeline = [
+      { $match: { league: leagueName } },
+      { $unwind: '$matches' },
+      { $match: { 'matches.home': home, 'matches.away': away } },
+      { $sort: { 'matches.date_obj': -1 } },
+      { $limit: 1 },
+      { $replaceRoot: { newRoot: '$matches' } }
+    ];
+    const matchDocs = await req.db.collection('h2h_by_round').aggregate(matchPipeline).toArray();
+    if (matchDocs.length === 0) return res.json(null);
+
+    const m = matchDocs[0];
+    const hd = m.h2h_data || {};
+    const odds = m.odds || {};
+
+    // Cerca team docs per dati GOL
+    const [homeTeamDocs, awayTeamDocs] = await Promise.all([
+      req.db.collection('teams').find({ name: home }).limit(1).toArray(),
+      req.db.collection('teams').find({ name: away }).limit(1).toArray()
+    ]);
+    const homeTeam = homeTeamDocs[0] || {};
+    const awayTeam = awayTeamDocs[0] || {};
+
+    // ===== CALCOLO SEGNO =====
+
+    // BVS raw
+    const bvsHome = Number(hd.bvs_index || 0);
+    const bvsAway = Number(hd.bvs_away || 0);
+
+    // Quote raw (probabilità implicite normalizzate)
+    const q1 = Number(odds['1'] || odds.qt_1 || 99);
+    const qx = Number(odds['X'] || odds.qt_x || 99);
+    const q2 = Number(odds['2'] || odds.qt_2 || 99);
+    let quoteHome = 50, quoteAway = 50;
+    if (q1 < 90 && q2 < 90) {
+      const p1 = 1 / q1, px = 1 / qx, p2 = 1 / q2;
+      const tot = p1 + px + p2;
+      const n1 = (p1 / tot) * 100, nx = (px / tot) * 100, n2 = (p2 / tot) * 100;
+      quoteHome = Math.round((n1 + nx / 2) * 10) / 10;
+      quoteAway = Math.round((n2 + nx / 2) * 10) / 10;
+    }
+
+    // Lucifero raw
+    const lucHome = Number(hd.lucifero_home || 0);
+    const lucAway = Number(hd.lucifero_away || 0);
+
+    // Affidabilità raw
+    const trustHL = hd.trust_home_letter || 'C';
+    const trustAL = hd.trust_away_letter || 'C';
+    const trustMap = { 'A': 10, 'B': 7, 'C': 4, 'D': 1 };
+    const trustHN = trustMap[trustHL] || 4;
+    const trustAN = trustMap[trustAL] || 4;
+
+    // DNA raw (35%att + 25%def + 25%tec + 15%val)
+    const hDna = hd.home_dna || hd.h2h_dna?.home_dna || {};
+    const aDna = hd.away_dna || hd.h2h_dna?.away_dna || {};
+    const dnaCalc = (d) => (Number(d.att || 50) * 0.35 + Number(d.def || 50) * 0.25 + Number(d.tec || 50) * 0.25 + Number(d.val || 50) * 0.15);
+    const dnaHome = Math.round(dnaCalc(hDna) * 10) / 10;
+    const dnaAway = Math.round(dnaCalc(aDna) * 10) / 10;
+
+    // Motivazioni raw (da teams collection)
+    const motHome = Number(homeTeam?.stats?.motivation || 7);
+    const motAway = Number(awayTeam?.stats?.motivation || 7);
+
+    // H2H raw
+    const h2hHome = Number(hd.home_score || 5);
+    const h2hAway = Number(hd.away_score || 5);
+    const h2hMatches = Number(hd.total_matches || 0);
+
+    // Campo raw
+    const fc = hd.fattore_campo || {};
+    const campoHome = Number(fc.field_home || hd.field_home || 3.5);
+    const campoAway = Number(fc.field_away || hd.field_away || 3.5);
+
+    // Score functions per SEGNO (0-100)
+    const scoreBvs = (() => {
+      const cls = hd.classification || 'NON_BVS';
+      const bmi = Number(hd.bvs_match_index || 0);
+      const lin = hd.is_linear;
+      if (cls === 'NON_BVS') return 40;
+      let base = 50 + (bmi / 7) * 40;
+      if (cls === 'PURO' && lin) base = Math.min(base + 10, 100);
+      if (cls === 'SEMI') base *= 0.85;
+      return Math.max(0, Math.min(100, Math.round(base * 10) / 10));
+    })();
+
+    const scoreQuote = (() => {
+      if (q1 >= 90 || q2 >= 90) return 50;
+      const diff = Math.abs(quoteHome - quoteAway);
+      return Math.max(0, Math.min(100, Math.round((50 + diff * 0.8) * 10) / 10));
+    })();
+
+    const scoreLucifero = (() => {
+      const diff = Math.abs(lucHome - lucAway);
+      return Math.max(0, Math.min(100, Math.round((50 + diff * 3) * 10) / 10));
+    })();
+
+    const scoreAffidabilita = (() => {
+      const diff = Math.abs(trustHN - trustAN);
+      return Math.max(0, Math.min(100, Math.round((50 + diff * 8) * 10) / 10));
+    })();
+
+    const scoreDna = (() => {
+      const diff = Math.abs(dnaHome - dnaAway);
+      return Math.max(0, Math.min(100, Math.round((50 + diff * 0.5) * 10) / 10));
+    })();
+
+    const scoreMot = (() => {
+      const diff = Math.abs(motHome - motAway);
+      return Math.max(0, Math.min(100, Math.round((50 + diff * 5) * 10) / 10));
+    })();
+
+    const scoreH2h = (() => {
+      if (h2hMatches < 2) return 50;
+      const diff = Math.abs(h2hHome - h2hAway);
+      const weight = Math.min(h2hMatches / 10, 1);
+      return Math.max(0, Math.min(100, Math.round((50 + diff * 5 * weight) * 10) / 10));
+    })();
+
+    const scoreCampo = (() => {
+      const diff = Math.abs(campoHome - campoAway);
+      return Math.max(0, Math.min(100, Math.round((50 + diff * 10) * 10) / 10));
+    })();
+
+    const segno_dettaglio = {
+      bvs: scoreBvs, quote: scoreQuote, lucifero: scoreLucifero,
+      affidabilita: scoreAffidabilita, dna: scoreDna, motivazioni: scoreMot,
+      h2h: scoreH2h, campo: scoreCampo
+    };
+
+    const segno_dettaglio_raw = {
+      bvs: { home: bvsHome, away: bvsAway, scala: '±7' },
+      quote: { home: quoteHome, away: quoteAway, scala: '%' },
+      lucifero: { home: lucHome, away: lucAway, scala: '±7' },
+      affidabilita: { home: trustHL, away: trustAL, home_num: trustHN, away_num: trustAN, scala: 'A-D' },
+      dna: { home: dnaHome, away: dnaAway, scala: '%' },
+      motivazioni: { home: motHome, away: motAway, scala: '%' },
+      h2h: { home: h2hHome, away: h2hAway, matches: h2hMatches, scala: '%' },
+      campo: { home: campoHome, away: campoAway, scala: '%' }
+    };
+
+    // ===== CALCOLO GOL =====
+
+    // Media gol da ranking stats
+    const hStats = homeTeam?.ranking?.homeStats || {};
+    const aStats = awayTeam?.ranking?.awayStats || {};
+    const hPlayed = Number(hStats.played || 1);
+    const aPlayed = Number(aStats.played || 1);
+    const hGfAvg = Number(hStats.goalsFor || 0) / hPlayed;
+    const hGaAvg = Number(hStats.goalsAgainst || 0) / hPlayed;
+    const aGfAvg = Number(aStats.goalsFor || 0) / aPlayed;
+    const aGaAvg = Number(aStats.goalsAgainst || 0) / aPlayed;
+
+    const expHome = (hGfAvg + aGaAvg) / 2;
+    const expAway = (aGfAvg + hGaAvg) / 2;
+    const expected_total_goals = Math.round((expHome + expAway) * 100) / 100 || 2.5;
+
+    // Direzione da expected total
+    const dirFromExp = (et) => et >= 2.5 ? 'over' : et <= 2.0 ? 'under' : 'neutro';
+
+    // Score media gol
+    const scoreMediaGol = (() => {
+      const et = expected_total_goals;
+      if (et >= 3.0) return Math.min(100, 80 + (et - 3.0) * 20);
+      if (et >= 2.5) return 60 + (et - 2.5) * 40;
+      if (et <= 1.8) return Math.min(100, 80 + (1.8 - et) * 30);
+      if (et <= 2.2) return 55 + (2.2 - et) * 62;
+      return 45;
+    })();
+    const dirMediaGol = dirFromExp(expected_total_goals);
+
+    // Att vs Def
+    const attHome = Number(homeTeam?.scores?.attack_home || 7);
+    const defAway = Number(awayTeam?.scores?.defense_away || 5);
+    const attAway = Number(awayTeam?.scores?.attack_away || 7);
+    const defHome = Number(homeTeam?.scores?.defense_home || 5);
+    const attHN = (attHome / 15) * 100;
+    const defAN = (defAway / 10) * 100;
+    const attAN = (attAway / 15) * 100;
+    const defHN = (defHome / 10) * 100;
+    const mismatch = Math.max(0, attHN - defAN) + Math.max(0, attAN - defHN);
+    const scoreAttVsDef = Math.max(0, Math.min(100, Math.round((35 + mismatch * 0.5) * 10) / 10));
+    const dirAttVsDef = mismatch > 30 ? 'over' : mismatch < 10 ? 'under' : 'neutro';
+
+    // DNA off/def
+    const dnaAttComb = ((Number(hDna.att || 50) + Number(aDna.att || 50)) / 2);
+    const dnaDefComb = ((Number(hDna.def || 50) + Number(aDna.def || 50)) / 2);
+    const scoreDnaOffDef = Math.max(0, Math.min(100, Math.round((dnaAttComb - dnaDefComb + 50) * 10) / 10));
+    const dirDnaOffDef = dnaAttComb > dnaDefComb + 10 ? 'over' : dnaAttComb < dnaDefComb - 10 ? 'under' : 'neutro';
+
+    // xG (default se non disponibile)
+    const scoreXg = 50;
+    const dirXg = 'neutro';
+
+    // H2H gol (default se non disponibile)
+    const scoreH2hGol = 50;
+    const dirH2hGol = 'neutro';
+
+    // Media lega (default 2.5)
+    const scoreMediaLega = 50;
+    const dirMediaLega = 'neutro';
+
+    const gol_dettaglio = {
+      media_gol: scoreMediaGol,
+      att_vs_def: scoreAttVsDef,
+      xg: scoreXg,
+      h2h_gol: scoreH2hGol,
+      media_lega: scoreMediaLega,
+      dna_off_def: scoreDnaOffDef
+    };
+
+    const gol_directions = {
+      media_gol: dirMediaGol,
+      att_vs_def: dirAttVsDef,
+      xg: dirXg,
+      h2h_gol: dirH2hGol,
+      media_lega: dirMediaLega,
+      dna_off_def: dirDnaOffDef
+    };
+
+    res.json({
+      segno_dettaglio,
+      segno_dettaglio_raw,
+      gol_dettaglio,
+      gol_directions,
+      expected_total_goals,
+      source: 'calculated' // Per distinguere dai dati daily_predictions
+    });
+
+  } catch (error) {
+    console.error('❌ [GAUGE-DATA] Errore:', error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ============================================
 // ENDPOINT: /leagues
 // ============================================
 
