@@ -59,7 +59,7 @@ def run_simulation(request: https_fn.Request) -> https_fn.Response:
         # ---------------------------------------------------------
         if payload and (payload.get('home') or payload.get('match_id') or payload.get('main_mode')):
     
-            league = payload.get('league', 'Serie A')
+            league = payload.get('league') or payload.get('bulk_cache', {}).get('league') or 'Serie A'
             
             # ✅ DETERMINA SE È UNA COPPA
             is_cup = league in ['UCL', 'UEL'] or payload.get('is_cup', False)
@@ -288,8 +288,8 @@ def get_formations(request: https_fn.Request) -> https_fn.Response:
         
         home_team = payload.get('home', '')
         away_team = payload.get('away', '')
-        league = payload.get('league', 'Serie A')
-        
+        league = payload.get('league') or payload.get('bulk_cache', {}).get('league') or 'Serie A'
+
         if not home_team or not away_team:
             return https_fn.Response(
                 json.dumps({"success": False, "error": "Missing home or away team"}),
