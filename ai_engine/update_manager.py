@@ -168,17 +168,71 @@ def main():
     report = []
     total_start_time = time.time() # Start Cronometro Globale
 
-    for filename, desc, impact, folder in SCRAPER_SEQUENCE:
-        ok, err_msg, duration = run_single_script(filename, desc, folder)
-        report.append({
-            "file": filename,
-            "status": "✅ OK" if ok else "❌ KO",
-            "error": err_msg,
-            "impact": impact,
-            "folder": folder,
-            "duration": duration
-        })
-        if ok: time.sleep(2)
+    # Script da eseguire in parallelo (stessa fonte fbref.com, indipendenti tra loro)
+    PARALLEL_GROUP = {"fbref_scraper_att.py", "fbref_scraper_mid.py", "fbref_scraper_def.py", "scraper_gk_fbref.py"}
+
+    i = 0
+    while i < len(SCRAPER_SEQUENCE):
+        filename, desc, impact, folder = SCRAPER_SEQUENCE[i]
+
+        # Controlla se questo script fa parte del gruppo parallelo
+        if filename in PARALLEL_GROUP:
+            # Raccogli tutti gli script consecutivi del gruppo
+            parallel_tasks = []
+            while i < len(SCRAPER_SEQUENCE) and SCRAPER_SEQUENCE[i][0] in PARALLEL_GROUP:
+                parallel_tasks.append(SCRAPER_SEQUENCE[i])
+                i += 1
+
+            print(f"\n🔀 LANCIO PARALLELO: {len(parallel_tasks)} fbref scrapers contemporanei")
+
+            # Lancia tutti con Popen (non-bloccante)
+            env = os.environ.copy()
+            env["PYTHONIOENCODING"] = "utf-8"
+            processes = []
+            for pf, pd, pi, pfolder in parallel_tasks:
+                full_path = os.path.join(pfolder, pf)
+                print(f"   🚀 Avvio: {pf}")
+                p_start = time.time()
+                proc = subprocess.Popen(
+                    [sys.executable, full_path],
+                    env=env,
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL
+                )
+                processes.append((pf, pd, pi, pfolder, proc, p_start))
+
+            # Aspetta che tutti finiscano
+            print(f"   ⏳ Attendo completamento di tutti e {len(processes)}...")
+            for pf, pd, pi, pfolder, proc, p_start in processes:
+                proc.wait()
+                elapsed = time.time() - p_start
+                ok = (proc.returncode == 0)
+                err_msg = None if ok else f"Exit code {proc.returncode}"
+                print(f"   {'✅' if ok else '❌'} {pf} completato in {elapsed/60:.1f}min")
+                report.append({
+                    "file": pf,
+                    "status": "✅ OK" if ok else "❌ KO",
+                    "error": err_msg,
+                    "impact": pi,
+                    "folder": pfolder,
+                    "duration": elapsed
+                })
+
+            print(f"🔀 GRUPPO PARALLELO COMPLETATO")
+            time.sleep(2)
+        else:
+            # Esecuzione sequenziale normale
+            ok, err_msg, duration = run_single_script(filename, desc, folder)
+            report.append({
+                "file": filename,
+                "status": "✅ OK" if ok else "❌ KO",
+                "error": err_msg,
+                "impact": impact,
+                "folder": folder,
+                "duration": duration
+            })
+            if ok: time.sleep(2)
+            i += 1
 
     total_duration_sec = time.time() - total_start_time
     total_duration_str = str(timedelta(seconds=int(total_duration_sec))) # Converte in HH:MM:SS
@@ -192,7 +246,8 @@ def main():
 
     failures = []
     for item in report:
-        dur_str = f"{item['duration']:.1f}s"
+        dur_min = item['duration'] / 60
+        dur_str = f"{dur_min:.1f}min"
         print(f"{item['status']:<6} | {dur_str:<10} | {item['file']:<35} | {item['impact']}")
         if item['status'] == "❌ KO":
             failures.append(item)

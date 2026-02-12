@@ -7,10 +7,13 @@ from dotenv import load_dotenv
 
 # --- 1. IMPORTAZIONE LOGICA CALCOLATORE ---
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+PROJECT_ROOT = os.path.dirname(BASE_DIR)  # simulatore-calcio-backend/
+sys.path.insert(0, PROJECT_ROOT)
+sys.path.insert(0, BASE_DIR)
 sys.path.append(os.path.join(BASE_DIR, "calculators"))
 
 try:
-    from calculator_affidabilità import calculate_reliability  # type: ignore
+    from calculator_affidabilità import calculate_reliability, build_caches  # type: ignore
     print("✅ Modulo 'calculator_affidabilità' caricato con successo.")
 except ImportError as e:
     print(f"❌ Errore critico: Impossibile caricare il calcolatore. {e}")
@@ -34,6 +37,9 @@ def run_update_affidabilità():
     print(f"\n{'='*60}")
     print(f"🚀 AVVIO AGGIORNAMENTO TOTALE SU {len(leghe)} CAMPIONATI")
     print(f"{'='*60}")
+
+    # Carica cache in memoria (teams + matches_history) per eliminare query ripetute
+    build_caches()
 
     count_total = 0
     oggi = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)

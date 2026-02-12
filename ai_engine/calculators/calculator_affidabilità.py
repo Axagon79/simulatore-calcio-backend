@@ -13,9 +13,70 @@ COLLECTION_TEAMS = "teams"
 def connect_db():
     return db
 
+# --- CACHE IN MEMORIA (opzionale, per pipeline) ---
+_teams_cache = {}    # nome_lower → {name, aliases, alias_transfermarkt, league}
+_history_cache = {}  # team_name_lower → [match_docs]
+
+def build_caches():
+    """Carica teams e matches_history in memoria per eliminare query ripetute."""
+    global _teams_cache, _history_cache
+    _teams_cache = {}
+    _history_cache = {}
+
+    # Cache teams (494 doc → ~1100 nomi indicizzati)
+    all_teams = list(db[COLLECTION_TEAMS].find({}))
+    for t in all_teams:
+        info = {
+            'name': t.get('name'),
+            'aliases': t.get('aliases', []),
+            'alias_transfermarkt': t.get('alias_transfermarkt'),
+            'league': t.get('league')
+        }
+        name = t.get('name', '')
+        if name:
+            _teams_cache[name.lower()] = info
+        al = t.get('aliases', [])
+        if isinstance(al, list):
+            for a in al:
+                if a: _teams_cache[a.lower()] = info
+        elif isinstance(al, dict):
+            for a in al.values():
+                if a: _teams_cache[a.lower()] = info
+        atm = t.get('alias_transfermarkt')
+        if atm:
+            _teams_cache[atm.lower()] = info
+
+    # Cache matches_history (4265 doc → indicizzati per team)
+    all_matches = list(db[COLLECTION_HISTORY].find({}))
+    for m in all_matches:
+        home = (m.get('homeTeam') or '').lower()
+        away = (m.get('awayTeam') or '').lower()
+        if home:
+            _history_cache.setdefault(home, []).append(m)
+        if away:
+            _history_cache.setdefault(away, []).append(m)
+
+    print(f"   📋 Cache affidabilità: {len(all_teams)} teams → {len(_teams_cache)} nomi, {len(all_matches)} partite storiche → {len(_history_cache)} team")
+
 def get_team_aliases(db, team_name):
     """Cerca gli alias della squadra per trovarla nello storico anche se il nome è diverso."""
-    # MODIFICA A VENTAGLIO: Cerca il documento partendo da nome, alias o transfermarkt
+    # Se cache disponibile, usa quella (zero query DB)
+    if _teams_cache:
+        info = _teams_cache.get(team_name.lower())
+        if info:
+            aliases = [team_name]
+            if info['name'] and info['name'] not in aliases:
+                aliases.append(info['name'])
+            if isinstance(info['aliases'], list):
+                aliases.extend(info['aliases'])
+            elif isinstance(info['aliases'], dict):
+                aliases.extend(info['aliases'].values())
+            if info['alias_transfermarkt']:
+                aliases.append(info['alias_transfermarkt'])
+            return [a.lower() for a in list(set(aliases)) if a]
+        return [team_name.lower()]
+
+    # Fallback: query DB (per uso standalone/debug)
     team = db[COLLECTION_TEAMS].find_one({
         "$or": [
             {"name": team_name},
@@ -23,28 +84,28 @@ def get_team_aliases(db, team_name):
             {"alias_transfermarkt": team_name}
         ]
     })
-    
+
     aliases = [team_name]
     if team:
-        # Se il nome ufficiale nel DB è diverso da quello passato, lo aggiungiamo
         if team.get('name') and team['name'] not in aliases:
             aliases.append(team['name'])
-            
-        # Aggiungi alias da oggetto o lista
         if isinstance(team.get('aliases'), list):
             aliases.extend(team['aliases'])
         elif isinstance(team.get('aliases'), dict):
             aliases.extend(team['aliases'].values())
-            
-        # Aggiungi alias transfermarkt se presente
         if team.get('alias_transfermarkt'):
             aliases.append(team['alias_transfermarkt'])
 
-    return [a.lower() for a in list(set(aliases)) if a] # Tutto minuscolo e senza duplicati
+    return [a.lower() for a in list(set(aliases)) if a]
 
 def get_team_league(db, team_name):
     """Recupera il campionato della squadra da teams (per ricerca intelligente)."""
-    # MODIFICA A VENTAGLIO: Cerca la lega anche se il nome passato è un alias
+    # Se cache disponibile, usa quella (zero query DB)
+    if _teams_cache:
+        info = _teams_cache.get(team_name.lower())
+        return info.get('league') if info else None
+
+    # Fallback: query DB (per uso standalone/debug)
     team = db[COLLECTION_TEAMS].find_one({
         "$or": [
             {"name": team_name},
@@ -67,41 +128,61 @@ def calculate_reliability(team_name, specific_league=None):
     """
     history_col = db[COLLECTION_HISTORY]
     aliases = get_team_aliases(db, team_name)
-    
+
     # Determina lega target (priorità: specific_league → league da teams → nessuna)
     target_league = specific_league or get_team_league(db, team_name)
-    
+
     matches = []
-    
-    # LIVELLO 1: Lega + Nome Esatto (più preciso)
-    if target_league:
-        query_l1 = {
-            "league": target_league,
-            "$or": [{"homeTeam": team_name}, {"awayTeam": team_name}]
-        }
-        matches = list(history_col.find(query_l1))
-    
-    # LIVELLO 2: Lega + Alias (se L1 non trova nulla)
-    if not matches and target_league:
-        regex_pattern = "|".join([f"^{a}$" for a in aliases])
-        query_l2 = {
-            "league": target_league,
-            "$or": [
-                {"homeTeam": {"$regex": regex_pattern, "$options": "i"}},
-                {"awayTeam": {"$regex": regex_pattern, "$options": "i"}}
-            ]
-        }
-        matches = list(history_col.find(query_l2))
-    
-    # LIVELLO 3: Globale con Alias (fallback disperato)
-    if not matches:
-        regex_pattern = "|".join([f"^{a}$" for a in aliases])
-        matches = list(history_col.find({
-            "$or": [
-                {"homeTeam": {"$regex": regex_pattern, "$options": "i"}},
-                {"awayTeam": {"$regex": regex_pattern, "$options": "i"}}
-            ]
-        }))
+
+    if _history_cache:
+        # Cache: raccogli match per tutti gli alias (zero query DB)
+        all_matches = []
+        seen_ids = set()
+        for alias in aliases:
+            for m in _history_cache.get(alias, []):
+                mid = m.get('_id')
+                if mid and mid not in seen_ids:
+                    seen_ids.add(mid)
+                    all_matches.append(m)
+
+        # Filtra per lega (equivalente Livello 1+2)
+        if target_league:
+            matches = [m for m in all_matches if m.get('league') == target_league]
+
+        # Fallback globale (equivalente Livello 3)
+        if not matches:
+            matches = all_matches
+    else:
+        # Fallback: query DB (per uso standalone/debug)
+        # LIVELLO 1: Lega + Nome Esatto (più preciso)
+        if target_league:
+            query_l1 = {
+                "league": target_league,
+                "$or": [{"homeTeam": team_name}, {"awayTeam": team_name}]
+            }
+            matches = list(history_col.find(query_l1))
+
+        # LIVELLO 2: Lega + Alias (se L1 non trova nulla)
+        if not matches and target_league:
+            regex_pattern = "|".join([f"^{a}$" for a in aliases])
+            query_l2 = {
+                "league": target_league,
+                "$or": [
+                    {"homeTeam": {"$regex": regex_pattern, "$options": "i"}},
+                    {"awayTeam": {"$regex": regex_pattern, "$options": "i"}}
+                ]
+            }
+            matches = list(history_col.find(query_l2))
+
+        # LIVELLO 3: Globale con Alias (fallback disperato)
+        if not matches:
+            regex_pattern = "|".join([f"^{a}$" for a in aliases])
+            matches = list(history_col.find({
+                "$or": [
+                    {"homeTeam": {"$regex": regex_pattern, "$options": "i"}},
+                    {"awayTeam": {"$regex": regex_pattern, "$options": "i"}}
+                ]
+            }))
 
     if not matches:
         return 5.0 # Valore neutro se nessuna partita trovata

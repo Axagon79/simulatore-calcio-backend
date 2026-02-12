@@ -1,6 +1,8 @@
 import os
 import sys
+import re
 from datetime import datetime
+import dateutil.parser
 import contextlib
 
 # 1. CONFIGURAZIONE DEI PERCORSI
@@ -91,6 +93,37 @@ def select_leagues_interactive(h2h_col):
         except ValueError:
             print("❌ Input non valido. Usa solo numeri e virgole.")
 
+def get_round_number(doc):
+    """Estrae il numero di giornata dall'ID documento."""
+    name = doc.get('_id', '') or doc.get('round_name', '')
+    match = re.search(r'(\d+)', str(name))
+    return int(match.group(1)) if match else 999
+
+def find_target_rounds(league_docs):
+    """Trova le 3 giornate da aggiornare: precedente, attuale, successiva."""
+    if not league_docs: return []
+    sorted_docs = sorted(league_docs, key=get_round_number)
+    now = datetime.now()
+    closest_index = -1
+    min_diff = float('inf')
+    for i, doc in enumerate(sorted_docs):
+        dates = []
+        for m in doc.get('matches', []):
+            d_raw = m.get('date_obj') or m.get('date')
+            try:
+                if d_raw:
+                    d = d_raw if isinstance(d_raw, datetime) else dateutil.parser.parse(d_raw)
+                    dates.append(d.replace(tzinfo=None))
+            except: pass
+        if dates:
+            avg_date = sum([d.timestamp() for d in dates]) / len(dates)
+            diff = abs(now.timestamp() - avg_date)
+            if diff < min_diff: min_diff = diff; closest_index = i
+    if closest_index == -1: return []
+    start_idx = max(0, closest_index - 1)
+    end_idx = min(len(sorted_docs), closest_index + 2)
+    return sorted_docs[start_idx:end_idx]
+
 def run_injection(interactive=True):
     teams_col = db["teams"]
     h2h_col = db["h2h_by_round"]
@@ -98,13 +131,27 @@ def run_injection(interactive=True):
     uel_col = db["matches_europa_league"]
 
 # --- 1. GESTIONE MENU / AUTOMATICO ---
+    targeted_rounds = None
     if interactive:
-        # Se siamo in modalità manuale, mostriamo il menu
         query_filter = select_leagues_interactive(h2h_col)
     else:
-        # Se siamo in modalità AUTOMATICA (chiamata dal direttore d'orchestra)
-        print("\n🤖 MODALITÀ AUTOMATICA ATTIVA: Aggiorno tutti i campionati.")
-        query_filter = {} # Filtro vuoto = Tutto
+        print("\n🤖 MODALITÀ AUTOMATICA MIRATA: Prec/Attuale/Succ per ogni campionato")
+        query_filter = {}
+        # Pre-compute targeted rounds: 2 fasi (projection leggera + query mirata)
+        print("   📥 Fase 1: selezione round (query leggera)...")
+        light_docs = list(h2h_col.find({}, {"_id": 1, "league": 1, "matches.date": 1, "matches.date_obj": 1}))
+        by_league = {}
+        for doc in light_docs:
+            lg = doc.get("league")
+            if lg:
+                by_league.setdefault(lg, []).append(doc)
+        target_ids = []
+        for lg_name, lg_docs in by_league.items():
+            target = find_target_rounds(lg_docs)
+            target_ids.extend([d["_id"] for d in target])
+        print(f"   📥 Fase 2: caricamento {len(target_ids)} round completi...")
+        targeted_rounds = list(h2h_col.find({"_id": {"$in": target_ids}}))
+        print(f"   📋 {len(by_league)} campionati, {len(light_docs)} docs → {len(targeted_rounds)} giornate mirate")
 
     print("\n🚀 AVVIO INIEZIONE (Sherlock Mode)...")
     print("   Sto analizzando i dati... attendere prego.\n")
@@ -198,9 +245,19 @@ def run_injection(interactive=True):
 
     # --- 2. RECUPERO DOCUMENTI FILTRATI (Campionati + Coppe) ---
     all_docs = []
-    
+
     # Determina quali collezioni processare in base al filtro
-    if not query_filter:  # Tutto
+    if targeted_rounds is not None:
+        # Modalità mirata: round pre-calcolati + coppe mirate
+        all_docs.extend(targeted_rounds)
+        for cup_col in [ucl_col, uel_col]:
+            cup_light = list(cup_col.find({}, {"_id": 1, "matches.date": 1, "matches.date_obj": 1}))
+            cup_target = find_target_rounds(cup_light)
+            cup_ids = [d["_id"] for d in cup_target]
+            if cup_ids:
+                all_docs.extend(list(cup_col.find({"_id": {"$in": cup_ids}})))
+        print(f"   📋 Totale documenti da processare: {len(all_docs)} (h2h: {len(targeted_rounds)} + coppe mirate)")
+    elif not query_filter:  # Tutto (fallback)
         all_docs.extend(list(h2h_col.find({})))
         all_docs.extend(list(ucl_col.find({})))
         all_docs.extend(list(uel_col.find({})))

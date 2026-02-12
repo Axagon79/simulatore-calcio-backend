@@ -3,7 +3,6 @@ import sys
 import time
 import random
 import requests
-import re
 import importlib
 from bs4 import BeautifulSoup
 
@@ -21,6 +20,32 @@ from config import db
 # --- COLLEZIONI ---
 rankings_collection = db['classifiche']
 teams_collection = db['teams']  # <--- FONDAMENTALE: Ci serve per cercare gli ID
+
+# --- CACHE TEAMS IN MEMORIA (evita ~520 query regex individuali) ---
+_teams_cache = {}  # nome_lower → transfermarkt_id
+
+def _build_teams_cache():
+    """Carica tutte le teams e costruisce un dizionario nome/alias → tm_id."""
+    all_teams = list(teams_collection.find({}, {"name": 1, "aliases": 1, "aliases_transfermarkt": 1, "transfermarkt_id": 1}))
+    for t in all_teams:
+        tm_id = t.get("transfermarkt_id")
+        if not tm_id:
+            continue
+        # Nome principale
+        name = t.get("name", "")
+        if name:
+            _teams_cache[name.strip().lower()] = tm_id
+        # Aliases standard
+        for alias in (t.get("aliases") or []):
+            if alias:
+                _teams_cache[alias.strip().lower()] = tm_id
+        # Aliases Transfermarkt
+        for alias in (t.get("aliases_transfermarkt") or []):
+            if alias:
+                _teams_cache[alias.strip().lower()] = tm_id
+    print(f"   ✅ Cache teams: {len(all_teams)} squadre → {len(_teams_cache)} nomi indicizzati")
+
+_build_teams_cache()
 
 # --- CONFIGURAZIONE COMPETIZIONI (ANNO 2025) ---
 COMPETITIONS = [
@@ -213,26 +238,15 @@ def normalize_name(name):
 
 def find_db_data(scraped_name):
     """
-    Cerca il nome scaricato nella collezione 'teams' (Nome o Alias).
-    Se trova la squadra, restituisce il suo 'transfermarkt_id' (dal DB) e il 'team_id'.
+    Cerca il nome scaricato nella cache in-memory (Nome o Alias).
+    Restituisce (transfermarkt_id, None) — il team_id non è più necessario.
     """
     if not scraped_name: return None, None
-    
-    # Cerca per Nome ESATTO, per ALIAS o per ALIAS TRANSFERMARKT
-    query = {
-        "$or": [
-            {"name": {"$regex": f"^{re.escape(scraped_name)}$", "$options": "i"}},
-            {"aliases": {"$regex": f"^{re.escape(scraped_name)}$", "$options": "i"}},
-            {"aliases_transfermarkt": {"$regex": f"^{re.escape(scraped_name)}$", "$options": "i"}}
-        ]
-    }
-    
-    team = teams_collection.find_one(query)
-    
-    if team:
-        # Restituisce il numeretto (transfermarkt_id) presente nel TUO DB e l'ID interno
-        return team.get('transfermarkt_id'), (team.get('team_id') or team.get('id') or team.get('_id'))
-    
+
+    tm_id = _teams_cache.get(scraped_name.strip().lower())
+    if tm_id:
+        return tm_id, None
+
     return None, None
 
 def scrape_single_table(soup, table_index=0, split_mode=None, force_grid_view=False):

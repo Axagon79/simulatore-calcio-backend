@@ -1,6 +1,8 @@
 import os
 import sys
+import re
 from datetime import datetime
+import dateutil.parser
 import contextlib
 
 # 1. CONFIGURAZIONE PERCORSI
@@ -58,18 +60,63 @@ def select_leagues_interactive(h2h_col):
         except: pass
         print("❌ Scelta non valida.")
 
+def get_round_number(doc):
+    """Estrae il numero di giornata dall'ID documento."""
+    name = doc.get('_id', '') or doc.get('round_name', '')
+    match = re.search(r'(\d+)', str(name))
+    return int(match.group(1)) if match else 999
+
+def find_target_rounds(league_docs):
+    """Trova le 3 giornate da aggiornare: precedente, attuale, successiva."""
+    if not league_docs: return []
+    sorted_docs = sorted(league_docs, key=get_round_number)
+    now = datetime.now()
+    closest_index = -1
+    min_diff = float('inf')
+    for i, doc in enumerate(sorted_docs):
+        dates = []
+        for m in doc.get('matches', []):
+            d_raw = m.get('date_obj') or m.get('date')
+            try:
+                if d_raw:
+                    d = d_raw if isinstance(d_raw, datetime) else dateutil.parser.parse(d_raw)
+                    dates.append(d.replace(tzinfo=None))
+            except: pass
+        if dates:
+            avg_date = sum([d.timestamp() for d in dates]) / len(dates)
+            diff = abs(now.timestamp() - avg_date)
+            if diff < min_diff: min_diff = diff; closest_index = i
+    if closest_index == -1: return []
+    start_idx = max(0, closest_index - 1)
+    end_idx = min(len(sorted_docs), closest_index + 2)
+    return sorted_docs[start_idx:end_idx]
+
 def run_injection_att_def(interactive=True):
     teams_col = db["teams"]
     h2h_col = db["h2h_by_round"]
 
     if interactive:
         query_filter = select_leagues_interactive(h2h_col)
+        rounds = list(h2h_col.find(query_filter))
     else:
-        query_filter = {}
+        # Modalità mirata: 2 fasi (projection leggera + query mirata)
+        print("\n🤖 MODALITÀ AUTOMATICA MIRATA: Prec/Attuale/Succ per ogni campionato")
+        print("   📥 Fase 1: selezione round (query leggera)...")
+        light_docs = list(h2h_col.find({}, {"_id": 1, "league": 1, "matches.date": 1, "matches.date_obj": 1}))
+        by_league = {}
+        for doc in light_docs:
+            lg = doc.get("league")
+            if lg:
+                by_league.setdefault(lg, []).append(doc)
+        target_ids = []
+        for lg_name, lg_docs in by_league.items():
+            target = find_target_rounds(lg_docs)
+            target_ids.extend([d["_id"] for d in target])
+        print(f"   📥 Fase 2: caricamento {len(target_ids)} round completi...")
+        rounds = list(h2h_col.find({"_id": {"$in": target_ids}}))
+        print(f"   📋 {len(by_league)} campionati, {len(light_docs)} docs → {len(rounds)} giornate mirate")
 
     print("\n🚀 AVVIO INIEZIONE ATT/DEF...")
-    
-    rounds = list(h2h_col.find(query_filter))
     total_rounds = len(rounds)
     updated_rounds_count = 0
     matches_processed = 0

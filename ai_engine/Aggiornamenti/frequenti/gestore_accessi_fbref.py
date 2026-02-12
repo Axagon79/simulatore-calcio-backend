@@ -163,9 +163,9 @@ class BrowserIntelligente:
                 time.sleep(2)
                 attempts += 1
                 
-                # Timeout di sicurezza (molto lungo, 3 minuti) per evitare loop infiniti se proprio non va
-                if attempts > 90: 
-                    print("   ⚠️ Impossibile sbloccare. Procedo comunque (rischio errore).")
+                # Timeout di sicurezza (~1 minuto) per evitare loop infiniti
+                if attempts > 30:
+                    print("   ⚠️ Impossibile sbloccare dopo 30 tentativi. Salto pagina.")
                     break
             
             # Risposta

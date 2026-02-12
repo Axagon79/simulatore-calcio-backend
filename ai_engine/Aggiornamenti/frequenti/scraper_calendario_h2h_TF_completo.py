@@ -89,15 +89,20 @@ def scrape_tm_calendar_v8():
     for league in LEAGUES_TM:
         print(f"\n🌍 Lega: {league['name']}")
         try:
+            # Batch load: carica tutti i doc esistenti per questa lega in una query
+            existing_docs = list(col.find({"league": league['name']}))
+            existing_docs_cache = {doc["_id"]: doc for doc in existing_docs}
+            print(f"   📥 Cache: {len(existing_docs_cache)} round esistenti caricati")
+
             time.sleep(random.uniform(3, 5))
             resp = requests.get(league['url'], headers=HEADERS, timeout=15)
             soup = BeautifulSoup(resp.content, "html.parser")
-            
+
             headers = soup.find_all("div", class_="content-box-headline")
             print(f"   Giornate trovate: {len(headers)}")
-            
+
             saved_count = 0
-            
+
             for header in headers:
                 round_name = header.get_text(strip=True)
                 if "Giornata" not in round_name and "Turno" not in round_name: continue
@@ -191,7 +196,7 @@ def scrape_tm_calendar_v8():
                     })
 
                 if matches:
-                    save_round(col, league['name'], round_name, matches)
+                    save_round(col, league['name'], round_name, matches, existing_docs_cache)
                     saved_count += 1
             
             print(f"   ✅ Processate {saved_count} giornate.")
@@ -199,13 +204,16 @@ def scrape_tm_calendar_v8():
         except Exception as e:
             print(f"   ❌ Errore: {e}")
 
-def save_round(col, league, round_name, matches):
+def save_round(col, league, round_name, matches, existing_docs_cache=None):
     safe_round = round_name.replace(".", "").replace(" ", "")
     safe_league = league.replace(" ", "")
     doc_id = f"{safe_league}_{safe_round}"
-    
-    # 1. Recupero il documento esistente per fare il MERGE
-    existing_doc = col.find_one({"_id": doc_id})
+
+    # 1. Recupero il documento esistente (da cache o da DB)
+    if existing_docs_cache is not None:
+        existing_doc = existing_docs_cache.get(doc_id)
+    else:
+        existing_doc = col.find_one({"_id": doc_id})
     
     # 2. Logica di Merge Intelligente (per NOME SQUADRE)
     if existing_doc:

@@ -1,11 +1,15 @@
 import os
 import sys
+import re
+from datetime import datetime
+import dateutil.parser
 from tqdm import tqdm # Barra di caricamento
 from bson import ObjectId # Necessario per gestire gli ID di MongoDB
 
 # --- CONFIGURAZIONE PERCORSI ---
-# Permette di trovare il file config.py nella cartella superiore
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+# Risale fino alla root del progetto (3 livelli: frequenti -> Aggiornamenti -> ai_engine -> root)
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+sys.path.insert(0, PROJECT_ROOT)
 
 try:
     from config import db
@@ -17,21 +21,39 @@ except ImportError:
 teams_collection = db['teams'] if db is not None else None
 h2h_collection = db['h2h_by_round'] if db is not None else None
 
+# --- CACHE TEAMS (popolata da run_updater per performance) ---
+_teams_by_id = None       # {str(ObjectId): team_doc}
+_teams_by_name = None     # {lowercase_name: team_doc}
+_teams_by_league = None   # {league_name: [team_doc, ...]}
+_league_avg_cache = {}    # {league_name: (avg_home, avg_away)}
+
 def get_league_averages(league_name):
     """
     Calcola la media punti casalinga e in trasferta dell'intero campionato.
+    Usa cache se disponibile, altrimenti query DB.
     """
-    if teams_collection is None: return 1.60, 1.10
+    # Check cache
+    if league_name in _league_avg_cache:
+        return _league_avg_cache[league_name]
 
-    # Cerca tutte le squadre di quel campionato
-    teams = list(teams_collection.find({"ranking.league": league_name}))
+    # Trova teams: da cache o da DB
+    if _teams_by_league is not None:
+        teams = _teams_by_league.get(league_name, [])
+        if not teams:
+            # Fallback: ricerca parziale tra le chiavi
+            ln = league_name.lower()
+            for key, val in _teams_by_league.items():
+                if ln in key.lower():
+                    teams = val
+                    break
+    else:
+        if teams_collection is None: return 1.60, 1.10
+        teams = list(teams_collection.find({"ranking.league": league_name}))
+        if not teams:
+            teams = list(teams_collection.find({"ranking.league": {"$regex": league_name, "$options": "i"}}))
 
     if not teams:
-        # Fallback: ricerca parziale
-        teams = list(teams_collection.find({"ranking.league": {"$regex": league_name, "$options": "i"}}))
-
-    if not teams:
-        return 1.60, 1.10 
+        return 1.60, 1.10
 
     total_home_ppg = 0
     total_away_ppg = 0
@@ -39,27 +61,23 @@ def get_league_averages(league_name):
 
     for team in teams:
         rank = team.get('ranking', {})
-        
-        # Statistiche Casa
         h_pts = rank.get('homePoints', 0)
         h_played = rank.get('homeStats', {}).get('played', 0)
-        
-        # Statistiche Fuori
         a_pts = rank.get('awayPoints', 0)
         a_played = rank.get('awayStats', {}).get('played', 0)
 
         if h_played > 0:
             total_home_ppg += (h_pts / h_played)
-        
         if a_played > 0:
             total_away_ppg += (a_pts / a_played)
-            
         if h_played > 0 or a_played > 0:
             count += 1
 
     if count == 0: return 1.60, 1.10
 
-    return total_home_ppg / count, total_away_ppg / count
+    result = total_home_ppg / count, total_away_ppg / count
+    _league_avg_cache[league_name] = result
+    return result
 
 def calculate_field_factor(home_id, home_name, away_id, away_name, league_name=None):
     """
@@ -70,11 +88,20 @@ def calculate_field_factor(home_id, home_name, away_id, away_name, league_name=N
     
     if teams_collection is None: return default_res
 
-    # 1. FUNZIONE CERCA SQUADRA (Potenziata con ID)
+    # 1. FUNZIONE CERCA SQUADRA (Cache > ID > Nome)
     def find_team(t_id, t_name):
-        # A. Cerca per ID (Metodo Sicuro al 100%)
+        # --- MODALITÀ CACHE (veloce) ---
+        if _teams_by_id is not None:
+            if t_id:
+                tid_str = str(t_id)
+                if tid_str in _teams_by_id:
+                    return _teams_by_id[tid_str]
+            if t_name:
+                return _teams_by_name.get(t_name.lower())
+            return None
+
+        # --- MODALITÀ DB (fallback per test_manuale) ---
         if t_id:
-            # Assicuriamoci che sia un ObjectId valido
             if isinstance(t_id, str) and ObjectId.is_valid(t_id):
                 res = teams_collection.find_one({"_id": ObjectId(t_id)})
                 if res: return res
@@ -82,7 +109,6 @@ def calculate_field_factor(home_id, home_name, away_id, away_name, league_name=N
                 res = teams_collection.find_one({"_id": t_id})
                 if res: return res
 
-        # B. Fallback per Nome (se ID non trovato o non fornito)
         return teams_collection.find_one({
             "$or": [
                 {"name": t_name},
@@ -142,72 +168,158 @@ def calculate_field_factor(home_id, home_name, away_id, away_name, league_name=N
     return round(home_score, 2), round(away_score, 2)
 
 
+# --- FUNZIONI PER TROVARE LE GIORNATE MIRATE (Prec/Attuale/Succ) ---
+# Copiato da db_updater_bvs.py
+
+def get_round_number(doc):
+    """Estrae il numero di giornata dall'ID documento."""
+    name = doc.get('_id', '') or doc.get('round_name', '')
+    match = re.search(r'(\d+)', str(name))
+    return int(match.group(1)) if match else 999
+
+def find_target_rounds(league_docs):
+    """Trova le 3 giornate da aggiornare: precedente, attuale, successiva."""
+    if not league_docs: return []
+    sorted_docs = sorted(league_docs, key=get_round_number)
+    now = datetime.now()
+    closest_index = -1
+    min_diff = float('inf')
+    for i, doc in enumerate(sorted_docs):
+        dates = []
+        for m in doc.get('matches', []):
+            d_raw = m.get('date_obj') or m.get('date')
+            try:
+                if d_raw:
+                    d = d_raw if isinstance(d_raw, datetime) else dateutil.parser.parse(d_raw)
+                    dates.append(d.replace(tzinfo=None))
+            except: pass
+        if dates:
+            avg_date = sum([d.timestamp() for d in dates]) / len(dates)
+            diff = abs(now.timestamp() - avg_date)
+            if diff < min_diff: min_diff = diff; closest_index = i
+    if closest_index == -1: return []
+    start_idx = max(0, closest_index - 1)
+    end_idx = min(len(sorted_docs), closest_index + 2)
+    return sorted_docs[start_idx:end_idx]
+
+
 # --- IL "BRACCIO": Funzione che aggiorna il Database ---
 def run_updater():
-    print("🚀 Avvio Update Fattore Campo (Ricerca per ID + Nome)...")
-    
+    global _teams_by_id, _teams_by_name, _teams_by_league, _league_avg_cache
+    print("🚀 Avvio Update Fattore Campo (MIRATO: Prec/Attuale/Succ)...")
+
     if h2h_collection is None:
         print("❌ Errore: Impossibile connettersi alla collezione h2h_by_round")
         return
 
-    # Prendi tutte le giornate
-    rounds = list(h2h_collection.find({}))
+    # 0. Cache: carica tutti i teams una volta sola
+    print("📦 Caricamento teams in memoria...")
+    all_teams_list = list(teams_collection.find({}))
+    _teams_by_id = {}
+    _teams_by_name = {}
+    _teams_by_league = {}
+    _league_avg_cache = {}
+
+    for t in all_teams_list:
+        # Indice per ID
+        _teams_by_id[str(t["_id"])] = t
+        # Indice per nome
+        name = t.get("name")
+        if name:
+            _teams_by_name[name.lower()] = t
+        official = t.get("official_name")
+        if official:
+            _teams_by_name[official.lower()] = t
+        # Indice per aliases
+        aliases = t.get("aliases")
+        if isinstance(aliases, list):
+            for a in aliases:
+                if isinstance(a, str):
+                    _teams_by_name[a.lower()] = t
+        elif isinstance(aliases, dict):
+            for val in aliases.values():
+                if isinstance(val, str):
+                    _teams_by_name[val.lower()] = t
+        elif isinstance(aliases, str):
+            _teams_by_name[aliases.lower()] = t
+        # Indice per lega
+        league = t.get("ranking", {}).get("league")
+        if league:
+            _teams_by_league.setdefault(league, []).append(t)
+
+    print(f"   {len(all_teams_list)} teams → {len(_teams_by_name)} nomi indicizzati, {len(_teams_by_league)} leghe")
+
+    # 1. Trova tutti i campionati distinti
+    all_leagues = h2h_collection.distinct("league")
+    print(f"📋 Campionati trovati: {len(all_leagues)}")
+
     total_updated = 0
+    total_rounds = 0
 
-    for r in tqdm(rounds, desc="Elaborazione Giornate"):
-        modified = False
-        matches = r.get("matches", [])
-        
-        for m in matches:
-            # 1. Recupera ID e Nomi dalla partita
-            # Nota: Cerchiamo chiavi comuni per gli ID (home_id, home_team_id, id_home, etc.)
-            h_id = m.get("home_team_id") or m.get("home_id") or m.get("id_home")
-            a_id = m.get("away_team_id") or m.get("away_id") or m.get("id_away")
-            
-            h_name = m.get("home")
-            a_name = m.get("away")
+    for league in tqdm(all_leagues, desc="Campionati"):
+        # 2. Prendi i round di questo campionato
+        league_docs = list(h2h_collection.find({"league": league}))
 
-            # 2. Chiama il calcolatore (Restituisce 0-7)
-            raw_h, raw_a = calculate_field_factor(h_id, h_name, a_id, a_name)
-            
-            # 3. Normalizza in Percentuale (0-100) per il Frontend
-            # Formula: (Voto / 7) * 100
-            pct_h = int((raw_h / 7.0) * 100)
-            pct_a = int((raw_a / 7.0) * 100)
-            
-            # Capping di sicurezza (Min 10 - Max 99)
-            pct_h = max(10, min(99, pct_h))
-            pct_a = max(10, min(99, pct_a))
+        # 3. Trova le 3 giornate mirate
+        target_rounds = find_target_rounds(league_docs)
 
-            # 4. Crea il pacchetto dati
-            nuovo_dato = {
-                "field_home": pct_h,
-                "field_away": pct_a
-            }
+        if not target_rounds:
+            continue
 
-            # 5. Iniezione nel campo "fattore_campo"
-            existing_h2h = m.get("h2h_data", {})
-            if not isinstance(existing_h2h, dict): existing_h2h = {}
-            
-            # Se esiste già il blocco fattore_campo, aggiornalo, altrimenti crealo
-            existing_fattore_campo = existing_h2h.get("fattore_campo", {})
-            existing_fattore_campo.update(nuovo_dato)
-            
-            existing_h2h["fattore_campo"] = existing_fattore_campo
-            
-            # Salva in memoria
-            m["h2h_data"] = existing_h2h
-            modified = True
-            total_updated += 1
+        round_nums = [get_round_number(d) for d in target_rounds]
+        print(f"\n  🏆 {league}: giornate {round_nums}")
+        total_rounds += len(target_rounds)
 
-        # 6. Salva su DB se la giornata è stata modificata
-        if modified:
-            h2h_collection.update_one(
-                {"_id": r["_id"]}, 
-                {"$set": {"matches": matches}}
-            )
+        for r in target_rounds:
+            modified = False
+            matches = r.get("matches", [])
 
-    print(f"✅ Completato! Aggiornate {total_updated} partite con successo.")
+            for m in matches:
+                # 1. Recupera ID e Nomi dalla partita
+                h_id = m.get("home_team_id") or m.get("home_id") or m.get("id_home")
+                a_id = m.get("away_team_id") or m.get("away_id") or m.get("id_away")
+
+                h_name = m.get("home")
+                a_name = m.get("away")
+
+                # 2. Chiama il calcolatore (Restituisce 0-7)
+                raw_h, raw_a = calculate_field_factor(h_id, h_name, a_id, a_name)
+
+                # 3. Normalizza in Percentuale (0-100) per il Frontend
+                pct_h = int((raw_h / 7.0) * 100)
+                pct_a = int((raw_a / 7.0) * 100)
+
+                # Capping di sicurezza (Min 10 - Max 99)
+                pct_h = max(10, min(99, pct_h))
+                pct_a = max(10, min(99, pct_a))
+
+                # 4. Crea il pacchetto dati
+                nuovo_dato = {
+                    "field_home": pct_h,
+                    "field_away": pct_a
+                }
+
+                # 5. Iniezione nel campo "fattore_campo"
+                existing_h2h = m.get("h2h_data", {})
+                if not isinstance(existing_h2h, dict): existing_h2h = {}
+
+                existing_fattore_campo = existing_h2h.get("fattore_campo", {})
+                existing_fattore_campo.update(nuovo_dato)
+
+                existing_h2h["fattore_campo"] = existing_fattore_campo
+
+                m["h2h_data"] = existing_h2h
+                modified = True
+                total_updated += 1
+
+            # 6. Salva su DB se la giornata è stata modificata
+            if modified:
+                h2h_collection.update_one(
+                    {"_id": r["_id"]},
+                    {"$set": {"matches": matches}}
+                )
+
+    print(f"\n✅ Completato! Processati {total_rounds} round, aggiornate {total_updated} partite.")
     
 # --- FUNZIONE DI TEST MANUALE ---
 def test_manuale(squadra_casa, squadra_ospite):

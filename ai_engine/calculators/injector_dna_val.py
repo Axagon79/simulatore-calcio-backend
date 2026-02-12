@@ -1,6 +1,8 @@
 import os
 import sys
+import re
 from datetime import datetime
+import dateutil.parser
 
 # --- FIX PERCORSI UNIVERSALE ---
 current_path = os.path.dirname(os.path.abspath(__file__))
@@ -80,6 +82,37 @@ def select_leagues_interactive(h2h_col):
             print("❌ Input non valido. Usa solo numeri e virgole.")
 
 
+def get_round_number(doc):
+    """Estrae il numero di giornata dall'ID documento."""
+    name = doc.get('_id', '') or doc.get('round_name', '')
+    match = re.search(r'(\d+)', str(name))
+    return int(match.group(1)) if match else 999
+
+def find_target_rounds(league_docs):
+    """Trova le 3 giornate da aggiornare: precedente, attuale, successiva."""
+    if not league_docs: return []
+    sorted_docs = sorted(league_docs, key=get_round_number)
+    now = datetime.now()
+    closest_index = -1
+    min_diff = float('inf')
+    for i, doc in enumerate(sorted_docs):
+        dates = []
+        for m in doc.get('matches', []):
+            d_raw = m.get('date_obj') or m.get('date')
+            try:
+                if d_raw:
+                    d = d_raw if isinstance(d_raw, datetime) else dateutil.parser.parse(d_raw)
+                    dates.append(d.replace(tzinfo=None))
+            except: pass
+        if dates:
+            avg_date = sum([d.timestamp() for d in dates]) / len(dates)
+            diff = abs(now.timestamp() - avg_date)
+            if diff < min_diff: min_diff = diff; closest_index = i
+    if closest_index == -1: return []
+    start_idx = max(0, closest_index - 1)
+    end_idx = min(len(sorted_docs), closest_index + 2)
+    return sorted_docs[start_idx:end_idx]
+
 def run_injection_val(interactive=True):
     """
     Estrae 'strengthScore09' da Teams e lo inietta come percentuale (0-100)
@@ -89,34 +122,42 @@ def run_injection_val(interactive=True):
     teams_col = db["teams"]
     h2h_col = db["h2h_by_round"]
 
-    # 1. GESTIONE MENU / AUTOMATICO
-    if interactive:
-        # Se lanciato a mano, chiede quali campionati fare
-        query_filter = select_leagues_interactive(h2h_col)
-    else:
-        # Se lanciato dal "Direttore d'Orchestra", fa tutto in silenzio
-        print("\n🤖 MODALITÀ AUTOMATICA: Aggiorno tutti i campionati.")
-        query_filter = {}
-
     print("\n🚀 Inizio aggiornamento asse VALORE (VAL) - Modalità TURBO...")
 
-    # 2. CARICAMENTO SQUADRE IN MEMORIA (TURBO ⚡)
+    # 1. CARICAMENTO SQUADRE IN MEMORIA (TURBO ⚡)
     print("   📥 Caricamento dati squadre in memoria (attendere)...")
     all_teams = list(teams_col.find({}, {"transfermarkt_id": 1, "stats.strengthScore09": 1}))
-    
-    # Creiamo una mappa veloce: { id_squadra: valore_val }
+
     team_val_map = {}
     for t in all_teams:
         tm_id = t.get("transfermarkt_id")
         if tm_id:
-            # Prende il voto (es. 7.5) e lo moltiplica per 10 -> 75
             raw_score = t.get("stats", {}).get("strengthScore09", 0) or 0
             team_val_map[tm_id] = round(raw_score * 10, 1)
 
     print(f"   ✅ Mappate {len(team_val_map)} squadre.")
 
-    # 3. RECUPERO GIORNATE (CON FILTRO)
-    all_rounds = list(h2h_col.find(query_filter))
+    # 2. RECUPERO GIORNATE
+    if interactive:
+        query_filter = select_leagues_interactive(h2h_col)
+        all_rounds = list(h2h_col.find(query_filter))
+    else:
+        # Modalità mirata: 2 fasi (projection leggera + query mirata)
+        print("🤖 MODALITÀ AUTOMATICA MIRATA: Prec/Attuale/Succ per ogni campionato")
+        print("   📥 Fase 1: selezione round (query leggera)...")
+        light_docs = list(h2h_col.find({}, {"_id": 1, "league": 1, "matches.date": 1, "matches.date_obj": 1}))
+        by_league = {}
+        for doc in light_docs:
+            lg = doc.get("league")
+            if lg:
+                by_league.setdefault(lg, []).append(doc)
+        target_ids = []
+        for lg_name, lg_docs in by_league.items():
+            target = find_target_rounds(lg_docs)
+            target_ids.extend([d["_id"] for d in target])
+        print(f"   📥 Fase 2: caricamento {len(target_ids)} round completi...")
+        all_rounds = list(h2h_col.find({"_id": {"$in": target_ids}}))
+        print(f"   📋 {len(by_league)} campionati, {len(light_docs)} docs → {len(all_rounds)} giornate mirate")
     
     if not all_rounds:
         print("⚠️  Nessuna giornata trovata con i filtri selezionati.")

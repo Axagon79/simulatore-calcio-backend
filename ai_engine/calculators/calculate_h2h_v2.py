@@ -2,9 +2,11 @@ import sys
 import os
 import json
 import math
+import re
 from datetime import datetime, timedelta
 from tqdm import tqdm
 from colorama import Fore, Style, init
+import dateutil.parser
 
 # --- FIX PERCORSI UNIVERSALE ---
 current_path = os.path.dirname(os.path.abspath(__file__))
@@ -23,8 +25,39 @@ except ImportError:
 
 init(autoreset=True)
 
-SOURCE_COLLECTION = "raw_h2h_data_v2" 
+SOURCE_COLLECTION = "raw_h2h_data_v2"
 TARGET_COLLECTION = "h2h_by_round"
+
+def get_round_number(doc):
+    """Estrae il numero di giornata dall'ID documento."""
+    name = doc.get('_id', '') or doc.get('round_name', '')
+    match = re.search(r'(\d+)', str(name))
+    return int(match.group(1)) if match else 999
+
+def find_target_rounds(league_docs):
+    """Trova le 3 giornate da aggiornare: precedente, attuale, successiva."""
+    if not league_docs: return []
+    sorted_docs = sorted(league_docs, key=get_round_number)
+    now = datetime.now()
+    closest_index = -1
+    min_diff = float('inf')
+    for i, doc in enumerate(sorted_docs):
+        dates = []
+        for m in doc.get('matches', []):
+            d_raw = m.get('date_obj') or m.get('date')
+            try:
+                if d_raw:
+                    d = d_raw if isinstance(d_raw, datetime) else dateutil.parser.parse(d_raw)
+                    dates.append(d.replace(tzinfo=None))
+            except: pass
+        if dates:
+            avg_date = sum([d.timestamp() for d in dates]) / len(dates)
+            diff = abs(now.timestamp() - avg_date)
+            if diff < min_diff: min_diff = diff; closest_index = i
+    if closest_index == -1: return []
+    start_idx = max(0, closest_index - 1)
+    end_idx = min(len(sorted_docs), closest_index + 2)
+    return sorted_docs[start_idx:end_idx]
 
 def extract_goals_from_score(score_str):
     """
@@ -83,23 +116,26 @@ def calculate_match_points(winner, home_name_db, away_name_db, home_pos, away_po
         
     return points_h, points_a
 
-def get_h2h_score_v2(match_payload):
+def get_h2h_score_v2(match_payload, h2h_cache=None):
     """Calcola i dati rispettando la struttura originale del database."""
     id_h = match_payload.get("home_tm_id")
     id_a = match_payload.get("away_tm_id")
     home_name_curr = match_payload.get("home", "")
     away_name_curr = match_payload.get("away", "")
-    
+
     if not id_h or not id_a:
         return {"status": "No ID", "h2h_weight": 0}
 
-    # Query per ID (Veloce e precisa)
-    doc = db[SOURCE_COLLECTION].find_one({
-        "$or": [
-            {"tm_id_a": int(id_h), "tm_id_b": int(id_a)},
-            {"tm_id_a": int(id_a), "tm_id_b": int(id_h)}
-        ]
-    })
+    # Usa cache se disponibile, altrimenti query singola
+    if h2h_cache is not None:
+        doc = h2h_cache.get((int(id_h), int(id_a)))
+    else:
+        doc = db[SOURCE_COLLECTION].find_one({
+            "$or": [
+                {"tm_id_a": int(id_h), "tm_id_b": int(id_a)},
+                {"tm_id_a": int(id_a), "tm_id_b": int(id_h)}
+            ]
+        })
 
     if not doc or not doc.get("matches"):
         return {"status": "No Data", "h2h_weight": 0, "home_score": 5.0, "away_score": 5.0}
@@ -169,9 +205,10 @@ def get_h2h_score_v2(match_payload):
 
 def run_calculator(target_league=None):
     leagues_in_db = sorted(db[TARGET_COLLECTION].distinct("league"))
-    
+    is_pipeline = target_league and target_league.lower() == "all"
+
     if target_league:
-        selected_leagues = leagues_in_db if target_league.lower() == "all" else [target_league]
+        selected_leagues = leagues_in_db if is_pipeline else [target_league]
     else:
         print(f"\n{Fore.CYAN}🚀 RIPRISTINO STRUTTURA COLLEZIONE H2H")
         for i, l in enumerate(leagues_in_db, 1): print(f"  {i}. {l}")
@@ -180,32 +217,78 @@ def run_calculator(target_league=None):
         if not choice: return
         selected_leagues = leagues_in_db if int(choice) == len(leagues_in_db) + 1 else [leagues_in_db[int(choice) - 1]]
 
-    for league_name in selected_leagues:
-        rounds = list(db[TARGET_COLLECTION].find({"league": league_name}))
-        print(f"\nProcessing {Fore.GREEN}{league_name}{Style.RESET_ALL}...")
-        
-        for r in tqdm(rounds, desc="Aggiornamento DB", disable=target_league is not None):
+    # --- CACHE H2H IN MEMORIA (evita ~677 find_one singoli) ---
+    print("   📥 Caricamento cache H2H in memoria...")
+    h2h_cache = {}
+    all_h2h = list(db[SOURCE_COLLECTION].find({}))
+    for doc in all_h2h:
+        id_a = doc.get("tm_id_a")
+        id_b = doc.get("tm_id_b")
+        if id_a and id_b:
+            h2h_cache[(id_a, id_b)] = doc
+            h2h_cache[(id_b, id_a)] = doc
+    print(f"   ✅ Cache: {len(all_h2h)} coppie H2H caricate ({len(h2h_cache)} lookup)")
+
+    # --- MODALITÀ MIRATA (pipeline) o COMPLETA (menu) ---
+    if is_pipeline:
+        print("🤖 MODALITÀ AUTOMATICA MIRATA: Prec/Attuale/Succ per ogni campionato")
+        print("   📥 Fase 1: selezione round (query leggera)...")
+        light_docs = list(db[TARGET_COLLECTION].find({}, {"_id": 1, "league": 1, "matches.date": 1, "matches.date_obj": 1}))
+        by_league = {}
+        for doc in light_docs:
+            lg = doc.get("league")
+            if lg:
+                by_league.setdefault(lg, []).append(doc)
+        target_ids = []
+        for lg_name, lg_docs in by_league.items():
+            target = find_target_rounds(lg_docs)
+            target_ids.extend([d["_id"] for d in target])
+        print(f"   📥 Fase 2: caricamento {len(target_ids)} round completi...")
+        all_rounds = list(db[TARGET_COLLECTION].find({"_id": {"$in": target_ids}}))
+        print(f"   📋 {len(by_league)} campionati, {len(light_docs)} docs → {len(all_rounds)} giornate mirate")
+
+        matches_total = 0
+        for i, r in enumerate(all_rounds):
             matches_updated = []
             for m in r.get("matches", []):
-                res = get_h2h_score_v2(m)
-                
-                # --- AGGIORNAMENTO CHIRURGICO (Preserva Lucifero) ---
+                res = get_h2h_score_v2(m, h2h_cache)
                 h2h_obj = m.get("h2h_data", {})
                 if not isinstance(h2h_obj, dict): h2h_obj = {}
                 h2h_obj.update(res)
                 m["h2h_data"] = h2h_obj
-                
-                # Sincronizzazione campi esterni per compatibilità frontend
                 if res.get("status") == "Calculated":
                     m["home_score"] = res["home_score"]
                     m["away_score"] = res["away_score"]
                     m["avg_goals_home"] = res["avg_goals_home"]
                     m["avg_goals_away"] = res["avg_goals_away"]
                     m["history_summary"] = res["history_summary"]
-                
                 matches_updated.append(m)
-            
             db[TARGET_COLLECTION].update_one({"_id": r["_id"]}, {"$set": {"matches": matches_updated}})
+            matches_total += len(matches_updated)
+            print(f"\r⏳ Elaborazione: {i+1}/{len(all_rounds)} giornate...", end="", flush=True)
+        print(f"\n✅ FINE. Giornate: {len(all_rounds)}, Match: {matches_total}")
+    else:
+        # Modalità interattiva/singola lega (carica tutti i round della lega)
+        for league_name in selected_leagues:
+            rounds = list(db[TARGET_COLLECTION].find({"league": league_name}))
+            print(f"\nProcessing {Fore.GREEN}{league_name}{Style.RESET_ALL}...")
+
+            for r in tqdm(rounds, desc="Aggiornamento DB", disable=target_league is not None):
+                matches_updated = []
+                for m in r.get("matches", []):
+                    res = get_h2h_score_v2(m, h2h_cache)
+                    h2h_obj = m.get("h2h_data", {})
+                    if not isinstance(h2h_obj, dict): h2h_obj = {}
+                    h2h_obj.update(res)
+                    m["h2h_data"] = h2h_obj
+                    if res.get("status") == "Calculated":
+                        m["home_score"] = res["home_score"]
+                        m["away_score"] = res["away_score"]
+                        m["avg_goals_home"] = res["avg_goals_home"]
+                        m["avg_goals_away"] = res["avg_goals_away"]
+                        m["history_summary"] = res["history_summary"]
+                    matches_updated.append(m)
+                db[TARGET_COLLECTION].update_one({"_id": r["_id"]}, {"$set": {"matches": matches_updated}})
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
