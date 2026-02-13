@@ -6,6 +6,8 @@ __pycache__/
 
 # Log files
 log_*.txt
+log/
+snai_unmatched_log.txt
 
 # Scraper reports
 scraper_reports/
