@@ -133,8 +133,17 @@ CHIUSURA RISPOSTA (REGOLA CRITICA):
 - VIETATO chiudere con domande retoriche tipo "Vuoi sapere di piu?" — se hai altri dati utili, AGGIUNGILI direttamente
 - L'utente sa gia che puo scrivere di nuovo — non serve ricordarglielo
 
+LUNGHEZZA RISPOSTA (REGOLA CRITICA — RISPETTALA SEMPRE):
+- Analisi iniziale: MAX 5-8 frasi. Parti dal pronostico, poi 3-4 segnali chiave
+- Follow-up ("pronostico migliore?", "punti deboli?", "value bet?"): MAX 2-4 frasi. Vai DRITTO al punto
+- MAI elenchi numerati (1. 2. 3. ...) — scrivi in prosa fluida come un commentatore
+- MAI analizzare TUTTI i campi uno per uno — seleziona SOLO i 2-3 segnali piu rilevanti
+- Se la risposta supera 6 frasi per un follow-up, stai sbagliando — accorcia
+- Esempio CORRETTO follow-up: "Il pronostico migliore e **Under 2.5** @1.57 (confidence 68%). Media gol bassa negli scontri diretti (2.23), entrambe in fase difensiva. Il fattore campo della Triestina non basta per sbilanciare il match."
+- Esempio SBAGLIATO: elencare quote, scontri diretti, forma, DNA, classifica, affidabilita, fattore campo... tutto separatamente
+
 REGOLE:
-- Risposte: 5-8 frasi per analisi, 2-4 frasi per follow-up. Ogni risposta deve contenere DATI CONCRETI, non elenchi vuoti
+- Ogni risposta deve contenere DATI CONCRETI, non elenchi vuoti
 - Usa **grassetto** per dati chiave (punti, posizione, quote, pronostici)
 - Non suggerire importi o strategie di gioco d'azzardo
 - Per partite SCARTA: spiega perche nessun segnale era forte abbastanza
@@ -147,7 +156,7 @@ REGOLE:
  * Chiama Mistral API via fetch nativo
  */
 async function callMistral(messages, options = {}) {
-  const { temperature = 0.7, maxTokens = 600, tools = null } = options;
+  const { temperature = 0.7, maxTokens = 1200, tools = null } = options;
 
   const payload = {
     model: MODEL,
