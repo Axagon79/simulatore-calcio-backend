@@ -7,6 +7,7 @@ const router = express.Router();
 const { generateAnalysis, chatWithContext, SYSTEM_PROMPT } = require('../services/llmService');
 const { buildMatchContext, searchMatch } = require('../services/contextBuilder');
 const { WEB_SEARCH_TOOL, handleToolCalls } = require('../services/webSearch');
+const { DB_TOOLS } = require('../services/dbTools');
 
 // ── GET /chat/context?home=X&away=Y&date=Z ──
 // Genera analisi iniziale per una partita
@@ -38,31 +39,39 @@ router.get('/context', async (req, res) => {
 
 // ── POST /chat/message ──
 // Messaggio follow-up nella chat (con web search opzionale)
+// Funziona anche SENZA home/away — in quel caso risponde come domanda generica
 router.post('/message', async (req, res) => {
   try {
     const { home, away, date, message, history } = req.body;
-    if (!home || !away || !message) {
-      return res.status(400).json({ success: false, error: 'Missing home, away, or message' });
+    if (!message) {
+      return res.status(400).json({ success: false, error: 'Missing message' });
     }
 
-    const result = await buildMatchContext(req.db, home, away, date || undefined);
-    if (!result) {
-      return res.json({ success: false, error: 'Match not found' });
+    // Se home/away forniti, cerca contesto partita
+    let contextText = '';
+    if (home && away) {
+      const result = await buildMatchContext(req.db, home, away, date || undefined);
+      if (result) {
+        contextText = result.context;
+      }
     }
 
-    // Chiama LLM con tool web_search disponibile
-    const tools = [WEB_SEARCH_TOOL];
-    const reply = await chatWithContext(result.context, message, history || [], tools);
+    // Chiama LLM con tutti i tool disponibili (web + DB)
+    const tools = [WEB_SEARCH_TOOL, ...DB_TOOLS];
+    const reply = await chatWithContext(contextText, message, history || [], tools);
 
-    // Se Mistral ha richiesto web search, gestisci il ciclo
+    // Se Mistral ha richiesto tool calls, gestisci il ciclo
     let finalReply;
     if (reply.tool_calls && reply.tool_calls.length > 0) {
       const messages = [{ role: 'system', content: SYSTEM_PROMPT }];
       for (const msg of (history || [])) {
         messages.push({ role: msg.role, content: msg.content });
       }
-      messages.push({ role: 'user', content: `Contesto partita:\n${result.context}\n\nDomanda utente: ${message}` });
-      finalReply = await handleToolCalls(reply, messages);
+      const userContent = contextText
+        ? `Contesto partita:\n${contextText}\n\nDomanda utente: ${message}`
+        : `Domanda utente: ${message}`;
+      messages.push({ role: 'user', content: userContent });
+      finalReply = await handleToolCalls(reply, messages, req.db);
     } else {
       finalReply = reply.content;
     }

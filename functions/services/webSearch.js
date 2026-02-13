@@ -66,44 +66,58 @@ async function searchWeb(query) {
 
 /**
  * Gestisce il ciclo tool_call con Mistral
- * Se Mistral vuole cercare sul web, esegue la ricerca e ritorna la risposta finale
+ * Supporta: web_search + tool DB (get_today_matches, search_matches, get_match_details)
+ * @param {object} reply - Risposta Mistral con tool_calls
+ * @param {Array} messages - Storia messaggi
+ * @param {object} db - Istanza MongoDB (per tool DB)
  */
-async function handleToolCalls(reply, messages) {
+async function handleToolCalls(reply, messages, db) {
   if (!reply.tool_calls || reply.tool_calls.length === 0) {
     return reply.content;
   }
 
   const { callMistral } = require('./llmService');
+  const { executeDbTool } = require('./dbTools');
 
   // Aggiungi la risposta del modello con le tool calls
   messages.push(reply);
 
   for (const tc of reply.tool_calls) {
-    if (tc.function.name === 'web_search') {
-      let args;
-      try {
-        args = JSON.parse(tc.function.arguments);
-      } catch {
-        args = { query: tc.function.arguments };
-      }
-
-      let results;
-      try {
-        results = await searchWeb(args.query);
-      } catch (err) {
-        results = [{ title: 'Errore ricerca', snippet: err.message }];
-      }
-
-      messages.push({
-        role: 'tool',
-        tool_call_id: tc.id,
-        name: 'web_search',
-        content: JSON.stringify(results),
-      });
+    let args;
+    try {
+      args = JSON.parse(tc.function.arguments);
+    } catch {
+      args = typeof tc.function.arguments === 'string' ? { query: tc.function.arguments } : {};
     }
+
+    let content;
+
+    if (tc.function.name === 'web_search') {
+      try {
+        const results = await searchWeb(args.query);
+        content = JSON.stringify(results);
+      } catch (err) {
+        content = JSON.stringify([{ title: 'Errore ricerca', snippet: err.message }]);
+      }
+    } else if (['get_today_matches', 'search_matches', 'get_match_details'].includes(tc.function.name)) {
+      try {
+        content = await executeDbTool(db, tc.function.name, args);
+      } catch (err) {
+        content = JSON.stringify({ error: `Errore query DB: ${err.message}` });
+      }
+    } else {
+      content = JSON.stringify({ error: `Tool non riconosciuto: ${tc.function.name}` });
+    }
+
+    messages.push({
+      role: 'tool',
+      tool_call_id: tc.id,
+      name: tc.function.name,
+      content,
+    });
   }
 
-  // Richiama Mistral con i risultati della ricerca
+  // Richiama Mistral con i risultati dei tool
   const finalReply = await callMistral(messages);
   return finalReply.content;
 }

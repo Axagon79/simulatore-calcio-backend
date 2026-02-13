@@ -113,11 +113,11 @@ async function chatWithContext(contextText, userMessage, history = [], tools = n
     messages.push({ role: msg.role, content: msg.content });
   }
 
-  // Aggiungi il nuovo messaggio con contesto
-  messages.push({
-    role: 'user',
-    content: `Contesto partita:\n${contextText}\n\nDomanda utente: ${userMessage}`
-  });
+  // Aggiungi il nuovo messaggio (con o senza contesto partita)
+  const userContent = contextText
+    ? `Contesto partita:\n${contextText}\n\nDomanda utente: ${userMessage}`
+    : `Domanda utente (nessuna partita selezionata): ${userMessage}`;
+  messages.push({ role: 'user', content: userContent });
 
   const reply = await callMistral(messages, { tools });
   return reply;
