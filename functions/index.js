@@ -43,6 +43,9 @@ app.use('/simulation', simulationRoutes);
 const predictionsRoutes = require('./routes/predictionsRoutes');
 app.use('/simulation', predictionsRoutes);
 
+const chatRoutes = require('./routes/chatRoutes');
+app.use('/chat', chatRoutes);
+
 // ============================================
 // UTILITY FUNCTIONS
 // ============================================
