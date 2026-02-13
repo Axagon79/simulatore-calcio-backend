@@ -1,6 +1,8 @@
 import time
 import random
 import sys
+import os
+import tempfile
 import winreg # Libreria standard di Windows per leggere il registro
 import undetected_chromedriver as uc
 from selenium.webdriver.common.by import By
@@ -17,14 +19,20 @@ APRISCATOLE V3.5 - NO PROFILO + FIX FOCUS
 
 class BrowserIntelligente:
     def __init__(self):
-        print("🤖 [Gestore Accessi] Avvio Chrome (Modalità Pulita)...")
-        
+        # Porta Chrome separata per esecuzione parallela (env da update_manager)
+        self._debug_port = int(os.environ.get("CHROME_DEBUG_PORT", "9222"))
+        self._user_data_dir = tempfile.mkdtemp(prefix=f"fbref_chrome_{self._debug_port}_")
+
+        print(f"🤖 [Gestore Accessi] Avvio Chrome (porta {self._debug_port})...")
+
         # Opzioni per il PRIMO TENTATIVO
         options = uc.ChromeOptions()
         options.add_argument("--disable-blink-features=AutomationControlled")
         options.add_argument("--start-maximized")
         options.add_argument("--no-sandbox")
-        
+        options.add_argument(f"--remote-debugging-port={self._debug_port}")
+        options.add_argument(f"--user-data-dir={self._user_data_dir}")
+
         # --- BLOCCO AVVIO SMART (Auto-Correzione Versione) ---
         try:
             # 1. Prova l'avvio normale
@@ -65,6 +73,8 @@ class BrowserIntelligente:
                 new_options.add_argument("--disable-blink-features=AutomationControlled")
                 new_options.add_argument("--start-maximized")
                 new_options.add_argument("--no-sandbox")
+                new_options.add_argument(f"--remote-debugging-port={self._debug_port}")
+                new_options.add_argument(f"--user-data-dir={self._user_data_dir}")
                 # --------------------------------------------------------------------------
 
                 if detected_version:

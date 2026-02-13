@@ -715,8 +715,22 @@ def league_is_fresh(league_name, max_age_hours=1):
 
 
 def run_scraper():
+    # Supporto esecuzione parallela: SNAI_LEAGUE_GROUP=0/1/2 processa solo 1/3 delle leghe
+    league_group = os.environ.get("SNAI_LEAGUE_GROUP")
+    if league_group is not None:
+        group_idx = int(league_group)
+        total_leagues = len(LEAGUES_CONFIG)
+        chunk_size = (total_leagues + 2) // 3  # arrotonda per eccesso
+        start = group_idx * chunk_size
+        end = min(start + chunk_size, total_leagues)
+        leagues_to_process = LEAGUES_CONFIG[start:end]
+        group_label = f" (GRUPPO {group_idx}: {len(leagues_to_process)} leghe, indici {start}-{end-1})"
+    else:
+        leagues_to_process = LEAGUES_CONFIG
+        group_label = ""
+
     print(f"\n{'='*55}")
-    print(f"  SCRAPER SNAI — Quote O/U + GG/NG")
+    print(f"  SCRAPER SNAI — Quote O/U + GG/NG{group_label}")
     print(f"  {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print(f"{'='*55}")
 
@@ -750,7 +764,7 @@ def run_scraper():
             print(f"  Sidebar SNAI: {len(available)} nazioni trovate")
 
         first_league = True
-        for league in LEAGUES_CONFIG:
+        for league in leagues_to_process:
             sidebar_country = league.get('sidebar', '')
 
             # Skip se la nazione non è nella sidebar (fuori stagione / non disponibile)

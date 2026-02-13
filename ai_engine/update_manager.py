@@ -169,39 +169,49 @@ def main():
     total_start_time = time.time() # Start Cronometro Globale
 
     # Script da eseguire in parallelo (stessa fonte fbref.com, indipendenti tra loro)
-    PARALLEL_GROUP = {"fbref_scraper_att.py", "fbref_scraper_mid.py", "fbref_scraper_def.py", "scraper_gk_fbref.py"}
+    PARALLEL_FBREF = {"fbref_scraper_att.py", "fbref_scraper_mid.py", "fbref_scraper_def.py", "scraper_gk_fbref.py"}
+    # SNAI scraper: 3 istanze parallele, ognuna processa 1/3 delle leghe
+    PARALLEL_SNAI = "scrape_snai_odds.py"
+    SNAI_NUM_GROUPS = 3
+
+    log_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'log')
+    os.makedirs(log_dir, exist_ok=True)
 
     i = 0
     while i < len(SCRAPER_SEQUENCE):
         filename, desc, impact, folder = SCRAPER_SEQUENCE[i]
 
-        # Controlla se questo script fa parte del gruppo parallelo
-        if filename in PARALLEL_GROUP:
-            # Raccogli tutti gli script consecutivi del gruppo
+        # --- GRUPPO PARALLELO FBREF ---
+        if filename in PARALLEL_FBREF:
             parallel_tasks = []
-            while i < len(SCRAPER_SEQUENCE) and SCRAPER_SEQUENCE[i][0] in PARALLEL_GROUP:
+            while i < len(SCRAPER_SEQUENCE) and SCRAPER_SEQUENCE[i][0] in PARALLEL_FBREF:
                 parallel_tasks.append(SCRAPER_SEQUENCE[i])
                 i += 1
 
             print(f"\n🔀 LANCIO PARALLELO: {len(parallel_tasks)} fbref scrapers contemporanei")
 
-            # Lancia tutti con Popen (non-bloccante)
             env = os.environ.copy()
             env["PYTHONIOENCODING"] = "utf-8"
             processes = []
-            for pf, pd, pi, pfolder in parallel_tasks:
+            log_files = []
+            base_port = 9222
+            for idx, (pf, pd, pi, pfolder) in enumerate(parallel_tasks):
                 full_path = os.path.join(pfolder, pf)
-                print(f"   🚀 Avvio: {pf}")
+                print(f"   🚀 Avvio: {pf} (porta Chrome: {base_port + idx})")
                 p_start = time.time()
+                proc_env = env.copy()
+                proc_env["CHROME_DEBUG_PORT"] = str(base_port + idx)
+                log_path = os.path.join(log_dir, f"fbref_{pf.replace('.py','')}.txt")
+                lf = open(log_path, 'w', encoding='utf-8')
+                log_files.append(lf)
                 proc = subprocess.Popen(
                     [sys.executable, full_path],
-                    env=env,
-                    stdout=subprocess.DEVNULL,
-                    stderr=subprocess.DEVNULL
+                    env=proc_env,
+                    stdout=lf,
+                    stderr=lf
                 )
                 processes.append((pf, pd, pi, pfolder, proc, p_start))
 
-            # Aspetta che tutti finiscano
             print(f"   ⏳ Attendo completamento di tutti e {len(processes)}...")
             for pf, pd, pi, pfolder, proc, p_start in processes:
                 proc.wait()
@@ -218,8 +228,66 @@ def main():
                     "duration": elapsed
                 })
 
-            print(f"🔀 GRUPPO PARALLELO COMPLETATO")
+            for lf in log_files:
+                lf.close()
+            print(f"🔀 GRUPPO PARALLELO FBREF COMPLETATO")
             time.sleep(2)
+
+        # --- GRUPPO PARALLELO SNAI (3 istanze, 1/3 leghe ciascuna) ---
+        elif filename == PARALLEL_SNAI:
+            i += 1
+            full_path = os.path.join(folder, filename)
+            print(f"\n🔀 LANCIO PARALLELO: {SNAI_NUM_GROUPS} istanze SNAI (8 leghe ciascuna)")
+
+            env = os.environ.copy()
+            env["PYTHONIOENCODING"] = "utf-8"
+            processes = []
+            log_files = []
+            group_start = time.time()
+
+            for grp in range(SNAI_NUM_GROUPS):
+                print(f"   🚀 Avvio: SNAI gruppo {grp}")
+                proc_env = env.copy()
+                proc_env["SNAI_LEAGUE_GROUP"] = str(grp)
+                log_path = os.path.join(log_dir, f"snai_group_{grp}.txt")
+                lf = open(log_path, 'w', encoding='utf-8')
+                log_files.append(lf)
+                proc = subprocess.Popen(
+                    [sys.executable, full_path],
+                    env=proc_env,
+                    stdout=lf,
+                    stderr=lf
+                )
+                processes.append((f"snai_group_{grp}", desc, impact, folder, proc, time.time()))
+                # Sfasa di 5s per non colpire snai.it simultaneamente
+                if grp < SNAI_NUM_GROUPS - 1:
+                    time.sleep(5)
+
+            print(f"   ⏳ Attendo completamento di tutti e {len(processes)} gruppi SNAI...")
+            for pf, pd, pi, pfolder, proc, p_start in processes:
+                proc.wait()
+                elapsed = time.time() - p_start
+                ok = (proc.returncode == 0)
+                err_msg = None if ok else f"Exit code {proc.returncode}"
+                print(f"   {'✅' if ok else '❌'} {pf} completato in {elapsed/60:.1f}min")
+
+            total_snai_elapsed = time.time() - group_start
+            # Un solo record nel report per l'intero gruppo SNAI
+            all_ok = all(proc.returncode == 0 for _, _, _, _, proc, _ in processes)
+            report.append({
+                "file": f"{filename} (x{SNAI_NUM_GROUPS} parallelo)",
+                "status": "✅ OK" if all_ok else "❌ KO",
+                "error": None if all_ok else "Uno o più gruppi falliti",
+                "impact": impact,
+                "folder": folder,
+                "duration": total_snai_elapsed
+            })
+
+            for lf in log_files:
+                lf.close()
+            print(f"🔀 GRUPPO PARALLELO SNAI COMPLETATO in {total_snai_elapsed/60:.1f}min")
+            time.sleep(2)
+
         else:
             # Esecuzione sequenziale normale
             ok, err_msg, duration = run_single_script(filename, desc, folder)
