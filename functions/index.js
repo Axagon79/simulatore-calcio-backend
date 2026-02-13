@@ -1,3 +1,4 @@
+require('dotenv').config();
 const { onRequest } = require("firebase-functions/v2/https");
 const simulationRoutes = require('./routes/simulationRoutes');
 const express = require('express');
