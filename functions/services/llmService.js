@@ -3,7 +3,10 @@
  * ZERO dipendenze aggiuntive — usa solo fetch globale
  */
 
-const MISTRAL_API_KEY = process.env.MISTRAL_API_KEY || 'DOJTKqPXYYLiEOQGovk4G8X2dKH3jVej';
+const MISTRAL_API_KEY = process.env.MISTRAL_API_KEY;
+if (!MISTRAL_API_KEY) {
+  console.error('MISTRAL_API_KEY non configurata! Usa: firebase functions:config:set mistral.api_key="TUA_CHIAVE"');
+}
 const MISTRAL_URL = 'https://api.mistral.ai/v1/chat/completions';
 const MODEL = 'mistral-small-latest';
 
