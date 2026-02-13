@@ -68,6 +68,8 @@ LIVE_URL = "https://live4.nowgoal26.com/"
 CYCLE_SECONDS = 120       # Ogni 2 minuti
 _leagues_selected = False  # Flag: "Select All" leagues già cliccato
 PAGE_LOAD_WAIT = 5        # Secondi di attesa dopo navigazione
+RESTART_EVERY_N_CYCLES = 50  # Restart preventivo del driver ogni N cicli
+_cycle_count = 0          # Contatore cicli per restart periodico
 HOUR_START = 10            # Inizio finestra operativa
 HOUR_END = 1               # Fine (giorno dopo, 01:00)
 
@@ -322,7 +324,7 @@ def run_cycle(driver):
         time.sleep(PAGE_LOAD_WAIT)
     except Exception as e:
         print(f"   Errore navigazione: {e}")
-        return
+        raise  # Propaga l'errore per triggerare il restart del driver nel main loop
 
     # 3b. Al primo ciclo, clicca "Select All" per mostrare tutte le leghe
     global _leagues_selected
@@ -420,8 +422,30 @@ def is_in_operating_window():
     return hour >= HOUR_START or hour < HOUR_END
 
 
+def create_driver(service, chrome_options):
+    """Crea un nuovo Chrome driver con timeout configurati."""
+    driver = webdriver.Chrome(service=service, options=chrome_options)
+    driver.set_page_load_timeout(30)  # Max 30s per caricare una pagina
+    driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+    return driver
+
+
+def restart_driver(driver, service, chrome_options, reason="periodico"):
+    """Chiude e ricrea il driver Chrome."""
+    global _leagues_selected
+    print(f"   Restart driver ({reason})...")
+    try: driver.quit()
+    except: pass
+    new_driver = create_driver(service, chrome_options)
+    _leagues_selected = False  # Deve rifare "Select All" sul nuovo browser
+    print(f"   Nuovo driver avviato.")
+    return new_driver
+
+
 def main():
+    global _cycle_count
     print(f"Configurazione: ciclo ogni {CYCLE_SECONDS}s, finestra {HOUR_START}:00-{HOUR_END}:00")
+    print(f"Restart driver ogni {RESTART_EVERY_N_CYCLES} cicli")
     print(f"URL: {LIVE_URL}\n")
 
     chrome_options = Options()
@@ -435,12 +459,17 @@ def main():
 
     try:
         service = Service(ChromeDriverManager().install())
-        driver = webdriver.Chrome(service=service, options=chrome_options)
-        driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+        driver = create_driver(service, chrome_options)
         print("Chrome driver avviato.\n")
 
         while True:
             if is_in_operating_window():
+                # Restart preventivo ogni N cicli per evitare memory leak
+                _cycle_count += 1
+                if _cycle_count >= RESTART_EVERY_N_CYCLES:
+                    driver = restart_driver(driver, service, chrome_options, f"preventivo dopo {_cycle_count} cicli")
+                    _cycle_count = 0
+
                 try:
                     run_cycle(driver)
                 except Exception as e:
@@ -451,11 +480,8 @@ def main():
                     try:
                         driver.title  # Test se il driver e' ancora vivo
                     except:
-                        print("   Driver crashato, ricreo...")
-                        try: driver.quit()
-                        except: pass
-                        driver = webdriver.Chrome(service=service, options=chrome_options)
-                        driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+                        driver = restart_driver(driver, service, chrome_options, "driver crashato")
+                        _cycle_count = 0
             else:
                 now = datetime.now()
                 print(f"\r   Fuori finestra operativa ({now.strftime('%H:%M')}). Prossimo check tra {CYCLE_SECONDS}s...", end='')
