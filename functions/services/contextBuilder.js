@@ -58,6 +58,7 @@ function buildDailyPredictionsContext(doc) {
 
   lines.push(`PARTITA: ${home} vs ${away}`);
   lines.push(`Campionato: ${doc.league} | Data: ${doc.date} ore ${doc.match_time || '?'}`);
+  if (doc.real_score) lines.push(`RISULTATO FINALE: ${doc.real_score} (${doc.status || 'finita'})`);
   lines.push(`Decisione algoritmo: ${doc.decision}`);
 
   // Pronostici

@@ -53,6 +53,22 @@ const DB_TOOLS = [
       }
     }
   }
+  ,
+  {
+    type: 'function',
+    function: {
+      name: 'get_standings',
+      description: "Ottieni la classifica di un campionato o la posizione di una squadra specifica. Usa quando l'utente chiede 'quanti punti ha la Juve?', 'classifica Serie A', 'chi e primo in Premier League?', 'distacco dalla prima', ecc. Restituisce: classifica completa con posizione, squadra, punti.",
+      parameters: {
+        type: 'object',
+        properties: {
+          league: { type: 'string', description: "Nome del campionato (es. 'Serie A', 'Premier League', 'La Liga', 'Bundesliga', 'Ligue 1'). Se non specificato e team e fornito, viene individuato automaticamente." },
+          team: { type: 'string', description: "Nome squadra per filtrare/evidenziare (es. 'Juventus', 'Milan'). Se fornito senza league, cerca la lega della squadra." }
+        },
+        required: []
+      }
+    }
+  }
 ];
 
 // ── Funzioni Esecutrici ──
@@ -70,17 +86,30 @@ async function executeTodayMatches(db, args) {
   // 1. daily_predictions — partite con pronostici
   const dpQuery = { date };
   if (leagueFilter) {
-    dpQuery.league = { $regex: new RegExp(leagueFilter, 'i') };
+    // Match esatto con word boundary — evita "Serie A" che matcha "Brasileirão Serie A"
+    dpQuery.league = { $regex: new RegExp(`^${leagueFilter}$`, 'i') };
   }
   const predictions = await db.collection('daily_predictions')
     .find(dpQuery)
-    .project({ home: 1, away: 1, league: 1, date: 1, match_time: 1, decision: 1, pronostici: 1, confidence_segno: 1, confidence_gol: 1, stelle_segno: 1, stelle_gol: 1 })
+    .project({ home: 1, away: 1, league: 1, date: 1, match_time: 1, decision: 1, pronostici: 1, confidence_segno: 1, confidence_gol: 1, stelle_segno: 1, stelle_gol: 1, odds: 1, real_score: 1, status: 1 })
     .sort({ match_time: 1 })
     .toArray();
 
+  // Mapping pronostico GOL → chiave quota (le quote GOL non sono nel sub-doc pronostici, ma in odds)
+  const golQuotaMap = (pronostico, odds) => {
+    if (!odds || !pronostico) return null;
+    return { 'Over 1.5': odds.over_15, 'Over 2.5': odds.over_25, 'Over 3.5': odds.over_35,
+      'Under 1.5': odds.under_15, 'Under 2.5': odds.under_25, 'Under 3.5': odds.under_35,
+      'Goal': odds.gg, 'NoGoal': odds.ng }[pronostico] || null;
+  };
+
   for (const p of predictions) {
-    const pronostici = (p.pronostici || []).map(pr => `${pr.tipo}: ${pr.segno} @${pr.quota}`).join(', ');
-    results.push({
+    const odds = p.odds || {};
+    const pronostici = (p.pronostici || []).map(pr => {
+      const quota = pr.quota || golQuotaMap(pr.pronostico, odds);
+      return `${pr.tipo}: ${pr.pronostico} @${quota || '?'} (${pr.confidence}%)`;
+    }).join(', ');
+    const entry = {
       home: p.home,
       away: p.away,
       league: p.league,
@@ -93,25 +122,50 @@ async function executeTodayMatches(db, args) {
       stelle_segno: p.stelle_segno,
       stelle_gol: p.stelle_gol,
       source: 'daily_predictions'
-    });
+    };
+    if (p.real_score) entry.risultato = p.real_score;
+    if (p.status) entry.status = p.status;
+    results.push(entry);
   }
 
-  // 2. h2h_by_round — partite senza pronostici (complemento)
-  const h2hPipeline = [
-    { $unwind: '$matches' },
-    { $match: { 'matches.date_obj': { $regex: new RegExp(`^${date}`) } } },
-    { $project: { _id: 0, league: '$league', home: '$matches.home', away: '$matches.away', time: '$matches.match_time', date_obj: '$matches.date_obj' } }
-  ];
+  // 2. h2h_by_round — risultati + partite extra (stessa logica di predictionsRoutes.js)
+  const startOfDay = new Date(date + 'T00:00:00.000Z');
+  const endOfDay = new Date(date + 'T23:59:59.999Z');
+  const h2hMatchCondition = {
+    'matches.date_obj': { $gte: startOfDay, $lte: endOfDay }
+  };
   if (leagueFilter) {
-    h2hPipeline.unshift({ $match: { league: { $regex: new RegExp(leagueFilter, 'i') } } });
+    h2hMatchCondition.league = { $regex: new RegExp(`^${leagueFilter}$`, 'i') };
   }
-  const h2hMatches = await db.collection('h2h_by_round').aggregate(h2hPipeline).toArray();
+  const h2hMatches = await db.collection('h2h_by_round').aggregate([
+    { $unwind: '$matches' },
+    { $match: h2hMatchCondition },
+    { $project: { _id: 0, league: '$league', home: '$matches.home', away: '$matches.away', time: '$matches.match_time', real_score: '$matches.real_score', status: '$matches.status' } }
+  ]).toArray();
 
+  // Mappa risultati h2h per lookup veloce (home|||away → real_score)
+  const resultsMap = {};
   for (const m of h2hMatches) {
-    // Evita duplicati già presenti da daily_predictions
+    const key = `${m.home}|||${m.away}`;
+    resultsMap[key] = { real_score: m.real_score, status: m.status };
+  }
+
+  // Arricchisci pronostici con risultati da h2h_by_round
+  for (const r of results) {
+    if (!r.risultato) {
+      const h2h = resultsMap[`${r.home}|||${r.away}`];
+      if (h2h && h2h.real_score) {
+        r.risultato = h2h.real_score;
+        if (h2h.status) r.status = h2h.status;
+      }
+    }
+  }
+
+  // Aggiungi partite h2h senza pronostici (complemento)
+  for (const m of h2hMatches) {
     const isDup = results.some(r => r.home === m.home && r.away === m.away);
     if (!isDup) {
-      results.push({
+      const entry = {
         home: m.home,
         away: m.away,
         league: m.league,
@@ -120,7 +174,10 @@ async function executeTodayMatches(db, args) {
         decision: 'NO_PRONOSTICO',
         pronostici: 'non analizzata',
         source: 'h2h_by_round'
-      });
+      };
+      if (m.real_score) entry.risultato = m.real_score;
+      if (m.status) entry.status = m.status;
+      results.push(entry);
     }
   }
 
@@ -131,10 +188,14 @@ async function executeTodayMatches(db, args) {
     return JSON.stringify({ message: `Nessuna partita trovata per il ${date}${leagueFilter ? ' in ' + leagueFilter : ''}.` });
   }
 
+  // Conta pronostici totali (una partita può averne più di uno, es. SEGNO + GOL)
+  const totalPronostici = predictions.reduce((sum, p) => sum + (p.pronostici || []).length, 0);
+
   return JSON.stringify({
     date,
     league_filter: leagueFilter || 'tutte',
-    total: results.length,
+    total_matches: results.length,
+    total_pronostici: totalPronostici,
     matches: results
   });
 }
@@ -154,11 +215,131 @@ async function executeSearchMatches(db, args) {
  * Dettagli completi di una partita (wrapper di buildMatchContext)
  */
 async function executeMatchDetails(db, args) {
-  const result = await buildMatchContext(db, args.home, args.away, args.date || undefined);
+  // Fallback: Mistral a volte manda {"match": "Home vs Away"} invece di {"home", "away"} separati
+  let home = args.home;
+  let away = args.away;
+  if (!home && !away && args.match) {
+    const parts = args.match.split(/\s+vs\s+/i);
+    if (parts.length === 2) {
+      home = parts[0].trim();
+      away = parts[1].trim();
+    }
+  }
+  if (!home || !away) {
+    return JSON.stringify({ message: `Parametri mancanti: serve home e away (ricevuto: ${JSON.stringify(args)})` });
+  }
+  const result = await buildMatchContext(db, home, away, args.date || undefined);
   if (!result) {
-    return JSON.stringify({ message: `Partita ${args.home} vs ${args.away} non trovata nel database.` });
+    return JSON.stringify({ message: `Partita ${home} vs ${away} non trovata nel database.` });
   }
   return result.context; // Già una stringa di testo formattata
+}
+
+/**
+ * Classifica di un campionato o posizione di una squadra
+ * Collezione: classifica (un doc per lega con array table[])
+ */
+async function executeGetStandings(db, args) {
+  const { league, team } = args;
+
+  // Se team fornito senza league, cerca in quale lega gioca
+  let leagueQuery = league;
+  if (!leagueQuery && team) {
+    const regex = new RegExp(team, 'i');
+    const found = await db.collection('classifiche').findOne(
+      { 'table.team': regex },
+      { projection: { league: 1 } }
+    );
+    if (found) leagueQuery = found.league;
+  }
+
+  if (!leagueQuery) {
+    return JSON.stringify({ error: 'Specifica un campionato (es. Serie A) o una squadra.' });
+  }
+
+  const doc = await db.collection('classifiche').findOne(
+    { league: { $regex: new RegExp(leagueQuery, 'i') } }
+  );
+
+  if (!doc || !doc.table) {
+    return JSON.stringify({ message: `Classifica non trovata per "${leagueQuery}".` });
+  }
+
+  // Calcola round corrente da h2h_by_round (played nel DB potrebbe essere 0)
+  // NOTA: h2h_by_round NON ha "round_number" — ha "round_name" (es. "Giornata 24")
+  let currentRound = 0;
+  let totalRounds = 38; // default Serie A/top 5
+  try {
+    const today = new Date().toISOString().split('T')[0]; // "2026-02-13"
+    // Match ESATTO sulla league (non regex — evita "Serie A" che matcha "Brasileirão Serie A")
+    const exactLeague = doc.league; // nome esatto dalla classifica
+    // Aggregation: estrae round_name + prima data di ogni giornata, ordina per data DESC
+    const roundDates = await db.collection('h2h_by_round').aggregate([
+      { $match: { league: exactLeague } },
+      { $project: { round_name: 1, first_date: { $arrayElemAt: ['$matches.date_obj', 0] } } },
+      { $sort: { first_date: -1 } }
+    ]).toArray();
+    if (roundDates.length > 0) {
+      // Funzione helper: "Giornata 24" → 24, "Round 5" → 5
+      const parseRoundNum = (name) => parseInt((name || '').replace(/\D/g, '')) || 0;
+      // totalRounds = numero più alto tra tutti i round_name
+      totalRounds = Math.max(...roundDates.map(rd => parseRoundNum(rd.round_name))) || roundDates.length;
+      // Trova il round più recente con partite già giocate (data ≤ oggi)
+      // roundDates è ordinato per first_date DESC → il primo con data ≤ oggi è il round corrente
+      for (const rd of roundDates) {
+        if (rd.first_date) {
+          const dateStr = rd.first_date instanceof Date
+            ? rd.first_date.toISOString().substring(0, 10)
+            : String(rd.first_date).substring(0, 10);
+          if (dateStr && dateStr <= today) {
+            currentRound = parseRoundNum(rd.round_name);
+            break;
+          }
+        }
+      }
+    }
+  } catch (e) { /* ignora errore calcolo round */ }
+
+  const remainingRounds = totalRounds - currentRound;
+
+  const result = {
+    league: doc.league,
+    country: doc.country,
+    total_teams: doc.table.length,
+    current_round: currentRound,
+    total_rounds: totalRounds,
+    remaining_rounds: remainingRounds,
+    remaining_points_available: remainingRounds * 3,
+    table: doc.table.map(t => ({
+      rank: t.rank,
+      team: t.team,
+      points: t.points,
+      played: t.played || currentRound
+    }))
+  };
+
+  // Se team specificato, evidenzia la posizione
+  if (team) {
+    const regex = new RegExp(team, 'i');
+    const teamRow = doc.table.find(t => regex.test(t.team));
+    if (teamRow) {
+      const leader = doc.table[0];
+      const gap = leader.points - teamRow.points;
+      result.highlighted_team = {
+        team: teamRow.team,
+        rank: teamRow.rank,
+        points: teamRow.points,
+        played: teamRow.played || currentRound,
+        gap_from_first: gap,
+        leader: leader.team,
+        leader_points: leader.points,
+        can_catch_leader: gap <= remainingRounds * 3,
+        min_points_needed_to_catch: gap + 1
+      };
+    }
+  }
+
+  return JSON.stringify(result);
 }
 
 /**
@@ -173,6 +354,8 @@ async function executeDbTool(db, toolName, args) {
       return executeSearchMatches(db, args);
     case 'get_match_details':
       return executeMatchDetails(db, args);
+    case 'get_standings':
+      return executeGetStandings(db, args);
     default:
       return JSON.stringify({ error: `Tool sconosciuto: ${toolName}` });
   }

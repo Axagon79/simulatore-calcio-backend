@@ -78,48 +78,64 @@ async function handleToolCalls(reply, messages, db) {
 
   const { callMistral } = require('./llmService');
   const { executeDbTool } = require('./dbTools');
+  const MAX_ROUNDS = 5;
 
-  // Aggiungi la risposta del modello con le tool calls
-  messages.push(reply);
+  let currentReply = reply;
 
-  for (const tc of reply.tool_calls) {
-    let args;
-    try {
-      args = JSON.parse(tc.function.arguments);
-    } catch {
-      args = typeof tc.function.arguments === 'string' ? { query: tc.function.arguments } : {};
+  for (let round = 0; round < MAX_ROUNDS; round++) {
+    if (!currentReply.tool_calls || currentReply.tool_calls.length === 0) {
+      return currentReply.content || '(risposta vuota)';
     }
 
-    let content;
+    // Aggiungi la risposta del modello con le tool calls
+    messages.push(currentReply);
 
-    if (tc.function.name === 'web_search') {
+    for (const tc of currentReply.tool_calls) {
+      let args;
       try {
-        const results = await searchWeb(args.query);
-        content = JSON.stringify(results);
-      } catch (err) {
-        content = JSON.stringify([{ title: 'Errore ricerca', snippet: err.message }]);
+        args = JSON.parse(tc.function.arguments);
+      } catch {
+        args = typeof tc.function.arguments === 'string' ? { query: tc.function.arguments } : {};
       }
-    } else if (['get_today_matches', 'search_matches', 'get_match_details'].includes(tc.function.name)) {
-      try {
-        content = await executeDbTool(db, tc.function.name, args);
-      } catch (err) {
-        content = JSON.stringify({ error: `Errore query DB: ${err.message}` });
+
+      let content;
+
+      if (tc.function.name === 'web_search') {
+        try {
+          const results = await searchWeb(args.query);
+          content = JSON.stringify(results);
+        } catch (err) {
+          content = JSON.stringify([{ title: 'Errore ricerca', snippet: err.message }]);
+        }
+      } else if (['get_today_matches', 'search_matches', 'get_match_details', 'get_standings'].includes(tc.function.name)) {
+        try {
+          content = await executeDbTool(db, tc.function.name, args);
+        } catch (err) {
+          content = JSON.stringify({ error: `Errore query DB: ${err.message}` });
+        }
+      } else {
+        content = JSON.stringify({ error: `Tool non riconosciuto: ${tc.function.name}` });
       }
-    } else {
-      content = JSON.stringify({ error: `Tool non riconosciuto: ${tc.function.name}` });
+
+      messages.push({
+        role: 'tool',
+        tool_call_id: tc.id,
+        name: tc.function.name,
+        content,
+      });
     }
 
-    messages.push({
-      role: 'tool',
-      tool_call_id: tc.id,
-      name: tc.function.name,
-      content,
-    });
+    // Richiama Mistral con i risultati dei tool
+    currentReply = await callMistral(messages);
+
+    // Se non ci sono altre tool_calls, abbiamo la risposta finale
+    if (!currentReply.tool_calls || currentReply.tool_calls.length === 0) {
+      return currentReply.content || '(risposta vuota)';
+    }
   }
 
-  // Richiama Mistral con i risultati dei tool
-  const finalReply = await callMistral(messages);
-  return finalReply.content;
+  // Raggiunto il limite di round
+  return currentReply.content || '(limite round tool raggiunto)';
 }
 
 module.exports = { WEB_SEARCH_TOOL, searchWeb, handleToolCalls };
