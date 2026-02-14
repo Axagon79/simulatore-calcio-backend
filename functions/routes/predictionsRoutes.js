@@ -54,6 +54,17 @@ function checkPronostico(pronostico, tipo, parsed) {
     return null;
   }
 
+  // X FACTOR: pronostico è 'X', hit se risultato è pareggio
+  if (tipo === 'X_FACTOR') {
+    return p === parsed.sign;
+  }
+
+  // RISULTATO ESATTO: pronostico è "1-0", hit se risultato reale matcha
+  if (tipo === 'RISULTATO_ESATTO') {
+    const realScore = `${parsed.homeGoals}-${parsed.awayGoals}`;
+    return p === realScore;
+  }
+
   return null;
 }
 
@@ -384,8 +395,14 @@ router.get('/track-record', async (req, res) => {
       if (!parsed || !pred.pronostici || pred.pronostici.length === 0) continue;
 
       for (const p of pred.pronostici) {
-        const hit = checkPronostico(p.pronostico, p.tipo, parsed);
+        let hit = checkPronostico(p.pronostico, p.tipo, parsed);
         if (hit === null) continue; // pronostico non verificabile
+
+        // RISULTATO ESATTO: hit se risultato reale è nei top-3 (non solo top-1)
+        if (p.tipo === 'RISULTATO_ESATTO' && !hit && pred.exact_score_top3) {
+          const realScore = `${parsed.homeGoals}-${parsed.awayGoals}`;
+          hit = pred.exact_score_top3.some(s => s.score === realScore);
+        }
 
         // Splitta tipo "GOL" in OVER_UNDER vs GG_NG
         let tipoEffettivo = p.tipo;
