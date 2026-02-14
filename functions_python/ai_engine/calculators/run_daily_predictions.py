@@ -137,6 +137,459 @@ ALL_STREAK_TYPES = [
     "over25", "under25", "gg", "clean_sheet", "senza_segnare", "gol_subiti",
 ]
 
+# ==================== X FACTOR — Algoritmo Predizione Pareggi ====================
+
+# Leghe con >30% draw rate storico (da analisi su 4286 partite)
+LEGHE_ALTA_X = {
+    "Serie B", "Serie C - Girone B", "Süper Lig", "Serie C - Girone A",
+    "Brasileirão Serie A", "Primera División",
+}
+
+THRESHOLD_X_FACTOR = 55  # Confidence minima per output X Factor (~10-14 partite/giorno)
+
+def calculate_x_factor(match):
+    """
+    Calcola la probabilità di pareggio (X) per una partita.
+    Usa sistema a punti pesati basato su analisi di 4286 partite storiche.
+    Baseline: 27.3% di X.
+
+    Returns: dict con confidence, segnali attivi, score raw — oppure None se confidence < soglia.
+    """
+    h2h = match.get('h2h_data', {}) or {}
+    odds = match.get('odds', {}) or {}
+    league = match.get('_league', '')
+
+    raw_score = 0
+    signals = []
+
+    # --- SEGNALI POSITIVI (spingono verso X) ---
+
+    # 1. Classification = NON_BVS (+12)
+    classification = h2h.get('classification')
+    if classification == 'NON_BVS':
+        raw_score += 12
+        signals.append('NON_BVS')
+    elif classification == 'SEMI':
+        raw_score -= 10  # Anti-segnale
+        signals.append('SEMI_penalty')
+
+    # 2. Quote equilibrate |Q1-Q2| < 0.50 (+9)
+    q1 = odds.get('1')
+    q2 = odds.get('2')
+    if q1 is not None and q2 is not None:
+        try:
+            diff_q = abs(float(q1) - float(q2))
+            if diff_q < 0.50:
+                raw_score += 9
+                signals.append(f'quote_eq({diff_q:.2f})')
+        except (ValueError, TypeError):
+            pass
+
+    # 3. BVS molto negativo (<-3) → +7, moderatamente negativo [-3,-1) → +4
+    bvs = h2h.get('bvs_match_index')
+    if bvs is not None:
+        try:
+            bvs_val = float(bvs)
+            if bvs_val < -3:
+                raw_score += 7
+                signals.append(f'BVS_neg({bvs_val:.1f})')
+            elif bvs_val < -1:
+                raw_score += 4
+                signals.append(f'BVS_mod({bvs_val:.1f})')
+            elif -1 <= bvs_val < 1:
+                raw_score -= 11  # Anti-segnale: BVS neutro
+                signals.append('BVS_neutro_penalty')
+        except (ValueError, TypeError):
+            pass
+
+    # 4. Trust away = D (+6), Trust home = D (+4)
+    trust_away = h2h.get('trust_away_letter')
+    trust_home = h2h.get('trust_home_letter')
+    if trust_away == 'D':
+        raw_score += 6
+        signals.append('trust_away_D')
+    elif trust_away == 'A':
+        raw_score -= 11  # Anti-segnale forte
+        signals.append('trust_away_A_penalty')
+    if trust_home == 'D':
+        raw_score += 4
+        signals.append('trust_home_D')
+    elif trust_home == 'A':
+        raw_score -= 5
+        signals.append('trust_home_A_penalty')
+
+    # 5. Lega alta X (>30% storico) → +4
+    if league in LEGHE_ALTA_X:
+        raw_score += 4
+        signals.append(f'lega_alta_X')
+
+    # 6. Quota X bassa < 3.30 → +4
+    qx = odds.get('X')
+    if qx is not None:
+        try:
+            qx_val = float(qx)
+            if qx_val < 3.30:
+                raw_score += 4
+                signals.append(f'quota_X({qx_val:.2f})')
+            elif qx_val > 5.00:
+                raw_score -= 15  # Anti-segnale: quota troppo alta
+                signals.append('quota_X_alta_penalty')
+        except (ValueError, TypeError):
+            pass
+
+    # 7. DNA DEF simile (diff < 15) → +4
+    h2h_dna = h2h.get('h2h_dna', {}) or {}
+    home_dna = h2h_dna.get('home_dna', {}) or {}
+    away_dna = h2h_dna.get('away_dna', {}) or {}
+    h_def = home_dna.get('def')
+    a_def = away_dna.get('def')
+    if h_def is not None and a_def is not None:
+        diff_def = abs(float(h_def) - float(a_def))
+        if diff_def < 15:
+            raw_score += 4
+            signals.append(f'DNA_DEF_sim({diff_def:.0f})')
+
+    # 8. DNA ATT simile (diff < 15) → +3
+    h_att = home_dna.get('att')
+    a_att = away_dna.get('att')
+    if h_att is not None and a_att is not None:
+        diff_att = abs(float(h_att) - float(a_att))
+        if diff_att < 15:
+            raw_score += 3
+            signals.append(f'DNA_ATT_sim({diff_att:.0f})')
+
+    # 9. Rank vicini (diff <= 5) → +3
+    h_rank = h2h.get('home_rank')
+    a_rank = h2h.get('away_rank')
+    if h_rank is not None and a_rank is not None:
+        diff_rank = abs(int(h_rank) - int(a_rank))
+        if diff_rank <= 5:
+            raw_score += 3
+            signals.append(f'rank_vicini({diff_rank})')
+
+    # 10. Fattore campo basso (< 45) → +3
+    fc = h2h.get('fattore_campo', {}) or {}
+    fc_home = fc.get('field_home')
+    if fc_home is not None:
+        try:
+            fc_val = float(fc_home)
+            if fc_val < 45:
+                raw_score += 3
+                signals.append(f'FC_basso({fc_val:.0f})')
+        except (ValueError, TypeError):
+            pass
+
+    # --- SEGNALI DA ENGINE INTERNO (se disponibili) ---
+
+    # 11. Engine predice Under 2.5 con alta confidence → +6
+    gol_r = match.get('_gol_result', {})
+    if gol_r:
+        tipo_gol = gol_r.get('tipo_gol', '')
+        gol_score = gol_r.get('score', 0)
+        if tipo_gol == 'Under 2.5' and gol_score >= 60:
+            raw_score += 6
+            signals.append(f'eng_Under({gol_score:.0f})')
+
+        # 12. Engine predice GG con alta confidence → +4
+        tipo_gg = gol_r.get('tipo_gol_extra', '')
+        conf_gg = gol_r.get('confidence_gol_extra', 0)
+        if tipo_gg == 'Goal' and conf_gg >= 60:
+            raw_score += 4
+            signals.append(f'eng_GG({conf_gg:.0f})')
+
+    # 13. Segno incerto (confidence < 55) → +5
+    segno_r = match.get('_segno_result', {})
+    if segno_r:
+        segno_score = segno_r.get('score', 100)
+        if segno_score < 55:
+            raw_score += 5
+            signals.append(f'segno_incerto({segno_score:.0f})')
+
+    # --- CALCOLO CONFIDENCE ---
+    confidence = 27.3 + raw_score
+    confidence = max(10, min(70, confidence))  # Clamp 10-70
+
+    if confidence < THRESHOLD_X_FACTOR:
+        return None
+
+    return {
+        'confidence': round(confidence, 1),
+        'raw_score': raw_score,
+        'signals': signals,
+        'n_signals': len([s for s in signals if 'penalty' not in s]),
+        'quota_x': float(qx) if qx else None,
+    }
+
+
+# ==================== RISULTATO ESATTO — Algoritmo basato su Profili Storici ====================
+
+# Profili medi per risultato (da 4294 partite analizzate)
+EXACT_SCORE_PROFILES = {
+    '1:0': {'base_rate': 10.9, 'fc_home': 59.62, 'fc_away': 42.67, 'dna_att_diff': 6.62, 'dna_def_diff': 4.65, 'rank_diff': -3.16, 'avg_total_goals': 2.22, 'bvs': -0.15, 'h2h_score_diff': 0.64, 'lucifero_home': 9.45, 'lucifero_away': 9.10, 'dna_home_def': 55.12, 'dna_away_def': 50.47},
+    '0:1': {'base_rate': 7.6, 'fc_home': 44.81, 'fc_away': 58.73, 'dna_att_diff': -7.38, 'dna_def_diff': -8.47, 'rank_diff': 4.06, 'avg_total_goals': 2.26, 'bvs': -1.81, 'h2h_score_diff': -1.01, 'lucifero_home': 7.41, 'lucifero_away': 9.63, 'dna_home_def': 48.11, 'dna_away_def': 56.58},
+    '1:1': {'base_rate': 12.8, 'fc_home': 50.06, 'fc_away': 50.05, 'dna_att_diff': -2.41, 'dna_def_diff': -1.78, 'rank_diff': 1.31, 'avg_total_goals': 2.35, 'bvs': -2.18, 'h2h_score_diff': -0.17, 'lucifero_home': 8.84, 'lucifero_away': 9.24, 'dna_home_def': 48.92, 'dna_away_def': 50.70},
+    '0:0': {'base_rate': 7.5, 'fc_home': 49.42, 'fc_away': 49.70, 'dna_att_diff': -2.83, 'dna_def_diff': -0.79, 'rank_diff': 0.88, 'avg_total_goals': 2.12, 'bvs': -1.15, 'h2h_score_diff': -0.07, 'lucifero_home': 8.35, 'lucifero_away': 10.36, 'dna_home_def': 52.96, 'dna_away_def': 53.75},
+    '2:0': {'base_rate': 6.5, 'fc_home': 61.51, 'fc_away': 42.88, 'dna_att_diff': 11.35, 'dna_def_diff': 10.64, 'rank_diff': -3.95, 'avg_total_goals': 2.36, 'bvs': -0.19, 'h2h_score_diff': 0.85, 'lucifero_home': 11.06, 'lucifero_away': 9.79, 'dna_home_def': 58.28, 'dna_away_def': 47.64},
+    '2:1': {'base_rate': 9.1, 'fc_home': 59.64, 'fc_away': 42.72, 'dna_att_diff': 4.69, 'dna_def_diff': 6.10, 'rank_diff': -2.69, 'avg_total_goals': 2.46, 'bvs': -0.02, 'h2h_score_diff': 0.41, 'lucifero_home': 9.61, 'lucifero_away': 9.25, 'dna_home_def': 52.85, 'dna_away_def': 46.74},
+    '1:2': {'base_rate': 7.6, 'fc_home': 46.16, 'fc_away': 58.72, 'dna_att_diff': -7.81, 'dna_def_diff': -7.02, 'rank_diff': 3.33, 'avg_total_goals': 2.47, 'bvs': -0.98, 'h2h_score_diff': -0.77, 'lucifero_home': 9.09, 'lucifero_away': 10.66, 'dna_home_def': 45.73, 'dna_away_def': 52.75},
+    '0:2': {'base_rate': 4.9, 'fc_home': 43.31, 'fc_away': 59.54, 'dna_att_diff': -13.57, 'dna_def_diff': -12.78, 'rank_diff': 4.86, 'avg_total_goals': 2.45, 'bvs': -1.97, 'h2h_score_diff': -1.06, 'lucifero_home': 9.70, 'lucifero_away': 11.93, 'dna_home_def': 43.58, 'dna_away_def': 56.36},
+    '2:2': {'base_rate': 5.8, 'fc_home': 49.64, 'fc_away': 48.02, 'dna_att_diff': -3.56, 'dna_def_diff': -0.92, 'rank_diff': 0.79, 'avg_total_goals': 2.52, 'bvs': -1.46, 'h2h_score_diff': -0.22, 'lucifero_home': 9.56, 'lucifero_away': 9.98, 'dna_home_def': 45.53, 'dna_away_def': 46.45},
+    '3:1': {'base_rate': 4.5, 'fc_home': 60.69, 'fc_away': 43.01, 'dna_att_diff': 11.75, 'dna_def_diff': 8.54, 'rank_diff': -3.63, 'avg_total_goals': 2.54, 'bvs': -0.64, 'h2h_score_diff': 0.46, 'lucifero_home': 10.27, 'lucifero_away': 9.04, 'dna_home_def': 52.57, 'dna_away_def': 44.03},
+    '3:0': {'base_rate': 3.3, 'fc_home': 64.99, 'fc_away': 39.30, 'dna_att_diff': 19.76, 'dna_def_diff': 16.33, 'rank_diff': -6.03, 'avg_total_goals': 2.58, 'bvs': -0.01, 'h2h_score_diff': 0.49, 'lucifero_home': 12.26, 'lucifero_away': 7.64, 'dna_home_def': 59.64, 'dna_away_def': 43.31},
+    '0:3': {'base_rate': 2.7, 'fc_home': 42.22, 'fc_away': 65.48, 'dna_att_diff': -22.98, 'dna_def_diff': -21.36, 'rank_diff': 5.93, 'avg_total_goals': 2.58, 'bvs': -0.62, 'h2h_score_diff': -0.99, 'lucifero_home': 8.71, 'lucifero_away': 12.79, 'dna_home_def': 38.35, 'dna_away_def': 59.71},
+    '1:3': {'base_rate': 2.5, 'fc_home': 44.34, 'fc_away': 57.79, 'dna_att_diff': -11.89, 'dna_def_diff': -11.13, 'rank_diff': 4.40, 'avg_total_goals': 2.53, 'bvs': -1.02, 'h2h_score_diff': -0.85, 'lucifero_home': 6.99, 'lucifero_away': 11.99, 'dna_home_def': 41.16, 'dna_away_def': 52.29},
+    '3:2': {'base_rate': 2.3, 'fc_home': 58.59, 'fc_away': 40.83, 'dna_att_diff': 4.21, 'dna_def_diff': 5.78, 'rank_diff': -3.81, 'avg_total_goals': 2.68, 'bvs': -0.47, 'h2h_score_diff': 0.44, 'lucifero_home': 9.79, 'lucifero_away': 7.81, 'dna_home_def': 47.85, 'dna_away_def': 42.06},
+    '2:3': {'base_rate': 1.9, 'fc_home': 47.29, 'fc_away': 60.62, 'dna_att_diff': -10.49, 'dna_def_diff': -8.78, 'rank_diff': 4.23, 'avg_total_goals': 2.73, 'bvs': -3.33, 'h2h_score_diff': -0.88, 'lucifero_home': 8.60, 'lucifero_away': 9.84, 'dna_home_def': 41.72, 'dna_away_def': 50.50},
+}
+
+# Pesi segnali (dalla varianza tra risultati)
+EXACT_SIGNAL_WEIGHTS = {
+    'dna_att_diff': 10, 'dna_def_diff': 9,
+    'fc_home': 8, 'fc_away': 8,
+    'avg_total_goals': 7, 'rank_diff': 6,
+    'dna_home_def': 5, 'dna_away_def': 5,
+    'h2h_score_diff': 4, 'bvs': 3,
+    'lucifero_home': 3, 'lucifero_away': 3,
+}
+
+# Range per normalizzazione
+EXACT_SIGNAL_RANGES = {
+    'dna_att_diff': 43.0, 'dna_def_diff': 38.0,
+    'fc_home': 23.0, 'fc_away': 26.0,
+    'avg_total_goals': 0.65, 'rank_diff': 12.0,
+    'dna_home_def': 21.5, 'dna_away_def': 18.0,
+    'h2h_score_diff': 2.0, 'bvs': 3.5,
+    'lucifero_home': 5.5, 'lucifero_away': 5.5,
+}
+
+# Bonus categorici — Classification
+EXACT_CLASS_BONUS = {
+    '1:1': {'NON_BVS': 4, 'PURO': -2, 'SEMI': -2},
+    '0:0': {'NON_BVS': 2, 'PURO': 0, 'SEMI': -2},
+    '1:0': {'PURO': 1, 'SEMI': 0, 'NON_BVS': -1},
+    '0:1': {'NON_BVS': 2, 'SEMI': 1, 'PURO': -3},
+    '2:0': {'PURO': 1, 'SEMI': 2, 'NON_BVS': -2},
+    '2:1': {'PURO': 2, 'SEMI': 1, 'NON_BVS': -3},
+    '1:2': {'NON_BVS': 1, 'PURO': -2, 'SEMI': 0},
+    '0:2': {'SEMI': 2, 'NON_BVS': 1, 'PURO': -2},
+    '2:2': {'PURO': 2, 'SEMI': -2, 'NON_BVS': 0},
+    '3:0': {'PURO': 1, 'SEMI': 2, 'NON_BVS': -2},
+    '3:1': {'SEMI': 1, 'PURO': -1, 'NON_BVS': 0},
+    '0:3': {'SEMI': 2, 'NON_BVS': 1, 'PURO': -2},
+}
+
+# Bonus Trust Home
+EXACT_TRUST_HOME_BONUS = {
+    '1:0': {'A': 3, 'B': 1, 'C': -1, 'D': -2},
+    '0:1': {'A': -3, 'B': -3, 'C': 4, 'D': 2},
+    '1:1': {'A': -1, 'B': 0, 'C': 1, 'D': 0},
+    '0:0': {'A': 0, 'B': 0, 'C': 0, 'D': 1},
+    '2:0': {'A': 2, 'B': 3, 'C': -3, 'D': -2},
+    '2:1': {'A': 3, 'B': 2, 'C': -3, 'D': -1},
+    '1:2': {'A': -2, 'B': -2, 'C': 3, 'D': 3},
+    '0:2': {'A': -2, 'B': -2, 'C': 3, 'D': 2},
+}
+
+# Bonus Trust Away
+EXACT_TRUST_AWAY_BONUS = {
+    '1:0': {'A': -1, 'B': -1, 'C': 0, 'D': 3},
+    '0:1': {'A': 1, 'B': 2, 'C': 0, 'D': -5},
+    '1:1': {'A': -1, 'B': -1, 'C': 0, 'D': 2},
+    '0:0': {'A': 0, 'B': 0, 'C': 0, 'D': 1},
+    '2:0': {'A': -1, 'B': -1, 'C': 1, 'D': 2},
+    '2:1': {'A': -1, 'B': -1, 'C': 2, 'D': 1},
+    '1:2': {'A': 1, 'B': 2, 'C': 0, 'D': -3},
+    '0:2': {'A': 2, 'B': 3, 'C': 0, 'D': -3},
+}
+
+# Lookup per score properties
+_SCORE_TOTAL = {s: sum(int(x) for x in s.split(':')) for s in EXACT_SCORE_PROFILES}
+_SCORE_BOTH = {s: int(s.split(':')[0]) > 0 and int(s.split(':')[1]) > 0 for s in EXACT_SCORE_PROFILES}
+_SCORE_HOME_W = {s: int(s.split(':')[0]) > int(s.split(':')[1]) for s in EXACT_SCORE_PROFILES}
+_SCORE_AWAY_W = {s: int(s.split(':')[1]) > int(s.split(':')[0]) for s in EXACT_SCORE_PROFILES}
+
+THRESHOLD_EXACT_SCORE = 52
+
+
+def _safe_float_es(val, default=None):
+    if val is None:
+        return default
+    try:
+        return float(val)
+    except (ValueError, TypeError):
+        return default
+
+
+def calculate_exact_score(match):
+    """
+    Algoritmo Risultato Esatto — profili storici (4294 partite) + segnali engine.
+    Per ogni risultato candidato, calcola quanto la partita assomiglia
+    al profilo tipico di quel risultato.
+    """
+    h2h = match.get('h2h_data', {}) or {}
+    fc = h2h.get('fattore_campo', {}) or {}
+    h2h_dna = h2h.get('h2h_dna', {}) or {}
+    home_dna = h2h_dna.get('home_dna', {}) or {}
+    away_dna = h2h_dna.get('away_dna', {}) or {}
+
+    # --- Estrai segnali numerici ---
+    signals = {}
+    signals['fc_home'] = _safe_float_es(fc.get('field_home'))
+    signals['fc_away'] = _safe_float_es(fc.get('field_away'))
+
+    dna_h_att = _safe_float_es(home_dna.get('att'))
+    dna_h_def = _safe_float_es(home_dna.get('def'))
+    dna_a_att = _safe_float_es(away_dna.get('att'))
+    dna_a_def = _safe_float_es(away_dna.get('def'))
+
+    signals['dna_att_diff'] = (dna_h_att - dna_a_att) if (dna_h_att is not None and dna_a_att is not None) else None
+    signals['dna_def_diff'] = (dna_h_def - dna_a_def) if (dna_h_def is not None and dna_a_def is not None) else None
+    signals['dna_home_def'] = dna_h_def
+    signals['dna_away_def'] = dna_a_def
+
+    hr = _safe_float_es(h2h.get('home_rank'))
+    ar = _safe_float_es(h2h.get('away_rank'))
+    signals['rank_diff'] = (hr - ar) if (hr is not None and ar is not None) else None
+
+    signals['avg_total_goals'] = _safe_float_es(h2h.get('avg_total_goals'))
+    signals['bvs'] = _safe_float_es(h2h.get('bvs_match_index'))
+
+    hs = _safe_float_es(h2h.get('home_score'))
+    aws = _safe_float_es(h2h.get('away_score'))
+    signals['h2h_score_diff'] = (hs - aws) if (hs is not None and aws is not None) else None
+
+    signals['lucifero_home'] = _safe_float_es(h2h.get('lucifero_home'))
+    signals['lucifero_away'] = _safe_float_es(h2h.get('lucifero_away'))
+
+    # Categorici
+    classification = h2h.get('classification')
+    trust_home = h2h.get('trust_home_letter')
+    trust_away = h2h.get('trust_away_letter')
+
+    # Engine (se disponibili dal loop principale)
+    gol_r = match.get('_gol_result', {})
+    segno_r = match.get('_segno_result', {})
+
+    # Minimo 4 segnali disponibili
+    available = sum(1 for v in signals.values() if v is not None)
+    if available < 4:
+        return None
+
+    # --- Calcola fit score per ogni risultato candidato ---
+    candidate_scores = {}
+
+    for score_key, profile in EXACT_SCORE_PROFILES.items():
+        # 1. Base rate come starting point
+        fit = profile['base_rate'] * 0.3
+
+        # 2. Prossimità segnali numerici
+        for sig_name, weight in EXACT_SIGNAL_WEIGHTS.items():
+            match_val = signals.get(sig_name)
+            profile_val = profile.get(sig_name)
+            if match_val is None or profile_val is None:
+                continue
+            range_val = EXACT_SIGNAL_RANGES[sig_name]
+            diff = abs(match_val - profile_val) / range_val
+            proximity = max(0.0, 1.0 - diff)
+            fit += weight * proximity
+
+        # 3. Classification
+        if classification and score_key in EXACT_CLASS_BONUS:
+            fit += EXACT_CLASS_BONUS[score_key].get(classification, 0)
+
+        # 4. Trust Home
+        if trust_home and score_key in EXACT_TRUST_HOME_BONUS:
+            fit += EXACT_TRUST_HOME_BONUS[score_key].get(trust_home, 0)
+
+        # 5. Trust Away
+        if trust_away and score_key in EXACT_TRUST_AWAY_BONUS:
+            fit += EXACT_TRUST_AWAY_BONUS[score_key].get(trust_away, 0)
+
+        # 6. Engine: Under/Over
+        if gol_r:
+            tipo_gol = gol_r.get('tipo_gol') or ''
+            gol_conf = gol_r.get('score') or 0
+            total_goals = _SCORE_TOTAL[score_key]
+
+            if gol_conf >= 55:
+                scale = min(1.3, gol_conf / 60)
+                if 'Under' in tipo_gol:
+                    if total_goals <= 1:
+                        fit += 4 * scale
+                    elif total_goals == 2:
+                        fit += 2 * scale
+                    elif total_goals >= 4:
+                        fit -= 3 * scale
+                elif 'Over' in tipo_gol:
+                    if total_goals >= 4:
+                        fit += 3 * scale
+                    elif total_goals == 3:
+                        fit += 2 * scale
+                    elif total_goals <= 1:
+                        fit -= 3 * scale
+
+            # GG/NG
+            tipo_gg = gol_r.get('tipo_gol_extra') or ''
+            gg_conf = gol_r.get('confidence_gol_extra') or 0
+            both_score = _SCORE_BOTH[score_key]
+
+            if gg_conf >= 55:
+                scale = min(1.3, gg_conf / 60)
+                if tipo_gg == 'Goal':
+                    fit += (3 if both_score else -3) * scale
+                elif tipo_gg == 'No Goal':
+                    fit += (3 if not both_score else -2) * scale
+
+        # 7. Engine: Segno
+        if segno_r:
+            segno_tipo = segno_r.get('tipo') or ''
+            segno_conf = segno_r.get('score') or 0
+
+            if segno_conf >= 55:
+                scale = min(1.3, segno_conf / 60)
+                if segno_tipo == '1':
+                    if _SCORE_HOME_W[score_key]:
+                        fit += 2 * scale
+                    elif _SCORE_AWAY_W[score_key]:
+                        fit -= 2 * scale
+                elif segno_tipo == '2':
+                    if _SCORE_AWAY_W[score_key]:
+                        fit += 2 * scale
+                    elif _SCORE_HOME_W[score_key]:
+                        fit -= 2 * scale
+
+            # Confidence segno bassa → favorisce pareggi
+            if segno_conf < 52:
+                h_g, a_g = (int(x) for x in score_key.split(':'))
+                if h_g == a_g:
+                    fit += 2
+
+        candidate_scores[score_key] = max(0, fit)
+
+    # Ordina e normalizza
+    sorted_scores = sorted(candidate_scores.items(), key=lambda x: -x[1])
+    total = sum(s for _, s in sorted_scores)
+    if total <= 0:
+        return None
+
+    top_scores = [{'score': k, 'prob': round(v / total * 100, 1)} for k, v in sorted_scores[:5]]
+
+    # Gap tra top-1 e probabilità uniforme (100/15 = 6.67%)
+    avg_uniform = 100.0 / len(EXACT_SCORE_PROFILES)
+    gap = top_scores[0]['prob'] - avg_uniform
+
+    # Confidence basata su quanto top-1 emerge sopra la distribuzione uniforme
+    confidence = min(70, max(25, 30 + gap * 7))
+
+    if confidence < THRESHOLD_EXACT_SCORE:
+        return None
+
+    return {
+        'top_3': top_scores[:3],
+        'confidence': round(confidence, 1),
+        'gap': round(gap, 2),
+    }
+
 
 # ==================== STRISCE: Cache + Calcolo + Curva a Campana ====================
 
@@ -1883,6 +2336,9 @@ def run_daily_predictions(target_date=None):
         decision = make_decision(segno_result, gol_result)
         match['_home_team_doc'] = home_team_doc
         match['_away_team_doc'] = away_team_doc
+        # Salva risultati interni per X Factor (accessibili nel loop successivo)
+        match['_segno_result'] = segno_result
+        match['_gol_result'] = gol_result
         # FASE 5: Commento
         comment = generate_comment(match, segno_result, gol_result, decision)
         
@@ -1954,20 +2410,127 @@ def run_daily_predictions(target_date=None):
         }
 
         results.append(prediction_doc)
-    
+
+    # ==================== FASE X FACTOR ====================
+    # Analizza TUTTE le partite (anche le scartate) per X Factor
+    x_factor_results = []
+    print(f"\n{'─' * 50}")
+    print(f"🎯 FASE X FACTOR — Analisi pareggi su {len(matches)} partite")
+
+    for match in matches:
+        xf = calculate_x_factor(match)
+        if xf is None:
+            continue
+
+        home = match.get('home', '???')
+        away = match.get('away', '???')
+        league = match.get('_league', 'Unknown')
+
+        print(f"   ✖️  {home} vs {away} — conf {xf['confidence']}% ({xf['n_signals']} segnali)")
+
+        xf_doc = {
+            'date': target_str,
+            'home': home,
+            'away': away,
+            'league': league,
+            'match_time': match.get('match_time', ''),
+            'home_mongo_id': match.get('home_mongo_id', ''),
+            'away_mongo_id': match.get('away_mongo_id', ''),
+            'is_x_factor': True,
+            'decision': 'X_FACTOR',
+            'pronostici': [{
+                'tipo': 'X_FACTOR',
+                'pronostico': 'X',
+                'quota': xf['quota_x'],
+                'confidence': xf['confidence'],
+                'stars': calculate_stars(xf['confidence']),
+            }],
+            'confidence_segno': xf['confidence'],
+            'confidence_gol': 0,
+            'stars_segno': calculate_stars(xf['confidence']),
+            'stars_gol': 0,
+            'x_factor_signals': xf['signals'],
+            'x_factor_n_signals': xf['n_signals'],
+            'x_factor_raw_score': xf['raw_score'],
+            'odds': match.get('odds', {}),
+            'comment': f"X Factor: {xf['n_signals']} segnali attivi",
+            'created_at': datetime.now(),
+        }
+        x_factor_results.append(xf_doc)
+
+    if x_factor_results:
+        print(f"   🎯 X Factor trovate: {len(x_factor_results)}")
+    else:
+        print(f"   🎯 Nessuna partita X Factor oggi")
+
+    # ==================== FASE RISULTATO ESATTO ====================
+    # Analizza TUTTE le partite per predire il risultato esatto più probabile
+    exact_score_results = []
+    print(f"\n{'─' * 50}")
+    print(f"🎯 FASE RISULTATO ESATTO — Analisi su {len(matches)} partite")
+
+    for match in matches:
+        es = calculate_exact_score(match)
+        if es is None:
+            continue
+
+        home = match.get('home', '???')
+        away = match.get('away', '???')
+        league = match.get('_league', 'Unknown')
+
+        top3_str = ', '.join([f"{s['score']} ({s['prob']:.1f}%)" for s in es['top_3']])
+        print(f"   🎯 {home} vs {away} — conf {es['confidence']}% | {top3_str}")
+
+        es_doc = {
+            'date': target_str,
+            'home': home,
+            'away': away,
+            'league': league,
+            'match_time': match.get('match_time', ''),
+            'home_mongo_id': match.get('home_mongo_id', ''),
+            'away_mongo_id': match.get('away_mongo_id', ''),
+            'is_exact_score': True,
+            'decision': 'RISULTATO_ESATTO',
+            'pronostici': [{
+                'tipo': 'RISULTATO_ESATTO',
+                'pronostico': es['top_3'][0]['score'],
+                'confidence': es['confidence'],
+                'stars': calculate_stars(es['confidence']),
+                'top_3': es['top_3'],
+            }],
+            'confidence_segno': es['confidence'],
+            'confidence_gol': 0,
+            'stars_segno': calculate_stars(es['confidence']),
+            'stars_gol': 0,
+            'exact_score_top3': es['top_3'],
+            'exact_score_gap': es['gap'],
+            'odds': match.get('odds', {}),
+            'comment': f"RE: {es['top_3'][0]['score']} ({es['top_3'][0]['prob']:.1f}%)",
+            'created_at': datetime.now(),
+        }
+        exact_score_results.append(es_doc)
+
+    if exact_score_results:
+        print(f"   🎯 Risultato Esatto trovati: {len(exact_score_results)}")
+    else:
+        print(f"   🎯 Nessun Risultato Esatto oggi")
+
     # 3. Salva nel DB
-    if results:
+    all_results = results + x_factor_results + exact_score_results  # Unisci normali + X Factor + RE
+
+    if all_results:
         # Cancella previsioni vecchie per oggi
-        
         predictions_collection.delete_many({'date': target_str})
-        
-        # Inserisci nuove
-        predictions_collection.insert_many(results)
-        
+
+        # Inserisci tutte (normali + X Factor + Risultato Esatto)
+        predictions_collection.insert_many(all_results)
+
         print(f"\n{'=' * 70}")
         print(f"✅ COMPLETATO!")
         print(f"   📊 Partite analizzate: {len(matches)}")
         print(f"   ✅ Pronostici salvati: {len(results)}")
+        print(f"   🎯 X Factor salvati: {len(x_factor_results)}")
+        print(f"   🎯 Risultato Esatto salvati: {len(exact_score_results)}")
         print(f"   ❌ Scartate: {scartate}")
         print(f"   📅 Data: {target_str}")
         print(f"{'=' * 70}\n")
@@ -1976,7 +2539,7 @@ def run_daily_predictions(target_date=None):
 
     # Salva bombe
     if bombs:
-        
+
         bombs_collection.delete_many({'date': target_str})
         bombs_collection.insert_many(bombs)
         print(f"   💣 Bombe salvate: {len(bombs)}")
