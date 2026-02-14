@@ -258,23 +258,17 @@ def run_scraper():
                         possible_names_a.extend([x.lower().strip() for x in team_a_doc['aliases'] if x])
 
                     found_item = None
-                    
-                    # 3. CONTROLLO POTENZIATO
-                    # Controlliamo ogni riga del sito usando le liste estese
+
+                    # 3. CONTROLLO POTENZIATO (word boundary per evitare "real" in "villarreal")
                     for item in scraped_data:
                         row_txt = item['text'] # È già minuscolo
-                        
-                        # C'è almeno un nome di Casa nella riga?
-                        h_match = any(alias in row_txt for alias in possible_names_h)
-                        # C'è almeno un nome di Trasferta nella riga?
-                        a_match = any(alias in row_txt for alias in possible_names_a)
+
+                        h_match = any(re.search(r'\b' + re.escape(alias) + r'\b', row_txt) for alias in possible_names_h)
+                        a_match = any(re.search(r'\b' + re.escape(alias) + r'\b', row_txt) for alias in possible_names_a)
 
                         if h_match and a_match:
                             found_item = item
                             break
-                            if h in item['text'] and a in item['text']:
-                                found_item = item
-                                break
                     
                     # Se non trovo la quota nel sito, passo alla prossima (Pace)
                     if not found_item:

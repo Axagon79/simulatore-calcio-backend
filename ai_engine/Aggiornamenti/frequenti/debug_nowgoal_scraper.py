@@ -285,9 +285,9 @@ def find_match_in_rows(home_aliases: List[str], away_aliases: List[str], rows_te
         row_lower = row_text.lower()
         
         # Controlla se entrambe le squadre sono presenti
-        home_found = any(alias in row_normalized or alias in row_lower for alias in home_aliases_normalized)
-        away_found = any(alias in row_normalized or alias in row_lower for alias in away_aliases_normalized)
-        
+        home_found = any(re.search(r'\b' + re.escape(alias) + r'\b', row_normalized) or re.search(r'\b' + re.escape(alias) + r'\b', row_lower) for alias in home_aliases_normalized)
+        away_found = any(re.search(r'\b' + re.escape(alias) + r'\b', row_normalized) or re.search(r'\b' + re.escape(alias) + r'\b', row_lower) for alias in away_aliases_normalized)
+
         if home_found and away_found:
             # Partita trovata! Ora verifica se ha quote
             odds = extract_odds_from_row(row_text)
@@ -411,10 +411,10 @@ def analyze_missing_match(
         row_norm = normalize_name(row)
         row_lower = row.lower()
         
-        if any(alias in row_norm or alias in row_lower for alias in home_aliases):
+        if any(re.search(r'\b' + re.escape(alias) + r'\b', row_norm) or re.search(r'\b' + re.escape(alias) + r'\b', row_lower) for alias in home_aliases):
             home_found_in.append(idx)
-        
-        if any(alias in row_norm or alias in row_lower for alias in away_aliases):
+
+        if any(re.search(r'\b' + re.escape(alias) + r'\b', row_norm) or re.search(r'\b' + re.escape(alias) + r'\b', row_lower) for alias in away_aliases):
             away_found_in.append(idx)
     
     # Analizza i risultati

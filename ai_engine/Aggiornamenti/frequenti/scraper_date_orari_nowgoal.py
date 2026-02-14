@@ -202,8 +202,8 @@ def find_match_with_datetime(home_aliases: List[str], away_aliases: List[str], r
         row_normalized = normalize_name(row_text)
         row_lower = row_text.lower()
         
-        home_found = any(alias in row_normalized or alias in row_lower for alias in home_aliases_normalized)
-        away_found = any(alias in row_normalized or alias in row_lower for alias in away_aliases_normalized)
+        home_found = any(re.search(r'\b' + re.escape(alias) + r'\b', row_normalized) or re.search(r'\b' + re.escape(alias) + r'\b', row_lower) for alias in home_aliases_normalized)
+        away_found = any(re.search(r'\b' + re.escape(alias) + r'\b', row_normalized) or re.search(r'\b' + re.escape(alias) + r'\b', row_lower) for alias in away_aliases_normalized)
         
         if home_found and away_found:
             datetime_result = extract_datetime_from_row(row_text)
