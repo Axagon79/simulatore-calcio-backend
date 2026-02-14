@@ -76,6 +76,34 @@ LEAGUES_CONFIG = [
     {"name": "J1 League", "url": "https://football.nowgoal26.com/subleague/25"},
 ]
 
+def strip_accents(text):
+    for k, v in {'á':'a','à':'a','ã':'a','â':'a','é':'e','è':'e','ê':'e',
+                  'í':'i','ì':'i','ó':'o','ò':'o','ô':'o','õ':'o',
+                  'ú':'u','ù':'u','ü':'u','ñ':'n','ç':'c','ø':'o','å':'a','ä':'a'}.items():
+        text = text.replace(k, v)
+    return text
+
+def clean_nowgoal_text(text):
+    text = re.sub(r'\[\d+\]', '', text)
+    text = re.sub(r'(\d)([a-z])', r'\1 \2', text)
+    text = re.sub(r'([a-z])(\d)', r'\1 \2', text)
+    return strip_accents(text)
+
+def generate_search_names(name):
+    name = strip_accents(name)
+    names = [name]
+    for p in ['fc ', 'cf ', 'ca ', 'rcd ', 'cd ', 'ud ', 'rc ', 'sd ']:
+        if name.startswith(p):
+            short = name[len(p):].strip()
+            if len(short) >= 3: names.append(short)
+    for s in [' fc', ' cf']:
+        if name.endswith(s):
+            short = name[:-len(s)].strip()
+            if len(short) >= 3: names.append(short)
+    if ' de ' in name:
+        names.append(name.replace(' de ', ' '))
+    return list(set(names))
+
 def normalize_name(name: str) -> str:
     """Normalizza il nome di una squadra rimuovendo prefissi comuni e caratteri speciali"""
     if not name: 
@@ -238,31 +266,27 @@ def find_match_in_rows(home_aliases: List[str], away_aliases: List[str], rows_te
     Ritorna None se la partita non è stata trovata per niente.
     """
     # Normalizza TUTTI gli alias (rimuovi accenti, lowercase, ecc.)
-    home_aliases_normalized = set()
+    home_search = set()
     for alias in home_aliases:
-        home_aliases_normalized.add(alias.lower())
-        home_aliases_normalized.add(normalize_name(alias))
-    
-    away_aliases_normalized = set()
+        for n in generate_search_names(alias.lower()):
+            home_search.add(n)
+        home_search.add(normalize_name(alias))
+    home_search.discard("")
+
+    away_search = set()
     for alias in away_aliases:
-        away_aliases_normalized.add(alias.lower())
-        away_aliases_normalized.add(normalize_name(alias))
-    
-    # Rimuovi stringhe vuote
-    home_aliases_normalized.discard("")
-    away_aliases_normalized.discard("")
-    
+        for n in generate_search_names(alias.lower()):
+            away_search.add(n)
+        away_search.add(normalize_name(alias))
+    away_search.discard("")
+
     for row_text in rows_text:
-        # Normalizza il testo della riga per il confronto
-        row_normalized = normalize_name(row_text)
-        row_lower = row_text.lower()
-        
-        # Controlla se entrambe le squadre sono presenti
-        home_found = any(re.search(r'\b' + re.escape(alias) + r'\b', row_normalized) or re.search(r'\b' + re.escape(alias) + r'\b', row_lower) for alias in home_aliases_normalized)
-        away_found = any(re.search(r'\b' + re.escape(alias) + r'\b', row_normalized) or re.search(r'\b' + re.escape(alias) + r'\b', row_lower) for alias in away_aliases_normalized)
+        row_clean = clean_nowgoal_text(row_text.lower())
+
+        home_found = any(re.search(r'\b' + re.escape(n) + r'\b', row_clean) for n in home_search)
+        away_found = any(re.search(r'\b' + re.escape(n) + r'\b', row_clean) for n in away_search)
 
         if home_found and away_found:
-            # Partita trovata! Ora verifica se ha quote
             odds = extract_odds_from_row(row_text)
             
             if odds:
@@ -380,14 +404,22 @@ def analyze_missing_match(
     home_found_in = []
     away_found_in = []
     
+    home_search_diag = set()
+    for a in home_aliases:
+        for n in generate_search_names(a.lower()): home_search_diag.add(n)
+    home_search_diag.discard("")
+    away_search_diag = set()
+    for a in away_aliases:
+        for n in generate_search_names(a.lower()): away_search_diag.add(n)
+    away_search_diag.discard("")
+
     for idx, row in enumerate(all_rows):
-        row_norm = normalize_name(row)
-        row_lower = row.lower()
-        
-        if any(re.search(r'\b' + re.escape(alias) + r'\b', row_norm) or re.search(r'\b' + re.escape(alias) + r'\b', row_lower) for alias in home_aliases):
+        row_clean = clean_nowgoal_text(row.lower())
+
+        if any(re.search(r'\b' + re.escape(n) + r'\b', row_clean) for n in home_search_diag):
             home_found_in.append(idx)
 
-        if any(re.search(r'\b' + re.escape(alias) + r'\b', row_norm) or re.search(r'\b' + re.escape(alias) + r'\b', row_lower) for alias in away_aliases):
+        if any(re.search(r'\b' + re.escape(n) + r'\b', row_clean) for n in away_search_diag):
             away_found_in.append(idx)
     
     # Analizza i risultati

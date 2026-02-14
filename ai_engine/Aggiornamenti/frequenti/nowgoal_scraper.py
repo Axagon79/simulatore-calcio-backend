@@ -34,43 +34,74 @@ except ImportError:
 
 LEAGUES_CONFIG = [
     # ITALIA
-    {"name": "Serie A", "url": "https://football.nowgoal26.com/subleague/34"},
-    {"name": "Serie B", "url": "https://football.nowgoal26.com/subleague/40"},
-    {"name": "Serie C - Girone A", "url": "https://football.nowgoal26.com/subleague/142"},
-    {"name": "Serie C - Girone B", "url": "https://football.nowgoal26.com/subleague/2025-2026/142/1526"},
-    {"name": "Serie C - Girone C", "url": "https://football.nowgoal26.com/subleague/2025-2026/142/1527"},
+    # {"name": "Serie A", "url": "https://football.nowgoal26.com/subleague/34"},
+    # {"name": "Serie B", "url": "https://football.nowgoal26.com/subleague/40"},
+    # {"name": "Serie C - Girone A", "url": "https://football.nowgoal26.com/subleague/142"},
+    # {"name": "Serie C - Girone B", "url": "https://football.nowgoal26.com/subleague/2025-2026/142/1526"},
+    # {"name": "Serie C - Girone C", "url": "https://football.nowgoal26.com/subleague/2025-2026/142/1527"},
     
-    # EUROPA TOP
-    {"name": "Premier League", "url": "https://football.nowgoal26.com/league/36"},
+    # # EUROPA TOP
+    # {"name": "Premier League", "url": "https://football.nowgoal26.com/league/36"},
     {"name": "La Liga", "url": "https://football.nowgoal26.com/league/31"},
-    {"name": "Bundesliga", "url": "https://football.nowgoal26.com/league/8"},
-    {"name": "Ligue 1", "url": "https://football.nowgoal26.com/league/11"},
-    {"name": "Eredivisie", "url": "https://football.nowgoal26.com/league/16"},
-    {"name": "Liga Portugal", "url": "https://football.nowgoal26.com/league/23"},
+    # {"name": "Bundesliga", "url": "https://football.nowgoal26.com/league/8"},
+    # {"name": "Ligue 1", "url": "https://football.nowgoal26.com/league/11"},
+    # {"name": "Eredivisie", "url": "https://football.nowgoal26.com/league/16"},
+    # {"name": "Liga Portugal", "url": "https://football.nowgoal26.com/league/23"},
     
-    # 🆕 EUROPA SERIE B
-    {"name": "Championship", "url": "https://football.nowgoal26.com/league/37"},
-    {"name": "LaLiga 2", "url": "https://football.nowgoal26.com/subleague/33"},
-    {"name": "2. Bundesliga", "url": "https://football.nowgoal26.com/league/9"},
-    {"name": "Ligue 2", "url": "https://football.nowgoal26.com/league/12"},
+    # # 🆕 EUROPA SERIE B
+    # {"name": "Championship", "url": "https://football.nowgoal26.com/league/37"},
+    # {"name": "LaLiga 2", "url": "https://football.nowgoal26.com/subleague/33"},
+    # {"name": "2. Bundesliga", "url": "https://football.nowgoal26.com/league/9"},
+    # {"name": "Ligue 2", "url": "https://football.nowgoal26.com/league/12"},
     
-    # 🆕 EUROPA NORDICI + EXTRA
-    {"name": "Scottish Premiership", "url": "https://football.nowgoal26.com/subleague/29"},
-    {"name": "Allsvenskan", "url": "https://football.nowgoal26.com/subleague/26"},
-    {"name": "Eliteserien", "url": "https://football.nowgoal26.com/subleague/22"},
-    {"name": "Superligaen", "url": "https://football.nowgoal26.com/subleague/7"},
-    {"name": "Jupiler Pro League", "url": "https://football.nowgoal26.com/subleague/5"},
-    {"name": "Süper Lig", "url": "https://football.nowgoal26.com/subleague/30"},
-    {"name": "League of Ireland Premier Division", "url": "https://football.nowgoal26.com/subleague/1"},
+    # # 🆕 EUROPA NORDICI + EXTRA
+    # {"name": "Scottish Premiership", "url": "https://football.nowgoal26.com/subleague/29"},
+    # {"name": "Allsvenskan", "url": "https://football.nowgoal26.com/subleague/26"},
+    # {"name": "Eliteserien", "url": "https://football.nowgoal26.com/subleague/22"},
+    # {"name": "Superligaen", "url": "https://football.nowgoal26.com/subleague/7"},
+    # {"name": "Jupiler Pro League", "url": "https://football.nowgoal26.com/subleague/5"},
+    # {"name": "Süper Lig", "url": "https://football.nowgoal26.com/subleague/30"},
+    # {"name": "League of Ireland Premier Division", "url": "https://football.nowgoal26.com/subleague/1"},
     
-    # 🆕 AMERICHE
-    {"name": "Brasileirão Serie A", "url": "https://football.nowgoal26.com/league/4"},
-    {"name": "Primera División", "url": "https://football.nowgoal26.com/subleague/2"},
-    {"name": "Major League Soccer", "url": "https://football.nowgoal26.com/subleague/21"},
+    # # 🆕 AMERICHE
+    # {"name": "Brasileirão Serie A", "url": "https://football.nowgoal26.com/league/4"},
+    # {"name": "Primera División", "url": "https://football.nowgoal26.com/subleague/2"},
+    # {"name": "Major League Soccer", "url": "https://football.nowgoal26.com/subleague/21"},
     
-    # 🆕 ASIA
-    {"name": "J1 League", "url": "https://football.nowgoal26.com/subleague/25"},
+    # # 🆕 ASIA
+    # {"name": "J1 League", "url": "https://football.nowgoal26.com/subleague/25"},
 ]
+
+def strip_accents(text):
+    """Rimuove accenti per matching flessibile"""
+    for k, v in {'á':'a','à':'a','ã':'a','â':'a','é':'e','è':'e','ê':'e',
+                  'í':'i','ì':'i','ó':'o','ò':'o','ô':'o','õ':'o',
+                  'ú':'u','ù':'u','ü':'u','ñ':'n','ç':'c','ø':'o','å':'a','ä':'a'}.items():
+        text = text.replace(k, v)
+    return text
+
+def clean_nowgoal_text(text):
+    """Pulisce testo riga NowGoal: rimuove [N], separa numeri incollati a lettere"""
+    text = re.sub(r'\[\d+\]', '', text)             # [20], [3] etc.
+    text = re.sub(r'(\d)([a-z])', r'\1 \2', text)   # 3real → 3 real
+    text = re.sub(r'([a-z])(\d)', r'\1 \2', text)   # madrid2 → madrid 2
+    return strip_accents(text)
+
+def generate_search_names(name):
+    """Da un alias genera varianti senza prefissi/suffissi comuni (input già lowercase)"""
+    name = strip_accents(name)
+    names = [name]
+    for p in ['fc ', 'cf ', 'ca ', 'rcd ', 'cd ', 'ud ', 'rc ', 'sd ']:
+        if name.startswith(p):
+            short = name[len(p):].strip()
+            if len(short) >= 3: names.append(short)
+    for s in [' fc', ' cf']:
+        if name.endswith(s):
+            short = name[:-len(s)].strip()
+            if len(short) >= 3: names.append(short)
+    if ' de ' in name:
+        names.append(name.replace(' de ', ' '))
+    return list(set(names))
 
 def normalize_name(name):
     if not name: return ""
@@ -240,37 +271,42 @@ def run_scraper():
                 matches = round_doc['matches']
                 mod = False
                 match_count = 0
-                
+
                 for m in matches:
                     # 1. Carichiamo la squadra dal DB per leggere i suoi alias
                     team_h_doc = db.teams.find_one({"name": m['home']})
                     team_a_doc = db.teams.find_one({"name": m['away']})
 
-                    # 2. Creiamo la lista di TUTTI i nomi possibili (Nome vero + Alias)
-                    # Per la casa
+                    # 2. Creiamo la lista di TUTTI i nomi possibili + varianti senza prefissi/suffissi
                     possible_names_h = [m['home'].lower().strip()]
                     if team_h_doc and 'aliases' in team_h_doc:
                         possible_names_h.extend([x.lower().strip() for x in team_h_doc['aliases'] if x])
-                    
-                    # Per la trasferta
+                    search_h = []
+                    for alias in possible_names_h:
+                        search_h.extend(generate_search_names(alias))
+                    search_h = list(set(search_h))
+
                     possible_names_a = [m['away'].lower().strip()]
                     if team_a_doc and 'aliases' in team_a_doc:
                         possible_names_a.extend([x.lower().strip() for x in team_a_doc['aliases'] if x])
+                    search_a = []
+                    for alias in possible_names_a:
+                        search_a.extend(generate_search_names(alias))
+                    search_a = list(set(search_a))
 
                     found_item = None
 
-                    # 3. CONTROLLO POTENZIATO (word boundary per evitare "real" in "villarreal")
+                    # 3. Word boundary su testo pulito (no [N], no numeri incollati, no accenti)
                     for item in scraped_data:
-                        row_txt = item['text'] # È già minuscolo
+                        row_txt = clean_nowgoal_text(item['text'])
 
-                        h_match = any(re.search(r'\b' + re.escape(alias) + r'\b', row_txt) for alias in possible_names_h)
-                        a_match = any(re.search(r'\b' + re.escape(alias) + r'\b', row_txt) for alias in possible_names_a)
+                        h_match = any(re.search(r'\b' + re.escape(n) + r'\b', row_txt) for n in search_h)
+                        a_match = any(re.search(r'\b' + re.escape(n) + r'\b', row_txt) for n in search_a)
 
                         if h_match and a_match:
                             found_item = item
                             break
-                    
-                    # Se non trovo la quota nel sito, passo alla prossima (Pace)
+
                     if not found_item:
                         continue
 
