@@ -154,6 +154,8 @@ def process_league(driver, league_config):
                     if db_m.get('real_score') != be_match["score"] or db_m.get('status') != "Finished":
                         db_m['real_score'] = be_match["score"]
                         db_m['status'] = "Finished"
+                        db_m['live_status'] = "Finished"
+                        db_m['live_minute'] = None
                         modified = True
                         totale_aggiornati += 1
                     break
