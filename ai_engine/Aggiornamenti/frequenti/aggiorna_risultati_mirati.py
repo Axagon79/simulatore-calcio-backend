@@ -217,9 +217,9 @@ def run_director_loop():
     while True:
         ora_attuale = datetime.now()
 
-        # Gestione Pausa Notturna
-        if 2 <= ora_attuale.hour < 8:
-            sys.stdout.write(f"\r 💤 [PAUSA] Il Direttore riposa. Sveglia alle 08:00...          ")
+        # Gestione Pausa Notturna + Pipeline (03:30-09:00 per evitare conflitti Chrome)
+        if 2 <= ora_attuale.hour < 9:
+            sys.stdout.write(f"\r 💤 [PAUSA] Il Direttore riposa. Sveglia alle 09:00...          ")
             sys.stdout.flush()
             time.sleep(1800)
             continue

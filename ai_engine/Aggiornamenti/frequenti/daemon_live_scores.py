@@ -73,6 +73,17 @@ _cycle_count = 0          # Contatore cicli per restart periodico
 HOUR_START = 10            # Inizio finestra operativa
 HOUR_END = 1               # Fine (giorno dopo, 01:00)
 
+# --- PAUSA PIPELINE NOTTURNA ---
+PIPELINE_PAUSE_START_H = 3   # Ora inizio pausa
+PIPELINE_PAUSE_START_M = 30  # Minuto inizio pausa
+PIPELINE_PAUSE_END_H = 9     # Ora fine pausa
+
+def is_pipeline_window():
+    """Pausa durante la pipeline notturna (03:30-09:00) per evitare conflitti Chrome/chromedriver."""
+    now = datetime.now()
+    return (now.hour == PIPELINE_PAUSE_START_H and now.minute >= PIPELINE_PAUSE_START_M) or \
+           (PIPELINE_PAUSE_START_H < now.hour < PIPELINE_PAUSE_END_H)
+
 # --- FUNZIONI MATCHING (copiate da debug_nowgoal_scraper.py) ---
 
 def normalize_name(name: str) -> str:
@@ -463,6 +474,23 @@ def main():
         print("Chrome driver avviato.\n")
 
         while True:
+            # --- PAUSA PIPELINE NOTTURNA (03:30-09:00) ---
+            if is_pipeline_window():
+                if driver is not None:
+                    try: driver.quit()
+                    except: pass
+                    driver = None
+                    _cycle_count = 0
+                    print(f"\n   💤 [PAUSA PIPELINE] Chrome chiuso alle {datetime.now().strftime('%H:%M')}. Ripresa alle 09:00...")
+                time.sleep(60)
+                continue
+
+            # Riavvia driver se era stato chiuso dalla pausa pipeline
+            if driver is None:
+                print(f"\n   🔄 Ripresa dopo pausa pipeline — riavvio Chrome...")
+                driver = create_driver(service, chrome_options)
+                _cycle_count = 0
+
             if is_in_operating_window():
                 # Restart preventivo ogni N cicli per evitare memory leak
                 _cycle_count += 1
