@@ -625,4 +625,4 @@ router.get('/track-record', async (req, res) => {
   }
 });
 
-module.exports = router;
+module.exports = { router, parseScore, checkPronostico, getQuotaForPronostico, getFinishedResults };

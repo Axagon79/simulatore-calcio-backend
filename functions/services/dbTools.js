@@ -4,6 +4,7 @@
  */
 
 const { buildMatchContext, searchMatch } = require('./contextBuilder');
+const { parseScore, checkPronostico, getQuotaForPronostico, getFinishedResults } = require('../routes/predictionsRoutes');
 
 // ── Tool Definitions (formato Mistral function calling) ──
 
@@ -64,6 +65,22 @@ const DB_TOOLS = [
         properties: {
           league: { type: 'string', description: "Nome del campionato (es. 'Serie A', 'Premier League', 'La Liga', 'Bundesliga', 'Ligue 1'). Se non specificato e team e fornito, viene individuato automaticamente." },
           team: { type: 'string', description: "Nome squadra per filtrare/evidenziare (es. 'Juventus', 'Milan'). Se fornito senza league, cerca la lega della squadra." }
+        },
+        required: []
+      }
+    }
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'get_track_record',
+      description: "Ottieni le statistiche del track record dei pronostici: percentuale di successo globale, per mercato (SEGNO, Over/Under, GG/NG), per campionato, per fascia di quota (con ROI), e trend temporale. Usa quando l'utente chiede 'come vanno i pronostici?', 'percentuale di successo', 'track record', 'hit rate', 'quanti ne azzecchiamo?', 'ROI', 'rendimento quote', ecc.",
+      parameters: {
+        type: 'object',
+        properties: {
+          days: { type: 'number', description: "Numero di giorni indietro da analizzare (default 30). Es. 7 = ultima settimana, 30 = ultimo mese." },
+          league: { type: 'string', description: "Filtro opzionale per campionato (es. 'Serie A', 'Premier League')." },
+          market: { type: 'string', description: "Filtro opzionale per mercato: 'SEGNO', 'OVER_UNDER', 'GG_NG'." }
         },
         required: []
       }
@@ -343,6 +360,144 @@ async function executeGetStandings(db, args) {
 }
 
 /**
+ * Track Record — statistiche accuratezza pronostici
+ * Restituisce: globale, per mercato, per campionato (top/bottom), per fascia quota (con ROI), trend
+ */
+async function executeTrackRecord(db, args) {
+  const days = args.days || 30;
+  const leagueFilter = args.league || null;
+  const marketFilter = args.market || null;
+
+  const to = new Date().toISOString().split('T')[0];
+  const fromDate = new Date();
+  fromDate.setDate(fromDate.getDate() - days);
+  const from = fromDate.toISOString().split('T')[0];
+
+  // 1. Query predictions + risultati
+  const query = { date: { $gte: from, $lte: to } };
+  if (leagueFilter) query.league = { $regex: new RegExp(leagueFilter, 'i') };
+
+  const [predictions, resultsMap] = await Promise.all([
+    db.collection('daily_predictions').find(query, { projection: { _id: 0 } }).toArray(),
+    getFinishedResults(db, { from, to })
+  ]);
+
+  // 2. Cross-match e verifica hit/miss
+  const verified = [];
+  for (const pred of predictions) {
+    const realScore = resultsMap[`${pred.home}|||${pred.away}|||${pred.date}`] || null;
+    if (!realScore) continue;
+    const parsed = parseScore(realScore);
+    if (!parsed || !pred.pronostici || pred.pronostici.length === 0) continue;
+
+    for (const p of pred.pronostici) {
+      const hit = checkPronostico(p.pronostico, p.tipo, parsed);
+      if (hit === null) continue;
+
+      let tipoEffettivo = p.tipo;
+      if (p.tipo === 'GOL') {
+        const pLower = (p.pronostico || '').toLowerCase();
+        if (pLower.startsWith('over') || pLower.startsWith('under')) tipoEffettivo = 'OVER_UNDER';
+        else if (pLower === 'goal' || pLower === 'nogoal') tipoEffettivo = 'GG_NG';
+      }
+      if (marketFilter && tipoEffettivo.toUpperCase() !== marketFilter.toUpperCase()) continue;
+
+      let quota = p.quota != null ? parseFloat(p.quota) : null;
+      if (quota === null || isNaN(quota)) quota = getQuotaForPronostico(p.pronostico, p.tipo, pred.odds);
+
+      verified.push({ date: pred.date, league: pred.league || 'N/A', tipo: tipoEffettivo, quota, hit });
+    }
+  }
+
+  // 3. Aggregazioni
+  const hitRate = (items) => {
+    const total = items.length;
+    const hits = items.filter(i => i.hit).length;
+    return { total, hits, misses: total - hits, hit_rate: total > 0 ? Math.round((hits / total) * 1000) / 10 : null };
+  };
+
+  // Globale
+  const globale = hitRate(verified);
+
+  // Per mercato
+  const byMarket = {};
+  for (const v of verified) { if (!byMarket[v.tipo]) byMarket[v.tipo] = []; byMarket[v.tipo].push(v); }
+  const breakdown_mercato = {};
+  for (const [tipo, items] of Object.entries(byMarket)) breakdown_mercato[tipo] = hitRate(items);
+
+  // Per campionato (top 5 + bottom 5 per hit rate, min 3 pronostici)
+  const byLeague = {};
+  for (const v of verified) { if (!byLeague[v.league]) byLeague[v.league] = []; byLeague[v.league].push(v); }
+  const leagueStats = Object.entries(byLeague)
+    .map(([lg, items]) => ({ league: lg, ...hitRate(items) }))
+    .filter(l => l.total >= 3)
+    .sort((a, b) => (b.hit_rate || 0) - (a.hit_rate || 0));
+  const top_campionati = leagueStats.slice(0, 5);
+  const bottom_campionati = leagueStats.slice(-5).reverse();
+
+  // Per fascia quota (con ROI)
+  const getQuotaBand = (q) => {
+    if (q === null || q === undefined) return 'N/D';
+    if (q <= 1.20) return '1.01-1.20'; if (q <= 1.40) return '1.21-1.40';
+    if (q <= 1.60) return '1.41-1.60'; if (q <= 1.80) return '1.61-1.80';
+    if (q <= 2.00) return '1.81-2.00'; if (q <= 2.50) return '2.01-2.50';
+    if (q <= 3.00) return '2.51-3.00'; if (q <= 4.00) return '3.01-4.00';
+    return '4.00+';
+  };
+  const quotaBands = {};
+  for (const v of verified) {
+    const band = getQuotaBand(v.quota);
+    if (!quotaBands[band]) quotaBands[band] = [];
+    quotaBands[band].push(v);
+  }
+  const breakdown_quota = {};
+  for (const [band, items] of Object.entries(quotaBands)) {
+    if (items.length === 0 || band === 'N/D') continue;
+    const base = hitRate(items);
+    let profit = 0;
+    for (const v of items) profit += v.hit && v.quota != null ? (v.quota - 1) : -1;
+    const quotaItems = items.filter(v => v.quota != null);
+    breakdown_quota[band] = {
+      ...base,
+      roi: items.length > 0 ? Math.round((profit / items.length) * 1000) / 10 : null,
+      profit: Math.round(profit * 100) / 100,
+      avg_quota: quotaItems.length > 0 ? Math.round(quotaItems.reduce((s, v) => s + v.quota, 0) / quotaItems.length * 100) / 100 : null
+    };
+  }
+
+  // Quote stats globali
+  const quotaVerified = verified.filter(v => v.quota != null);
+  let roiGlobale = 0;
+  for (const v of quotaVerified) roiGlobale += v.hit ? (v.quota - 1) : -1;
+  const quota_stats = {
+    total_con_quota: quotaVerified.length,
+    avg_quota: quotaVerified.length > 0 ? Math.round(quotaVerified.reduce((s, v) => s + v.quota, 0) / quotaVerified.length * 100) / 100 : null,
+    roi_globale: quotaVerified.length > 0 ? Math.round((roiGlobale / quotaVerified.length) * 1000) / 10 : null,
+    profit_globale: Math.round(roiGlobale * 100) / 100
+  };
+
+  // Trend ultimi 7 giorni
+  const byDate = {};
+  for (const v of verified) { if (!byDate[v.date]) byDate[v.date] = []; byDate[v.date].push(v); }
+  const trend = Object.entries(byDate)
+    .map(([date, items]) => ({ date, ...hitRate(items) }))
+    .sort((a, b) => a.date.localeCompare(b.date))
+    .slice(-7);
+
+  return JSON.stringify({
+    periodo: { from, to, giorni: days },
+    filtri: { league: leagueFilter, market: marketFilter },
+    globale,
+    breakdown_mercato,
+    top_campionati,
+    bottom_campionati,
+    breakdown_quota,
+    quota_stats,
+    trend_ultimi_7_giorni: trend
+  });
+}
+
+/**
  * Esegue un tool DB dato il nome e gli argomenti
  * @returns {string} Risultato serializzato
  */
@@ -356,6 +511,8 @@ async function executeDbTool(db, toolName, args) {
       return executeMatchDetails(db, args);
     case 'get_standings':
       return executeGetStandings(db, args);
+    case 'get_track_record':
+      return executeTrackRecord(db, args);
     default:
       return JSON.stringify({ error: `Tool sconosciuto: ${toolName}` });
   }

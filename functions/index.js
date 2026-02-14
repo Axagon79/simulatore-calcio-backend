@@ -42,7 +42,7 @@ app.use(async (req, res, next) => {
 app.use('/simulation', simulationRoutes);
 
 const predictionsRoutes = require('./routes/predictionsRoutes');
-app.use('/simulation', predictionsRoutes);
+app.use('/simulation', predictionsRoutes.router);
 
 const chatRoutes = require('./routes/chatRoutes');
 app.use('/chat', chatRoutes);

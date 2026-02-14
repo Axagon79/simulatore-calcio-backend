@@ -13,7 +13,7 @@ const { DB_TOOLS } = require('../services/dbTools');
 // Genera analisi iniziale per una partita
 router.get('/context', async (req, res) => {
   try {
-    const { home, away, date } = req.query;
+    const { home, away, date, pageContext, isAdmin } = req.query;
     if (!home || !away) {
       return res.status(400).json({ success: false, error: 'Missing home or away parameter' });
     }
@@ -23,7 +23,8 @@ router.get('/context', async (req, res) => {
       return res.json({ success: false, error: 'Match not found' });
     }
 
-    const analysis = await generateAnalysis(result.context);
+    const userInfo = { pageContext: pageContext || '', isAdmin: isAdmin === 'true' };
+    const analysis = await generateAnalysis(result.context, userInfo);
 
     res.json({
       success: true,
@@ -42,10 +43,12 @@ router.get('/context', async (req, res) => {
 // Funziona anche SENZA home/away — in quel caso risponde come domanda generica
 router.post('/message', async (req, res) => {
   try {
-    const { home, away, date, message, history } = req.body;
+    const { home, away, date, message, history, pageContext, isAdmin } = req.body;
     if (!message) {
       return res.status(400).json({ success: false, error: 'Missing message' });
     }
+
+    const userInfo = { pageContext: pageContext || '', isAdmin: !!isAdmin };
 
     // Se home/away forniti, cerca contesto partita
     let contextText = '';
@@ -58,7 +61,7 @@ router.post('/message', async (req, res) => {
 
     // Chiama LLM con tutti i tool disponibili (web + DB)
     const tools = [WEB_SEARCH_TOOL, ...DB_TOOLS];
-    const reply = await chatWithContext(contextText, message, history || [], tools);
+    const reply = await chatWithContext(contextText, message, history || [], tools, userInfo);
 
     // Se Mistral ha richiesto tool calls, gestisci il ciclo
     let finalReply;
@@ -67,9 +70,10 @@ router.post('/message', async (req, res) => {
       for (const msg of (history || [])) {
         messages.push({ role: msg.role, content: msg.content });
       }
+      const pageLine = userInfo.pageContext ? `\n[Pagina: ${userInfo.pageContext} | ${userInfo.isAdmin ? 'Admin' : 'Utente'}]` : '';
       const userContent = contextText
-        ? `Contesto partita:\n${contextText}\n\nDomanda utente: ${message}`
-        : `Domanda utente: ${message}`;
+        ? `Contesto partita:\n${contextText}${pageLine}\n\nDomanda utente: ${message}`
+        : `${pageLine}\nDomanda utente: ${message}`;
       messages.push({ role: 'user', content: userContent });
       finalReply = await handleToolCalls(reply, messages, req.db);
     } else {
