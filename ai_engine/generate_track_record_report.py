@@ -307,6 +307,7 @@ print(f"   Pronostici verificati: {len(verified)}")
 # ==============================================================================
 
 print("4. Calcolo statistiche...")
+print(f"   GLOBALE: {len(verified)} pronostici, {sum(1 for v in verified if v['hit'])} azzeccati, HR {hit_rate(len(verified), sum(1 for v in verified if v['hit']))}%")
 
 total = len(verified)
 hits = sum(1 for v in verified if v['hit'])
@@ -345,6 +346,8 @@ for m, data in sorted(markets.items()):
         'misses': data['total'] - data['hits'],
         'hit_rate': hit_rate(data['total'], data['hits']),
     }
+
+print(f"   MERCATO: " + " | ".join(f"{m} {d['hit_rate']}%" for m, d in report['breakdown_mercato'].items()))
 
 # --- Per Campionato ---
 leagues = defaultdict(lambda: {'total': 0, 'hits': 0})

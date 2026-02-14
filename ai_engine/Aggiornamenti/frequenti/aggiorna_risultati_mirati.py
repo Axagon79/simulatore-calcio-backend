@@ -227,10 +227,10 @@ def run_director_loop():
         agenda = set()
 
         # --- DEFINIZIONE FINESTRA TEMPORALE ---
-        # Cerca partite iniziate tra 2h e 5h fa (2h partita + 3h margine per BetExplorer)
-        # Dopo 5h dal fischio d'inizio senza risultato → probabilmente posticipata
+        # Cerca partite iniziate tra 2h e 10h fa (2h partita + margine per pausa notturna 03:30-09:00)
+        # Le partite notturne (es. Argentina 02:15) vengono coperte al risveglio alle 09:00
         soglia_fine = ora_attuale - timedelta(hours=2)   # Iniziata da almeno 2 ore
-        soglia_inizio = ora_attuale - timedelta(hours=5)  # Non più vecchia di 5 ore
+        soglia_inizio = ora_attuale - timedelta(hours=10)  # Non più vecchia di 10 ore
 
         # Check campionati
         query_leagues = {

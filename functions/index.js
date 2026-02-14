@@ -414,7 +414,7 @@ app.get('/live-scores', async (req, res) => {
       { $unwind: '$matches' },
       { $match: {
         'matches.date_obj': { $gte: startOfDay, $lte: endOfDay },
-        'matches.live_status': { $in: ['Live', 'HT'] }
+        'matches.live_status': { $in: ['Live', 'HT', 'Finished'] }
       }},
       { $project: {
         _id: 0,
