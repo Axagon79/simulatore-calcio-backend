@@ -333,7 +333,12 @@ def get_formations(request: https_fn.Request) -> https_fn.Response:
             league_clean = league.replace('_', ' ').title()
             if league_clean == "Serie A":
                 league_clean = "Serie A"
-            
+
+            # Mappatura Serie C: "Serie C A" → "Serie C - Girone A"
+            serie_c_map = {"Serie C A": "Serie C - Girone A", "Serie C B": "Serie C - Girone B", "Serie C C": "Serie C - Girone C"}
+            if league_clean in serie_c_map:
+                league_clean = serie_c_map[league_clean]
+
             # Cerca la partita in tutte le giornate
             all_rounds = db.h2h_by_round.find({"league": league_clean})
             for round_doc in all_rounds:
