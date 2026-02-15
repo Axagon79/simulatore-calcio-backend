@@ -3,6 +3,7 @@ import sys
 import time
 import re
 import ctypes  # // aggiunto per: nascondere la finestra
+ctypes.windll.kernel32.SetConsoleTitleW("Aggiornamento Quote Calcio (debug_nowgoal_scraper.py)")
 import msvcrt  # // aggiunto per: tasto H e battito cardiaco
 import json
 from datetime import datetime, timedelta

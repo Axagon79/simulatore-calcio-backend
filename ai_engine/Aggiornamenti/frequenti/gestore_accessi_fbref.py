@@ -36,8 +36,8 @@ class BrowserIntelligente:
         # --- BLOCCO AVVIO SMART (Auto-Correzione Versione) ---
         try:
             # 1. Prova l'avvio normale
-            self.driver = uc.Chrome(options=options, headless=False)
-        
+            self.driver = uc.Chrome(options=options, headless=False, user_multi_procs=True)
+
         except Exception as e:
             error_msg = str(e).lower()
             
@@ -81,11 +81,11 @@ class BrowserIntelligente:
                     print(f"✅ [Browser] Trovata versione reale: {detected_version}")
                     print(f"🔄 [Browser] Riavvio driver forzando versione {detected_version}...")
                     # Usiamo new_options qui sotto!
-                    self.driver = uc.Chrome(options=new_options, headless=False, version_main=detected_version)
+                    self.driver = uc.Chrome(options=new_options, headless=False, version_main=detected_version, user_multi_procs=True)
                 else:
                     print("⚠️ [Browser] Versione non rilevata. Uso salvagente (144).")
                     # Usiamo new_options qui sotto!
-                    self.driver = uc.Chrome(options=new_options, headless=False, version_main=144)
+                    self.driver = uc.Chrome(options=new_options, headless=False, version_main=144, user_multi_procs=True)
             else:
                 print(f"❌ Errore critico avvio Chrome: {e}")
                 sys.exit(1)

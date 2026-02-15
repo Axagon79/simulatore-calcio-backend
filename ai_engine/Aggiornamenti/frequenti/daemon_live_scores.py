@@ -7,6 +7,8 @@ import os
 import sys
 import time
 import re
+import ctypes
+ctypes.windll.kernel32.SetConsoleTitleW("Daemon Risultati Live (daemon_live_scores.py)")
 from datetime import datetime, timedelta
 
 # --- LOGGING: output su terminale + file log ---

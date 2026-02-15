@@ -7,6 +7,7 @@ import os
 import sys
 import time
 import ctypes
+ctypes.windll.kernel32.SetConsoleTitleW("Aggiornamento Quote SNAI (daemon_snai_odds.py)")
 import msvcrt
 from datetime import datetime, timedelta
 

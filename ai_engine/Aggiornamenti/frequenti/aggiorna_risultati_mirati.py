@@ -3,6 +3,7 @@ import sys
 import time
 
 import ctypes  # // aggiunto per: nascondere la finestra
+ctypes.windll.kernel32.SetConsoleTitleW("Direttore Live Risultati (aggiorna_risultati_mirati.py)")
 import msvcrt  # // aggiunto per: leggere i tasti senza bloccare il ciclo
 import importlib.util
 import re
@@ -278,27 +279,45 @@ def run_director_loop():
             # Leghe: un solo Chrome driver per tutte
             if leghe:
                 driver = None
+                chrome_options = Options()
+                chrome_options.add_argument("--headless")
                 try:
-                    chrome_options = Options()
-                    chrome_options.add_argument("--headless")
                     driver = webdriver.Chrome(options=chrome_options)
+                    driver.set_page_load_timeout(30)
 
                     for target in leghe:
                         cfg = TARGET_CONFIG[target]
-                        aggiornati = process_league(driver, cfg)
-                        if aggiornati == 0:
+                        try:
+                            aggiornati = process_league(driver, cfg)
+                            if aggiornati == 0:
+                                last_empty_check[target] = datetime.now()
+                            else:
+                                last_empty_check.pop(target, None)
+                        except Exception as e:
+                            print(f"\n⚠️ Errore scraping {target}: {e}")
                             last_empty_check[target] = datetime.now()
-                        else:
-                            # Risultati trovati: rimuovi dal cooldown (potrebbe finirne un'altra)
-                            last_empty_check.pop(target, None)
+                            try: driver.quit()
+                            except: pass
+                            try:
+                                driver = webdriver.Chrome(options=chrome_options)
+                                driver.set_page_load_timeout(30)
+                            except Exception as e2:
+                                print(f"❌ Impossibile ricreare Chrome: {e2}")
+                                break
+                except Exception as e:
+                    print(f"\n❌ Errore Chrome driver: {e}")
                 finally:
                     if driver:
-                        driver.quit()
+                        try: driver.quit()
+                        except: pass
 
             # Coppe: driver proprio (scrape_nowgoal_matches lo crea internamente)
             for target in coppe:
                 cfg = TARGET_CONFIG[target]
-                scrape_nowgoal_matches(cfg)
+                try:
+                    scrape_nowgoal_matches(cfg)
+                except Exception as e:
+                    print(f"\n⚠️ Errore coppa {target}: {e}")
 
         elif agenda:
             # Tutte in cooldown
@@ -323,4 +342,10 @@ def run_director_loop():
             time.sleep(10)
 
 if __name__ == "__main__":
-    run_director_loop()
+    while True:
+        try:
+            run_director_loop()
+        except Exception as e:
+            print(f"\n❌ ERRORE FATALE: {e}")
+            print("🔄 Il daemon riparte tra 60s...")
+            time.sleep(60)

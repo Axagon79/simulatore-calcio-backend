@@ -24,7 +24,7 @@ def run_all():
     try:
         # --- FASE 1: ATTACCO E DIFESA ---
         # File: injector_att_def_dna.py
-        print("\n🔹 [1/3] Caricamento 'injector_att_def_dna'...")
+        print("\n🔹 [1/4] Caricamento 'injector_att_def_dna'...")
         try:
             inj_att_def = importlib.import_module("injector_att_def_dna")
             
@@ -43,7 +43,7 @@ def run_all():
 
         # --- FASE 2: TECNICA E FORMAZIONI ---
         # File: injector_dna_tec_e_formazioni.py
-        print("\n🔹 [2/3] Caricamento 'injector_dna_tec_e_formazioni'...")
+        print("\n🔹 [2/4] Caricamento 'injector_dna_tec_e_formazioni'...")
         try:
             # Carichiamo ESATTAMENTE il nome del file che mi hai dato
             inj_tec = importlib.import_module("injector_dna_tec_e_formazioni")
@@ -62,7 +62,7 @@ def run_all():
 
         # --- FASE 3: VALORE ROSA ---
         # File: injector_dna_val.py
-        print("\n🔹 [3/3] Caricamento 'injector_dna_val'...")
+        print("\n🔹 [3/4] Caricamento 'injector_dna_val'...")
         try:
             inj_val = importlib.import_module("injector_dna_val")
             
@@ -77,6 +77,18 @@ def run_all():
             print("⚠️ Modulo 'injector_dna_val' non trovato (saltato).")
         except Exception as e:
             print(f"❌ ERRORE CRITICO FASE 3: {e}")
+
+        # --- FASE 4: FORMAZIONI SERIE C (Sportradar) ---
+        print("\n🔹 [4/4] Formazioni Serie C (Sportradar)...")
+        try:
+            from scrape_sportradar_serie_c import scrape_all_teams, inject_formations
+            scrape_all_teams()
+            inject_formations()
+            print("✅ Fase 4 (Serie C Sportradar) completata.")
+        except ImportError:
+            print("⚠️ Modulo 'scrape_sportradar_serie_c' non trovato (saltato).")
+        except Exception as e:
+            print(f"❌ ERRORE FASE 4: {e}")
 
         # --- RIEPILOGO FINALE ---
         end_time = time.time()

@@ -1,5 +1,6 @@
 import os
 import sys
+import json
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from config import db
 
@@ -45,6 +46,78 @@ gk_uel_col = db["players_stats_fbref_gk_uel"]
 def_uel_col = db["players_stats_fbref_def_uel"]
 mid_uel_col = db["players_stats_fbref_mid_uel"]
 att_uel_col = db["players_stats_fbref_att_uel"]
+
+
+# ==================== CACHE SPORTRADAR SERIE C ====================
+
+_SERIE_C_CACHE = None
+
+def _load_serie_c_cache():
+    """Carica cache rose Sportradar Serie C (lazy, una sola volta)."""
+    global _SERIE_C_CACHE
+    if _SERIE_C_CACHE is not None:
+        return _SERIE_C_CACHE
+    cache_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "cache", "sportradar_serie_c_rosters.json")
+    if os.path.exists(cache_path):
+        with open(cache_path, "r", encoding="utf-8") as f:
+            _SERIE_C_CACHE = json.load(f)
+    else:
+        _SERIE_C_CACHE = {}
+    return _SERIE_C_CACHE
+
+
+def _get_serie_c_formation(team_name, formation_str):
+    """Genera starters/bench da cache Sportradar per una squadra Serie C."""
+    cache = _load_serie_c_cache()
+    roster_data = cache.get(team_name)
+    if not roster_data:
+        # Prova case-insensitive
+        for k, v in cache.items():
+            if k.lower() == team_name.lower():
+                roster_data = v
+                break
+    if not roster_data or not roster_data.get("players"):
+        return [], []
+
+    players = roster_data["players"]
+    formation = parse_formation(formation_str)
+    BASE_RATING = 6.0
+
+    gk_all = sorted([p for p in players if p.get("ruolo") == "GK"], key=lambda x: x.get("minuti", 0), reverse=True)
+    dif_all = sorted([p for p in players if p.get("ruolo") == "DIF"], key=lambda x: x.get("minuti", 0), reverse=True)
+    mid_all = sorted([p for p in players if p.get("ruolo") == "MID"], key=lambda x: x.get("minuti", 0), reverse=True)
+    att_all = sorted([p for p in players if p.get("ruolo") == "ATT"], key=lambda x: x.get("minuti", 0), reverse=True)
+
+    starters = []
+    if gk_all:
+        gk = gk_all[0]
+        starters.append({"role": "GK", "player": gk["nome_completo"], "rating": BASE_RATING, "minutes_90s": round(gk["minuti"] / 90, 1)})
+    for i in range(min(formation["DIF"], len(dif_all))):
+        p = dif_all[i]
+        starters.append({"role": "DIF", "player": p["nome_completo"], "rating": BASE_RATING, "minutes_90s": round(p["minuti"] / 90, 1)})
+    for i in range(min(formation["MID"], len(mid_all))):
+        p = mid_all[i]
+        starters.append({"role": "MID", "player": p["nome_completo"], "rating": BASE_RATING, "minutes_90s": round(p["minuti"] / 90, 1)})
+    for i in range(min(formation["ATT"], len(att_all))):
+        p = att_all[i]
+        starters.append({"role": "ATT", "player": p["nome_completo"], "rating": BASE_RATING, "minutes_90s": round(p["minuti"] / 90, 1)})
+
+    bench = []
+    used = set(s["player"] for s in starters)
+    if len(gk_all) > 1 and gk_all[1]["nome_completo"] not in used:
+        bench.append({"role": "GK", "player": gk_all[1]["nome_completo"], "rating": BASE_RATING, "minutes_90s": round(gk_all[1]["minuti"] / 90, 1), "effective_rating": BASE_RATING * 0.85})
+        used.add(gk_all[1]["nome_completo"])
+    for role_list, role_name, slots in [(dif_all, "DIF", formation["DIF"]), (mid_all, "MID", formation["MID"]), (att_all, "ATT", formation["ATT"])]:
+        cnt = 0
+        for i in range(slots, len(role_list)):
+            if cnt >= 2: break
+            p = role_list[i]
+            if p["nome_completo"] not in used:
+                bench.append({"role": role_name, "player": p["nome_completo"], "rating": BASE_RATING, "minutes_90s": round(p["minuti"] / 90, 1), "effective_rating": BASE_RATING * 0.85})
+                used.add(p["nome_completo"])
+                cnt += 1
+
+    return starters, bench
 
 
 # ==================== FUNZIONI ====================
@@ -299,12 +372,16 @@ def calculate_team_rating(team_name, verbose=True, bulk_cache=None):
         print(f"   🎯 RATING: {rating_0_10:.2f}/10 → {rating_5_25:.2f}/25")
         print(f"{'='*70}\n")
         
+        starters, bench = _get_serie_c_formation(team_name, formation_str)
+
         return {
             "team": team_name,
             "league": league,
-            "formation": "4-3-3",
+            "formation": formation_str,
             "rating_0_10": round(rating_0_10, 2),
-            "rating_5_25": round(rating_5_25, 2)
+            "rating_5_25": round(rating_5_25, 2),
+            "starters": starters,
+            "bench": bench
         }
 
 
