@@ -63,6 +63,10 @@ raw_h2h_collection = db['raw_h2h_data_v2']
 classifiche_collection = db['classifiche']
 predictions_collection = db['daily_predictions']
 bombs_collection = db['daily_bombs']
+ucl_matches_collection = db['matches_champions_league']
+uel_matches_collection = db['matches_europa_league']
+ucl_teams_collection = db['teams_champions_league']
+uel_teams_collection = db['teams_europa_league']
 
 # ==================== COSTANTI ====================
 
@@ -821,6 +825,144 @@ def get_today_matches(target_date=None):
     return matches
 
 
+def get_today_cup_matches(target_date=None):
+    """Recupera partite UCL/UEL del giorno dalle collections coppe."""
+    if target_date:
+        day_str = target_date.strftime('%d-%m-%Y')
+    else:
+        day_str = datetime.now().strftime('%d-%m-%Y')
+
+    cup_matches = []
+    for collection, league_name, teams_coll in [
+        (ucl_matches_collection, 'Champions League', ucl_teams_collection),
+        (uel_matches_collection, 'Europa League', uel_teams_collection),
+    ]:
+        docs = list(collection.find({
+            'match_date': {'$regex': f'^{day_str}'},
+            'status': {'$in': ['scheduled', 'Scheduled', 'not_started']}
+        }))
+
+        for doc in docs:
+            # Parse match_date "DD-MM-YYYY HH:MM"
+            match_date_str = doc.get('match_date', '')
+            match_time = ''
+            if ' ' in match_date_str:
+                match_time = match_date_str.split(' ')[1]
+
+            # Mapping odds: home/draw/away → 1/X/2
+            raw_odds = doc.get('odds', {})
+            mapped_odds = {}
+            if raw_odds:
+                mapped_odds['1'] = raw_odds.get('home') or raw_odds.get('1')
+                mapped_odds['X'] = raw_odds.get('draw') or raw_odds.get('X')
+                mapped_odds['2'] = raw_odds.get('away') or raw_odds.get('2')
+                # Copia anche O/U e GG se presenti
+                for k in ['over_25', 'under_25', 'gg', 'ng', 'over_15', 'under_15', 'over_35', 'under_35']:
+                    if k in raw_odds:
+                        mapped_odds[k] = raw_odds[k]
+
+            home_name = doc.get('home_team', '')
+            away_name = doc.get('away_team', '')
+
+            # Recupera dati team (ELO + valore rosa) per h2h_data
+            home_cup_team = teams_coll.find_one({
+                '$or': [{'name': home_name}, {'aliases': home_name}]
+            })
+            away_cup_team = teams_coll.find_one({
+                '$or': [{'name': away_name}, {'aliases': away_name}]
+            })
+
+            # Mongo IDs per stemmi
+            home_mongo_id = str(home_cup_team['_id']) if home_cup_team else ''
+            away_mongo_id = str(away_cup_team['_id']) if away_cup_team else ''
+
+            # Costruisci h2h_data sintetico da ELO + valore rosa
+            h2h_data = build_cup_h2h_data(home_cup_team, away_cup_team)
+
+            cup_match = {
+                'home': home_name,
+                'away': away_name,
+                'match_time': match_time,
+                'odds': mapped_odds,
+                'h2h_data': h2h_data,
+                'home_mongo_id': home_mongo_id,
+                'away_mongo_id': away_mongo_id,
+                '_league': league_name,
+                '_source': 'cup',
+                '_round_id': None,
+            }
+            cup_matches.append(cup_match)
+
+    if cup_matches:
+        print(f"🏆 Trovate {len(cup_matches)} partite coppe europee")
+    return cup_matches
+
+
+def build_cup_h2h_data(home_team_data, away_team_data):
+    """Costruisce h2h_data sintetico per partite coppa da ELO + valore rosa."""
+    home_elo = (home_team_data or {}).get('elo_rating', 1500)
+    away_elo = (away_team_data or {}).get('elo_rating', 1500)
+    home_value = (home_team_data or {}).get('valore_rosa_transfermarkt', 200_000_000)
+    away_value = (away_team_data or {}).get('valore_rosa_transfermarkt', 200_000_000)
+
+    elo_diff = home_elo - away_elo  # positivo = casa più forte
+
+    # --- BVS da ELO ---
+    # |diff| > 150 = PURO, 50-150 = SEMI, < 50 = NON_BVS
+    abs_diff = abs(elo_diff)
+    if abs_diff > 150:
+        classification = 'PURO'
+    elif abs_diff > 50:
+        classification = 'SEMI'
+    else:
+        classification = 'NON_BVS'
+
+    # bvs_match_index: scala -6/+7, mappo elo_diff (-300,+300) → (-6,+7)
+    bvs_index = max(-6, min(7, elo_diff / 300 * 7))
+
+    # --- Affidabilità da valore rosa ---
+    def value_to_trust(value):
+        if value >= 600_000_000: return 'A', 8.5
+        elif value >= 400_000_000: return 'B', 7.0
+        elif value >= 200_000_000: return 'C', 5.0
+        else: return 'D', 3.0
+
+    trust_home, aff_home = value_to_trust(home_value)
+    trust_away, aff_away = value_to_trust(away_value)
+
+    return {
+        # BVS (da ELO)
+        'classification': classification,
+        'bvs_match_index': round(bvs_index, 2),
+        'is_linear': abs_diff > 100,
+        # Affidabilità (da valore rosa)
+        'trust_home_letter': trust_home,
+        'trust_away_letter': trust_away,
+        'affidabilità_casa': aff_home,
+        'affidabilità_trasferta': aff_away,
+        'affidabilità': {
+            'affidabilità_casa': aff_home,
+            'affidabilità_trasferta': aff_away,
+        },
+        # Defaults per segnali non disponibili
+        'lucifero_home': 12.5,
+        'lucifero_away': 12.5,
+        'lucifero_trend_home': 0,
+        'lucifero_trend_away': 0,
+        'home_dna': {'att': 50, 'def': 50, 'tec': 50, 'val': 50},
+        'away_dna': {'att': 50, 'def': 50, 'tec': 50, 'val': 50},
+        'h2h_dna': {
+            'home_dna': {'att': 50, 'def': 50, 'tec': 50, 'val': 50},
+            'away_dna': {'att': 50, 'def': 50, 'tec': 50, 'val': 50},
+        },
+        'fattore_campo': {'field_home': 45, 'field_away': 40},
+        'home_score': 5.0,
+        'away_score': 5.0,
+        'total_matches': 0,
+        'avg_total_goals': 2.7,  # media europea
+    }
+
+
 def get_team_data(team_name):
     """Recupera tutti i dati di una squadra dalla collection teams."""
     team = teams_collection.find_one({
@@ -1456,8 +1598,8 @@ def score_att_vs_def(home_team_doc, away_team_doc):
     Attacco forte vs difesa debole = Over/Goal.
     """
     if not home_team_doc or not away_team_doc:
-        return 50, 'neutro'
-    
+        return 50, 'neutro', False
+
     h_scores = home_team_doc.get('scores', {})
     a_scores = away_team_doc.get('scores', {})
     
@@ -1886,17 +2028,22 @@ def analyze_gol(match_data, home_team_doc, away_team_doc, league_name):
 
 # ==================== FASE 4: DECISIONE FINALE ====================
 
-def make_decision(segno_result, gol_result):
+def make_decision(segno_result, gol_result, is_cup=False):
     """
     Decide: SEGNO, GOL, SEGNO+GOL, o SCARTA.
     Include doppia chance (1X, X2, 12).
-    Sotto 60 su entrambi = SCARTA.
+    Sotto soglia su entrambi = SCARTA.
+    Coppe: soglia SEGNO abbassata a 55 (meno segnali disponibili).
     """
     s_score = segno_result['score']
     g_score = gol_result['score']
-    
-    # Sotto 60 su entrambi = SCARTA
-    if s_score < THRESHOLD_INCLUDE and g_score < THRESHOLD_INCLUDE:
+
+    # Soglia SEGNO ridotta per coppe (6 segnali su 9 a default neutro)
+    CUP_THRESHOLD_SEGNO = 55
+    threshold_segno = CUP_THRESHOLD_SEGNO if is_cup else THRESHOLD_INCLUDE
+
+    # Sotto soglia su entrambi = SCARTA
+    if s_score < threshold_segno and g_score < THRESHOLD_INCLUDE:
         return {
             'decision': 'SCARTA',
             'pronostici': [],
@@ -1909,7 +2056,7 @@ def make_decision(segno_result, gol_result):
     pronostici = []
     
     # Segno (bloccato se quota < 1.35, ma analisi resta visibile)
-    if s_score >= THRESHOLD_INCLUDE and not segno_result.get('segno_blocked'):
+    if s_score >= threshold_segno and not segno_result.get('segno_blocked'):
         pronostici.append({
             'tipo': 'SEGNO',
             'pronostico': segno_result['segno'],
@@ -2298,11 +2445,15 @@ def run_daily_predictions(target_date=None):
     
     # 1. Recupera partite del giorno
     matches = get_today_matches(target_date)
-    
+
+    # 1a. Recupera partite coppe europee (UCL/UEL)
+    cup_matches = get_today_cup_matches(target_date)
+    matches = matches + cup_matches
+
     if not matches:
         print("⚠️  Nessuna partita oggi.")
         return
-    
+
     # 1b. Costruisci cache strisce per tutte le leghe delle partite di oggi
     leagues_today = set(m.get('_league', '') for m in matches if m.get('_league'))
     for league in leagues_today:
@@ -2322,10 +2473,14 @@ def run_daily_predictions(target_date=None):
         print(f"\n{'─' * 50}")
         print(f"⚽ {home} vs {away} ({league})")
         
-        # Recupera dati squadre
-        home_team_doc = get_team_data(home)
-        away_team_doc = get_team_data(away)
-        
+        # Recupera dati squadre (coppe: solo dati cup, MAI team_doc campionati)
+        if match.get('_source') == 'cup':
+            home_team_doc = None
+            away_team_doc = None
+        else:
+            home_team_doc = get_team_data(home)
+            away_team_doc = get_team_data(away)
+
         # FASE 2: Analisi Segno
         segno_result = analyze_segno(match, home_team_doc, away_team_doc)
         
@@ -2333,7 +2488,8 @@ def run_daily_predictions(target_date=None):
         gol_result = analyze_gol(match, home_team_doc, away_team_doc, league)
         
         # FASE 4: Decisione
-        decision = make_decision(segno_result, gol_result)
+        is_cup = match.get('_source') == 'cup'
+        decision = make_decision(segno_result, gol_result, is_cup=is_cup)
         match['_home_team_doc'] = home_team_doc
         match['_away_team_doc'] = away_team_doc
         # Salva risultati interni per X Factor (accessibili nel loop successivo)
@@ -2376,6 +2532,20 @@ def run_daily_predictions(target_date=None):
             print(f"      → {p['pronostico']} ({p['confidence']:.0f}/100, {p['stars']:.1f}⭐)")
         print(f"      💬 {comment}")
         
+        # Cap confidence per coppe (meno dati = meno sicurezza)
+        if is_cup:
+            CUP_CONF_CAP = 70
+            for p in decision['pronostici']:
+                if p['confidence'] > CUP_CONF_CAP:
+                    p['confidence'] = CUP_CONF_CAP
+                    p['stars'] = calculate_stars(CUP_CONF_CAP)
+            if decision['confidence_segno'] > CUP_CONF_CAP:
+                decision['confidence_segno'] = CUP_CONF_CAP
+                decision['stars_segno'] = calculate_stars(CUP_CONF_CAP)
+            if decision['confidence_gol'] > CUP_CONF_CAP:
+                decision['confidence_gol'] = CUP_CONF_CAP
+                decision['stars_gol'] = calculate_stars(CUP_CONF_CAP)
+
         # Prepara documento per DB
         prediction_doc = {
             'date': target_str,
@@ -2385,6 +2555,7 @@ def run_daily_predictions(target_date=None):
             'match_time': match.get('match_time', ''),
             'home_mongo_id': match.get('home_mongo_id', ''),
             'away_mongo_id': match.get('away_mongo_id', ''),
+            'is_cup': is_cup,
             'decision': decision['decision'],
             'pronostici': decision['pronostici'],
             'confidence_segno': decision['confidence_segno'],

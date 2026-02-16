@@ -64,6 +64,10 @@ classifiche_collection = db['classifiche']
 # --- SANDBOX: output su collection separate ---
 predictions_collection = db['daily_predictions_sandbox']
 bombs_collection = db['daily_bombs_sandbox']
+ucl_matches_collection = db['matches_champions_league']
+uel_matches_collection = db['matches_europa_league']
+ucl_teams_collection = db['teams_champions_league']
+uel_teams_collection = db['teams_europa_league']
 
 # ==================== COSTANTI (DEFAULT — sovrascritte da MongoDB se disponibili) ====================
 
@@ -864,6 +868,131 @@ def get_today_matches(target_date=None):
     return matches
 
 
+def get_today_cup_matches(target_date=None):
+    """Recupera partite UCL/UEL del giorno dalle collections coppe."""
+    if target_date:
+        day_str = target_date.strftime('%d-%m-%Y')
+    else:
+        day_str = datetime.now().strftime('%d-%m-%Y')
+
+    cup_matches = []
+    for collection, league_name, teams_coll in [
+        (ucl_matches_collection, 'Champions League', ucl_teams_collection),
+        (uel_matches_collection, 'Europa League', uel_teams_collection),
+    ]:
+        docs = list(collection.find({
+            'match_date': {'$regex': f'^{day_str}'},
+            'status': {'$in': ['scheduled', 'Scheduled', 'not_started']}
+        }))
+
+        for doc in docs:
+            match_date_str = doc.get('match_date', '')
+            match_time = ''
+            if ' ' in match_date_str:
+                match_time = match_date_str.split(' ')[1]
+
+            raw_odds = doc.get('odds', {})
+            mapped_odds = {}
+            if raw_odds:
+                mapped_odds['1'] = raw_odds.get('home') or raw_odds.get('1')
+                mapped_odds['X'] = raw_odds.get('draw') or raw_odds.get('X')
+                mapped_odds['2'] = raw_odds.get('away') or raw_odds.get('2')
+                for k in ['over_25', 'under_25', 'gg', 'ng', 'over_15', 'under_15', 'over_35', 'under_35']:
+                    if k in raw_odds:
+                        mapped_odds[k] = raw_odds[k]
+
+            home_name = doc.get('home_team', '')
+            away_name = doc.get('away_team', '')
+
+            home_cup_team = teams_coll.find_one({
+                '$or': [{'name': home_name}, {'aliases': home_name}]
+            })
+            away_cup_team = teams_coll.find_one({
+                '$or': [{'name': away_name}, {'aliases': away_name}]
+            })
+
+            home_mongo_id = str(home_cup_team['_id']) if home_cup_team else ''
+            away_mongo_id = str(away_cup_team['_id']) if away_cup_team else ''
+
+            h2h_data = build_cup_h2h_data(home_cup_team, away_cup_team)
+
+            cup_match = {
+                'home': home_name,
+                'away': away_name,
+                'match_time': match_time,
+                'odds': mapped_odds,
+                'h2h_data': h2h_data,
+                'home_mongo_id': home_mongo_id,
+                'away_mongo_id': away_mongo_id,
+                '_league': league_name,
+                '_source': 'cup',
+                '_round_id': None,
+            }
+            cup_matches.append(cup_match)
+
+    if cup_matches:
+        print(f"🏆 Trovate {len(cup_matches)} partite coppe europee")
+    return cup_matches
+
+
+def build_cup_h2h_data(home_team_data, away_team_data):
+    """Costruisce h2h_data sintetico per partite coppa da ELO + valore rosa."""
+    home_elo = (home_team_data or {}).get('elo_rating', 1500)
+    away_elo = (away_team_data or {}).get('elo_rating', 1500)
+    home_value = (home_team_data or {}).get('valore_rosa_transfermarkt', 200_000_000)
+    away_value = (away_team_data or {}).get('valore_rosa_transfermarkt', 200_000_000)
+
+    elo_diff = home_elo - away_elo
+
+    abs_diff = abs(elo_diff)
+    if abs_diff > 150:
+        classification = 'PURO'
+    elif abs_diff > 50:
+        classification = 'SEMI'
+    else:
+        classification = 'NON_BVS'
+
+    bvs_index = max(-6, min(7, elo_diff / 300 * 7))
+
+    def value_to_trust(value):
+        if value >= 600_000_000: return 'A', 8.5
+        elif value >= 400_000_000: return 'B', 7.0
+        elif value >= 200_000_000: return 'C', 5.0
+        else: return 'D', 3.0
+
+    trust_home, aff_home = value_to_trust(home_value)
+    trust_away, aff_away = value_to_trust(away_value)
+
+    return {
+        'classification': classification,
+        'bvs_match_index': round(bvs_index, 2),
+        'is_linear': abs_diff > 100,
+        'trust_home_letter': trust_home,
+        'trust_away_letter': trust_away,
+        'affidabilità_casa': aff_home,
+        'affidabilità_trasferta': aff_away,
+        'affidabilità': {
+            'affidabilità_casa': aff_home,
+            'affidabilità_trasferta': aff_away,
+        },
+        'lucifero_home': 12.5,
+        'lucifero_away': 12.5,
+        'lucifero_trend_home': 0,
+        'lucifero_trend_away': 0,
+        'home_dna': {'att': 50, 'def': 50, 'tec': 50, 'val': 50},
+        'away_dna': {'att': 50, 'def': 50, 'tec': 50, 'val': 50},
+        'h2h_dna': {
+            'home_dna': {'att': 50, 'def': 50, 'tec': 50, 'val': 50},
+            'away_dna': {'att': 50, 'def': 50, 'tec': 50, 'val': 50},
+        },
+        'fattore_campo': {'field_home': 45, 'field_away': 40},
+        'home_score': 5.0,
+        'away_score': 5.0,
+        'total_matches': 0,
+        'avg_total_goals': 2.7,
+    }
+
+
 def get_team_data(team_name):
     """Recupera tutti i dati di una squadra dalla collection teams."""
     team = teams_collection.find_one({
@@ -1498,7 +1627,7 @@ def score_att_vs_def(home_team_doc, away_team_doc):
     Attacco forte vs difesa debole = Over/Goal.
     """
     if not home_team_doc or not away_team_doc:
-        return 50, 'neutro'
+        return 50, 'neutro', False
 
     h_scores = home_team_doc.get('scores', {})
     a_scores = away_team_doc.get('scores', {})
@@ -1740,45 +1869,35 @@ def analyze_gol(match_data, home_team_doc, away_team_doc, league_name):
     over_count = directions.count('over')
     under_count = directions.count('under')
 
-    # Determina tipo pronostico GOL
+    # Determina tipo pronostico GOL (Over/Under)
     if over_count > under_count:
-        # Over — ma quale? 1.5 o 2.5?
         if expected_total >= 2.8:
             tipo_gol = 'Over 2.5'
         else:
             tipo_gol = 'Over 1.5'
-
-        # Goal/NoGoal
-        btts_confidence = h2h_patterns.get('btts_pct', 50) if isinstance(h2h_patterns, dict) else 50
-        if (both_score or both_att_strong) and btts_confidence >= 55:
-            tipo_gol_extra = 'Goal'
-        elif btts_confidence < 35:
-            tipo_gol_extra = 'NoGoal'
-        else:
-            tipo_gol_extra = None
-
     elif under_count > over_count:
         if expected_total <= 2.0:
             tipo_gol = 'Under 2.5'
         else:
             tipo_gol = 'Under 3.5'
-
-        btts_confidence = h2h_patterns.get('btts_pct', 50) if isinstance(h2h_patterns, dict) else 50
-        if btts_confidence < 40:
-            tipo_gol_extra = 'NoGoal'
-        else:
-            tipo_gol_extra = None
     else:
         tipo_gol = None
-        tipo_gol_extra = None
 
-    # ====== CONFIDENCE SEPARATA per Goal/NoGoal (6 segnali) ======
+    # Goal/NoGoal: decisione INDIPENDENTE da Over/Under
+    # La direzione viene determinata DOPO il calcolo btts_total (vedi sotto)
+    tipo_gol_extra = None  # verrà impostato dopo btts_total
+
+    # ====== CONFIDENCE SEPARATA per Goal/NoGoal (8 segnali) ======
     # Ogni segnale: 0-100 (alto = probabile che entrambe segnino → Goal)
+    # Decisione Goal/NoGoal INDIPENDENTE da Over/Under
 
-    # 1. BTTS% dagli H2H (peso 0.25)
+    odds = match_data.get('odds', {})
+
+    # 1. BTTS% dagli H2H (peso 0.18)
     btts_h2h = h2h_patterns.get('btts_pct', 50) if isinstance(h2h_patterns, dict) else 50
 
-    # 2. Gol attesi squadra più debole (peso 0.20)
+    # 2. Gol attesi + xG combinato — squadra più debole (peso 0.15)
+    #    Fonde i vecchi segnali exp e xG (ridondanti se separati)
     if home_team_doc and away_team_doc:
         h_hs = home_team_doc.get('ranking', {}).get('homeStats', {})
         a_as = away_team_doc.get('ranking', {}).get('awayStats', {})
@@ -1786,13 +1905,15 @@ def analyze_gol(match_data, home_team_doc, away_team_doc, league_name):
         if hp > 0 and ap > 0:
             exp_h = (h_hs.get('goalsFor', 0) / hp + a_as.get('goalsAgainst', 0) / ap) / 2
             exp_a = (a_as.get('goalsFor', 0) / ap + h_hs.get('goalsAgainst', 0) / hp) / 2
-            btts_exp = min(100, (min(exp_h, exp_a) / 1.4) * 100)
+            btts_exp_raw = min(100, (min(exp_h, exp_a) / 1.4) * 100)
         else:
-            btts_exp = 50
+            btts_exp_raw = 50
     else:
-        btts_exp = 50
+        btts_exp_raw = 50
+    btts_xg_raw = min(100, (min(h_xg, a_xg) / 1.4) * 100)
+    btts_exp_xg = (btts_exp_raw + btts_xg_raw) / 2  # media dei due
 
-    # 3. Forza attacco più debole (peso 0.15)
+    # 3. Forza attacco più debole (peso 0.10)
     if home_team_doc and away_team_doc:
         h_sc = home_team_doc.get('scores', {})
         a_sc = away_team_doc.get('scores', {})
@@ -1802,30 +1923,65 @@ def analyze_gol(match_data, home_team_doc, away_team_doc, league_name):
     else:
         btts_att = 50
 
-    # 4. xG squadra più debole (peso 0.20)
-    btts_xg = min(100, (min(h_xg, a_xg) / 1.4) * 100)
-
-    # 5. DNA offensivo più debole (peso 0.10)
+    # 4. DNA offensivo più debole (peso 0.07)
     h2h_d = match_data.get('h2h_data', {})
     dna_h_att = h2h_d.get('home_dna', {}).get('att', 50) if h2h_d.get('home_dna') else 50
     dna_a_att = h2h_d.get('away_dna', {}).get('att', 50) if h2h_d.get('away_dna') else 50
     btts_dna = min(dna_h_att, dna_a_att)
 
-    # 6. Both score likely bonus (peso 0.09)
+    # 5. Both score likely bonus (peso 0.07)
     btts_both = 80 if both_score else 30
 
-    # 7. Strisce GG/NG (peso 0.10)
+    # 6. Strisce GG/NG (peso 0.08)
     btts_strisce = score_strisce(home_name, away_name, 'GGNG')
 
-    # Media pesata → 0-100 (alto = probabile BTTS/Goal) — include strisce come segnale
+    # 7. NUOVO — Conceding rate: % gol subiti per partita (peso 0.15)
+    #    Alto = entrambe subiscono spesso → probabile GG
+    if home_team_doc and away_team_doc:
+        h_hs_c = home_team_doc.get('ranking', {}).get('homeStats', {})
+        a_as_c = away_team_doc.get('ranking', {}).get('awayStats', {})
+        hp_c, ap_c = h_hs_c.get('played', 0), a_as_c.get('played', 0)
+        if hp_c > 0 and ap_c > 0:
+            # Gol subiti per partita: alto = difesa bucata = più probabile GG
+            h_concede = h_hs_c.get('goalsAgainst', 0) / hp_c
+            a_concede = a_as_c.get('goalsAgainst', 0) / ap_c
+            # Media gol subiti: se entrambe subiscono ~1.5/partita → GG probabile
+            avg_concede = (h_concede + a_concede) / 2
+            # Scala 0-100: 0 gol/partita→0, 1.5 gol/partita→75, 2+→100
+            btts_concede = min(100, (avg_concede / 2.0) * 100)
+        else:
+            btts_concede = 50
+    else:
+        btts_concede = 50
+
+    # 8. NUOVO — Quota SNAI GG/NG come segnale (peso 0.20)
+    #    Quota bassa = bookmaker convinto → segnale forte
+    q_gg_raw = odds.get('gg')
+    q_ng_raw = odds.get('ng')
+    if q_gg_raw is not None and q_ng_raw is not None:
+        q_gg_f = float(q_gg_raw)
+        q_ng_f = float(q_ng_raw)
+        # Probabilità implicita: 1/quota (normalizzata per overround)
+        prob_gg = 1.0 / q_gg_f
+        prob_ng = 1.0 / q_ng_f
+        overround = prob_gg + prob_ng
+        if overround > 0:
+            btts_odds = (prob_gg / overround) * 100  # 0-100 (alto = GG probabile)
+        else:
+            btts_odds = 50
+    else:
+        btts_odds = 50  # Nessuna quota → neutro
+
+    # Media pesata → 0-100 (alto = probabile BTTS/Goal)
     btts_total = (
-        btts_h2h * 0.23 +
-        btts_exp * 0.18 +
-        btts_xg * 0.18 +
-        btts_att * 0.13 +
-        btts_dna * 0.09 +
-        btts_both * 0.09 +
-        btts_strisce * 0.10
+        btts_h2h    * 0.18 +
+        btts_exp_xg * 0.15 +
+        btts_att    * 0.10 +
+        btts_dna    * 0.07 +
+        btts_both   * 0.07 +
+        btts_strisce * 0.08 +
+        btts_concede * 0.15 +
+        btts_odds   * 0.20
     )
 
     # --- MOLTIPLICATORE STRISCE GG/NG (±5%, spinta finale) ---
@@ -1835,22 +1991,60 @@ def analyze_gol(match_data, home_team_doc, away_team_doc, league_name):
         a_data = _streak_cache[away_name]
         adj_h_gg = get_streak_adjustment(h_data['total'], h_data['home'], 'GGNG')
         adj_a_gg = get_streak_adjustment(a_data['total'], a_data['away'], 'GGNG')
-        streak_adj_ggng = (adj_h_gg + adj_a_gg) / 2  # media
+        streak_adj_ggng = (adj_h_gg + adj_a_gg) / 2
         if streak_adj_ggng != 0:
             btts_total = btts_total * (1 + streak_adj_ggng)
             btts_total = max(0.0, min(100.0, btts_total))
             print(f"   [STREAK GG/NG] Score: {btts_strisce:.0f}/100 | Molt: {streak_adj_ggng:+.2%}")
 
-    # Confidence per Goal/NoGoal
-    if tipo_gol_extra == 'Goal':
+    # ====== CALCOLO SEPARATO NoGoal (segnali invertiti, pesi dedicati) ======
+    nogoal_h2h     = 100 - btts_h2h        # storico NoGoal
+    nogoal_exp_xg  = 100 - btts_exp_xg     # bassa pericolosità
+    nogoal_att     = 100 - btts_att         # attacchi deboli
+    nogoal_dna     = 100 - btts_dna         # DNA poco offensivo
+    nogoal_both    = 20 if both_score else 70  # invertito
+    nogoal_strisce = 100 - btts_strisce     # strisce NoGoal
+    nogoal_concede = 100 - btts_concede     # squadre che NON subiscono
+    nogoal_odds    = 100 - btts_odds        # probabilità implicita NG
+
+    nogoal_total = (
+        nogoal_h2h     * 0.18 +
+        nogoal_exp_xg  * 0.05 +
+        nogoal_att     * 0.12 +
+        nogoal_dna     * 0.02 +
+        nogoal_both    * 0.08 +
+        nogoal_strisce * 0.08 +
+        nogoal_concede * 0.22 +
+        nogoal_odds    * 0.25
+    )
+
+    # Moltiplicatore strisce invertito per NoGoal (GG streaks → penalizza NoGoal)
+    if streak_adj_ggng != 0:
+        nogoal_total = nogoal_total * (1 - streak_adj_ggng)
+        nogoal_total = max(0.0, min(100.0, nogoal_total))
+
+    # ====== DECISIONE Goal/NoGoal (calcoli SEPARATI e INDIPENDENTI) ======
+    BTTS_SOGLIA_GOAL_MIN = 60     # btts_total 60-64 → Goal
+    BTTS_SOGLIA_GOAL_MAX = 64     # sopra → SKIP (segnali estremi)
+    NOGOAL_SOGLIA = 56            # nogoal_total >= 56 → NoGoal (senza cap: più alto = meglio)
+
+    if BTTS_SOGLIA_GOAL_MIN <= btts_total <= BTTS_SOGLIA_GOAL_MAX:
+        tipo_gol_extra = 'Goal'
         confidence_gol_extra = round(btts_total, 1)
-    elif tipo_gol_extra == 'NoGoal':
-        confidence_gol_extra = round(100 - btts_total, 1)
+    elif nogoal_total >= NOGOAL_SOGLIA:
+        tipo_gol_extra = 'NoGoal'
+        confidence_gol_extra = round(nogoal_total, 1)
     else:
+        tipo_gol_extra = None
         confidence_gol_extra = 0
 
+    print(f"   [GG/NG v2] btts_total={btts_total:.1f} nogoal={nogoal_total:.1f} | "
+          f"H2H={btts_h2h:.0f} ExpXG={btts_exp_xg:.0f} Att={btts_att:.0f} DNA={btts_dna:.0f} "
+          f"Both={btts_both:.0f} Strisce={btts_strisce:.0f} Concede={btts_concede:.0f} "
+          f"Odds={btts_odds:.0f} → {tipo_gol_extra or 'SKIP'}")
+
     # ====== RISOLUZIONE CONFLITTI: Over+NoGoal / Under+Goal ======
-    odds = match_data.get('odds', {})
+    # odds già caricato sopra per il segnale quote SNAI
     quota_map = {
         'Over 2.5': 'over_25', 'Over 1.5': 'over_15',
         'Under 2.5': 'under_25', 'Under 3.5': 'under_35',
@@ -1926,17 +2120,22 @@ def analyze_gol(match_data, home_team_doc, away_team_doc, league_name):
 
 # ==================== FASE 4: DECISIONE FINALE ====================
 
-def make_decision(segno_result, gol_result):
+def make_decision(segno_result, gol_result, is_cup=False):
     """
     Decide: SEGNO, GOL, SEGNO+GOL, o SCARTA.
     Include doppia chance (1X, X2, 12).
-    Sotto 60 su entrambi = SCARTA.
+    Sotto soglia su entrambi = SCARTA.
+    Coppe: soglia SEGNO abbassata a 55 (meno segnali disponibili).
     """
     s_score = segno_result['score']
     g_score = gol_result['score']
 
-    # Sotto 60 su entrambi = SCARTA
-    if s_score < THRESHOLD_INCLUDE and g_score < THRESHOLD_INCLUDE:
+    # Soglia SEGNO ridotta per coppe (6 segnali su 9 a default neutro)
+    CUP_THRESHOLD_SEGNO = 55
+    threshold_segno = CUP_THRESHOLD_SEGNO if is_cup else THRESHOLD_INCLUDE
+
+    # Sotto soglia su entrambi = SCARTA
+    if s_score < threshold_segno and g_score < THRESHOLD_INCLUDE:
         return {
             'decision': 'SCARTA',
             'pronostici': [],
@@ -1949,26 +2148,72 @@ def make_decision(segno_result, gol_result):
     pronostici = []
 
     # Segno (bloccato se quota < 1.35, ma analisi resta visibile)
-    if s_score >= THRESHOLD_INCLUDE and not segno_result.get('segno_blocked'):
-        pronostici.append({
-            'tipo': 'SEGNO',
-            'pronostico': segno_result['segno'],
-            'quota': segno_result.get('odds', {}).get(segno_result['segno']),
-            'confidence': s_score,
-            'stars': calculate_stars(s_score),
-        })
+    if s_score >= threshold_segno and not segno_result.get('segno_blocked'):
 
-        # Doppia chance (se disponibile e quota >= 1.30)
-        dc = segno_result.get('doppia_chance')
-        dc_quota = segno_result.get('doppia_chance_quota')
-        if dc and dc_quota and dc_quota >= 1.30:
-            pronostici.append({
-                'tipo': 'DOPPIA_CHANCE',
-                'pronostico': dc,
-                'quota': dc_quota,
-                'confidence': s_score,
-                'stars': calculate_stars(s_score),
-            })
+        # === DIROTTAMENTO X FACTOR (2026-02-16) ===
+        # Pattern storico: lucifero > affidabilita + quota > 1.60 → ~50% finisce in X
+        # NON emettere SEGNO, lasciare che X Factor gestisca la partita
+        lucif_score = segno_result.get('dettaglio', {}).get('lucifero', 0)
+        affid_score = segno_result.get('dettaglio', {}).get('affidabilita', 0)
+        odds_data = segno_result.get('odds', {})
+        q1_raw = float(odds_data.get('1', 0) or 0)
+        q2_raw = float(odds_data.get('2', 0) or 0)
+        q_fav = min(q1_raw, q2_raw) if q1_raw > 0 and q2_raw > 0 else 0
+
+        x_factor_divert = (lucif_score > affid_score and q_fav >= 1.60 and q_fav < 1.80)
+
+        if not x_factor_divert:
+            # Partita NON dirottata → check DC intelligente o SEGNO secco
+            q_pred = odds_data.get(segno_result['segno'])
+            dc = segno_result.get('doppia_chance')
+            dc_quota = segno_result.get('doppia_chance_quota')
+            q_pred_float = float(q_pred) if q_pred else 0
+
+            # === DC INTELLIGENTE (2026-02-16) ===
+            # Conf bassa + quota alta (ma non dirottata a XF) → solo DC se quota decente
+            SOGLIA_CONF_DC = 65
+            SOGLIA_QUOTA_DC = 1.60
+            SOGLIA_QUOTA_MIN_DC = 1.35
+
+            if s_score < SOGLIA_CONF_DC and q_pred_float > SOGLIA_QUOTA_DC:
+                # Zona critica residua: conf bassa + quota alta
+                if dc and dc_quota and dc_quota >= SOGLIA_QUOTA_MIN_DC:
+                    pronostici.append({
+                        'tipo': 'DOPPIA_CHANCE',
+                        'pronostico': dc,
+                        'quota': dc_quota,
+                        'confidence': s_score,
+                        'stars': calculate_stars(s_score),
+                    })
+                else:
+                    # Fallback: DC non disponibile o quota troppo bassa → emetti SEGNO comunque
+                    pronostici.append({
+                        'tipo': 'SEGNO',
+                        'pronostico': segno_result['segno'],
+                        'quota': q_pred,
+                        'confidence': s_score,
+                        'stars': calculate_stars(s_score),
+                    })
+            else:
+                # Conf alta OPPURE quota bassa → SEGNO secco
+                pronostici.append({
+                    'tipo': 'SEGNO',
+                    'pronostico': segno_result['segno'],
+                    'quota': q_pred,
+                    'confidence': s_score,
+                    'stars': calculate_stars(s_score),
+                })
+
+                # Doppia chance aggiuntiva (se disponibile e quota >= 1.30)
+                if dc and dc_quota and dc_quota >= 1.30:
+                    pronostici.append({
+                        'tipo': 'DOPPIA_CHANCE',
+                        'pronostico': dc,
+                        'quota': dc_quota,
+                        'confidence': s_score,
+                        'stars': calculate_stars(s_score),
+                    })
+        # else: SEGNO skippato — X Factor processerà questa partita
 
     # Gol — Over/Under (usa g_score)
     if g_score >= THRESHOLD_INCLUDE and gol_result['tipo_gol']:
@@ -2347,6 +2592,10 @@ def run_daily_predictions(target_date=None):
     # 1. Recupera partite del giorno
     matches = get_today_matches(target_date)
 
+    # 1a. Recupera partite coppe europee (UCL/UEL)
+    cup_matches = get_today_cup_matches(target_date)
+    matches = matches + cup_matches
+
     if not matches:
         print("⚠️  Nessuna partita oggi.")
         return
@@ -2370,9 +2619,13 @@ def run_daily_predictions(target_date=None):
         print(f"\n{'─' * 50}")
         print(f"⚽ {home} vs {away} ({league})")
 
-        # Recupera dati squadre
-        home_team_doc = get_team_data(home)
-        away_team_doc = get_team_data(away)
+        # Recupera dati squadre (coppe: solo dati cup, MAI team_doc campionati)
+        if match.get('_source') == 'cup':
+            home_team_doc = None
+            away_team_doc = None
+        else:
+            home_team_doc = get_team_data(home)
+            away_team_doc = get_team_data(away)
 
         # FASE 2: Analisi Segno
         segno_result = analyze_segno(match, home_team_doc, away_team_doc)
@@ -2381,7 +2634,8 @@ def run_daily_predictions(target_date=None):
         gol_result = analyze_gol(match, home_team_doc, away_team_doc, league)
 
         # FASE 4: Decisione
-        decision = make_decision(segno_result, gol_result)
+        is_cup = match.get('_source') == 'cup'
+        decision = make_decision(segno_result, gol_result, is_cup=is_cup)
         match['_home_team_doc'] = home_team_doc
         match['_away_team_doc'] = away_team_doc
         # Salva risultati interni per X Factor (accessibili nel loop successivo)
@@ -2424,6 +2678,20 @@ def run_daily_predictions(target_date=None):
             print(f"      → {p['pronostico']} ({p['confidence']:.0f}/100, {p['stars']:.1f}⭐)")
         print(f"      💬 {comment}")
 
+        # Cap confidence per coppe (meno dati = meno sicurezza)
+        if is_cup:
+            CUP_CONF_CAP = 70
+            for p in decision['pronostici']:
+                if p['confidence'] > CUP_CONF_CAP:
+                    p['confidence'] = CUP_CONF_CAP
+                    p['stars'] = calculate_stars(CUP_CONF_CAP)
+            if decision['confidence_segno'] > CUP_CONF_CAP:
+                decision['confidence_segno'] = CUP_CONF_CAP
+                decision['stars_segno'] = calculate_stars(CUP_CONF_CAP)
+            if decision['confidence_gol'] > CUP_CONF_CAP:
+                decision['confidence_gol'] = CUP_CONF_CAP
+                decision['stars_gol'] = calculate_stars(CUP_CONF_CAP)
+
         # Prepara documento per DB
         prediction_doc = {
             'date': target_str,
@@ -2433,6 +2701,7 @@ def run_daily_predictions(target_date=None):
             'match_time': match.get('match_time', ''),
             'home_mongo_id': match.get('home_mongo_id', ''),
             'away_mongo_id': match.get('away_mongo_id', ''),
+            'is_cup': is_cup,
             'decision': decision['decision'],
             'pronostici': decision['pronostici'],
             'confidence_segno': decision['confidence_segno'],
