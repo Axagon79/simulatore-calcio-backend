@@ -108,7 +108,11 @@ def extract_h2h_data(driver, season_id, home_id, away_id, home_name, away_name):
         print(f"  Errore caricamento: {e}")
         return None
 
-    body_text = driver.find_element(By.TAG_NAME, 'body').text
+    try:
+        body_text = driver.find_element(By.TAG_NAME, 'body').text
+    except Exception as e:
+        print(f"  Errore lettura body: {e}")
+        return None
 
     result = {
         'home_name': home_name,
@@ -309,12 +313,18 @@ def main():
     # Avvia Chrome solo se ci sono partite
     import undetected_chromedriver as uc
 
+    def create_driver():
+        """Crea una nuova istanza Chrome."""
+        options = uc.ChromeOptions()
+        options.add_argument('--no-sandbox')
+        options.add_argument('--disable-dev-shm-usage')
+        d = uc.Chrome(options=options, user_multi_procs=True)
+        d.set_page_load_timeout(30)
+        return d
+
     print("\nAvvio Chrome...")
-    options = uc.ChromeOptions()
-    options.add_argument('--no-sandbox')
-    options.add_argument('--disable-dev-shm-usage')
-    driver = uc.Chrome(options=options, user_multi_procs=True)
-    driver.set_page_load_timeout(30)
+    driver = create_driver()
+    consecutive_errors = 0
 
     results = []
     errors = []
@@ -339,8 +349,22 @@ def main():
                     {'$set': {'sportradar_h2h': data}}
                 )
                 print(f"  ✅ Salvato in DB!")
+                consecutive_errors = 0
             else:
                 errors.append(f"{match['home']} vs {match['away']}")
+                consecutive_errors += 1
+
+                # Dopo 2 errori consecutivi, Chrome è probabilmente corrotto → ricrea
+                if consecutive_errors >= 2:
+                    print(f"  ⚠️ {consecutive_errors} errori consecutivi — ricreo Chrome...")
+                    try:
+                        driver.quit()
+                    except Exception:
+                        pass
+                    time.sleep(3)
+                    driver = create_driver()
+                    consecutive_errors = 0
+                    print(f"  ✅ Chrome ricreato!")
 
             if i < len(matches_to_scrape) - 1:
                 time.sleep(2)
@@ -351,7 +375,10 @@ def main():
         traceback.print_exc()
 
     finally:
-        driver.quit()
+        try:
+            driver.quit()
+        except Exception:
+            pass
         print("\nBrowser chiuso.")
 
     # Riepilogo
