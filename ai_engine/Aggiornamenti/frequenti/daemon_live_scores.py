@@ -483,15 +483,36 @@ def create_driver(service, chrome_options):
     return driver
 
 
-def restart_driver(driver, service, chrome_options, reason="periodico"):
-    """Chiude e ricrea il driver Chrome."""
+def _fresh_service():
+    """Crea un nuovo Service con chromedriver fresco (re-installa se necessario)."""
+    return Service(ChromeDriverManager().install())
+
+
+def safe_create_driver(chrome_options, max_retries=3):
+    """Crea driver con retry e reinstallazione chromedriver ad ogni tentativo."""
+    for attempt in range(1, max_retries + 1):
+        try:
+            svc = _fresh_service()
+            drv = create_driver(svc, chrome_options)
+            return drv
+        except Exception as e:
+            print(f"   Tentativo {attempt}/{max_retries} fallito: {e}")
+            if attempt < max_retries:
+                time.sleep(10)
+    print(f"   ERRORE: impossibile creare driver dopo {max_retries} tentativi")
+    return None
+
+
+def restart_driver(driver, chrome_options, reason="periodico"):
+    """Chiude e ricrea il driver Chrome con service fresco."""
     global _leagues_selected
     print(f"   Restart driver ({reason})...")
     try: driver.quit()
     except: pass
-    new_driver = create_driver(service, chrome_options)
+    new_driver = safe_create_driver(chrome_options)
     _leagues_selected = False  # Deve rifare "Select All" sul nuovo browser
-    print(f"   Nuovo driver avviato.")
+    if new_driver:
+        print(f"   Nuovo driver avviato.")
     return new_driver
 
 
@@ -511,8 +532,10 @@ def main():
     driver = None
 
     try:
-        service = Service(ChromeDriverManager().install())
-        driver = create_driver(service, chrome_options)
+        driver = safe_create_driver(chrome_options)
+        if not driver:
+            print("ERRORE FATALE: impossibile avviare Chrome all'avvio.")
+            return
         print("Chrome driver avviato.\n")
 
         while True:
@@ -531,15 +554,23 @@ def main():
             # Riavvia driver se era stato chiuso dalla pausa pipeline
             if driver is None:
                 print(f"\n   🔄 Ripresa dopo pausa pipeline — riavvio Chrome...")
-                driver = create_driver(service, chrome_options)
+                driver = safe_create_driver(chrome_options)
                 _cycle_count = 0
+                if not driver:
+                    print(f"   Driver non disponibile, riprovo tra 60s...")
+                    time.sleep(60)
+                    continue
 
             if is_in_operating_window():
                 # Restart preventivo ogni N cicli per evitare memory leak
                 _cycle_count += 1
                 if _cycle_count >= RESTART_EVERY_N_CYCLES:
-                    driver = restart_driver(driver, service, chrome_options, f"preventivo dopo {_cycle_count} cicli")
+                    driver = restart_driver(driver, chrome_options, f"preventivo dopo {_cycle_count} cicli")
                     _cycle_count = 0
+                    if not driver:
+                        print(f"   Restart fallito, riprovo tra 60s...")
+                        time.sleep(60)
+                        continue
 
                 try:
                     run_cycle(driver)
@@ -551,8 +582,11 @@ def main():
                     try:
                         driver.title  # Test se il driver e' ancora vivo
                     except:
-                        driver = restart_driver(driver, service, chrome_options, "driver crashato")
+                        driver = restart_driver(driver, chrome_options, "driver crashato")
                         _cycle_count = 0
+                        if not driver:
+                            time.sleep(60)
+                            continue
             else:
                 now = datetime.now()
                 print(f"\r   Fuori finestra operativa ({now.strftime('%H:%M')}). Prossimo check tra {CYCLE_SECONDS}s...", end='')
