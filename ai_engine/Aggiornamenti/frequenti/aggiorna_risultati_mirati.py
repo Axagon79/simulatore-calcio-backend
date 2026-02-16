@@ -8,6 +8,9 @@ import msvcrt  # // aggiunto per: leggere i tasti senza bloccare il ciclo
 import importlib.util
 import re
 from datetime import datetime, timedelta
+import atexit
+import signal
+import subprocess
 
 # --- LOGGING: output su terminale + file log ---
 class _TeeOutput:
@@ -44,6 +47,41 @@ from selenium.webdriver.support import expected_conditions as EC
 current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.dirname(os.path.dirname(os.path.dirname(current_dir)))
 sys.path.append(project_root)
+
+# --- ANTI-ZOMBIE: cleanup Chrome orfani all'avvio e all'uscita ---
+_current_driver = None
+
+def _cleanup_chrome():
+    """Chiude il Chrome driver corrente all'uscita del processo."""
+    global _current_driver
+    if _current_driver is not None:
+        try:
+            _current_driver.quit()
+            print(f"   [CLEANUP] Chrome chiuso via atexit handler")
+        except:
+            pass
+        _current_driver = None
+
+def _kill_orphan_chrome():
+    """All'avvio, killa Chrome zombie (scoped_dir con parent morto)."""
+    try:
+        r = subprocess.run(
+            ['powershell', '-Command',
+             '$k=0; Get-CimInstance Win32_Process | Where-Object { $_.Name -eq "chrome.exe" -and $_.CommandLine -match "scoped_dir" } | ForEach-Object { $p=Get-Process -Id $_.ParentProcessId -EA SilentlyContinue; if(-not $p){Stop-Process -Id $_.ProcessId -Force -EA SilentlyContinue; $k++} }; if($k -gt 0){Write-Host "Killati $k Chrome zombie"}'],
+            capture_output=True, text=True, timeout=30
+        )
+        if r.stdout.strip():
+            print(f"   [CLEANUP] {r.stdout.strip()}")
+    except:
+        pass
+
+atexit.register(_cleanup_chrome)
+try:
+    signal.signal(signal.SIGTERM, lambda s, f: (_cleanup_chrome(), sys.exit(0)))
+except:
+    pass
+
+_kill_orphan_chrome()
 
 try:
     spec = importlib.util.spec_from_file_location("config", os.path.join(project_root, "config.py"))
@@ -208,6 +246,7 @@ def scrape_nowgoal_matches(config):
 # --- LOGICA DIRETTORE AGGIORNATA ---
 
 def run_director_loop():
+    global _current_driver
     print(f"\n{'='*50}")
     print(f" 🚀 DIRETTORE RISULTATI - SISTEMA ATTIVO ")
     print(f"{'='*50}")
@@ -283,6 +322,7 @@ def run_director_loop():
                 chrome_options.add_argument("--headless")
                 try:
                     driver = webdriver.Chrome(options=chrome_options)
+                    _current_driver = driver
                     driver.set_page_load_timeout(30)
 
                     for target in leghe:
@@ -300,6 +340,7 @@ def run_director_loop():
                             except: pass
                             try:
                                 driver = webdriver.Chrome(options=chrome_options)
+                                _current_driver = driver
                                 driver.set_page_load_timeout(30)
                             except Exception as e2:
                                 print(f"❌ Impossibile ricreare Chrome: {e2}")
@@ -310,6 +351,7 @@ def run_director_loop():
                     if driver:
                         try: driver.quit()
                         except: pass
+                    _current_driver = None
 
             # Coppe: driver proprio (scrape_nowgoal_matches lo crea internamente)
             for target in coppe:

@@ -10,6 +10,9 @@ import ctypes
 ctypes.windll.kernel32.SetConsoleTitleW("Aggiornamento Quote SNAI (daemon_snai_odds.py)")
 import msvcrt
 from datetime import datetime, timedelta
+import atexit
+import signal
+import subprocess
 
 # --- LOGGING: output su terminale + file log ---
 class _TeeOutput:
@@ -46,6 +49,22 @@ if project_root not in sys.path:
     sys.path.insert(0, project_root)
 if current_dir not in sys.path:
     sys.path.insert(0, current_dir)
+
+# --- ANTI-ZOMBIE: cleanup Chrome orfani all'avvio ---
+def _kill_orphan_chrome():
+    """All'avvio, killa Chrome zombie (scoped_dir con parent morto)."""
+    try:
+        r = subprocess.run(
+            ['powershell', '-Command',
+             '$k=0; Get-CimInstance Win32_Process | Where-Object { $_.Name -eq "chrome.exe" -and $_.CommandLine -match "scoped_dir" } | ForEach-Object { $p=Get-Process -Id $_.ParentProcessId -EA SilentlyContinue; if(-not $p){Stop-Process -Id $_.ProcessId -Force -EA SilentlyContinue; $k++} }; if($k -gt 0){Write-Host "Killati $k Chrome zombie"}'],
+            capture_output=True, text=True, timeout=30
+        )
+        if r.stdout.strip():
+            print(f"   [CLEANUP] {r.stdout.strip()}")
+    except:
+        pass
+
+_kill_orphan_chrome()
 
 # Import dello scraper SNAI esistente
 from scrape_snai_odds import run_scraper

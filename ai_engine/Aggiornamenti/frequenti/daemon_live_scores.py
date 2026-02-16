@@ -10,6 +10,9 @@ import re
 import ctypes
 ctypes.windll.kernel32.SetConsoleTitleW("Daemon Risultati Live (daemon_live_scores.py)")
 from datetime import datetime, timedelta
+import atexit
+import signal
+import subprocess
 
 # --- LOGGING: output su terminale + file log ---
 class _TeeOutput:
@@ -44,6 +47,41 @@ project_root = os.path.dirname(ai_engine_dir)
 
 if ai_engine_dir not in sys.path: sys.path.insert(0, ai_engine_dir)
 if project_root not in sys.path: sys.path.insert(0, project_root)
+
+# --- ANTI-ZOMBIE: cleanup Chrome orfani all'avvio e all'uscita ---
+_current_driver = None
+
+def _cleanup_chrome():
+    """Chiude il Chrome driver corrente all'uscita del processo."""
+    global _current_driver
+    if _current_driver is not None:
+        try:
+            _current_driver.quit()
+            print(f"   [CLEANUP] Chrome chiuso via atexit handler")
+        except:
+            pass
+        _current_driver = None
+
+def _kill_orphan_chrome():
+    """All'avvio, killa Chrome zombie (scoped_dir con parent morto)."""
+    try:
+        r = subprocess.run(
+            ['powershell', '-Command',
+             '$k=0; Get-CimInstance Win32_Process | Where-Object { $_.Name -eq "chrome.exe" -and $_.CommandLine -match "scoped_dir" } | ForEach-Object { $p=Get-Process -Id $_.ParentProcessId -EA SilentlyContinue; if(-not $p){Stop-Process -Id $_.ProcessId -Force -EA SilentlyContinue; $k++} }; if($k -gt 0){Write-Host "Killati $k Chrome zombie"}'],
+            capture_output=True, text=True, timeout=30
+        )
+        if r.stdout.strip():
+            print(f"   [CLEANUP] {r.stdout.strip()}")
+    except:
+        pass
+
+atexit.register(_cleanup_chrome)
+try:
+    signal.signal(signal.SIGTERM, lambda s, f: (_cleanup_chrome(), sys.exit(0)))
+except:
+    pass
+
+_kill_orphan_chrome()
 
 try:
     from config import db
@@ -437,9 +475,11 @@ def is_in_operating_window():
 
 def create_driver(service, chrome_options):
     """Crea un nuovo Chrome driver con timeout configurati."""
+    global _current_driver
     driver = webdriver.Chrome(service=service, options=chrome_options)
     driver.set_page_load_timeout(30)  # Max 30s per caricare una pagina
     driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+    _current_driver = driver
     return driver
 
 
@@ -456,7 +496,7 @@ def restart_driver(driver, service, chrome_options, reason="periodico"):
 
 
 def main():
-    global _cycle_count
+    global _cycle_count, _current_driver
     print(f"Configurazione: ciclo ogni {CYCLE_SECONDS}s, finestra {HOUR_START}:00-{HOUR_END}:00")
     print(f"Restart driver ogni {RESTART_EVERY_N_CYCLES} cicli")
     print(f"URL: {LIVE_URL}\n")
@@ -482,6 +522,7 @@ def main():
                     try: driver.quit()
                     except: pass
                     driver = None
+                    _current_driver = None
                     _cycle_count = 0
                     print(f"\n   💤 [PAUSA PIPELINE] Chrome chiuso alle {datetime.now().strftime('%H:%M')}. Ripresa alle 09:00...")
                 time.sleep(60)
