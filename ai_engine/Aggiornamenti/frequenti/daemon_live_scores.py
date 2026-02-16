@@ -395,8 +395,15 @@ def run_cycle(driver):
                     link.click()
                     break
             time.sleep(2)
+            # Clicca tab "All" per mostrare TUTTE le partite (incluse leghe minori)
+            try:
+                all_tab = driver.find_element(By.ID, "li_ShowAll")
+                all_tab.click()
+                time.sleep(1)
+            except:
+                pass
             _leagues_selected = True
-            print("   Filtro leghe: Select All applicato")
+            print("   Filtro leghe: Select All + tab All applicato")
         except Exception as e:
             print(f"   Filtro leghe non trovato (proseguo): {e}")
             _leagues_selected = True  # Non riprovare ogni ciclo
