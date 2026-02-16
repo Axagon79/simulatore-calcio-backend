@@ -3010,7 +3010,8 @@ def run_daily_predictions(target_date=None):
         if match.get('_source') == 'cup':
             sr_comments = match.get('sportradar_h2h', {}).get('comments', [])
             if sr_comments:
-                comment = {'segno': ' | '.join(sr_comments)}
+                keys = ['segno', 'gol', 'doppia_chance', 'gol_extra']
+                comment = {keys[i]: c for i, c in enumerate(sr_comments[:4])}
             else:
                 comment = {}
 
