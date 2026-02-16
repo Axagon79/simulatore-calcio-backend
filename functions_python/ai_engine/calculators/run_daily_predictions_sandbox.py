@@ -113,20 +113,25 @@ THRESHOLD_GGNG = 65  # Soglia specifica per Goal/NoGoal (separata da THRESHOLD_I
 
 # ==================== COSTANTI COPPE (UCL/UEL) ====================
 
+# Pesi SEGNO: Potenza (più importante), Forma e Rendimento pari, Solidità ultima
 PESI_CUP_SEGNO = {
-    'forma': 0.25, 'quote': 0.25, 'classifica': 0.20,
-    'bvs': 0.15, 'h2h': 0.15,
+    'forma': 0.25, 'potenza': 0.35, 'rendimento': 0.25, 'solidita': 0.15,
 }
 
-PESI_CUP_GOL = {
-    'avg_goals': 0.25, 'over_under_pct': 0.22, 'quote_gol': 0.18,
-    'h2h_gol': 0.15, 'btts_potential': 0.10, 'competition_avg': 0.10,
+# Pesi GOL — Over/Under
+PESI_CUP_OU = {
+    'media_gol': 0.30, 'quote_ou': 0.25, 'over_pct': 0.20, 'h2h_gol': 0.15, 'fragilita': 0.10,
+}
+
+# Pesi GOL — GG/NG
+PESI_CUP_GGNG = {
+    'prob_segna_home': 0.30, 'prob_segna_away': 0.30, 'quote_ggng': 0.25, 'h2h_media': 0.15,
 }
 
 CUP_AVG_GOALS = {'Champions League': 3.03, 'Europa League': 2.82}
 CUP_THRESHOLD_SEGNO = 55
-CUP_THRESHOLD_GOL = 58
-CUP_THRESHOLD_GGNG = 63
+CUP_THRESHOLD_GOL = 55
+CUP_THRESHOLD_GGNG = 55
 CUP_CONF_CAP = 75
 
 # ==================== COSTANTI STRISCE (Curva a Campana) ====================
@@ -946,6 +951,10 @@ def get_today_cup_matches(target_date=None):
                 '_source': 'cup',
                 '_round_id': None,
                 'sportradar_h2h': doc.get('sportradar_h2h', {}),
+                'home_elo': (home_cup_team or {}).get('elo_rating', 1500),
+                'away_elo': (away_cup_team or {}).get('elo_rating', 1500),
+                'home_valore_rosa': (home_cup_team or {}).get('valore_rosa_transfermarkt', 200_000_000),
+                'away_valore_rosa': (away_cup_team or {}).get('valore_rosa_transfermarkt', 200_000_000),
             }
             cup_matches.append(cup_match)
 
@@ -1012,244 +1021,348 @@ def build_cup_h2h_data(home_team_data, away_team_data):
     }
 
 
-# ==================== SEGNALI CUP — SEGNO ====================
+# ==================== SEGNALI CUP — SEGNO (Per-Team Scoring) ====================
 
-def cup_score_forma(match):
-    """Forma Sportradar: form_pct + lettere V/P/S ultime 6 partite."""
+def cup_forma(match):
+    """Segnale Forma: metodo Lucifero con 5 partite, pesi [5,4,3,2,1].
+    Ritorna (home_score, away_score) su scala 0-25."""
     sr = match.get('sportradar_h2h', {})
-    h_pct = sr.get('home_form_pct')
-    a_pct = sr.get('away_form_pct')
-    if h_pct is None or a_pct is None:
-        return 50
 
-    diff = h_pct - a_pct
-    score = 50 + (diff / 100) * 30
+    def lucifero_5(letters):
+        if not letters:
+            return 12.5  # neutro
+        weights = [5, 4, 3, 2, 1]
+        total = 0
+        max_score = 0
+        for i, letter in enumerate(letters[:5]):
+            w = weights[i] if i < len(weights) else 1
+            max_score += 3 * w
+            if letter == 'V':
+                total += 3 * w
+            elif letter == 'P':
+                total += 1 * w
+            # S = 0
+        if max_score == 0:
+            return 12.5
+        return (total / max_score) * 25.0
 
     h_form = sr.get('home_form', [])
     a_form = sr.get('away_form', [])
-    h_wins = sum(1 for x in h_form if x == 'V')
-    a_wins = sum(1 for x in a_form if x == 'V')
-    win_diff = h_wins - a_wins
-    score += win_diff * 2
 
-    if h_pct > 80:
-        score += 5
-    if a_pct > 80:
-        score -= 5
-
-    return max(0, min(100, round(score, 1)))
+    return (round(lucifero_5(h_form), 2), round(lucifero_5(a_form), 2))
 
 
-def cup_score_classifica(match):
-    """Classifica coppa: posizione, punti, goal_diff, win rate."""
+def cup_potenza(match):
+    """Segnale Potenza: ELO (40%) + Quote (35%) + Valore Rosa (25%).
+    Ritorna (home_score, away_score) su scala 0-100."""
+    odds = match.get('odds', {})
+    q1 = float(odds.get('1', 99))
+    qx = float(odds.get('X', 99))
+    q2 = float(odds.get('2', 99))
+
+    # Quote: probabilità implicita senza aggio
+    total_ip = 0
+    if q1 > 0: total_ip += 1/q1
+    if qx > 0: total_ip += 1/qx
+    if q2 > 0: total_ip += 1/q2
+
+    if total_ip > 0:
+        quote_home = (1/q1) / total_ip * 100 if q1 > 0 else 33.3
+        quote_away = (1/q2) / total_ip * 100 if q2 > 0 else 33.3
+    else:
+        quote_home = 33.3
+        quote_away = 33.3
+
+    # ELO: normalizzato con divisore 2100
+    home_elo = match.get('home_elo', 1500)
+    away_elo = match.get('away_elo', 1500)
+    elo_home = (home_elo / 2100) * 100
+    elo_away = (away_elo / 2100) * 100
+
+    # Valore Rosa: scala 50-100, gap max 50
+    home_rosa = match.get('home_valore_rosa', 200_000_000)
+    away_rosa = match.get('away_valore_rosa', 200_000_000)
+    rosa_home = 50 + (home_rosa / 1_350_000_000) * 50
+    rosa_away = 50 + (away_rosa / 1_350_000_000) * 50
+
+    # Media pesata
+    h_score = elo_home * 0.40 + quote_home * 0.35 + rosa_home * 0.25
+    a_score = elo_away * 0.40 + quote_away * 0.35 + rosa_away * 0.25
+
+    return (round(h_score, 2), round(a_score, 2))
+
+
+def cup_rendimento(match):
+    """Segnale Rendimento Coppa: Posizione + Punti + Form_pct + H2H record.
+    Ritorna (home_score, away_score) su scala 50-100."""
     sr = match.get('sportradar_h2h', {})
-    h_pos = sr.get('home_position')
-    a_pos = sr.get('away_position')
-    if h_pos is None or a_pos is None:
-        return 50
 
-    pos_diff = a_pos - h_pos
-    pos_score = min(25, max(-25, pos_diff * 2.5))
+    def calc_rendimento(prefix, team_side):
+        components = []
 
-    h_pts = sr.get('home_points', 0)
-    a_pts = sr.get('away_points', 0)
-    pts_score = min(15, max(-15, (h_pts - a_pts) * 1.5))
+        # Posizione: (37 - pos) / 36 * 100
+        pos = sr.get(f'{prefix}_position')
+        if pos is not None:
+            components.append((37 - pos) / 36 * 100)
 
-    h_stand = sr.get('home_standing', {})
-    a_stand = sr.get('away_standing', {})
-    h_gd = h_stand.get('goal_diff', 0)
-    a_gd = a_stand.get('goal_diff', 0)
-    gd_score = min(10, max(-10, (h_gd - a_gd) * 1.0))
+        # Punti: punti / 24 * 100
+        pts = sr.get(f'{prefix}_points')
+        if pts is not None:
+            components.append((pts / 24) * 100)
 
-    h_played = h_stand.get('played', 0)
-    a_played = a_stand.get('played', 0)
-    h_wr = (h_stand.get('wins', 0) / h_played * 100) if h_played > 0 else 50
-    a_wr = (a_stand.get('wins', 0) / a_played * 100) if a_played > 0 else 50
-    wr_score = min(10, max(-10, (h_wr - a_wr) / 10))
+        # Form_pct: diretto (0-100)
+        form_pct = sr.get(f'{prefix}_form_pct')
+        if form_pct is not None:
+            components.append(form_pct)
 
-    score = 50 + pos_score + pts_score + gd_score + wr_score
-    return max(0, min(100, round(score, 1)))
+        # H2H record: vittorie squadra / totale * 100
+        h_wins = sr.get('h2h_home_wins')
+        draws = sr.get('h2h_draws')
+        a_wins = sr.get('h2h_away_wins')
+        if h_wins is not None and a_wins is not None:
+            total = h_wins + (draws or 0) + a_wins
+            if total > 0:
+                if team_side == 'home':
+                    components.append(h_wins / total * 100)
+                else:
+                    components.append(a_wins / total * 100)
+
+        if not components:
+            return 75.0  # neutro nel range 50-100
+
+        media = sum(components) / len(components)
+        # Comprimi su 50-100
+        return 50 + (media / 100) * 50
+
+    h_score = calc_rendimento('home', 'home')
+    a_score = calc_rendimento('away', 'away')
+
+    return (round(h_score, 2), round(a_score, 2))
 
 
-def cup_score_h2h(match):
-    """H2H precedenti diretti Sportradar."""
+def cup_solidita(match):
+    """Segnale Solidità: Win rate + Goal diff.
+    Ritorna (home_score, away_score) su scala 50-100."""
     sr = match.get('sportradar_h2h', {})
-    h_wins = sr.get('h2h_home_wins')
-    draws = sr.get('h2h_draws')
-    a_wins = sr.get('h2h_away_wins')
-    if h_wins is None or a_wins is None:
-        return 50
 
-    total = h_wins + draws + a_wins
-    if total == 0:
-        return 50
+    def calc_solidita(prefix):
+        stand = sr.get(f'{prefix}_standing', {})
+        if not stand:
+            return 75.0  # neutro
 
-    h_rate = h_wins / total * 100
-    a_rate = a_wins / total * 100
-    diff = h_rate - a_rate
+        played = stand.get('played', 0)
+        if played == 0:
+            return 75.0
 
-    score = 50 + (diff / 100) * 30
+        # Win rate: wins / played * 100
+        win_rate = (stand.get('wins', 0) / played) * 100
 
-    if total >= 10:
-        score += 8 if diff > 0 else -8
-    elif total >= 5:
-        score += 5 if diff > 0 else -5
+        # Goal diff normalizzato: 50 + (gd/played) * 25 → clamp 0-100
+        gd = stand.get('goal_diff', 0)
+        gd_norm = max(0, min(100, 50 + (gd / played) * 25))
 
-    return max(0, min(100, round(score, 1)))
+        # Media dei due
+        media = (win_rate + gd_norm) / 2
+
+        # Comprimi su 50-100
+        return 50 + (media / 100) * 50
+
+    h_score = calc_solidita('home')
+    a_score = calc_solidita('away')
+
+    return (round(h_score, 2), round(a_score, 2))
 
 
-# ==================== SEGNALI CUP — GOL ====================
+# ==================== SEGNALI CUP — GOL (Over/Under) ====================
 
-def cup_score_avg_goals(match):
-    """Media gol per partita in questa coppa (Sportradar)."""
+def cup_ou_media_gol(match):
+    """Media gol combinata delle due squadre. >50=Over, <50=Under."""
     sr = match.get('sportradar_h2h', {})
     h_avg = sr.get('home_avg_goals_cl')
     a_avg = sr.get('away_avg_goals_cl')
     if h_avg is None or a_avg is None:
         return 50
 
-    avg = (h_avg + a_avg) / 2
-
-    if avg >= 3.0:
-        score = 75 + min(25, (avg - 3.0) * 25)
-    elif avg >= 2.5:
-        score = 50 + (avg - 2.5) * 50
-    elif avg >= 1.8:
-        score = 15 + (avg - 1.8) / 0.7 * 35
-    else:
-        score = max(5, 15 - (1.8 - avg) * 20)
-
+    combined = (h_avg + a_avg) / 2
+    # 2.5 = neutro (50). Ogni 0.5 sopra/sotto = ±20 punti
+    score = 50 + (combined - 2.5) * 40
     return max(0, min(100, round(score, 1)))
 
 
-def cup_score_over_under_pct(match):
-    """% partite Over 2.5 di entrambe le squadre (Sportradar)."""
-    sr = match.get('sportradar_h2h', {})
-    h_over = sr.get('home_over_pct')
-    a_over = sr.get('away_over_pct')
-    if h_over is None or a_over is None:
-        return 50
-
-    avg_over = (h_over + a_over) / 2
-
-    if avg_over >= 65:
-        score = 75 + min(25, (avg_over - 65) * 0.7)
-    elif avg_over >= 50:
-        score = 50 + (avg_over - 50) / 15 * 25
-    elif avg_over >= 35:
-        score = 25 + (avg_over - 35) / 15 * 25
-    else:
-        score = max(5, 25 - (35 - avg_over) * 0.6)
-
-    return max(0, min(100, round(score, 1)))
-
-
-def cup_score_quote_gol(match):
-    """Implied probability da quote Over/Under 2.5."""
+def cup_ou_quote(match):
+    """Probabilità implicita Over/Under 2.5 dalle quote."""
     odds = match.get('odds', {})
     q_over = odds.get('over_25')
     q_under = odds.get('under_25')
     if q_over is None or q_under is None:
         return 50
 
-    q_over = float(q_over)
-    q_under = float(q_under)
+    q_over_f = float(q_over)
+    q_under_f = float(q_under)
+    if q_over_f <= 0 or q_under_f <= 0:
+        return 50
 
-    ip_over = (1 / q_over) / (1 / q_over + 1 / q_under) * 100 if q_over > 0 and q_under > 0 else 50
+    # Implied probability senza aggio
+    total_ip = 1/q_over_f + 1/q_under_f
+    ip_over = (1/q_over_f) / total_ip * 100
+    return max(0, min(100, round(ip_over, 1)))
 
-    score = ip_over
-    return max(0, min(100, round(score, 1)))
+
+def cup_ou_over_pct(match):
+    """Media Over% storico delle due squadre."""
+    sr = match.get('sportradar_h2h', {})
+    h_over = sr.get('home_over_pct')
+    a_over = sr.get('away_over_pct')
+    if h_over is None or a_over is None:
+        return 50
+
+    return max(0, min(100, round((h_over + a_over) / 2, 1)))
 
 
-def cup_score_h2h_goals(match):
-    """Media gol nei precedenti diretti (Sportradar)."""
+def cup_ou_h2h_gol(match):
+    """Media gol nei precedenti diretti. >50=Over, <50=Under."""
     sr = match.get('sportradar_h2h', {})
     avg = sr.get('h2h_avg_goals')
     if avg is None:
         return 50
 
-    total_goals = sr.get('home_h2h_total_goals', 0) + sr.get('away_h2h_total_goals', 0)
-    n_matches = round(total_goals / avg) if avg > 0 else 0
-
-    if avg >= 3.0:
-        score = 75 + min(25, (avg - 3.0) * 15)
-    elif avg >= 2.5:
-        score = 50 + (avg - 2.5) * 50
-    elif avg >= 1.5:
-        score = 15 + (avg - 1.5) / 1.0 * 35
-    else:
-        score = max(5, 15 - (1.5 - avg) * 15)
-
-    if n_matches >= 5:
-        if score > 50:
-            score = min(100, score + 5)
-        elif score < 50:
-            score = max(0, score - 5)
-
+    # 2.5 = neutro. Ogni 0.5 = ±20 punti
+    score = 50 + (avg - 2.5) * 40
     return max(0, min(100, round(score, 1)))
 
 
-def cup_score_btts_potential(match):
-    """Potenziale Both Teams To Score da score_pct + clean_sheet_pct."""
+def cup_ou_fragilita(match):
+    """Fragilità difensiva: 100 - media clean_sheet%. Alto=difese deboli=Over."""
     sr = match.get('sportradar_h2h', {})
-    h_score_pct = sr.get('home_score_pct')
-    a_score_pct = sr.get('away_score_pct')
-    h_cs_pct = sr.get('home_clean_sheet_pct')
-    a_cs_pct = sr.get('away_clean_sheet_pct')
-    if h_score_pct is None or a_score_pct is None:
+    h_cs = sr.get('home_clean_sheet_pct')
+    a_cs = sr.get('away_clean_sheet_pct')
+    if h_cs is None or a_cs is None:
         return 50
 
-    h_btts = h_score_pct * (1 - (a_cs_pct or 0) / 100)
-    a_btts = a_score_pct * (1 - (h_cs_pct or 0) / 100)
-
-    avg_btts = (h_btts + a_btts) / 2
-    score = avg_btts
-
-    return max(0, min(100, round(score, 1)))
+    avg_cs = (h_cs + a_cs) / 2
+    return max(0, min(100, round(100 - avg_cs, 1)))
 
 
-def cup_score_competition_avg(league_name):
-    """Media gol hardcoded della competizione."""
-    avg = CUP_AVG_GOALS.get(league_name, 2.7)
+# ==================== SEGNALI CUP — GOL (GG/NG) ====================
 
-    if avg >= 3.0:
-        score = 65 + (avg - 3.0) * 30
-    elif avg >= 2.5:
-        score = 45 + (avg - 2.5) * 40
-    else:
-        score = max(30, 45 - (2.5 - avg) * 30)
+def cup_gg_prob_segna_home(match):
+    """Probabilità che la casa segni: score_pct × (100 - cs_pct avversaria)."""
+    sr = match.get('sportradar_h2h', {})
+    h_score = sr.get('home_score_pct')
+    a_cs = sr.get('away_clean_sheet_pct')
+    if h_score is None or a_cs is None:
+        return 50
 
-    return max(0, min(100, round(score, 1)))
+    prob = h_score * (100 - a_cs) / 100
+    return max(0, min(100, round(prob, 1)))
+
+
+def cup_gg_prob_segna_away(match):
+    """Probabilità che l'ospite segni: score_pct × (100 - cs_pct avversaria)."""
+    sr = match.get('sportradar_h2h', {})
+    a_score = sr.get('away_score_pct')
+    h_cs = sr.get('home_clean_sheet_pct')
+    if a_score is None or h_cs is None:
+        return 50
+
+    prob = a_score * (100 - h_cs) / 100
+    return max(0, min(100, round(prob, 1)))
+
+
+def cup_gg_quote(match):
+    """Probabilità implicita GG dalle quote GG/NG."""
+    odds = match.get('odds', {})
+    q_gg = odds.get('gg')
+    q_ng = odds.get('ng')
+    if q_gg is None or q_ng is None:
+        return 50
+
+    q_gg_f = float(q_gg)
+    q_ng_f = float(q_ng)
+    if q_gg_f <= 0 or q_ng_f <= 0:
+        return 50
+
+    total_ip = 1/q_gg_f + 1/q_ng_f
+    ip_gg = (1/q_gg_f) / total_ip * 100
+    return max(0, min(100, round(ip_gg, 1)))
+
+
+def cup_gg_h2h_media(match):
+    """H2H avg goals + media gol squadre → indicatore GG."""
+    sr = match.get('sportradar_h2h', {})
+    h2h_avg = sr.get('h2h_avg_goals')
+    h_avg = sr.get('home_avg_goals_cl')
+    a_avg = sr.get('away_avg_goals_cl')
+
+    components = []
+    if h2h_avg is not None:
+        # >2.5 favorisce GG, <1.5 favorisce NG
+        h2h_score = 50 + (h2h_avg - 2.0) * 30
+        components.append(max(0, min(100, h2h_score)))
+
+    if h_avg is not None and a_avg is not None:
+        # Il minore dei due determina: se entrambe segnano almeno 1.0 → GG
+        both_score = min(h_avg, a_avg)
+        avg_score = 50 + (both_score - 1.0) * 40
+        components.append(max(0, min(100, avg_score)))
+
+    if not components:
+        return 50
+
+    return round(sum(components) / len(components), 1)
 
 
 # ==================== ANALYZE CUP — SEGNO + GOL ====================
 
 def analyze_cup_segno(match):
-    """Analisi SEGNO dedicata per partite coppa UCL/UEL."""
+    """Analisi SEGNO dedicata per partite coppa UCL/UEL.
+    4 segnali per-team: Forma, Potenza, Rendimento, Solidità.
+    Home total vs Away total → favorita + confidence."""
     odds = match.get('odds', {})
     q1 = float(odds.get('1', 99))
     qx = float(odds.get('X', 99))
     q2 = float(odds.get('2', 99))
 
-    scores = {
-        'forma': cup_score_forma(match),
-        'quote': score_quote(match),
-        'classifica': cup_score_classifica(match),
-        'bvs': score_bvs(match),
-        'h2h': cup_score_h2h(match),
-    }
+    # Calcola i 4 segnali (ognuno ritorna (home, away))
+    forma_h, forma_a = cup_forma(match)
+    potenza_h, potenza_a = cup_potenza(match)
+    rendimento_h, rendimento_a = cup_rendimento(match)
+    solidita_h, solidita_a = cup_solidita(match)
 
-    total = sum(scores[k] * PESI_CUP_SEGNO[k] for k in PESI_CUP_SEGNO)
+    # Normalizza Forma da 0-25 a 0-100
+    forma_h_norm = (forma_h / 25) * 100
+    forma_a_norm = (forma_a / 25) * 100
 
-    if q1 <= q2:
+    # Totale pesato per ogni squadra
+    home_total = (
+        forma_h_norm * PESI_CUP_SEGNO['forma'] +
+        potenza_h * PESI_CUP_SEGNO['potenza'] +
+        rendimento_h * PESI_CUP_SEGNO['rendimento'] +
+        solidita_h * PESI_CUP_SEGNO['solidita']
+    )
+    away_total = (
+        forma_a_norm * PESI_CUP_SEGNO['forma'] +
+        potenza_a * PESI_CUP_SEGNO['potenza'] +
+        rendimento_a * PESI_CUP_SEGNO['rendimento'] +
+        solidita_a * PESI_CUP_SEGNO['solidita']
+    )
+
+    # Gap → confidence
+    gap = abs(home_total - away_total)
+    confidence = min(CUP_CONF_CAP, round(50 + gap, 1))
+
+    # Favorita: chi ha il totale più alto
+    if home_total >= away_total:
         segno = '1'
         q_fav = q1
     else:
         segno = '2'
         q_fav = q2
 
+    # Segno bloccato se quota troppo bassa
     segno_blocked = q_fav < 1.35
 
+    # Doppia chance
     doppia_chance = None
     doppia_chance_quota = None
     if q1 < q2:
@@ -1267,24 +1380,31 @@ def analyze_cup_segno(match):
             doppia_chance = '12'
             doppia_chance_quota = 1 / (1/q1 + 1/q2) if q1 < 99 and q2 < 99 else None
 
-    sr = match.get('sportradar_h2h', {})
+    # Dettaglio per frontend — formato compatibile con renderDetailBarWithTeams
+    # dettaglio[key] = affidabilità (50 + gap = quanto il segnale differenzia)
+    # dettaglio_raw[key] = {home, away, scala} per barre confronto squadre
+    dettaglio = {
+        'forma': min(100, round(50 + abs(forma_h_norm - forma_a_norm), 1)),
+        'potenza': min(100, round(50 + abs(potenza_h - potenza_a), 1)),
+        'rendimento': min(100, round(50 + abs(rendimento_h - rendimento_a), 1)),
+        'solidita': min(100, round(50 + abs(solidita_h - solidita_a), 1)),
+    }
     dettaglio_raw = {
-        'forma_home_pct': sr.get('home_form_pct'),
-        'forma_away_pct': sr.get('away_form_pct'),
-        'forma_home_letters': sr.get('home_form', []),
-        'forma_away_letters': sr.get('away_form', []),
-        'position_home': sr.get('home_position'),
-        'position_away': sr.get('away_position'),
-        'h2h_record': f"{sr.get('h2h_home_wins', '?')}-{sr.get('h2h_draws', '?')}-{sr.get('h2h_away_wins', '?')}",
+        'forma': {'home': forma_h, 'away': forma_a, 'scala': '/25'},
+        'potenza': {'home': round(potenza_h, 1), 'away': round(potenza_a, 1), 'scala': '%'},
+        'rendimento': {'home': round(rendimento_h, 1), 'away': round(rendimento_a, 1), 'scala': '%'},
+        'solidita': {'home': round(solidita_h, 1), 'away': round(solidita_a, 1), 'scala': '%'},
     }
 
+    print(f"  🏆 CUP SEGNO: home_total={round(home_total,1)} away_total={round(away_total,1)} gap={round(gap,1)} → {segno} conf={confidence}")
+
     return {
-        'score': round(total, 1),
+        'score': confidence,
         'segno': segno,
         'doppia_chance': doppia_chance,
         'doppia_chance_quota': doppia_chance_quota,
         'odds': {'1': q1, 'X': qx, '2': q2},
-        'dettaglio': scores,
+        'dettaglio': dettaglio,
         'dettaglio_raw': dettaglio_raw,
         'segno_blocked': segno_blocked,
         'streak_adjustment_segno': 0,
@@ -1292,109 +1412,93 @@ def analyze_cup_segno(match):
 
 
 def analyze_cup_gol(match, league_name):
-    """Analisi GOL dedicata per partite coppa UCL/UEL."""
+    """Analisi GOL dedicata per partite coppa UCL/UEL.
+    Over/Under: 5 segnali. GG/NG: 4 segnali incrociati."""
     sr = match.get('sportradar_h2h', {})
 
-    scores = {
-        'avg_goals': cup_score_avg_goals(match),
-        'over_under_pct': cup_score_over_under_pct(match),
-        'quote_gol': cup_score_quote_gol(match),
-        'h2h_gol': cup_score_h2h_goals(match),
-        'btts_potential': cup_score_btts_potential(match),
-        'competition_avg': cup_score_competition_avg(league_name),
+    # ===== OVER/UNDER =====
+    ou_scores = {
+        'media_gol': cup_ou_media_gol(match),
+        'quote_ou': cup_ou_quote(match),
+        'over_pct': cup_ou_over_pct(match),
+        'h2h_gol': cup_ou_h2h_gol(match),
+        'fragilita': cup_ou_fragilita(match),
     }
 
-    total = sum(scores[k] * PESI_CUP_GOL[k] for k in PESI_CUP_GOL)
+    ou_total = sum(ou_scores[k] * PESI_CUP_OU[k] for k in PESI_CUP_OU)
 
-    directions = {}
-    for k, v in scores.items():
-        if v > 55:
-            directions[k] = 'over'
-        elif v < 45:
-            directions[k] = 'under'
-        else:
-            directions[k] = 'neutro'
-
-    n_over = sum(1 for d in directions.values() if d == 'over')
-    n_under = sum(1 for d in directions.values() if d == 'under')
-
+    # Direction: >50 = Over, <50 = Under. Distanza da 50 = confidence
+    ou_confidence = round(abs(ou_total - 50) + 50, 1)
     tipo_gol = None
-    if total >= CUP_THRESHOLD_GOL:
-        if n_over >= n_under:
-            tipo_gol = 'Over 2.5'
-        else:
-            tipo_gol = 'Under 2.5'
+    if ou_confidence >= CUP_THRESHOLD_GOL:
+        tipo_gol = 'Over 2.5' if ou_total > 50 else 'Under 2.5'
 
-    h_avg = sr.get('home_avg_goals_cl')
-    a_avg = sr.get('away_avg_goals_cl')
-    expected_total = ((h_avg or 2.7) + (a_avg or 2.7)) / 2
-    league_avg = CUP_AVG_GOALS.get(league_name, 2.7)
+    # ===== GG/NG =====
+    gg_scores = {
+        'prob_segna_home': cup_gg_prob_segna_home(match),
+        'prob_segna_away': cup_gg_prob_segna_away(match),
+        'quote_ggng': cup_gg_quote(match),
+        'h2h_media': cup_gg_h2h_media(match),
+    }
 
-    # GG/NG Confidence
-    btts_sr = scores['btts_potential']
-    h2h_gol_score = scores['h2h_gol']
-    avg_gol_score = scores['avg_goals']
+    gg_total = sum(gg_scores[k] * PESI_CUP_GGNG[k] for k in PESI_CUP_GGNG)
 
-    odds = match.get('odds', {})
-    q_gg = odds.get('gg')
-    q_ng = odds.get('ng')
-    if q_gg and q_ng:
-        q_gg_f = float(q_gg)
-        q_ng_f = float(q_ng)
-        ip_gg = (1 / q_gg_f) / (1 / q_gg_f + 1 / q_ng_f) * 100 if q_gg_f > 0 and q_ng_f > 0 else 50
-    else:
-        ip_gg = 50
-
-    h_form_pct = sr.get('home_form_pct', 50)
-    a_form_pct = sr.get('away_form_pct', 50)
-    form_btts = (h_form_pct + a_form_pct) / 2
-
-    gg_weights = {'btts_sr': 0.30, 'h2h': 0.20, 'avg': 0.20, 'odds': 0.20, 'form': 0.10}
-    gg_score = (
-        btts_sr * gg_weights['btts_sr'] +
-        h2h_gol_score * gg_weights['h2h'] +
-        avg_gol_score * gg_weights['avg'] +
-        ip_gg * gg_weights['odds'] +
-        form_btts * gg_weights['form']
-    )
-
+    gg_confidence = round(abs(gg_total - 50) + 50, 1)
     tipo_gol_extra = None
     confidence_gol_extra = 0
-    if gg_score >= CUP_THRESHOLD_GGNG:
-        tipo_gol_extra = 'Goal'
-        confidence_gol_extra = gg_score
-    elif (100 - gg_score) >= CUP_THRESHOLD_GGNG:
-        tipo_gol_extra = 'NoGoal'
-        confidence_gol_extra = 100 - gg_score
+    if gg_confidence >= CUP_THRESHOLD_GGNG:
+        if gg_total > 50:
+            tipo_gol_extra = 'Goal'
+            confidence_gol_extra = gg_confidence
+        else:
+            tipo_gol_extra = 'NoGoal'
+            confidence_gol_extra = gg_confidence
 
-    # Anti-conflitto
+    # Anti-conflitto: Over+NG o Under+GG
     if tipo_gol and tipo_gol_extra:
         is_conflict = (
             ('Over' in tipo_gol and tipo_gol_extra == 'NoGoal') or
             ('Under' in tipo_gol and tipo_gol_extra == 'Goal')
         )
         if is_conflict:
-            if total >= confidence_gol_extra:
+            if ou_confidence >= confidence_gol_extra:
                 tipo_gol_extra = None
                 confidence_gol_extra = 0
             else:
                 tipo_gol = None
 
-    h2h_patterns = {
-        'btts_pct': btts_sr,
-        'over25_pct': scores['over_under_pct'],
-    }
+    # Expected total goals
+    h_avg = sr.get('home_avg_goals_cl')
+    a_avg = sr.get('away_avg_goals_cl')
+    expected_total = ((h_avg or 2.7) + (a_avg or 2.7)) / 2
+    league_avg = CUP_AVG_GOALS.get(league_name, 2.7)
+
+    # Directions O/U + GG/NG (per frontend)
+    directions = {}
+    for k, v in ou_scores.items():
+        if v > 55: directions[k] = 'over'
+        elif v < 45: directions[k] = 'under'
+        else: directions[k] = 'neutro'
+    for k, v in gg_scores.items():
+        if v > 55: directions[f'gg_{k}'] = 'goal'
+        elif v < 45: directions[f'gg_{k}'] = 'nogoal'
+        else: directions[f'gg_{k}'] = 'neutro'
+
+    print(f"  🏆 CUP GOL: ou_total={round(ou_total,1)} ou_conf={ou_confidence} → {tipo_gol or 'SKIP'} | gg_total={round(gg_total,1)} gg_conf={gg_confidence} → {tipo_gol_extra or 'SKIP'}")
 
     return {
-        'score': round(total, 1),
+        'score': ou_confidence,
         'tipo_gol': tipo_gol,
         'tipo_gol_extra': tipo_gol_extra,
         'confidence_gol_extra': round(confidence_gol_extra, 1),
         'expected_total': round(expected_total, 2),
         'league_avg': league_avg,
-        'dettaglio': scores,
+        'dettaglio': {**ou_scores, **{f'gg_{k}': v for k, v in gg_scores.items()}},
         'directions': directions,
-        'h2h_patterns': h2h_patterns,
+        'h2h_patterns': {
+            'btts_pct': gg_scores.get('prob_segna_home', 50),
+            'over25_pct': ou_scores.get('over_pct', 50),
+        },
         'streak_adjustment_gol': 0,
         'streak_adjustment_ggng': 0,
     }
@@ -3048,6 +3152,13 @@ def run_daily_predictions(target_date=None):
         match['_gol_result'] = gol_result
         # FASE 5: Commento
         comment = generate_comment(match, segno_result, gol_result, decision)
+        # Per coppe: usa commenti Sportradar al posto di quelli generati
+        if match.get('_source') == 'cup':
+            sr_comments = match.get('sportradar_h2h', {}).get('comments', [])
+            if sr_comments:
+                comment = {'segno': ' | '.join(sr_comments)}
+            else:
+                comment = {}
 
         if decision['decision'] == 'SCARTA':
             print(f"   ❌ SCARTATA (Segno: {segno_result['score']}, Gol: {gol_result['score']})")
@@ -3135,16 +3246,13 @@ def run_daily_predictions(target_date=None):
             sr = match.get('sportradar_h2h', {})
             prediction_doc['cup_dettaglio'] = {
                 'sportradar_available': bool(sr),
-                'forma_home': sr.get('home_form_pct'),
-                'forma_away': sr.get('away_form_pct'),
+                'segno_dettaglio': segno_result.get('dettaglio', {}),
+                'segno_dettaglio_raw': segno_result.get('dettaglio_raw', {}),
+                'gol_dettaglio': gol_result.get('dettaglio', {}),
                 'forma_home_letters': sr.get('home_form', []),
                 'forma_away_letters': sr.get('away_form', []),
                 'position_home': sr.get('home_position'),
                 'position_away': sr.get('away_position'),
-                'over_pct_home': sr.get('home_over_pct'),
-                'over_pct_away': sr.get('away_over_pct'),
-                'avg_goals_home': sr.get('home_avg_goals_cl'),
-                'avg_goals_away': sr.get('away_avg_goals_cl'),
                 'h2h_record': f"{sr.get('h2h_home_wins', 0)}-{sr.get('h2h_draws', 0)}-{sr.get('h2h_away_wins', 0)}",
                 'comments': sr.get('comments', []),
             }
