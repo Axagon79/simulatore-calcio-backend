@@ -99,13 +99,16 @@ SCRAPER_SEQUENCE = [
       ("scrape_sportradar_h2h.py", "⚽ [24/27] H2H Sportradar Coppe", "Mancano dati H2H Sportradar per partite coppa", FREQUENT_DIR),
 
       # ⭐ GENERAZIONE PRONOSTICI GIORNALIERI (DEVE girare DOPO tutti gli aggiornamenti dati + quote)
-      ("run_daily_predictions.py", "🔮 [25/27] Pronostici Giornalieri", "Pronostici non generati o con quote mancanti", FP_CALCULATORS_DIR),
+      ("run_daily_predictions.py", "🔮 [25/28] Pronostici Giornalieri", "Pronostici non generati o con quote mancanti", FP_CALCULATORS_DIR),
 
       # ⭐ SYNC QUOTE SNAI → SANDBOX (recupera quote mancanti da h2h_by_round + produzione)
-      ("sync_snai_odds_to_sandbox.py", "🧪 [26/27] Sync Quote SNAI → Sandbox", "Sandbox potrebbe avere quote SNAI mancanti", CURRENT_DIR),
+      ("sync_snai_odds_to_sandbox.py", "🧪 [26/28] Sync Quote SNAI → Sandbox", "Sandbox potrebbe avere quote SNAI mancanti", CURRENT_DIR),
 
       # ⭐ REPORT TRACK RECORD (genera JSON + TXT con statistiche pronostici vs risultati)
-      ("generate_track_record_report.py", "📊 [27/27] Report Track Record", "Report statistiche non generato", CURRENT_DIR),
+      ("generate_track_record_report.py", "📊 [27/28] Report Track Record", "Report statistiche non generato", CURRENT_DIR),
+
+      # ⭐ CALCOLO PROFIT/LOSS post-match (aggiorna esito + P/L per ogni pronostico)
+      ("calculate_profit_loss.py", "💰 [28/28] Calcolo Profit/Loss", "Profit/loss non calcolati per pronostici passati", CURRENT_DIR),
 ]
 
 

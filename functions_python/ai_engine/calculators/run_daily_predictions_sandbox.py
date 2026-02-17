@@ -2629,6 +2629,147 @@ def analyze_gol(match_data, home_team_doc, away_team_doc, league_name):
 
 
 
+# ==================== KELLY CRITERION — Probabilità Stimata e Stake ====================
+
+def get_quota_segno(pronostico, match):
+    """Recupera quota per SEGNO/DOPPIA_CHANCE. DC = quota sintetica."""
+    odds = match.get('odds', {})
+    if pronostico in ['1', '2', 'X']:
+        v = float(odds.get(pronostico, 0))
+        return v if v > 1.01 else None
+    dc_map = {'1X': ('1', 'X'), 'X2': ('X', '2'), '12': ('1', '2')}
+    pair = dc_map.get(pronostico)
+    if pair:
+        q1, q2 = float(odds.get(pair[0], 0)), float(odds.get(pair[1], 0))
+        if q1 > 1 and q2 > 1:
+            return round(1 / (1/q1 + 1/q2), 2)
+    return None
+
+def get_quota_gol(pronostico, match):
+    """Recupera quota per GOL (Over/Under, Goal/NoGoal)."""
+    odds = match.get('odds', {})
+    mapping = {
+        'over 2.5': 'over_25', 'under 2.5': 'under_25',
+        'over 1.5': 'over_15', 'under 3.5': 'under_35',
+        'goal': 'gg', 'nogoal': 'ng',
+    }
+    key = mapping.get(pronostico.lower())
+    if key:
+        v = float(odds.get(key, 0))
+        return v if v > 1.01 else None
+    return None
+
+def calcola_probabilita_stimata(quota, dettaglio, tipo, directions=None):
+    """
+    Probabilità stimata per-match, per-pronostico.
+    Modello PURO — nessun blend con mercato.
+    Slope differenziata per tipo (SEGNO/DC/GOL), bonus a gradini.
+    """
+    # A) Probabilità mercato (solo per display, non per blend)
+    if quota and quota > 1.01:
+        p_market = (1.0 / quota) * 0.96
+        p_market = min(p_market, 0.92)
+        has_odds = True
+    else:
+        p_market = 0.50
+        has_odds = False
+
+    # B) Probabilità modello (segnali algoritmo)
+    scores = [v for v in dettaglio.values() if isinstance(v, (int, float))]
+    n = len(scores)
+    if n == 0:
+        p = round(p_market * 100, 1)
+        return {'probabilita_stimata': p, 'prob_mercato': p, 'prob_modello': 50.0, 'has_odds': has_odds}
+
+    avg = sum(scores) / n
+    consensus = sum(1 for s in scores if s > 55) / n
+    strong = sum(1 for s in scores if s > 70) / n
+    variance = sum((s - avg) ** 2 for s in scores) / n
+    std = variance ** 0.5
+
+    # Consenso direzionale GOL
+    dir_bonus = 0
+    if directions:
+        vals = [v for v in directions.values() if v != 'neutro']
+        if vals:
+            most = max(set(vals), key=vals.count)
+            dir_ratio = vals.count(most) / len(vals)
+            if dir_ratio > 0.70:
+                dir_bonus = (dir_ratio - 0.70) * 0.12
+
+    # Calcolo differenziato per tipo di mercato
+    if tipo == 'SEGNO':
+        p_model = 0.44 + (avg - 50) * 0.015
+    elif tipo == 'DOPPIA_CHANCE':
+        p_model = 0.52 + (avg - 50) * 0.018
+    else:  # GOL (Over/Under, GG/NG)
+        p_model = 0.42 + (avg - 50) * 0.013
+
+    # Bonus consensus (a gradini)
+    if consensus >= 0.80:
+        p_model += 0.03
+    elif consensus >= 0.70:
+        p_model += 0.02
+    elif consensus >= 0.60:
+        p_model += 0.01
+
+    # Bonus strong signals (a gradini)
+    if strong >= 0.50:
+        p_model += 0.03
+    elif strong >= 0.35:
+        p_model += 0.02
+
+    # Direction bonus GOL + penalità varianza
+    p_model += dir_bonus
+    if std > 12:
+        p_model -= (std - 12) * 0.003
+    p_model = max(0.25, min(0.88, p_model))
+
+    # Modello puro — nessun blend con il mercato
+    p_final = p_model
+
+    # Cap per tipo mercato
+    caps = {
+        'SEGNO': (0.30, 0.78), 'DOPPIA_CHANCE': (0.45, 0.88), 'GOL': (0.35, 0.80),
+    }
+    lo, hi = caps.get(tipo, (0.30, 0.85))
+    p_final = max(lo, min(hi, p_final))
+
+    return {
+        'probabilita_stimata': round(p_final * 100, 1),
+        'prob_mercato': round(p_market * 100, 1),
+        'prob_modello': round(p_model * 100, 1),
+        'has_odds': has_odds,
+    }
+
+def calcola_stake_kelly(quota, probabilita_stimata, tipo='GOL'):
+    """Quarter Kelly Criterion — tutti i pronostici ricevono stake 1-10."""
+    p = probabilita_stimata / 100
+    if not quota or quota <= 1:
+        return 1, 0.0  # Stake minimo anche senza quota
+    edge = (p * quota - 1) * 100
+    if (p * quota) <= 1:
+        # Edge negativo → stake minimo (il modello ha già filtrato)
+        return 1, round(edge, 2)
+    full_kelly = (p * quota - 1) / (quota - 1)
+    quarter_kelly = full_kelly / 4
+    stake = min(max(round(quarter_kelly * 100), 1), 10)
+
+    # Protezioni tipo-specifiche
+    if tipo == 'SEGNO':
+        if quota < 1.30:
+            stake = min(stake, 2)   # Favorita fortissima
+        elif quota < 1.50:
+            stake = min(stake, 4)   # Favorita media
+    if quota < 1.20:
+        stake = min(stake, 2)       # Generale: quote bassissime
+    if probabilita_stimata > 85:
+        stake = min(stake, 3)       # Overconfidence protection
+    if quota > 5.0:
+        stake = min(stake, 2)       # Value trap protection
+    return stake, round(edge, 2)
+
+
 # ==================== FASE 4: DECISIONE FINALE ====================
 
 def make_decision(segno_result, gol_result, is_cup=False):
@@ -3207,6 +3348,33 @@ def run_daily_predictions(target_date=None):
             if decision['confidence_gol'] > CUP_CONF_CAP:
                 decision['confidence_gol'] = CUP_CONF_CAP
                 decision['stars_gol'] = calculate_stars(CUP_CONF_CAP)
+
+        # KELLY: Arricchisci ogni pronostico con probabilità stimata, stake, edge
+        for p in decision['pronostici']:
+            tipo = p.get('tipo', '')
+            pronostico = p.get('pronostico', '')
+            if tipo in ('SEGNO', 'DOPPIA_CHANCE'):
+                quota_prono = get_quota_segno(pronostico, match)
+                det = segno_result.get('dettaglio', {})
+                dirs = None
+            else:  # GOL
+                quota_prono = get_quota_gol(pronostico, match)
+                det = gol_result.get('dettaglio', {})
+                dirs = gol_result.get('directions', {})
+
+            prob_result = calcola_probabilita_stimata(quota_prono, det, tipo, dirs)
+            stake, edge = calcola_stake_kelly(quota_prono, prob_result['probabilita_stimata'], tipo)
+
+            p['quota'] = p.get('quota') or quota_prono
+            p['probabilita_stimata'] = prob_result['probabilita_stimata']
+            p['prob_mercato'] = prob_result['prob_mercato']
+            p['prob_modello'] = prob_result['prob_modello']
+            p['has_odds'] = prob_result['has_odds']
+            p['stake'] = stake
+            p['edge'] = edge
+
+            if stake > 0:
+                print(f"      💰 {pronostico}: stake {stake}/10 (edge {edge:+.1f}%, prob {prob_result['probabilita_stimata']:.1f}%)")
 
         # Prepara documento per DB
         prediction_doc = {

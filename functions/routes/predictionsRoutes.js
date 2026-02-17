@@ -172,12 +172,31 @@ router.get('/daily-predictions', async (req, res) => {
 
     predictions.sort((a, b) => (a.match_time || '').localeCompare(b.match_time || ''));
 
+    // Backward compatibility: assicura campi Kelly sempre presenti
+    for (const pred of predictions) {
+      if (pred.pronostici) {
+        for (const p of pred.pronostici) {
+          p.probabilita_stimata = p.probabilita_stimata ?? null;
+          p.stake = p.stake ?? 0;
+          p.edge = p.edge ?? 0;
+          p.profit_loss = p.profit_loss ?? null;
+          p.prob_mercato = p.prob_mercato ?? null;
+          p.prob_modello = p.prob_modello ?? null;
+          p.has_odds = p.has_odds ?? true;
+        }
+      }
+    }
+
     // Conteggio per singolo pronostico (non per partita)
     const allP = predictions.flatMap(p => p.pronostici || []);
     const verifiedP = allP.filter(p => p.hit === true || p.hit === false);
     const hitsP = allP.filter(p => p.hit === true).length;
 
-    console.log(`✅ [PREDICTIONS] ${predictions.length} partite, ${allP.length} pronostici, ${hitsP}/${verifiedP.length} azzeccati`);
+    // Conteggio HR per partita (almeno 1 pronostico corretto = match hit)
+    const matchesWithResult = predictions.filter(p => p.real_score);
+    const matchHits = matchesWithResult.filter(p => p.hit === true).length;
+
+    console.log(`✅ [PREDICTIONS] ${predictions.length} partite, ${allP.length} pronostici, ${hitsP}/${verifiedP.length} azzeccati, HR partite: ${matchHits}/${matchesWithResult.length}`);
 
     return res.json({
       success: true, date, predictions, count: predictions.length,
@@ -188,7 +207,11 @@ router.get('/daily-predictions', async (req, res) => {
         hits: hitsP,
         misses: verifiedP.length - hitsP,
         pending: allP.length - verifiedP.length,
-        hit_rate: verifiedP.length > 0 ? Math.round((hitsP / verifiedP.length) * 1000) / 10 : null
+        hit_rate: verifiedP.length > 0 ? Math.round((hitsP / verifiedP.length) * 1000) / 10 : null,
+        // HR Partite
+        matches_finished: matchesWithResult.length,
+        matches_hits: matchHits,
+        matches_hit_rate: matchesWithResult.length > 0 ? Math.round((matchHits / matchesWithResult.length) * 1000) / 10 : null
       }
     });
   } catch (error) {
@@ -639,6 +662,161 @@ router.get('/track-record', async (req, res) => {
   } catch (error) {
     console.error('❌ [TRACK-RECORD] Errore:', error);
     return res.status(500).json({ error: 'Errore nel calcolo track record', details: error.message });
+  }
+});
+
+// 💰 ENDPOINT: Statistiche Bankroll (ROI, Yield, P/L)
+router.get('/bankroll-stats', async (req, res) => {
+  console.log('💰 [BANKROLL] Richiesta statistiche');
+
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    const docs = await req.db.collection('daily_predictions')
+      .find({ date: { $lt: today } })
+      .project({ date: 1, league: 1, pronostici: 1 })
+      .toArray();
+
+    // Raccogli tutti i pronostici con profit_loss
+    const allBets = [];
+    for (const doc of docs) {
+      for (const p of (doc.pronostici || [])) {
+        if (p.profit_loss === undefined || p.profit_loss === null) continue;
+        if (p.stake === undefined || p.stake === 0) continue;
+        allBets.push({
+          date: doc.date,
+          league: doc.league,
+          tipo: p.tipo,
+          pronostico: p.pronostico,
+          quota: p.quota,
+          probabilita_stimata: p.probabilita_stimata,
+          stake: p.stake,
+          edge: p.edge,
+          esito: p.esito,
+          profit_loss: p.profit_loss,
+        });
+      }
+    }
+
+    if (allBets.length === 0) {
+      return res.json({ success: true, message: 'Nessun dato disponibile. Esegui prima il backfill.', data: null });
+    }
+
+    // Helper
+    const calcStats = (bets) => {
+      const total = bets.length;
+      const won = bets.filter(b => b.esito === true).length;
+      const totalStake = bets.reduce((s, b) => s + (b.stake || 0), 0);
+      const totalPL = bets.reduce((s, b) => s + (b.profit_loss || 0), 0);
+      return {
+        count: total,
+        won,
+        lost: total - won,
+        hr: total > 0 ? Math.round((won / total) * 1000) / 10 : 0,
+        total_stake: Math.round(totalStake * 100) / 100,
+        profit_loss: Math.round(totalPL * 100) / 100,
+        yield: totalStake > 0 ? Math.round((totalPL / totalStake) * 1000) / 10 : 0,
+      };
+    };
+
+    // Globale
+    const globale = calcStats(allBets);
+
+    // Per mercato
+    const mercati = {};
+    for (const b of allBets) {
+      let m = b.tipo;
+      if (m === 'GOL') {
+        const p = (b.pronostico || '').toLowerCase();
+        m = (p.includes('over') || p.includes('under')) ? 'OVER_UNDER' : 'GG_NG';
+      }
+      if (!mercati[m]) mercati[m] = [];
+      mercati[m].push(b);
+    }
+    const byMercato = {};
+    for (const [m, bets] of Object.entries(mercati)) {
+      byMercato[m] = calcStats(bets);
+    }
+
+    // Per stake level
+    const stakeLevels = { '0': [], '1': [], '2': [], '3': [], '4-5': [], '6+': [] };
+    for (const b of allBets) {
+      const s = b.stake || 0;
+      if (s === 0) stakeLevels['0'].push(b);
+      else if (s === 1) stakeLevels['1'].push(b);
+      else if (s === 2) stakeLevels['2'].push(b);
+      else if (s === 3) stakeLevels['3'].push(b);
+      else if (s <= 5) stakeLevels['4-5'].push(b);
+      else stakeLevels['6+'].push(b);
+    }
+    const byStake = {};
+    for (const [level, bets] of Object.entries(stakeLevels)) {
+      if (bets.length > 0) byStake[level] = calcStats(bets);
+    }
+
+    // Per campionato
+    const campionati = {};
+    for (const b of allBets) {
+      const lg = b.league || 'Altro';
+      if (!campionati[lg]) campionati[lg] = [];
+      campionati[lg].push(b);
+    }
+    const byLeague = {};
+    for (const [lg, bets] of Object.entries(campionati)) {
+      byLeague[lg] = calcStats(bets);
+    }
+
+    // Temporale: ultimi 7/30/90 giorni
+    const now = new Date();
+    const daysAgo = (n) => {
+      const d = new Date(now);
+      d.setDate(d.getDate() - n);
+      return d.toISOString().split('T')[0];
+    };
+    const last7 = calcStats(allBets.filter(b => b.date >= daysAgo(7)));
+    const last30 = calcStats(allBets.filter(b => b.date >= daysAgo(30)));
+    const last90 = calcStats(allBets.filter(b => b.date >= daysAgo(90)));
+
+    // Per mese
+    const mesi = {};
+    for (const b of allBets) {
+      const ym = b.date ? b.date.substring(0, 7) : '????-??';
+      if (!mesi[ym]) mesi[ym] = [];
+      mesi[ym].push(b);
+    }
+    const byMonth = {};
+    for (const [ym, bets] of Object.entries(mesi)) {
+      byMonth[ym] = calcStats(bets);
+    }
+
+    // Profitto cumulativo per data (per chart)
+    const dateMap = {};
+    for (const b of allBets) {
+      if (!dateMap[b.date]) dateMap[b.date] = 0;
+      dateMap[b.date] += b.profit_loss || 0;
+    }
+    const sortedDates = Object.keys(dateMap).sort();
+    let cumulative = 0;
+    const cumulativeChart = sortedDates.map(d => {
+      cumulative += dateMap[d];
+      return { date: d, pl: Math.round(cumulative * 100) / 100 };
+    });
+
+    console.log(`✅ [BANKROLL] ${allBets.length} pronostici, P/L: ${globale.profit_loss}, Yield: ${globale.yield}%`);
+
+    return res.json({
+      success: true,
+      data: {
+        globale,
+        byMercato,
+        byStake,
+        byLeague,
+        temporal: { last7, last30, last90, byMonth },
+        cumulativeChart,
+      }
+    });
+  } catch (error) {
+    console.error('❌ [BANKROLL] Errore:', error);
+    return res.status(500).json({ error: 'Errore nel calcolo bankroll stats', details: error.message });
   }
 });
 
