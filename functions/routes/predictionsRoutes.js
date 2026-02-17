@@ -822,4 +822,87 @@ router.get('/bankroll-stats', async (req, res) => {
   }
 });
 
+// 🎲 ENDPOINT: Pronostici Sistema C (Monte Carlo)
+router.get('/daily-predictions-engine-c', async (req, res) => {
+  const { date } = req.query;
+  if (!date) return res.status(400).json({ error: 'Parametro date mancante' });
+
+  console.log('🎲 [ENGINE C] Richiesta per:', date);
+
+  try {
+    const [predictions, resultsMap] = await Promise.all([
+      req.db.collection('daily_predictions_engine_c')
+        .find({ date }, { projection: { _id: 0 } })
+        .toArray(),
+      getFinishedResults(req.db, date)
+    ]);
+
+    for (const pred of predictions) {
+      const realScore = resultsMap[`${pred.home}|||${pred.away}|||${pred.date}`] || null;
+      pred.real_score = realScore;
+
+      if (realScore) {
+        const parsed = parseScore(realScore);
+        pred.real_sign = parsed ? parsed.sign : null;
+
+        if (pred.pronostici && pred.pronostici.length > 0) {
+          for (const p of pred.pronostici) {
+            p.hit = checkPronostico(p.pronostico, p.tipo, parsed);
+          }
+          pred.hit = pred.pronostici.some(p => p.hit === true);
+        } else {
+          pred.hit = null;
+        }
+      } else {
+        pred.real_sign = null;
+        pred.hit = null;
+      }
+    }
+
+    predictions.sort((a, b) => (a.match_time || '').localeCompare(b.match_time || ''));
+
+    // Backward compatibility: assicura campi Kelly sempre presenti
+    for (const pred of predictions) {
+      if (pred.pronostici) {
+        for (const p of pred.pronostici) {
+          p.probabilita_stimata = p.probabilita_stimata ?? null;
+          p.stake = p.stake ?? 0;
+          p.edge = p.edge ?? 0;
+          p.prob_mercato = p.prob_mercato ?? null;
+          p.prob_modello = p.prob_modello ?? null;
+          p.has_odds = p.has_odds ?? true;
+        }
+      }
+    }
+
+    const allP = predictions.flatMap(p => p.pronostici || []);
+    const verifiedP = allP.filter(p => p.hit === true || p.hit === false);
+    const hitsP = allP.filter(p => p.hit === true).length;
+
+    const matchesWithResult = predictions.filter(p => p.real_score);
+    const matchHits = matchesWithResult.filter(p => p.hit === true).length;
+
+    console.log(`✅ [ENGINE C] ${predictions.length} partite, ${allP.length} pronostici, ${hitsP}/${verifiedP.length} azzeccati`);
+
+    return res.json({
+      success: true, date, predictions, count: predictions.length,
+      stats: {
+        total: allP.length,
+        total_matches: predictions.length,
+        finished: verifiedP.length,
+        hits: hitsP,
+        misses: verifiedP.length - hitsP,
+        pending: allP.length - verifiedP.length,
+        hit_rate: verifiedP.length > 0 ? Math.round((hitsP / verifiedP.length) * 1000) / 10 : null,
+        matches_finished: matchesWithResult.length,
+        matches_hits: matchHits,
+        matches_hit_rate: matchesWithResult.length > 0 ? Math.round((matchHits / matchesWithResult.length) * 1000) / 10 : null
+      }
+    });
+  } catch (error) {
+    console.error('❌ [ENGINE C] Errore:', error);
+    return res.status(500).json({ error: 'Errore nel recupero pronostici Engine C', details: error.message });
+  }
+});
+
 module.exports = { router, parseScore, checkPronostico, getQuotaForPronostico, getFinishedResults };
