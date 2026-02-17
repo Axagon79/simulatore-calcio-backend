@@ -428,6 +428,29 @@ app.get('/live-scores', async (req, res) => {
     ];
 
     const scores = await db.collection('h2h_by_round').aggregate(pipeline).toArray();
+
+    // Coppe europee (documenti singoli, struttura diversa)
+    const [y, m, d] = targetDate.split('-');
+    const cupDatePrefix = `${d}-${m}-${y}`;  // "17-02-2026"
+
+    for (const cupColl of ['matches_champions_league', 'matches_europa_league']) {
+      const cupMatches = await db.collection(cupColl).find({
+        match_date: { $regex: `^${cupDatePrefix}` },
+        live_status: { $in: ['Live', 'HT', 'Finished'] }
+      }).toArray();
+
+      for (const cm of cupMatches) {
+        scores.push({
+          home: cm.home_team,
+          away: cm.away_team,
+          live_score: cm.live_score || null,
+          live_status: cm.live_status || null,
+          live_minute: cm.live_minute || null,
+          match_time: cm.match_date ? cm.match_date.split(' ')[1] : null
+        });
+      }
+    }
+
     res.json({ success: true, scores });
   } catch (error) {
     console.error('Live-scores error:', error);

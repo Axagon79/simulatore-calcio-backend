@@ -234,6 +234,38 @@ def get_today_matches_from_db():
     return matches
 
 
+def get_today_cup_matches_from_db():
+    """Carica le partite coppe di oggi da matches_champions/europa_league."""
+    today_str = datetime.now().strftime('%d-%m-%Y')  # "17-02-2026"
+
+    cup_matches = []
+    cup_collections = [
+        ('matches_champions_league', 'Champions League'),
+        ('matches_europa_league', 'Europa League'),
+    ]
+
+    for coll_name, league_name in cup_collections:
+        try:
+            docs = list(db[coll_name].find({
+                'match_date': {'$regex': f'^{today_str}'}
+            }))
+            for doc in docs:
+                cup_matches.append({
+                    'home': doc.get('home_team', ''),
+                    'away': doc.get('away_team', ''),
+                    'live_score': doc.get('live_score'),
+                    'live_status': doc.get('live_status'),
+                    'live_minute': doc.get('live_minute'),
+                    '_collection': coll_name,
+                    '_doc_id': doc['_id'],
+                    '_league': league_name,
+                })
+        except Exception as e:
+            print(f"   Errore caricamento {coll_name}: {e}")
+
+    return cup_matches
+
+
 def load_team_docs_batch(matches):
     """Pre-carica tutti i team doc dal DB in un'unica query."""
     team_names = set()
@@ -357,8 +389,13 @@ def run_cycle(driver):
     print(f"CICLO LIVE: {cycle_start.strftime('%H:%M:%S')}")
     print(f"{'='*50}")
 
-    # 1. Carica partite di oggi dal DB
+    # 1. Carica partite di oggi dal DB (campionati + coppe)
     db_matches = get_today_matches_from_db()
+    cup_matches = get_today_cup_matches_from_db()
+    if cup_matches:
+        db_matches.extend(cup_matches)
+        print(f"   Partite coppe: {len(cup_matches)}")
+
     if not db_matches:
         print("   Nessuna partita oggi nel DB.")
         return
@@ -418,13 +455,14 @@ def run_cycle(driver):
         print("   Nessuna partita attiva su NowGoal.")
         return
 
-    # 4. Matching e aggiornamento atomico (positional operator $)
+    # 4. Matching e aggiornamento
     updated_count = 0
     matched_count = 0
 
     for db_match in db_matches:
-        round_id = db_match.get('_round_id')
-        if not round_id:
+        # Le coppe non hanno _round_id, i campionati sì
+        is_cup = '_collection' in db_match
+        if not is_cup and not db_match.get('_round_id'):
             continue
 
         ng_match = find_nowgoal_match(db_match, nowgoal_matches, team_docs)
@@ -448,25 +486,46 @@ def run_cycle(driver):
         home = db_match.get('home', '?')
         away = db_match.get('away', '?')
 
-        # Update atomico con positional operator $
-        update_fields = {
-            "matches.$.live_score": new_score,
-            "matches.$.live_status": new_status,
-            "matches.$.live_minute": new_minute
-        }
-        # Se FT, scrivi anche real_score e status per risultato immediato
-        if new_status == "Finished":
-            update_fields["matches.$.real_score"] = new_score
-            update_fields["matches.$.status"] = "Finished"
+        if is_cup:
+            # Coppe — update diretto sul documento singolo
+            cup_update = {
+                "live_score": new_score,
+                "live_status": new_status,
+                "live_minute": new_minute
+            }
+            if new_status == "Finished":
+                scores = new_score.split(':')
+                cup_update["result"] = {
+                    "home_score": int(scores[0]),
+                    "away_score": int(scores[1])
+                }
+                cup_update["status"] = "finished"
 
-        result = db.h2h_by_round.update_one(
-            {"_id": round_id, "matches.home": home, "matches.away": away},
-            {"$set": update_fields}
-        )
+            result = db[db_match['_collection']].update_one(
+                {"_id": db_match['_doc_id']},
+                {"$set": cup_update}
+            )
+        else:
+            # Campionati — update atomico con positional operator $
+            round_id = db_match.get('_round_id')
+            update_fields = {
+                "matches.$.live_score": new_score,
+                "matches.$.live_status": new_status,
+                "matches.$.live_minute": new_minute
+            }
+            if new_status == "Finished":
+                update_fields["matches.$.real_score"] = new_score
+                update_fields["matches.$.status"] = "Finished"
+
+            result = db.h2h_by_round.update_one(
+                {"_id": round_id, "matches.home": home, "matches.away": away},
+                {"$set": update_fields}
+            )
 
         if result.modified_count > 0:
             updated_count += 1
-            print(f"   {new_status:8s} {new_minute:3d}' | {home} {new_score} {away}")
+            cup_tag = " [CUP]" if is_cup else ""
+            print(f"   {new_status:8s} {new_minute:3d}' | {home} {new_score} {away}{cup_tag}")
 
     print(f"\n   Matched: {matched_count} | Aggiornati: {updated_count}")
 

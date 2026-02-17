@@ -1375,7 +1375,7 @@ def analyze_cup_segno(match):
     # Segno bloccato se quota troppo bassa
     segno_blocked = q_fav < 1.35
 
-    # Doppia chance
+    # Doppia chance — basata sul favorito del mercato
     doppia_chance = None
     doppia_chance_quota = None
     if q1 < q2:
@@ -2859,17 +2859,22 @@ def make_decision(segno_result, gol_result, is_cup=False):
                         'stars': calculate_stars(s_score),
                     })
             else:
-                # Conf alta OPPURE quota bassa → SEGNO secco
-                pronostici.append({
-                    'tipo': 'SEGNO',
-                    'pronostico': segno_result['segno'],
-                    'quota': q_pred,
-                    'confidence': s_score,
-                    'stars': calculate_stars(s_score),
-                })
+                segno_val = segno_result['segno']
+                SOGLIA_MAX_QUOTA_SEGNO = 2.50
 
-                # Doppia chance aggiuntiva (se disponibile e quota >= 1.30)
-                if dc and dc_quota and dc_quota >= 1.30:
+                # Check 1: coerenza SEGNO ↔ DC (evita es. SEGNO 1 + DC X2)
+                segno_dc_coerente = True
+                if dc:
+                    if segno_val == '1' and dc == 'X2':
+                        segno_dc_coerente = False
+                    elif segno_val == '2' and dc == '1X':
+                        segno_dc_coerente = False
+
+                # Check 2: quota SEGNO troppo alta (underdog) → solo DC
+                segno_troppo_underdog = q_pred_float > SOGLIA_MAX_QUOTA_SEGNO
+
+                if (not segno_dc_coerente or segno_troppo_underdog) and dc and dc_quota and dc_quota >= 1.30:
+                    # Contraddizione o underdog → emetti solo DC, skip SEGNO
                     pronostici.append({
                         'tipo': 'DOPPIA_CHANCE',
                         'pronostico': dc,
@@ -2877,6 +2882,28 @@ def make_decision(segno_result, gol_result, is_cup=False):
                         'confidence': s_score,
                         'stars': calculate_stars(s_score),
                     })
+                elif not segno_dc_coerente or segno_troppo_underdog:
+                    # Contraddizione/underdog ma DC non disponibile → skip tutto
+                    pass
+                else:
+                    # SEGNO secco (coerente + quota ragionevole)
+                    pronostici.append({
+                        'tipo': 'SEGNO',
+                        'pronostico': segno_val,
+                        'quota': q_pred,
+                        'confidence': s_score,
+                        'stars': calculate_stars(s_score),
+                    })
+
+                    # Doppia chance aggiuntiva (se disponibile e quota >= 1.30)
+                    if dc and dc_quota and dc_quota >= 1.30:
+                        pronostici.append({
+                            'tipo': 'DOPPIA_CHANCE',
+                            'pronostico': dc,
+                            'quota': dc_quota,
+                            'confidence': s_score,
+                            'stars': calculate_stars(s_score),
+                        })
         # else: SEGNO skippato — X Factor processerà questa partita
     
     # Gol — Over/Under (usa g_score)
