@@ -671,8 +671,10 @@ router.get('/bankroll-stats', async (req, res) => {
 
   try {
     const today = new Date().toISOString().split('T')[0];
+    const dateFilter = { $lt: today };
+    if (req.query.from) dateFilter.$gte = req.query.from;
     const docs = await req.db.collection('daily_predictions')
-      .find({ date: { $lt: today } })
+      .find({ date: dateFilter })
       .project({ date: 1, league: 1, pronostici: 1 })
       .toArray();
 
