@@ -18,7 +18,7 @@ from collections import Counter
 
 # ==================== TUNING ====================
 SIMULATION_CYCLES = 100          # Cicli MC per partita
-ALGO_MODE = 5                    # Master/Ensemble
+ALGO_MODE = 6                    # Master/Ensemble
 
 # Soglie (da calibrare dopo i test — per ora emette tutto)
 MIN_CONFIDENCE = 0               # 0 = emette tutto, calibrare dopo

@@ -35,29 +35,6 @@ def validate_tuning(settings):
     
     return validated
 
-# --- FUNZIONE VALIDAZIONE PARAMETRI ---
-def validate_tuning(settings):
-    """
-    Valida SOLO i parametri critici che causano crash.
-    I pesi possono andare a zero (disattivato) ma non sotto.
-    """
-    validated = settings.copy()
-    
-    # DIVISORI: Non possono essere 0 o negativi (causano CRASH)
-    if "DIVISORE_MEDIA_GOL" in validated:
-        val = validated["DIVISORE_MEDIA_GOL"]
-        if val <= 0:
-            print(f"⚠️ [TUNING] DIVISORE_MEDIA_GOL = {val} causa crash! Uso default: 2.0")
-            validated["DIVISORE_MEDIA_GOL"] = 2.0
-    
-    if "IMPATTO_DIFESA_TATTICA" in validated:
-        val = validated["IMPATTO_DIFESA_TATTICA"]
-        if val <= 0:
-            print(f"⚠️ [TUNING] IMPATTO_DIFESA_TATTICA = {val} causa crash! Uso default: 15.0")
-            validated["IMPATTO_DIFESA_TATTICA"] = 15.0
-    
-    return validated
-
 
 def load_tuning(algo_mode="GLOBAL"):
     """
@@ -96,7 +73,8 @@ def load_tuning(algo_mode="GLOBAL"):
         2: "ALGO_2",
         3: "ALGO_3",
         4: "ALGO_4",
-        5: "ALGO_5"
+        5: "ALGO_5",
+        6: "ALGO_C"
     }
 
     # Determinazione della chiave target
@@ -104,6 +82,16 @@ def load_tuning(algo_mode="GLOBAL"):
         target_key = algo_map.get(algo_mode, "GLOBAL")
     else:
         target_key = str(algo_mode)
+
+    # --- ALGO_C: legge da documento MongoDB dedicato (algo_c_config) ---
+    if target_key == "ALGO_C":
+        try:
+            from config import db as _db
+            algo_c_doc = _db['tuning_settings'].find_one({"_id": "algo_c_config"})
+            if algo_c_doc and "config" in algo_c_doc and "ALGO_C" in algo_c_doc["config"]:
+                full_data["ALGO_C"] = algo_c_doc["config"]["ALGO_C"]
+        except Exception:
+            pass  # fallback: usa ALGO_C da main_config se presente
 
     merged_settings = {}
 
@@ -467,8 +455,7 @@ def calculate_goals_from_engine(home_score, away_score, home_data, away_data, al
     # Minimo 0.15 gol attesi (mai zero assoluto), Massimo da Mixer
     final_lambda_h = max(0.15, min(S["TETTO_MAX_GOL_ATTESI"], final_lambda_h))
     final_lambda_a = max(0.15, min(S["TETTO_MAX_GOL_ATTESI"], final_lambda_a))
-    
-    
+
     # --- E. GENERAZIONE RISULTATO (POISSON) ---
     # Simulazione Monte Carlo basata sulle aspettative finali
     gh = np.random.poisson(final_lambda_h)

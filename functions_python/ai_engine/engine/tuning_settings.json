@@ -347,5 +347,66 @@
         "THR_GG_GREEN": {
             "valore": 60.0
         }
+    },
+    "ALGO_C": {
+        "_NOME": "PRONOSTICI MC - Dedicato Sistema C",
+        "_OBIETTIVO": "Algoritmo indipendente per pronostici giornalieri MC",
+        "PESO_RATING_ROSA": {
+            "valore": 1.3
+        },
+        "PESO_FORMA_RECENTE": {
+            "valore": 2.0
+        },
+        "PESO_MOTIVAZIONE": {
+            "valore": 1.2
+        },
+        "PESO_FATTORE_CAMPO": {
+            "valore": 1.4
+        },
+        "PESO_STORIA_H2H": {
+            "valore": -0.5
+        },
+        "PESO_BVS_QUOTE": {
+            "valore": 1.5
+        },
+        "PESO_AFFIDABILITA": {
+            "valore": 1.0
+        },
+        "PESO_VALORE_ROSA": {
+            "valore": 1.0
+        },
+        "PESO_STREAK": {
+            "valore": 2.0
+        },
+        "DIVISORE_MEDIA_GOL": {
+            "valore": 0.50
+        },
+        "POTENZA_FAVORITA_WINSHIFT": {
+            "valore": 0.35
+        },
+        "IMPATTO_DIFESA_TATTICA": {
+            "valore": 22.0
+        },
+        "TETTO_MAX_GOL_ATTESI": {
+            "valore": 4.5
+        },
+        "THR_1X2_RED": {
+            "valore": 40.0
+        },
+        "THR_1X2_GREEN": {
+            "valore": 60.0
+        },
+        "THR_UO_RED": {
+            "valore": 40.0
+        },
+        "THR_UO_GREEN": {
+            "valore": 60.0
+        },
+        "THR_GG_RED": {
+            "valore": 40.0
+        },
+        "THR_GG_GREEN": {
+            "valore": 60.0
+        }
     }
 }

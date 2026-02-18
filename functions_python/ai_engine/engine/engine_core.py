@@ -77,12 +77,22 @@ def load_tuning_db():
 
 RAW_DB = load_tuning_db()
 
+# Carica ALGO_C da documento MongoDB dedicato (separato da main_config)
+try:
+    _algo_c_doc = db['tuning_settings'].find_one({"_id": "algo_c_config"})
+    if _algo_c_doc and "config" in _algo_c_doc and "ALGO_C" in _algo_c_doc["config"]:
+        RAW_DB["ALGO_C"] = _algo_c_doc["config"]["ALGO_C"]
+        print("✅ [ENGINE] ALGO_C caricato da documento dedicato (algo_c_config)")
+except Exception:
+    pass  # fallback: usa ALGO_C da main_config se presente
+
 JSON_KEYS_MAP = {
     1: "ALGO_1",
     2: "ALGO_2",
     3: "ALGO_3",
     4: "ALGO_4",
-    5: "GLOBAL"
+    5: "GLOBAL",
+    6: "ALGO_C"
 }
 
 # 3. Funzione costruttrice del compartimento pesi
@@ -116,8 +126,8 @@ def build_weights_compartment(algo_id):
     }
 
 WEIGHTS_CACHE = {
-    algo_id: build_weights_compartment(algo_id) 
-    for algo_id in [1, 2, 3, 4, 5]
+    algo_id: build_weights_compartment(algo_id)
+    for algo_id in [1, 2, 3, 4, 5, 6]
 }
 
 print(f"🎛️ [ENGINE] Tuning Granulare Caricato: {len(WEIGHTS_CACHE)} profili attivi.")
@@ -128,7 +138,8 @@ ALGO_NAMES = {
     2: "DINAMICO (Base)",
     3: "COMPLESSO (Tattico)",
     4: "CAOS (Estremo)",
-    5: "MASTER (Ensemble)"
+    5: "MASTER (Ensemble)",
+    6: "PRONOSTICI (MC Dedicato)"
 }
 
 # === SISTEMA IBRIDO: DB league_stats → JSON fallback ===
