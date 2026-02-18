@@ -1176,8 +1176,8 @@ if __name__ == "__main__":
         target = datetime.strptime(args.date, '%Y-%m-%d')
         run_engine_c(target)
     else:
-        for i in range(7):  # TEMPORANEO: 11-17 febbraio 2026 (rimettere datetime.now() dopo)
-            target = datetime(2026, 2, 11) + timedelta(days=i)
+        for i in range(7):  # 0=oggi, 1=domani, 2=dopodomani, ... 6=tra 6 giorni
+            target = datetime.now() + timedelta(days=i)
             print("\n" + "=" * 70)
             print(f"📅 ELABORAZIONE: {target.strftime('%Y-%m-%d')}")
             print("=" * 70)
