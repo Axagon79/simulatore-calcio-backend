@@ -467,27 +467,31 @@ def run_engine_c(target_date=None):
     for league, league_matches in leagues.items():
         print(f"\n📂 {league} ({len(league_matches)} partite)")
 
-        # Carica bulk_cache una volta per lega
-        first = league_matches[0]
-        home_0 = first.get('home', first.get('home_team', ''))
-        away_0 = first.get('away', first.get('away_team', ''))
-        try:
-            with suppress_stdout():
-                bulk_cache = bulk_manager.get_all_data_bulk(home_0, away_0, league)
-        except Exception as e:
-            print(f"  ⚠️ Bulk cache fallito per {league}: {e}")
-            skipped += len(league_matches)
-            continue
-
         for m in league_matches:
             home = m.get('home', m.get('home_team', ''))
             away = m.get('away', m.get('away_team', ''))
             t_match = time.time()
 
-            # Ponte dati
+            # Carica bulk_cache per ogni partita (ogni coppia di squadre)
+            try:
+                with suppress_stdout():
+                    bulk_cache = bulk_manager.get_all_data_bulk(home, away, league)
+            except Exception as e:
+                print(f"  ⏭️ Skip (bulk fallito): {home} vs {away} — {e}")
+                skipped += 1
+                continue
+
+            # Ponte dati — chiamo preload_match_data direttamente per catturare errori
+            preload_error = None
             with suppress_stdout():
-                preloaded = build_preloaded(home, away, league, bulk_cache=bulk_cache)
+                try:
+                    preloaded = preload_match_data(home, away, league=league, bulk_cache=bulk_cache)
+                except Exception as e:
+                    preloaded = None
+                    preload_error = str(e)
             if not preloaded:
+                err_msg = f" — {preload_error}" if preload_error else ""
+                print(f"  ⏭️ Skip (preload fallito): {home} vs {away}{err_msg}")
                 skipped += 1
                 continue
 

@@ -129,8 +129,8 @@ def get_value_score_live_bulk(team_name, league_name, bulk_cache):
     if not league_teams:
         return 5.0
 
-    values_valid = [t.get("stats", {}).get("marketValue", 0) for t in league_teams if t.get("stats", {}).get("marketValue", 0) > 0]
-    ages_valid = [t.get("stats", {}).get("avgAge", 0) for t in league_teams if t.get("stats", {}).get("avgAge", 0) > 0]
+    values_valid = [t.get("stats", {}).get("marketValue") or 0 for t in league_teams if (t.get("stats", {}).get("marketValue") or 0) > 0]
+    ages_valid = [t.get("stats", {}).get("avgAge") or 0 for t in league_teams if (t.get("stats", {}).get("avgAge") or 0) > 0]
     
     # RICERCA TARGET TEAM (FIX ALIAS BLINDATO)
     target_team = None
