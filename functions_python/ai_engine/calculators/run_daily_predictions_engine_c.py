@@ -487,57 +487,171 @@ def decidi_segno_dc(dist, odds, re_dir):
     return None
 
 
-# ---------- OVER / UNDER (Regole 8-12) ----------
+# ---------- OVER / UNDER (Regole 8-12 + Regola 19: Fascia a Campana Under) ----------
+
+# Over: logica classica con soglia
+SOGLIA_SEVERA_OVER = 60    # Over: emissione diretta se MC% >= 60%
+SOGLIA_MINIMA_OVER = 55    # Over: sotto 55% → eliminato
+
+# Under: fascia a campana (sweet spot 55-75%, paradosso confidence invertita)
+# MC sottostima gol → confidence alta Under = sbaglia di piu
+UNDER_ELIMINA = 45         # < 45% → eliminato
+UNDER_DECLASSA_BASSO = 55  # 45-55% → declassamento
+UNDER_SWEET_MAX = 75       # 55-75% → emissione diretta (72.2% HR)
+                           # > 75% → declassamento (50% HR)
+
+# Mappa declassamento: linea originale → linea piu sicura
+_DOWNGRADE_MAP = {
+    ('Over', '3.5'): '2.5',   # Over 3.5 → Over 2.5
+    ('Over', '2.5'): '1.5',   # Over 2.5 → Over 1.5
+    ('Under', '2.5'): '3.5',  # Under 2.5 → Under 3.5
+    # Under 1.5: ELIMINATO (33% HR, non declassabile)
+    # Over 1.5 / Under 3.5: non hanno linea adiacente → eliminati
+}
+
 
 def decidi_over_under(dist, odds, re_dir, fav_pct):
-    """Regole 8-12: O/U per tutte le linee. Ritorna lista pronostici."""
+    """Regole 8-12 + Regola 19 (Fascia a Campana Under): O/U."""
     if _is_piatta(dist):
         return []  # Regola 9: 1X2 piatta → O/U inaffidabile
 
     re_avg_gol = _calcola_re_gol_medi(dist['top_scores'], dist['valid_cycles'])
     _, fav_pct_actual = identifica_favorita(dist)
+
+    # Mappa MC% e quote per tutte le linee (per declassamento)
+    mc_map = {
+        ('Over', '1.5'): dist['over_15_pct'],
+        ('Over', '2.5'): dist['over_25_pct'],
+        ('Over', '3.5'): dist['over_35_pct'],
+        ('Under', '2.5'): dist['under_25_pct'],
+        ('Under', '3.5'): dist['under_35_pct'],
+    }
+    quota_map = {
+        ('Over', '1.5'): _get_quota(odds, 'over_15', 'Over 1.5'),
+        ('Over', '2.5'): _get_quota(odds, 'over_25', 'Over 2.5'),
+        ('Over', '3.5'): _get_quota(odds, 'over_35', 'Over 3.5'),
+        ('Under', '2.5'): _get_quota(odds, 'under_25', 'Under 2.5'),
+        ('Under', '3.5'): _get_quota(odds, 'under_35', 'Under 3.5'),
+    }
+
     pronostici = []
+    emitted_keys = set()
+    to_downgrade = []
 
     lines = [
         ('1.5', dist['over_15_pct'], dist['under_15_pct'],
          _get_quota(odds, 'over_15', 'Over 1.5'), _get_quota(odds, 'under_15', 'Under 1.5')),
         ('2.5', dist['over_25_pct'], dist['under_25_pct'],
-         _get_quota(odds, 'over_25', 'Over 2.5'), _get_quota(odds, 'under_25', 'Under 2.5')),
+         quota_map[('Over', '2.5')], quota_map[('Under', '2.5')]),
         ('3.5', dist['over_35_pct'], dist['under_35_pct'],
-         _get_quota(odds, 'over_35', 'Over 3.5'), _get_quota(odds, 'under_35', 'Under 3.5')),
+         quota_map[('Over', '3.5')], quota_map[('Under', '3.5')]),
     ]
 
+    # --- PASS 1: Emissione diretta ---
     for line, over_pct, under_pct, q_over, q_under in lines:
         line_val = float(line)
-        for direction, mc_pct, quota in [('Over', over_pct, q_over), ('Under', under_pct, q_under)]:
-            if mc_pct < 55:
-                continue
-            if quota < SOGLIA_QUOTA_MIN:
-                continue  # Regola 1
+
+        # ===== OVER (logica classica: soglia 60%) =====
+        mc_pct, quota = over_pct, q_over
+        if mc_pct >= SOGLIA_MINIMA_OVER and quota >= SOGLIA_QUOTA_MIN:
+            downgraded = False
 
             # Regola 10: RE vincono sulla distribuzione quando margine basso
-            if mc_pct < 62:
-                if direction == 'Over' and re_avg_gol <= line_val:
-                    continue
-                if direction == 'Under' and re_avg_gol > line_val + 0.5:
-                    continue
+            if mc_pct < 62 and re_avg_gol <= line_val:
+                to_downgrade.append(('Over', line, mc_pct))
+                downgraded = True
 
-            # Regola 11: Value — serve margine minimo tra MC% e implied prob
-            p_implied = 1.0 / quota if quota > 0 else 1.0
-            p_model = mc_pct / 100
-            if p_model - p_implied < 0.05 and mc_pct < 70:
-                continue
+            # Regola 11: Value
+            if not downgraded:
+                p_implied = 1.0 / quota if quota > 0 else 1.0
+                if mc_pct / 100 - p_implied < 0.05 and mc_pct < 70:
+                    to_downgrade.append(('Over', line, mc_pct))
+                    downgraded = True
 
-            # Regola 9: favorita debole → serve MC% piu' alta
-            if fav_pct_actual < 50 and mc_pct < 65:
-                continue
+            # Regola 9: favorita debole
+            if not downgraded and fav_pct_actual < 50 and mc_pct < 65:
+                to_downgrade.append(('Over', line, mc_pct))
+                downgraded = True
 
+            if not downgraded:
+                if mc_pct >= SOGLIA_SEVERA_OVER:
+                    pronostici.append({
+                        'tipo': 'GOL',
+                        'pronostico': f'Over {line}',
+                        'confidence': round(mc_pct, 1),
+                        'stars': calculate_stars(mc_pct),
+                    })
+                    emitted_keys.add(('Over', line))
+                else:
+                    to_downgrade.append(('Over', line, mc_pct))
+
+        # ===== UNDER (fascia a campana: 55-75% sweet spot) =====
+        mc_pct, quota = under_pct, q_under
+
+        # Under 1.5: ELIMINATO SEMPRE (33% HR)
+        if line == '1.5':
+            continue
+
+        if mc_pct < UNDER_ELIMINA:
+            continue  # < 45% → eliminato
+
+        if quota < SOGLIA_QUOTA_MIN:
+            continue
+
+        # Regola 10: RE vincono → ELIMINA Under (no declassamento)
+        if mc_pct < 62 and re_avg_gol > line_val + 0.5:
+            continue
+
+        # Regola 11: Value → ELIMINA Under (no declassamento)
+        p_implied = 1.0 / quota if quota > 0 else 1.0
+        if mc_pct / 100 - p_implied < 0.05 and mc_pct < 70:
+            continue
+
+        # Regola 9: favorita debole → ELIMINA Under (no declassamento)
+        if fav_pct_actual < 50 and mc_pct < 65:
+            continue
+
+        # Fascia a campana: 55-75% = sweet spot
+        if UNDER_DECLASSA_BASSO <= mc_pct <= UNDER_SWEET_MAX:
+            # Sweet spot → emissione diretta
             pronostici.append({
                 'tipo': 'GOL',
-                'pronostico': f'{direction} {line}',
+                'pronostico': f'Under {line}',
                 'confidence': round(mc_pct, 1),
                 'stars': calculate_stars(mc_pct),
             })
+            emitted_keys.add(('Under', line))
+        elif mc_pct > UNDER_SWEET_MAX:
+            # > 75% → declassamento (confidence invertita, ma declassati da alta hanno 75% HR)
+            to_downgrade.append(('Under', line, mc_pct))
+        # 45-55%: eliminato (no declassamento, non aggiunge valore)
+
+    # --- PASS 2: Declassamento (linea piu sicura) ---
+    for direction, orig_line, orig_mc_pct in to_downgrade:
+        downgrade_line = _DOWNGRADE_MAP.get((direction, orig_line))
+        if not downgrade_line:
+            continue  # Nessuna linea adiacente
+
+        dest_key = (direction, downgrade_line)
+        if dest_key in emitted_keys:
+            continue  # Linea gia emessa nel pass 1
+
+        dest_quota = quota_map.get(dest_key, 0)
+        if dest_quota < SOGLIA_QUOTA_MIN:
+            continue
+
+        dest_mc = mc_map.get(dest_key, 0)
+        if dest_mc < UNDER_ELIMINA if direction == 'Under' else dest_mc < SOGLIA_MINIMA_OVER:
+            continue
+
+        pronostici.append({
+            'tipo': 'GOL',
+            'pronostico': f'{direction} {downgrade_line}',
+            'confidence': round(dest_mc, 1),
+            'stars': calculate_stars(dest_mc),
+            '_downgraded_from': f'{direction} {orig_line}',
+        })
+        emitted_keys.add(dest_key)
 
     return pronostici
 
@@ -732,6 +846,7 @@ def apply_kelly(pronostici, dist, odds=None):
         # Rimuovi campi interni temporanei
         p.pop('_stake_hint', None)
         p.pop('_conflitto', None)
+        p.pop('_downgraded_from', None)
 
         if not quota or quota <= 1:
             p['probabilita_stimata'] = round(p['confidence'], 1)
