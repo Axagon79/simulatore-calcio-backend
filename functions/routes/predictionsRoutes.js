@@ -875,14 +875,14 @@ router.get('/daily-predictions-engine-c', async (req, res) => {
       }
     }
 
-    const allP = predictions.flatMap(p => p.pronostici || []);
+    const allP = predictions.flatMap(p => (p.pronostici || []).filter(pr => pr.tipo !== 'RISULTATO_ESATTO'));
     const verifiedP = allP.filter(p => p.hit === true || p.hit === false);
     const hitsP = allP.filter(p => p.hit === true).length;
 
     const matchesWithResult = predictions.filter(p => p.real_score);
     const matchHits = matchesWithResult.filter(p => p.hit === true).length;
 
-    console.log(`✅ [ENGINE C] ${predictions.length} partite, ${allP.length} pronostici, ${hitsP}/${verifiedP.length} azzeccati`);
+    console.log(`✅ [ENGINE C] ${predictions.length} partite, ${allP.length} pronostici (no RE), ${hitsP}/${verifiedP.length} azzeccati`);
 
     return res.json({
       success: true, date, predictions, count: predictions.length,
