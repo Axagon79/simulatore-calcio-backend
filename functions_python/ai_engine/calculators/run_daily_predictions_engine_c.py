@@ -69,6 +69,7 @@ sys.path.insert(0, current_path)
 from engine.engine_core import predict_match, preload_match_data
 from engine.goals_converter import calculate_goals_from_engine, load_tuning
 import ai_engine.calculators.bulk_manager as bulk_manager
+import ai_engine.calculators.bulk_manager_c as bulk_manager_c
 
 # ==================== COLLECTIONS ====================
 h2h_collection = db['h2h_by_round']
@@ -1075,31 +1076,36 @@ def run_engine_c(target_date=None):
     for league, league_matches in leagues.items():
         print(f"\n📂 {league} ({len(league_matches)} partite)")
 
+        # Raccogli TUTTE le squadre della lega per oggi
+        all_teams = []
+        for m in league_matches:
+            all_teams.append(m.get('home', m.get('home_team', '')))
+            all_teams.append(m.get('away', m.get('away_team', '')))
+        all_teams = list(set(all_teams))  # deduplica
+
+        # Carica cache lega UNA volta (tutte le squadre + rounds limit 12)
+        try:
+            with suppress_stdout():
+                league_cache = bulk_manager_c.load_league_cache(all_teams, league)
+        except Exception as e:
+            print(f"  ⚠️ Bulk cache fallito per {league}: {e}")
+            skipped += len(league_matches)
+            continue
+
         for m in league_matches:
             home = m.get('home', m.get('home_team', ''))
             away = m.get('away', m.get('away_team', ''))
             t_match = time.time()
 
-            # Carica bulk_cache per ogni partita (ogni coppia di squadre)
-            try:
-                with suppress_stdout():
-                    bulk_cache = bulk_manager.get_all_data_bulk(home, away, league)
-            except Exception as e:
-                print(f"  ⏭️ Skip (bulk fallito): {home} vs {away} — {e}")
-                skipped += 1
-                continue
-
-            # Ponte dati — chiamo preload_match_data direttamente per catturare errori
-            preload_error = None
+            # Costruisci bulk_cache per questa partita (solo MASTER_DATA + H2H, no query pesanti)
             with suppress_stdout():
-                try:
-                    preloaded = preload_match_data(home, away, league=league, bulk_cache=bulk_cache)
-                except Exception as e:
-                    preloaded = None
-                    preload_error = str(e)
+                bulk_cache = bulk_manager_c.build_match_cache(league_cache, home, away)
+
+            # Ponte dati
+            with suppress_stdout():
+                preloaded = build_preloaded(home, away, league, bulk_cache=bulk_cache)
             if not preloaded:
-                err_msg = f" — {preload_error}" if preload_error else ""
-                print(f"  ⏭️ Skip (preload fallito): {home} vs {away}{err_msg}")
+                print(f"  ⏭️ Skip (preload fallito): {home} vs {away}")
                 skipped += 1
                 continue
 
@@ -1170,8 +1176,8 @@ if __name__ == "__main__":
         target = datetime.strptime(args.date, '%Y-%m-%d')
         run_engine_c(target)
     else:
-        for i in range(7):  # 0=oggi, 1=domani, 2=dopodomani, ... 6=tra 6 giorni
-            target = datetime.now() + timedelta(days=i)
+        for i in range(7):  # TEMPORANEO: 11-17 febbraio 2026 (rimettere datetime.now() dopo)
+            target = datetime(2026, 2, 11) + timedelta(days=i)
             print("\n" + "=" * 70)
             print(f"📅 ELABORAZIONE: {target.strftime('%Y-%m-%d')}")
             print("=" * 70)

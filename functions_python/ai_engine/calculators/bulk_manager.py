@@ -3,7 +3,7 @@ import sys
 from config import db
 
 
-def get_all_data_bulk(home_team, away_team, league_name):
+def get_all_data_bulk(home_team, away_team, league_name, preloaded_rounds=None):
     """
     MAGAZZINO CENTRALE V3: Versione Omnicomprensiva.
     Preleva tutto ciò che l'Engine Core e i Calcolatori cercano,
@@ -82,25 +82,29 @@ def get_all_data_bulk(home_team, away_team, league_name):
         scores_keys = list(team.get("scores", {}).keys()) if has_scores else []
         print(f"  - {name} (league={league}): scores={has_scores}, keys={scores_keys}", file=sys.stderr)
     
-    raw_rounds = list(db["h2h_by_round"].find({"league": league_normalized}).sort("last_updated", -1))
-    print(f"🔍 [BULK] Rounds totali caricati: {len(raw_rounds)}", file=sys.stderr)
+    if preloaded_rounds is not None:
+        raw_rounds = preloaded_rounds
+        print(f"♻️ [BULK] Rounds riutilizzati dal cache lega: {len(raw_rounds)}", file=sys.stderr)
+    else:
+        raw_rounds = list(db["h2h_by_round"].find({"league": league_normalized}).sort("last_updated", -1))
+        print(f"🔍 [BULK] Rounds totali caricati: {len(raw_rounds)}", file=sys.stderr)
 
-    # Fallback: se 0 round, la normalizzazione ha fallito → cerca la lega corretta dal match
-    if not raw_rounds:
-        print(f"⚠️ [BULK] 0 round per '{league_normalized}', fallback ricerca match diretto...", file=sys.stderr)
-        fallback = list(db["h2h_by_round"].aggregate([
-            {"$unwind": "$matches"},
-            {"$match": {"matches.home": home_team, "matches.away": away_team}},
-            {"$limit": 1}
-        ]))
-        if fallback:
-            actual_league = fallback[0].get("league")
-            print(f"✅ [BULK] Lega corretta trovata: '{actual_league}'", file=sys.stderr)
-            raw_rounds = list(db["h2h_by_round"].find({"league": actual_league}).sort("last_updated", -1))
-            league_normalized = actual_league
-            print(f"🔍 [BULK] Rounds dopo fallback: {len(raw_rounds)}", file=sys.stderr)
-        else:
-            print(f"❌ [BULK] Match {home_team} vs {away_team} non trovato in nessuna lega!", file=sys.stderr)
+        # Fallback: se 0 round, la normalizzazione ha fallito → cerca la lega corretta dal match
+        if not raw_rounds:
+            print(f"⚠️ [BULK] 0 round per '{league_normalized}', fallback ricerca match diretto...", file=sys.stderr)
+            fallback = list(db["h2h_by_round"].aggregate([
+                {"$unwind": "$matches"},
+                {"$match": {"matches.home": home_team, "matches.away": away_team}},
+                {"$limit": 1}
+            ]))
+            if fallback:
+                actual_league = fallback[0].get("league")
+                print(f"✅ [BULK] Lega corretta trovata: '{actual_league}'", file=sys.stderr)
+                raw_rounds = list(db["h2h_by_round"].find({"league": actual_league}).sort("last_updated", -1))
+                league_normalized = actual_league
+                print(f"🔍 [BULK] Rounds dopo fallback: {len(raw_rounds)}", file=sys.stderr)
+            else:
+                print(f"❌ [BULK] Match {home_team} vs {away_team} non trovato in nessuna lega!", file=sys.stderr)
 
     # 3. ESTRAZIONE DATI H2H SPECIFICI
     h2h_match_data = {"h_score": 0, "a_score": 0, "msg": "Dati non trovati", "extra": {}, "quotes": {}}
