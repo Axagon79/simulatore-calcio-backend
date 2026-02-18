@@ -186,8 +186,15 @@ def run_monte_carlo(preloaded_data, home, away, cycles=SIMULATION_CYCLES):
     home_wins = sum(1 for g in results if g[0] > g[1])
     draws = sum(1 for g in results if g[0] == g[1])
     away_wins = sum(1 for g in results if g[0] < g[1])
+
+    # Over/Under per tutte le linee (1.5, 2.5, 3.5)
+    over_15 = sum(1 for g in results if g[0] + g[1] > 1)
+    under_15 = sum(1 for g in results if g[0] + g[1] <= 1)
     over_25 = sum(1 for g in results if g[0] + g[1] > 2)
     under_25 = sum(1 for g in results if g[0] + g[1] <= 2)
+    over_35 = sum(1 for g in results if g[0] + g[1] > 3)
+    under_35 = sum(1 for g in results if g[0] + g[1] <= 3)
+
     gg = sum(1 for g in results if g[0] > 0 and g[1] > 0)
     ng = sum(1 for g in results if g[0] == 0 or g[1] == 0)
 
@@ -202,8 +209,12 @@ def run_monte_carlo(preloaded_data, home, away, cycles=SIMULATION_CYCLES):
         'home_win_pct': round(home_wins / n * 100, 1),
         'draw_pct': round(draws / n * 100, 1),
         'away_win_pct': round(away_wins / n * 100, 1),
+        'over_15_pct': round(over_15 / n * 100, 1),
+        'under_15_pct': round(under_15 / n * 100, 1),
         'over_25_pct': round(over_25 / n * 100, 1),
         'under_25_pct': round(under_25 / n * 100, 1),
+        'over_35_pct': round(over_35 / n * 100, 1),
+        'under_35_pct': round(under_35 / n * 100, 1),
         'gg_pct': round(gg / n * 100, 1),
         'ng_pct': round(ng / n * 100, 1),
         'avg_goals_home': round(avg_gh, 2),
@@ -216,87 +227,441 @@ def run_monte_carlo(preloaded_data, home, away, cycles=SIMULATION_CYCLES):
 
 
 # ==================== FASE 4: CONVERSIONE → PRONOSTICI ====================
+# Riscrittura completa: 18 regole derivate da analisi caso-per-caso (2026-02-18)
 
-def convert_to_predictions(dist, odds):
+SOGLIA_QUOTA_MIN = 1.30  # Sotto questa quota, NON emettere il pronostico
+
+
+def _get_quota(odds, key, fallback_key=None):
+    """Getter sicuro per le quote."""
+    val = odds.get(key) or (odds.get(fallback_key) if fallback_key else None)
+    try:
+        return float(val) if val else 0.0
+    except (ValueError, TypeError):
+        return 0.0
+
+
+def calcola_re_direzione(top_scores, valid_cycles):
     """
-    Converte distribuzione MC in pronostici SEGNO / GOL / DC.
-    Per ora emette tutto (soglie a 0), da calibrare dopo.
+    Regola 3: somma % dei top RE raggruppati per casa/pari/ospite e GG/NG.
     """
+    casa_count = pari_count = ospite_count = 0
+    gg_count = ng_count = 0
+    n = valid_cycles if valid_cycles > 0 else 1
+
+    for score_str, count in top_scores:
+        gh, ga = int(score_str.split('-')[0]), int(score_str.split('-')[1])
+        if gh > ga:
+            casa_count += count
+        elif gh == ga:
+            pari_count += count
+        else:
+            ospite_count += count
+        if gh > 0 and ga > 0:
+            gg_count += count
+        else:
+            ng_count += count
+
+    return {
+        'casa': round(casa_count / n * 100, 1),
+        'pari': round(pari_count / n * 100, 1),
+        'ospite': round(ospite_count / n * 100, 1),
+        'gg': round(gg_count / n * 100, 1),
+        'ng': round(ng_count / n * 100, 1),
+    }
+
+
+def identifica_favorita(dist):
+    """Ritorna (lato, percentuale). Lato: 'casa', 'ospite' o 'pari'."""
+    home, draw, away = dist['home_win_pct'], dist['draw_pct'], dist['away_win_pct']
+    if home >= away and home >= draw:
+        return 'casa', home
+    elif away >= home and away >= draw:
+        return 'ospite', away
+    return 'pari', draw
+
+
+def _is_piatta(dist):
+    """Distribuzione piatta: tutti < 40% e differenza max < 8%."""
+    vals = [dist['home_win_pct'], dist['draw_pct'], dist['away_win_pct']]
+    return max(vals) < 40 and (max(vals) - min(vals)) < 8
+
+
+def _get_book_second_fav(odds):
+    """Ritorna il 2° segno piu' probabile per il bookmaker (quota piu' bassa dopo il favorito)."""
+    pairs = [('1', _get_quota(odds, '1')), ('X', _get_quota(odds, 'X')), ('2', _get_quota(odds, '2'))]
+    valid = [(s, q) for s, q in pairs if q > 0]
+    valid.sort(key=lambda x: x[1])
+    return valid[1][0] if len(valid) >= 2 else None
+
+
+def _segno_in_dc(segno, dc_label):
+    """Controlla se un segno e' contenuto nella DC."""
+    dc_map = {'1X': ['1', 'X'], 'X2': ['X', '2'], '12': ['1', '2']}
+    return segno in dc_map.get(dc_label, [])
+
+
+def _calcola_re_gol_medi(top_scores, valid_cycles):
+    """Calcola gol medi attesi dai RE top."""
+    total_gol = total_count = 0
+    for score_str, count in top_scores:
+        gh, ga = int(score_str.split('-')[0]), int(score_str.split('-')[1])
+        total_gol += (gh + ga) * count
+        total_count += count
+    return total_gol / total_count if total_count > 0 else 2.0
+
+
+# ---------- SEGNO / DC (Regole 1-7) ----------
+
+def decidi_segno_dc(dist, odds, re_dir):
+    """Albero decisionale SEGNO/DC. Ritorna dict pronostico oppure None."""
+    home_pct = dist['home_win_pct']
+    draw_pct = dist['draw_pct']
+    away_pct = dist['away_win_pct']
+
+    # Identifica favorita tra casa e ospite
+    if home_pct >= away_pct:
+        fav_pct, fav_segno, fav_side = home_pct, '1', 'casa'
+        dc_label = '1X'
+        dc_pct = home_pct + draw_pct
+    else:
+        fav_pct, fav_segno, fav_side = away_pct, '2', 'ospite'
+        dc_label = 'X2'
+        dc_pct = away_pct + draw_pct
+
+    # Regola 5: Pareggio e' favorito (X > 1 e X > 2)
+    if draw_pct > home_pct and draw_pct > away_pct:
+        if home_pct >= away_pct:
+            dc_l, dc_p = '1X', draw_pct + home_pct
+        else:
+            dc_l, dc_p = 'X2', draw_pct + away_pct
+        q_dc = _get_quota(odds, dc_l)
+        if q_dc < SOGLIA_QUOTA_MIN:
+            return None
+        return {
+            'tipo': 'DOPPIA_CHANCE', 'pronostico': dc_l,
+            'confidence': round(dc_p, 1), 'stars': calculate_stars(dc_p),
+            '_stake_hint': 'medio',
+        }
+
+    # Regola 7 (piatta): distribuzione piatta → SKIP salvo RE forte
+    if _is_piatta(dist):
+        re_max = max(re_dir['casa'], re_dir['ospite'], re_dir['pari'])
+        if re_max >= 25:
+            if re_dir['casa'] == re_max:
+                dc_l, dc_p = '1X', home_pct + draw_pct
+            elif re_dir['ospite'] == re_max:
+                dc_l, dc_p = 'X2', away_pct + draw_pct
+            else:
+                dc_l, dc_p = ('1X', draw_pct + home_pct) if home_pct >= away_pct else ('X2', draw_pct + away_pct)
+            if _get_quota(odds, dc_l) >= SOGLIA_QUOTA_MIN:
+                return {
+                    'tipo': 'DOPPIA_CHANCE', 'pronostico': dc_l,
+                    'confidence': round(dc_p, 1), 'stars': calculate_stars(dc_p),
+                    '_stake_hint': 'basso',
+                }
+        return None
+
+    q_fav = _get_quota(odds, fav_segno)
+    q_dc = _get_quota(odds, dc_label)
+
+    # Regola 1: Quota minima — se entrambe sotto soglia → SKIP
+    if q_fav < SOGLIA_QUOTA_MIN and q_dc < SOGLIA_QUOTA_MIN:
+        return None
+
+    # RE confermano la favorita?
+    re_fav = re_dir[fav_side]
+    re_pari = re_dir['pari']
+    re_opp = re_dir['ospite'] if fav_side == 'casa' else re_dir['casa']
+    re_confermano = re_fav >= re_pari and re_fav >= re_opp
+
+    # Regola 7: Favorita schiacciante (>= 70%)
+    if fav_pct >= 70:
+        if q_fav >= SOGLIA_QUOTA_MIN:
+            return {
+                'tipo': 'SEGNO', 'pronostico': fav_segno,
+                'confidence': round(fav_pct, 1), 'stars': calculate_stars(fav_pct),
+                '_stake_hint': 'alto',
+            }
+        return None
+
+    # Ramo 2: favorita >= 62%
+    if fav_pct >= 62:
+        if q_fav >= SOGLIA_QUOTA_MIN:
+            return {
+                'tipo': 'SEGNO', 'pronostico': fav_segno,
+                'confidence': round(fav_pct, 1), 'stars': calculate_stars(fav_pct),
+                '_stake_hint': 'alto' if re_confermano else 'medio',
+            }
+        return None
+
+    # Ramo 3: favorita 55-62%
+    if fav_pct >= 55:
+        if re_confermano and q_fav >= SOGLIA_QUOTA_MIN:
+            return {
+                'tipo': 'SEGNO', 'pronostico': fav_segno,
+                'confidence': round(fav_pct, 1), 'stars': calculate_stars(fav_pct),
+                '_stake_hint': 'medio',
+            }
+        if q_dc >= SOGLIA_QUOTA_MIN:
+            return {
+                'tipo': 'DOPPIA_CHANCE', 'pronostico': dc_label,
+                'confidence': round(dc_pct, 1), 'stars': calculate_stars(dc_pct),
+                '_stake_hint': 'medio-basso',
+            }
+        if q_fav >= SOGLIA_QUOTA_MIN:
+            return {
+                'tipo': 'SEGNO', 'pronostico': fav_segno,
+                'confidence': round(fav_pct, 1), 'stars': calculate_stars(fav_pct),
+                '_stake_hint': 'medio-basso',
+            }
+        return None
+
+    # Ramo 4: favorita 50-55%
+    if fav_pct >= 50:
+        if q_fav >= SOGLIA_QUOTA_MIN:
+            return {
+                'tipo': 'SEGNO', 'pronostico': fav_segno,
+                'confidence': round(fav_pct, 1), 'stars': calculate_stars(fav_pct),
+                '_stake_hint': 'medio-basso' if re_confermano else 'basso',
+            }
+        if q_dc >= SOGLIA_QUOTA_MIN:
+            return {
+                'tipo': 'DOPPIA_CHANCE', 'pronostico': dc_label,
+                'confidence': round(dc_pct, 1), 'stars': calculate_stars(dc_pct),
+                '_stake_hint': 'basso',
+            }
+        return None
+
+    # Ramo 5: favorita 40-50%
+    if fav_pct >= 40:
+        if re_confermano:
+            if q_dc >= SOGLIA_QUOTA_MIN:
+                hint = 'medio-basso'
+                book_second = _get_book_second_fav(odds)
+                if book_second and not _segno_in_dc(book_second, dc_label):
+                    hint = 'basso'
+                return {
+                    'tipo': 'DOPPIA_CHANCE', 'pronostico': dc_label,
+                    'confidence': round(dc_pct, 1), 'stars': calculate_stars(dc_pct),
+                    '_stake_hint': hint,
+                }
+            if q_fav >= SOGLIA_QUOTA_MIN:
+                return {
+                    'tipo': 'SEGNO', 'pronostico': fav_segno,
+                    'confidence': round(fav_pct, 1), 'stars': calculate_stars(fav_pct),
+                    '_stake_hint': 'basso',
+                }
+        elif re_pari > re_fav:
+            if q_dc >= SOGLIA_QUOTA_MIN:
+                return {
+                    'tipo': 'DOPPIA_CHANCE', 'pronostico': dc_label,
+                    'confidence': round(dc_pct, 1), 'stars': calculate_stars(dc_pct),
+                    '_stake_hint': 'basso',
+                }
+        elif re_opp > re_fav:
+            q_12 = _get_quota(odds, '12')
+            if q_12 >= SOGLIA_QUOTA_MIN:
+                return {
+                    'tipo': 'DOPPIA_CHANCE', 'pronostico': '12',
+                    'confidence': round(home_pct + away_pct, 1),
+                    'stars': calculate_stars(home_pct + away_pct),
+                    '_stake_hint': 'basso',
+                }
+        return None
+
+    # Ramo 6: favorita < 40%
+    re_max = max(re_dir['casa'], re_dir['ospite'], re_dir['pari'])
+    re_min = min(re_dir['casa'], re_dir['ospite'], re_dir['pari'])
+    if (re_max - re_min) >= 10:
+        if re_dir['casa'] == re_max or re_dir['pari'] == re_max:
+            dc_l, dc_p = '1X', home_pct + draw_pct
+        else:
+            dc_l, dc_p = 'X2', away_pct + draw_pct
+        if _get_quota(odds, dc_l) >= SOGLIA_QUOTA_MIN:
+            return {
+                'tipo': 'DOPPIA_CHANCE', 'pronostico': dc_l,
+                'confidence': round(dc_p, 1), 'stars': calculate_stars(dc_p),
+                '_stake_hint': 'basso',
+            }
+    return None
+
+
+# ---------- OVER / UNDER (Regole 8-12) ----------
+
+def decidi_over_under(dist, odds, re_dir, fav_pct):
+    """Regole 8-12: O/U per tutte le linee. Ritorna lista pronostici."""
+    if _is_piatta(dist):
+        return []  # Regola 9: 1X2 piatta → O/U inaffidabile
+
+    re_avg_gol = _calcola_re_gol_medi(dist['top_scores'], dist['valid_cycles'])
+    _, fav_pct_actual = identifica_favorita(dist)
     pronostici = []
 
-    # --- SEGNO ---
-    home_pct = dist['home_win_pct']
-    away_pct = dist['away_win_pct']
-    draw_pct = dist['draw_pct']
+    lines = [
+        ('1.5', dist['over_15_pct'], dist['under_15_pct'],
+         _get_quota(odds, 'over_15', 'Over 1.5'), _get_quota(odds, 'under_15', 'Under 1.5')),
+        ('2.5', dist['over_25_pct'], dist['under_25_pct'],
+         _get_quota(odds, 'over_25', 'Over 2.5'), _get_quota(odds, 'under_25', 'Under 2.5')),
+        ('3.5', dist['over_35_pct'], dist['under_35_pct'],
+         _get_quota(odds, 'over_35', 'Over 3.5'), _get_quota(odds, 'under_35', 'Under 3.5')),
+    ]
 
-    if home_pct > away_pct:
-        fav_pct, fav_segno = home_pct, '1'
-        q_fav = float(odds.get('1', 0) or 0)
-    else:
-        fav_pct, fav_segno = away_pct, '2'
-        q_fav = float(odds.get('2', 0) or 0)
+    for line, over_pct, under_pct, q_over, q_under in lines:
+        line_val = float(line)
+        for direction, mc_pct, quota in [('Over', over_pct, q_over), ('Under', under_pct, q_under)]:
+            if mc_pct < 55:
+                continue
+            if quota < SOGLIA_QUOTA_MIN:
+                continue  # Regola 1
 
-    if fav_pct >= MIN_CONFIDENCE:
-        # DC se quota alta (>2.50) oppure confidence bassa
-        if q_fav > 2.50 and fav_pct < 50:
-            dc_map = {'1': '1X', '2': 'X2'}
-            dc = dc_map.get(fav_segno, '1X')
+            # Regola 10: RE vincono sulla distribuzione quando margine basso
+            if mc_pct < 62:
+                if direction == 'Over' and re_avg_gol <= line_val:
+                    continue
+                if direction == 'Under' and re_avg_gol > line_val + 0.5:
+                    continue
+
+            # Regola 11: Value — serve margine minimo tra MC% e implied prob
+            p_implied = 1.0 / quota if quota > 0 else 1.0
+            p_model = mc_pct / 100
+            if p_model - p_implied < 0.05 and mc_pct < 70:
+                continue
+
+            # Regola 9: favorita debole → serve MC% piu' alta
+            if fav_pct_actual < 50 and mc_pct < 65:
+                continue
+
             pronostici.append({
-                'tipo': 'DOPPIA_CHANCE',
-                'pronostico': dc,
-                'confidence': round(fav_pct + draw_pct, 1),
-                'stars': calculate_stars(fav_pct + draw_pct),
-            })
-        else:
-            pronostici.append({
-                'tipo': 'SEGNO',
-                'pronostico': fav_segno,
-                'confidence': round(fav_pct, 1),
-                'stars': calculate_stars(fav_pct),
+                'tipo': 'GOL',
+                'pronostico': f'{direction} {line}',
+                'confidence': round(mc_pct, 1),
+                'stars': calculate_stars(mc_pct),
             })
 
-    # --- GOL: Over/Under 2.5 ---
-    if dist['over_25_pct'] >= dist['under_25_pct']:
-        ou_pct = dist['over_25_pct']
-        ou_pronostico = 'Over 2.5'
-        ou_quota = float(odds.get('over_25', odds.get('Over 2.5', 0)) or 0)
+    return pronostici
+
+
+# ---------- GG / NG (Regole 13-16) ----------
+
+def decidi_gg_ng(dist, odds, re_dir, fav_pct, ou_preds):
+    """Regole 13-16: GG/NG. Ritorna dict pronostico oppure None."""
+    if _is_piatta(dist):
+        return None  # Regola 9: 1X2 piatta → inaffidabile
+
+    gg_pct, ng_pct = dist['gg_pct'], dist['ng_pct']
+    q_gg = _get_quota(odds, 'gg', 'GG')
+    q_ng = _get_quota(odds, 'ng', 'NG')
+
+    # Regola 16: bookmaker come validazione
+    book_says_gg = q_gg > 0 and q_ng > 0 and q_gg < q_ng
+    book_says_ng = q_gg > 0 and q_ng > 0 and q_ng < q_gg
+
+    # Decidi direzione
+    if gg_pct > ng_pct:
+        best_pct, best_pron, best_q = gg_pct, 'Goal', q_gg
+        re_support, book_confirms = re_dir['gg'], book_says_gg
     else:
-        ou_pct = dist['under_25_pct']
-        ou_pronostico = 'Under 2.5'
-        ou_quota = float(odds.get('under_25', odds.get('Under 2.5', 0)) or 0)
+        best_pct, best_pron, best_q = ng_pct, 'NoGoal', q_ng
+        re_support, book_confirms = re_dir['ng'], book_says_ng
 
-    if ou_pct >= MIN_CONFIDENCE:
-        pronostici.append({
-            'tipo': 'GOL',
-            'pronostico': ou_pronostico,
-            'confidence': round(ou_pct, 1),
-            'stars': calculate_stars(ou_pct),
-        })
+    if best_q < SOGLIA_QUOTA_MIN:
+        return None  # Regola 1
 
-    # --- GOL: GG/NG ---
-    if dist['gg_pct'] >= dist['ng_pct']:
-        gg_pct = dist['gg_pct']
-        gg_pronostico = 'Goal'
-        gg_quota = float(odds.get('gg', odds.get('GG', 0)) or 0)
-    else:
-        gg_pct = dist['ng_pct']
-        gg_pronostico = 'NoGoal'
-        gg_quota = float(odds.get('ng', odds.get('NG', 0)) or 0)
+    # Regola 13: Soglia flessibile — base 50%, abbassata se RE+book concordano
+    soglia = 50
+    if re_support >= 20 and book_confirms:
+        soglia = 45
 
-    if gg_pct >= MIN_CONFIDENCE:
-        pronostici.append({
-            'tipo': 'GOL',
-            'pronostico': gg_pronostico,
-            'confidence': round(gg_pct, 1),
-            'stars': calculate_stars(gg_pct),
-        })
+    if best_pct < soglia:
+        return None
 
-    # Assegna quote ai pronostici
+    # Regola 16: book contradice + MC non forte → cautela
+    if not book_confirms and best_pct < 58:
+        return None
+
+    # Regola 11: Value
+    p_implied = 1.0 / best_q if best_q > 0 else 1.0
+    if (best_pct / 100) - p_implied < 0.03 and best_pct < 65:
+        return None
+
+    # Regola 15: Conflitto Over+NG / Under+GG
+    has_over = any('Over' in p['pronostico'] for p in ou_preds)
+    has_under = any('Under' in p['pronostico'] for p in ou_preds)
+    conflitto = (has_over and best_pron == 'NoGoal') or (has_under and best_pron == 'Goal')
+
+    return {
+        'tipo': 'GOL', 'pronostico': best_pron,
+        'confidence': round(best_pct, 1), 'stars': calculate_stars(best_pct),
+        '_stake_hint': 'basso' if conflitto else 'medio',
+        '_conflitto': conflitto,
+    }
+
+
+# ---------- RISULTATO ESATTO (Regole 17-18) ----------
+
+def riordina_re(top_scores, valid_cycles, fav_pct, fav_side, segno_pred, ggng_pred):
+    """Regole 17-18: Top 3 RE riordinati per contesto partita."""
+    if not top_scores:
+        return []
+
+    n = valid_cycles if valid_cycles > 0 else 1
+    scored = []
+
+    for score_str, count in top_scores:
+        gh, ga = int(score_str.split('-')[0]), int(score_str.split('-')[1])
+        re_pct = round(count / n * 100, 1)
+        if re_pct < 5:
+            continue
+        bonus = 0
+
+        # Regola 18A: Favorita forte (55%+) → promuovi RE con 2+ gol favorita
+        if fav_pct >= 55:
+            fav_goals = gh if fav_side == 'casa' else ga
+            if fav_goals >= 2:
+                bonus += 3
+            elif fav_goals <= 1:
+                bonus -= 2  # Demoti 1-0 / 0-1
+
+        # Regola 18B: Partita equilibrata
+        if fav_pct < 55:
+            if ggng_pred and ggng_pred.get('pronostico') == 'Goal':
+                if gh == 0 or ga == 0:
+                    bonus -= 1  # Demoti NG scores se GG emesso
+                if gh > 0 and ga > 0:
+                    bonus += 1
+            if ggng_pred and ggng_pred.get('pronostico') == 'NoGoal':
+                if gh == 0 and ga == 0:
+                    bonus -= 2  # Demoti 0-0 (poco informativo)
+
+        scored.append((score_str, count, re_pct, bonus))
+
+    scored.sort(key=lambda x: (x[3], x[1]), reverse=True)
+
+    return [
+        {
+            'tipo': 'RISULTATO_ESATTO',
+            'pronostico': f"{s.split('-')[0]}:{s.split('-')[1]}",
+            'confidence': pct,
+            'stars': calculate_stars(pct),
+        }
+        for s, _, pct, _ in scored[:3]
+    ]
+
+
+# ---------- ASSEGNA QUOTE ----------
+
+def assegna_quote(pronostici, odds):
+    """Assegna le quote SNAI a ciascun pronostico."""
     quota_map = {
         '1': odds.get('1'), 'X': odds.get('X'), '2': odds.get('2'),
         '1X': odds.get('1X'), 'X2': odds.get('X2'), '12': odds.get('12'),
+        'Over 1.5': odds.get('over_15', odds.get('Over 1.5')),
+        'Under 1.5': odds.get('under_15', odds.get('Under 1.5')),
         'Over 2.5': odds.get('over_25', odds.get('Over 2.5')),
         'Under 2.5': odds.get('under_25', odds.get('Under 2.5')),
+        'Over 3.5': odds.get('over_35', odds.get('Over 3.5')),
+        'Under 3.5': odds.get('under_35', odds.get('Under 3.5')),
         'Goal': odds.get('gg', odds.get('GG')),
         'NoGoal': odds.get('ng', odds.get('NG')),
     }
@@ -304,21 +669,69 @@ def convert_to_predictions(dist, odds):
         q = quota_map.get(p['pronostico'])
         p['quota'] = float(q) if q else None
 
+
+# ---------- ORCHESTRATORE ----------
+
+def convert_to_predictions(dist, odds):
+    """
+    Converte distribuzione MC in pronostici COERENTI tra loro.
+    18 regole derivate da analisi caso-per-caso con l'utente.
+    """
+    pronostici = []
+    re_dir = calcola_re_direzione(dist['top_scores'], dist['valid_cycles'])
+    fav_side, fav_pct = identifica_favorita(dist)
+
+    # 1. SEGNO / DC (Regole 1-7)
+    segno_pred = decidi_segno_dc(dist, odds, re_dir)
+    if segno_pred:
+        pronostici.append(segno_pred)
+
+    # 2. OVER / UNDER (Regole 8-12)
+    ou_preds = decidi_over_under(dist, odds, re_dir, fav_pct)
+    pronostici.extend(ou_preds)
+
+    # 3. GG / NG (Regole 13-16)
+    ggng_pred = decidi_gg_ng(dist, odds, re_dir, fav_pct, ou_preds)
+    if ggng_pred:
+        pronostici.append(ggng_pred)
+
+    # 4. RE top 3 riordinati (Regole 17-18)
+    re_top3 = riordina_re(dist['top_scores'], dist['valid_cycles'],
+                          fav_pct, fav_side, segno_pred, ggng_pred)
+    pronostici.extend(re_top3)
+
+    # 5. Assegna quote
+    assegna_quote(pronostici, odds)
+
     return pronostici
 
 
-# ==================== FASE 5: KELLY/STAKE ====================
+# ==================== FASE 5: KELLY/STAKE + 5 MODIFICATORI ====================
 
-def apply_kelly(pronostici, dist):
+def apply_kelly(pronostici, dist, odds=None):
     """
-    Per Sistema C, la probabilità MC è direttamente la probabilità reale.
-    Non serve la formula a slope del Sistema A.
+    Kelly Frazionario 1/4 + 5 Modificatori calibrabili.
+    La probabilita' MC e' direttamente la probabilita' reale.
     """
+    if odds is None:
+        odds = {}
+    re_dir = calcola_re_direzione(dist['top_scores'], dist['valid_cycles'])
+
+    # Pre-calcola conflitti tra mercati (Fattore 5)
+    has_over = any(p['tipo'] == 'GOL' and 'Over' in p.get('pronostico', '') for p in pronostici)
+    has_under = any(p['tipo'] == 'GOL' and 'Under' in p.get('pronostico', '') for p in pronostici)
+    has_gg = any(p['tipo'] == 'GOL' and p.get('pronostico') == 'Goal' for p in pronostici)
+    has_ng = any(p['tipo'] == 'GOL' and p.get('pronostico') == 'NoGoal' for p in pronostici)
+    conflitto_mercati = (has_over and has_ng) or (has_under and has_gg)
+
     for p in pronostici:
-        # La confidence MC è la probabilità stimata
         prob = p['confidence'] / 100
         quota = p.get('quota')
         tipo = p['tipo']
+
+        # Rimuovi campi interni temporanei
+        p.pop('_stake_hint', None)
+        p.pop('_conflitto', None)
 
         if not quota or quota <= 1:
             p['probabilita_stimata'] = round(p['confidence'], 1)
@@ -326,38 +739,114 @@ def apply_kelly(pronostici, dist):
             p['prob_modello'] = round(p['confidence'], 1)
             p['has_odds'] = False
             p['stake'] = 1
+            p['stake_min'] = 1
+            p['stake_max'] = 1
             p['edge'] = 0
             continue
 
         p_market = (1.0 / quota) * 0.96
-        edge = (prob * quota - 1) * 100
+        edge_pct = (prob * quota - 1) * 100
 
+        # --- Kelly 3/4 base ---
         if (prob * quota) <= 1:
-            stake = 1
+            stake_base = 1.0
         else:
             full_kelly = (prob * quota - 1) / (quota - 1)
-            quarter_kelly = full_kelly / 4
-            stake = min(max(round(quarter_kelly * 100), 1), 10)
+            tq_kelly = full_kelly * 3 / 4
+            stake_base = tq_kelly * 10  # scala 1-10
 
-        # Protezioni
-        if tipo == 'SEGNO':
-            if quota < 1.30:
-                stake = min(stake, 2)
-            elif quota < 1.50:
-                stake = min(stake, 4)
-        if quota < 1.20:
-            stake = min(stake, 2)
-        if p['confidence'] > 85:
-            stake = min(stake, 3)
-        if quota > 5.0:
-            stake = min(stake, 2)
+        # --- 5 Modificatori (proporzionali al Kelly base, cap ±50%) ---
+        mod_pct = 0.0
+
+        # Fattore 1: % MC
+        if p['confidence'] >= 65:
+            mod_pct += 0.20
+        elif p['confidence'] < 50:
+            mod_pct -= 0.20
+
+        # Fattore 2: RE confermano/contraddicono
+        pron = p['pronostico']
+        if tipo in ('SEGNO', 'DOPPIA_CHANCE'):
+            if pron == '1' and re_dir['casa'] >= 25:
+                mod_pct += 0.20
+            elif pron == '2' and re_dir['ospite'] >= 25:
+                mod_pct += 0.20
+            elif pron in ('1X', 'X2'):
+                dc_sides = {'1X': ['casa', 'pari'], 'X2': ['ospite', 'pari']}
+                if sum(re_dir[s] for s in dc_sides.get(pron, [])) >= 35:
+                    mod_pct += 0.20
+        elif tipo == 'GOL':
+            if pron == 'Goal' and re_dir['gg'] >= 25:
+                mod_pct += 0.20
+            elif pron == 'Goal' and re_dir['ng'] >= 30:
+                mod_pct -= 0.20
+            elif pron == 'NoGoal' and re_dir['ng'] >= 25:
+                mod_pct += 0.20
+            elif pron == 'NoGoal' and re_dir['gg'] >= 30:
+                mod_pct -= 0.20
+
+        # Fattore 3: Valore quota (edge)
+        edge_val = prob - (1.0 / quota)
+        if edge_val > 0.10:
+            mod_pct += 0.20
+        elif edge_val < 0.03:
+            mod_pct -= 0.20
+
+        # Fattore 4: Book conferma/contradice
+        if tipo in ('SEGNO', 'DOPPIA_CHANCE'):
+            if pron in ('1', '2'):
+                q_fav = _get_quota(odds, pron)
+                q_other = _get_quota(odds, '2' if pron == '1' else '1')
+                if q_fav > 0 and q_other > 0 and q_fav > q_other:
+                    mod_pct -= 0.20  # Book non concorda sulla favorita
+            elif pron in ('1X', 'X2'):
+                book_second = _get_book_second_fav(odds)
+                if book_second and not _segno_in_dc(book_second, pron):
+                    mod_pct -= 0.20
+        elif tipo == 'GOL' and pron in ('Goal', 'NoGoal'):
+            q_gg = _get_quota(odds, 'gg', 'GG')
+            q_ng = _get_quota(odds, 'ng', 'NG')
+            if q_gg > 0 and q_ng > 0:
+                if pron == 'Goal' and q_ng < q_gg:
+                    mod_pct -= 0.20
+                elif pron == 'NoGoal' and q_gg < q_ng:
+                    mod_pct -= 0.20
+
+        # Fattore 5: Conflitti mercati
+        if conflitto_mercati and tipo == 'GOL':
+            mod_pct -= 0.20
+        elif not conflitto_mercati and len(pronostici) >= 3:
+            mod_pct += 0.20  # Tutto coerente
+
+        # Cap modificatori a ±50% del Kelly base
+        mod_pct = max(-0.50, min(0.50, mod_pct))
+        mod_value = stake_base * mod_pct
+
+        # Stake finale con range
+        raw_stake = max(1.0, min(10.0, stake_base + mod_value))
+        floor_val = int(raw_stake)
+        decimal_part = raw_stake - floor_val
+
+        if decimal_part > 0.25:
+            stake_min = floor_val
+            stake_max = floor_val + 1
+        else:
+            stake_min = floor_val - 1
+            stake_max = floor_val
+
+        # Clamp a 1-10
+        stake_min = max(1, min(10, stake_min))
+        stake_max = max(1, min(10, stake_max))
+        stake = max(1, min(10, round(raw_stake)))
 
         p['probabilita_stimata'] = round(prob * 100, 1)
         p['prob_mercato'] = round(p_market * 100, 1)
         p['prob_modello'] = round(prob * 100, 1)
         p['has_odds'] = True
         p['stake'] = stake
-        p['edge'] = round(edge, 2)
+        p['stake_min'] = stake_min
+        p['stake_max'] = stake_max
+        p['edge'] = round(edge_pct, 2)
 
 
 # ==================== FASE 6: BUILD DOCUMENTO ====================
@@ -417,8 +906,12 @@ def build_document(match, pronostici, dist, target_str):
             'home_win_pct': dist['home_win_pct'],
             'draw_pct': dist['draw_pct'],
             'away_win_pct': dist['away_win_pct'],
+            'over_15_pct': dist['over_15_pct'],
+            'under_15_pct': dist['under_15_pct'],
             'over_25_pct': dist['over_25_pct'],
             'under_25_pct': dist['under_25_pct'],
+            'over_35_pct': dist['over_35_pct'],
+            'under_35_pct': dist['under_35_pct'],
             'gg_pct': dist['gg_pct'],
             'ng_pct': dist['ng_pct'],
             'avg_goals_home': dist['avg_goals_home'],
@@ -506,8 +999,8 @@ def run_engine_c(target_date=None):
             odds = m.get('odds', {})
             pronostici = convert_to_predictions(dist, odds)
 
-            # Kelly/Stake
-            apply_kelly(pronostici, dist)
+            # Kelly/Stake + 5 Modificatori
+            apply_kelly(pronostici, dist, odds)
 
             # Build documento
             doc = build_document(m, pronostici, dist, target_str)
