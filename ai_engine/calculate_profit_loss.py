@@ -108,67 +108,82 @@ print(f"  {len(results_map)} risultati caricati.\n")
 
 # ==================== TROVA PREDICTIONS SENZA PROFIT_LOSS ====================
 
+# Processa tutte le collection di pronostici (A, C, Unified)
+PREDICTION_COLLECTIONS = [
+    'daily_predictions',
+    'daily_predictions_engine_c',
+    'daily_predictions_unified',
+]
+
 # Cerca documenti con date passate dove almeno un pronostico NON ha profit_loss
 query = {
     'date': {'$lt': today},
     'pronostici': {'$elemMatch': {'profit_loss': {'$exists': False}}},
 }
-docs = list(db.daily_predictions.find(query))
-print(f"Documenti da processare: {len(docs)}")
 
-stats = {
-    'documenti': len(docs),
-    'pronostici': 0,
-    'aggiornati': 0,
-    'vinti': 0,
-    'persi': 0,
-    'pending': 0,
-    'errori': 0,
-}
+global_stats = {}
 
-for doc in docs:
-    date = doc.get('date', '')
-    home = doc.get('home', '')
-    away = doc.get('away', '')
-    key = f"{home}|||{away}|||{date}"
-    real_score = results_map.get(key)
-    parsed = parse_score(real_score) if real_score else None
+for coll_name in PREDICTION_COLLECTIONS:
+    coll = db[coll_name]
+    docs = list(coll.find(query))
 
-    updates = {}
-    for i, prono in enumerate(doc.get('pronostici', [])):
-        stats['pronostici'] += 1
+    stats = {
+        'documenti': len(docs),
+        'pronostici': 0,
+        'aggiornati': 0,
+        'vinti': 0,
+        'persi': 0,
+        'pending': 0,
+        'errori': 0,
+    }
 
-        # Skip se già calcolato
-        if 'profit_loss' in prono:
-            continue
+    print(f"\n--- {coll_name}: {len(docs)} documenti da processare ---")
 
-        pronostico = prono.get('pronostico', '')
-        tipo = prono.get('tipo', '')
-        stake = prono.get('stake', 0)
-        quota = prono.get('quota')
+    for doc in docs:
+        date = doc.get('date', '')
+        home = doc.get('home', '')
+        away = doc.get('away', '')
+        key = f"{home}|||{away}|||{date}"
+        real_score = results_map.get(key)
+        parsed = parse_score(real_score) if real_score else None
 
-        esito = check_pronostico(pronostico, tipo, parsed)
+        updates = {}
+        for i, prono in enumerate(doc.get('pronostici', [])):
+            stats['pronostici'] += 1
 
-        if esito is True and quota:
-            pl = round(stake * (quota - 1), 2)
-            stats['vinti'] += 1
-        elif esito is False:
-            pl = -stake
-            stats['persi'] += 1
-        else:
-            pl = None
-            stats['pending'] += 1
+            # Skip se già calcolato
+            if 'profit_loss' in prono:
+                continue
 
-        updates[f'pronostici.{i}.esito'] = esito
-        updates[f'pronostici.{i}.profit_loss'] = pl
-        stats['aggiornati'] += 1
+            pronostico = prono.get('pronostico', '')
+            tipo = prono.get('tipo', '')
+            stake = prono.get('stake', 0)
+            quota = prono.get('quota')
 
-    if updates:
-        try:
-            db.daily_predictions.update_one({'_id': doc['_id']}, {'$set': updates})
-        except Exception as e:
-            print(f"  ❌ Errore update {home} vs {away} ({date}): {e}")
-            stats['errori'] += 1
+            esito = check_pronostico(pronostico, tipo, parsed)
+
+            if esito is True and quota:
+                pl = round(stake * (quota - 1), 2)
+                stats['vinti'] += 1
+            elif esito is False:
+                pl = -stake
+                stats['persi'] += 1
+            else:
+                pl = None
+                stats['pending'] += 1
+
+            updates[f'pronostici.{i}.esito'] = esito
+            updates[f'pronostici.{i}.profit_loss'] = pl
+            stats['aggiornati'] += 1
+
+        if updates:
+            try:
+                coll.update_one({'_id': doc['_id']}, {'$set': updates})
+            except Exception as e:
+                print(f"  ❌ Errore update {home} vs {away} ({date}): {e}")
+                stats['errori'] += 1
+
+    global_stats[coll_name] = stats
 
 
 # ==================== RIEPILOGO ====================
@@ -176,11 +191,13 @@ for doc in docs:
 print(f"\n{'='*60}")
 print(f"RIEPILOGO PROFIT/LOSS")
 print(f"{'='*60}")
-print(f"  Documenti processati:  {stats['documenti']}")
-print(f"  Pronostici totali:     {stats['pronostici']}")
-print(f"  Aggiornati ora:        {stats['aggiornati']}")
-print(f"    Vinti:     {stats['vinti']}")
-print(f"    Persi:     {stats['persi']}")
-print(f"    Pending:   {stats['pending']} (risultato non disponibile)")
-print(f"    Errori:    {stats['errori']}")
+for coll_name, stats in global_stats.items():
+    print(f"\n  📊 {coll_name}:")
+    print(f"    Documenti processati:  {stats['documenti']}")
+    print(f"    Pronostici totali:     {stats['pronostici']}")
+    print(f"    Aggiornati ora:        {stats['aggiornati']}")
+    print(f"      Vinti:     {stats['vinti']}")
+    print(f"      Persi:     {stats['persi']}")
+    print(f"      Pending:   {stats['pending']} (risultato non disponibile)")
+    print(f"      Errori:    {stats['errori']}")
 print(f"\nFine: {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}")

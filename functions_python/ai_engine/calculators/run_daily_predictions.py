@@ -3168,8 +3168,8 @@ def generate_comment(match_data, segno_result, gol_result, decision_result):
 
     comments = {}
 
-    # Commento per SEGNO
-    if decision_result['confidence_segno'] >= THRESHOLD_INCLUDE:
+    # Commento per SEGNO (sempre, anche per scartate — servono all'orchestratore Unified)
+    if True:
         template = random.choice(COMMENTS_POOL.get('SEGNO', ['Analisi algoritmica']))
         try:
             comments['segno'] = template.format(**placeholders)
@@ -3185,8 +3185,8 @@ def generate_comment(match_data, segno_result, gol_result, decision_result):
         except (KeyError, ValueError):
             comments['doppia_chance'] = 'Copertura consigliata'
 
-    # Commento per GOL
-    if decision_result['confidence_gol'] >= THRESHOLD_INCLUDE:
+    # Commento per GOL (sempre, anche per scartate)
+    if True:
         tipo_gol = gol_result.get('tipo_gol', '')
         if 'Over' in str(tipo_gol):
             pool_key = 'OVER'
@@ -3366,7 +3366,41 @@ def run_daily_predictions(target_date=None):
                     'created_at': datetime.now(),
                 }
                 bombs.append(bomba_doc)
-            
+
+            # Salva doc scartato con comment+dettaglio per orchestratore Unified
+            discarded_doc = {
+                'date': target_str,
+                'home': home,
+                'away': away,
+                'league': league,
+                'match_time': match.get('match_time', ''),
+                'home_mongo_id': match.get('home_mongo_id', ''),
+                'away_mongo_id': match.get('away_mongo_id', ''),
+                'is_cup': is_cup,
+                'decision': 'SCARTA',
+                'pronostici': [],
+                'confidence_segno': segno_result['score'],
+                'confidence_gol': gol_result['score'],
+                'stars_segno': 0,
+                'stars_gol': 0,
+                'comment': comment,
+                'odds': match.get('odds', {}),
+                'segno_dettaglio': segno_result['dettaglio'],
+                'gol_dettaglio': gol_result['dettaglio'],
+                'gol_directions': gol_result.get('directions', {}),
+                'expected_total_goals': gol_result.get('expected_total'),
+                'league_avg_goals': gol_result.get('league_avg'),
+                'streak_home': _streak_cache.get(home, {}).get('total', {}),
+                'streak_away': _streak_cache.get(away, {}).get('total', {}),
+                'streak_home_context': _streak_cache.get(home, {}).get('home', {}),
+                'streak_away_context': _streak_cache.get(away, {}).get('away', {}),
+                'streak_adjustment_segno': segno_result.get('streak_adjustment_segno', 0),
+                'streak_adjustment_gol': gol_result.get('streak_adjustment_gol', 0),
+                'streak_adjustment_ggng': gol_result.get('streak_adjustment_ggng', 0),
+                'created_at': datetime.now(),
+            }
+            results.append(discarded_doc)
+
             continue
         
         # Stampa risultato

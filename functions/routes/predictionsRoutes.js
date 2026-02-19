@@ -140,7 +140,7 @@ router.get('/daily-predictions', async (req, res) => {
   try {
     const [predictions, resultsMap] = await Promise.all([
       req.db.collection('daily_predictions')
-        .find({ date }, { projection: { _id: 0 } })
+        .find({ date, decision: { $ne: 'SCARTA' } }, { projection: { _id: 0 } })
         .toArray(),
       getFinishedResults(req.db, date)
     ]);
@@ -282,7 +282,7 @@ router.get('/daily-predictions-sandbox', async (req, res) => {
   try {
     const [predictions, resultsMap] = await Promise.all([
       req.db.collection('daily_predictions_sandbox')
-        .find({ date }, { projection: { _id: 0 } })
+        .find({ date, decision: { $ne: 'SCARTA' } }, { projection: { _id: 0 } })
         .toArray(),
       getFinishedResults(req.db, date)
     ]);
@@ -673,7 +673,7 @@ router.get('/bankroll-stats', async (req, res) => {
     const today = new Date().toISOString().split('T')[0];
     const dateFilter = { $lt: today };
     if (req.query.from) dateFilter.$gte = req.query.from;
-    const docs = await req.db.collection('daily_predictions')
+    const docs = await req.db.collection('daily_predictions_unified')
       .find({ date: dateFilter })
       .project({ date: 1, league: 1, pronostici: 1 })
       .toArray();
@@ -902,6 +902,104 @@ router.get('/daily-predictions-engine-c', async (req, res) => {
   } catch (error) {
     console.error('❌ [ENGINE C] Errore:', error);
     return res.status(500).json({ error: 'Errore nel recupero pronostici Engine C', details: error.message });
+  }
+});
+
+// 🎼 ENDPOINT: Pronostici Unified (Mixture of Experts)
+router.get('/daily-predictions-unified', async (req, res) => {
+  const { date } = req.query;
+  if (!date) return res.status(400).json({ error: 'Parametro date mancante' });
+
+  console.log('🎼 [UNIFIED] Richiesta per:', date);
+
+  try {
+    const [predictions, resultsMap] = await Promise.all([
+      req.db.collection('daily_predictions_unified')
+        .find({ date }, { projection: { _id: 0 } })
+        .toArray(),
+      getFinishedResults(req.db, date)
+    ]);
+
+    for (const pred of predictions) {
+      const realScore = resultsMap[`${pred.home}|||${pred.away}|||${pred.date}`] || null;
+      pred.real_score = realScore;
+
+      if (realScore) {
+        const parsed = parseScore(realScore);
+        pred.real_sign = parsed ? parsed.sign : null;
+
+        if (pred.pronostici && pred.pronostici.length > 0) {
+          for (const p of pred.pronostici) {
+            p.hit = checkPronostico(p.pronostico, p.tipo, parsed);
+          }
+          pred.hit = pred.pronostici.some(p => p.hit === true);
+        } else {
+          pred.hit = null;
+        }
+      } else {
+        pred.real_sign = null;
+        pred.hit = null;
+      }
+    }
+
+    predictions.sort((a, b) => (a.match_time || '').localeCompare(b.match_time || ''));
+
+    // Assicura campi sempre presenti
+    for (const pred of predictions) {
+      if (pred.pronostici) {
+        for (const p of pred.pronostici) {
+          p.probabilita_stimata = p.probabilita_stimata ?? null;
+          p.stake = p.stake ?? 0;
+          p.edge = p.edge ?? 0;
+          p.prob_mercato = p.prob_mercato ?? null;
+          p.prob_modello = p.prob_modello ?? null;
+          p.has_odds = p.has_odds ?? true;
+          p.source = p.source ?? null;
+          p.routing_rule = p.routing_rule ?? null;
+        }
+      }
+    }
+
+    const allP = predictions.flatMap(p => p.pronostici || []);
+    const verifiedP = allP.filter(p => p.hit === true || p.hit === false);
+    const hitsP = allP.filter(p => p.hit === true).length;
+
+    const matchesWithResult = predictions.filter(p => p.real_score);
+    const matchHits = matchesWithResult.filter(p => p.hit === true).length;
+
+    // Stats per source (da quale sistema viene ogni pronostico)
+    const bySource = {};
+    for (const p of allP) {
+      const src = p.source || 'unknown';
+      if (!bySource[src]) bySource[src] = { total: 0, hits: 0, verified: 0 };
+      bySource[src].total++;
+      if (p.hit === true || p.hit === false) {
+        bySource[src].verified++;
+        if (p.hit === true) bySource[src].hits++;
+      }
+    }
+
+    console.log(`✅ [UNIFIED] ${predictions.length} partite, ${allP.length} pronostici, ${hitsP}/${verifiedP.length} azzeccati`);
+
+    return res.json({
+      success: true, date, predictions, count: predictions.length,
+      stats: {
+        total: allP.length,
+        total_matches: predictions.length,
+        finished: verifiedP.length,
+        hits: hitsP,
+        misses: verifiedP.length - hitsP,
+        pending: allP.length - verifiedP.length,
+        hit_rate: verifiedP.length > 0 ? Math.round((hitsP / verifiedP.length) * 1000) / 10 : null,
+        matches_finished: matchesWithResult.length,
+        matches_hits: matchHits,
+        matches_hit_rate: matchesWithResult.length > 0 ? Math.round((matchHits / matchesWithResult.length) * 1000) / 10 : null,
+        by_source: bySource
+      }
+    });
+  } catch (error) {
+    console.error('❌ [UNIFIED] Errore:', error);
+    return res.status(500).json({ error: 'Errore nel recupero pronostici unified', details: error.message });
   }
 });
 

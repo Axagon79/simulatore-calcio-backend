@@ -120,16 +120,22 @@ SCRAPER_SEQUENCE = [
       ("run_daily_predictions.py", "🔮 [25/29] Pronostici Giornalieri", "Pronostici non generati o con quote mancanti", FP_CALCULATORS_DIR),
 
       # ⭐ SYNC QUOTE SNAI → SANDBOX (recupera quote mancanti da h2h_by_round + produzione)
-      ("sync_snai_odds_to_sandbox.py", "🧪 [26/29] Sync Quote SNAI → Sandbox", "Sandbox potrebbe avere quote SNAI mancanti", CURRENT_DIR),
+      ("sync_snai_odds_to_sandbox.py", "🧪 [26/31] Sync Quote SNAI → Sandbox", "Sandbox potrebbe avere quote SNAI mancanti", CURRENT_DIR),
+
+      # ⭐ SISTEMA S — PRONOSTICI SANDBOX (stessi algoritmi di A, con tuning separato)
+      ("run_daily_predictions_sandbox.py", "🧪 [27/31] Pronostici Sandbox", "Pronostici sandbox non generati", FP_CALCULATORS_DIR),
 
       # ⭐ REPORT TRACK RECORD (genera JSON + TXT con statistiche pronostici vs risultati)
-      ("generate_track_record_report.py", "📊 [27/29] Report Track Record", "Report statistiche non generato", CURRENT_DIR),
+      ("generate_track_record_report.py", "📊 [28/31] Report Track Record", "Report statistiche non generato", CURRENT_DIR),
 
       # ⭐ CALCOLO PROFIT/LOSS post-match (aggiorna esito + P/L per ogni pronostico)
-      ("calculate_profit_loss.py", "💰 [28/29] Calcolo Profit/Loss", "Profit/loss non calcolati per pronostici passati", CURRENT_DIR),
+      ("calculate_profit_loss.py", "💰 [29/31] Calcolo Profit/Loss", "Profit/loss non calcolati per pronostici passati", CURRENT_DIR),
 
       # ⭐ SISTEMA C — PRONOSTICI MONTE CARLO (100 cicli, Master mode 5, collection separata)
-      ("run_daily_predictions_engine_c.py", "🎲 [29/29] Pronostici Sistema C (MC)", "Pronostici Monte Carlo non generati", FP_CALCULATORS_DIR),
+      ("run_daily_predictions_engine_c.py", "🎲 [30/31] Pronostici Sistema C (MC)", "Pronostici Monte Carlo non generati", FP_CALCULATORS_DIR),
+
+      # ⭐ MIXTURE OF EXPERTS — Orchestratore (legge A+C+S, applica routing, scrive in unified)
+      ("orchestrate_experts.py", "🎼 [31/31] Orchestrazione MoE", "Pronostici unified non generati", FP_CALCULATORS_DIR),
 ]
 
 
