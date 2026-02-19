@@ -3,6 +3,24 @@ import sys
 import subprocess
 import time
 from datetime import datetime, timedelta
+def kill_chrome_zombies():
+    """Uccide tutti i processi Chrome/chromedriver orfani (Windows)"""
+    killed = 0
+    for proc_name in ['chrome.exe', 'chromedriver.exe']:
+        try:
+            result = subprocess.run(
+                ['taskkill', '/F', '/IM', proc_name, '/T'],
+                capture_output=True, text=True, timeout=10
+            )
+            if result.returncode == 0:
+                lines = [l for l in result.stdout.strip().split('\n') if l.strip()]
+                killed += len(lines)
+        except Exception:
+            pass
+    if killed:
+        print(f"   🧹 Cleanup: ~{killed} processi Chrome/chromedriver terminati")
+    else:
+        print(f"   🧹 Cleanup: nessun Chrome zombie trovato")
 
 
 # (FA L AGGIORNAMENTO COMPLETO FREQUENTE)
@@ -173,6 +191,10 @@ def main():
     print("\n" + "="*80)
     print("🎩 DIRETTORE D'ORCHESTRA 3.3: CON CRONOMETRO & DIAGNOSTICA")
     print("="*80)
+
+    # Cleanup Chrome zombie prima di iniziare
+    print("\n🧹 Pulizia Chrome zombie...")
+    kill_chrome_zombies()
 
     report = []
     total_start_time = time.time() # Start Cronometro Globale
@@ -351,6 +373,10 @@ def main():
         print("\n❌ L'aggiornamento ha avuto dei problemi. Controlla i comandi sopra.")
     else:
         print(f"\n✨ SISTEMA PERFETTAMENTE AGGIORNATO IN {total_duration_str}!")
+
+    # Cleanup Chrome zombie alla fine
+    print("\n🧹 Pulizia Chrome finale...")
+    kill_chrome_zombies()
 
     print("\n")
 
