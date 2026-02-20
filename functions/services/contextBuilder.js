@@ -322,4 +322,108 @@ async function searchMatch(db, query) {
   return results.slice(0, 10);
 }
 
-module.exports = { buildMatchContext, searchMatch };
+// ══════════════════════════════════════════════
+// Contesto da daily_predictions_unified (per Analisi Premium)
+// ══════════════════════════════════════════════
+async function buildUnifiedContext(db, home, away, date) {
+  const doc = await db.collection('daily_predictions_unified')
+    .findOne({ home, away, date });
+  if (!doc) return null;
+
+  const lines = [];
+  lines.push(`PARTITA: ${doc.home} vs ${doc.away}`);
+  lines.push(`Campionato: ${doc.league} | Data: ${doc.date} ore ${doc.match_time || '?'}`);
+
+  // Pronostici
+  lines.push(`\nPRONOSTICI EMESSI:`);
+  for (const p of (doc.pronostici || [])) {
+    lines.push(`  ${p.tipo}: ${p.pronostico} (confidence ${p.confidence}%, stelle ${p.stars}, quota ${p.quota || '?'})`);
+  }
+  lines.push(`Confidence SEGNO: ${doc.confidence_segno ?? '?'}% | Confidence GOL: ${doc.confidence_gol ?? '?'}%`);
+
+  // Quote
+  const odds = doc.odds || {};
+  lines.push(`\nQUOTE MERCATO:`);
+  lines.push(`  1X2: 1=${odds['1'] || '?'} X=${odds['X'] || '?'} 2=${odds['2'] || '?'}`);
+  lines.push(`  Over/Under: O1.5=${odds.over_15 || '?'} O2.5=${odds.over_25 || '?'} O3.5=${odds.over_35 || '?'} U1.5=${odds.under_15 || '?'} U2.5=${odds.under_25 || '?'} U3.5=${odds.under_35 || '?'}`);
+  lines.push(`  GG/NG: GG=${odds.gg || '?'} NG=${odds.ng || '?'}`);
+
+  // Segnali SEGNO
+  const sd = doc.segno_dettaglio || {};
+  lines.push(`\nSEGNALI SEGNO (0-100, >50 = favore ${doc.home}, <50 = favore ${doc.away}):`);
+  for (const [k, v] of Object.entries(sd)) {
+    const nome = NOMI_SEGNALI[k] || k;
+    lines.push(`  ${nome}: ${typeof v === 'number' ? v.toFixed(1) : v}`);
+  }
+
+  // Segnali GOL + direzioni
+  const gd = doc.gol_dettaglio || {};
+  const gdir = doc.gol_directions || {};
+  lines.push(`\nSEGNALI GOL (0-100 + direzione over/under/neutro):`);
+  for (const [k, v] of Object.entries(gd)) {
+    const d = gdir[k] || '?';
+    lines.push(`  ${k}: ${typeof v === 'number' ? v.toFixed(1) : v} (direzione: ${d})`);
+  }
+  lines.push(`Gol attesi totali: ${doc.expected_total_goals ?? '?'}`);
+
+  // Simulazione Monte Carlo
+  const sim = doc.simulation_data || {};
+  if (sim.home_win_pct !== undefined) {
+    lines.push(`\nSIMULAZIONE MONTE CARLO (100 cicli):`);
+    lines.push(`  Vittoria ${doc.home}: ${sim.home_win_pct}%`);
+    lines.push(`  Pareggio: ${sim.draw_pct}%`);
+    lines.push(`  Vittoria ${doc.away}: ${sim.away_win_pct}%`);
+    lines.push(`  Over 2.5: ${sim.over_25_pct}% | Under 2.5: ${sim.under_25_pct}%`);
+    if (sim.gg_pct !== undefined) lines.push(`  GG: ${sim.gg_pct}% | NG: ${sim.ng_pct}%`);
+    if (sim.avg_goals !== undefined) lines.push(`  Media gol simulata: ${sim.avg_goals}`);
+    // Top scores
+    if (sim.top_scores && sim.top_scores.length > 0) {
+      const topStr = sim.top_scores.slice(0, 5).map(s => `${s.score} (${s.pct}%)`).join(', ');
+      lines.push(`  Risultati esatti più probabili: ${topStr}`);
+    }
+  }
+
+  // Strisce
+  const sh = doc.streak_home || {};
+  const sa = doc.streak_away || {};
+  const hasStreaks = Object.values(sh).some(v => v >= 2) || Object.values(sa).some(v => v >= 2);
+  if (hasStreaks) {
+    lines.push(`\nSTRISCE ATTIVE (N partite consecutive):`);
+    const STREAK_LABELS = {
+      vittorie: 'Vittorie', sconfitte: 'Sconfitte', imbattibilita: 'Imbattibilità',
+      pareggi: 'Pareggi', senza_vittorie: 'Senza vittorie',
+      over25: 'Over 2.5', under25: 'Under 2.5',
+      gg: 'Entrambe segnano', clean_sheet: 'Clean sheet',
+      senza_segnare: 'Senza segnare', gol_subiti: 'Gol subiti',
+    };
+    for (const [k, label] of Object.entries(STREAK_LABELS)) {
+      const hv = sh[k] || 0;
+      const av = sa[k] || 0;
+      if (hv >= 2 || av >= 2) {
+        lines.push(`  ${label}: ${doc.home} ${hv}, ${doc.away} ${av}`);
+      }
+    }
+  }
+
+  // Alert dei checker (se presenti)
+  const alerts = doc.analysis_alerts || [];
+  if (alerts.length > 0) {
+    lines.push(`\nCONTRADDIZIONI RILEVATE (${alerts.length}):`);
+    for (const a of alerts) {
+      lines.push(`  [Gravità ${a.severity}/100] ${a.text || a.id}`);
+    }
+  }
+
+  // Score coerenza
+  if (doc.analysis_score !== undefined) {
+    lines.push(`\nSCORE COERENZA COMPLESSIVO: ${doc.analysis_score}/100`);
+  }
+
+  return {
+    context: lines.join('\n'),
+    source: 'daily_predictions_unified',
+    doc,
+  };
+}
+
+module.exports = { buildMatchContext, searchMatch, buildUnifiedContext };

@@ -315,4 +315,41 @@ async function chatWithContext(contextText, userMessage, history = [], tools = n
   return reply;
 }
 
-module.exports = { generateAnalysis, chatWithContext, callMistral, SYSTEM_PROMPT };
+// ══════════════════════════════════════════════
+// Analisi Match Premium — System Prompt dedicato
+// ══════════════════════════════════════════════
+const MATCH_ANALYSIS_PROMPT = `Sei un analista sportivo professionista. Ti vengono forniti i dati completi di una partita: pronostici, quote, simulazioni, tendenze, strisce. Il tuo compito è analizzarli e fornire la tua opinione ragionata.
+
+STRUTTURA (4 sezioni, ognuna con rating stelle 1-5):
+1. **Segno** ★☆☆☆☆ — La tua analisi del mercato 1X2
+2. **Mercato Gol** ★☆☆☆☆ — La tua analisi su Over/Under e GG/NG
+3. **Alert** ⚠️ — Eventuali criticità, contraddizioni o aspetti da monitorare
+4. **Verdetto** ★☆☆☆☆ — Il tuo giudizio complessivo sulla partita
+
+Le stelle (1-5) rappresentano la tua fiducia nella leggibilità di quel mercato. 5 = quadro chiarissimo, 1 = troppo incerto.
+
+Hai piena libertà di ragionamento. Analizza i dati, incrocia i segnali, e esprimi la tua opinione. Puoi concordare o dissentire con i pronostici emessi — sei un analista, non un portavoce.
+
+REGOLE DI STILE:
+- Tono professionale ma leggero da leggere, prosa fluida (no elenchi puntati)
+- Puoi citare numeri ma senza appesantire
+- NON usare nomi tecnici interni: BVS, Lucifero, Sistema A/C/S, ALGO, MoE
+- USA: "i nostri algoritmi", "la simulazione", "l'analisi statistica", "i modelli"
+- Italiano, ~200 parole
+- Formato stelle: ★★★☆☆ (sempre 5 totali)
+- NON aggiungere frasi di cortesia alla fine`;
+
+/**
+ * Genera analisi match Premium via Mistral (no tools, temperature bassa)
+ */
+async function generateMatchAnalysisPremium(contextText) {
+  const messages = [
+    { role: 'system', content: MATCH_ANALYSIS_PROMPT },
+    { role: 'user', content: `Analizza questa partita seguendo la struttura obbligatoria (Segno, Mercato Gol, Alert, Verdetto):\n\n${contextText}` },
+  ];
+
+  const reply = await callMistral(messages, { temperature: 0.5, maxTokens: 800 });
+  return reply.content;
+}
+
+module.exports = { generateAnalysis, chatWithContext, callMistral, generateMatchAnalysisPremium, SYSTEM_PROMPT };

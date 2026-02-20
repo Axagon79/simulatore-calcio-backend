@@ -135,7 +135,10 @@ SCRAPER_SEQUENCE = [
       ("run_daily_predictions_engine_c.py", "🎲 [30/31] Pronostici Sistema C (MC)", "Pronostici Monte Carlo non generati", FP_CALCULATORS_DIR),
 
       # ⭐ MIXTURE OF EXPERTS — Orchestratore (legge A+C+S, applica routing, scrive in unified)
-      ("orchestrate_experts.py", "🎼 [31/31] Orchestrazione MoE", "Pronostici unified non generati", FP_CALCULATORS_DIR),
+      ("orchestrate_experts.py", "🎼 [31/32] Orchestrazione MoE", "Pronostici unified non generati", FP_CALCULATORS_DIR),
+
+      # ⭐ ANALISI MATCH — Genera analisi free per ogni pronostico unified (22 checker contraddizioni)
+      ("generate_match_analysis.py", "🔍 [32/32] Analisi Match (contraddizioni)", "Analisi match non generate", FP_CALCULATORS_DIR),
 ]
 
 

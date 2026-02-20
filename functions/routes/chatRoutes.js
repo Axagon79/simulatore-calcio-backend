@@ -4,8 +4,8 @@
  */
 const express = require('express');
 const router = express.Router();
-const { generateAnalysis, chatWithContext, SYSTEM_PROMPT } = require('../services/llmService');
-const { buildMatchContext, searchMatch } = require('../services/contextBuilder');
+const { generateAnalysis, chatWithContext, generateMatchAnalysisPremium, SYSTEM_PROMPT } = require('../services/llmService');
+const { buildMatchContext, searchMatch, buildUnifiedContext } = require('../services/contextBuilder');
 const { WEB_SEARCH_TOOL, handleToolCalls } = require('../services/webSearch');
 const { DB_TOOLS } = require('../services/dbTools');
 
@@ -100,6 +100,46 @@ router.get('/search-match', async (req, res) => {
     res.json({ success: true, matches });
   } catch (error) {
     console.error('[CHAT/SEARCH]', error.message);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// ── POST /chat/match-analysis-premium ──
+// Analisi Premium AI via Mistral (solo admin per ora)
+router.post('/match-analysis-premium', async (req, res) => {
+  try {
+    const { home, away, date, isAdmin } = req.body;
+
+    if (!home || !away || !date) {
+      return res.status(400).json({ success: false, error: 'Missing home, away or date' });
+    }
+
+    if (isAdmin !== true && isAdmin !== 'true') {
+      return res.status(403).json({ success: false, error: 'Premium analysis is admin-only' });
+    }
+
+    // Check se analisi già salvata su MongoDB (one-shot: non richiamare Mistral)
+    const existing = await req.db.collection('daily_predictions_unified')
+      .findOne({ home, away, date }, { projection: { analysis_premium: 1 } });
+
+    if (existing && existing.analysis_premium) {
+      return res.json({ success: true, analysis: existing.analysis_premium, cached: true });
+    }
+
+    const result = await buildUnifiedContext(req.db, home, away, date);
+    if (!result) {
+      return res.json({ success: false, error: 'Match not found in unified predictions' });
+    }
+
+    const analysis = await generateMatchAnalysisPremium(result.context);
+
+    // Salva su MongoDB per non richiamare Mistral al prossimo reload
+    await req.db.collection('daily_predictions_unified')
+      .updateOne({ home, away, date }, { $set: { analysis_premium: analysis } });
+
+    res.json({ success: true, analysis, cached: false });
+  } catch (error) {
+    console.error('[CHAT/MATCH-ANALYSIS-PREMIUM]', error.message);
     res.status(500).json({ success: false, error: error.message });
   }
 });
