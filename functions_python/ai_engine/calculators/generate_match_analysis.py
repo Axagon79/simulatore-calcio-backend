@@ -62,6 +62,37 @@ def _get_under_pred(pronostici):
     return next((p for p in pronostici if p.get('tipo') == 'GOL' and 'Under' in p.get('pronostico', '')), None)
 
 
+def _build_streak_highlights(doc):
+    """Genera commenti per strisce notevoli (>=6) di entrambe le squadre.
+    Non influiscono sullo score — arricchiscono solo il testo dell'analisi."""
+    home = doc.get('home', '?')
+    away = doc.get('away', '?')
+    streak_home = doc.get('streak_home') or {}
+    streak_away = doc.get('streak_away') or {}
+
+    LABELS = {
+        'imbattibilita': 'imbattuta da',
+        'vittorie': 'in serie positiva con',
+        'sconfitte': 'in serie negativa con',
+        'senza_vittorie': 'senza vittoria da',
+        'over25': 'con almeno 3 gol in',
+        'under25': 'con meno di 3 gol in',
+        'gg': 'con entrambe a segno in',
+        'clean_sheet': 'senza subire gol da',
+        'senza_segnare': 'a secco di gol da',
+        'gol_subiti': 'subisce gol da',
+    }
+
+    highlights = []
+    for team, streaks in [(home, streak_home), (away, streak_away)]:
+        for key, prefix in LABELS.items():
+            val = streaks.get(key, 0)
+            if val >= 6:
+                highlights.append(f"\u25b8 Dato chiave: {team} {prefix} {val} partite consecutive.")
+
+    return highlights
+
+
 # =====================================================
 # CATEGORIA 1: CONTRADDIZIONI INTERNE PRONOSTICI (1-2)
 # =====================================================
@@ -951,6 +982,10 @@ def _build_positive_analysis(doc):
         lines.append("▸ Mercato Gol: nessun pronostico emesso — segnali insufficienti "
                      "per esprimere una direzione chiara.")
 
+    # Strisce notevoli (>=6)
+    highlights = _build_streak_highlights(doc)
+    lines.extend(highlights)
+
     # Chiusura positiva
     lines.append("Tutti i segnali convergono nella stessa direzione: "
                  "un buon indicatore di affidabilità per questa partita.")
@@ -1013,6 +1048,10 @@ def generate_free_analysis(doc):
     max_alerts = 4 if len(alerts) >= 5 else 3
     for alert in alerts[:max_alerts]:
         lines.append(f"▸ {alert['text']}")
+
+    # Strisce notevoli (>=6)
+    highlights = _build_streak_highlights(doc)
+    lines.extend(highlights)
 
     # Chiusura basata su score
     if score < 25:
