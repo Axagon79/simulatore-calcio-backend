@@ -339,7 +339,8 @@ REGOLE DI STILE:
 - USA: "i nostri algoritmi", "la simulazione", "l'analisi statistica", "i modelli"
 - Italiano, ~200 parole
 - Formato stelle: ★★★☆☆ (sempre 5 totali)
-- NON aggiungere frasi di cortesia alla fine`;
+- NON aggiungere frasi di cortesia alla fine
+- Sii DECISO nelle valutazioni: prendi posizione chiara, non coprire tutte le eventualità. Se i segnali convergono, dillo con convinzione. Un mercato supportato dal 70%+ della simulazione merita almeno 3 stelle. Evita formule vaghe come "da monitorare con attenzione" o "molti fattori in bilico" — l'utente vuole un'opinione netta, non diplomatica`;
 
 /**
  * Genera analisi match Premium via Mistral (no tools, temperature bassa)
