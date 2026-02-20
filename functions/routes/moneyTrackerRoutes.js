@@ -123,15 +123,14 @@ router.get('/settings', async (req, res) => {
 
 router.post('/settings', async (req, res) => {
   try {
-    const { initial_capital, max_bet_pct, aggressiveness } = req.body;
+    const { initial_capital, max_bet_pct, daily_exposure_pct, aggressiveness } = req.body;
 
     if (!initial_capital || initial_capital < 10) {
       return res.status(400).json({ error: 'Capitale iniziale minimo 10€' });
     }
-    if (!['conservative', 'moderate', 'aggressive'].includes(aggressiveness)) {
-      return res.status(400).json({ error: 'Aggressività non valida' });
-    }
-    const maxPct = Math.max(1, Math.min(10, Number(max_bet_pct) || 5));
+    const validAggr = ['conservative', 'moderate', 'aggressive'].includes(aggressiveness) ? aggressiveness : 'moderate';
+    const maxPct = Math.max(1, Math.min(20, Number(max_bet_pct) || 4));
+    const dailyPct = Math.max(5, Math.min(50, Number(daily_exposure_pct) || 15));
 
     const existing = await req.db.collection('money_tracker_settings')
       .findOne({ user_id: req.userId });
@@ -143,7 +142,8 @@ router.post('/settings', async (req, res) => {
           $set: {
             initial_capital: Number(initial_capital),
             max_bet_pct: maxPct,
-            aggressiveness,
+            daily_exposure_pct: dailyPct,
+            aggressiveness: validAggr,
             updated_at: new Date()
           }
         }
@@ -154,7 +154,8 @@ router.post('/settings', async (req, res) => {
         initial_capital: Number(initial_capital),
         current_balance: Number(initial_capital),
         max_bet_pct: maxPct,
-        aggressiveness,
+        daily_exposure_pct: dailyPct,
+        aggressiveness: validAggr,
         created_at: new Date(),
         updated_at: new Date()
       });
@@ -592,6 +593,84 @@ router.post('/reset', async (req, res) => {
     });
   } catch (error) {
     console.error('MT reset error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ============================================
+// GET /summary?year=2026 — Sommario annuale
+// ============================================
+
+router.get('/summary', async (req, res) => {
+  try {
+    const year = Number(req.query.year) || new Date().getFullYear();
+
+    const bets = await req.db.collection('money_tracker_bets')
+      .find({
+        user_id: req.userId,
+        date: { $gte: `${year}-01-01`, $lte: `${year}-12-31` }
+      })
+      .toArray();
+
+    // Inizializza 12 mesi
+    const months = {};
+    for (let m = 1; m <= 12; m++) {
+      const key = String(m).padStart(2, '0');
+      months[key] = { count: 0, won: 0, lost: 0, pending: 0, stake: 0, wins: 0, profit: 0 };
+    }
+
+    for (const bet of bets) {
+      const m = bet.date.substring(5, 7);
+      if (!months[m]) continue;
+      months[m].count++;
+      months[m].stake += bet.stake_amount || 0;
+
+      if (bet.status === 'won') {
+        months[m].won++;
+        months[m].wins += bet.potential_win || 0;
+        months[m].profit += (bet.net_profit || 0);
+      } else if (bet.status === 'lost') {
+        months[m].lost++;
+        months[m].profit -= (bet.stake_amount || 0);
+      } else if (bet.status === 'pending') {
+        months[m].pending++;
+      }
+    }
+
+    // Arrotonda
+    for (const k of Object.keys(months)) {
+      months[k].stake = Math.round(months[k].stake * 100) / 100;
+      months[k].wins = Math.round(months[k].wins * 100) / 100;
+      months[k].profit = Math.round(months[k].profit * 100) / 100;
+    }
+
+    // Totali
+    let totalStake = 0, totalWins = 0, totalProfit = 0, totalCount = 0, totalWon = 0, totalLost = 0;
+    for (const m of Object.values(months)) {
+      totalStake += m.stake;
+      totalWins += m.wins;
+      totalProfit += m.profit;
+      totalCount += m.count;
+      totalWon += m.won;
+      totalLost += m.lost;
+    }
+
+    res.json({
+      success: true,
+      year,
+      months,
+      totals: {
+        count: totalCount,
+        won: totalWon,
+        lost: totalLost,
+        stake: Math.round(totalStake * 100) / 100,
+        wins: Math.round(totalWins * 100) / 100,
+        profit: Math.round(totalProfit * 100) / 100,
+        yield: totalStake > 0 ? Math.round((totalProfit / totalStake) * 10000) / 100 : 0
+      }
+    });
+  } catch (error) {
+    console.error('MT summary error:', error);
     res.status(500).json({ error: error.message });
   }
 });
