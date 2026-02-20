@@ -36,6 +36,28 @@ function getOddsBandMult(totalOdds) {
   return 0.25;
 }
 
+// Multiplier basato sullo stake del sistema (S:1-10)
+function getSystemStakeMult(sysStake) {
+  if (sysStake == null || sysStake <= 0) return 1.0;
+  if (sysStake <= 3) return 0.50;
+  if (sysStake <= 6) return 1.00;
+  if (sysStake <= 8) return 1.30;
+  return 1.50; // 9-10
+}
+
+// Quarter Kelly: f = 0.25 * (p*b - q) / b
+// p = probabilità stimata, b = odds decimali - 1
+// Restituisce la frazione del bankroll (0 se edge negativo)
+function quarterKelly(probStimata, odds) {
+  if (!probStimata || !odds || odds <= 1) return null;
+  const p = probStimata / 100;
+  const q = 1 - p;
+  const b = odds - 1;
+  const kelly = (p * b - q) / b;
+  if (kelly <= 0) return null; // edge negativo
+  return kelly * 0.25; // quarter Kelly
+}
+
 // ============================================
 // HELPER: profilo utente (crea se non esiste)
 // ============================================
@@ -450,7 +472,7 @@ router.delete('/bets/:id', async (req, res) => {
 
 router.post('/suggest-stake', async (req, res) => {
   try {
-    const { bet_type, total_odds } = req.body;
+    const { bet_type, total_odds, confidence, probabilita_stimata, system_stake } = req.body;
 
     const settings = await req.db.collection('money_tracker_settings')
       .findOne({ user_id: req.userId });
@@ -461,10 +483,7 @@ router.post('/suggest-stake', async (req, res) => {
     const balance = settings.current_balance || 0;
     const aggressiveness = settings.aggressiveness || 'moderate';
     const maxBetPct = (settings.max_bet_pct || 5) / 100;
-
-    const basePct = AGGRESSIVENESS_PCT[aggressiveness] || 0.03;
-    const typeMult = BET_TYPE_MULT[bet_type] || 1.0;
-    const oddsMult = getOddsBandMult(Number(total_odds) || 2.0);
+    const odds = Number(total_odds) || 2.0;
 
     // Striscia
     const { winStreak, lossStreak } = await getRecentStreak(req.db, req.userId);
@@ -474,23 +493,50 @@ router.post('/suggest-stake', async (req, res) => {
     else if (winStreak >= 5) streakMult = 1.15;
     else if (winStreak >= 3) streakMult = 1.10;
 
-    let suggested = balance * basePct * typeMult * oddsMult * streakMult;
     const maxBet = balance * maxBetPct;
+    let suggested;
+    let method;
+
+    // Se abbiamo dati dal sistema → Quarter Kelly + system stake
+    const kellyFraction = quarterKelly(probabilita_stimata, odds);
+    const sysStakeMult = getSystemStakeMult(system_stake);
+
+    if (kellyFraction != null && probabilita_stimata > 0) {
+      // METODO KELLY: fraction del bankroll × system stake × striscia
+      suggested = balance * kellyFraction * sysStakeMult * streakMult;
+      method = 'kelly';
+    } else {
+      // METODO CLASSICO (inserimento manuale, no dati sistema)
+      const basePct = AGGRESSIVENESS_PCT[aggressiveness] || 0.03;
+      const typeMult = BET_TYPE_MULT[bet_type] || 1.0;
+      const oddsMult = getOddsBandMult(odds);
+      suggested = balance * basePct * typeMult * oddsMult * streakMult;
+      method = 'classic';
+    }
+
     suggested = Math.max(1, Math.min(suggested, maxBet));
     suggested = Math.round(suggested * 100) / 100;
 
     res.json({
       success: true,
       suggested_stake: suggested,
+      method,
       details: {
         balance,
-        base_pct: basePct,
-        type_mult: typeMult,
-        odds_mult: oddsMult,
+        max_bet: Math.round(maxBet * 100) / 100,
         streak_mult: streakMult,
         win_streak: winStreak,
         loss_streak: lossStreak,
-        max_bet: Math.round(maxBet * 100) / 100
+        ...(method === 'kelly' ? {
+          kelly_fraction: kellyFraction ? Math.round(kellyFraction * 10000) / 100 : null,
+          probabilita_stimata,
+          system_stake,
+          sys_stake_mult: sysStakeMult
+        } : {
+          base_pct: AGGRESSIVENESS_PCT[aggressiveness] || 0.03,
+          type_mult: BET_TYPE_MULT[bet_type] || 1.0,
+          odds_mult: getOddsBandMult(odds)
+        })
       }
     });
   } catch (error) {
