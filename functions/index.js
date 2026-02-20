@@ -47,6 +47,10 @@ app.use('/simulation', predictionsRoutes.router);
 const chatRoutes = require('./routes/chatRoutes');
 app.use('/chat', chatRoutes);
 
+const authenticate = require('./middleware/auth');
+const moneyTrackerRoutes = require('./routes/moneyTrackerRoutes');
+app.use('/money-tracker', authenticate, moneyTrackerRoutes);
+
 // ============================================
 // UTILITY FUNCTIONS
 // ============================================
