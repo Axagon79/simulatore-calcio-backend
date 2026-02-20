@@ -82,7 +82,7 @@ def check_over_nogoal(doc):
     conf_ng = nogoal_p.get('confidence', 60) if nogoal_p else 60
     avg_conf = (conf_over + conf_ng) / 2
     # Piu entrambi sono convinti, piu e grave la contraddizione
-    severity = _clamp(int(55 + avg_conf * 0.45), 75, 95)
+    severity = _clamp(int(55 + avg_conf * 0.45), 6, 95)
 
     return {
         'id': 'over_nogoal',
@@ -106,7 +106,7 @@ def check_under_goal(doc):
     conf_under = under_p.get('confidence', 60) if under_p else 60
     conf_goal = goal_p.get('confidence', 60) if goal_p else 60
     avg_conf = (conf_under + conf_goal) / 2
-    severity = _clamp(int(50 + avg_conf * 0.45), 70, 90)
+    severity = _clamp(int(50 + avg_conf * 0.45), 6, 90)
 
     return {
         'id': 'under_goal',
@@ -137,7 +137,7 @@ def check_mc_vs_gol(doc):
 
     if any(p.get('pronostico') == 'Over 2.5' for p in pronostici if p.get('tipo') == 'GOL'):
         if under_25_pct > 55:
-            severity = _clamp(int(under_25_pct), 55, 90)
+            severity = _clamp(int(under_25_pct), 6, 90)
             return {
                 'id': 'mc_vs_over',
                 'severity': severity,
@@ -148,7 +148,7 @@ def check_mc_vs_gol(doc):
 
     if any(p.get('pronostico') == 'Under 2.5' for p in pronostici if p.get('tipo') == 'GOL'):
         if over_25_pct > 55:
-            severity = _clamp(int(over_25_pct), 55, 90)
+            severity = _clamp(int(over_25_pct), 6, 90)
             return {
                 'id': 'mc_vs_under',
                 'severity': severity,
@@ -181,7 +181,7 @@ def check_mc_vs_segno(doc):
 
     if pron == '1' and home_pct < 45 and (away_pct > 30 or draw_pct > 30):
         # 20% → sev 85, 30% → sev 72, 40% → sev 58, 44% → sev 52
-        severity = _clamp(int(110 - home_pct * 1.5), 45, 85)
+        severity = _clamp(int(110 - home_pct * 1.5), 6, 85)
         return {
             'id': 'mc_vs_segno_home',
             'severity': severity,
@@ -191,7 +191,7 @@ def check_mc_vs_segno(doc):
         }
 
     if pron == '2' and away_pct < 45 and (home_pct > 30 or draw_pct > 30):
-        severity = _clamp(int(110 - away_pct * 1.5), 45, 85)
+        severity = _clamp(int(110 - away_pct * 1.5), 6, 85)
         return {
             'id': 'mc_vs_segno_away',
             'severity': severity,
@@ -218,7 +218,7 @@ def check_mc_ggng(doc):
     ng_pct = sim.get('ng_pct', 50)
 
     if _has_goal(pronostici) and ng_pct > 55:
-        severity = _clamp(int(ng_pct), 50, 85)
+        severity = _clamp(int(ng_pct), 6, 85)
         return {
             'id': 'mc_vs_goal',
             'severity': severity,
@@ -228,7 +228,7 @@ def check_mc_ggng(doc):
         }
 
     if _has_nogoal(pronostici) and gg_pct > 55:
-        severity = _clamp(int(gg_pct), 50, 85)
+        severity = _clamp(int(gg_pct), 6, 85)
         return {
             'id': 'mc_vs_nogoal',
             'severity': severity,
@@ -258,7 +258,7 @@ def check_mc_draw_vs_segno(doc):
 
     if draw_pct > 35 and pron in ('1', '2'):
         # 36% → sev 46, 40% → sev 54, 45% → sev 64, 50% → sev 74
-        severity = _clamp(int(draw_pct * 2 - 26), 45, 75)
+        severity = _clamp(int(draw_pct * 2 - 26), 6, 75)
         esito = 'vittoria casalinga' if pron == '1' else 'vittoria ospite'
         return {
             'id': 'mc_draw_high',
@@ -309,7 +309,7 @@ def check_mc_topscores_vs_over(doc):
 
     if low_count >= 2:
         # 2 su 3 → sev 65, 3 su 3 → sev 78
-        severity = _clamp(50 + low_count * 10, 60, 80)
+        severity = _clamp(50 + low_count * 10, 6, 80)
         scores_text = ', '.join(_get_score_str(ts) for ts in top_scores[:3])
         return {
             'id': 'mc_topscores_vs_over',
@@ -340,7 +340,7 @@ def check_quota_gg_vs_nogoal(doc):
 
     if _has_nogoal(pronostici) and quota_gg < 1.60:
         # 1.20 → sev 80, 1.35 → sev 68, 1.50 → sev 56, 1.58 → sev 50
-        severity = _clamp(int(120 - quota_gg * 50), 50, 80)
+        severity = _clamp(int(120 - quota_gg * 50), 6, 80)
         return {
             'id': 'quota_gg_vs_nogoal',
             'severity': severity,
@@ -364,7 +364,7 @@ def check_quota_ng_vs_goal(doc):
         return None
 
     if _has_goal(pronostici) and quota_ng < 1.60:
-        severity = _clamp(int(120 - quota_ng * 50), 50, 80)
+        severity = _clamp(int(120 - quota_ng * 50), 6, 80)
         return {
             'id': 'quota_ng_vs_goal',
             'severity': severity,
@@ -390,7 +390,7 @@ def check_quota_over_vs_under(doc):
         if _has_under(pronostici) and quota_over25 < 1.60:
             under_p = _get_under_pred(pronostici)
             if under_p and 'Under 2.5' in under_p.get('pronostico', ''):
-                severity = _clamp(int(110 - quota_over25 * 45), 50, 75)
+                severity = _clamp(int(110 - quota_over25 * 45), 6, 75)
                 return {
                     'id': 'quota_over_vs_under',
                     'severity': severity,
@@ -403,7 +403,7 @@ def check_quota_over_vs_under(doc):
         if _has_over(pronostici) and quota_under25 < 1.60:
             over_p = _get_over_pred(pronostici)
             if over_p and 'Over 2.5' in over_p.get('pronostico', ''):
-                severity = _clamp(int(110 - quota_under25 * 45), 50, 75)
+                severity = _clamp(int(110 - quota_under25 * 45), 6, 75)
                 return {
                     'id': 'quota_under_vs_over',
                     'severity': severity,
@@ -435,7 +435,7 @@ def check_quota_segno_divergente(doc):
 
     if isinstance(quota_1, (int, float)) and quota_1 < 1.50 and pron in ('X', '2'):
         # 1.10 → sev 79, 1.25 → sev 69, 1.40 → sev 59, 1.48 → sev 53
-        severity = _clamp(int(92 - quota_1 * 30), 50, 80)
+        severity = _clamp(int(92 - quota_1 * 30), 6, 80)
         return {
             'id': 'quota_segno_home_fav',
             'severity': severity,
@@ -445,7 +445,7 @@ def check_quota_segno_divergente(doc):
         }
 
     if isinstance(quota_2, (int, float)) and quota_2 < 1.50 and pron in ('X', '1'):
-        severity = _clamp(int(92 - quota_2 * 30), 50, 80)
+        severity = _clamp(int(92 - quota_2 * 30), 6, 80)
         return {
             'id': 'quota_segno_away_fav',
             'severity': severity,
@@ -481,7 +481,7 @@ def check_quota_bassa_confidence_bassa(doc):
 
     if quota_fav and isinstance(quota_fav, (int, float)) and quota_fav < 1.40:
         # Conf 30 → sev 62, Conf 40 → sev 55, Conf 50 → sev 48, Conf 54 → sev 45
-        severity = _clamp(int(82 - confidence * 0.7), 40, 65)
+        severity = _clamp(int(82 - confidence * 0.7), 6, 65)
         return {
             'id': 'quota_bassa_conf_bassa',
             'severity': severity,
@@ -518,7 +518,7 @@ def check_strisce_over_vs_over(doc):
     best_streak = max(home_over, away_over, home_gg, away_gg)
 
     if best_streak >= 4:
-        severity = _clamp(int(43 + best_streak * 6), 50, 80)
+        severity = _clamp(int(43 + best_streak * 6), 6, 80)
         team = 'casa' if max(home_over, home_gg) >= max(away_over, away_gg) else 'ospite'
         return {
             'id': 'strisce_over_vs_over',
@@ -552,7 +552,7 @@ def check_strisce_under_vs_under(doc):
     best_streak = max(home_under, away_under, home_cs, away_cs)
 
     if best_streak >= 4:
-        severity = _clamp(int(43 + best_streak * 6), 50, 80)
+        severity = _clamp(int(43 + best_streak * 6), 6, 80)
         team = 'casa' if max(home_under, home_cs) >= max(away_under, away_cs) else 'ospite'
         return {
             'id': 'strisce_under_vs_under',
@@ -583,7 +583,7 @@ def check_striscia_senza_segnare_vs_nogoal(doc):
     best = max(home_no_gol, away_no_gol)
 
     if best >= 3:
-        severity = _clamp(int(40 + best * 7), 55, 85)
+        severity = _clamp(int(40 + best * 7), 6, 85)
         team = 'casa' if home_no_gol >= away_no_gol else 'ospite'
         return {
             'id': 'striscia_no_gol_vs_nogoal',
@@ -614,7 +614,7 @@ def check_striscia_gol_subiti_vs_over(doc):
     best = max(home_gs, away_gs)
 
     if best >= 4:
-        severity = _clamp(int(38 + best * 6), 50, 80)
+        severity = _clamp(int(38 + best * 6), 6, 80)
         team = 'casa' if home_gs >= away_gs else 'ospite'
         return {
             'id': 'striscia_gol_subiti_vs_over',
@@ -650,7 +650,7 @@ def check_gol_directions_discordant(doc):
     if _has_over(pronostici) and under_count > over_count and under_count >= total * 0.5:
         ratio = under_count / total
         # ratio 0.5 → sev 50, 0.7 → sev 64, 0.85 → sev 75, 1.0 → sev 80
-        severity = _clamp(int(ratio * 70 + 15), 50, 80)
+        severity = _clamp(int(ratio * 70 + 15), 6, 80)
         return {
             'id': 'directions_vs_over',
             'severity': severity,
@@ -661,7 +661,7 @@ def check_gol_directions_discordant(doc):
 
     if _has_under(pronostici) and over_count > under_count and over_count >= total * 0.5:
         ratio = over_count / total
-        severity = _clamp(int(ratio * 70 + 15), 50, 80)
+        severity = _clamp(int(ratio * 70 + 15), 6, 80)
         return {
             'id': 'directions_vs_under',
             'severity': severity,
@@ -695,7 +695,7 @@ def check_segno_equilibrato(doc):
     ratio = zona_grigia / len(values)
 
     if ratio >= 0.6:
-        severity = _clamp(int(ratio * 50 + 20), 45, 65)
+        severity = _clamp(int(ratio * 50 + 20), 6, 65)
         esito = 'vittoria casalinga' if segno_pred['pronostico'] == '1' else 'vittoria ospite'
         return {
             'id': 'segno_equilibrato',
@@ -729,7 +729,7 @@ def check_gol_dettaglio_basso_vs_over(doc):
 
     if avg < 35:
         # avg 15 → sev 75, avg 25 → sev 63, avg 34 → sev 52
-        severity = _clamp(int(93 - avg * 1.2), 45, 75)
+        severity = _clamp(int(93 - avg * 1.2), 6, 75)
         return {
             'id': 'gol_det_basso_vs_over',
             'severity': severity,
@@ -759,7 +759,7 @@ def check_bvs_vs_quote_divergenti(doc):
     divergenza = abs(bvs - quote)
 
     if bvs > 60 and quote < 40 and divergenza > 25:
-        severity = _clamp(int(30 + divergenza * 0.7), 45, 70)
+        severity = _clamp(int(30 + divergenza * 0.7), 6, 70)
         return {
             'id': 'bvs_vs_quote',
             'severity': severity,
@@ -769,7 +769,7 @@ def check_bvs_vs_quote_divergenti(doc):
         }
 
     if bvs < 40 and quote > 60 and divergenza > 25:
-        severity = _clamp(int(30 + divergenza * 0.7), 45, 70)
+        severity = _clamp(int(30 + divergenza * 0.7), 6, 70)
         return {
             'id': 'bvs_vs_quote_inv',
             'severity': severity,
@@ -799,7 +799,7 @@ def check_confidence_bassa_segno(doc):
         return None
 
     # 30 → sev 65, 40 → sev 58, 50 → sev 51, 54 → sev 48
-    severity = _clamp(int(86 - confidence * 0.7), 40, 65)
+    severity = _clamp(int(86 - confidence * 0.7), 6, 65)
 
     return {
         'id': 'low_confidence_segno',
@@ -826,7 +826,7 @@ def check_expected_goals_vs_pronostico(doc):
         if etg < 2.2:
             # Distanza da 2.5: piu lontano = piu grave
             dist = 2.5 - etg  # 0.3 a 2.5
-            severity = _clamp(int(45 + dist * 25), 50, 80)
+            severity = _clamp(int(45 + dist * 25), 6, 80)
             return {
                 'id': 'xg_vs_over',
                 'severity': severity,
@@ -838,7 +838,7 @@ def check_expected_goals_vs_pronostico(doc):
     if any(p.get('pronostico') == 'Under 2.5' for p in pronostici if p.get('tipo') == 'GOL'):
         if etg > 2.8:
             dist = etg - 2.5
-            severity = _clamp(int(45 + dist * 25), 50, 80)
+            severity = _clamp(int(45 + dist * 25), 6, 80)
             return {
                 'id': 'xg_vs_under',
                 'severity': severity,
@@ -991,11 +991,12 @@ def generate_free_analysis(doc):
         return (positive_text, [], 100)
 
     # === Caso con contraddizioni ===
-    # Calcola score coerenza (100 = nessuna contraddizione)
+    # Riscala severity: da range 6-95 a 1-19 per checker
+    # Formula lineare pura: ogni +1 severity = -1 score. Copre ogni intero 0-100.
+    for a in alerts:
+        a['severity'] = max(1, round(a['severity'] / 5))
     total_severity = sum(a['severity'] for a in alerts)
-    avg_severity = total_severity / len(alerts)
-    penalty = min(100, avg_severity + (len(alerts) - 1) * 8)
-    score = max(0, 100 - int(penalty))
+    score = max(0, 100 - total_severity)
 
     # Ordina per severity decrescente
     alerts.sort(key=lambda a: a['severity'], reverse=True)
@@ -1117,9 +1118,7 @@ def main():
                 if alerts:
                     print(f"\n  --- {doc.get('home')} vs {doc.get('away')} ({date_str}) ---")
                     print(f"  Score coerenza: {score}/100")
-                    print(f"  Alert ({len(alerts)}):")
-                    for a in alerts:
-                        print(f"    [{a['severity']}] {a['id']}")
+                    print(f"  Alert ({len(alerts)}): {', '.join(alerts)}")
                     print(f"  Testo: {text[:300]}...")
                     shown += 1
                     if shown >= 3:
