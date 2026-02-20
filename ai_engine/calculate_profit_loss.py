@@ -89,10 +89,25 @@ for doc in db.h2h_by_round.aggregate(pipeline):
         key = f"{doc['home']}|||{doc['away']}|||{date_str}"
         results_map[key] = doc['score']
 
-# Risultati coppe
+# Risultati coppe (supporta sia real_score che result.home_score/away_score)
 for coll_name in ['matches_champions_league', 'matches_europa_league']:
     if coll_name in db.list_collection_names():
-        for doc in db[coll_name].find({"real_score": {"$ne": None}}, {"home_team": 1, "away_team": 1, "match_date": 1, "real_score": 1}):
+        for doc in db[coll_name].find(
+            {"$or": [{"real_score": {"$ne": None}}, {"result": {"$exists": True}}]},
+            {"home_team": 1, "away_team": 1, "match_date": 1, "real_score": 1, "result": 1, "status": 1}
+        ):
+            # Prova real_score, altrimenti costruisci da result
+            rs = doc.get('real_score')
+            if not rs and doc.get('result'):
+                r = doc['result']
+                if r.get('home_score') is not None and r.get('away_score') is not None:
+                    rs = f"{r['home_score']}:{r['away_score']}"
+            if not rs:
+                continue
+            # Accetta solo partite finite
+            status = (doc.get('status') or '').lower()
+            if status not in ('finished', 'ft'):
+                continue
             md = doc.get('match_date', '')
             if md:
                 try:
@@ -101,7 +116,7 @@ for coll_name in ['matches_champions_league', 'matches_europa_league']:
                 except:
                     continue
                 key = f"{doc['home_team']}|||{doc['away_team']}|||{date_str}"
-                results_map[key] = doc['real_score']
+                results_map[key] = rs
 
 print(f"  {len(results_map)} risultati caricati.\n")
 
