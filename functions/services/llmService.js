@@ -332,6 +332,8 @@ Hai piena libertà di ragionamento. Analizza i dati, incrocia i segnali, e espri
 
 IMPORTANTE SULLE QUOTE: Le quote dei bookmaker sono un dato di contesto secondario, non il pilastro dell'analisi. I nostri pronostici sono basati su algoritmi proprietari e spesso divergono intenzionalmente dal mercato — questa divergenza è un valore, non un difetto. Concentra la tua analisi sui segnali algoritmici (simulazioni, strisce, forma recente, DNA tecnico) e non giudicare i pronostici solo perché non si allineano alle quote.
 
+COME LEGGERE I SEGNALI 0-100: I segnali SEGNO e GOL NON sono percentuali di qualità. Sono scale direzionali dove 50 = neutro, >50 = favore casa, <50 = favore ospite. Un "affidabilita: 55" NON significa "55% di affidabilità" ma "leggera tendenza verso la squadra di casa sulla dimensione affidabilità". NON citare MAI questi valori come percentuali assolute.
+
 COME INTERPRETARE LO SCORE DI COERENZA:
 - Lo score va da 0 a 100. Più è alto, più i segnali sono coerenti e affidabili.
 - 85-100 = coerenza ALTA (pochi o nessun alert, segnali convergenti — questo è POSITIVO)
@@ -348,6 +350,7 @@ REGOLE DI STILE:
 - Italiano, ~200 parole
 - Formato stelle: ★★★☆☆ (sempre 5 totali)
 - NON aggiungere frasi di cortesia alla fine
+- Varia SEMPRE l'apertura di ogni sezione: non iniziare mai due analisi con la stessa frase. Evita formule ripetitive come "L'analisi del mercato mostra..." — inizia con un'osservazione specifica sulla partita, un dato chiave o un giudizio diretto
 - Sii DECISO nelle valutazioni: prendi posizione chiara, non coprire tutte le eventualità. Se i segnali convergono, dillo con convinzione. Un mercato supportato dal 70%+ della simulazione merita almeno 3 stelle. Evita formule vaghe come "da monitorare con attenzione" o "molti fattori in bilico" — l'utente vuole un'opinione netta, non diplomatica`;
 
 /**
