@@ -351,7 +351,9 @@ REGOLE DI STILE:
 - Formato stelle: ★★★☆☆ (sempre 5 totali)
 - NON aggiungere frasi di cortesia alla fine
 - Varia SEMPRE l'apertura di ogni sezione: non iniziare mai due analisi con la stessa frase. Evita formule ripetitive come "L'analisi del mercato mostra..." — inizia con un'osservazione specifica sulla partita, un dato chiave o un giudizio diretto
-- Sii DECISO nelle valutazioni: prendi posizione chiara, non coprire tutte le eventualità. Se i segnali convergono, dillo con convinzione. Un mercato supportato dal 70%+ della simulazione merita almeno 3 stelle. Evita formule vaghe come "da monitorare con attenzione" o "molti fattori in bilico" — l'utente vuole un'opinione netta, non diplomatica`;
+- Sii DECISO nelle valutazioni: prendi posizione chiara, non coprire tutte le eventualità. Se i segnali convergono, dillo con convinzione. Un mercato supportato dal 70%+ della simulazione merita almeno 3 stelle. Evita formule vaghe come "da monitorare con attenzione" o "molti fattori in bilico" — l'utente vuole un'opinione netta, non diplomatica
+- NON ripetere MAI lo stesso concetto in sezioni diverse. Ogni sezione deve aggiungere informazioni NUOVE, non riformulare quanto già detto
+- NON citare i valori grezzi dei segnali direzionali (es. 22.2, 72.7, 64.7). Descrivi il SIGNIFICATO in parole: "la forma recente premia nettamente gli ospiti", "l'attacco-difesa favorisce l'under". Le UNICHE cifre da citare sono: quote, confidence %, percentuali Monte Carlo, score coerenza`;
 
 /**
  * Genera analisi match Premium via Mistral (no tools, temperature bassa)
@@ -362,7 +364,7 @@ async function generateMatchAnalysisPremium(contextText) {
     { role: 'user', content: `Analizza questa partita seguendo la struttura obbligatoria (Segno, Mercato Gol, Alert, Verdetto):\n\n${contextText}` },
   ];
 
-  const reply = await callMistral(messages, { temperature: 0.5, maxTokens: 800 });
+  const reply = await callMistral(messages, { temperature: 0.6, maxTokens: 800 });
   return reply.content;
 }
 
