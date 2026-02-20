@@ -410,7 +410,7 @@ async function buildUnifiedContext(db, home, away, date) {
   if (alerts.length > 0) {
     lines.push(`\nCONTRADDIZIONI RILEVATE (${alerts.length}):`);
     for (const a of alerts) {
-      lines.push(`  [Gravità ${a.severity}/100] ${a.text || a.id}`);
+      lines.push(`  - ${typeof a === 'string' ? a : (a.text || a.id)}`);
     }
   }
 
