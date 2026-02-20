@@ -130,10 +130,10 @@ PREDICTION_COLLECTIONS = [
     'daily_predictions_unified',
 ]
 
-# Cerca documenti con date passate dove almeno un pronostico NON ha profit_loss
+# Cerca documenti con date passate dove almeno un pronostico non ha profit_loss (o è null/pending)
 query = {
     'date': {'$lt': today},
-    'pronostici': {'$elemMatch': {'profit_loss': {'$exists': False}}},
+    'pronostici': {'$elemMatch': {'$or': [{'profit_loss': {'$exists': False}}, {'profit_loss': None}]}},
 }
 
 global_stats = {}
@@ -166,8 +166,8 @@ for coll_name in PREDICTION_COLLECTIONS:
         for i, prono in enumerate(doc.get('pronostici', [])):
             stats['pronostici'] += 1
 
-            # Skip se già calcolato
-            if 'profit_loss' in prono:
+            # Skip se già calcolato (numero reale, non null/pending)
+            if prono.get('profit_loss') is not None:
                 continue
 
             pronostico = prono.get('pronostico', '')
