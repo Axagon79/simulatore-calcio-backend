@@ -678,12 +678,18 @@ router.get('/bankroll-stats', async (req, res) => {
       .project({ date: 1, league: 1, pronostici: 1 })
       .toArray();
 
+    // Filtro quota: low (<=2.50), high (>2.50), omesso = tutti
+    const quotaFilter = req.query.quotaFilter; // 'low' | 'high' | undefined
+
     // Raccogli tutti i pronostici con profit_loss
     const allBets = [];
     for (const doc of docs) {
       for (const p of (doc.pronostici || [])) {
         if (p.profit_loss === undefined || p.profit_loss === null) continue;
         if (p.stake === undefined || p.stake === 0) continue;
+        // Applica filtro quota se richiesto
+        if (quotaFilter === 'low' && p.quota && p.quota > 2.50) continue;
+        if (quotaFilter === 'high' && (!p.quota || p.quota <= 2.50)) continue;
         allBets.push({
           date: doc.date,
           league: doc.league,
