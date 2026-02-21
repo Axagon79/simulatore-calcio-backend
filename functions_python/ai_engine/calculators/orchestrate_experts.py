@@ -211,7 +211,7 @@ def route_predictions(preds_by_sys, markets_by_sys):
                         break
 
                 # Filtro contrarian: emetti NG solo se quota 2.00-2.50
-                # (HR 66.7% su 15 campioni in questa fascia)
+                # (HR 66.7% su 15 campioni — fascia bassa 1.35-1.60 ha solo 11.1%)
                 if not ng_quota or ng_quota < 2.00 or ng_quota > 2.50:
                     continue
 
