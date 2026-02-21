@@ -51,6 +51,9 @@ const authenticate = require('./middleware/auth');
 const moneyTrackerRoutes = require('./routes/moneyTrackerRoutes');
 app.use('/money-tracker', authenticate, moneyTrackerRoutes);
 
+const stepSystemRoutes = require('./routes/stepSystemRoutes');
+app.use('/step-system', authenticate, stepSystemRoutes);
+
 // ============================================
 // UTILITY FUNCTIONS
 // ============================================
