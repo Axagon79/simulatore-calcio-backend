@@ -106,14 +106,8 @@ router.post('/sessions', async (req, res) => {
     const db = req.db;
     const userId = req.userId;
 
-    // Check: non più di 1 sessione attiva
-    const active = await db.collection('step_system_sessions')
-      .findOne({ user_id: userId, status: 'active' });
-    if (active) {
-      return res.status(400).json({ error: 'Hai già una sessione attiva. Chiudila prima di crearne una nuova.' });
-    }
-
     const {
+      name = 'Sessione',
       budget = 200,
       target_multiplier = 2,
       total_steps = 15,
@@ -132,6 +126,7 @@ router.post('/sessions', async (req, res) => {
 
     const session = {
       user_id: userId,
+      name: String(name).trim() || 'Sessione',
       status: 'active',
       budget: +budget,
       target_multiplier: +target_multiplier,
@@ -443,6 +438,33 @@ router.post('/sessions/:id/close', async (req, res) => {
     res.json({ success: true, status: reason === 'completed' ? 'completed' : 'abandoned' });
   } catch (err) {
     console.error('POST /close error:', err);
+    res.status(500).json({ error: 'Errore server' });
+  }
+});
+
+// ============================================
+// 8. DELETE /sessions/:id — Elimina sessione
+// ============================================
+router.delete('/sessions/:id', async (req, res) => {
+  try {
+    const db = req.db;
+    const userId = req.userId;
+    const sessionId = req.params.id;
+
+    if (!ObjectId.isValid(sessionId)) {
+      return res.status(400).json({ error: 'ID sessione non valido' });
+    }
+
+    const result = await db.collection('step_system_sessions')
+      .deleteOne({ _id: new ObjectId(sessionId), user_id: userId });
+
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ error: 'Sessione non trovata' });
+    }
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error('DELETE /sessions/:id error:', err);
     res.status(500).json({ error: 'Errore server' });
   }
 });
