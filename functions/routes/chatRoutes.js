@@ -4,7 +4,7 @@
  */
 const express = require('express');
 const router = express.Router();
-const { generateAnalysis, chatWithContext, generateMatchAnalysisPremium, SYSTEM_PROMPT } = require('../services/llmService');
+const { generateAnalysis, chatWithContext, chatDashboard, generateMatchAnalysisPremium, SYSTEM_PROMPT } = require('../services/llmService');
 const { buildMatchContext, searchMatch, buildUnifiedContext } = require('../services/contextBuilder');
 const { WEB_SEARCH_TOOL, handleToolCalls } = require('../services/webSearch');
 const { DB_TOOLS } = require('../services/dbTools');
@@ -48,6 +48,13 @@ router.post('/message', async (req, res) => {
       return res.status(400).json({ success: false, error: 'Missing message' });
     }
 
+    // ── Dashboard: bot informativo (no tools, prompt dedicato) ──
+    if (pageContext === 'dashboard') {
+      const reply = await chatDashboard(message, history || []);
+      return res.json({ success: true, reply });
+    }
+
+    // ── Altre pagine: Coach AI completo con tools ──
     const userInfo = { pageContext: pageContext || '', isAdmin: !!isAdmin };
 
     // Se home/away forniti, cerca contesto partita
