@@ -247,6 +247,50 @@ def route_predictions(preds_by_sys, markets_by_sys):
 
                 unified.append(p)
 
+    # --- FLIP: Goal debole Sistema A → NoGoal ---
+    # Se Sistema A ha Goal con confidence < 65, è segnale invertito (61.1% NoGoal reale)
+    goal_a = preds_by_sys.get('A', {}).get('GG')
+    if goal_a and goal_a.get('confidence', 0) < 65:
+        # Rimuovi qualsiasi Goal dalla lista unified
+        unified = [p for p in unified if p.get('pronostico') != 'Goal']
+        # Cerca quota NoGoal dagli odds di qualsiasi sistema
+        ng_quota = None
+        for sys_id in ['A', 'C', 'S']:
+            ng_pred = preds_by_sys.get(sys_id, {}).get('NG')
+            if ng_pred and ng_pred.get('quota'):
+                ng_quota = ng_pred['quota']
+                break
+        # Crea pronostico NoGoal derivato dal flip
+        p = {
+            'tipo': 'GOL',
+            'pronostico': 'NoGoal',
+            'confidence': 65,
+            'stars': 3.0,
+            'quota': ng_quota,
+            'probabilita_stimata': 61.0,
+            'has_odds': ng_quota is not None,
+            'source': 'A_flip',
+            'routing_rule': 'goal_flip',
+        }
+        # Calcola stake se c'è quota
+        if ng_quota and ng_quota > 1.0:
+            edge = (61.0 - (100.0 / ng_quota)) / 100.0
+            if edge > 0:
+                kelly_fraction = 0.75
+                kelly = kelly_fraction * (edge * ng_quota - (1 - edge)) / (ng_quota - 1)
+                stake = max(1, min(10, round(kelly * 10)))
+                p['stake'] = stake
+                p['edge'] = round(edge * 100, 1)
+                p['prob_mercato'] = round(100.0 / ng_quota, 1)
+                p['prob_modello'] = 61.0
+            else:
+                p['stake'] = 1
+                p['edge'] = 0
+        else:
+            p['stake'] = 1
+            p['edge'] = 0
+        unified.append(p)
+
     # --- DEDUP: Goal vs NoGoal mutualmente esclusivi ---
     # Se entrambi presenti = conflitto → rimuovi ENTRAMBI (match incerto)
     gg_list = [p for p in unified if p.get('pronostico') == 'Goal']
