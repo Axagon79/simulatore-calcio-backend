@@ -210,9 +210,9 @@ def route_predictions(preds_by_sys, markets_by_sys):
                         ng_quota = pred['quota']
                         break
 
-                # Filtro contrarian: emetti NG solo se quota >= 1.81
-                # (HR 65.2% con quota alta vs 29% con quota bassa vs 0% senza quota)
-                if not ng_quota or ng_quota < 1.81:
+                # Filtro contrarian: emetti NG solo se quota 2.00-2.50
+                # (HR 66.7% su 15 campioni in questa fascia)
+                if not ng_quota or ng_quota < 2.00 or ng_quota > 2.50:
                     continue
 
                 p = {
