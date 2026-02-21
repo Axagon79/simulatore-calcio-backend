@@ -242,6 +242,14 @@ def route_predictions(preds_by_sys, markets_by_sys):
 
                 unified.append(p)
 
+    # --- DEDUP: Goal vs NoGoal mutualmente esclusivi ---
+    gg_list = [p for p in unified if p.get('pronostico') == 'Goal']
+    ng_list = [p for p in unified if p.get('pronostico') == 'NoGoal']
+    if gg_list and ng_list:
+        winner = max(gg_list + ng_list, key=lambda x: x.get('confidence', 0))
+        loser_pron = 'NoGoal' if winner['pronostico'] == 'Goal' else 'Goal'
+        unified = [p for p in unified if p.get('pronostico') != loser_pron]
+
     return unified
 
 
