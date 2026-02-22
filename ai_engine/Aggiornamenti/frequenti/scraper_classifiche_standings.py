@@ -206,9 +206,9 @@ COMPETITIONS = [
         "name": "Major League Soccer",
         "country": "USA",
         "table_url": "https://www.transfermarkt.com/major-league-soccer/tabelle/wettbewerb/MLS1",
-        "dual_tables": False,
+        "dual_tables": True,
     },
-    
+
     # 🆕 ASIA
     {
         "name": "J1 League",

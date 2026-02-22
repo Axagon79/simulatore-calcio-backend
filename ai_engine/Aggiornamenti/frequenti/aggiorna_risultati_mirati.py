@@ -119,10 +119,17 @@ TARGET_CONFIG = {
     "League of Ireland Premier Division": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/ireland/premier-division/results/", "id_prefix": "LeagueOfIreland", "league_name": "League of Ireland Premier Division"},
     "Brasileirão Serie A": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/brazil/serie-a-betano/results/", "id_prefix": "Brasileirao", "league_name": "Brasileirão Serie A"},
     "Primera División": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/argentina/liga-profesional/results//", "id_prefix": "PrimeraDivisión", "league_name": "Primera División"},
-    "Major League Soccer": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/usa/mls/results/", "id_prefix": "MLS", "league_name": "Major League Soccer"},
     "J1 League": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/japan/j1-league/results/", "id_prefix": "J1League", "league_name": "J1 League"},
     "UCL": {"tipo": "coppa", "matches_collection": "matches_champions_league", "nowgoal_url": "https://football.nowgoal26.com/cupmatch/103", "name": "Champions League", "season": "2025-2026"},
-    "UEL": {"tipo": "coppa", "matches_collection": "matches_europa_league", "nowgoal_url": "https://football.nowgoal26.com/cupmatch/113", "name": "Europa League", "season": "2025-2026"}
+    "UEL": {"tipo": "coppa", "matches_collection": "matches_europa_league", "nowgoal_url": "https://football.nowgoal26.com/cupmatch/113", "name": "Europa League", "season": "2025-2026"},
+    # -------------------------------------------------------------------
+    # LEGHE VIA NOWGOAL (tipo: "lega_nowgoal")
+    # BetExplorer per alcune leghe (es. MLS) non mostra gli header "Giornata"
+    # nella pagina risultati, quindi il parser standard fallisce.
+    # Soluzione: scrapare i risultati da NowGoal (stesso formato delle coppe)
+    # e salvarli in h2h_by_round matchando per transfermarkt_id.
+    # -------------------------------------------------------------------
+    "Major League Soccer": {"tipo": "lega_nowgoal", "nowgoal_url": "https://football.nowgoal26.com/subleague/21", "id_prefix": "MajorLeagueSoccer", "league_name": "Major League Soccer"},
 }
 
 # --- FUNZIONI ORIGINALI CAMPIONATI (da per_agg_pianificato_update_results_only.py) ---
@@ -243,6 +250,97 @@ def scrape_nowgoal_matches(config):
     driver.quit()
     print(f"✅ Risultati {config['name']} aggiornati.")
 
+
+def scrape_nowgoal_league(config):
+    """
+    Scrapa risultati da NowGoal per leghe che non funzionano su BetExplorer
+    (es. MLS: BetExplorer non ha header "Giornata", il parser standard fallisce).
+    Stessa logica di scrape_nowgoal_matches() ma salva in h2h_by_round.
+    Match: nome NowGoal → cerca in teams (name/aliases) → ottiene tm_id →
+    trova la partita in h2h_by_round (home_tm_id/away_tm_id).
+    """
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+    driver = webdriver.Chrome(options=chrome_options)
+    driver.get(config['nowgoal_url'])
+    time.sleep(5)
+    soup = BeautifulSoup(driver.page_source, "html.parser")
+    driver.quit()
+
+    table = soup.find("table", id="Table3")
+    if not table:
+        print(f"⚠️ {config['league_name']}: Table3 non trovata su NowGoal")
+        return 0
+
+    # Estrai risultati dalla pagina (stessa logica coppe)
+    ng_results = []
+    for row in table.find_all("tr"):
+        team_links = row.find_all("a", href=re.compile(r"/team/"))
+        if len(team_links) < 2: continue
+        home = team_links[0].get_text(strip=True)
+        away = team_links[1].get_text(strip=True)
+        score_cell = row.find("div", class_="point")
+        if not score_cell: continue
+        fonts = score_cell.find_all("font")
+        if len(fonts) < 2: continue
+        h_s = fonts[0].get_text(strip=True).replace("-", "")
+        a_s = fonts[1].get_text(strip=True).replace("-", "")
+        if h_s.isdigit() and a_s.isdigit():
+            ng_results.append({"home": home, "away": away, "score": f"{h_s}:{a_s}"})
+
+    if not ng_results:
+        print(f"☕ {config['league_name']}: Nessun risultato su NowGoal.")
+        return 0
+
+    # Carica tutti i documenti h2h_by_round della lega
+    h2h_col = db["h2h_by_round"]
+    all_docs = list(h2h_col.find({"_id": {"$regex": f"^{config['id_prefix']}_"}}))
+    if not all_docs:
+        print(f"⚠️ {config['league_name']}: Nessun documento h2h_by_round con prefix {config['id_prefix']}")
+        return 0
+
+    # Matcha risultati NowGoal → h2h_by_round via transfermarkt_id
+    totale_aggiornati = 0
+    docs_modificati = set()
+
+    for ng in ng_results:
+        h_id = find_team_tm_id(ng["home"])
+        a_id = find_team_tm_id(ng["away"])
+        if not h_id or not a_id:
+            continue
+
+        for doc in all_docs:
+            found = False
+            for db_m in doc.get("matches", []):
+                if str(db_m.get("home_tm_id")) == h_id and str(db_m.get("away_tm_id")) == a_id:
+                    if db_m.get("real_score") != ng["score"] or db_m.get("status") != "Finished":
+                        db_m["real_score"] = ng["score"]
+                        db_m["status"] = "Finished"
+                        db_m["live_status"] = "Finished"
+                        db_m["live_minute"] = None
+                        docs_modificati.add(doc["_id"])
+                        totale_aggiornati += 1
+                    found = True
+                    break
+            if found:
+                break
+
+    # Salva i documenti modificati
+    for doc in all_docs:
+        if doc["_id"] in docs_modificati:
+            h2h_col.update_one(
+                {"_id": doc["_id"]},
+                {"$set": {"matches": doc["matches"], "last_updated": datetime.now()}}
+            )
+
+    if totale_aggiornati > 0:
+        print(f"✅ {config['league_name']}: Aggiornati {totale_aggiornati} risultati (via NowGoal).")
+    else:
+        print(f"☕ {config['league_name']}: Nessun nuovo risultato (via NowGoal).")
+
+    return totale_aggiornati
+
+
 # --- LOGICA DIRETTORE AGGIORNATA ---
 
 def run_director_loop():
@@ -312,6 +410,7 @@ def run_director_loop():
         if agenda_filtrata:
             leghe = [t for t in agenda_filtrata if t in TARGET_CONFIG and TARGET_CONFIG[t]['tipo'] == 'lega']
             coppe = [t for t in agenda_filtrata if t in TARGET_CONFIG and TARGET_CONFIG[t]['tipo'] == 'coppa']
+            leghe_nowgoal = [t for t in agenda_filtrata if t in TARGET_CONFIG and TARGET_CONFIG[t]['tipo'] == 'lega_nowgoal']
 
             print(f"\n🎯 Aggiornamento: {list(agenda_filtrata)}")
 
@@ -360,6 +459,18 @@ def run_director_loop():
                     scrape_nowgoal_matches(cfg)
                 except Exception as e:
                     print(f"\n⚠️ Errore coppa {target}: {e}")
+
+            # Leghe via NowGoal (es. MLS): stessa logica coppe ma salva in h2h_by_round
+            for target in leghe_nowgoal:
+                cfg = TARGET_CONFIG[target]
+                try:
+                    aggiornati = scrape_nowgoal_league(cfg)
+                    if aggiornati == 0:
+                        last_empty_check[target] = datetime.now()
+                    else:
+                        last_empty_check.pop(target, None)
+                except Exception as e:
+                    print(f"\n⚠️ Errore lega NowGoal {target}: {e}")
 
         elif agenda:
             # Tutte in cooldown
