@@ -1126,9 +1126,9 @@ def main():
         # Data specifica → solo quella
         dates = [args.date]
     else:
-        # Ultimi N giorni (oggi + N-1 precedenti)
+        # Oggi + N-1 giorni futuri (allineato a orchestrate_experts.py step 31)
         today = datetime.now()
-        dates = [(today - timedelta(days=i)).strftime('%Y-%m-%d') for i in range(args.days)]
+        dates = [(today + timedelta(days=i)).strftime('%Y-%m-%d') for i in range(args.days)]
 
     print(f"\n  Analisi del Match — {len(dates)} giorni da analizzare")
     if args.dry_run:
