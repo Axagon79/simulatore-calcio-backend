@@ -485,7 +485,7 @@ def normalize_team_name(name: str) -> str:
     
     # Rimuovi caratteri speciali
     replacements = {
-        "ü": "u", "ö": "o", "é": "e", "è": "e", "à": "a",
+        "ü": "u", "ö": "o", "é": "e", "è": "e", "à": "a", "ì": "i",
         "ñ": "n", "ã": "a", "ç": "c", "á": "a", "í": "i",
         "ó": "o", "ú": "u", "ê": "e", "ô": "o", "â": "a",
     }

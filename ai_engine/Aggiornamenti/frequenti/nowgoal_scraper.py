@@ -115,7 +115,7 @@ def normalize_name(name):
         "united": "utd", "city": "ci", # Normalizzazione generica
         
         # --- CARATTERI SPECIALI ---
-        "ü": "u", "ö": "o", "é": "e", "è": "e", "ñ": "n", "ã": "a", "ç": "c",
+        "ü": "u", "ö": "o", "é": "e", "è": "e", "ì": "i", "ñ": "n", "ã": "a", "ç": "c",
         "südtirol": "sudtirol", "köln": "koln",
         
         # --- SERIE A/B/C (ITALIA) ---
