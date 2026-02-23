@@ -654,7 +654,18 @@ router.get('/track-record', async (req, res) => {
       byDate[v.date].push(v);
     }
     const serie_temporale = Object.entries(byDate)
-      .map(([date, items]) => ({ date, ...hitRate(items) }))
+      .map(([date, items]) => {
+        const withQuota = items.filter(v => v.quota != null);
+        let dayProfit = 0;
+        for (const v of withQuota) {
+          dayProfit += v.hit ? (v.quota - 1) : -1;
+        }
+        return {
+          date,
+          ...hitRate(items),
+          profit: Math.round(dayProfit * 100) / 100,
+        };
+      })
       .sort((a, b) => a.date.localeCompare(b.date));
 
     // Incrocio mercato × campionato
