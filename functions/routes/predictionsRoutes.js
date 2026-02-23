@@ -464,6 +464,7 @@ router.get('/track-record', async (req, res) => {
           confidence: p.confidence || 0,
           stars: p.stars || 0,
           quota,
+          probabilita_stimata: p.probabilita_stimata != null ? parseFloat(String(p.probabilita_stimata)) : null,
           hit: p.esito === true,
           sezione: sez
         };
@@ -660,10 +661,21 @@ router.get('/track-record', async (req, res) => {
         for (const v of withQuota) {
           dayProfit += v.hit ? (v.quota - 1) : -1;
         }
+        // Quota media giornaliera
+        const avgQuota = withQuota.length > 0
+          ? Math.round(withQuota.reduce((s, v) => s + v.quota, 0) / withQuota.length * 100) / 100
+          : null;
+        // Edge medio giornaliero: probabilita_stimata - (1/quota)
+        const withEdge = items.filter(v => v.quota != null && v.probabilita_stimata != null);
+        const avgEdge = withEdge.length > 0
+          ? Math.round(withEdge.reduce((s, v) => s + (v.probabilita_stimata / 100 - 1 / v.quota), 0) / withEdge.length * 1000) / 10
+          : null;
         return {
           date,
           ...hitRate(items),
           profit: Math.round(dayProfit * 100) / 100,
+          avg_quota: avgQuota,
+          edge: avgEdge,
         };
       })
       .sort((a, b) => a.date.localeCompare(b.date));
