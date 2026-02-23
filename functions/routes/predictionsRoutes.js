@@ -416,6 +416,9 @@ router.get('/track-record', async (req, res) => {
         // Solo pronostici con esito verificato
         if (p.esito === undefined || p.esito === null) continue;
 
+        // Ignora tipi deprecati (sicurezza — unified non dovrebbe averli)
+        if (p.tipo === 'X_FACTOR' || p.tipo === 'RISULTATO_ESATTO') continue;
+
         // Splitta tipo "GOL" in OVER_UNDER vs GG_NG
         let tipoEffettivo = p.tipo;
         if (p.tipo === 'GOL') {
@@ -432,10 +435,19 @@ router.get('/track-record', async (req, res) => {
         // Filtro per confidence minima
         if (min_confidence && (p.confidence || 0) < parseFloat(min_confidence)) continue;
 
-        // Risolvi quota: prima dal pronostico, poi dal parent odds (GOL)
+        // Risolvi quota — STESSA logica del frontend (UnifiedPredictions.getPronosticoQuota)
         let quota = p.quota != null ? parseFloat(p.quota) : null;
         if (quota === null || isNaN(quota)) {
           quota = getQuotaForPronostico(p.pronostico, p.tipo, pred.odds);
+        }
+        // Fallback SEGNO / DOPPIA_CHANCE: estrai da pred.odds[pronostico]
+        if ((quota === null || isNaN(quota)) && pred.odds) {
+          if (p.tipo === 'SEGNO' || p.tipo === 'DOPPIA_CHANCE') {
+            const oddsVal = pred.odds[p.pronostico];
+            if (oddsVal != null && !isNaN(parseFloat(String(oddsVal)))) {
+              quota = parseFloat(String(oddsVal));
+            }
+          }
         }
         // Filtro per range quota
         if (min_quota && (quota === null || quota < parseFloat(min_quota))) continue;
