@@ -408,6 +408,7 @@ router.get('/track-record', async (req, res) => {
 
     // 2. Estrai pronostici verificati (con esito già calcolato dal P/L)
     const verified = [];
+    const allVerified = []; // tutti senza filtro sezione, per split_sezione
     for (const pred of predictions) {
       if (!pred.pronostici || pred.pronostici.length === 0) continue;
 
@@ -442,10 +443,8 @@ router.get('/track-record', async (req, res) => {
 
         // Classificazione Pronostici (≤2.50) vs Alto Rendimento (>2.50)
         const sez = (quota != null && quota > 2.50) ? 'alto_rendimento' : 'pronostici';
-        // Filtro per sezione se specificato
-        if (sezione && sezione !== sez) continue;
 
-        verified.push({
+        const item = {
           date: pred.date,
           league: pred.league || 'N/A',
           tipo: tipoEffettivo,
@@ -455,7 +454,15 @@ router.get('/track-record', async (req, res) => {
           quota,
           hit: p.esito === true,
           sezione: sez
-        });
+        };
+
+        // Salva in allVerified PRIMA del filtro sezione (per split_sezione)
+        allVerified.push(item);
+
+        // Filtro per sezione se specificato
+        if (sezione && sezione !== sez) continue;
+
+        verified.push(item);
       }
     }
 
@@ -466,6 +473,22 @@ router.get('/track-record', async (req, res) => {
       return {
         total, hits, misses: total - hits,
         hit_rate: total > 0 ? Math.round((hits / total) * 1000) / 10 : null
+      };
+    };
+
+    // Stats estese per sezione (hitRate + dati finanziari)
+    const sectionStats = (items) => {
+      const base = hitRate(items);
+      const withQuota = items.filter(v => v.quota != null);
+      let profit = 0;
+      for (const v of withQuota) {
+        profit += v.hit ? (v.quota - 1) : -1;
+      }
+      return {
+        ...base,
+        roi: withQuota.length > 0 ? Math.round((profit / withQuota.length) * 1000) / 10 : null,
+        profit: Math.round(profit * 100) / 100,
+        avg_quota: withQuota.length > 0 ? Math.round(withQuota.reduce((s, v) => s + v.quota, 0) / withQuota.length * 100) / 100 : null,
       };
     };
 
@@ -636,9 +659,9 @@ router.get('/track-record', async (req, res) => {
       cross_mercato_campionato[tipo][lg] = hitRate(items);
     }
 
-    // Split Pronostici vs Alto Rendimento
-    const pronosticiItems = verified.filter(v => v.sezione === 'pronostici');
-    const arItems = verified.filter(v => v.sezione === 'alto_rendimento');
+    // Split Pronostici vs Alto Rendimento (da allVerified — non filtrato per sezione)
+    const pronosticiItems = allVerified.filter(v => v.sezione === 'pronostici');
+    const arItems = allVerified.filter(v => v.sezione === 'alto_rendimento');
 
     console.log(`✅ [TRACK-RECORD] ${verified.length} pronostici verificati (${pronosticiItems.length} pronostici + ${arItems.length} AR), hit rate globale: ${globale.hit_rate}%`);
 
@@ -648,8 +671,8 @@ router.get('/track-record', async (req, res) => {
       filtri: { league: league || null, market: market || null, min_confidence: min_confidence || null, min_quota: min_quota || null, max_quota: max_quota || null, sezione: sezione || null },
       globale,
       split_sezione: {
-        pronostici: hitRate(pronosticiItems),
-        alto_rendimento: hitRate(arItems)
+        pronostici: sectionStats(pronosticiItems),
+        alto_rendimento: sectionStats(arItems)
       },
       breakdown_mercato,
       breakdown_campionato,
