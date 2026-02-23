@@ -390,42 +390,30 @@ router.get('/daily-bombs-sandbox', async (req, res) => {
 
 // 📊 ENDPOINT: Track Record — Aggregazione storica accuratezza pronostici
 router.get('/track-record', async (req, res) => {
-  const { from, to, league, market, min_confidence, min_quota, max_quota } = req.query;
+  const { from, to, league, market, min_confidence, min_quota, max_quota, sezione } = req.query;
 
   if (!from || !to) {
     return res.status(400).json({ error: 'Parametri from e to (YYYY-MM-DD) obbligatori' });
   }
 
-  console.log(`📊 [TRACK-RECORD] Richiesta: ${from} → ${to} | league=${league || 'tutte'} | market=${market || 'tutti'}`);
+  console.log(`📊 [TRACK-RECORD] Richiesta: ${from} → ${to} | league=${league || 'tutte'} | market=${market || 'tutti'} | sezione=${sezione || 'tutto'}`);
 
   try {
-    // 1. Query predictions nel range di date
+    // 1. Query da daily_predictions_unified (MoE — sistema attuale)
     const query = { date: { $gte: from, $lte: to } };
     if (league) query.league = { $regex: new RegExp(league, 'i') };
 
-    const [predictions, resultsMap] = await Promise.all([
-      req.db.collection('daily_predictions').find(query, { projection: { _id: 0 } }).toArray(),
-      getFinishedResults(req.db, { from, to })
-    ]);
+    const predictions = await req.db.collection('daily_predictions_unified')
+      .find(query, { projection: { _id: 0 } }).toArray();
 
-    // 2. Cross-match con risultati reali + verifica hit/miss
+    // 2. Estrai pronostici verificati (con esito già calcolato dal P/L)
     const verified = [];
     for (const pred of predictions) {
-      const realScore = resultsMap[`${pred.home}|||${pred.away}|||${pred.date}`] || null;
-      if (!realScore) continue; // solo partite finite
-
-      const parsed = parseScore(realScore);
-      if (!parsed || !pred.pronostici || pred.pronostici.length === 0) continue;
+      if (!pred.pronostici || pred.pronostici.length === 0) continue;
 
       for (const p of pred.pronostici) {
-        let hit = checkPronostico(p.pronostico, p.tipo, parsed);
-        if (hit === null) continue; // pronostico non verificabile
-
-        // RISULTATO ESATTO: hit se risultato reale è nei top-3 (non solo top-1)
-        if (p.tipo === 'RISULTATO_ESATTO' && !hit && pred.exact_score_top3) {
-          const realScore = `${parsed.homeGoals}-${parsed.awayGoals}`;
-          hit = pred.exact_score_top3.some(s => s.score === realScore);
-        }
+        // Solo pronostici con esito verificato
+        if (p.esito === undefined || p.esito === null) continue;
 
         // Splitta tipo "GOL" in OVER_UNDER vs GG_NG
         let tipoEffettivo = p.tipo;
@@ -452,6 +440,11 @@ router.get('/track-record', async (req, res) => {
         if (min_quota && (quota === null || quota < parseFloat(min_quota))) continue;
         if (max_quota && (quota === null || quota > parseFloat(max_quota))) continue;
 
+        // Classificazione Pronostici (≤2.50) vs Alto Rendimento (>2.50)
+        const sez = (quota != null && quota > 2.50) ? 'alto_rendimento' : 'pronostici';
+        // Filtro per sezione se specificato
+        if (sezione && sezione !== sez) continue;
+
         verified.push({
           date: pred.date,
           league: pred.league || 'N/A',
@@ -460,7 +453,8 @@ router.get('/track-record', async (req, res) => {
           confidence: p.confidence || 0,
           stars: p.stars || 0,
           quota,
-          hit
+          hit: p.esito === true,
+          sezione: sez
         });
       }
     }
@@ -642,13 +636,21 @@ router.get('/track-record', async (req, res) => {
       cross_mercato_campionato[tipo][lg] = hitRate(items);
     }
 
-    console.log(`✅ [TRACK-RECORD] ${verified.length} pronostici verificati, hit rate globale: ${globale.hit_rate}%`);
+    // Split Pronostici vs Alto Rendimento
+    const pronosticiItems = verified.filter(v => v.sezione === 'pronostici');
+    const arItems = verified.filter(v => v.sezione === 'alto_rendimento');
+
+    console.log(`✅ [TRACK-RECORD] ${verified.length} pronostici verificati (${pronosticiItems.length} pronostici + ${arItems.length} AR), hit rate globale: ${globale.hit_rate}%`);
 
     return res.json({
       success: true,
       periodo: { from, to },
-      filtri: { league: league || null, market: market || null, min_confidence: min_confidence || null, min_quota: min_quota || null, max_quota: max_quota || null },
+      filtri: { league: league || null, market: market || null, min_confidence: min_confidence || null, min_quota: min_quota || null, max_quota: max_quota || null, sezione: sezione || null },
       globale,
+      split_sezione: {
+        pronostici: hitRate(pronosticiItems),
+        alto_rendimento: hitRate(arItems)
+      },
       breakdown_mercato,
       breakdown_campionato,
       breakdown_confidence,
