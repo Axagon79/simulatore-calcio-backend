@@ -77,9 +77,10 @@ LEAGUES_CONFIG = [
     {"name": "J1 League", "url": "https://www.snai.it/sport/CALCIO/GIAPPONE%201", "sidebar": "GIAPPONE"},
 
     # COPPE EUROPEE (2) — scrivono in matches_champions_league / matches_europa_league
-    {"name": "Champions League", "url": "https://www.snai.it/sport/CALCIO/CHAMPIONS%20LEAGUE", "sidebar": "CHAMPIONS LEAGUE",
+    # sidebar "EUROPA" = la categoria sotto cui SNAI raggruppa le coppe
+    {"name": "Champions League", "url": "https://www.snai.it/sport/CALCIO/CHAMPIONS%20LEAGUE", "sidebar": "EUROPA",
      "is_cup": True, "cup_collection": "matches_champions_league", "cup_teams": "teams_champions_league"},
-    {"name": "Europa League", "url": "https://www.snai.it/sport/CALCIO/EUROPA%20LEAGUE", "sidebar": "EUROPA LEAGUE",
+    {"name": "Europa League", "url": "https://www.snai.it/sport/CALCIO/EUROPA%20LEAGUE", "sidebar": "EUROPA",
      "is_cup": True, "cup_collection": "matches_europa_league", "cup_teams": "teams_europa_league"},
 ]
 
@@ -559,8 +560,18 @@ def find_and_update_odds_cups(cup_collection, cup_teams_collection, ou_data, gg_
     coll = db[cup_collection]
     teams_coll = db[cup_teams_collection]
 
-    # Carica alias da teams collection coppe
-    cup_teams = {t['name']: t for t in teams_coll.find({}, {"name": 1, "aliases": 1})}
+    # Carica teams coppe: by tm_id (primario), by name, by alias (fallback)
+    cup_teams = {}
+    cup_teams_by_tm_id = {}
+    cup_teams_by_alias = {}
+    for t in teams_coll.find({}, {"name": 1, "aliases": 1, "transfermarkt_id": 1}):
+        cup_teams[t['name']] = t
+        if t.get('transfermarkt_id'):
+            cup_teams_by_tm_id[t['transfermarkt_id']] = t
+        # Indice aggiuntivo: ogni alias (normalizzato) → team doc
+        for a in t.get('aliases', []):
+            cup_teams_by_alias[normalize_name(a)] = t
+        cup_teams_by_alias[normalize_name(t['name'])] = t
 
     updated = 0
     matched_snai_pairs = set()
@@ -596,9 +607,9 @@ def find_and_update_odds_cups(cup_collection, cup_teams_collection, ou_data, gg_
             if age_hours < 1:
                 continue
 
-        # Genera alias per matching
-        home_doc = cup_teams.get(home_db)
-        away_doc = cup_teams.get(away_db)
+        # Genera alias per matching (tm_id → nome esatto → alias normalizzato)
+        home_doc = cup_teams_by_tm_id.get(m.get('home_tm_id')) or cup_teams.get(home_db) or cup_teams_by_alias.get(normalize_name(home_db))
+        away_doc = cup_teams_by_tm_id.get(m.get('away_tm_id')) or cup_teams.get(away_db) or cup_teams_by_alias.get(normalize_name(away_db))
         home_aliases = get_team_aliases(home_db, home_doc)
         away_aliases = get_team_aliases(away_db, away_doc)
 
