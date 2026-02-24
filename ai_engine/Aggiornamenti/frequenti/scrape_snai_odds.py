@@ -75,6 +75,12 @@ LEAGUES_CONFIG = [
 
     # ASIA (1)
     {"name": "J1 League", "url": "https://www.snai.it/sport/CALCIO/GIAPPONE%201", "sidebar": "GIAPPONE"},
+
+    # COPPE EUROPEE (2) — scrivono in matches_champions_league / matches_europa_league
+    {"name": "Champions League", "url": "https://www.snai.it/sport/CALCIO/CHAMPIONS%20LEAGUE", "sidebar": "CHAMPIONS LEAGUE",
+     "is_cup": True, "cup_collection": "matches_champions_league", "cup_teams": "teams_champions_league"},
+    {"name": "Europa League", "url": "https://www.snai.it/sport/CALCIO/EUROPA%20LEAGUE", "sidebar": "EUROPA LEAGUE",
+     "is_cup": True, "cup_collection": "matches_europa_league", "cup_teams": "teams_europa_league"},
 ]
 
 MAX_RETRIES_EMPTY = 3  # Tentativi di reload se 0 partite trovate
@@ -542,6 +548,160 @@ def find_and_update_odds(league_name, ou_data, gg_data, teams_by_tm_id=None, tea
 
 
 # ============================================================
+#  COPPE — MATCHING E UPDATE DB
+# ============================================================
+def find_and_update_odds_cups(cup_collection, cup_teams_collection, ou_data, gg_data):
+    """
+    Trova le partite di coppa nel DB e aggiorna odds con O/U e GG/NG.
+    Scrive in matches_champions_league / matches_europa_league.
+    Propaga anche a daily_predictions, daily_predictions_sandbox, daily_predictions_unified.
+    """
+    coll = db[cup_collection]
+    teams_coll = db[cup_teams_collection]
+
+    # Carica alias da teams collection coppe
+    cup_teams = {t['name']: t for t in teams_coll.find({}, {"name": 1, "aliases": 1})}
+
+    updated = 0
+    matched_snai_pairs = set()
+    all_snai_pairs = set()
+    for (sh, sa) in ou_data.keys():
+        all_snai_pairs.add((sh, sa))
+    for (sh, sa) in gg_data.keys():
+        all_snai_pairs.add((sh, sa))
+
+    # Pre-compute chiavi normalizzate
+    ou_keys_norm = []
+    for (sh, sa), data in ou_data.items():
+        ou_keys_norm.append((normalize_name(sh), normalize_name(sa), sh.lower(), sa.lower(), sh, sa, data))
+    gg_keys_norm = []
+    for (sh, sa), data in gg_data.items():
+        gg_keys_norm.append((normalize_name(sh), normalize_name(sa), sh.lower(), sa.lower(), sh, sa, data))
+
+    # Partite di coppa scheduled o recenti
+    matches = list(coll.find({"status": {"$in": ["scheduled", "Scheduled", "not_started"]}}))
+    print(f"    Partite coppa in DB: {len(matches)}")
+
+    for m in matches:
+        home_db = m.get('home_team', '')
+        away_db = m.get('away_team', '')
+        if not home_db or not away_db:
+            continue
+
+        # Freshness: salta se aggiornate meno di 1 ora fa
+        existing_ts = m.get('odds', {}).get('ts_ou_gg')
+        if existing_ts:
+            ts = existing_ts if isinstance(existing_ts, datetime) else datetime.strptime(str(existing_ts)[:19], "%Y-%m-%d %H:%M:%S")
+            age_hours = (datetime.now() - ts).total_seconds() / 3600
+            if age_hours < 1:
+                continue
+
+        # Genera alias per matching
+        home_doc = cup_teams.get(home_db)
+        away_doc = cup_teams.get(away_db)
+        home_aliases = get_team_aliases(home_db, home_doc)
+        away_aliases = get_team_aliases(away_db, away_doc)
+
+        new_fields = {}
+        now = datetime.now()
+
+        # Cerca match O/U
+        for sh_norm, sa_norm, sh_low, sa_low, sh_orig, sa_orig, ou in ou_keys_norm:
+            home_found = any(
+                a in sh_norm or a in sh_low or sh_norm in a or sh_low in a
+                for a in home_aliases
+            )
+            away_found = any(
+                a in sa_norm or a in sa_low or sa_norm in a or sa_low in a
+                for a in away_aliases
+            )
+            if home_found and away_found:
+                matched_snai_pairs.add((sh_orig, sa_orig))
+                for key in ['under_15', 'over_15', 'under_25', 'over_25', 'under_35', 'over_35']:
+                    if ou.get(key) is not None:
+                        new_fields[key] = ou[key]
+                break
+
+        # Cerca match GG/NG
+        for sh_norm, sa_norm, sh_low, sa_low, sh_orig, sa_orig, gg in gg_keys_norm:
+            home_found = any(
+                a in sh_norm or a in sh_low or sh_norm in a or sh_low in a
+                for a in home_aliases
+            )
+            away_found = any(
+                a in sa_norm or a in sa_low or sa_norm in a or sa_low in a
+                for a in away_aliases
+            )
+            if home_found and away_found:
+                matched_snai_pairs.add((sh_orig, sa_orig))
+                if gg.get('gg') is not None:
+                    new_fields['gg'] = gg['gg']
+                if gg.get('ng') is not None:
+                    new_fields['ng'] = gg['ng']
+                break
+
+        if new_fields:
+            # Aggiorna documento coppa
+            odds_update = {f"odds.{k}": v for k, v in new_fields.items()}
+            odds_update["odds.src_ou_gg"] = "SNAI"
+            odds_update["odds.ts_ou_gg"] = now
+            coll.update_one({"_id": m["_id"]}, {"$set": odds_update})
+            updated += 1
+
+            # Propaga a daily_predictions, daily_predictions_sandbox, daily_predictions_unified
+            # Le coppe matchano per home_team/away_team → nel DB pronostici usano home/away
+            dp_update = {f"odds.{k}": v for k, v in new_fields.items()}
+            dp_update["odds.src_ou_gg"] = "SNAI"
+            dp_update["odds.ts_ou_gg"] = now
+            home_norm = normalize_name(home_db)
+            away_norm = normalize_name(away_db)
+            # Cerca per nome normalizzato nelle predictions (i nomi potrebbero differire leggermente)
+            for dp_coll_name in ['daily_predictions', 'daily_predictions_sandbox', 'daily_predictions_unified']:
+                dp_coll = db[dp_coll_name]
+                # Prova match diretto
+                result = dp_coll.update_many(
+                    {"home": home_db, "away": away_db, "is_cup": True},
+                    {"$set": dp_update}
+                )
+                if result.modified_count == 0:
+                    # Fallback: cerca con regex case-insensitive
+                    dp_coll.update_many(
+                        {"home": {"$regex": f"^{home_norm}$", "$options": "i"}, "away": {"$regex": f"^{away_norm}$", "$options": "i"}, "is_cup": True},
+                        {"$set": dp_update}
+                    )
+
+    unmatched = all_snai_pairs - matched_snai_pairs
+    return updated, unmatched
+
+
+def league_is_fresh_cups(cup_collection):
+    """Controlla se le quote O/U+GG delle coppe sono aggiornate (<1h)."""
+    coll = db[cup_collection]
+    soglia = datetime.now() - timedelta(hours=1)
+
+    # Cerca il ts_ou_gg più recente tra le partite scheduled
+    result = list(coll.aggregate([
+        {"$match": {"status": {"$in": ["scheduled", "Scheduled", "not_started"]}, "odds.ts_ou_gg": {"$exists": True}}},
+        {"$group": {"_id": None, "max_ts": {"$max": "$odds.ts_ou_gg"}}}
+    ]))
+
+    if not result or not result[0].get('max_ts'):
+        print(f"    [freshness] {cup_collection}: nessun ts_ou_gg trovato")
+        return False
+
+    max_ts = result[0]['max_ts']
+    if isinstance(max_ts, str):
+        max_ts = datetime.strptime(max_ts[:19], "%Y-%m-%d %H:%M:%S")
+    else:
+        max_ts = max_ts.replace(tzinfo=None)
+
+    age_min = int((datetime.now() - max_ts).total_seconds() / 60)
+    is_fresh = max_ts > soglia
+    print(f"    [freshness] {cup_collection}: ultimo update {age_min} min fa → {'SKIP' if is_fresh else 'SCRAPE'}")
+    return is_fresh
+
+
+# ============================================================
 #  MAIN
 # ============================================================
 def scrape_league(driver, league, teams_by_tm_id, teams_by_name, is_first=False):
@@ -597,8 +757,13 @@ def scrape_league(driver, league, teams_by_tm_id, teams_by_name, is_first=False)
         print(f"  [{name}] Nessuna quota estratta, skip")
         return len(matches), 0, set()
 
-    # Match con DB e aggiorna
-    updated, unmatched = find_and_update_odds(name, ou_data, gg_data, teams_by_tm_id, teams_by_name)
+    # Match con DB e aggiorna — routing diverso per coppe vs campionati
+    if league.get('is_cup'):
+        updated, unmatched = find_and_update_odds_cups(
+            league['cup_collection'], league['cup_teams'], ou_data, gg_data
+        )
+    else:
+        updated, unmatched = find_and_update_odds(name, ou_data, gg_data, teams_by_tm_id, teams_by_name)
     print(f"  [{name}] Aggiornate: {updated}")
     if unmatched:
         print(f"  [{name}] ⚠️  {len(unmatched)} partite SNAI senza match DB")
@@ -768,17 +933,24 @@ def run_scraper():
             sidebar_country = league.get('sidebar', '')
 
             # Skip se la nazione non è nella sidebar (fuori stagione / non disponibile)
+            # Per le coppe: sidebar potrebbe avere "CHAMPIONS LEAGUE" come voce diretta
             if available and sidebar_country and sidebar_country not in available:
                 print(f"\n  [{league['name']}] ⏭️  {sidebar_country} non in sidebar, skip")
                 total_skipped += 1
                 continue
 
             # Skip se tutte le partite hanno quote aggiornate da meno di 1 ora
-            if league_is_fresh(league['name']):
-                print(f"\n  [{league['name']}] ⏩ Quote già aggiornate (<1h), skip")
-                total_sandbox_propagated += propagate_to_sandbox(league['name'])
-                total_skipped += 1
-                continue
+            if league.get('is_cup'):
+                if league_is_fresh_cups(league['cup_collection']):
+                    print(f"\n  [{league['name']}] ⏩ Quote coppa già aggiornate (<1h), skip")
+                    total_skipped += 1
+                    continue
+            else:
+                if league_is_fresh(league['name']):
+                    print(f"\n  [{league['name']}] ⏩ Quote già aggiornate (<1h), skip")
+                    total_sandbox_propagated += propagate_to_sandbox(league['name'])
+                    total_skipped += 1
+                    continue
 
             try:
                 found, updated, unmatched = scrape_league(driver, league, teams_by_tm_id, teams_by_name, is_first=first_league)
