@@ -141,7 +141,7 @@ def calculate_cup_rating(valore_rosa, elo, quota, rosa_min, rosa_max):
 
 
 def sanitize_data(data):
-    """Rimuove NaN e Inf dai dati"""
+    """Rimuove NaN e Inf dai dati, converte datetime in stringa ISO"""
     if isinstance(data, dict):
         return {k: sanitize_data(v) for k, v in data.items()}
     elif isinstance(data, list):
@@ -149,6 +149,8 @@ def sanitize_data(data):
     elif isinstance(data, float):
         if math.isnan(data) or math.isinf(data):
             return 0.0
+    elif isinstance(data, datetime):
+        return data.isoformat()
     return data
 
 

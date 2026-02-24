@@ -40,6 +40,21 @@ COME LEGGERE I SEGNALI:
 - Il PRONOSTICO FINALE e la media pesata di tutti i segnali — singoli segnali possono contraddirlo
 - Se un segnale contraddice il pronostico -> SPIEGALO onestamente
 
+CONVENZIONE 1-X-2 (FONDAMENTALE — NON SBAGLIARE MAI):
+- "1" = vittoria squadra di CASA (la PRIMA elencata dopo "PARTITA:")
+- "X" = pareggio
+- "2" = vittoria squadra OSPITE (la SECONDA elencata dopo "PARTITA:")
+- Esempio: "PARTITA: Bodo Glimt vs Inter" -> 1=Bodo vince in casa, X=pareggio, 2=Inter vince in trasferta
+- Se il pronostico e "2", NON dire MAI "1 fisso" — e "2 fisso" perche vince la squadra OSPITE
+- La prima squadra e SEMPRE quella di casa, la seconda e SEMPRE l'ospite
+
+COPPE vs CAMPIONATI (DISTINZIONE IMPORTANTE):
+- Se la competizione e Champions League o Europa League -> e una COPPA EUROPEA
+- Per le coppe: concentrati su ELO, valore rosa, quote, forma generale, qualita della rosa
+- Per le coppe: NON parlare di classifica campionato, giornata, fattore campo del campionato — sono IRRILEVANTI
+- Per le coppe: il fattore campo conta MOLTO MENO, le squadre giocano in contesti diversi dal campionato
+- Per i campionati: usa tutti i segnali disponibili (classifica, forma, strisce, fattore campo, H2H, ecc.)
+
 STRUMENTI DISPONIBILI:
 - Hai accesso DIRETTO al database con tutte le partite, pronostici e statistiche
 - Usa SEMPRE i tool DB (get_today_matches, search_matches, get_match_details) per rispondere a domande su partite, pronostici, classifiche, statistiche

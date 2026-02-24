@@ -57,7 +57,7 @@ function buildDailyPredictionsContext(doc) {
   const lines = [];
 
   lines.push(`PARTITA: ${home} vs ${away}`);
-  lines.push(`Campionato: ${doc.league} | Data: ${doc.date} ore ${doc.match_time || '?'}`);
+  lines.push(`${doc.is_cup ? 'COPPA EUROPEA' : 'Campionato'}: ${doc.league} | Data: ${doc.date} ore ${doc.match_time || '?'}`);
   if (doc.real_score) lines.push(`RISULTATO FINALE: ${doc.real_score} (${doc.status || 'finita'})`);
   lines.push(`Decisione algoritmo: ${doc.decision}`);
 
@@ -216,12 +216,12 @@ function buildCupContext(doc) {
   lines.push(`Competizione: ${doc.cup} | Data: ${doc.match_date || '?'}`);
   lines.push(`Stato: ${doc.status || '?'}`);
 
-  if (doc.result && doc.result.home_goals != null) {
-    lines.push(`Risultato: ${doc.result.home_goals}-${doc.result.away_goals}`);
+  if (doc.result && doc.result.home_score != null) {
+    lines.push(`RISULTATO FINALE: ${doc.result.home_score}-${doc.result.away_score}`);
   }
 
   const odds = doc.odds || {};
-  if (odds['1']) lines.push(`Quote 1X2: 1=${odds['1']} X=${odds['X'] || '?'} 2=${odds['2'] || '?'}`);
+  if (odds.home || odds['1']) lines.push(`Quote 1X2: 1=${odds.home || odds['1'] || '?'} X=${odds.draw || odds['X'] || '?'} 2=${odds.away || odds['2'] || '?'}`);
   if (odds.over_25) lines.push(`Quote O/U: Over2.5=${odds.over_25} Under2.5=${odds.under_25 || '?'}`);
   if (odds.gg) lines.push(`Quote GG/NG: GG=${odds.gg} NG=${odds.ng || '?'}`);
 
