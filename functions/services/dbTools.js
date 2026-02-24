@@ -80,7 +80,7 @@ const DB_TOOLS = [
         properties: {
           days: { type: 'number', description: "Numero di giorni indietro da analizzare (default 30). Es. 7 = ultima settimana, 30 = ultimo mese." },
           league: { type: 'string', description: "Filtro opzionale per campionato (es. 'Serie A', 'Premier League')." },
-          market: { type: 'string', description: "Filtro opzionale per mercato: 'SEGNO', 'OVER_UNDER', 'GG_NG'." }
+          market: { type: 'string', description: "Filtro opzionale per mercato: 'SEGNO', 'OVER_UNDER', 'GG_NG', 'MULTI_GOAL'." }
         },
         required: []
       }

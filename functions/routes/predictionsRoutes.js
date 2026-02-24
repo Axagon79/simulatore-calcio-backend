@@ -427,6 +427,8 @@ router.get('/track-record', async (req, res) => {
             tipoEffettivo = 'OVER_UNDER';
           } else if (pLower === 'goal' || pLower === 'nogoal') {
             tipoEffettivo = 'GG_NG';
+          } else if (pLower.startsWith('mg ')) {
+            tipoEffettivo = 'MULTI_GOAL';
           }
         }
 

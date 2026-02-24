@@ -57,6 +57,9 @@ def check_pronostico(pronostico, tipo, parsed):
             return parsed['total'] > float(m.group(2)) if m.group(1).lower() == 'over' else parsed['total'] < float(m.group(2))
         if p.lower() == 'goal': return parsed['btts']
         if p.lower() == 'nogoal': return not parsed['btts']
+        mg = re.match(r'MG\s+(\d+)-(\d+)', p, re.IGNORECASE)
+        if mg:
+            return int(mg.group(1)) <= parsed['total'] <= int(mg.group(2))
     return None
 
 
