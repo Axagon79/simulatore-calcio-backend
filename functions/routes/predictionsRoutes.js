@@ -797,7 +797,9 @@ router.get('/bankroll-stats', async (req, res) => {
       let m = b.tipo;
       if (m === 'GOL') {
         const p = (b.pronostico || '').toLowerCase();
-        m = (p.includes('over') || p.includes('under')) ? 'OVER_UNDER' : 'GG_NG';
+        if (p.includes('over') || p.includes('under')) m = 'OVER_UNDER';
+        else if (p.startsWith('mg ')) m = 'MULTI_GOAL';
+        else m = 'GG_NG';
       }
       if (!mercati[m]) mercati[m] = [];
       mercati[m].push(b);

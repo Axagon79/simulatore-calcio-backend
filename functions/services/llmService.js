@@ -184,7 +184,7 @@ TRACK RECORD (SOLO ADMIN — USA IL TOOL get_track_record):
   3. L'utente chiede statistiche su un campionato specifico o un mercato specifico
   4. L'utente e sulla pagina Track Record e chiede approfondimenti
   5. Vuoi supportare un consiglio con dati storici (es. "il sistema azzecca il 70% degli Over 2.5")
-- PARAMETRI: days (default 30, ultimi N giorni), league (filtro campionato), market (SEGNO/OVER_UNDER/GG_NG)
+- PARAMETRI: days (default 30, ultimi N giorni), league (filtro campionato), market (SEGNO/OVER_UNDER/GG_NG/MULTI_GOAL)
 - COME COMMENTARE i dati:
   - Hit rate >65% → "Il sistema ha un buon rendimento"
   - Hit rate 55-65% → "Il rendimento e nella media, c'e margine di miglioramento"
@@ -393,9 +393,10 @@ Il sistema genera pronostici automatici ogni notte tramite una pipeline che anal
 TIPI DI PRONOSTICI:
 - **SEGNO** (1X2): chi vince la partita. Possibili esiti: 1 (casa), X (pareggio), 2 (ospite)
 - **DOPPIA CHANCE**: due esiti su tre (1X, X2, 12). Meno rischiosa del segno secco
-- **GOL** — comprende due sotto-mercati:
+- **GOL** — comprende tre sotto-mercati:
   - **Over/Under 2.5**: si segneranno più o meno di 2.5 gol totali
   - **GG/NG** (Goal/NoGoal): entrambe le squadre segneranno almeno un gol (GG) oppure no (NG)
+  - **Multi-goal** (MG): fascia di gol totali (es. MG 2-3 = si segneranno 2 o 3 gol). Quote calcolate con Poisson
 
 CONFIDENCE E STELLE:
 - Ogni pronostico ha un valore di **confidence** (0-100) che indica quanto il sistema è sicuro
