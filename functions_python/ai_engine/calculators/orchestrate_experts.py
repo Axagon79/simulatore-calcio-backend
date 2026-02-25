@@ -400,6 +400,123 @@ def _apply_x_draw_combos(unified, odds, simulation_data):
     return result
 
 
+# Combo che storicamente producono 1 (100% su 11 partite, campione piccolo)
+HOME_WIN_COMBOS = {14, 25, 26, 38, 61, 71, 80, 88, 93, 94}
+
+
+def _apply_home_win_combos(unified, odds, simulation_data):
+    """
+    Combo Home-Win: 10 combo rare dove il SEGNO 1 ha hit rate 100%.
+    Sostituisce SEGNO diverso da 1 con SEGNO 1, o aggiunge SEGNO 1 se assente.
+    Solo se quota 1 ≥ 1.35.
+    """
+    if not simulation_data or not odds:
+        return unified
+
+    top_scores = simulation_data.get('top_scores', [])
+    if len(top_scores) < 4:
+        return unified
+
+    # Calcola combo number
+    pos1 = _score_to_sign(top_scores[0][0])
+    pos4 = _score_to_sign(top_scores[3][0])
+    if not pos1 or not pos4:
+        return unified
+
+    h_pct = simulation_data.get('home_win_pct', 0) or 0
+    d_pct = simulation_data.get('draw_pct', 0) or 0
+    a_pct = simulation_data.get('away_win_pct', 0) or 0
+    if h_pct >= d_pct and h_pct >= a_pct:
+        mc = '1'
+    elif d_pct >= h_pct and d_pct >= a_pct:
+        mc = 'X'
+    else:
+        mc = '2'
+
+    o25 = simulation_data.get('over_25_pct', 0) or 0
+    u25 = simulation_data.get('under_25_pct', 0) or 0
+    ou = 'Over' if o25 >= u25 else 'Under'
+
+    gg_pct = simulation_data.get('gg_pct', 0) or 0
+    ng_pct = simulation_data.get('ng_pct', 0) or 0
+    ggng = 'GG' if gg_pct >= ng_pct else 'NG'
+
+    # Calcola numero combo
+    s = {'1': 0, 'X': 1, '2': 2}
+    ou_idx = 0 if ou == 'Over' else 1
+    gg_idx = 0 if ggng == 'GG' else 1
+    combo = s[pos1] * 36 + s[pos4] * 12 + s[mc] * 4 + ou_idx * 2 + gg_idx + 1
+
+    if combo not in HOME_WIN_COMBOS:
+        return unified
+
+    # Quota 1
+    q_1 = float(odds.get('1', 0) or 0)
+    if q_1 < 1.35:
+        return unified
+
+    # Cerca se c'è già un SEGNO e sostituiscilo, altrimenti aggiungi
+    result = []
+    replaced = False
+    for p in unified:
+        if p.get('tipo') == 'SEGNO' and not replaced:
+            h_pred = {
+                'tipo': 'SEGNO',
+                'pronostico': '1',
+                'quota': q_1,
+                'confidence': p.get('confidence', 55),
+                'stars': p.get('stars', 3.0),
+                'source': p.get('source', '?') + '_hw',
+                'routing_rule': f'home_win_combo_{combo}',
+                'has_odds': True,
+            }
+            prob_mod = 0.75  # stima conservativa (storico 100% ma campione 11 partite)
+            prob_mkt = 1.0 / q_1
+            edge = prob_mod - prob_mkt
+            if edge > 0:
+                kelly = 0.75 * (edge * q_1) / (q_1 - 1)
+                h_pred['stake'] = max(1, min(10, round(kelly * 10)))
+                h_pred['edge'] = round(edge * 100, 1)
+                h_pred['prob_mercato'] = round(prob_mkt * 100, 1)
+                h_pred['prob_modello'] = round(prob_mod * 100, 1)
+                h_pred['probabilita_stimata'] = round(prob_mod * 100, 1)
+            else:
+                h_pred['stake'] = 1
+                h_pred['edge'] = 0
+            result.append(h_pred)
+            replaced = True
+        else:
+            result.append(p)
+
+    # Se non c'era un SEGNO, aggiungilo
+    if not replaced:
+        h_pred = {
+            'tipo': 'SEGNO',
+            'pronostico': '1',
+            'quota': q_1,
+            'confidence': 55,
+            'stars': 3.0,
+            'source': 'MC_hw',
+            'routing_rule': f'home_win_combo_{combo}',
+            'has_odds': True,
+            'stake': 1,
+            'edge': 0,
+        }
+        prob_mkt = 1.0 / q_1
+        edge = 0.75 - prob_mkt
+        if edge > 0:
+            kelly = 0.75 * (edge * q_1) / (q_1 - 1)
+            h_pred['stake'] = max(1, min(10, round(kelly * 10)))
+            h_pred['edge'] = round(edge * 100, 1)
+            h_pred['prob_mercato'] = round(prob_mkt * 100, 1)
+            h_pred['prob_modello'] = 75.0
+            h_pred['probabilita_stimata'] = 75.0
+        result.append(h_pred)
+
+    print(f"    ⚡ COMBO HOME-WIN #{combo}: → SEGNO 1 @{q_1}")
+    return result
+
+
 # =====================================================
 # MAPPING PREDIZIONE → CHIAVE MERCATO
 # =====================================================
@@ -744,6 +861,7 @@ def orchestrate_date(date_str, dry_run=False):
             sim_data = c_doc_for_combo.get('simulation_data')
             unified_pronostici = _apply_combo96_dc_flip(unified_pronostici, match_odds, sim_data)
             unified_pronostici = _apply_x_draw_combos(unified_pronostici, match_odds, sim_data)
+            unified_pronostici = _apply_home_win_combos(unified_pronostici, match_odds, sim_data)
 
         # --- FILTRO GLOBALE: quota minima 1.35 su tutti i mercati ---
         unified_pronostici = [p for p in unified_pronostici if (p.get('quota') or 0) >= 1.35]
