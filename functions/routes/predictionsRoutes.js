@@ -51,6 +51,11 @@ function checkPronostico(pronostico, tipo, parsed) {
     // Goal (entrambe segnano) / NoGoal
     if (p.toLowerCase() === 'goal') return parsed.btts;
     if (p.toLowerCase() === 'nogoal') return !parsed.btts;
+    // Multigol: MG X-Y
+    const mgMatch = p.match(/^MG\s+(\d+)-(\d+)$/i);
+    if (mgMatch) {
+      return parsed.total >= parseInt(mgMatch[1]) && parsed.total <= parseInt(mgMatch[2]);
+    }
     return null;
   }
 
