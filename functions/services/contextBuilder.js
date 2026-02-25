@@ -334,6 +334,20 @@ async function buildUnifiedContext(db, home, away, date) {
   lines.push(`PARTITA: ${doc.home} vs ${doc.away}`);
   lines.push(`Campionato: ${doc.league} | Data: ${doc.date} ore ${doc.match_time || '?'}`);
 
+  // Risultato finale (se partita terminata)
+  if (doc.real_score) {
+    lines.push(`RISULTATO FINALE: ${doc.real_score} (${doc.status || 'finita'})`);
+  }
+  // Esiti pronostici (se P/L ha già processato)
+  const pronosticiConEsito = (doc.pronostici || []).filter(p => p.esito !== undefined && p.esito !== null);
+  if (pronosticiConEsito.length > 0) {
+    lines.push(`\nPARTITA GIA' TERMINATA — ESITI PRONOSTICI:`);
+    for (const p of pronosticiConEsito) {
+      const res = p.esito === true ? 'CENTRATO' : 'SBAGLIATO';
+      lines.push(`  ${p.tipo} ${p.pronostico} @${p.quota || '?'} → ${res}`);
+    }
+  }
+
   // Pronostici
   lines.push(`\nPRONOSTICI EMESSI:`);
   for (const p of (doc.pronostici || [])) {
