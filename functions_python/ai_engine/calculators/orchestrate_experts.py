@@ -745,6 +745,9 @@ def orchestrate_date(date_str, dry_run=False):
             unified_pronostici = _apply_combo96_dc_flip(unified_pronostici, match_odds, sim_data)
             unified_pronostici = _apply_x_draw_combos(unified_pronostici, match_odds, sim_data)
 
+        # --- FILTRO GLOBALE: quota minima 1.35 su tutti i mercati ---
+        unified_pronostici = [p for p in unified_pronostici if (p.get('quota') or 0) >= 1.35]
+
         if not unified_pronostici:
             continue
 

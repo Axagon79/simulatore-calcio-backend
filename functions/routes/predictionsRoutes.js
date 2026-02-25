@@ -473,7 +473,8 @@ router.get('/track-record', async (req, res) => {
           quota,
           probabilita_stimata: p.probabilita_stimata != null ? parseFloat(String(p.probabilita_stimata)) : null,
           hit: p.esito === true,
-          sezione: sez
+          sezione: sez,
+          source: p.source || 'unknown'
         };
 
         // Salva in allVerified PRIMA del filtro sezione (per split_sezione)
@@ -524,6 +525,22 @@ router.get('/track-record', async (req, res) => {
     const breakdown_mercato = {};
     for (const [tipo, items] of Object.entries(byMarket)) {
       breakdown_mercato[tipo] = hitRate(items);
+    }
+
+    // Per source (algoritmo di provenienza)
+    const bySource = {};
+    for (const v of verified) {
+      if (!bySource[v.source]) bySource[v.source] = [];
+      bySource[v.source].push(v);
+    }
+    const breakdown_source = {};
+    for (const [src, items] of Object.entries(bySource)) {
+      const hr = hitRate(items);
+      const withQuota = items.filter(i => i.quota && i.quota > 1);
+      const profit = withQuota.reduce((sum, i) => sum + (i.hit ? (i.quota - 1) : -1), 0);
+      const avgQuota = withQuota.length > 0 ? Math.round(withQuota.reduce((s, i) => s + i.quota, 0) / withQuota.length * 100) / 100 : null;
+      const roi = withQuota.length > 0 ? Math.round((profit / withQuota.length) * 1000) / 10 : null;
+      breakdown_source[src] = { ...hr, profit: Math.round(profit * 100) / 100, avg_quota: avgQuota, roi };
     }
 
     // Per campionato
@@ -717,6 +734,7 @@ router.get('/track-record', async (req, res) => {
         alto_rendimento: sectionStats(arItems)
       },
       breakdown_mercato,
+      breakdown_source,
       breakdown_campionato,
       breakdown_confidence,
       breakdown_stelle,
