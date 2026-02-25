@@ -15,6 +15,7 @@ Uso:
 
 import sys
 import os
+import math
 import argparse
 from datetime import datetime, timedelta, timezone
 from copy import deepcopy
@@ -52,6 +53,351 @@ MATCH_FIELDS = [
 ]
 
 ROUTING_VERSION = '1.0'
+
+
+# =====================================================
+# MULTI-GOAL — Poisson + Lambda zones
+# =====================================================
+MULTIGOL_ZONES = [
+    {'lambda_min': 0,    'lambda_max': 2.00, 'range': '1-2', 'goals': [1, 2]},
+    {'lambda_min': 2.00, 'lambda_max': 2.45, 'range': '1-3', 'goals': [1, 2, 3]},
+    {'lambda_min': 2.45, 'lambda_max': 2.70, 'range': '2-3', 'goals': [2, 3]},
+    {'lambda_min': 2.70, 'lambda_max': 3.00, 'range': '2-4', 'goals': [2, 3, 4]},
+    {'lambda_min': 3.00, 'lambda_max': 99,   'range': '3-5', 'goals': [3, 4, 5]},
+]
+MULTIGOL_MARGINE = 0.88
+MULTIGOL_QUOTA_MIN = 1.35
+
+
+def _poisson(k, lamb):
+    """Probabilità Poisson P(X=k) dato lambda."""
+    return (math.exp(-lamb) * (lamb ** k)) / math.factorial(k)
+
+
+def _calc_lambda(under_25_odds):
+    """Calcola lambda totale dalla quota Under 2.5 (bisection Poisson)."""
+    if not under_25_odds or under_25_odds <= 1.0:
+        return None
+    p_u25 = (1 / under_25_odds) * 1.06
+    l_tot = 0.1
+    while sum(_poisson(i, l_tot) for i in range(3)) > p_u25:
+        l_tot += 0.005
+        if l_tot > 10:
+            return None
+    return l_tot
+
+
+def _score_to_sign(score_str):
+    """Segno da score MC: '2-1' → '1', '1-1' → 'X', '0-2' → '2'"""
+    if not score_str:
+        return None
+    parts = str(score_str).replace(':', '-').split('-')
+    if len(parts) != 2:
+        return None
+    try:
+        h, a = int(parts[0]), int(parts[1])
+    except ValueError:
+        return None
+    if h > a: return '1'
+    if h == a: return 'X'
+    return '2'
+
+
+def _apply_multigol(unified, odds):
+    """
+    Post-processing: sostituisce pronostici deboli con Multi-goal.
+    Candidati: Over 1.5, Under 3.5, GG/NG con confidence 60-65.
+    Logica: Poisson → lambda → zona MG → quota calcolata ≥ 1.35.
+    """
+    u25 = odds.get('under_25')
+    if not u25:
+        return unified
+    try:
+        u25_f = float(u25)
+    except (TypeError, ValueError):
+        return unified
+
+    l_tot = _calc_lambda(u25_f)
+    if l_tot is None:
+        return unified
+
+    # Probabilità per ogni numero di gol (0-10)
+    probs = {g: _poisson(g, l_tot) for g in range(11)}
+
+    # Trova zona MG in base a lambda
+    zone = None
+    for z in MULTIGOL_ZONES:
+        if z['lambda_min'] <= l_tot < z['lambda_max']:
+            zone = z
+            break
+    if not zone:
+        return unified
+
+    # Calcola prob e quota MG per questa zona
+    mg_prob = sum(probs[g] for g in zone['goals'])
+    mg_quota = round((1 / mg_prob) * MULTIGOL_MARGINE, 2) if mg_prob > 0 else 99
+
+    # Filtro quota minima — se troppo bassa, non conviene
+    if mg_quota < MULTIGOL_QUOTA_MIN:
+        return unified
+
+    # Scansiona pronostici e sostituisci i candidati
+    result = []
+    for p in unified:
+        pron = p.get('pronostico', '')
+        conf = p.get('confidence', 0)
+
+        is_candidate = (
+            pron == 'Over 1.5' or
+            pron == 'Under 3.5' or
+            (pron in ('Goal', 'NoGoal') and 60 <= conf <= 65)
+        )
+
+        if is_candidate:
+            mg = {
+                'tipo': 'GOL',
+                'pronostico': f'MG {zone["range"]}',
+                'confidence': conf,
+                'stars': p.get('stars', 3.0),
+                'quota': mg_quota,
+                'probabilita_stimata': round(mg_prob * 100, 1),
+                'has_odds': True,
+                'source': p.get('source', '?') + '_mg',
+                'routing_rule': 'multigol_v6',
+                'multigol_detail': {
+                    'lambda': round(l_tot, 3),
+                    'zone': zone['range'],
+                    'original': pron,
+                    'mg_prob': round(mg_prob, 4),
+                },
+            }
+            # Calcola stake con Kelly 3/4
+            if mg_quota > 1.0:
+                edge = mg_prob - (1.0 / mg_quota)
+                if edge > 0:
+                    kelly_fraction = 0.75
+                    kelly = kelly_fraction * (edge * mg_quota - (1 - edge)) / (mg_quota - 1)
+                    mg['stake'] = max(1, min(10, round(kelly * 10)))
+                    mg['edge'] = round(edge * 100, 1)
+                    mg['prob_mercato'] = round(100.0 / mg_quota, 1)
+                    mg['prob_modello'] = round(mg_prob * 100, 1)
+                else:
+                    mg['stake'] = 1
+                    mg['edge'] = 0
+            else:
+                mg['stake'] = 1
+                mg['edge'] = 0
+            result.append(mg)
+        else:
+            result.append(p)
+
+    return result
+
+
+def _apply_combo96_dc_flip(unified, odds, simulation_data):
+    """
+    Combo #96: se Pos1=2, Pos4=X, MC=2, Under 2.5, NG
+    e quota DC X2 ≥ 1.35 → sostituisce SEGNO 2 con DC X2.
+    Backtest: 12 partite con DC X2 ≥1.35 → 100% HR, +55.6% yield.
+    """
+    if not simulation_data or not odds:
+        return unified
+
+    top_scores = simulation_data.get('top_scores', [])
+    if len(top_scores) < 4:
+        return unified
+
+    # Check 5 condizioni combo #96
+    pos1 = _score_to_sign(top_scores[0][0])
+    pos4 = _score_to_sign(top_scores[3][0])
+    if pos1 != '2' or pos4 != 'X':
+        return unified
+
+    h_pct = simulation_data.get('home_win_pct', 0) or 0
+    d_pct = simulation_data.get('draw_pct', 0) or 0
+    a_pct = simulation_data.get('away_win_pct', 0) or 0
+    if not (a_pct >= h_pct and a_pct >= d_pct):  # MC max = 2
+        return unified
+
+    o25 = simulation_data.get('over_25_pct', 0) or 0
+    u25 = simulation_data.get('under_25_pct', 0) or 0
+    if not (u25 > o25):  # Under
+        return unified
+
+    gg = simulation_data.get('gg_pct', 0) or 0
+    ng = simulation_data.get('ng_pct', 0) or 0
+    if not (ng > gg):  # NG
+        return unified
+
+    # Calcola quota DC X2
+    q_x = float(odds.get('X', 0) or 0)
+    q_2 = float(odds.get('2', 0) or 0)
+    if q_x <= 1 or q_2 <= 1:
+        return unified
+
+    dc_quota = round(1 / (1/q_x + 1/q_2), 2)
+    if dc_quota < 1.35:
+        return unified  # Quota troppo bassa, tieni SEGNO 2
+
+    # Trova SEGNO 2 e sostituisci con DC X2
+    result = []
+    flipped = False
+    for p in unified:
+        if p.get('tipo') == 'SEGNO' and p.get('pronostico') == '2' and not flipped:
+            dc_pred = {
+                'tipo': 'DOPPIA_CHANCE',
+                'pronostico': 'X2',
+                'quota': dc_quota,
+                'confidence': p.get('confidence', 60),
+                'stars': p.get('stars', 3.0),
+                'source': p.get('source', '?') + '_combo96',
+                'routing_rule': 'combo_96_dc_flip',
+                'has_odds': True,
+            }
+            # Ricalcola stake/edge
+            prob_est = p.get('probabilita_stimata', p.get('confidence', 60))
+            prob_mod = prob_est / 100.0 if prob_est > 1 else prob_est
+            prob_mkt = 1.0 / dc_quota
+            edge = prob_mod - prob_mkt
+            if edge > 0:
+                kelly = 0.75 * (edge * dc_quota) / (dc_quota - 1)
+                dc_pred['stake'] = max(1, min(10, round(kelly * 10)))
+                dc_pred['edge'] = round(edge * 100, 1)
+                dc_pred['prob_mercato'] = round(prob_mkt * 100, 1)
+                dc_pred['prob_modello'] = round(prob_mod * 100, 1)
+                dc_pred['probabilita_stimata'] = round(prob_mod * 100, 1)
+            else:
+                dc_pred['stake'] = 1
+                dc_pred['edge'] = 0
+            result.append(dc_pred)
+            flipped = True
+        else:
+            result.append(p)
+
+    if flipped:
+        print(f"    ⚡ COMBO #96: SEGNO 2 → DC X2 @{dc_quota}")
+
+    return result
+
+
+# Combo che storicamente producono X (91.7% su 12 partite)
+# Pattern: segnali 1X2 contraddittori + GG prevalente
+X_DRAW_COMBOS = {3, 21, 32, 39, 45, 57, 59, 85}
+
+
+def _apply_x_draw_combos(unified, odds, simulation_data):
+    """
+    Combo X-draw: quando i segnali MC sono contraddittori e GG prevale,
+    il pareggio è molto probabile (91.7% storico su 12 partite).
+    Sostituisce SEGNO 1/2 con SEGNO X, o aggiunge SEGNO X se assente.
+    """
+    if not simulation_data or not odds:
+        return unified
+
+    top_scores = simulation_data.get('top_scores', [])
+    if len(top_scores) < 4:
+        return unified
+
+    # Calcola combo number
+    pos1 = _score_to_sign(top_scores[0][0])
+    pos4 = _score_to_sign(top_scores[3][0])
+    if not pos1 or not pos4:
+        return unified
+
+    h_pct = simulation_data.get('home_win_pct', 0) or 0
+    d_pct = simulation_data.get('draw_pct', 0) or 0
+    a_pct = simulation_data.get('away_win_pct', 0) or 0
+    if h_pct >= d_pct and h_pct >= a_pct:
+        mc = '1'
+    elif d_pct >= h_pct and d_pct >= a_pct:
+        mc = 'X'
+    else:
+        mc = '2'
+
+    o25 = simulation_data.get('over_25_pct', 0) or 0
+    u25 = simulation_data.get('under_25_pct', 0) or 0
+    ou = 'Over' if o25 >= u25 else 'Under'
+
+    gg_pct = simulation_data.get('gg_pct', 0) or 0
+    ng_pct = simulation_data.get('ng_pct', 0) or 0
+    ggng = 'GG' if gg_pct >= ng_pct else 'NG'
+
+    # Calcola numero combo
+    s = {'1': 0, 'X': 1, '2': 2}
+    ou_idx = 0 if ou == 'Over' else 1
+    gg_idx = 0 if ggng == 'GG' else 1
+    combo = s[pos1] * 36 + s[pos4] * 12 + s[mc] * 4 + ou_idx * 2 + gg_idx + 1
+
+    if combo not in X_DRAW_COMBOS:
+        return unified
+
+    # Quota X
+    q_x = float(odds.get('X', 0) or 0)
+    if q_x <= 1:
+        return unified
+
+    # Cerca se c'è già un SEGNO e sostituiscilo, altrimenti aggiungi
+    result = []
+    replaced = False
+    for p in unified:
+        if p.get('tipo') == 'SEGNO' and not replaced:
+            # Sostituisci SEGNO 1/2 con SEGNO X
+            x_pred = {
+                'tipo': 'SEGNO',
+                'pronostico': 'X',
+                'quota': q_x,
+                'confidence': p.get('confidence', 55),
+                'stars': p.get('stars', 3.0),
+                'source': p.get('source', '?') + '_xdraw',
+                'routing_rule': f'x_draw_combo_{combo}',
+                'has_odds': True,
+            }
+            # Stake/edge
+            prob_mod = 0.70  # stima conservativa (storico 91.7% ma campione piccolo)
+            prob_mkt = 1.0 / q_x
+            edge = prob_mod - prob_mkt
+            if edge > 0:
+                kelly = 0.75 * (edge * q_x) / (q_x - 1)
+                x_pred['stake'] = max(1, min(10, round(kelly * 10)))
+                x_pred['edge'] = round(edge * 100, 1)
+                x_pred['prob_mercato'] = round(prob_mkt * 100, 1)
+                x_pred['prob_modello'] = round(prob_mod * 100, 1)
+                x_pred['probabilita_stimata'] = round(prob_mod * 100, 1)
+            else:
+                x_pred['stake'] = 1
+                x_pred['edge'] = 0
+            result.append(x_pred)
+            replaced = True
+        else:
+            result.append(p)
+
+    # Se non c'era un SEGNO, aggiungilo
+    if not replaced:
+        x_pred = {
+            'tipo': 'SEGNO',
+            'pronostico': 'X',
+            'quota': q_x,
+            'confidence': 55,
+            'stars': 3.0,
+            'source': 'MC_xdraw',
+            'routing_rule': f'x_draw_combo_{combo}',
+            'has_odds': True,
+            'stake': 1,
+            'edge': 0,
+        }
+        prob_mkt = 1.0 / q_x
+        edge = 0.70 - prob_mkt
+        if edge > 0:
+            kelly = 0.75 * (edge * q_x) / (q_x - 1)
+            x_pred['stake'] = max(1, min(10, round(kelly * 10)))
+            x_pred['edge'] = round(edge * 100, 1)
+            x_pred['prob_mercato'] = round(prob_mkt * 100, 1)
+            x_pred['prob_modello'] = 70.0
+            x_pred['probabilita_stimata'] = 70.0
+        result.append(x_pred)
+
+    print(f"    ⚡ COMBO X-DRAW #{combo}: → SEGNO X @{q_x}")
+    return result
 
 
 # =====================================================
@@ -387,6 +733,17 @@ def orchestrate_date(date_str, dry_run=False):
 
         # Applica routing
         unified_pronostici = route_predictions(preds_by_sys, markets_by_sys)
+
+        # --- POST-PROCESSING: Multi-goal su pronostici deboli ---
+        match_odds = base_doc.get('odds', {})
+        unified_pronostici = _apply_multigol(unified_pronostici, match_odds)
+
+        # --- POST-PROCESSING: Combo #96 — SEGNO 2 → DC X2 ---
+        c_doc_for_combo = docs_by_sys['C'].get(match_key)
+        if c_doc_for_combo:
+            sim_data = c_doc_for_combo.get('simulation_data')
+            unified_pronostici = _apply_combo96_dc_flip(unified_pronostici, match_odds, sim_data)
+            unified_pronostici = _apply_x_draw_combos(unified_pronostici, match_odds, sim_data)
 
         if not unified_pronostici:
             continue
