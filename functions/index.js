@@ -54,6 +54,9 @@ app.use('/money-tracker', authenticate, moneyTrackerRoutes);
 const stepSystemRoutes = require('./routes/stepSystemRoutes');
 app.use('/step-system', authenticate, stepSystemRoutes);
 
+const standingsRoutes = require('./routes/standingsRoutes');
+app.use('/standings', standingsRoutes);
+
 // ============================================
 // UTILITY FUNCTIONS
 // ============================================
