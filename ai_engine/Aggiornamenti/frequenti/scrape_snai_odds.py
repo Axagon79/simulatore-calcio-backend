@@ -120,10 +120,11 @@ def get_team_aliases(team_name, team_doc=None):
             aliases.add(a.lower())
             aliases.add(normalize_name(a))
     # Parti del nome (es. "Estoril Praia" → "estoril")
+    # Min 5 chars per evitare alias ambigui ("city", "real", "club", ecc.)
     parts = team_name.lower().split()
     if len(parts) > 1:
         for p in parts:
-            if len(p) > 3:
+            if len(p) >= 5:
                 aliases.add(p)
     return aliases
 

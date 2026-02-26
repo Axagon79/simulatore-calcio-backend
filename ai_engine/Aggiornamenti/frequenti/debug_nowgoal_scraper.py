@@ -281,18 +281,19 @@ def get_team_aliases(team_name: str, team_doc: Optional[Dict] = None) -> List[st
     
     # Aggiungi anche parti del nome (per nomi composti)
     # Es: "Estoril Praia" -> aggiungi anche "estoril" e "praia"
+    # Min 5 chars per evitare alias ambigui ("city", "real", "club", ecc.)
     words = team_name.lower().split()
     if len(words) > 1:
         for word in words:
-            if len(word) >= 4:  # Solo parole di almeno 4 caratteri
+            if len(word) >= 5:
                 aliases.add(word)
-    
+
     # Stesso per il nome normalizzato
     if normalized:
         words_norm = normalized.split()
         if len(words_norm) > 1:
             for word in words_norm:
-                if len(word) >= 4:
+                if len(word) >= 5:
                     aliases.add(word)
     
     # Rimuovi stringhe vuote
@@ -321,15 +322,13 @@ def extract_odds_from_row(row_text: str) -> Optional[Dict[str, float]]:
     
     return None
 
-def find_match_in_rows(home_aliases: List[str], away_aliases: List[str], rows_text: List[str]) -> Optional[Tuple[Dict, str, bool]]:
+def find_match_in_rows(home_aliases: List[str], away_aliases: List[str], rows_data: List) -> Optional[Tuple[Dict, str, bool]]:
     """
     Cerca una partita nelle righe del sito usando gli alias.
-    Ritorna (quote_dict, row_text, has_odds) se trovata:
-    - quote_dict: dizionario con le quote (può essere None)
-    - row_text: testo della riga
-    - has_odds: True se la riga ha quote, False altrimenti
-    
-    Ritorna None se la partita non è stata trovata per niente.
+    Usa POSITION MATCHING (home aliases solo vs home_text, away vs away_text)
+    e SCORING (alias più lungo/specifico vince).
+
+    Ritorna (quote_dict, row_text, has_odds) se trovata, None altrimenti.
     """
     # Normalizza TUTTI gli alias (rimuovi accenti, lowercase, ecc.)
     home_search = set()
@@ -346,24 +345,37 @@ def find_match_in_rows(home_aliases: List[str], away_aliases: List[str], rows_te
         away_search.add(normalize_name(alias))
     away_search.discard("")
 
-    for row_text in rows_text:
-        row_clean = clean_nowgoal_text(row_text.lower())
+    best_match = None
+    best_score = 0
 
-        home_found = any(re.search(r'\b' + re.escape(n) + r'\b', row_clean) for n in home_search)
-        away_found = any(re.search(r'\b' + re.escape(n) + r'\b', row_clean) for n in away_search)
+    for row in rows_data:
+        # Supporta sia dict (nuovo) che str (backward compat)
+        if isinstance(row, dict):
+            home_text = clean_nowgoal_text(row["home_text"])
+            away_text = clean_nowgoal_text(row["away_text"])
+            full_text = row["full_text"]
+        else:
+            # Fallback: cerca nel testo completo (vecchio comportamento)
+            full = clean_nowgoal_text(row.lower())
+            home_text = full
+            away_text = full
+            full_text = row
 
-        if home_found and away_found:
-            odds = extract_odds_from_row(row_text)
-            
-            if odds:
-                # Partita trovata CON quote
-                return (odds, row_text, True)
-            else:
-                # Partita trovata SENZA quote
-                return (None, row_text, False)
-    
-    # Partita non trovata
-    return None
+        # Position matching: home aliases SOLO contro home_text
+        home_matches = [n for n in home_search if re.search(r'\b' + re.escape(n) + r'\b', home_text)]
+        # Position matching: away aliases SOLO contro away_text
+        away_matches = [n for n in away_search if re.search(r'\b' + re.escape(n) + r'\b', away_text)]
+
+        if home_matches and away_matches:
+            # Scoring: somma lunghezza alias più lungo per home + away
+            score = max(len(m) for m in home_matches) + max(len(m) for m in away_matches)
+
+            if score > best_score:
+                odds = extract_odds_from_row(full_text)
+                best_match = (odds, full_text, odds is not None)
+                best_score = score
+
+    return best_match
 
 def click_round_and_wait(driver, round_num: int, timeout: int = 15) -> bool:
     """
@@ -434,25 +446,51 @@ def get_current_round_from_page(driver) -> Optional[int]:
     
     return None
 
-def get_all_match_rows(driver) -> List[str]:
-    """Estrae tutte le righe di partite dalla pagina corrente"""
+def get_all_match_rows(driver) -> List[Dict]:
+    """Estrae tutte le righe di partite dalla pagina corrente.
+    Ritorna lista di dict: {full_text, home_text, away_text}
+    Home/away estratti dai link <a href='/team/summary/'>."""
     try:
         rows = driver.find_elements(By.CSS_SELECTOR, "tr[id]")
-        return [row.text for row in rows if row.text.strip()]
+        result = []
+        for row in rows:
+            full_text = row.text.strip()
+            if not full_text:
+                continue
+
+            # Estrai home/away dai link squadra
+            home_text = ""
+            away_text = ""
+            try:
+                team_links = row.find_elements(By.CSS_SELECTOR, "a[href*='/team/summary/']")
+                if len(team_links) >= 2:
+                    home_text = team_links[0].text.strip().lower()
+                    away_text = team_links[1].text.strip().lower()
+                elif len(team_links) == 1:
+                    home_text = team_links[0].text.strip().lower()
+            except:
+                pass
+
+            result.append({
+                "full_text": full_text,
+                "home_text": home_text,
+                "away_text": away_text
+            })
+        return result
     except:
         return []
 
 def analyze_missing_match(
-    home: str, 
-    away: str, 
-    home_aliases: List[str], 
-    away_aliases: List[str], 
-    all_rows: List[str],
+    home: str,
+    away: str,
+    home_aliases: List[str],
+    away_aliases: List[str],
+    all_rows: List[Dict],
     round_num: int,
     league_name: str
 ) -> Dict:
     """Analizza perché una partita non è stata trovata"""
-    
+
     analysis = {
         "partita": f"{home} vs {away}",
         "lega": league_name,
@@ -461,15 +499,15 @@ def analyze_missing_match(
         "motivi": [],
         "dettagli": {}
     }
-    
+
     if not all_rows:
         analysis["motivi"].append("NESSUNA_RIGA_TROVATA_PER_GIORNATA")
         return analysis
-    
-    # Cerca le squadre singolarmente
+
+    # Cerca le squadre singolarmente (usa position matching)
     home_found_in = []
     away_found_in = []
-    
+
     home_search_diag = set()
     for a in home_aliases:
         for n in generate_search_names(a.lower()): home_search_diag.add(n)
@@ -480,50 +518,50 @@ def analyze_missing_match(
     away_search_diag.discard("")
 
     for idx, row in enumerate(all_rows):
-        row_clean = clean_nowgoal_text(row.lower())
+        row_ft = row["full_text"] if isinstance(row, dict) else row
+        row_clean = clean_nowgoal_text(row_ft.lower())
 
         if any(re.search(r'\b' + re.escape(n) + r'\b', row_clean) for n in home_search_diag):
             home_found_in.append(idx)
 
         if any(re.search(r'\b' + re.escape(n) + r'\b', row_clean) for n in away_search_diag):
             away_found_in.append(idx)
-    
+
+    def _row_text(idx):
+        r = all_rows[idx]
+        return (r["full_text"] if isinstance(r, dict) else r)[:200]
+
     # Analizza i risultati
     if not home_found_in and not away_found_in:
         analysis["motivi"].append("NESSUNA_SQUADRA_TROVATA")
         analysis["dettagli"]["nota"] = "Nessuna delle due squadre trovata sul sito"
-        
+
     elif home_found_in and not away_found_in:
         analysis["motivi"].append("SOLO_CASA_TROVATA")
         analysis["dettagli"]["righe_casa"] = home_found_in[:3]
-        
-        # 🔍 NUOVO: Trova quale squadra c'è nella riga con casa
+
         if home_found_in:
-            riga_con_casa = all_rows[home_found_in[0]]
-            # Estrai i nomi delle squadre dalla riga
-            analysis["dettagli"]["riga_esempio"] = riga_con_casa[:200]
+            analysis["dettagli"]["riga_esempio"] = _row_text(home_found_in[0])
             analysis["dettagli"]["suggerimento"] = f"Cerca '{away}' in questa riga per vedere come si chiama sul sito"
-        
+
     elif away_found_in and not home_found_in:
         analysis["motivi"].append("SOLO_TRASFERTA_TROVATA")
         analysis["dettagli"]["righe_trasferta"] = away_found_in[:3]
-        
-        # 🔍 NUOVO: Trova quale squadra c'è nella riga con trasferta
+
         if away_found_in:
-            riga_con_trasferta = all_rows[away_found_in[0]]
-            analysis["dettagli"]["riga_esempio"] = riga_con_trasferta[:200]
+            analysis["dettagli"]["riga_esempio"] = _row_text(away_found_in[0])
             analysis["dettagli"]["suggerimento"] = f"Cerca '{home}' in questa riga per vedere come si chiama sul sito"
-        
+
     elif home_found_in and away_found_in:
         # Entrambe trovate ma non nella stessa riga
         same_row = set(home_found_in) & set(away_found_in)
         if same_row:
             analysis["motivi"].append("PARTITA_TROVATA_MA_SENZA_QUOTE")
             example_idx = list(same_row)[0]
-            analysis["dettagli"]["esempio_riga"] = all_rows[example_idx][:200]
+            analysis["dettagli"]["esempio_riga"] = _row_text(example_idx)
         else:
             analysis["motivi"].append("SQUADRE_IN_RIGHE_DIVERSE")
-    
+
     analysis["dettagli"]["alias_casa"] = home_aliases
     analysis["dettagli"]["alias_trasferta"] = away_aliases
     
@@ -791,7 +829,7 @@ def run_scraper():
                 
                 # DEBUG: mostra prima riga come esempio
                 if all_rows:
-                    print(f"      📄 Esempio prima riga: {all_rows[0][:80]}...")
+                    print(f"      📄 Esempio prima riga: {all_rows[0]['full_text'][:80]}...")
                 
                 # Processa ogni partita
                 updated_count = 0
@@ -892,7 +930,7 @@ def run_scraper():
                     print(f"\n      ⚠️ ATTENZIONE: 0 partite trovate su {len(matches)}!")
                     print(f"      📄 DUMP RIGHE SITO (prime 3):")
                     for i, row in enumerate(all_rows[:3]):
-                        print(f"         [{i+1}] {row[:120]}")
+                        print(f"         [{i+1}] {row['full_text'][:120]}")
                     print(f"      🏠 PARTITE DB (prime 3):")
                     for i, m in enumerate(matches[:3]):
                         print(f"         [{i+1}] {m['home']} vs {m['away']}")
