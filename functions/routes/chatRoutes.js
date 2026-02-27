@@ -115,7 +115,7 @@ router.get('/search-match', async (req, res) => {
 // Analisi Premium AI via Mistral (solo admin per ora)
 router.post('/match-analysis-premium', async (req, res) => {
   try {
-    const { home, away, date, isAdmin } = req.body;
+    const { home, away, date, isAdmin, section } = req.body;
 
     if (!home || !away || !date) {
       return res.status(400).json({ success: false, error: 'Missing home, away or date' });
@@ -133,7 +133,7 @@ router.post('/match-analysis-premium', async (req, res) => {
       return res.json({ success: true, analysis: existing.analysis_premium, cached: true });
     }
 
-    const result = await buildUnifiedContext(req.db, home, away, date);
+    const result = await buildUnifiedContext(req.db, home, away, date, section);
     if (!result) {
       return res.json({ success: false, error: 'Match not found in unified predictions' });
     }

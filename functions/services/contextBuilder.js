@@ -325,12 +325,15 @@ async function searchMatch(db, query) {
 // ══════════════════════════════════════════════
 // Contesto da daily_predictions_unified (per Analisi Premium)
 // ══════════════════════════════════════════════
-async function buildUnifiedContext(db, home, away, date) {
+async function buildUnifiedContext(db, home, away, date, section) {
   const doc = await db.collection('daily_predictions_unified')
     .findOne({ home, away, date });
   if (!doc) return null;
 
   const lines = [];
+  if (section) {
+    lines.push(`SEZIONE: ${section}`);
+  }
   lines.push(`PARTITA: ${doc.home} vs ${doc.away}`);
   lines.push(`Campionato: ${doc.league} | Data: ${doc.date} ore ${doc.match_time || '?'}`);
 
