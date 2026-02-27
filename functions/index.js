@@ -57,6 +57,9 @@ app.use('/step-system', authenticate, stepSystemRoutes);
 const standingsRoutes = require('./routes/standingsRoutes');
 app.use('/standings', standingsRoutes);
 
+const analyticsRoutes = require('./routes/analyticsRoutes');
+app.use('/analytics', analyticsRoutes);
+
 // ============================================
 // UTILITY FUNCTIONS
 // ============================================
