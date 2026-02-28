@@ -152,6 +152,7 @@ for coll_name in PREDICTION_COLLECTIONS:
         'vinti': 0,
         'persi': 0,
         'pending': 0,
+        'annullati': 0,
         'errori': 0,
     }
 
@@ -186,6 +187,20 @@ for coll_name in PREDICTION_COLLECTIONS:
             elif esito is False:
                 pl = -stake
                 stats['persi'] += 1
+            elif parsed is None:
+                # Nessun risultato trovato — controlla se è un rinvio (>7 giorni)
+                try:
+                    days_old = (datetime.now() - datetime.strptime(date, '%Y-%m-%d')).days
+                except ValueError:
+                    days_old = 0
+                if days_old >= 7:
+                    pl = 0
+                    esito = 'void'
+                    stats['annullati'] += 1
+                    print(f"  ⛔ VOID: {home} vs {away} ({date}) — {days_old}gg senza risultato → rinvio/annullato")
+                else:
+                    pl = None
+                    stats['pending'] += 1
             else:
                 pl = None
                 stats['pending'] += 1
@@ -217,5 +232,6 @@ for coll_name, stats in global_stats.items():
     print(f"      Vinti:     {stats['vinti']}")
     print(f"      Persi:     {stats['persi']}")
     print(f"      Pending:   {stats['pending']} (risultato non disponibile)")
+    print(f"      Annullati: {stats['annullati']} (rinvio >7gg)")
     print(f"      Errori:    {stats['errori']}")
 print(f"\nFine: {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}")
