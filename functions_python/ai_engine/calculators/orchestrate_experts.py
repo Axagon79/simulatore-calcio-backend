@@ -602,84 +602,113 @@ def _apply_segno_scrematura(unified, odds, base_doc):
     fascia = ''
     azione = ''
 
-    # --- FASCIA 1.00-1.45: ELIMINA, eccezione X ---
-    if quota < 1.45:
-        fascia = '1.00-1.45'
-        gol_dirs = base_doc.get('gol_directions', {})
-        over_count = sum(1 for v in gol_dirs.values() if isinstance(v, str) and v == 'over')
-        ng_favorito = gg_q > ng_q and ng_q > 0
+    over25_q = odds.get('over_25', 0) or 0
 
-        if ng_favorito and over_count >= 2 and q_x >= 1.35:
-            # Eccezione: converti in X
-            result[segno_idx] = _make_segno_x(q_x)
-            azione = f'SEGNO X @{q_x:.2f} (eccezione NG+over)'
+    # --- FASCIA 1 (1.00-1.44): Escalation O1.5 → O2.5 → GG → SEGNO puro ---
+    if quota < 1.45:
+        fascia = '1.00-1.44'
+        if over15_q >= 1.35:
+            result[segno_idx] = _make_sostituto('Over 1.5', over15_q)
+            azione = f'Over 1.5 @{over15_q:.2f}'
+        elif over25_q >= 1.35:
+            result[segno_idx] = _make_sostituto('Over 2.5', over25_q)
+            azione = f'Over 2.5 @{over25_q:.2f}'
+        elif gg_q >= 1.35:
+            result[segno_idx] = _make_sostituto('Goal', gg_q)
+            azione = f'GG @{gg_q:.2f}'
+        elif not gol_in_unified:
+            # SEGNO puro (nessun GOL in unified) — tieni
+            azione = 'TIENI SEGNO (puro, no GOL)'
+            return unified
         else:
-            # Elimina
             result.pop(segno_idx)
             azione = 'ELIMINATO'
 
-    # --- FASCIA 1.45-1.55: GOL o SEGNO ---
-    elif quota < 1.55:
-        fascia = '1.45-1.55'
-        if gol_in_unified:
-            result.pop(segno_idx)
-            azione = 'rimosso (GOL presente)'
-        else:
-            azione = 'TIENI SEGNO'
-            return unified
+    # --- FASCE 2, 3, 5: TIENI SEGNO (buone) — skip automatico sopra ---
 
-    # --- FASCIA 1.65-1.85: Over 1.5 o SEGNO ---
+    # --- FASCIA 4 (1.65-1.84): Escalation O1.5 → SEGNO puro → ELIMINA ---
     elif 1.65 <= quota < 1.85:
-        fascia = '1.65-1.85'
+        fascia = '1.65-1.84'
         if over15_q >= 1.35:
             result[segno_idx] = _make_sostituto('Over 1.5', over15_q)
             azione = f'Over 1.5 @{over15_q:.2f}'
-        else:
-            azione = 'TIENI SEGNO'
+        elif not gol_in_unified:
+            # SEGNO puro (nessun GOL in unified) — tieni
+            azione = 'TIENI SEGNO (puro, no GOL)'
             return unified
+        else:
+            result.pop(segno_idx)
+            azione = 'ELIMINATO'
 
-    # --- FASCIA 2.10-2.50: Over 1.5 o SEGNO ---
+    # --- FASCIA 6 (2.10-2.49): Escalation O1.5 → O2.5 → DC coerente → ELIMINA ---
     elif 2.10 <= quota < 2.50:
-        fascia = '2.10-2.50'
+        fascia = '2.10-2.49'
+        if over15_q >= 1.35:
+            result[segno_idx] = _make_sostituto('Over 1.5', over15_q)
+            azione = f'Over 1.5 @{over15_q:.2f}'
+        elif over25_q >= 1.35:
+            result[segno_idx] = _make_sostituto('Over 2.5', over25_q)
+            azione = f'Over 2.5 @{over25_q:.2f}'
+        else:
+            # DC coerente col segno: SEGNO 1 → DC 1X, SEGNO 2 → DC X2
+            dc_key = '1x' if segno == '1' else 'x2' if segno == '2' else None
+            dc_q = odds.get(dc_key, 0) or 0 if dc_key else 0
+            dc_label = '1X' if segno == '1' else 'X2' if segno == '2' else None
+            if dc_q >= 1.35 and dc_label:
+                sost = _make_sostituto(dc_label, dc_q)
+                sost['tipo'] = 'DOPPIA_CHANCE'
+                result[segno_idx] = sost
+                azione = f'DC {dc_label} @{dc_q:.2f}'
+            else:
+                result.pop(segno_idx)
+                azione = 'ELIMINATO'
+
+    # --- FASCIA 7 (2.50-3.69): Escalation O1.5 → DC coerente → GG → ELIMINA ---
+    elif 2.50 <= quota < 3.70:
+        fascia = '2.50-3.69'
         if over15_q >= 1.35:
             result[segno_idx] = _make_sostituto('Over 1.5', over15_q)
             azione = f'Over 1.5 @{over15_q:.2f}'
         else:
-            azione = 'TIENI SEGNO'
-            return unified
+            dc_key = '1x' if segno == '1' else 'x2' if segno == '2' else None
+            dc_q = odds.get(dc_key, 0) or 0 if dc_key else 0
+            dc_label = '1X' if segno == '1' else 'X2' if segno == '2' else None
+            if dc_q >= 1.35 and dc_label:
+                sost = _make_sostituto(dc_label, dc_q)
+                sost['tipo'] = 'DOPPIA_CHANCE'
+                result[segno_idx] = sost
+                azione = f'DC {dc_label} @{dc_q:.2f}'
+            elif gg_q >= 1.35:
+                result[segno_idx] = _make_sostituto('Goal', gg_q)
+                azione = f'GG @{gg_q:.2f}'
+            else:
+                result.pop(segno_idx)
+                azione = 'ELIMINATO'
 
-    # --- FASCIA 2.50-3.50: Over 1.5 o GG ---
-    elif 2.50 <= quota < 3.50:
-        fascia = '2.50-3.50'
-        if over15_q >= 1.35:
-            result[segno_idx] = _make_sostituto('Over 1.5', over15_q)
-            azione = f'Over 1.5 @{over15_q:.2f}'
+    # --- FASCIA 8 (3.70+): SEGNO puro → GG → DC coerente → ELIMINA ---
+    elif quota >= 3.70:
+        fascia = '3.70+'
+        if not gol_in_unified:
+            # SEGNO puro — tieni
+            azione = 'TIENI SEGNO (puro, no GOL)'
+            return unified
         elif gg_q >= 1.35:
             result[segno_idx] = _make_sostituto('Goal', gg_q)
             azione = f'GG @{gg_q:.2f}'
         else:
-            # GG senza quota — il pronostico resta, la quota arriverà dal bookmaker
-            result[segno_idx] = _make_sostituto('Goal', None)
-            azione = 'GG (in attesa quota)'
-
-    # --- FASCIA 3.50+: Over 1.5 → GOL → SEGNO >= 3.70 → ELIMINA ---
-    elif quota >= 3.50:
-        fascia = '3.50+'
-        if over15_q >= 1.35:
-            result[segno_idx] = _make_sostituto('Over 1.5', over15_q)
-            azione = f'Over 1.5 @{over15_q:.2f}'
-        elif gol_in_unified:
-            result.pop(segno_idx)
-            azione = 'rimosso (GOL presente)'
-        elif quota >= 3.70:
-            azione = 'TIENI SEGNO (q>=3.70)'
-            return unified
-        else:
-            result.pop(segno_idx)
-            azione = 'ELIMINATO (q<3.70)'
+            dc_key = '1x' if segno == '1' else 'x2' if segno == '2' else None
+            dc_q = odds.get(dc_key, 0) or 0 if dc_key else 0
+            dc_label = '1X' if segno == '1' else 'X2' if segno == '2' else None
+            if dc_q >= 1.35 and dc_label:
+                sost = _make_sostituto(dc_label, dc_q)
+                sost['tipo'] = 'DOPPIA_CHANCE'
+                result[segno_idx] = sost
+                azione = f'DC {dc_label} @{dc_q:.2f}'
+            else:
+                result.pop(segno_idx)
+                azione = 'ELIMINATO'
 
     else:
-        # Quota tra fasce buone — non toccare
         return unified
 
     print(f"    🔄 SCREMATURA: SEGNO {segno} @{quota:.2f} → {azione} (fascia {fascia})")
@@ -1036,11 +1065,9 @@ def orchestrate_date(date_str, dry_run=False):
         unified_pronostici = _apply_segno_scrematura(unified_pronostici, match_odds, base_doc)
 
         # --- FILTRO GLOBALE: quota minima 1.35 su tutti i mercati ---
-        # Pronostici da scrematura senza quota (in attesa bookmaker) vengono preservati
         unified_pronostici = [
             p for p in unified_pronostici
             if (p.get('quota') or 0) >= 1.35
-            or (p.get('routing_rule') == 'scrematura_segno' and not p.get('quota'))
         ]
 
         if not unified_pronostici:
