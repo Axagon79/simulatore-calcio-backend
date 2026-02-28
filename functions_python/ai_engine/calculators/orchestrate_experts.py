@@ -591,7 +591,12 @@ def _apply_segno_scrematura(unified, odds, base_doc):
     over15_q = odds.get('over_15', 0) or 0
     gg_q = odds.get('gg', 0) or 0
     ng_q = odds.get('ng', 0) or 0
-    q_x = odds.get('x', 0) or 0
+    q_x = float(odds.get('x', 0) or odds.get('X', 0) or 0)
+    q_1 = float(odds.get('1', 0) or 0)
+    q_2 = float(odds.get('2', 0) or 0)
+    # Calcola quote DC dalle 1X2 (come combo #96)
+    dc_1x_q = round(1/(1/q_1 + 1/q_x), 2) if q_1 > 1 and q_x > 1 else 0
+    dc_x2_q = round(1/(1/q_x + 1/q_2), 2) if q_x > 1 and q_2 > 1 else 0
 
     # Cerca GOL già presente in unified con quota >= 1.35
     gol_in_unified = any(
@@ -658,8 +663,7 @@ def _apply_segno_scrematura(unified, odds, base_doc):
             azione = f'Over 2.5 @{over25_q:.2f}'
         else:
             # DC coerente col segno: SEGNO 1 → DC 1X, SEGNO 2 → DC X2
-            dc_key = '1x' if segno == '1' else 'x2' if segno == '2' else None
-            dc_q = odds.get(dc_key, 0) or 0 if dc_key else 0
+            dc_q = dc_1x_q if segno == '1' else dc_x2_q if segno == '2' else 0
             dc_label = '1X' if segno == '1' else 'X2' if segno == '2' else None
             if dc_q >= 1.35 and dc_label:
                 sost = _make_sostituto(dc_label, dc_q)
@@ -670,50 +674,39 @@ def _apply_segno_scrematura(unified, odds, base_doc):
                 result.pop(segno_idx)
                 azione = 'ELIMINATO'
 
-    # --- FASCIA 7 (2.50-3.69): Escalation O1.5 → DC coerente → GG → ELIMINA ---
+    # --- FASCIA 7 (2.50-3.69): SEGNO → DC coerente ---
     elif 2.50 <= quota < 3.70:
         fascia = '2.50-3.69'
-        if over15_q >= 1.35:
-            result[segno_idx] = _make_sostituto('Over 1.5', over15_q)
-            azione = f'Over 1.5 @{over15_q:.2f}'
+        dc_q = dc_1x_q if segno == '1' else dc_x2_q if segno == '2' else 0
+        dc_label = '1X' if segno == '1' else 'X2' if segno == '2' else None
+        if dc_label:
+            sost = _make_sostituto(dc_label, dc_q if dc_q >= 1.35 else None)
+            sost['tipo'] = 'DOPPIA_CHANCE'
+            result[segno_idx] = sost
+            azione = f'DC {dc_label} @{dc_q:.2f}' if dc_q >= 1.35 else f'DC {dc_label} (in attesa quota)'
         else:
-            dc_key = '1x' if segno == '1' else 'x2' if segno == '2' else None
-            dc_q = odds.get(dc_key, 0) or 0 if dc_key else 0
-            dc_label = '1X' if segno == '1' else 'X2' if segno == '2' else None
-            if dc_q >= 1.35 and dc_label:
-                sost = _make_sostituto(dc_label, dc_q)
-                sost['tipo'] = 'DOPPIA_CHANCE'
-                result[segno_idx] = sost
-                azione = f'DC {dc_label} @{dc_q:.2f}'
-            elif gg_q >= 1.35:
-                result[segno_idx] = _make_sostituto('Goal', gg_q)
-                azione = f'GG @{gg_q:.2f}'
-            else:
-                result.pop(segno_idx)
-                azione = 'ELIMINATO'
+            result.pop(segno_idx)
+            azione = 'ELIMINATO'
 
-    # --- FASCIA 8 (3.70+): SEGNO puro → GG → DC coerente → ELIMINA ---
+    # --- FASCIA 8 (3.70+): SEGNO resta (AR) + AGGIUNGI DC coerente ---
     elif quota >= 3.70:
         fascia = '3.70+'
-        if not gol_in_unified:
-            # SEGNO puro — tieni
-            azione = 'TIENI SEGNO (puro, no GOL)'
-            return unified
-        elif gg_q >= 1.35:
-            result[segno_idx] = _make_sostituto('Goal', gg_q)
-            azione = f'GG @{gg_q:.2f}'
+        dc_q = dc_1x_q if segno == '1' else dc_x2_q if segno == '2' else 0
+        dc_label = '1X' if segno == '1' else 'X2' if segno == '2' else None
+        # Controlla coerenza: no DC se esiste già qualsiasi DC o SEGNO incoerente
+        dc_gia_presente = any(p.get('tipo') == 'DOPPIA_CHANCE' for p in unified if p is not segno_pred)
+        segno_incoerente = any(
+            p.get('tipo') == 'SEGNO' and p.get('pronostico') != segno
+            for p in unified if p is not segno_pred
+        )
+        if dc_label and not dc_gia_presente and not segno_incoerente:
+            sost = _make_sostituto(dc_label, dc_q if dc_q >= 1.35 else None)
+            sost['tipo'] = 'DOPPIA_CHANCE'
+            result.append(sost)  # AGGIUNGI (non sostituisci) — SEGNO resta
+            azione = f'TIENI SEGNO + DC {dc_label} @{dc_q:.2f}' if dc_q >= 1.35 else f'TIENI SEGNO + DC {dc_label}'
         else:
-            dc_key = '1x' if segno == '1' else 'x2' if segno == '2' else None
-            dc_q = odds.get(dc_key, 0) or 0 if dc_key else 0
-            dc_label = '1X' if segno == '1' else 'X2' if segno == '2' else None
-            if dc_q >= 1.35 and dc_label:
-                sost = _make_sostituto(dc_label, dc_q)
-                sost['tipo'] = 'DOPPIA_CHANCE'
-                result[segno_idx] = sost
-                azione = f'DC {dc_label} @{dc_q:.2f}'
-            else:
-                result.pop(segno_idx)
-                azione = 'ELIMINATO'
+            azione = 'TIENI SEGNO (DC non aggiunta: conflitto)'
+            return unified
 
     else:
         return unified
