@@ -362,6 +362,15 @@ async function buildUnifiedContext(db, home, away, date, section) {
   const odds = doc.odds || {};
   lines.push(`\nQUOTE MERCATO:`);
   lines.push(`  1X2: 1=${odds['1'] || '?'} X=${odds['X'] || '?'} 2=${odds['2'] || '?'}`);
+  // Pre-calcola favorito bookmaker (quota più bassa = più probabile)
+  const q1 = parseFloat(odds['1']) || 0;
+  const qX = parseFloat(odds['X']) || 0;
+  const q2 = parseFloat(odds['2']) || 0;
+  if (q1 > 0 && qX > 0 && q2 > 0) {
+    const minQ = Math.min(q1, qX, q2);
+    const fav = minQ === q1 ? `${doc.home} (1 @${q1})` : minQ === q2 ? `${doc.away} (2 @${q2})` : `Pareggio (X @${qX})`;
+    lines.push(`  Favorito bookmaker: ${fav} — quota più bassa = esito più probabile`);
+  }
   lines.push(`  Over/Under: O1.5=${odds.over_15 || '?'} O2.5=${odds.over_25 || '?'} O3.5=${odds.over_35 || '?'} U1.5=${odds.under_15 || '?'} U2.5=${odds.under_25 || '?'} U3.5=${odds.under_35 || '?'}`);
   lines.push(`  GG/NG: GG=${odds.gg || '?'} NG=${odds.ng || '?'}`);
 
