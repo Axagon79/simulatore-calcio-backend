@@ -518,6 +518,175 @@ def _apply_home_win_combos(unified, odds, simulation_data):
 
 
 # =====================================================
+# SCREMATURA SEGNO PER FASCE DI QUOTA
+# =====================================================
+def _apply_segno_scrematura(unified, odds, base_doc):
+    """
+    Scrematura SEGNO: nelle fasce di quota deboli, converte il SEGNO
+    in Over 1.5, GOL o GG — oppure lo elimina.
+    Fasce BUONE (skip): 1.55-1.65, 1.85-2.10.
+    """
+    # Trova il pronostico SEGNO
+    segno_pred = None
+    segno_idx = None
+    for i, p in enumerate(unified):
+        if p.get('tipo') == 'SEGNO':
+            segno_pred = p
+            segno_idx = i
+            break
+
+    if segno_pred is None:
+        return unified
+
+    # Proteggi SEGNO prodotti da combo (qualsiasi combo ha HR altissimi)
+    routing = segno_pred.get('routing_rule', '')
+    if routing != 'single' and routing != '':
+        return unified
+
+    quota = segno_pred.get('quota', 0) or 0
+    segno = segno_pred.get('pronostico', '')
+
+    # Fasce BUONE — non toccare
+    if 1.55 <= quota < 1.65 or 1.85 <= quota < 2.10:
+        return unified
+
+    result = list(unified)
+
+    def _make_sostituto(tipo_pron, nuova_quota):
+        """Crea pronostico sostitutivo con stake/edge ricalcolati."""
+        p = {
+            'tipo': 'GOL',
+            'pronostico': tipo_pron,
+            'quota': nuova_quota,
+            'confidence': segno_pred.get('confidence', 60),
+            'stars': segno_pred.get('stars', 3),
+            'source': segno_pred.get('source', '') + '_screm',
+            'routing_rule': 'scrematura_segno',
+            'has_odds': nuova_quota is not None and nuova_quota > 0,
+        }
+        prob = segno_pred.get('probabilita_stimata', 60)
+        if nuova_quota and nuova_quota > 1.0:
+            prob_mkt = 1.0 / nuova_quota
+            edge = (prob / 100.0) - prob_mkt
+            if edge > 0:
+                kelly = 0.75 * (edge * nuova_quota - (1 - edge)) / (nuova_quota - 1)
+                p['stake'] = max(1, min(10, round(kelly * 10)))
+                p['edge'] = round(edge * 100, 1)
+            p['prob_mercato'] = round(prob_mkt * 100, 1)
+            p['probabilita_stimata'] = prob
+        return p
+
+    def _make_segno_x(q_x):
+        """Crea pronostico SEGNO X sostitutivo."""
+        p = deepcopy(segno_pred)
+        p['pronostico'] = 'X'
+        p['quota'] = q_x
+        p['source'] = segno_pred.get('source', '') + '_screm_x'
+        p['routing_rule'] = 'scrematura_segno_x'
+        if q_x and q_x > 1.0:
+            prob_mkt = 1.0 / q_x
+            p['prob_mercato'] = round(prob_mkt * 100, 1)
+        return p
+
+    over15_q = odds.get('over_15', 0) or 0
+    gg_q = odds.get('gg', 0) or 0
+    ng_q = odds.get('ng', 0) or 0
+    q_x = odds.get('x', 0) or 0
+
+    # Cerca GOL già presente in unified con quota >= 1.35
+    gol_in_unified = any(
+        p.get('tipo') == 'GOL' and (p.get('quota', 0) or 0) >= 1.35
+        for p in unified if p is not segno_pred
+    )
+
+    fascia = ''
+    azione = ''
+
+    # --- FASCIA 1.00-1.45: ELIMINA, eccezione X ---
+    if quota < 1.45:
+        fascia = '1.00-1.45'
+        gol_dirs = base_doc.get('gol_directions', {})
+        over_count = sum(1 for v in gol_dirs.values() if isinstance(v, str) and v == 'over')
+        ng_favorito = gg_q > ng_q and ng_q > 0
+
+        if ng_favorito and over_count >= 2 and q_x >= 1.35:
+            # Eccezione: converti in X
+            result[segno_idx] = _make_segno_x(q_x)
+            azione = f'SEGNO X @{q_x:.2f} (eccezione NG+over)'
+        else:
+            # Elimina
+            result.pop(segno_idx)
+            azione = 'ELIMINATO'
+
+    # --- FASCIA 1.45-1.55: GOL o SEGNO ---
+    elif quota < 1.55:
+        fascia = '1.45-1.55'
+        if gol_in_unified:
+            result.pop(segno_idx)
+            azione = 'rimosso (GOL presente)'
+        else:
+            azione = 'TIENI SEGNO'
+            return unified
+
+    # --- FASCIA 1.65-1.85: Over 1.5 o SEGNO ---
+    elif 1.65 <= quota < 1.85:
+        fascia = '1.65-1.85'
+        if over15_q >= 1.35:
+            result[segno_idx] = _make_sostituto('Over 1.5', over15_q)
+            azione = f'Over 1.5 @{over15_q:.2f}'
+        else:
+            azione = 'TIENI SEGNO'
+            return unified
+
+    # --- FASCIA 2.10-2.50: Over 1.5 o SEGNO ---
+    elif 2.10 <= quota < 2.50:
+        fascia = '2.10-2.50'
+        if over15_q >= 1.35:
+            result[segno_idx] = _make_sostituto('Over 1.5', over15_q)
+            azione = f'Over 1.5 @{over15_q:.2f}'
+        else:
+            azione = 'TIENI SEGNO'
+            return unified
+
+    # --- FASCIA 2.50-3.50: Over 1.5 o GG ---
+    elif 2.50 <= quota < 3.50:
+        fascia = '2.50-3.50'
+        if over15_q >= 1.35:
+            result[segno_idx] = _make_sostituto('Over 1.5', over15_q)
+            azione = f'Over 1.5 @{over15_q:.2f}'
+        elif gg_q >= 1.35:
+            result[segno_idx] = _make_sostituto('Goal', gg_q)
+            azione = f'GG @{gg_q:.2f}'
+        else:
+            # GG senza quota — il pronostico resta, la quota arriverà dal bookmaker
+            result[segno_idx] = _make_sostituto('Goal', None)
+            azione = 'GG (in attesa quota)'
+
+    # --- FASCIA 3.50+: Over 1.5 → GOL → SEGNO >= 3.70 → ELIMINA ---
+    elif quota >= 3.50:
+        fascia = '3.50+'
+        if over15_q >= 1.35:
+            result[segno_idx] = _make_sostituto('Over 1.5', over15_q)
+            azione = f'Over 1.5 @{over15_q:.2f}'
+        elif gol_in_unified:
+            result.pop(segno_idx)
+            azione = 'rimosso (GOL presente)'
+        elif quota >= 3.70:
+            azione = 'TIENI SEGNO (q>=3.70)'
+            return unified
+        else:
+            result.pop(segno_idx)
+            azione = 'ELIMINATO (q<3.70)'
+
+    else:
+        # Quota tra fasce buone — non toccare
+        return unified
+
+    print(f"    🔄 SCREMATURA: SEGNO {segno} @{quota:.2f} → {azione} (fascia {fascia})")
+    return result
+
+
+# =====================================================
 # MAPPING PREDIZIONE → CHIAVE MERCATO
 # =====================================================
 def market_key(pred):
@@ -863,8 +1032,16 @@ def orchestrate_date(date_str, dry_run=False):
             unified_pronostici = _apply_x_draw_combos(unified_pronostici, match_odds, sim_data)
             unified_pronostici = _apply_home_win_combos(unified_pronostici, match_odds, sim_data)
 
+        # --- POST-PROCESSING: Scrematura SEGNO per fasce di quota ---
+        unified_pronostici = _apply_segno_scrematura(unified_pronostici, match_odds, base_doc)
+
         # --- FILTRO GLOBALE: quota minima 1.35 su tutti i mercati ---
-        unified_pronostici = [p for p in unified_pronostici if (p.get('quota') or 0) >= 1.35]
+        # Pronostici da scrematura senza quota (in attesa bookmaker) vengono preservati
+        unified_pronostici = [
+            p for p in unified_pronostici
+            if (p.get('quota') or 0) >= 1.35
+            or (p.get('routing_rule') == 'scrematura_segno' and not p.get('quota'))
+        ]
 
         if not unified_pronostici:
             continue
