@@ -133,10 +133,16 @@ PREDICTION_COLLECTIONS = [
     'daily_predictions_unified',
 ]
 
-# Cerca documenti con date passate dove almeno un pronostico non ha profit_loss (o è null/pending)
+# Cerca documenti con date passate dove almeno un pronostico:
+# - non ha profit_loss (pending), oppure
+# - ha esito='void' (rinvio che potrebbe essere stato recuperato)
 query = {
     'date': {'$lt': today},
-    'pronostici': {'$elemMatch': {'$or': [{'profit_loss': {'$exists': False}}, {'profit_loss': None}]}},
+    'pronostici': {'$elemMatch': {'$or': [
+        {'profit_loss': {'$exists': False}},
+        {'profit_loss': None},
+        {'esito': 'void'},
+    ]}},
 }
 
 global_stats = {}
@@ -153,6 +159,7 @@ for coll_name in PREDICTION_COLLECTIONS:
         'persi': 0,
         'pending': 0,
         'annullati': 0,
+        'recuperati': 0,
         'errori': 0,
     }
 
@@ -170,9 +177,14 @@ for coll_name in PREDICTION_COLLECTIONS:
         for i, prono in enumerate(doc.get('pronostici', [])):
             stats['pronostici'] += 1
 
-            # Skip se già calcolato (numero reale, non null/pending)
+            # Skip se già calcolato, MA ricalcola i void se ora il risultato esiste
+            was_void = False
             if prono.get('profit_loss') is not None:
-                continue
+                if prono.get('esito') == 'void' and parsed is not None:
+                    was_void = True
+                    # Il risultato è arrivato → ricalcola
+                else:
+                    continue
 
             pronostico = prono.get('pronostico', '')
             tipo = prono.get('tipo', '')
@@ -184,9 +196,15 @@ for coll_name in PREDICTION_COLLECTIONS:
             if esito is True and quota:
                 pl = round(stake * (quota - 1), 2)
                 stats['vinti'] += 1
+                if was_void:
+                    stats['recuperati'] += 1
+                    print(f"  ✅ RECUPERATO (void→hit): {home} vs {away} ({date}) — {real_score}")
             elif esito is False:
                 pl = -stake
                 stats['persi'] += 1
+                if was_void:
+                    stats['recuperati'] += 1
+                    print(f"  ✅ RECUPERATO (void→miss): {home} vs {away} ({date}) — {real_score}")
             elif parsed is None:
                 # Nessun risultato trovato — controlla se è un rinvio (>7 giorni)
                 try:
@@ -233,5 +251,6 @@ for coll_name, stats in global_stats.items():
     print(f"      Persi:     {stats['persi']}")
     print(f"      Pending:   {stats['pending']} (risultato non disponibile)")
     print(f"      Annullati: {stats['annullati']} (rinvio >7gg)")
+    print(f"      Recuperati:{stats['recuperati']} (void→risultato)")
     print(f"      Errori:    {stats['errori']}")
 print(f"\nFine: {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}")
