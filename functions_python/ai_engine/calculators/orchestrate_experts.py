@@ -599,6 +599,13 @@ def _apply_segno_scrematura(unified, odds, base_doc):
         for p in unified if p is not segno_pred
     )
 
+    def _mercato_gia_presente(pronostico, tipo='GOL'):
+        """Controlla se un pronostico identico esiste già nell'unified."""
+        return any(
+            p.get('tipo') == tipo and p.get('pronostico') == pronostico
+            for p in unified if p is not segno_pred
+        )
+
     fascia = ''
     azione = ''
 
@@ -710,6 +717,15 @@ def _apply_segno_scrematura(unified, odds, base_doc):
 
     else:
         return unified
+
+    # --- DEDUP: se il sostituto è un mercato già presente nell'unified, rimuovi il SEGNO ---
+    if segno_idx < len(result):
+        sost = result[segno_idx]
+        sost_tipo = sost.get('tipo', '')
+        sost_pron = sost.get('pronostico', '')
+        if sost.get('routing_rule') == 'scrematura_segno' and _mercato_gia_presente(sost_pron, sost_tipo):
+            result.pop(segno_idx)
+            azione = f'rimosso ({sost_pron} già presente)'
 
     print(f"    🔄 SCREMATURA: SEGNO {segno} @{quota:.2f} → {azione} (fascia {fascia})")
     return result
