@@ -1073,6 +1073,26 @@ def orchestrate_date(date_str, dry_run=False):
         # --- POST-PROCESSING: Scrematura SEGNO per fasce di quota ---
         unified_pronostici = _apply_segno_scrematura(unified_pronostici, match_odds, base_doc)
 
+        # --- POST-PROCESSING: Over 3.5 @>2.00 → Over 2.5 se quota ≥ 1.35 ---
+        over25_q = match_odds.get('over_25', 0) or 0
+        for i, p in enumerate(unified_pronostici):
+            if p.get('pronostico') == 'Over 3.5' and (p.get('quota') or 0) > 2.00:
+                if over25_q >= 1.35:
+                    print(f"    🔄 DOWNGRADE: Over 3.5 @{p.get('quota', '?')} → Over 2.5 @{over25_q:.2f}")
+                    unified_pronostici[i]['pronostico'] = 'Over 2.5'
+                    unified_pronostici[i]['quota'] = over25_q
+                    unified_pronostici[i]['source'] = (p.get('source', '') or '') + '_dg35'
+                    # Ricalcola edge/stake
+                    prob = p.get('probabilita_stimata', 60)
+                    if over25_q > 1.0:
+                        prob_mkt = 1.0 / over25_q
+                        edge = (prob / 100.0) - prob_mkt
+                        if edge > 0:
+                            kelly = 0.75 * (edge * over25_q - (1 - edge)) / (over25_q - 1)
+                            unified_pronostici[i]['stake'] = max(1, min(10, round(kelly * 10)))
+                            unified_pronostici[i]['edge'] = round(edge * 100, 1)
+                        unified_pronostici[i]['prob_mercato'] = round(prob_mkt * 100, 1)
+
         # --- FILTRO GLOBALE: quota minima 1.35 su tutti i mercati ---
         unified_pronostici = [
             p for p in unified_pronostici

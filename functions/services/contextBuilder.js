@@ -367,7 +367,7 @@ async function buildUnifiedContext(db, home, away, date, section) {
 
   // Segnali SEGNO
   const sd = doc.segno_dettaglio || {};
-  lines.push(`\nSEGNALI SEGNO (0-100, >50 = favore ${doc.home}, <50 = favore ${doc.away}):`);
+  lines.push(`\nSEGNALI SEGNO (0-100, intensità del segnale — 80+ = molto forte, <40 = debole):`);
   for (const [k, v] of Object.entries(sd)) {
     const nome = NOMI_SEGNALI[k] || k;
     lines.push(`  ${nome}: ${typeof v === 'number' ? v.toFixed(1) : v}`);
