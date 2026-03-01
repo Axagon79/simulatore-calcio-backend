@@ -1100,6 +1100,13 @@ def orchestrate_date(date_str, dry_run=False):
             if not (p.get('pronostico') == 'Over 2.5' and (p.get('quota') or 0) > 1.65)
         ]
 
+        # --- FILTRO SEGNO: quota minima 1.50 (fascia 1.35-1.50 sotto break-even) ---
+        # Feb 2026: fascia 1.35-1.50 = 58.8% HR vs 68.7% BE necessario, P/L -2.45u
+        unified_pronostici = [
+            p for p in unified_pronostici
+            if not (p.get('pronostico') in ('1', 'X', '2') and (p.get('quota') or 0) < 1.50)
+        ]
+
         # --- FILTRO GLOBALE: quota minima 1.35 su tutti i mercati ---
         unified_pronostici = [
             p for p in unified_pronostici
