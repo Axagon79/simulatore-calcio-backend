@@ -1093,6 +1093,13 @@ def orchestrate_date(date_str, dry_run=False):
                             unified_pronostici[i]['edge'] = round(edge * 100, 1)
                         unified_pronostici[i]['prob_mercato'] = round(prob_mkt * 100, 1)
 
+        # --- FILTRO OVER 2.5: solo quota <= 1.65 (fasce sicure) ---
+        # HR 2 settimane: quota <=1.65 = 73%, quota >1.65 = 42%
+        unified_pronostici = [
+            p for p in unified_pronostici
+            if not (p.get('pronostico') == 'Over 2.5' and (p.get('quota') or 0) > 1.65)
+        ]
+
         # --- FILTRO GLOBALE: quota minima 1.35 su tutti i mercati ---
         unified_pronostici = [
             p for p in unified_pronostici

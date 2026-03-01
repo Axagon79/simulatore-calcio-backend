@@ -196,11 +196,18 @@ def extract_datetime_from_row(row_text: str) -> Optional[Tuple[str, str]]:
             day, month, hour, minute = match.groups()
             # Anno corrente (o prossimo se il mese è passato)
             current_year = datetime.now().year
-            current_month = datetime.now().month
-            
-            # Se il mese nella riga è minore del mese corrente, potrebbe essere anno prossimo
+
+            # Anno corretto: se la data con anno corrente è entro 14 giorni nel passato
+            # oppure nel futuro → anno corrente. Altrimenti è un match dell'anno prossimo.
+            # FIX: evita che partite di febbraio vengano assegnate al 2027 quando il pipeline
+            # gira il 1° marzo (mese 2 < mese 3 → l'old logic usava current_year + 1, sbagliato).
             month_int = int(month)
-            year = current_year if month_int >= current_month else current_year + 1
+            try:
+                try_this_year = datetime(current_year, month_int, int(day))
+                days_ago = (datetime.now() - try_this_year).days
+                year = current_year if (try_this_year > datetime.now() or days_ago <= 14) else current_year + 1
+            except ValueError:
+                year = current_year
             
             date_str = f"{year}-{month}-{day}"
             time_str = f"{hour}:{minute}"
@@ -209,9 +216,10 @@ def extract_datetime_from_row(row_text: str) -> Optional[Tuple[str, str]]:
         pass
     return None
 
-def find_match_with_datetime(home_aliases: List[str], away_aliases: List[str], rows_text: List[str]) -> Optional[Tuple[str, str, str]]:
+def find_match_with_datetime(home_aliases: List[str], away_aliases: List[str], rows: List[Tuple[str, Optional[str]]]) -> Optional[Tuple[str, str, str]]:
     """
     Cerca una partita nelle righe e ritorna (data, orario, row_text) se trovata.
+    rows e' una lista di (row_text, data_t) dove data_t e' es. '2026-03-04 01:00'.
     """
     home_search = set()
     for alias in home_aliases:
@@ -227,21 +235,26 @@ def find_match_with_datetime(home_aliases: List[str], away_aliases: List[str], r
         away_search.add(normalize_name(alias))
     away_search.discard("")
 
-    for row_text in rows_text:
+    for row_text, data_t in rows:
         row_clean = clean_nowgoal_text(row_text.lower())
 
         home_found = any(re.search(r'\b' + re.escape(n) + r'\b', row_clean) for n in home_search)
         away_found = any(re.search(r'\b' + re.escape(n) + r'\b', row_clean) for n in away_search)
-        
+
         if home_found and away_found:
+            # Usa data_t (anno completo) se disponibile, altrimenti fallback
+            if data_t:
+                try:
+                    dt = datetime.strptime(data_t[:16], "%Y-%m-%d %H:%M")
+                    return (dt.strftime("%Y-%m-%d"), dt.strftime("%H:%M"), row_text)
+                except:
+                    pass
             datetime_result = extract_datetime_from_row(row_text)
             if datetime_result:
                 date_str, time_str = datetime_result
                 return (date_str, time_str, row_text)
-            else:
-                # Partita trovata ma senza data/ora parsabile
-                return None
-    
+            return None
+
     return None
 
 def click_round_and_wait(driver, round_num: int, timeout: int = 15) -> bool:
@@ -292,11 +305,24 @@ def get_current_round_from_page(driver) -> Optional[int]:
         print(f" ⚠️ Impossibile leggere giornata: {e}")
     return None
 
-def get_all_match_rows(driver) -> List[str]:
-    """Estrae tutte le righe di partite"""
+def get_all_match_rows(driver) -> List[Tuple[str, Optional[str]]]:
+    """Estrae tutte le righe di partite come (testo, data_t).
+    data_t e' l'attributo data-t del td[name='timeData'], es. '2026-03-04 01:00' (anno incluso).
+    """
     try:
         rows = driver.find_elements(By.CSS_SELECTOR, "tr[id]")
-        return [row.text for row in rows if row.text.strip()]
+        result = []
+        for row in rows:
+            if not row.text.strip():
+                continue
+            data_t = None
+            try:
+                td = row.find_element(By.CSS_SELECTOR, "td[name='timeData']")
+                data_t = td.get_attribute("data-t")
+            except:
+                pass
+            result.append((row.text, data_t))
+        return result
     except:
         return []
 
@@ -460,7 +486,7 @@ def run_scraper():
                     result = find_match_with_datetime(home_aliases, away_aliases, all_rows)
                     
                     if result:
-                        date_str, time_str, row_text = result
+                        date_str, time_str, _ = result
                         
                         # Converti in oggetto datetime UTC (MongoDB lo salverà come ISODate)
                         date_obj_utc = convert_to_utc(date_str, time_str)        # datetime object

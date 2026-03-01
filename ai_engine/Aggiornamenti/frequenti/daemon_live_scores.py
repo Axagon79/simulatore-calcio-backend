@@ -139,6 +139,10 @@ def normalize_name(name: str) -> str:
     for old, new in replacements.items():
         name = name.replace(old, new)
 
+    # Trattini → spazi (es. "saint-etienne" → "saint etienne")
+    name = name.replace("-", " ")
+    name = re.sub(r'\s+', ' ', name).strip()
+
     prefixes = ["fc ", "cf ", "ac ", "as ", "sc ", "us ", "ss ", "asd ", "asc "]
     for prefix in prefixes:
         if name.startswith(prefix):
@@ -180,8 +184,13 @@ def get_team_aliases(team_name: str, team_doc: Optional[Dict] = None) -> List[st
     normalized = normalize_name(team_name)
     if normalized:
         aliases.add(normalized)
-    if team_doc and 'aliases' in team_doc:
-        for alias in team_doc['aliases']:
+    if team_doc:
+        if 'name' in team_doc and team_doc['name']:
+            aliases.add(team_doc['name'].lower().strip())
+            normalized_doc_name = normalize_name(team_doc['name'])
+            if normalized_doc_name:
+                aliases.add(normalized_doc_name)
+        for alias in team_doc.get('aliases', []):
             if alias and alias.strip():
                 aliases.add(alias.lower().strip())
                 normalized_alias = normalize_name(alias)
@@ -203,8 +212,10 @@ def get_team_aliases(team_name: str, team_doc: Optional[Dict] = None) -> List[st
 
 
 def strip_ranking(name: str) -> str:
-    """Rimuove il numero di ranking iniziale (es. '2 Chelsea' -> 'Chelsea')"""
-    return re.sub(r'^\d+\s+', '', name.strip())
+    """Rimuove il numero di ranking iniziale e finale (es. '2 Chelsea' -> 'Chelsea', 'Angers 3' -> 'Angers')"""
+    name = re.sub(r'^\d+\s+', '', name.strip())   # Ranking iniziale
+    name = re.sub(r'\s+\d{1,2}$', '', name.strip())  # Ranking finale
+    return name.strip()
 
 
 # --- FUNZIONI CORE ---
@@ -275,8 +286,13 @@ def load_team_docs_batch(matches):
     team_names.discard('')
 
     team_docs = {}
-    for doc in db.teams.find({"name": {"$in": list(team_names)}}):
+    for doc in db.teams.find({"$or": [
+        {"name": {"$in": list(team_names)}},
+        {"aliases": {"$in": list(team_names)}}
+    ]}):
         team_docs[doc['name']] = doc
+        for alias in doc.get('aliases', []):
+            team_docs[alias] = doc
     return team_docs
 
 
@@ -414,7 +430,14 @@ def run_cycle(driver):
         print(f"   Errore navigazione: {e}")
         raise  # Propaga l'errore per triggerare il restart del driver nel main loop
 
-    # 3b. Al primo ciclo, clicca "Select All" per mostrare tutte le leghe
+    # 3b. Ogni ciclo: clicca tab "All" per mostrare TUTTE le partite (incluse leghe minori)
+    try:
+        all_tab = driver.find_element(By.ID, "li_ShowAll")
+        driver.execute_script("arguments[0].click();", all_tab)
+        time.sleep(2)
+    except Exception:
+        pass
+    # Select All leghe (solo al primo ciclo)
     global _leagues_selected
     if not _leagues_selected:
         try:
@@ -432,24 +455,20 @@ def run_cycle(driver):
                     link.click()
                     break
             time.sleep(2)
-            # Clicca tab "All" per mostrare TUTTE le partite (incluse leghe minori)
-            try:
-                all_tab = driver.find_element(By.ID, "li_ShowAll")
-                all_tab.click()
-                time.sleep(1)
-            except:
-                pass
             _leagues_selected = True
-            print("   Filtro leghe: Select All + tab All applicato")
         except Exception as e:
             print(f"   Filtro leghe non trovato (proseguo): {e}")
-            _leagues_selected = True  # Non riprovare ogni ciclo
+            _leagues_selected = True
 
     nowgoal_matches = parse_nowgoal_live_page(driver)
     live_count = sum(1 for m in nowgoal_matches if m['status'] == 'Live')
     ht_count = sum(1 for m in nowgoal_matches if m['status'] == 'HT')
     ft_count = sum(1 for m in nowgoal_matches if m['status'] == 'Finished')
     print(f"   NowGoal: {len(nowgoal_matches)} partite (Live:{live_count} HT:{ht_count} FT:{ft_count})")
+    if ft_count > 0:
+        for m in nowgoal_matches:
+            if m['status'] == 'Finished':
+                print(f"   FT: {m['home']} {m['score']} {m['away']}")
 
     if not nowgoal_matches:
         print("   Nessuna partita attiva su NowGoal.")
@@ -657,6 +676,7 @@ def main():
                 now = datetime.now()
                 print(f"\r   Fuori finestra operativa ({now.strftime('%H:%M')}). Prossimo check tra {CYCLE_SECONDS}s...", end='')
 
+            print(f"\n   ⏳ Prossimo ciclo tra {CYCLE_SECONDS}s...")
             time.sleep(CYCLE_SECONDS)
 
     except KeyboardInterrupt:
