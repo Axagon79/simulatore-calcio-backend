@@ -1073,6 +1073,26 @@ def orchestrate_date(date_str, dry_run=False):
         # --- POST-PROCESSING: Scrematura SEGNO per fasce di quota ---
         unified_pronostici = _apply_segno_scrematura(unified_pronostici, match_odds, base_doc)
 
+        # --- DEDUP: Over/Under conflitto S8F vs A → S8F vince ---
+        # S8F (scrematura) ROI 4.2% vs A ROI 1.2% → solo contro fonte A
+        s8f_preds = [p for p in unified_pronostici if '_screm' in (p.get('source') or '')]
+        a_preds = [p for p in unified_pronostici if (p.get('source') or '') == 'A']
+        s8f_has_over = any(p.get('pronostico', '').startswith('Over') for p in s8f_preds)
+        s8f_has_under = any(p.get('pronostico', '').startswith('Under') for p in s8f_preds)
+        to_remove = []
+        if s8f_has_over:
+            to_remove += [p for p in a_preds if p.get('pronostico', '').startswith('Under')]
+        if s8f_has_under:
+            to_remove += [p for p in a_preds if p.get('pronostico', '').startswith('Over')]
+        if to_remove:
+            removed = [f"{p['pronostico']} @{p.get('quota','?')} ({p.get('source','?')})"
+                       for p in to_remove]
+            kept = [f"{p['pronostico']} @{p.get('quota','?')} (S8F)"
+                    for p in s8f_preds if p.get('pronostico', '').startswith(('Over', 'Under'))]
+            print(f"    ⚔️ DEDUP Over/Under: S8F vince su A → rimosso {', '.join(removed)}, tenuto {', '.join(kept)}")
+            remove_ids = {id(p) for p in to_remove}
+            unified_pronostici = [p for p in unified_pronostici if id(p) not in remove_ids]
+
         # --- POST-PROCESSING: Over 3.5 @>2.00 → Over 2.5 se quota ≥ 1.35 ---
         over25_q = match_odds.get('over_25', 0) or 0
         for i, p in enumerate(unified_pronostici):
