@@ -571,7 +571,9 @@ def _apply_segno_scrematura(unified, odds, base_doc):
             if edge > 0:
                 kelly = 0.75 * (edge * nuova_quota - (1 - edge)) / (nuova_quota - 1)
                 p['stake'] = max(1, min(10, round(kelly * 10)))
-                p['edge'] = round(edge * 100, 1)
+            else:
+                p['stake'] = 1
+            p['edge'] = round(edge * 100, 1)
             p['prob_mercato'] = round(prob_mkt * 100, 1)
             p['probabilita_stimata'] = prob
         return p
@@ -585,7 +587,16 @@ def _apply_segno_scrematura(unified, odds, base_doc):
         p['routing_rule'] = 'scrematura_segno_x'
         if q_x and q_x > 1.0:
             prob_mkt = 1.0 / q_x
+            prob = segno_pred.get('probabilita_stimata', 60)
+            edge = (prob / 100.0) - prob_mkt
+            if edge > 0:
+                kelly = 0.75 * (edge * q_x - (1 - edge)) / (q_x - 1)
+                p['stake'] = max(1, min(10, round(kelly * 10)))
+            else:
+                p['stake'] = 1
+            p['edge'] = round(edge * 100, 1)
             p['prob_mercato'] = round(prob_mkt * 100, 1)
+            p['probabilita_stimata'] = prob
         return p
 
     over15_q = odds.get('over_15', 0) or 0
