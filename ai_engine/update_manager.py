@@ -387,26 +387,24 @@ def main():
     print("\n🧹 Pulizia Chrome finale...")
     kill_chrome_zombies()
 
-    # Report mensile — solo il primo del mese
-    from datetime import datetime as _dt
-    if _dt.now().day == 1:
-        print("\n📊 Primo del mese — lancio report mensile automatico...")
-        try:
-            report_script = os.path.join(r"C:\Progetti", "report_mensile_auto.py")
-            report_result = subprocess.run(
-                [sys.executable, report_script],
-                cwd=r"C:\Progetti",
-                capture_output=True, text=True, timeout=900
-            )
-            if report_result.returncode == 0:
-                print("   ✅ Report mensile completato!")
-            else:
-                print(f"   ❌ Report mensile fallito: {report_result.stderr[:300]}")
-            if report_result.stdout:
-                for line in report_result.stdout.strip().split('\n')[-5:]:
-                    print(f"   {line}")
-        except Exception as e:
-            print(f"   ❌ Report mensile errore: {e}")
+    # Analisi professionale — ogni notte (aggiorna analisi_mensili su MongoDB)
+    print("\n📊 Lancio analisi professionale (aggiorna AnalisiStorica)...")
+    try:
+        report_script = os.path.join(r"C:\Progetti", "report_mensile_auto.py")
+        report_result = subprocess.run(
+            [sys.executable, report_script],
+            cwd=r"C:\Progetti",
+            capture_output=True, text=True, timeout=900
+        )
+        if report_result.returncode == 0:
+            print("   ✅ Analisi professionale completata!")
+        else:
+            print(f"   ❌ Analisi professionale fallita: {report_result.stderr[:300]}")
+        if report_result.stdout:
+            for line in report_result.stdout.strip().split('\n')[-5:]:
+                print(f"   {line}")
+    except Exception as e:
+        print(f"   ❌ Analisi professionale errore: {e}")
 
     print("\n")
 
