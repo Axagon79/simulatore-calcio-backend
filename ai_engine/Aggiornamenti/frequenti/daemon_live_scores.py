@@ -323,6 +323,11 @@ def parse_nowgoal_live_page(driver) -> List[Dict]:
             if not home_text or not away_text:
                 continue
 
+            # Skip partite giovanili/riserve/femminili (evita falsi match con prime squadre)
+            _skip_patterns = ('Reserves', 'Reserve', 'U21', 'U20', 'U19', 'U18', 'U17', 'Youth', '(W)', '(w)', 'Women')
+            if any(p in home_text or p in away_text for p in _skip_patterns):
+                continue
+
             # Determina stato
             if status_text.isdigit():
                 minute = int(status_text)
@@ -514,13 +519,8 @@ def run_cycle(driver):
                 "live_status": new_status,
                 "live_minute": new_minute
             }
-            if new_status == "Finished":
-                scores = new_score.split(':')
-                cup_update["result"] = {
-                    "home_score": int(scores[0]),
-                    "away_score": int(scores[1])
-                }
-                cup_update["status"] = "finished"
+            # NON impostare result/status qui — lo fa il daemon risultati
+            # da NowGoal coppe (fonte affidabile). Il live daemon scrive solo live_*
 
             result = db[db_match['_collection']].update_one(
                 {"_id": db_match['_doc_id']},
@@ -534,9 +534,8 @@ def run_cycle(driver):
                 "matches.$.live_status": new_status,
                 "matches.$.live_minute": new_minute
             }
-            if new_status == "Finished":
-                update_fields["matches.$.real_score"] = new_score
-                update_fields["matches.$.status"] = "Finished"
+            # NON impostare real_score/status qui — lo fa il daemon risultati
+            # da BetExplorer (fonte affidabile). Il live daemon scrive solo live_*
 
             result = db.h2h_by_round.update_one(
                 {"_id": round_id, "matches.home": home, "matches.away": away},

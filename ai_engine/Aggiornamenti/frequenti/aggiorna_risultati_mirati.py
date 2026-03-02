@@ -564,22 +564,18 @@ def run_director_loop():
             continue
 
         # --- CATCH-UP POST-PAUSA ---
-        # Al primo ciclo dopo la sveglia, usa finestra 24h per recuperare TUTTE
-        # le partite finite durante la notte (es. MLS 01:10, Argentina 02:00 CET)
-        # e azzera il cooldown per verificare tutte le leghe senza eccezioni.
-        _is_catchup = False
+        # Al primo ciclo dopo la sveglia, azzera il cooldown per verificare tutte le leghe.
         if _was_paused:
-            print(f"\n🌅 [CATCH-UP] Primo ciclo dopo pausa — finestra 24h, cooldown azzerato")
+            print(f"\n🌅 [CATCH-UP] Primo ciclo dopo pausa — cooldown azzerato")
             last_empty_check.clear()
             _was_paused = False
-            _is_catchup = True
 
         agenda = set()
 
         # --- DEFINIZIONE FINESTRA TEMPORALE ---
-        # Normalmente: partite iniziate 2-10h fa.
-        # Catch-up post-pausa: 2-24h fa per coprire tutta la notte.
-        lookback_hours = 24 if _is_catchup else 10
+        # Finestra fissa 24h: copre partite sudamericane (01:00-03:00 CET)
+        # che altrimenti uscivano dalla finestra 10h di sera.
+        lookback_hours = 24
         soglia_fine = ora_attuale - timedelta(hours=2)   # Iniziata da almeno 2 ore
         soglia_inizio = ora_attuale - timedelta(hours=lookback_hours)
 
