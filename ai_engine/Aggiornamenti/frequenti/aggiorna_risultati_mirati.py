@@ -92,6 +92,54 @@ except Exception as e:
     print(f"❌ Errore Config: {e}")
     sys.exit()
 
+# --- SYNC RISULTATI → COLLECTION PRONOSTICI ---
+# Quando il daemon scrive un risultato in h2h_by_round, lo propaga anche
+# alle collection pronostici come live_score + live_status='Finished'.
+# Così il frontend mostra subito il risultato senza aspettare il P/L notturno.
+# NON tocca real_score né hit (quelli li calcola il P/L con la logica completa).
+PREDICTION_COLLECTIONS_SYNC = [
+    'daily_predictions_unified',
+    'daily_predictions',
+    'daily_predictions_engine_c',
+]
+
+def _sync_results_to_predictions(updated_results):
+    """Propaga risultati appena trovati alle collection pronostici.
+    updated_results: lista di (home, away, date_str, score)
+    Scrive live_score + live_status='Finished' SOLO dove real_score è assente.
+    """
+    if not updated_results:
+        return
+    total_synced = 0
+    for home, away, date_str, score in updated_results:
+        # Genera date da provare: esatta + ±1 giorno (timezone mismatch h2h vs predictions)
+        dates_to_try = [date_str]
+        try:
+            d = datetime.strptime(date_str, '%Y-%m-%d')
+            dates_to_try.append((d - timedelta(days=1)).strftime('%Y-%m-%d'))
+            dates_to_try.append((d + timedelta(days=1)).strftime('%Y-%m-%d'))
+        except ValueError:
+            pass
+        for coll_name in PREDICTION_COLLECTIONS_SYNC:
+            try:
+                result = db[coll_name].update_many(
+                    {
+                        'home': home,
+                        'away': away,
+                        'date': {'$in': dates_to_try},
+                        '$or': [
+                            {'real_score': None},
+                            {'real_score': {'$exists': False}},
+                        ],
+                    },
+                    {'$set': {'live_score': score, 'live_status': 'Finished'}}
+                )
+                total_synced += result.modified_count
+            except Exception:
+                pass
+    if total_synced > 0:
+        print(f"   📋 Sync: {total_synced} pronostici aggiornati con risultati")
+
 # --- TARGET_CONFIG UNIFICATO ---
 # // modificato per: contenere tutte le chiavi richieste dalle funzioni originali
 TARGET_CONFIG = {
@@ -181,19 +229,20 @@ def process_league(driver, league_config):
     results = parse_betexplorer_html(driver.page_source)
     
     totale_aggiornati = 0  # Contatore globale per la lega
+    updated_for_sync = []  # Risultati da propagare alle collection pronostici
 
     for round_num, matches in results.items():
         doc_id = f"{league_config['id_prefix']}_{round_num}Giornata"
         db_doc = h2h_col.find_one({"_id": doc_id})
         if not db_doc: continue
-        
+
         db_matches = db_doc.get("matches", [])
         modified = False
-        
+
         for be_match in matches:
             h_id, a_id = find_team_tm_id(be_match["home"]), find_team_tm_id(be_match["away"])
             if not h_id or not a_id: continue
-            
+
             for db_m in db_matches:
                 if str(db_m.get('home_tm_id')) == h_id and str(db_m.get('away_tm_id')) == a_id:
                     # Verifica se il punteggio è cambiato o se lo stato non è ancora 'Finished'
@@ -204,13 +253,21 @@ def process_league(driver, league_config):
                         db_m['live_minute'] = None
                         modified = True
                         totale_aggiornati += 1
+                        # Raccogli per sync a collection pronostici
+                        date_obj = db_m.get('date_obj')
+                        if date_obj:
+                            ds = date_obj.strftime('%Y-%m-%d') if hasattr(date_obj, 'strftime') else str(date_obj)[:10]
+                            updated_for_sync.append((db_m.get('home', ''), db_m.get('away', ''), ds, be_match["score"]))
                     break
-        
+
         if modified:
             h2h_col.update_one(
-                {"_id": doc_id}, 
+                {"_id": doc_id},
                 {"$set": {"matches": db_matches, "last_updated": datetime.now()}}
             )
+
+    # Sync risultati alle collection pronostici (live_score + live_status)
+    _sync_results_to_predictions(updated_for_sync)
 
     # Log differenziato in base all'attività svolta
     if totale_aggiornati > 0:
@@ -251,57 +308,189 @@ def scrape_nowgoal_matches(config):
     print(f"✅ Risultati {config['name']} aggiornati.")
 
 
+def _ng_get_current_round(driver):
+    """Legge il numero della giornata corrente dalla pagina NowGoal subleague."""
+    try:
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, "tr[id]"))
+        )
+        first_row = driver.find_element(By.CSS_SELECTOR, "tr[id]")
+        m = re.match(r'^(\d+)', first_row.text.strip())
+        return int(m.group(1)) if m else None
+    except Exception:
+        return None
+
+
+def _ng_click_round(driver, round_num):
+    """Clicca sulla giornata indicata e attende il caricamento."""
+    try:
+        for xpath in [
+            f"//div[contains(@class,'subLeague_round')]//a[text()='{round_num}']",
+            f"//td[text()='{round_num}']",
+            f"//li[text()='{round_num}']",
+            f"//a[normalize-space()='{round_num}']",
+        ]:
+            try:
+                el = driver.find_element(By.XPATH, xpath)
+                if el:
+                    driver.execute_script("arguments[0].click();", el)
+                    WebDriverWait(driver, 15).until(
+                        EC.presence_of_element_located((By.CSS_SELECTOR, "tr[id]"))
+                    )
+                    time.sleep(1)
+                    return True
+            except Exception:
+                pass
+        return False
+    except Exception:
+        return False
+
+
+def _ng_extract_scores(driver):
+    """Estrai risultati (score) dalla pagina NowGoal corrente.
+    Strategia 1: BeautifulSoup su Table3 (formato coppe: div.point > font).
+    Strategia 2: Selenium text parsing sulle righe tr[id].
+    Strategia 3: BeautifulSoup su TD con classe specifica score.
+    Debug: stampa info su cosa trova per diagnosi.
+    """
+    results = []
+    soup = BeautifulSoup(driver.page_source, "html.parser")
+
+    # --- Strategia 1: Table3 > div.point > font ---
+    table = soup.find("table", id="Table3")
+    if table:
+        rows_with_teams = 0
+        rows_with_point = 0
+        for row in table.find_all("tr"):
+            team_links = row.find_all("a", href=re.compile(r"/team/"))
+            if len(team_links) < 2:
+                continue
+            rows_with_teams += 1
+            home = team_links[0].get_text(strip=True)
+            away = team_links[1].get_text(strip=True)
+            # Prova div.point > font (formato coppe)
+            score_cell = row.find("div", class_="point")
+            if score_cell:
+                rows_with_point += 1
+                fonts = score_cell.find_all("font")
+                if len(fonts) >= 2:
+                    h_s = fonts[0].get_text(strip=True).replace("-", "")
+                    a_s = fonts[1].get_text(strip=True).replace("-", "")
+                    if h_s.isdigit() and a_s.isdigit():
+                        results.append({"home": home, "away": away, "score": f"{h_s}:{a_s}"})
+                        continue
+            # Prova: qualsiasi TD con testo che sembra uno score (es. "1 - 0", "2:1")
+            for td in row.find_all("td"):
+                td_text = td.get_text(strip=True)
+                m = re.match(r'^(\d+)\s*[-:]\s*(\d+)$', td_text)
+                if m:
+                    results.append({"home": home, "away": away, "score": f"{m.group(1)}:{m.group(2)}"})
+                    break
+    else:
+        pass
+
+    if results:
+        return results
+
+    # --- Strategia 2: Selenium tr[id] — parsing testo righe ---
+    try:
+        sel_rows = driver.find_elements(By.CSS_SELECTOR, "tr[id]")
+        for row in sel_rows:
+            try:
+                row_text = row.text.strip()
+                if not row_text:
+                    continue
+                team_links = row.find_elements(By.CSS_SELECTOR, "a[href*='/team/']")
+                if len(team_links) < 2:
+                    continue
+                home = team_links[0].text.strip()
+                away = team_links[1].text.strip()
+                if not home or not away:
+                    continue
+                # Cerca score: "H - A" nel testo, ma DOPO la data (evita match su "03-01")
+                # Rimuovi la parte data/ora all'inizio, poi cerca score
+                # Formato tipico: "round_num date time Home Away H - A odds..."
+                text_after_away = row_text.split(away)[-1] if away in row_text else row_text
+                score_match = re.search(r'(\d+)\s*-\s*(\d+)', text_after_away)
+                if score_match:
+                    h_s, a_s = score_match.group(1), score_match.group(2)
+                    results.append({"home": home, "away": away, "score": f"{h_s}:{a_s}"})
+            except Exception:
+                continue
+    except Exception:
+        pass
+
+    return results
+
+
 def scrape_nowgoal_league(config):
     """
     Scrapa risultati da NowGoal per leghe che non funzionano su BetExplorer
     (es. MLS: BetExplorer non ha header "Giornata", il parser standard fallisce).
-    Stessa logica di scrape_nowgoal_matches() ma salva in h2h_by_round.
+    check_previous_round=True → naviga anche alla giornata precedente (catch-up post-pausa).
     Match: nome NowGoal → cerca in teams (name/aliases) → ottiene tm_id →
     trova la partita in h2h_by_round (home_tm_id/away_tm_id).
     """
     chrome_options = Options()
     chrome_options.add_argument("--headless")
-    driver = webdriver.Chrome(options=chrome_options)
-    driver.get(config['nowgoal_url'])
-    time.sleep(5)
-    soup = BeautifulSoup(driver.page_source, "html.parser")
-    driver.quit()
+    driver = None
+    try:
+        driver = webdriver.Chrome(options=chrome_options)
+        driver.set_page_load_timeout(30)
+        driver.get(config['nowgoal_url'])
+        time.sleep(5)
 
-    table = soup.find("table", id="Table3")
-    if not table:
-        print(f"⚠️ {config['league_name']}: Table3 non trovata su NowGoal")
+        # Determina giornata corrente
+        current_round = _ng_get_current_round(driver)
+        if not current_round:
+            print(f"⚠️ {config['league_name']}: Impossibile determinare giornata NowGoal")
+            return 0
+
+        # NowGoal subleague: la giornata "corrente" mostra partite FUTURE (senza score).
+        # I risultati sono SEMPRE nella giornata precedente → controlliamo sempre entrambe.
+        rounds_to_check = [current_round]
+        if current_round > 1:
+            rounds_to_check.append(current_round - 1)
+
+        ng_results = []
+        for round_num in rounds_to_check:
+            if round_num != current_round:
+                if not _ng_click_round(driver, round_num):
+                    print(f"   ⚠️ {config['league_name']}: Navigazione giornata {round_num} fallita")
+                    continue
+            scores = _ng_extract_scores(driver)
+            if scores:
+                print(f"   📊 {config['league_name']} Giornata {round_num}: {len(scores)} risultati trovati")
+                ng_results.extend(scores)
+
+        if not ng_results:
+            print(f"☕ {config['league_name']}: Nessun risultato su NowGoal (giornate {current_round}, {current_round - 1}).")
+            return 0
+
+    except Exception as e:
+        print(f"⚠️ {config['league_name']}: Errore scraping NowGoal: {e}")
         return 0
+    finally:
+        if driver:
+            try:
+                driver.quit()
+            except Exception:
+                pass
 
-    # Estrai risultati dalla pagina (stessa logica coppe)
-    ng_results = []
-    for row in table.find_all("tr"):
-        team_links = row.find_all("a", href=re.compile(r"/team/"))
-        if len(team_links) < 2: continue
-        home = team_links[0].get_text(strip=True)
-        away = team_links[1].get_text(strip=True)
-        score_cell = row.find("div", class_="point")
-        if not score_cell: continue
-        fonts = score_cell.find_all("font")
-        if len(fonts) < 2: continue
-        h_s = fonts[0].get_text(strip=True).replace("-", "")
-        a_s = fonts[1].get_text(strip=True).replace("-", "")
-        if h_s.isdigit() and a_s.isdigit():
-            ng_results.append({"home": home, "away": away, "score": f"{h_s}:{a_s}"})
-
-    if not ng_results:
-        print(f"☕ {config['league_name']}: Nessun risultato su NowGoal.")
-        return 0
-
-    # Carica tutti i documenti h2h_by_round della lega
+    # Carica documenti h2h_by_round della lega (per league name, più robusto del prefix)
     h2h_col = db["h2h_by_round"]
-    all_docs = list(h2h_col.find({"_id": {"$regex": f"^{config['id_prefix']}_"}}))
+    all_docs = list(h2h_col.find({"league": config['league_name']}))
     if not all_docs:
-        print(f"⚠️ {config['league_name']}: Nessun documento h2h_by_round con prefix {config['id_prefix']}")
+        # Fallback: cerca per id_prefix
+        all_docs = list(h2h_col.find({"_id": {"$regex": f"^{config['id_prefix']}_"}}))
+    if not all_docs:
+        print(f"⚠️ {config['league_name']}: Nessun documento h2h_by_round")
         return 0
 
     # Matcha risultati NowGoal → h2h_by_round via transfermarkt_id
     totale_aggiornati = 0
     docs_modificati = set()
+    updated_for_sync = []  # Risultati da propagare alle collection pronostici
 
     for ng in ng_results:
         h_id = find_team_tm_id(ng["home"])
@@ -320,6 +509,11 @@ def scrape_nowgoal_league(config):
                         db_m["live_minute"] = None
                         docs_modificati.add(doc["_id"])
                         totale_aggiornati += 1
+                        # Raccogli per sync a collection pronostici
+                        date_obj = db_m.get('date_obj')
+                        if date_obj:
+                            ds = date_obj.strftime('%Y-%m-%d') if hasattr(date_obj, 'strftime') else str(date_obj)[:10]
+                            updated_for_sync.append((db_m.get('home', ''), db_m.get('away', ''), ds, ng["score"]))
                     found = True
                     break
             if found:
@@ -332,6 +526,9 @@ def scrape_nowgoal_league(config):
                 {"_id": doc["_id"]},
                 {"$set": {"matches": doc["matches"], "last_updated": datetime.now()}}
             )
+
+    # Sync risultati alle collection pronostici (live_score + live_status)
+    _sync_results_to_predictions(updated_for_sync)
 
     if totale_aggiornati > 0:
         print(f"✅ {config['league_name']}: Aggiornati {totale_aggiornati} risultati (via NowGoal).")
@@ -353,24 +550,38 @@ def run_director_loop():
     heartbeat = ["❤️", "   "]
     last_empty_check = {}  # {league_name: datetime} — cooldown per leghe senza risultati
     COOLDOWN_MIN = 30  # Minuti di attesa dopo check vuoto
+    _was_paused = False  # Flag per catch-up post-pausa
 
     while True:
         ora_attuale = datetime.now()
 
-        # Gestione Pausa Notturna + Pipeline (03:30-09:00 per evitare conflitti Chrome)
-        if 2 <= ora_attuale.hour < 9:
+        # Gestione Pausa Notturna + Pipeline (03:00-09:00 per evitare conflitti Chrome)
+        if 3 <= ora_attuale.hour < 9:
             sys.stdout.write(f"\r 💤 [PAUSA] Il Direttore riposa. Sveglia alle 09:00...          ")
             sys.stdout.flush()
+            _was_paused = True
             time.sleep(1800)
             continue
+
+        # --- CATCH-UP POST-PAUSA ---
+        # Al primo ciclo dopo la sveglia, usa finestra 24h per recuperare TUTTE
+        # le partite finite durante la notte (es. MLS 01:10, Argentina 02:00 CET)
+        # e azzera il cooldown per verificare tutte le leghe senza eccezioni.
+        _is_catchup = False
+        if _was_paused:
+            print(f"\n🌅 [CATCH-UP] Primo ciclo dopo pausa — finestra 24h, cooldown azzerato")
+            last_empty_check.clear()
+            _was_paused = False
+            _is_catchup = True
 
         agenda = set()
 
         # --- DEFINIZIONE FINESTRA TEMPORALE ---
-        # Cerca partite iniziate tra 2h e 10h fa (2h partita + margine per pausa notturna 03:30-09:00)
-        # Le partite notturne (es. Argentina 02:15) vengono coperte al risveglio alle 09:00
+        # Normalmente: partite iniziate 2-10h fa.
+        # Catch-up post-pausa: 2-24h fa per coprire tutta la notte.
+        lookback_hours = 24 if _is_catchup else 10
         soglia_fine = ora_attuale - timedelta(hours=2)   # Iniziata da almeno 2 ore
-        soglia_inizio = ora_attuale - timedelta(hours=10)  # Non più vecchia di 10 ore
+        soglia_inizio = ora_attuale - timedelta(hours=lookback_hours)
 
         # Check campionati
         query_leagues = {
