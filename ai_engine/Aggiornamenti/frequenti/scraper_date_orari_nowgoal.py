@@ -2,7 +2,7 @@ import os
 import sys
 import time
 import re
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Dict, List, Optional, Tuple
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -242,17 +242,19 @@ def find_match_with_datetime(home_aliases: List[str], away_aliases: List[str], r
         away_found = any(re.search(r'\b' + re.escape(n) + r'\b', row_clean) for n in away_search)
 
         if home_found and away_found:
-            # Usa data_t (anno completo) se disponibile, altrimenti fallback
+            # PRIORITÀ: testo visibile = orario CET italiano (quello che l'utente vede)
+            # data-t è in timezone server NowGoal (UTC+8 Pechino) → NON usarlo come prima scelta
+            datetime_result = extract_datetime_from_row(row_text)
+            if datetime_result:
+                date_str, time_str = datetime_result
+                return (date_str, time_str, row_text)
+            # Fallback: data-t (NB: timezone server, potrebbe essere diverso da CET)
             if data_t:
                 try:
                     dt = datetime.strptime(data_t[:16], "%Y-%m-%d %H:%M")
                     return (dt.strftime("%Y-%m-%d"), dt.strftime("%H:%M"), row_text)
                 except:
                     pass
-            datetime_result = extract_datetime_from_row(row_text)
-            if datetime_result:
-                date_str, time_str = datetime_result
-                return (date_str, time_str, row_text)
             return None
 
     return None
@@ -328,19 +330,15 @@ def get_all_match_rows(driver) -> List[Tuple[str, Optional[str]]]:
 
 def convert_to_utc(date_str: str, time_str: str) -> datetime:
     """
-    Converte data e ora in oggetto datetime UTC per MongoDB.
-    MongoDB salverà automaticamente come ISODate nel formato corretto.
+    Crea oggetto datetime da data e orario CET (ora italiana, da NowGoal).
+    Salvato come naive datetime — la data corrisponde al giorno italiano.
+    NB: il nome 'convert_to_utc' è legacy, in realtà NON converte a UTC.
     """
     try:
-        # Parse date e time
-        dt_naive = datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %H:%M")
-        # Converti in UTC con tzinfo
-        dt_utc = dt_naive.replace(tzinfo=timezone.utc)
-        return dt_utc  # Ritorna oggetto datetime, non stringa!
+        return datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %H:%M")
     except Exception as e:
         print(f" ⚠️ Errore conversione datetime: {e}")
-        # Fallback
-        return datetime.now(timezone.utc)
+        return datetime.now()
 
 
 def format_match_time(time_str: str) -> str:

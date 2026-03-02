@@ -8,7 +8,7 @@ Per ogni daily_prediction con risultato disponibile ma senza profit_loss:
 """
 
 import os, sys, re
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # --- FIX PERCORSI ---
 current_path = os.path.dirname(os.path.abspath(__file__))
@@ -91,6 +91,13 @@ for doc in db.h2h_by_round.aggregate(pipeline):
         date_str = d.strftime('%Y-%m-%d')
         key = f"{doc['home']}|||{doc['away']}|||{date_str}"
         results_map[key] = doc['score']
+        # Fallback ±1 giorno: h2h_by_round può avere timezone diverso (es. match
+        # argentino 21:00 CET 1/3 salvato come 04:00 UTC 2/3 in date_obj).
+        # setdefault = non sovrascrive se esiste già il match esatto per quel giorno.
+        for delta in [-1, 1]:
+            alt = (d + timedelta(days=delta)).strftime('%Y-%m-%d')
+            alt_key = f"{doc['home']}|||{doc['away']}|||{alt}"
+            results_map.setdefault(alt_key, doc['score'])
 
 # Risultati coppe (supporta sia real_score che result.home_score/away_score)
 for coll_name in ['matches_champions_league', 'matches_europa_league']:
