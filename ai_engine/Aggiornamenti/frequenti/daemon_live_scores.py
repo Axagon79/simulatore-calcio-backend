@@ -13,6 +13,7 @@ from datetime import datetime, timedelta
 import atexit
 import signal
 import subprocess
+import threading
 
 # --- LOGGING: output su terminale + file log ---
 class _TeeOutput:
@@ -109,6 +110,7 @@ CYCLE_SECONDS = 120       # Ogni 2 minuti
 _leagues_selected = False  # Flag: "Select All" leagues già cliccato
 PAGE_LOAD_WAIT = 5        # Secondi di attesa dopo navigazione
 RESTART_EVERY_N_CYCLES = 50  # Restart preventivo del driver ogni N cicli
+CYCLE_TIMEOUT = 90            # Max secondi per un ciclo, poi watchdog killa Chrome
 _cycle_count = 0          # Contatore cicli per restart periodico
 HOUR_START = 10            # Inizio finestra operativa
 HOUR_END = 1               # Fine (giorno dopo, 01:00)
@@ -601,6 +603,40 @@ def restart_driver(driver, chrome_options, reason="periodico"):
     return new_driver
 
 
+def run_cycle_with_timeout(driver, timeout=CYCLE_TIMEOUT):
+    """Esegue run_cycle in un thread con timeout. Se scade, killa Chrome."""
+    result = {'ok': False, 'error': None}
+
+    def _target():
+        try:
+            run_cycle(driver)
+            result['ok'] = True
+        except Exception as e:
+            result['error'] = e
+
+    t = threading.Thread(target=_target, daemon=True)
+    t.start()
+    t.join(timeout=timeout)
+
+    if t.is_alive():
+        # Il ciclo è ancora bloccato dopo il timeout
+        print(f"\n   ⚠️ WATCHDOG: ciclo bloccato da {timeout}s — killo Chrome...")
+        try:
+            driver.quit()
+        except:
+            pass
+        # Kill Chrome zombie residui
+        try:
+            subprocess.run(['taskkill', '/F', '/IM', 'chrome.exe'], capture_output=True)
+            subprocess.run(['taskkill', '/F', '/IM', 'chromedriver.exe'], capture_output=True)
+        except:
+            pass
+        raise TimeoutError(f"Ciclo bloccato per oltre {timeout}s")
+
+    if result['error']:
+        raise result['error']
+
+
 def main():
     global _cycle_count, _current_driver
     print(f"Configurazione: ciclo ogni {CYCLE_SECONDS}s, finestra {HOUR_START}:00-{HOUR_END}:00")
@@ -658,7 +694,14 @@ def main():
                         continue
 
                 try:
-                    run_cycle(driver)
+                    run_cycle_with_timeout(driver)
+                except TimeoutError as te:
+                    print(f"\n   🔄 WATCHDOG RESTART: {te}")
+                    driver = restart_driver(driver, chrome_options, "watchdog timeout")
+                    _cycle_count = 0
+                    if not driver:
+                        time.sleep(60)
+                    continue
                 except Exception as e:
                     print(f"\n   ERRORE nel ciclo: {e}")
                     import traceback
