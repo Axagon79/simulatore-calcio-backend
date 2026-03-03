@@ -566,8 +566,6 @@ async function generateMatchAnalysisPremium(contextText) {
 // ══════════════════════════════════════════════
 // DEEPDIVE PROMPT — Analisi contestuale web "Scout"
 // ══════════════════════════════════════════════
-const TODAY = new Date().toISOString().split('T')[0];
-
 const DEEPDIVE_PROMPT = `Sei un giornalista sportivo investigativo italiano. Il tuo compito è UNICO: raccogliere informazioni EXTRA-CAMPO che gli algoritmi non possono conoscere.
 
 HAI A DISPOSIZIONE lo strumento web_search. DEVI usarlo per raccogliere informazioni su tutte le categorie elencate sotto. Fai query INTELLIGENTI che coprono più temi insieme (es. una sola ricerca per formazioni+infortuni+squalificati). Fai almeno 4 ricerche, massimo 6.
