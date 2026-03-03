@@ -76,13 +76,20 @@ const LEAGUE_DOMAINS = {
   'Europa League': ['uefa.com', 'goal.com', 'skysports.com', '90min.com', 'sportsgambler.com'],
 };
 
-// Trova i domini per un campionato (match case-insensitive parziale)
+// Top league dove include_domains è utile (siti prevedibili e affidabili)
+const TOP_LEAGUES_FOR_DOMAINS = new Set([
+  'Serie A', 'Serie B', 'Premier League', 'La Liga', 'Bundesliga', 'Ligue 1',
+  'Champions League', 'Europa League',
+]);
+
+// Trova i domini per un campionato — solo top league, per le altre ricerca libera
 function getLeagueDomains(league) {
   if (!league) return [];
   const key = Object.keys(LEAGUE_DOMAINS).find(k =>
     k.toLowerCase() === league.toLowerCase() || league.toLowerCase().includes(k.toLowerCase())
   );
-  return key ? LEAGUE_DOMAINS[key] : [];
+  if (!key || !TOP_LEAGUES_FOR_DOMAINS.has(key)) return [];
+  return LEAGUE_DOMAINS[key];
 }
 
 // ===================== PROVIDER FUNCTIONS =====================
@@ -103,6 +110,7 @@ async function searchTavily(query, domains = []) {
       time_range: 'week',
       days: 5,
     };
+    // include_domains solo per top league — per Serie C e minori troppo restrittivo
     if (domains.length > 0) body.include_domains = domains;
     const resp = await fetch('https://api.tavily.com/search', {
       method: 'POST',
