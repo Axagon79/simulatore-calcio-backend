@@ -685,6 +685,7 @@ REGOLE ASSOLUTE:
 - Verifica SEMPRE che i giocatori citati appartengano effettivamente alla squadra menzionata — non confondere giocatori di squadre dello stesso girone o omonime
 - Usa il nome ESATTO della squadra come appare nelle fonti — non abbreviare, non modificare, non confondere con sponsor o denominazioni simili
 - Se una fonte ha più di 30 giorni, NON usarla per dati che cambiano spesso (allenatore, squalificati, infortunati) — usala solo per contesto storico
+- Prima di citare qualsiasi dato su infortunati, squalificati o allenatore, verifica ESPLICITAMENTE la data dell'articolo. Se non è visibile la data, NON usare quel dato. Se la data è precedente a 7 giorni fa, NON usarla per dati che cambiano spesso
 - Se non trovi informazioni su una sezione, saltala — non riempire con banalità
 - Se trovi notizie contrastanti su allenatore o formazione, cita SOLO la fonte più recente e segnala l'incertezza ("secondo le ultime notizie...")
 - NON scrivere mai "nessuna notizia rilevante è emersa" se non hai esplicitamente cercato — cerca prima, poi concludi

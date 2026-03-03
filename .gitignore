@@ -18,3 +18,12 @@ calibration_snapshot_*.json
 # Debug/temp files
 debug_snai_sidebar.html
 temp_*.py
+temp_*.png
+_output*.txt
+
+# Cache data
+cache/
+
+# MC Tuning reports (riproducibili)
+functions_python/ai_engine/tools/results/report_*.json
+functions_python/ai_engine/tools/results/report_*.txt

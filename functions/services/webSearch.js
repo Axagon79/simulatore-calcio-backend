@@ -55,8 +55,11 @@ async function searchTavily(query) {
       body: JSON.stringify({
         api_key: TAVILY_API_KEY,
         query,
-        max_results: 3,
-        search_depth: 'basic',
+        max_results: 5,
+        search_depth: 'advanced',
+        topic: 'news',
+        time_range: 'week',
+        days: 5,
       }),
       signal: controller.signal,
     });
@@ -296,10 +299,13 @@ async function searchWeb(query, db) {
   // Senza DB non possiamo gestire contatori — fallback diretto
   if (!db) {
     console.warn('[WebSearch] No DB — tentativo diretto senza contatori');
+    const month = new Date().toLocaleString('it-IT', { month: 'long', year: 'numeric' });
     for (const provider of PROVIDER_ORDER) {
       if (!PROVIDER_KEY[provider]) continue;
       try {
-        const results = await PROVIDER_FN[provider](query);
+        const results = await PROVIDER_FN[provider](
+          (provider === 'brave' || provider === 'google') ? `${query} ${month}` : query
+        );
         console.log(`[WebSearch] ${provider} OK (no counter)`);
         return results;
       } catch (err) {
@@ -312,6 +318,12 @@ async function searchWeb(query, db) {
   // Carica e resetta contatori
   const counters = await loadCounters(db);
 
+  // Appendi mese+anno alla query per Brave e Google (no filtro nativo)
+  const now = new Date();
+  const monthYear = now.toLocaleString('it-IT', { month: 'long', year: 'numeric' });
+  const queryWithDate = (provider) =>
+    (provider === 'brave' || provider === 'google') ? `${query} ${monthYear}` : query;
+
   // Prova ogni provider in ordine
   for (const provider of PROVIDER_ORDER) {
     if (!isProviderAvailable(provider, counters)) {
@@ -319,7 +331,7 @@ async function searchWeb(query, db) {
     }
 
     try {
-      const results = await PROVIDER_FN[provider](query);
+      const results = await PROVIDER_FN[provider](queryWithDate(provider));
       await incrementCounter(db, provider);
       console.log(`[WebSearch] ${provider} OK (query: "${query.substring(0, 50)}")`);
       return results;
