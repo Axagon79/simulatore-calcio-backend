@@ -4,7 +4,7 @@
  */
 const express = require('express');
 const router = express.Router();
-const { generateAnalysis, chatWithContext, chatDashboard, generateMatchAnalysisPremium, SYSTEM_PROMPT } = require('../services/llmService');
+const { generateAnalysis, chatWithContext, chatDashboard, generateMatchAnalysisPremium, generateMatchDeepDive, SYSTEM_PROMPT } = require('../services/llmService');
 const { buildMatchContext, searchMatch, buildUnifiedContext } = require('../services/contextBuilder');
 const { WEB_SEARCH_TOOL, handleToolCalls } = require('../services/webSearch');
 const { DB_TOOLS } = require('../services/dbTools');
@@ -147,6 +147,78 @@ router.post('/match-analysis-premium', async (req, res) => {
     res.json({ success: true, analysis, cached: false });
   } catch (error) {
     console.error('[CHAT/MATCH-ANALYSIS-PREMIUM]', error.message);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// ── POST /chat/match-deepdive ──
+// Analisi "Scout" con ricerca web (admin + premium)
+router.post('/match-deepdive', async (req, res) => {
+  // Timeout più lungo per ricerche web (65s)
+  if (req.setTimeout) req.setTimeout(65000);
+
+  try {
+    const { home, away, date, league, isAdmin, forceRefresh } = req.body;
+
+    if (!home || !away || !date) {
+      return res.status(400).json({ success: false, error: 'Missing home, away or date' });
+    }
+
+    // Accesso: admin o premium
+    if (isAdmin !== true && isAdmin !== 'true') {
+      return res.status(403).json({ success: false, error: 'Scout analysis is premium-only' });
+    }
+
+    // Check cache su MongoDB
+    const existing = await req.db.collection('daily_predictions_unified')
+      .findOne({ home, away, date }, { projection: { analysis_deepdive: 1, analysis_deepdive_ts: 1, time: 1 } });
+
+    if (existing && existing.analysis_deepdive && !forceRefresh) {
+      const cacheTs = existing.analysis_deepdive_ts ? new Date(existing.analysis_deepdive_ts).getTime() : 0;
+      const sixHoursAgo = Date.now() - (6 * 60 * 60 * 1000);
+
+      // Cache auto-refresh se < 3 ore al fischio d'inizio
+      let cacheValid = cacheTs > sixHoursAgo;
+      if (cacheValid && existing.time) {
+        try {
+          const matchDateTime = new Date(`${date}T${existing.time}:00`);
+          const hoursToKickoff = (matchDateTime.getTime() - Date.now()) / (1000 * 60 * 60);
+          if (hoursToKickoff > 0 && hoursToKickoff < 3) {
+            cacheValid = false; // Auto-refresh per info più fresche
+          }
+        } catch (_) { /* ignore parse error */ }
+      }
+
+      if (cacheValid) {
+        return res.json({ success: true, analysis: existing.analysis_deepdive, cached: true, ts: existing.analysis_deepdive_ts });
+      }
+    }
+
+    // Genera deepdive con ricerca web
+    const analysis = await generateMatchDeepDive(home, away, date, league || '');
+
+    if (!analysis || analysis === '(risposta vuota)' || analysis === '(limite round tool raggiunto)') {
+      return res.json({ success: false, error: 'La ricerca web non ha prodotto risultati. Riprova tra qualche minuto.' });
+    }
+
+    // Salva su MongoDB con timestamp
+    const now = new Date().toISOString();
+    await req.db.collection('daily_predictions_unified')
+      .updateOne({ home, away, date }, {
+        $set: {
+          analysis_deepdive: analysis,
+          analysis_deepdive_ts: now
+        }
+      });
+
+    res.json({ success: true, analysis, cached: false, ts: now });
+  } catch (error) {
+    console.error('[CHAT/MATCH-DEEPDIVE]', error.message);
+
+    if (error.message?.includes('aborted') || error.name === 'AbortError') {
+      return res.status(504).json({ success: false, error: 'Timeout — la ricerca ha impiegato troppo tempo. Riprova.' });
+    }
+
     res.status(500).json({ success: false, error: error.message });
   }
 });

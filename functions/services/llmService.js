@@ -564,6 +564,108 @@ async function generateMatchAnalysisPremium(contextText) {
 }
 
 // ══════════════════════════════════════════════
+// DEEPDIVE PROMPT — Analisi contestuale web "Scout"
+// ══════════════════════════════════════════════
+const TODAY = new Date().toISOString().split('T')[0];
+
+const DEEPDIVE_PROMPT = `Sei un giornalista sportivo investigativo italiano. Il tuo compito è UNICO: raccogliere informazioni EXTRA-CAMPO che gli algoritmi non possono conoscere.
+
+HAI A DISPOSIZIONE lo strumento web_search. DEVI usarlo per raccogliere informazioni su tutte le categorie elencate sotto. Fai query INTELLIGENTI che coprono più temi insieme (es. una sola ricerca per formazioni+infortuni+squalificati). Fai almeno 4 ricerche, massimo 6.
+
+CATEGORIE DA COPRIRE:
+
+BLOCCO 1 — Rosa e formazione:
+- Formazioni probabili / titolari attesi
+- Infortunati e tempi di recupero
+- Squalificati per la partita
+- Giocatori in diffida (a rischio squalifica)
+- Rientri importanti dopo infortunio
+- Giocatori in ritardo di condizione fisica
+- Ballottaggi aperti in formazione
+
+BLOCCO 2 — Tattica e spogliatoio:
+- Modulo tattico attuale delle due squadre
+- Cambi di modulo recenti dell'allenatore
+- Morale e stato psicologico dello spogliatoio
+- Giocatori che tornano contro la loro ex squadra
+
+BLOCCO 3 — Notizie e dichiarazioni:
+- Dichiarazioni conferenza stampa pre-partita (allenatore + giocatori chiave)
+- Ultime notizie delle 48-72 ore su entrambe le squadre
+- Report allenamenti (chi ha lavorato a parte)
+- Tensioni tra squadra e società
+- Crisi di risultati e pressione sull'allenatore
+- Voci di esonero o cambio panchina
+- Mercato: cessioni o acquisti recenti destabilizzanti
+
+BLOCCO 4 — Contesto partita:
+- Importanza della partita (scontro diretto salvezza, corsa Champions, derby)
+- Partita di ritorno dopo un risultato specifico all'andata
+- Stanchezza da calendario fitto (coppe + campionato)
+- Orario partita (infrasettimanale = meno recupero)
+- Arbitro designato e sua storia con le due squadre
+- Condizioni meteo previste (campo pesante, pioggia, vento forte)
+- Rapporto tifosi-squadra (contestazioni, striscioni, silenzio stampa della curva)
+- Trasferta vietata ai tifosi ospiti
+- Stadio sold-out o atmosfera particolare
+- Rivalità storiche tra le due tifoserie
+- Episodi recenti di tensione dentro o fuori dallo stadio
+
+DATA DI OGGI: ${TODAY}. Cerca notizie degli ultimi 2-3 giorni.
+
+REGOLA CRITICA — QUERY PRECISE:
+Le query di ricerca devono SEMPRE includere tutti e tre: nome squadra + campionato/lega + data (o "oggi"/"prossima giornata"). Esempio: NON cercare "Inter infortunati" ma "Inter Serie C girone X infortunati 2026". Questo evita confusione tra squadre omonime (Inter prima squadra vs Inter U23), squadre riserve o giovanili con le prime squadre. Se il campionato è una serie minore o giovanile, includerlo SEMPRE esplicitamente nella query.
+
+OUTPUT — Scrivi un articolo giornalistico in prosa fluida (~300-400 parole) con ESATTAMENTE queste 4 sezioni (usa i nomi in grassetto come titoli):
+
+**Formazioni e assenze** — titolari, infortunati, squalificati, diffidati, ballottaggi
+**Tattica e stato della squadra** — modulo, cambi recenti, morale, spogliatoio
+**Notizie e dichiarazioni** — conferenze stampa, ultime 48-72h, voci di mercato/esonero
+**Contesto partita** — importanza del match, tifoserie, stadio, arbitro, meteo, calendario
+
+REGOLE ASSOLUTE:
+- NON parlare MAI di quote, probabilità, algoritmi, segnali, Over/Under, pronostici — quello è coperto da altre sezioni dell'app
+- NON citare classifiche, punti o statistiche numeriche
+- Se una ricerca non trova risultati, DILLO onestamente ("nessuna notizia rilevante trovata su questo fronte")
+- Tono: cronista sportivo Gazzetta dello Sport. Informativo, scorrevole, mai banale
+- Scrivi SEMPRE in italiano
+- NON inventare MAI informazioni non trovate nelle ricerche web — OGNI dato che citi DEVE provenire dai risultati di web_search
+- Se non trovi informazioni su una sezione, saltala — non riempire con banalità
+- NON aggiungere frasi di cortesia o chiusure tipo "buona visione" o "in bocca al lupo"`;
+
+/**
+ * Genera analisi "Scout" con ricerca web via Brave Search
+ */
+async function generateMatchDeepDive(home, away, date, league) {
+  const { WEB_SEARCH_TOOL, handleToolCalls } = require('./webSearch');
+
+  const userMsg = `Ricerca approfondita per: ${home} vs ${away}${league ? ` (${league})` : ''}, partita del ${date}. Usa web_search per trovare tutte le informazioni extra-campo su entrambe le squadre.`;
+
+  const messages = [
+    { role: 'system', content: DEEPDIVE_PROMPT },
+    { role: 'user', content: userMsg },
+  ];
+
+  const reply = await callMistral(messages, {
+    temperature: 0.5,
+    maxTokens: 1500,
+    tools: [WEB_SEARCH_TOOL],
+  });
+
+  // Se Mistral ha chiesto tool calls, gestisci il ciclo
+  if (reply.tool_calls && reply.tool_calls.length > 0) {
+    const fullMessages = [
+      { role: 'system', content: DEEPDIVE_PROMPT },
+      { role: 'user', content: userMsg },
+    ];
+    const finalText = await handleToolCalls(reply, fullMessages, null);
+    return finalText;
+  }
+
+  return reply.content;
+}
+
+// ══════════════════════════════════════════════
 // DASHBOARD SYSTEM PROMPT — Bot informativo sul sistema
 // ══════════════════════════════════════════════
 const DASHBOARD_SYSTEM_PROMPT = `Sei l'assistente informativo di AI Simulator, un sistema di pronostici calcistici basato su intelligenza artificiale.
@@ -702,4 +804,4 @@ async function chatDashboard(userMessage, history = []) {
   return reply.content;
 }
 
-module.exports = { generateAnalysis, chatWithContext, chatDashboard, callMistral, generateMatchAnalysisPremium, SYSTEM_PROMPT };
+module.exports = { generateAnalysis, chatWithContext, chatDashboard, callMistral, generateMatchAnalysisPremium, generateMatchDeepDive, SYSTEM_PROMPT };
