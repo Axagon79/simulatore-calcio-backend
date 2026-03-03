@@ -40,27 +40,74 @@ const WEB_SEARCH_TOOL = {
   },
 };
 
+// ===================== LEAGUE DOMAINS (per Tavily include_domains) =====================
+const LEAGUE_DOMAINS = {
+  // Italia
+  'Serie A': ['gazzetta.it', 'corrieredellosport.it', 'tuttosport.com', 'tuttomercatoweb.com', 'calciomercato.com', 'skysport.it', 'sportsgambler.com'],
+  'Serie B': ['gazzetta.it', 'corrieredellosport.it', 'tuttosport.com', 'tuttomercatoweb.com', 'calciomercato.com', 'skysport.it', 'sportsgambler.com'],
+  'Serie C': ['tuttoc.com', 'trivenetogoal.it', 'notiziariocalcio.com', 'tsportinthecity.it', 'sportsgambler.com'],
+  // Europa Top 5
+  'Premier League': ['premierleague.com', 'bbc.com', 'skysports.com', '90min.com', 'football365.com', 'sportsgambler.com'],
+  'Championship': ['skysports.com', 'bbc.com', 'football365.com', 'sportsmole.co.uk', 'sportsgambler.com'],
+  'La Liga': ['as.com', 'marca.com', 'mundodeportivo.com', 'footballespana.net', 'sportsgambler.com'],
+  'LaLiga 2': ['as.com', 'marca.com', 'sportsmole.co.uk', 'sportsgambler.com'],
+  'Bundesliga': ['bundesliga.com', 'bulinews.com', '90min.com', 'sportsgambler.com'],
+  '2. Bundesliga': ['bundesliga.com', 'bulinews.com', 'sportsmole.co.uk', 'sportsgambler.com'],
+  'Ligue 1': ['gffn.com', 'sofoot.com', 'footmercato.net', 'sportsgambler.com'],
+  'Ligue 2': ['gffn.com', 'sofoot.com', 'footmercato.net', 'sportsgambler.com'],
+  // Europa altri
+  'Eredivisie': ['vi.nl', 'voetbalzone.nl', 'sportsgambler.com', 'sofascore.com'],
+  'Liga Portugal': ['maisfutebol.iol.pt', 'record.pt', 'sportsgambler.com'],
+  'Scottish Premiership': ['bbc.com', 'dailyrecord.co.uk', 'scotsman.com', 'sportsgambler.com'],
+  'Allsvenskan': ['sofascore.com', 'sportsgambler.com', 'injuriesandsuspensions.com'],
+  'Eliteserien': ['sofascore.com', 'sportsgambler.com', 'injuriesandsuspensions.com'],
+  'Superligaen': ['sofascore.com', 'sportsgambler.com', 'injuriesandsuspensions.com'],
+  'Jupiler Pro League': ['sofascore.com', 'sportsgambler.com', 'injuriesandsuspensions.com'],
+  'Süper Lig': ['trtspor.com', 'sporx.com', 'sportsgambler.com'],
+  'League of Ireland': ['extratime.com', 'sportsgambler.com', 'sofascore.com'],
+  // Americhe
+  'Brasileirão': ['ge.globo.com', 'sofascore.com', 'sportsgambler.com'],
+  'Primera División': ['infobae.com', 'ole.com.ar', 'sportsgambler.com'],
+  'MLS': ['mlssoccer.com', 'rotowire.com', 'sportsgambler.com'],
+  // Asia
+  'J1 League': ['jsgoal.jp', 'japantimes.co.jp', 'sportsgambler.com'],
+  // Coppe
+  'Champions League': ['uefa.com', 'goal.com', 'skysports.com', '90min.com', 'sportsgambler.com'],
+  'Europa League': ['uefa.com', 'goal.com', 'skysports.com', '90min.com', 'sportsgambler.com'],
+};
+
+// Trova i domini per un campionato (match case-insensitive parziale)
+function getLeagueDomains(league) {
+  if (!league) return [];
+  const key = Object.keys(LEAGUE_DOMAINS).find(k =>
+    k.toLowerCase() === league.toLowerCase() || league.toLowerCase().includes(k.toLowerCase())
+  );
+  return key ? LEAGUE_DOMAINS[key] : [];
+}
+
 // ===================== PROVIDER FUNCTIONS =====================
 
 /**
  * Tavily Search — POST https://api.tavily.com/search
  */
-async function searchTavily(query) {
+async function searchTavily(query, domains = []) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 10000);
   try {
+    const body = {
+      api_key: TAVILY_API_KEY,
+      query,
+      max_results: 3,
+      search_depth: 'advanced',
+      topic: 'news',
+      time_range: 'week',
+      days: 5,
+    };
+    if (domains.length > 0) body.include_domains = domains;
     const resp = await fetch('https://api.tavily.com/search', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        api_key: TAVILY_API_KEY,
-        query,
-        max_results: 3,
-        search_depth: 'advanced',
-        topic: 'news',
-        time_range: 'week',
-        days: 5,
-      }),
+      body: JSON.stringify(body),
       signal: controller.signal,
     });
     if (!resp.ok) throw new Error(`Tavily API ${resp.status}`);
@@ -296,7 +343,13 @@ async function loadCounters(db) {
  * @param {string} query - La query di ricerca
  * @param {object} db - Istanza MongoDB (per contatori)
  */
-async function searchWeb(query, db) {
+async function searchWeb(query, db, league) {
+  const domains = getLeagueDomains(league);
+
+  // Chiama il provider giusto — Tavily riceve i domini, gli altri no
+  const callProvider = (provider, q) =>
+    provider === 'tavily' ? searchTavily(q, domains) : PROVIDER_FN[provider](q);
+
   // Senza DB non possiamo gestire contatori — fallback diretto
   if (!db) {
     console.warn('[WebSearch] No DB — tentativo diretto senza contatori');
@@ -304,9 +357,8 @@ async function searchWeb(query, db) {
     for (const provider of PROVIDER_ORDER) {
       if (!PROVIDER_KEY[provider]) continue;
       try {
-        const results = await PROVIDER_FN[provider](
-          (provider === 'brave' || provider === 'google') ? `${query} ${month}` : query
-        );
+        const q = (provider === 'brave' || provider === 'google') ? `${query} ${month}` : query;
+        const results = await callProvider(provider, q);
         console.log(`[WebSearch] ${provider} OK (no counter)`);
         return results;
       } catch (err) {
@@ -332,9 +384,9 @@ async function searchWeb(query, db) {
     }
 
     try {
-      const results = await PROVIDER_FN[provider](queryWithDate(provider));
+      const results = await callProvider(provider, queryWithDate(provider));
       await incrementCounter(db, provider);
-      console.log(`[WebSearch] ${provider} OK (query: "${query.substring(0, 50)}")`);
+      console.log(`[WebSearch] ${provider} OK (query: "${query.substring(0, 50)}"${domains.length ? `, domains: ${domains.length}` : ''})`);
       return results;
     } catch (err) {
       console.warn(`[WebSearch] ${provider} errore: ${err.message} — passo al successivo`);
@@ -356,8 +408,9 @@ async function searchWeb(query, db) {
  * @param {Array} messages - Storia messaggi
  * @param {object} db - Istanza MongoDB (per tool DB + contatori web search)
  * @param {function} [callFn] - Funzione LLM da usare nei round successivi (default: callMistral)
+ * @param {string} [league] - Campionato per filtrare i domini di ricerca (opzionale)
  */
-async function handleToolCalls(reply, messages, db, callFn) {
+async function handleToolCalls(reply, messages, db, callFn, league) {
   if (!reply.tool_calls || reply.tool_calls.length === 0) {
     return reply.content;
   }
@@ -389,7 +442,7 @@ async function handleToolCalls(reply, messages, db, callFn) {
 
       if (tc.function.name === 'web_search') {
         try {
-          const results = await searchWeb(args.query, db);
+          const results = await searchWeb(args.query, db, league);
           content = JSON.stringify(results);
         } catch (err) {
           content = JSON.stringify([{ title: 'Errore ricerca', snippet: err.message }]);

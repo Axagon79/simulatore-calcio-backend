@@ -618,6 +618,26 @@ async function generateMatchAnalysisPremium(contextText) {
 // ══════════════════════════════════════════════
 // DEEPDIVE PROMPT — Analisi contestuale web "Scout"
 // ══════════════════════════════════════════════
+
+// Mappa compatta campionato → siti di riferimento (per il prompt)
+const LEAGUE_SITES = {
+  'Serie A': 'gazzetta.it, corrieredellosport.it, tuttomercatoweb.com, calciomercato.com, skysport.it',
+  'Serie B': 'gazzetta.it, corrieredellosport.it, tuttomercatoweb.com, calciomercato.com, skysport.it',
+  'Serie C': 'tuttoc.com, trivenetogoal.it, notiziariocalcio.com, tsportinthecity.it',
+  'Premier League': 'premierleague.com, bbc.com/sport, skysports.com, 90min.com, football365.com',
+  'Championship': 'skysports.com, bbc.com/sport, football365.com, sportsmole.co.uk',
+  'La Liga': 'as.com, marca.com, mundodeportivo.com, footballespana.net',
+  'LaLiga 2': 'as.com, marca.com, sportsmole.co.uk',
+  'Bundesliga': 'bundesliga.com, bulinews.com, 90min.com',
+  '2. Bundesliga': 'bundesliga.com, bulinews.com, sportsmole.co.uk',
+  'Ligue 1': 'gffn.com, sofoot.com, footmercato.net',
+  'Ligue 2': 'gffn.com, sofoot.com, footmercato.net',
+  'Eredivisie': 'vi.nl, voetbalzone.nl',
+  'Liga Portugal': 'maisfutebol.iol.pt, record.pt',
+  'Champions League': 'uefa.com, goal.com, skysports.com, 90min.com',
+  'Europa League': 'uefa.com, goal.com, skysports.com, 90min.com',
+};
+
 const DEEPDIVE_PROMPT = `Sei un giornalista sportivo investigativo italiano. Raccogli informazioni EXTRA-CAMPO usando web_search. Esegui le 5 query obbligatorie.
 
 TEMI DA COPRIRE:
@@ -628,12 +648,16 @@ TEMI DA COPRIRE:
 
 DATA DI OGGI: ${TODAY}. Cerca notizie degli ultimi 2-3 giorni.
 
+SITI DI RIFERIMENTO per {LEAGUE}: {LEAGUE_SITES}
+Universali: sportsgambler.com, injuriesandsuspensions.com, sofascore.com
+Usa questi siti come riferimento nelle query. I risultati sono già filtrati su questi domini.
+
 QUERY — includi SEMPRE: nome completo squadra + campionato/lega + mese/anno. Se nome ambiguo (es. Trento, Lumezzane), aggiungi città + lega. Mai abbreviazioni.
 
 QUERY OBBLIGATORIE (sostituisci nomi, allenatore, mese e anno):
-1. "[SquadraCasa] convocati [mese anno]"
-2. "[SquadraOspite] squalificati infortunati [mese anno]"
-3. "[SquadraCasa] [SquadraOspite] probabili formazioni {LEAGUE}"
+1. "[SquadraCasa] sito ufficiale convocati news [mese anno]"
+2. "[SquadraOspite] sito ufficiale convocati news [mese anno]"
+3. "[SquadraCasa] [SquadraOspite] probabili formazioni squalificati infortunati {LEAGUE}"
 4. "[SquadraCasa] conferenza stampa [allenatore] [mese anno]"
 5. "[SquadraOspite] conferenza stampa [allenatore] [mese anno]"
 
@@ -666,7 +690,10 @@ async function generateMatchDeepDive(home, away, date, league, db) {
 
   const userMsg = `Ricerca approfondita per: ${home} vs ${away}${league ? ` (${league})` : ''}, partita del ${date}. Usa web_search per trovare tutte le informazioni extra-campo su entrambe le squadre.`;
 
-  const systemPrompt = DEEPDIVE_PROMPT.replace('{LEAGUE}', league || '');
+  const leagueSites = LEAGUE_SITES[league] || 'sportsgambler.com, sofascore.com, injuriesandsuspensions.com';
+  const systemPrompt = DEEPDIVE_PROMPT
+    .replace('{LEAGUE}', league || '')
+    .replace('{LEAGUE_SITES}', leagueSites);
 
   const messages = [
     { role: 'system', content: systemPrompt },
@@ -685,7 +712,7 @@ async function generateMatchDeepDive(home, away, date, league, db) {
       { role: 'system', content: systemPrompt },
       { role: 'user', content: userMsg },
     ];
-    const finalText = await handleToolCalls(reply, fullMessages, db, callGroq);
+    const finalText = await handleToolCalls(reply, fullMessages, db, callGroq, league);
     return finalText;
   }
 
