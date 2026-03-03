@@ -195,7 +195,7 @@ router.post('/match-deepdive', async (req, res) => {
     }
 
     // Genera deepdive con ricerca web
-    const analysis = await generateMatchDeepDive(home, away, date, league || '');
+    const analysis = await generateMatchDeepDive(home, away, date, league || '', req.db);
 
     if (!analysis || analysis === '(risposta vuota)' || analysis === '(limite round tool raggiunto)') {
       return res.json({ success: false, error: 'La ricerca web non ha prodotto risultati. Riprova tra qualche minuto.' });

@@ -1,13 +1,27 @@
 /**
- * webSearch.js — Ricerca web on-demand via Brave Search API
+ * webSearch.js — Ricerca web con rotazione a 4 provider gratuiti
+ * Ordine: Tavily (1000/mese) → Brave (1000/mese) → Google CSE (100/giorno, 3000/mese) → Serper (2500 lifetime)
+ * Contatori salvati in MongoDB (collection web_search_counters)
  * Mistral decide autonomamente SE cercare sul web (function calling)
- * Brave Search: 2000 query/mese gratis, no carta di credito
  */
 
+// --- API Keys ---
+const TAVILY_API_KEY = process.env.TAVILY_API_KEY || '';
 const BRAVE_API_KEY = process.env.BRAVE_API_KEY || '';
-const BRAVE_URL = 'https://api.search.brave.com/res/v1/web/search';
+const GOOGLE_CSE_API_KEY = process.env.GOOGLE_CSE_API_KEY || '';
+const GOOGLE_CSE_CX = process.env.GOOGLE_CSE_CX || '';
+const SERPER_API_KEY = process.env.SERPER_API_KEY || '';
 
-// Tool definition per Mistral function calling
+// --- Limiti ---
+const LIMITS = {
+  tavily: 1000,
+  brave: 1000,
+  google_daily: 100,
+  google_monthly: 3000,
+  serper_lifetime: 2500,
+};
+
+// Tool definition per Mistral function calling (invariata)
 const WEB_SEARCH_TOOL = {
   type: 'function',
   function: {
@@ -26,19 +40,45 @@ const WEB_SEARCH_TOOL = {
   },
 };
 
+// ===================== PROVIDER FUNCTIONS =====================
+
 /**
- * Esegue ricerca web via Brave Search API
+ * Tavily Search — POST https://api.tavily.com/search
  */
-async function searchWeb(query) {
-  if (!BRAVE_API_KEY) {
-    return [{ title: 'Ricerca web non configurata', snippet: 'API key Brave Search non impostata. Configurare BRAVE_API_KEY.' }];
-  }
-
-  const url = `${BRAVE_URL}?q=${encodeURIComponent(query)}&count=3&search_lang=it`;
-
+async function searchTavily(query) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 10000);
+  try {
+    const resp = await fetch('https://api.tavily.com/search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        api_key: TAVILY_API_KEY,
+        query,
+        max_results: 3,
+        search_depth: 'basic',
+      }),
+      signal: controller.signal,
+    });
+    if (!resp.ok) throw new Error(`Tavily API ${resp.status}`);
+    const data = await resp.json();
+    return (data.results || []).slice(0, 3).map(r => ({
+      title: r.title,
+      snippet: r.content || r.snippet || '',
+      url: r.url,
+    }));
+  } finally {
+    clearTimeout(timeout);
+  }
+}
 
+/**
+ * Brave Search — GET https://api.search.brave.com/res/v1/web/search
+ */
+async function searchBrave(query) {
+  const url = `https://api.search.brave.com/res/v1/web/search?q=${encodeURIComponent(query)}&count=3&search_lang=it`;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10000);
   try {
     const resp = await fetch(url, {
       headers: {
@@ -48,11 +88,7 @@ async function searchWeb(query) {
       },
       signal: controller.signal,
     });
-
-    if (!resp.ok) {
-      throw new Error(`Brave Search API ${resp.status}`);
-    }
-
+    if (!resp.ok) throw new Error(`Brave Search API ${resp.status}`);
     const data = await resp.json();
     return (data.web?.results || []).slice(0, 3).map(r => ({
       title: r.title,
@@ -65,11 +101,247 @@ async function searchWeb(query) {
 }
 
 /**
+ * Google Custom Search — GET https://www.googleapis.com/customsearch/v1
+ */
+async function searchGoogle(query) {
+  const url = `https://www.googleapis.com/customsearch/v1?key=${GOOGLE_CSE_API_KEY}&cx=${GOOGLE_CSE_CX}&q=${encodeURIComponent(query)}&num=3`;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10000);
+  try {
+    const resp = await fetch(url, { signal: controller.signal });
+    if (!resp.ok) throw new Error(`Google CSE API ${resp.status}`);
+    const data = await resp.json();
+    return (data.items || []).slice(0, 3).map(r => ({
+      title: r.title,
+      snippet: r.snippet || '',
+      url: r.link,
+    }));
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+/**
+ * Serper — POST https://google.serper.dev/search
+ */
+async function searchSerper(query) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10000);
+  try {
+    const resp = await fetch('https://google.serper.dev/search', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-KEY': SERPER_API_KEY,
+      },
+      body: JSON.stringify({ q: query, num: 3 }),
+      signal: controller.signal,
+    });
+    if (!resp.ok) throw new Error(`Serper API ${resp.status}`);
+    const data = await resp.json();
+    return (data.organic || []).slice(0, 3).map(r => ({
+      title: r.title,
+      snippet: r.snippet || '',
+      url: r.link,
+    }));
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+// ===================== CONTATORI MONGODB =====================
+
+const PROVIDER_ORDER = ['tavily', 'brave', 'google', 'serper'];
+const PROVIDER_FN = { tavily: searchTavily, brave: searchBrave, google: searchGoogle, serper: searchSerper };
+const PROVIDER_KEY = { tavily: TAVILY_API_KEY, brave: BRAVE_API_KEY, google: GOOGLE_CSE_API_KEY, serper: SERPER_API_KEY };
+
+/**
+ * Struttura contatori di default (primo uso)
+ */
+function defaultCounters() {
+  const now = new Date();
+  const nextMonth = new Date(now);
+  nextMonth.setMonth(nextMonth.getMonth() + 1);
+
+  const tomorrow = new Date(now);
+  tomorrow.setUTCHours(0, 0, 0, 0);
+  tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
+
+  const nextMonthFirst = new Date(now);
+  nextMonthFirst.setUTCDate(1);
+  nextMonthFirst.setUTCMonth(nextMonthFirst.getUTCMonth() + 1);
+  nextMonthFirst.setUTCHours(0, 0, 0, 0);
+
+  return {
+    _id: 'counters',
+    tavily: { count: 0, reset_date: nextMonth.toISOString() },
+    brave: { count: 0, reset_date: nextMonth.toISOString() },
+    google: {
+      daily_count: 0,
+      daily_reset: tomorrow.toISOString(),
+      monthly_count: 0,
+      monthly_reset: nextMonthFirst.toISOString(),
+    },
+    serper: { lifetime_count: 0 },
+    updated_at: now.toISOString(),
+  };
+}
+
+/**
+ * Reset contatori scaduti
+ */
+function checkAndReset(counters) {
+  const now = new Date();
+
+  // Reset Tavily (mensile dalla data iscrizione)
+  if (now >= new Date(counters.tavily.reset_date)) {
+    counters.tavily.count = 0;
+    const next = new Date(counters.tavily.reset_date);
+    next.setMonth(next.getMonth() + 1);
+    counters.tavily.reset_date = next.toISOString();
+  }
+
+  // Reset Brave (mensile dalla data iscrizione)
+  if (now >= new Date(counters.brave.reset_date)) {
+    counters.brave.count = 0;
+    const next = new Date(counters.brave.reset_date);
+    next.setMonth(next.getMonth() + 1);
+    counters.brave.reset_date = next.toISOString();
+  }
+
+  // Reset Google giornaliero (mezzanotte UTC)
+  if (now >= new Date(counters.google.daily_reset)) {
+    counters.google.daily_count = 0;
+    const tomorrow = new Date(now);
+    tomorrow.setUTCHours(0, 0, 0, 0);
+    tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
+    counters.google.daily_reset = tomorrow.toISOString();
+  }
+
+  // Reset Google mensile (1° del mese)
+  if (now >= new Date(counters.google.monthly_reset)) {
+    counters.google.monthly_count = 0;
+    const next = new Date(now);
+    next.setUTCDate(1);
+    next.setUTCMonth(next.getUTCMonth() + 1);
+    next.setUTCHours(0, 0, 0, 0);
+    counters.google.monthly_reset = next.toISOString();
+  }
+
+  return counters;
+}
+
+/**
+ * Controlla se un provider è disponibile (ha key + quota)
+ */
+function isProviderAvailable(provider, counters) {
+  if (!PROVIDER_KEY[provider]) return false;
+
+  switch (provider) {
+    case 'tavily':
+      return counters.tavily.count < LIMITS.tavily;
+    case 'brave':
+      return counters.brave.count < LIMITS.brave;
+    case 'google':
+      return counters.google.daily_count < LIMITS.google_daily &&
+             counters.google.monthly_count < LIMITS.google_monthly;
+    case 'serper':
+      return counters.serper.lifetime_count < LIMITS.serper_lifetime;
+    default:
+      return false;
+  }
+}
+
+/**
+ * Incrementa contatore atomico su MongoDB
+ */
+async function incrementCounter(db, provider) {
+  const inc = {};
+  if (provider === 'tavily') inc['tavily.count'] = 1;
+  else if (provider === 'brave') inc['brave.count'] = 1;
+  else if (provider === 'google') {
+    inc['google.daily_count'] = 1;
+    inc['google.monthly_count'] = 1;
+  } else if (provider === 'serper') {
+    inc['serper.lifetime_count'] = 1;
+  }
+
+  await db.collection('web_search_counters').updateOne(
+    { _id: 'counters' },
+    { $inc: inc, $set: { updated_at: new Date().toISOString() } }
+  );
+}
+
+/**
+ * Carica contatori da MongoDB (crea se non esistono)
+ */
+async function loadCounters(db) {
+  const col = db.collection('web_search_counters');
+  let doc = await col.findOne({ _id: 'counters' });
+  if (!doc) {
+    doc = defaultCounters();
+    await col.insertOne(doc);
+  }
+  return checkAndReset(doc);
+}
+
+// ===================== SEARCH CON ROTAZIONE =====================
+
+/**
+ * Esegue ricerca web con rotazione automatica tra 4 provider
+ * @param {string} query - La query di ricerca
+ * @param {object} db - Istanza MongoDB (per contatori)
+ */
+async function searchWeb(query, db) {
+  // Senza DB non possiamo gestire contatori — fallback diretto
+  if (!db) {
+    console.warn('[WebSearch] No DB — tentativo diretto senza contatori');
+    for (const provider of PROVIDER_ORDER) {
+      if (!PROVIDER_KEY[provider]) continue;
+      try {
+        const results = await PROVIDER_FN[provider](query);
+        console.log(`[WebSearch] ${provider} OK (no counter)`);
+        return results;
+      } catch (err) {
+        console.warn(`[WebSearch] ${provider} fallito: ${err.message}`);
+      }
+    }
+    return [{ title: 'Ricerca web non disponibile', snippet: 'Nessun provider configurato o tutti in errore.' }];
+  }
+
+  // Carica e resetta contatori
+  const counters = await loadCounters(db);
+
+  // Prova ogni provider in ordine
+  for (const provider of PROVIDER_ORDER) {
+    if (!isProviderAvailable(provider, counters)) {
+      continue;
+    }
+
+    try {
+      const results = await PROVIDER_FN[provider](query);
+      await incrementCounter(db, provider);
+      console.log(`[WebSearch] ${provider} OK (query: "${query.substring(0, 50)}")`);
+      return results;
+    } catch (err) {
+      console.warn(`[WebSearch] ${provider} errore: ${err.message} — passo al successivo`);
+      // NON incrementa contatore se errore
+    }
+  }
+
+  // Tutti esauriti o in errore
+  console.warn('[WebSearch] Tutti i provider esauriti o in errore');
+  return [{ title: 'Ricerca web temporaneamente non disponibile', snippet: 'Tutti i provider hanno raggiunto il limite. Riprova domani.' }];
+}
+
+// ===================== HANDLE TOOL CALLS =====================
+
+/**
  * Gestisce il ciclo tool_call con Mistral
- * Supporta: web_search + tool DB (get_today_matches, search_matches, get_match_details)
+ * Supporta: web_search + tool DB (get_today_matches, search_matches, get_match_details, get_standings)
  * @param {object} reply - Risposta Mistral con tool_calls
  * @param {Array} messages - Storia messaggi
- * @param {object} db - Istanza MongoDB (per tool DB)
+ * @param {object} db - Istanza MongoDB (per tool DB + contatori web search)
  */
 async function handleToolCalls(reply, messages, db) {
   if (!reply.tool_calls || reply.tool_calls.length === 0) {
@@ -102,7 +374,7 @@ async function handleToolCalls(reply, messages, db) {
 
       if (tc.function.name === 'web_search') {
         try {
-          const results = await searchWeb(args.query);
+          const results = await searchWeb(args.query, db);
           content = JSON.stringify(results);
         } catch (err) {
           content = JSON.stringify([{ title: 'Errore ricerca', snippet: err.message }]);

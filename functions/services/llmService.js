@@ -632,9 +632,9 @@ REGOLE ASSOLUTE:
 - NON aggiungere frasi di cortesia o chiusure tipo "buona visione" o "in bocca al lupo"`;
 
 /**
- * Genera analisi "Scout" con ricerca web via Brave Search
+ * Genera analisi "Scout" con ricerca web (rotazione 4 provider)
  */
-async function generateMatchDeepDive(home, away, date, league) {
+async function generateMatchDeepDive(home, away, date, league, db) {
   const { WEB_SEARCH_TOOL, handleToolCalls } = require('./webSearch');
 
   const userMsg = `Ricerca approfondita per: ${home} vs ${away}${league ? ` (${league})` : ''}, partita del ${date}. Usa web_search per trovare tutte le informazioni extra-campo su entrambe le squadre.`;
@@ -656,7 +656,7 @@ async function generateMatchDeepDive(home, away, date, league) {
       { role: 'system', content: DEEPDIVE_PROMPT },
       { role: 'user', content: userMsg },
     ];
-    const finalText = await handleToolCalls(reply, fullMessages, null);
+    const finalText = await handleToolCalls(reply, fullMessages, db);
     return finalText;
   }
 
