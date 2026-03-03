@@ -618,7 +618,7 @@ async function generateMatchAnalysisPremium(contextText) {
 // ══════════════════════════════════════════════
 // DEEPDIVE PROMPT — Analisi contestuale web "Scout"
 // ══════════════════════════════════════════════
-const DEEPDIVE_PROMPT = `Sei un giornalista sportivo investigativo italiano. Raccogli informazioni EXTRA-CAMPO usando web_search. Esegui massimo 3 ricerche. Usa query che coprono più temi insieme.
+const DEEPDIVE_PROMPT = `Sei un giornalista sportivo investigativo italiano. Raccogli informazioni EXTRA-CAMPO usando web_search. Esegui le 5 query obbligatorie.
 
 TEMI DA COPRIRE:
 - Formazioni probabili, infortunati, squalificati, diffidati, rientri, ballottaggi
@@ -631,9 +631,11 @@ DATA DI OGGI: ${TODAY}. Cerca notizie degli ultimi 2-3 giorni.
 QUERY — includi SEMPRE: nome completo squadra + campionato/lega + mese/anno. Se nome ambiguo (es. Trento, Lumezzane), aggiungi città + lega. Mai abbreviazioni.
 
 QUERY OBBLIGATORIE (sostituisci nomi, allenatore, mese e anno):
-1. "[SquadraCasa] [SquadraOspite] probabili formazioni squalificati infortunati {LEAGUE} [mese anno]"
-2. "[SquadraCasa] conferenza stampa [allenatore] [mese anno]"
-3. "[SquadraOspite] conferenza stampa [allenatore] [mese anno]"
+1. "[SquadraCasa] convocati [mese anno]"
+2. "[SquadraOspite] squalificati infortunati [mese anno]"
+3. "[SquadraCasa] [SquadraOspite] probabili formazioni {LEAGUE}"
+4. "[SquadraCasa] conferenza stampa [allenatore] [mese anno]"
+5. "[SquadraOspite] conferenza stampa [allenatore] [mese anno]"
 
 OUTPUT — Articolo in prosa (~300-400 parole), 4 sezioni con titoli in grassetto:
 **Formazioni e assenze** — titolari, infortunati, squalificati, diffidati, ballottaggi
