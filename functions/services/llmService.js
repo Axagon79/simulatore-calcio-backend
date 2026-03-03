@@ -666,6 +666,14 @@ DATA DI OGGI: ${TODAY}. Cerca notizie degli ultimi 2-3 giorni.
 REGOLA CRITICA — QUERY PRECISE:
 Le query di ricerca devono SEMPRE includere tutti e tre: nome squadra + campionato/lega + data (o "oggi"/"prossima giornata"). Esempio: NON cercare "Inter infortunati" ma "Inter U23 Serie C girone A squalificati marzo 2026". Questo evita confusione tra squadre omonime. Se il nome della squadra è ambiguo o poco noto (es. Dolomiti, Trento, Lumezzane), aggiungi SEMPRE il nome completo ufficiale + città + lega nella query. Non usare MAI nomi abbreviati o soprannomi nelle query di ricerca.
 
+QUERY OBBLIGATORIE — eseguile ESATTAMENTE così (sostituendo i nomi delle squadre, allenatore, mese e anno):
+
+1. "[SquadraCasa] convocati [mese anno]"
+2. "[SquadraOspite] squalificati infortunati [mese anno]"
+3. "[SquadraCasa] [SquadraOspite] probabili formazioni {LEAGUE}"
+4. "[SquadraCasa] conferenza stampa [allenatore] [mese anno]"
+5. "[SquadraOspite] conferenza stampa [allenatore] [mese anno]"
+
 OUTPUT — Scrivi un articolo giornalistico in prosa fluida (~300-400 parole) con ESATTAMENTE queste 4 sezioni (usa i nomi in grassetto come titoli):
 
 **Formazioni e assenze** — titolari, infortunati, squalificati, diffidati, ballottaggi
@@ -699,8 +707,10 @@ async function generateMatchDeepDive(home, away, date, league, db) {
 
   const userMsg = `Ricerca approfondita per: ${home} vs ${away}${league ? ` (${league})` : ''}, partita del ${date}. Usa web_search per trovare tutte le informazioni extra-campo su entrambe le squadre.`;
 
+  const systemPrompt = DEEPDIVE_PROMPT.replace('{LEAGUE}', league || '');
+
   const messages = [
-    { role: 'system', content: DEEPDIVE_PROMPT },
+    { role: 'system', content: systemPrompt },
     { role: 'user', content: userMsg },
   ];
 
@@ -713,7 +723,7 @@ async function generateMatchDeepDive(home, away, date, league, db) {
   // Se Groq ha chiesto tool calls, gestisci il ciclo (passa callGroq per i round successivi)
   if (reply.tool_calls && reply.tool_calls.length > 0) {
     const fullMessages = [
-      { role: 'system', content: DEEPDIVE_PROMPT },
+      { role: 'system', content: systemPrompt },
       { role: 'user', content: userMsg },
     ];
     const finalText = await handleToolCalls(reply, fullMessages, db, callGroq);
