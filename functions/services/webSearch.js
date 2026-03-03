@@ -55,7 +55,7 @@ async function searchTavily(query) {
       body: JSON.stringify({
         api_key: TAVILY_API_KEY,
         query,
-        max_results: 5,
+        max_results: 3,
         search_depth: 'advanced',
         topic: 'news',
         time_range: 'week',
@@ -67,8 +67,9 @@ async function searchTavily(query) {
     const data = await resp.json();
     return (data.results || []).slice(0, 3).map(r => ({
       title: r.title,
-      snippet: r.content || r.snippet || '',
+      snippet: (r.content || r.snippet || '').substring(0, 500),
       url: r.url,
+      published_date: r.published_date || null,
     }));
   } finally {
     clearTimeout(timeout);
@@ -95,7 +96,7 @@ async function searchBrave(query) {
     const data = await resp.json();
     return (data.web?.results || []).slice(0, 3).map(r => ({
       title: r.title,
-      snippet: r.description,
+      snippet: (r.description || '').substring(0, 500),
       url: r.url,
     }));
   } finally {
@@ -116,7 +117,7 @@ async function searchGoogle(query) {
     const data = await resp.json();
     return (data.items || []).slice(0, 3).map(r => ({
       title: r.title,
-      snippet: r.snippet || '',
+      snippet: (r.snippet || '').substring(0, 500),
       url: r.link,
     }));
   } finally {
@@ -144,7 +145,7 @@ async function searchSerper(query) {
     const data = await resp.json();
     return (data.organic || []).slice(0, 3).map(r => ({
       title: r.title,
-      snippet: r.snippet || '',
+      snippet: (r.snippet || '').substring(0, 500),
       url: r.link,
     }));
   } finally {
@@ -411,8 +412,8 @@ async function handleToolCalls(reply, messages, db, callFn) {
       });
     }
 
-    // Richiama LLM con i risultati dei tool
-    currentReply = await callLLM(messages);
+    // Richiama LLM con i risultati dei tool (maxTokens ridotto per rispettare limiti TPM)
+    currentReply = await callLLM(messages, { maxTokens: 1000 });
 
     // Se non ci sono altre tool_calls, abbiamo la risposta finale
     if (!currentReply.tool_calls || currentReply.tool_calls.length === 0) {
