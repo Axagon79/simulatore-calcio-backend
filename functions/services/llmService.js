@@ -638,7 +638,7 @@ const LEAGUE_SITES = {
   'Europa League': 'uefa.com, goal.com, skysports.com, 90min.com',
 };
 
-const DEEPDIVE_PROMPT = `Sei un giornalista sportivo investigativo italiano. Raccogli informazioni EXTRA-CAMPO usando web_search. Esegui le 5 query obbligatorie.
+const DEEPDIVE_PROMPT = `Sei un giornalista sportivo investigativo italiano. Raccogli informazioni EXTRA-CAMPO usando web_search. Esegui ESATTAMENTE le 3 query obbligatorie.
 
 TEMI DA COPRIRE:
 - Formazioni probabili, infortunati, squalificati, diffidati, rientri, ballottaggi
@@ -654,12 +654,10 @@ Usa questi siti come riferimento nelle query. I risultati sono già filtrati su 
 
 QUERY — includi SEMPRE: nome completo squadra + campionato/lega + mese/anno. Se nome ambiguo (es. Trento, Lumezzane), aggiungi città + lega. Mai abbreviazioni.
 
-QUERY OBBLIGATORIE (sostituisci nomi, allenatore, mese e anno):
-1. "[SquadraCasa] sito ufficiale convocati news [mese anno]"
-2. "[SquadraOspite] sito ufficiale convocati news [mese anno]"
-3. "[SquadraCasa] [SquadraOspite] probabili formazioni squalificati infortunati {LEAGUE}"
-4. "[SquadraCasa] conferenza stampa [allenatore] [mese anno]"
-5. "[SquadraOspite] conferenza stampa [allenatore] [mese anno]"
+QUERY OBBLIGATORIE (sostituisci nomi, mese e anno):
+1. "[SquadraCasa] [SquadraOspite] probabili formazioni squalificati infortunati convocati {LEAGUE} [mese anno]"
+2. "[SquadraCasa] conferenza stampa notizie ultime ore {LEAGUE} [mese anno]"
+3. "[SquadraOspite] conferenza stampa notizie ultime ore {LEAGUE} [mese anno]"
 
 OUTPUT — Articolo in prosa (~300-400 parole), 4 sezioni con titoli in grassetto:
 **Formazioni e assenze** — titolari, infortunati, squalificati, diffidati, ballottaggi

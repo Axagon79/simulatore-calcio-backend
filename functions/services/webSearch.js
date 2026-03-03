@@ -114,7 +114,7 @@ async function searchTavily(query, domains = []) {
     const data = await resp.json();
     return (data.results || []).slice(0, 3).map(r => ({
       title: r.title,
-      snippet: (r.content || r.snippet || '').substring(0, 800),
+      snippet: (r.content || r.snippet || '').substring(0, 1500),
       url: r.url,
       published_date: r.published_date || null,
     }));
@@ -143,7 +143,7 @@ async function searchBrave(query) {
     const data = await resp.json();
     return (data.web?.results || []).slice(0, 3).map(r => ({
       title: r.title,
-      snippet: (r.description || '').substring(0, 800),
+      snippet: (r.description || '').substring(0, 1500),
       url: r.url,
     }));
   } finally {
@@ -164,7 +164,7 @@ async function searchGoogle(query) {
     const data = await resp.json();
     return (data.items || []).slice(0, 3).map(r => ({
       title: r.title,
-      snippet: (r.snippet || '').substring(0, 800),
+      snippet: (r.snippet || '').substring(0, 1500),
       url: r.link,
     }));
   } finally {
@@ -192,7 +192,7 @@ async function searchSerper(query) {
     const data = await resp.json();
     return (data.organic || []).slice(0, 3).map(r => ({
       title: r.title,
-      snippet: (r.snippet || '').substring(0, 800),
+      snippet: (r.snippet || '').substring(0, 1500),
       url: r.link,
     }));
   } finally {
