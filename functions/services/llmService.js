@@ -322,6 +322,58 @@ async function callMistral(messages, options = {}) {
 }
 
 /**
+ * Chiama Groq API (Llama 3.3 70B) — usato solo per Scout (DEEPDIVE)
+ * API compatibile OpenAI, formato risposta normalizzato come callMistral
+ */
+async function callGroq(messages, options = {}) {
+  const { temperature = 0.5, maxTokens = 1500, tools = [] } = options;
+
+  const body = {
+    model: 'llama-3.3-70b-versatile',
+    messages,
+    temperature,
+    max_tokens: maxTokens,
+  };
+
+  if (tools.length > 0) {
+    body.tools = tools;
+    body.tool_choice = 'auto';
+  }
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 30000);
+
+  try {
+    const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
+      },
+      body: JSON.stringify(body),
+      signal: controller.signal,
+    });
+
+    if (!resp.ok) {
+      const errText = await resp.text();
+      throw new Error(`Groq API ${resp.status}: ${errText}`);
+    }
+
+    const data = await resp.json();
+    const choice = data.choices[0];
+
+    // Normalizza al formato interno (identico a callMistral — deve avere role per i round successivi)
+    return {
+      role: 'assistant',
+      content: choice.message.content || '',
+      tool_calls: choice.message.tool_calls || [],
+    };
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+/**
  * Costruisce la riga di contesto pagina/utente
  */
 function buildUserInfoLine(userInfo) {
@@ -612,7 +664,7 @@ BLOCCO 4 — Contesto partita:
 DATA DI OGGI: ${TODAY}. Cerca notizie degli ultimi 2-3 giorni.
 
 REGOLA CRITICA — QUERY PRECISE:
-Le query di ricerca devono SEMPRE includere tutti e tre: nome squadra + campionato/lega + data (o "oggi"/"prossima giornata"). Esempio: NON cercare "Inter infortunati" ma "Inter Serie C girone X infortunati 2026". Questo evita confusione tra squadre omonime (Inter prima squadra vs Inter U23), squadre riserve o giovanili con le prime squadre. Se il campionato è una serie minore o giovanile, includerlo SEMPRE esplicitamente nella query.
+Le query di ricerca devono SEMPRE includere tutti e tre: nome squadra + campionato/lega + data (o "oggi"/"prossima giornata"). Esempio: NON cercare "Inter infortunati" ma "Inter U23 Serie C girone A squalificati marzo 2026". Questo evita confusione tra squadre omonime. Se il nome della squadra è ambiguo o poco noto (es. Dolomiti, Trento, Lumezzane), aggiungi SEMPRE il nome completo ufficiale + città + lega nella query. Non usare MAI nomi abbreviati o soprannomi nelle query di ricerca.
 
 OUTPUT — Scrivi un articolo giornalistico in prosa fluida (~300-400 parole) con ESATTAMENTE queste 4 sezioni (usa i nomi in grassetto come titoli):
 
@@ -628,7 +680,14 @@ REGOLE ASSOLUTE:
 - Tono: cronista sportivo Gazzetta dello Sport. Informativo, scorrevole, mai banale
 - Scrivi SEMPRE in italiano
 - NON inventare MAI informazioni non trovate nelle ricerche web — OGNI dato che citi DEVE provenire dai risultati di web_search
+- NON citare MAI il nome dell'allenatore a meno che non sia esplicitamente confermato in un articolo degli ULTIMI 7 GIORNI — gli allenatori cambiano spesso e un nome sbagliato è peggio di nessun nome
+- NON citare MAI nomi di giocatori squalificati, infortunati o diffidati a meno che non siano esplicitamente associati a QUESTA partita specifica in una fonte recente — non basta che un giocatore appaia nel roster
+- Verifica SEMPRE che i giocatori citati appartengano effettivamente alla squadra menzionata — non confondere giocatori di squadre dello stesso girone o omonime
+- Usa il nome ESATTO della squadra come appare nelle fonti — non abbreviare, non modificare, non confondere con sponsor o denominazioni simili
+- Se una fonte ha più di 30 giorni, NON usarla per dati che cambiano spesso (allenatore, squalificati, infortunati) — usala solo per contesto storico
 - Se non trovi informazioni su una sezione, saltala — non riempire con banalità
+- Se trovi notizie contrastanti su allenatore o formazione, cita SOLO la fonte più recente e segnala l'incertezza ("secondo le ultime notizie...")
+- NON scrivere mai "nessuna notizia rilevante è emersa" se non hai esplicitamente cercato — cerca prima, poi concludi
 - NON aggiungere frasi di cortesia o chiusure tipo "buona visione" o "in bocca al lupo"`;
 
 /**
@@ -644,19 +703,19 @@ async function generateMatchDeepDive(home, away, date, league, db) {
     { role: 'user', content: userMsg },
   ];
 
-  const reply = await callMistral(messages, {
+  const reply = await callGroq(messages, {
     temperature: 0.5,
     maxTokens: 1500,
     tools: [WEB_SEARCH_TOOL],
   });
 
-  // Se Mistral ha chiesto tool calls, gestisci il ciclo
+  // Se Groq ha chiesto tool calls, gestisci il ciclo (passa callGroq per i round successivi)
   if (reply.tool_calls && reply.tool_calls.length > 0) {
     const fullMessages = [
       { role: 'system', content: DEEPDIVE_PROMPT },
       { role: 'user', content: userMsg },
     ];
-    const finalText = await handleToolCalls(reply, fullMessages, db);
+    const finalText = await handleToolCalls(reply, fullMessages, db, callGroq);
     return finalText;
   }
 
@@ -802,4 +861,4 @@ async function chatDashboard(userMessage, history = []) {
   return reply.content;
 }
 
-module.exports = { generateAnalysis, chatWithContext, chatDashboard, callMistral, generateMatchAnalysisPremium, generateMatchDeepDive, SYSTEM_PROMPT };
+module.exports = { generateAnalysis, chatWithContext, chatDashboard, callMistral, callGroq, generateMatchAnalysisPremium, generateMatchDeepDive, SYSTEM_PROMPT };

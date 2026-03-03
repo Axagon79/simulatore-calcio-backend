@@ -337,19 +337,21 @@ async function searchWeb(query, db) {
 // ===================== HANDLE TOOL CALLS =====================
 
 /**
- * Gestisce il ciclo tool_call con Mistral
+ * Gestisce il ciclo tool_call con LLM (Mistral o Groq)
  * Supporta: web_search + tool DB (get_today_matches, search_matches, get_match_details, get_standings)
- * @param {object} reply - Risposta Mistral con tool_calls
+ * @param {object} reply - Risposta LLM con tool_calls
  * @param {Array} messages - Storia messaggi
  * @param {object} db - Istanza MongoDB (per tool DB + contatori web search)
+ * @param {function} [callFn] - Funzione LLM da usare nei round successivi (default: callMistral)
  */
-async function handleToolCalls(reply, messages, db) {
+async function handleToolCalls(reply, messages, db, callFn) {
   if (!reply.tool_calls || reply.tool_calls.length === 0) {
     return reply.content;
   }
 
   const { callMistral } = require('./llmService');
   const { executeDbTool } = require('./dbTools');
+  const callLLM = callFn || callMistral;
   const MAX_ROUNDS = 5;
 
   let currentReply = reply;
@@ -397,8 +399,8 @@ async function handleToolCalls(reply, messages, db) {
       });
     }
 
-    // Richiama Mistral con i risultati dei tool
-    currentReply = await callMistral(messages);
+    // Richiama LLM con i risultati dei tool
+    currentReply = await callLLM(messages);
 
     // Se non ci sono altre tool_calls, abbiamo la risposta finale
     if (!currentReply.tool_calls || currentReply.tool_calls.length === 0) {
