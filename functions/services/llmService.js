@@ -626,24 +626,39 @@ async function generateMatchAnalysisPremium(contextText) {
 
 // Mappa compatta campionato → siti di riferimento (per il prompt)
 const LEAGUE_SITES = {
-  'Serie A': 'gazzetta.it, corrieredellosport.it, tuttomercatoweb.com, calciomercato.com, skysport.it',
-  'Serie B': 'gazzetta.it, corrieredellosport.it, tuttomercatoweb.com, calciomercato.com, skysport.it',
-  'Serie C': 'tuttoc.com, trivenetogoal.it, notiziariocalcio.com, tsportinthecity.it',
-  'Premier League': 'premierleague.com, bbc.com/sport, skysports.com, 90min.com, football365.com',
-  'Championship': 'skysports.com, bbc.com/sport, football365.com, sportsmole.co.uk',
-  'La Liga': 'as.com, marca.com, mundodeportivo.com, footballespana.net',
-  'LaLiga 2': 'as.com, marca.com, sportsmole.co.uk',
-  'Bundesliga': 'bundesliga.com, bulinews.com, 90min.com',
-  '2. Bundesliga': 'bundesliga.com, bulinews.com, sportsmole.co.uk',
-  'Ligue 1': 'gffn.com, sofoot.com, footmercato.net',
-  'Ligue 2': 'gffn.com, sofoot.com, footmercato.net',
-  'Eredivisie': 'vi.nl, voetbalzone.nl',
-  'Liga Portugal': 'maisfutebol.iol.pt, record.pt',
-  'Champions League': 'uefa.com, goal.com, skysports.com, 90min.com',
-  'Europa League': 'uefa.com, goal.com, skysports.com, 90min.com',
+  'Serie A': 'gazzetta.it, corrieredellosport.it, tuttomercatoweb.com, calciomercato.com, skysport.it, news.bet365.it',
+  'Serie B': 'gazzetta.it, corrieredellosport.it, tuttomercatoweb.com, calciomercato.com, skysport.it, news.bet365.it',
+  'Serie C': 'tuttoc.com, trivenetogoal.it, notiziariocalcio.com, tsportinthecity.it, tuttocampo.it, news.bet365.it',
+  'Premier League': 'premierleague.com, bbc.com/sport, skysports.com, 90min.com, football365.com, news.bet365.it',
+  'Championship': 'skysports.com, bbc.com/sport, football365.com, sportsmole.co.uk, news.bet365.it',
+  'La Liga': 'as.com, marca.com, mundodeportivo.com, footballespana.net, news.bet365.it',
+  'LaLiga 2': 'as.com, marca.com, sportsmole.co.uk, news.bet365.it',
+  'Bundesliga': 'bundesliga.com, bulinews.com, 90min.com, news.bet365.it',
+  '2. Bundesliga': 'bundesliga.com, bulinews.com, sportsmole.co.uk, news.bet365.it',
+  'Ligue 1': 'gffn.com, sofoot.com, footmercato.net, news.bet365.it',
+  'Ligue 2': 'gffn.com, sofoot.com, footmercato.net, news.bet365.it',
+  'Eredivisie': 'vi.nl, voetbalzone.nl, news.bet365.it',
+  'Liga Portugal': 'maisfutebol.iol.pt, record.pt, news.bet365.it',
+  // Europa Nordici + Extra
+  'Scottish Premiership': 'scotsman.com, dailyrecord.co.uk, sportsgambler.com',
+  'Allsvenskan': 'sportsgambler.com, sofascore.com, fotbollskanalen.se',
+  'Eliteserien': 'sportsgambler.com, sofascore.com, vg.no',
+  'Superligaen': 'sportsgambler.com, sofascore.com, boldklubben.dk',
+  'Jupiler Pro League': 'sportsgambler.com, sofascore.com, sporza.be',
+  'Süper Lig': 'sportsgambler.com, sofascore.com, trtspor.com.tr',
+  'League of Ireland': 'extratime.com, sportsgambler.com, sofascore.com',
+  // Americhe
+  'Brasileirão': 'ge.globo.com, sportsgambler.com, sofascore.com',
+  'Primera División': 'infobae.com, ole.com.ar, sportsgambler.com',
+  'MLS': 'mlssoccer.com, sportsgambler.com, sofascore.com',
+  // Asia
+  'J1 League': 'jsgoal.jp, sportsgambler.com, sofascore.com',
+  // Coppe
+  'Champions League': 'uefa.com, goal.com, skysports.com',
+  'Europa League': 'uefa.com, goal.com, skysports.com',
 };
 
-const DEEPDIVE_PROMPT = `Sei un giornalista sportivo investigativo italiano. Raccogli informazioni EXTRA-CAMPO usando web_search. Esegui ESATTAMENTE le 3 query obbligatorie.
+const DEEPDIVE_PROMPT = `Sei un giornalista sportivo investigativo italiano. Raccogli informazioni EXTRA-CAMPO usando web_search. Esegui ESATTAMENTE le 7 query obbligatorie.
 
 TEMI DA COPRIRE:
 - Formazioni probabili, infortunati, squalificati, diffidati, rientri, ballottaggi
@@ -654,7 +669,7 @@ TEMI DA COPRIRE:
 DATA DI OGGI: ${TODAY}. Cerca notizie degli ultimi 2-3 giorni.
 
 SITI DI RIFERIMENTO per {LEAGUE}: {LEAGUE_SITES}
-Universali: sportsgambler.com, injuriesandsuspensions.com, sofascore.com
+Universali: sportsgambler.com, injuriesandsuspensions.com, sofascore.com, news.bet365.it, forebet.com, windrawwin.com
 Usa questi siti come riferimento nelle query. I risultati sono già filtrati su questi domini.
 
 QUERY — includi SEMPRE: nome completo squadra + campionato/lega + mese/anno. Se nome ambiguo (es. Trento, Lumezzane), aggiungi città + lega. Mai abbreviazioni.
@@ -663,6 +678,10 @@ QUERY OBBLIGATORIE (sostituisci nomi, mese e anno):
 1. "[SquadraCasa] [SquadraOspite] probabili formazioni squalificati infortunati convocati {LEAGUE} [mese anno]"
 2. "[SquadraCasa] conferenza stampa notizie ultime ore {LEAGUE} [mese anno]"
 3. "[SquadraOspite] conferenza stampa notizie ultime ore {LEAGUE} [mese anno]"
+4. "[SquadraCasa] [SquadraOspite] tifosi ambiente stadio tensioni societarie [mese anno]"
+5. "[SquadraCasa] [SquadraOspite] pronostico tipster quote scommesse [mese anno]"
+6. "[SquadraCasa] sito ufficiale convocati conferenza stampa notizie [mese anno]"
+7. "[SquadraOspite] sito ufficiale convocati conferenza stampa notizie [mese anno]"
 
 OUTPUT — Articolo in prosa (~300-400 parole), 4 sezioni con titoli in grassetto:
 **Formazioni e assenze** — titolari, infortunati, squalificati, diffidati, ballottaggi
@@ -683,6 +702,8 @@ REGOLE:
 - Sezione senza info: saltala, mai banalità
 - Cerca PRIMA di concludere "nessuna notizia"
 - Tono: cronista Gazzetta dello Sport, in italiano
+- Calibra il linguaggio al livello reale della competizione: Serie C e Serie B sono terza/seconda divisione italiana — evita toni e drammatizzazioni da calcio internazionale
+- Dati insufficienti: se non hai informazioni sufficienti su una sezione, scrivi esplicitamente "Non sono disponibili notizie recenti su [argomento]" — MAI inferire o inventare contesto plausibile per riempire il testo
 - Mai frasi di cortesia o chiusure`;
 
 /**
@@ -694,7 +715,10 @@ async function generateMatchDeepDive(home, away, date, league, db) {
 
   const userMsg = `Ricerca approfondita per: ${home} vs ${away}${league ? ` (${league})` : ''}, partita del ${date}. Usa web_search per trovare tutte le informazioni extra-campo su entrambe le squadre.`;
 
-  const leagueSites = LEAGUE_SITES[league] || 'sportsgambler.com, sofascore.com, injuriesandsuspensions.com';
+  const leagueKey = Object.keys(LEAGUE_SITES).find(k =>
+    k.toLowerCase() === league.toLowerCase() || league.toLowerCase().includes(k.toLowerCase())
+  );
+  const leagueSites = (leagueKey && LEAGUE_SITES[leagueKey]) || 'sportsgambler.com, sofascore.com, injuriesandsuspensions.com';
   const systemPrompt = DEEPDIVE_PROMPT
     .replace('{LEAGUE}', league || '')
     .replace('{LEAGUE_SITES}', leagueSites);

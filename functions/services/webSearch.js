@@ -45,7 +45,7 @@ const LEAGUE_DOMAINS = {
   // Italia
   'Serie A': ['gazzetta.it', 'corrieredellosport.it', 'tuttosport.com', 'tuttomercatoweb.com', 'calciomercato.com', 'skysport.it', 'sportsgambler.com'],
   'Serie B': ['gazzetta.it', 'corrieredellosport.it', 'tuttosport.com', 'tuttomercatoweb.com', 'calciomercato.com', 'skysport.it', 'sportsgambler.com'],
-  'Serie C': ['tuttoc.com', 'trivenetogoal.it', 'notiziariocalcio.com', 'tsportinthecity.it', 'sportsgambler.com'],
+  'Serie C': ['tuttoc.com', 'trivenetogoal.it', 'notiziariocalcio.com', 'tsportinthecity.it', 'tuttocampo.it', 'news.bet365.it', 'forebet.com', 'windrawwin.com', 'sportsgambler.com'],
   // Europa Top 5
   'Premier League': ['premierleague.com', 'bbc.com', 'skysports.com', '90min.com', 'football365.com', 'sportsgambler.com'],
   'Championship': ['skysports.com', 'bbc.com', 'football365.com', 'sportsmole.co.uk', 'sportsgambler.com'],
