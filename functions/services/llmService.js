@@ -658,7 +658,7 @@ const LEAGUE_SITES = {
   'Europa League': 'uefa.com, goal.com, skysports.com',
 };
 
-const DEEPDIVE_PROMPT = `Sei un giornalista sportivo investigativo italiano. Raccogli informazioni EXTRA-CAMPO usando web_search. Esegui ESATTAMENTE le 7 query obbligatorie.
+const DEEPDIVE_PROMPT = `Sei un giornalista sportivo investigativo italiano. Raccogli informazioni EXTRA-CAMPO usando web_search. Esegui ESATTAMENTE le 5 query obbligatorie.
 
 TEMI DA COPRIRE:
 - Formazioni probabili, infortunati, squalificati, diffidati, rientri, ballottaggi
@@ -680,8 +680,6 @@ QUERY OBBLIGATORIE (sostituisci nomi, mese e anno):
 3. "[SquadraOspite] conferenza stampa notizie ultime ore {LEAGUE} [mese anno]"
 4. "[SquadraCasa] [SquadraOspite] tifosi ambiente stadio tensioni societarie [mese anno]"
 5. "[SquadraCasa] [SquadraOspite] pronostico tipster quote scommesse [mese anno]"
-6. "[SquadraCasa] sito ufficiale convocati conferenza stampa notizie [mese anno]"
-7. "[SquadraOspite] sito ufficiale convocati conferenza stampa notizie [mese anno]"
 
 OUTPUT — Articolo in prosa (~300-400 parole), 4 sezioni con titoli in grassetto:
 **Formazioni e assenze** — titolari, infortunati, squalificati, diffidati, ballottaggi
