@@ -409,7 +409,7 @@ router.get('/track-record', async (req, res) => {
     if (league) query.league = { $regex: new RegExp(league, 'i') };
 
     const predictions = await req.db.collection('daily_predictions_unified')
-      .find(query, { projection: { _id: 0 } }).toArray();
+      .find(query, { projection: { _id: 0, date: 1, league: 1, pronostici: 1, odds: 1 } }).toArray();
 
     // 2. Estrai pronostici verificati (con esito già calcolato dal P/L)
     const verified = [];
