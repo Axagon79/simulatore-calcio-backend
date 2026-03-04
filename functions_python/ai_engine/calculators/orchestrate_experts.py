@@ -925,6 +925,76 @@ def _apply_segno_mc_filter(unified, simulation_data, odds):
 
 
 # =====================================================
+# DEDUP GOL CORRELATI
+# =====================================================
+# Tabella: (pronostico_A, pronostico_B) → chi rimuovere (A o B)
+# Se entrambi presenti sulla stessa partita, rimuovi il perdente
+_GOL_DEDUP_RULES = {
+    # Over + Over → tieni il più sicuro (soglia bassa)
+    ('Over 2.5', 'Over 1.5'): 'Over 2.5',
+    ('Over 1.5', 'Over 3.5'): 'Over 3.5',
+    ('Over 2.5', 'Over 3.5'): 'Over 3.5',
+    # Under + Under → tieni il più sicuro (soglia alta)
+    ('Under 2.5', 'Under 3.5'): 'Under 2.5',
+    # Over + Goal → varie
+    ('Over 2.5', 'Goal'): 'Over 2.5',       # GG 83% HR > O2.5 50%
+    ('Over 1.5', 'Goal'): 'Goal',            # O1.5 ~100% HR
+    ('Over 3.5', 'Goal'): 'Goal',            # O3.5 forte → tieni O3.5
+    # Over + No Goal → tieni Over (Over è la previsione forte)
+    ('Over 1.5', 'No Goal'): 'No Goal',
+    ('Over 2.5', 'No Goal'): 'No Goal',
+    ('Over 3.5', 'No Goal'): 'No Goal',
+    # Under + Goal → conflitto, tieni Under
+    ('Under 2.5', 'Goal'): 'Goal',
+    ('Under 3.5', 'Goal'): 'Goal',
+    # Under + No Goal → ridondante, tieni Under
+    ('Under 3.5', 'No Goal'): 'No Goal',
+    # Under + Over → conflitto, tieni Under
+    ('Under 2.5', 'Over 1.5'): 'Over 1.5',
+    ('Under 3.5', 'Over 1.5'): 'Over 1.5',
+}
+
+
+def _dedup_gol_correlati(unified):
+    """
+    Rimuove pronostici GOL ridondanti o in conflitto sulla stessa partita.
+    Usa la tabella _GOL_DEDUP_RULES per decidere chi rimuovere.
+    """
+    gol_preds = [(i, p.get('pronostico', '')) for i, p in enumerate(unified) if p.get('tipo') == 'GOL']
+    if len(gol_preds) < 2:
+        return unified
+
+    to_remove = set()
+
+    # Controlla ogni coppia
+    for a_idx in range(len(gol_preds)):
+        for b_idx in range(a_idx + 1, len(gol_preds)):
+            i_a, name_a = gol_preds[a_idx]
+            i_b, name_b = gol_preds[b_idx]
+
+            # Cerca nella tabella (ordine A,B o B,A)
+            loser = _GOL_DEDUP_RULES.get((name_a, name_b))
+            if loser is None:
+                loser = _GOL_DEDUP_RULES.get((name_b, name_a))
+
+            if loser is not None:
+                if loser == name_a:
+                    to_remove.add(i_a)
+                elif loser == name_b:
+                    to_remove.add(i_b)
+
+    if to_remove:
+        removed = [f"{unified[i].get('pronostico', '')}@{unified[i].get('quota', 0):.2f}({unified[i].get('source', '')})"
+                   for i in sorted(to_remove)]
+        kept = [f"{p.get('pronostico', '')}@{p.get('quota', 0):.2f}"
+                for i, p in enumerate(unified) if p.get('tipo') == 'GOL' and i not in to_remove]
+        print(f"    🔀 DEDUP GOL: rimosso {', '.join(removed)}, tenuto {', '.join(kept)}")
+        unified = [p for i, p in enumerate(unified) if i not in to_remove]
+
+    return unified
+
+
+# =====================================================
 # MAPPING PREDIZIONE → CHIAVE MERCATO
 # =====================================================
 def market_key(pred):
@@ -1370,6 +1440,9 @@ def orchestrate_date(date_str, dry_run=False):
             sim_data_mc = c_doc_for_combo.get('simulation_data')
             if sim_data_mc:
                 unified_pronostici = _apply_segno_mc_filter(unified_pronostici, sim_data_mc, match_odds)
+
+        # --- DEDUP GOL CORRELATI: rimuove ridondanze/conflitti tra pronostici GOL ---
+        unified_pronostici = _dedup_gol_correlati(unified_pronostici)
 
         if not unified_pronostici:
             continue
