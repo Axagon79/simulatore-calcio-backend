@@ -768,11 +768,6 @@ def _apply_segno_mc_filter(unified, simulation_data, odds):
     segno = segno_pred.get('pronostico', '')
     quota = segno_pred.get('quota', 0) or 0
 
-    # Proteggi SEGNO prodotti da combo (hanno HR altissimi)
-    routing = segno_pred.get('routing_rule', '')
-    if routing and routing != 'single':
-        return unified
-
     # --- Calcola metriche dai top4 ---
     signs = []
     total_goals = 0
@@ -1278,12 +1273,6 @@ def orchestrate_date(date_str, dry_run=False):
         # --- POST-PROCESSING: Scrematura SEGNO per fasce di quota ---
         unified_pronostici = _apply_segno_scrematura(unified_pronostici, match_odds, base_doc)
 
-        # --- POST-PROCESSING: Filtro SEGNO basato su Top4 Monte Carlo ---
-        if c_doc_for_combo:
-            sim_data_mc = c_doc_for_combo.get('simulation_data')
-            if sim_data_mc:
-                unified_pronostici = _apply_segno_mc_filter(unified_pronostici, sim_data_mc, match_odds)
-
         # --- DEDUP: Over/Under conflitto S8F vs A → S8F vince ---
         # S8F (scrematura) ROI 4.2% vs A ROI 1.2% → solo contro fonte A
         s8f_preds = [p for p in unified_pronostici if '_screm' in (p.get('source') or '')]
@@ -1375,6 +1364,12 @@ def orchestrate_date(date_str, dry_run=False):
                     seen_pron[pron] = i
         if dedup_remove:
             unified_pronostici = [p for i, p in enumerate(unified_pronostici) if i not in dedup_remove]
+
+        # --- ULTIMO FILTRO: SEGNO basato su Top4 Monte Carlo ---
+        if c_doc_for_combo:
+            sim_data_mc = c_doc_for_combo.get('simulation_data')
+            if sim_data_mc:
+                unified_pronostici = _apply_segno_mc_filter(unified_pronostici, sim_data_mc, match_odds)
 
         if not unified_pronostici:
             continue
