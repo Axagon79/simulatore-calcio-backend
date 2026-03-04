@@ -700,8 +700,8 @@ REGOLE:
 - Sezione senza info: saltala, mai banalità
 - Cerca PRIMA di concludere "nessuna notizia"
 - Tono: cronista Gazzetta dello Sport, in italiano
-- Calibra il linguaggio al livello reale della competizione: Serie C e Serie B sono terza/seconda divisione italiana — evita toni e drammatizzazioni da calcio internazionale
-- Dati insufficienti: se non hai informazioni sufficienti su una sezione, scrivi esplicitamente "Non sono disponibili notizie recenti su [argomento]" — MAI inferire o inventare contesto plausibile per riempire il testo
+- Se mancano dati su una sezione, saltala — ma elabora sempre in modo ricco e dettagliato i dati che HAI trovato, con contesto e analisi (~300-400 parole totali)
+- MAI includere frammenti di URL, domini (.it, .com) o nomi di siti nel testo dell'articolo
 - Mai frasi di cortesia o chiusure`;
 
 /**
