@@ -682,9 +682,10 @@ REGOLE:
 
 /**
  * Genera analisi "Scout" con ricerca web (rotazione 4 provider)
+ * Include compressione snippet via Mistral se i token stimati superano 9.000
  */
 async function generateMatchDeepDive(home, away, date, league, db) {
-  const { WEB_SEARCH_TOOL, handleToolCalls } = require('./webSearch');
+  const { WEB_SEARCH_TOOL, searchWeb } = require('./webSearch');
 
   const userMsg = `Ricerca approfondita per: ${home} vs ${away}${league ? ` (${league})` : ''}, partita del ${date}. Usa web_search per trovare tutte le informazioni extra-campo su entrambe le squadre.`;
 
@@ -698,23 +699,88 @@ async function generateMatchDeepDive(home, away, date, league, db) {
     { role: 'user', content: userMsg },
   ];
 
+  // 1. Prima chiamata Groq → ottiene tool_calls (3 query web obbligatorie)
   const reply = await callGroq(messages, {
     temperature: 0.5,
     maxTokens: 1000,
     tools: [WEB_SEARCH_TOOL],
   });
 
-  // Se Groq ha chiesto tool calls, gestisci il ciclo (passa callGroq per i round successivi)
-  if (reply.tool_calls && reply.tool_calls.length > 0) {
-    const fullMessages = [
-      { role: 'system', content: systemPrompt },
-      { role: 'user', content: userMsg },
-    ];
-    const finalText = await handleToolCalls(reply, fullMessages, db, callGroq, league);
-    return finalText;
+  // Se nessun tool call, ritorna direttamente
+  if (!reply.tool_calls || reply.tool_calls.length === 0) {
+    return reply.content;
   }
 
-  return reply.content;
+  // 2. Processa i tool calls manualmente (searchWeb per ogni query)
+  messages.push(reply);
+  const snippetTexts = [];
+
+  for (const tc of reply.tool_calls) {
+    let args;
+    try {
+      args = JSON.parse(tc.function.arguments);
+    } catch {
+      args = typeof tc.function.arguments === 'string' ? { query: tc.function.arguments } : {};
+    }
+
+    let content;
+    try {
+      const results = await searchWeb(args.query, db, league);
+      content = JSON.stringify(results);
+    } catch (err) {
+      content = JSON.stringify([{ title: 'Errore ricerca', snippet: err.message }]);
+    }
+
+    snippetTexts.push(content);
+    messages.push({
+      role: 'tool',
+      tool_call_id: tc.id,
+      name: tc.function.name,
+      content,
+    });
+  }
+
+  // 3. Stima token (~1 token ogni 4 caratteri)
+  const totalChars = messages.reduce((sum, m) => {
+    const txt = m.content || JSON.stringify(m.tool_calls || '');
+    return sum + txt.length;
+  }, 0);
+  const estimatedTokens = Math.ceil(totalChars / 4);
+  console.log(`🔎 [Scout] Token stimati: ${estimatedTokens} (${totalChars} chars, ${snippetTexts.length} snippet)`);
+
+  // 4. Se > 9000 token → comprimi snippet con Mistral prima della chiamata finale
+  if (estimatedTokens > 9000) {
+    console.log(`🔎 [Scout] Compressione snippet con Mistral (${estimatedTokens} > 9000)`);
+
+    const allSnippets = snippetTexts.join('\n\n---\n\n');
+    const compressReply = await callMistral([
+      { role: 'user', content: `Sei un editor sportivo. Comprimi queste notizie in un riassunto conciso (~1500 caratteri) mantenendo TUTTI i dati concreti: nomi giocatori infortunati/squalificati, formazioni probabili, dichiarazioni allenatori, date e risultati recenti. Elimina ridondanze e frasi generiche.\n\nNOTIZIE:\n${allSnippets}` },
+    ], { temperature: 0.3, maxTokens: 800 });
+
+    const compressedText = compressReply.content || '';
+    console.log(`🔎 [Scout] Snippet compressi: ${allSnippets.length} → ${compressedText.length} chars`);
+
+    // Ricostruisci messaggi: system + user + contesto compresso (senza tool flow)
+    const compressedMessages = [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: `${userMsg}\n\nEcco le informazioni raccolte dalla ricerca web (già sintetizzate):\n\n${compressedText}` },
+    ];
+
+    const finalReply = await callGroq(compressedMessages, {
+      temperature: 0.5,
+      maxTokens: 1000,
+    });
+
+    return finalReply.content || '(risposta vuota)';
+  }
+
+  // 5. Token OK → chiamata finale Groq con i tool results originali
+  const finalReply = await callGroq(messages, {
+    temperature: 0.5,
+    maxTokens: 1000,
+  });
+
+  return finalReply.content || '(risposta vuota)';
 }
 
 // ══════════════════════════════════════════════
