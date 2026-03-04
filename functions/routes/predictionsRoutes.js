@@ -2,6 +2,10 @@
 const express = require('express');
 const router = express.Router();
 
+// --- CACHE: Track Record (TTL 5 minuti) ---
+const trackRecordCache = new Map();
+const CACHE_TTL = 5 * 60 * 1000; // 5 minuti
+
 // --- HELPER: Parse real_score → { home, away, total, sign } ---
 function parseScore(realScore) {
   if (!realScore || typeof realScore !== 'string') return null;
@@ -404,6 +408,14 @@ router.get('/track-record', async (req, res) => {
   console.log(`📊 [TRACK-RECORD] Richiesta: ${from} → ${to} | league=${league || 'tutte'} | market=${market || 'tutti'} | sezione=${sezione || 'tutto'}`);
 
   try {
+    // Cache check (chiave = tutti i parametri della richiesta)
+    const cacheKey = `${from}|${to}|${league || ''}|${market || ''}|${min_confidence || ''}|${min_quota || ''}|${max_quota || ''}|${sezione || ''}`;
+    const cached = trackRecordCache.get(cacheKey);
+    if (cached && (Date.now() - cached.ts) < CACHE_TTL) {
+      console.log(`⚡ [TRACK-RECORD] Cache hit (${Math.round((Date.now() - cached.ts) / 1000)}s old)`);
+      return res.json(cached.data);
+    }
+
     // 1. Query da daily_predictions_unified (MoE — sistema attuale)
     const query = { date: { $gte: from, $lte: to } };
     if (league) query.league = { $regex: new RegExp(league, 'i') };
@@ -724,7 +736,7 @@ router.get('/track-record', async (req, res) => {
 
     console.log(`✅ [TRACK-RECORD] ${verified.length} pronostici verificati (${pronosticiItems.length} pronostici + ${arItems.length} AR), hit rate globale: ${globale.hit_rate}%`);
 
-    return res.json({
+    const result = {
       success: true,
       periodo: { from, to },
       filtri: { league: league || null, market: market || null, min_confidence: min_confidence || null, min_quota: min_quota || null, max_quota: max_quota || null, sezione: sezione || null },
@@ -743,7 +755,12 @@ router.get('/track-record', async (req, res) => {
       cross_quota_mercato,
       cross_mercato_campionato,
       serie_temporale
-    });
+    };
+
+    // Salva in cache
+    trackRecordCache.set(cacheKey, { data: result, ts: Date.now() });
+
+    return res.json(result);
   } catch (error) {
     console.error('❌ [TRACK-RECORD] Errore:', error);
     return res.status(500).json({ error: 'Errore nel calcolo track record', details: error.message });
