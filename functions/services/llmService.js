@@ -315,7 +315,12 @@ async function callMistral(messages, options = {}) {
     }
 
     const data = await resp.json();
-    return data.choices[0].message;
+    const msg = data.choices[0].message;
+    // Mistral può restituire content come [{type:'text', text:'...'}] — normalizza a stringa
+    if (Array.isArray(msg.content)) {
+      msg.content = msg.content.map(c => c.text || '').join('');
+    }
+    return msg;
   } finally {
     clearTimeout(timeout);
   }

@@ -78,7 +78,7 @@ const LEAGUE_DOMAINS = {
 
 // Top league dove include_domains è utile (siti prevedibili e affidabili)
 const TOP_LEAGUES_FOR_DOMAINS = new Set([
-  'Serie A', 'Serie B', 'Premier League', 'La Liga', 'Bundesliga', 'Ligue 1',
+  'Serie A', 'Serie B', 'Serie C', 'Premier League', 'La Liga', 'Bundesliga', 'Ligue 1',
   'Champions League', 'Europa League',
 ]);
 
