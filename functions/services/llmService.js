@@ -750,10 +750,10 @@ async function generateMatchDeepDive(home, away, date, league, db) {
 
   // 4. Se > 9000 token → comprimi snippet con Mistral prima della chiamata finale
   if (estimatedTokens > 9000) {
-    console.log(`🔎 [Scout] Compressione snippet con Mistral (${estimatedTokens} > 9000)`);
+    console.log(`🔎 [Scout] Compressione snippet con Groq (${estimatedTokens} > 9000)`);
 
     const allSnippets = snippetTexts.join('\n\n---\n\n');
-    const compressReply = await callMistral([
+    const compressReply = await callGroq([
       { role: 'user', content: `Sei un editor sportivo. Comprimi queste notizie in un riassunto conciso (~1500 caratteri) mantenendo TUTTI i dati concreti: nomi giocatori infortunati/squalificati, formazioni probabili, dichiarazioni allenatori, date e risultati recenti. Elimina ridondanze e frasi generiche.\n\nNOTIZIE:\n${allSnippets}` },
     ], { temperature: 0.3, maxTokens: 800 });
 
@@ -766,7 +766,7 @@ async function generateMatchDeepDive(home, away, date, league, db) {
       { role: 'user', content: `${userMsg}\n\nEcco le informazioni raccolte dalla ricerca web (già sintetizzate):\n\n${compressedText}` },
     ];
 
-    const finalReply = await callGroq(compressedMessages, {
+    const finalReply = await callMistral(compressedMessages, {
       temperature: 0.5,
       maxTokens: 1000,
     });
@@ -774,8 +774,8 @@ async function generateMatchDeepDive(home, away, date, league, db) {
     return finalReply.content || '(risposta vuota)';
   }
 
-  // 5. Token OK → chiamata finale Groq con i tool results originali
-  const finalReply = await callGroq(messages, {
+  // 5. Token OK → chiamata finale Mistral con i tool results originali
+  const finalReply = await callMistral(messages, {
     temperature: 0.5,
     maxTokens: 1000,
   });
