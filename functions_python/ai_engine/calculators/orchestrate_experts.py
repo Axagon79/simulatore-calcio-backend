@@ -736,6 +736,200 @@ def _apply_segno_scrematura(unified, odds, base_doc):
 
 
 # =====================================================
+# FILTRO SEGNO basato su Top4 Monte Carlo
+# =====================================================
+# Regole validate su 134 partite (13/02-03/03):
+#   Algo: 68% HR, +26.56u | Con filtro: 76% HR, +31.35u, 0.352u/bet
+# Pattern: classifica i top4 MC scores per segno e applica regole
+# Decisioni: TIENI (mantieni segno), CONVERTI (→ O1.5), BLOCCA (rimuovi)
+
+def _apply_segno_mc_filter(unified, simulation_data, odds):
+    """
+    Filtro SEGNO basato su pattern Monte Carlo top4.
+    Classifica la concordanza tra pronostico SEGNO e top4 MC scores,
+    poi decide: TIENI / CONVERTI a O1.5 / BLOCCA.
+    """
+    # Trova il pronostico SEGNO
+    segno_pred = None
+    segno_idx = None
+    for i, p in enumerate(unified):
+        if p.get('tipo') == 'SEGNO' and p.get('pronostico') in ('1', '2', 'X'):
+            segno_pred = p
+            segno_idx = i
+            break
+
+    if segno_pred is None or simulation_data is None:
+        return unified
+
+    top_scores = simulation_data.get('top_scores', [])[:4]
+    if len(top_scores) < 4:
+        return unified
+
+    segno = segno_pred.get('pronostico', '')
+    quota = segno_pred.get('quota', 0) or 0
+
+    # Proteggi SEGNO prodotti da combo (hanno HR altissimi)
+    routing = segno_pred.get('routing_rule', '')
+    if routing and routing != 'single':
+        return unified
+
+    # --- Calcola metriche dai top4 ---
+    signs = []
+    total_goals = 0
+    max_margin = 0
+    gg_count = 0
+    counts = []
+
+    for sp in top_scores:
+        score = sp[0] if isinstance(sp, list) else sp
+        count = sp[1] if isinstance(sp, list) and len(sp) > 1 else 0
+        counts.append(count)
+        sign = _score_to_sign(score)
+        if sign:
+            signs.append(sign)
+        parts = str(score).replace(':', '-').split('-')
+        if len(parts) == 2:
+            try:
+                h, a = int(parts[0]), int(parts[1])
+                total_goals += h + a
+                margin = abs(h - a)
+                if margin > max_margin:
+                    max_margin = margin
+                if h > 0 and a > 0:
+                    gg_count += 1
+            except ValueError:
+                pass
+
+    if len(signs) < 4:
+        return unified
+
+    # Conta segni
+    sign_counts = {}
+    for s in signs:
+        sign_counts[s] = sign_counts.get(s, 0) + 1
+    pron_count = sign_counts.get(segno, 0)
+    unique_signs = len(sign_counts)
+    opposite = '2' if segno == '1' else ('1' if segno == '2' else None)
+    has_opposite = sign_counts.get(opposite, 0) > 0 if opposite else False
+    spread = max(counts) - min(counts) if counts else 0
+
+    # --- Albero decisionale ---
+    decision = 'TIENI'
+    reason = ''
+
+    # TRIPLA: tutti e 3 i segni presenti
+    if unique_signs == 3:
+        if total_goals >= 9:
+            decision = 'BLOCCA'
+            reason = 'TRIPLA + gol>=9 (0% HR storico)'
+        elif 1.65 <= quota < 1.80:
+            decision = 'BLOCCA'
+            reason = 'TRIPLA fascia 1.65-1.80 (30% HR storico)'
+        else:
+            decision = 'TIENI'
+            reason = f'TRIPLA fascia ok (quota {quota:.2f})'
+
+    # ASSENTE: segno pronosticato 0/4
+    elif pron_count == 0:
+        if gg_count >= 2:
+            decision = 'CONVERTI'
+            reason = 'ASSENTE + GG>=2 → O1.5'
+        else:
+            decision = 'BLOCCA'
+            reason = 'ASSENTE senza gol'
+
+    # 4/4: unanime
+    elif pron_count == 4:
+        decision = 'TIENI'
+        reason = '4/4 unanime (81% HR)'
+
+    # 3su4 + X (pareggio)
+    elif pron_count == 3 and not has_opposite:
+        if max_margin >= 3:
+            decision = 'TIENI'
+            reason = f'3su4+X margine {max_margin}>=3 (93% HR)'
+        elif max_margin == 2:
+            if total_goals >= 8:
+                decision = 'CONVERTI'
+                reason = f'3su4+X margine=2 gol={total_goals}>=8 → O1.5'
+            else:
+                decision = 'BLOCCA'
+                reason = f'3su4+X margine=2 gol={total_goals}<8 (56% HR)'
+        else:
+            decision = 'CONVERTI'
+            reason = f'3su4+X margine {max_margin}<=1 → O1.5'
+
+    # 3su4 + OPPOSTO
+    elif pron_count == 3 and has_opposite:
+        if spread < 5:
+            decision = 'BLOCCA'
+            reason = f'3su4+OPP spread={spread}<5 (50% HR)'
+        else:
+            decision = 'CONVERTI'
+            reason = f'3su4+OPP spread={spread}>=5 → O1.5'
+
+    # 2su4
+    elif pron_count == 2:
+        if total_goals <= 5:
+            decision = 'TIENI'
+            reason = f'2su4 gol={total_goals}<=5 (81% HR)'
+        else:
+            decision = 'BLOCCA'
+            reason = f'2su4 gol={total_goals}>5 (50% HR)'
+
+    # 1su4 o altro
+    else:
+        decision = 'BLOCCA'
+        reason = f'pron_count={pron_count} non classificato'
+
+    # --- Applica decisione ---
+    result = list(unified)
+
+    if decision == 'TIENI':
+        print(f"    🎯 FILTRO MC: SEGNO {segno} @{quota:.2f} → TIENI ({reason})")
+        return result
+
+    elif decision == 'CONVERTI':
+        over15_q = odds.get('over_15', 0) or 0
+        if over15_q >= 1.10:
+            # Crea sostituto O1.5
+            prob = segno_pred.get('probabilita_stimata', 70)
+            sost = {
+                'tipo': 'GOL',
+                'pronostico': 'Over 1.5',
+                'quota': over15_q,
+                'confidence': segno_pred.get('confidence', 60),
+                'stars': segno_pred.get('stars', 3),
+                'source': segno_pred.get('source', '') + '_mc_conv',
+                'routing_rule': 'mc_filter_convert',
+                'has_odds': True,
+            }
+            if over15_q > 1.0:
+                prob_mkt = 1.0 / over15_q
+                edge = (prob / 100.0) - prob_mkt
+                if edge > 0:
+                    kelly = 0.75 * (edge * over15_q - (1 - edge)) / (over15_q - 1)
+                    sost['stake'] = max(1, min(10, round(kelly * 10)))
+                else:
+                    sost['stake'] = 1
+                sost['edge'] = round(edge * 100, 1)
+                sost['prob_mercato'] = round(prob_mkt * 100, 1)
+                sost['probabilita_stimata'] = prob
+            result[segno_idx] = sost
+            print(f"    🔄 FILTRO MC: SEGNO {segno} @{quota:.2f} → CONVERTI O1.5 @{over15_q:.2f} ({reason})")
+        else:
+            # No quote O1.5 disponibili → blocca
+            result.pop(segno_idx)
+            print(f"    🚫 FILTRO MC: SEGNO {segno} @{quota:.2f} → BLOCCA (converti ma no O1.5 disponibile)")
+        return result
+
+    else:  # BLOCCA
+        result.pop(segno_idx)
+        print(f"    🚫 FILTRO MC: SEGNO {segno} @{quota:.2f} → BLOCCA ({reason})")
+        return result
+
+
+# =====================================================
 # MAPPING PREDIZIONE → CHIAVE MERCATO
 # =====================================================
 def market_key(pred):
@@ -1084,6 +1278,12 @@ def orchestrate_date(date_str, dry_run=False):
         # --- POST-PROCESSING: Scrematura SEGNO per fasce di quota ---
         unified_pronostici = _apply_segno_scrematura(unified_pronostici, match_odds, base_doc)
 
+        # --- POST-PROCESSING: Filtro SEGNO basato su Top4 Monte Carlo ---
+        if c_doc_for_combo:
+            sim_data_mc = c_doc_for_combo.get('simulation_data')
+            if sim_data_mc:
+                unified_pronostici = _apply_segno_mc_filter(unified_pronostici, sim_data_mc, match_odds)
+
         # --- DEDUP: Over/Under conflitto S8F vs A → S8F vince ---
         # S8F (scrematura) ROI 4.2% vs A ROI 1.2% → solo contro fonte A
         s8f_preds = [p for p in unified_pronostici if '_screm' in (p.get('source') or '')]
@@ -1143,6 +1343,38 @@ def orchestrate_date(date_str, dry_run=False):
             p for p in unified_pronostici
             if (p.get('quota') or 0) >= 1.35
         ]
+
+        # --- DEDUP CROSS-SISTEMA: stesso pronostico, fonti diverse → tieni fonte migliore ---
+        SOURCE_PRIORITY = {
+            'A+S': 1, 'A+S_mg': 1,
+            'C_screm': 2, 'S8F': 2,
+            'A': 3, 'S': 3,
+            'C': 4, 'C_dg35': 4,
+            'A_flip': 5, 'A_flip_mg': 5,
+            'MC_xdraw': 6,
+        }
+        seen_pron = {}
+        dedup_remove = set()
+        for i, p in enumerate(unified_pronostici):
+            pron = p.get('pronostico', '')
+            if pron:
+                if pron in seen_pron:
+                    j = seen_pron[pron]
+                    old = unified_pronostici[j]
+                    old_prio = SOURCE_PRIORITY.get(old.get('source', ''), 99)
+                    new_prio = SOURCE_PRIORITY.get(p.get('source', ''), 99)
+                    if new_prio < old_prio:
+                        dedup_remove.add(j)
+                        seen_pron[pron] = i
+                    else:
+                        dedup_remove.add(i)
+                    winner = unified_pronostici[seen_pron[pron]]
+                    loser_src = p.get('source') if new_prio >= old_prio else old.get('source')
+                    print(f"    🔀 DEDUP: {pron} — tenuto {winner.get('source')}, rimosso {loser_src}")
+                else:
+                    seen_pron[pron] = i
+        if dedup_remove:
+            unified_pronostici = [p for i, p in enumerate(unified_pronostici) if i not in dedup_remove]
 
         if not unified_pronostici:
             continue
