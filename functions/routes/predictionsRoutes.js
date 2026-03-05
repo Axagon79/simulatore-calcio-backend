@@ -472,8 +472,10 @@ router.get('/track-record', async (req, res) => {
         if (min_quota && (quota === null || quota < parseFloat(min_quota))) continue;
         if (max_quota && (quota === null || quota > parseFloat(max_quota))) continue;
 
-        // Classificazione Pronostici (≤2.50) vs Alto Rendimento (>2.50)
-        const sez = (quota != null && quota > 2.50) ? 'alto_rendimento' : 'pronostici';
+        // Classificazione Pronostici vs Alto Rendimento
+        // DC: soglia >= 2.00 (copre 2 esiti, quota 2.00 = 50% prob implicita), altri: > 2.50
+        const sogliaAR = (p.tipo === 'DOPPIA_CHANCE') ? 2.00 : 2.51;
+        const sez = (quota != null && quota >= sogliaAR) ? 'alto_rendimento' : 'pronostici';
 
         const item = {
           date: pred.date,
@@ -789,9 +791,10 @@ router.get('/bankroll-stats', async (req, res) => {
       for (const p of (doc.pronostici || [])) {
         if (p.profit_loss === undefined || p.profit_loss === null) continue;
         if (p.stake === undefined || p.stake === 0) continue;
-        // Applica filtro quota se richiesto
-        if (quotaFilter === 'low' && p.quota && p.quota > 2.50) continue;
-        if (quotaFilter === 'high' && (!p.quota || p.quota <= 2.50)) continue;
+        // Applica filtro quota se richiesto (DC soglia 2.00, altri 2.50)
+        const sogliaAR_bk = (p.tipo === 'DOPPIA_CHANCE') ? 2.00 : 2.51;
+        if (quotaFilter === 'low' && p.quota && p.quota >= sogliaAR_bk) continue;
+        if (quotaFilter === 'high' && (!p.quota || p.quota < sogliaAR_bk)) continue;
         allBets.push({
           date: doc.date,
           league: doc.league,
