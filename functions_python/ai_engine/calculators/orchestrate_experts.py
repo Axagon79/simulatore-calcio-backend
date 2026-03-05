@@ -955,6 +955,61 @@ _GOL_DEDUP_RULES = {
 }
 
 
+def _add_exact_score_predictions(unified, c_doc):
+    """Aggiunge pronostici RISULTATO_ESATTO basati su strategia MC.
+    Filtri: somma top4 counts 35-39 o 65-69, Pos1 count 10-11, Pos2 count 20-21.
+    Backtest: 28.9% successo su 728 partite, BE 3.45."""
+    if not c_doc:
+        return unified
+    sim_data = c_doc.get('simulation_data', {})
+    top_scores = sim_data.get('top_scores', [])
+    if len(top_scores) < 4:
+        return unified
+
+    sum_counts = sum(ts[1] for ts in top_scores[:4])
+    if not ((35 <= sum_counts <= 39) or (65 <= sum_counts <= 69)):
+        return unified
+
+    added = []
+    c1 = top_scores[0][1]
+    c2 = top_scores[1][1]
+
+    if 10 <= c1 <= 11:
+        score = str(top_scores[0][0]).replace('-', ':')
+        unified.append({
+            'pronostico': score,
+            'tipo': 'RISULTATO_ESATTO',
+            'source': 'MC_RE',
+            'quota': None,
+            'stake': None,
+            'confidence': c1,
+            'mc_position': 1,
+            'mc_count': c1,
+            'mc_sum': sum_counts,
+        })
+        added.append(f"Pos1 {score} (count {c1})")
+
+    if 20 <= c2 <= 21:
+        score = str(top_scores[1][0]).replace('-', ':')
+        unified.append({
+            'pronostico': score,
+            'tipo': 'RISULTATO_ESATTO',
+            'source': 'MC_RE',
+            'quota': None,
+            'stake': None,
+            'confidence': c2,
+            'mc_position': 2,
+            'mc_count': c2,
+            'mc_sum': sum_counts,
+        })
+        added.append(f"Pos2 {score} (count {c2})")
+
+    if added:
+        print(f"    RE: somma={sum_counts}, {', '.join(added)}")
+
+    return unified
+
+
 def _dedup_gol_correlati(unified):
     """
     Rimuove pronostici GOL ridondanti o in conflitto sulla stessa partita.
@@ -1443,6 +1498,9 @@ def orchestrate_date(date_str, dry_run=False):
 
         # --- DEDUP GOL CORRELATI: rimuove ridondanze/conflitti tra pronostici GOL ---
         unified_pronostici = _dedup_gol_correlati(unified_pronostici)
+
+        # --- RISULTATO ESATTO MC (admin-only, bonus separato) ---
+        unified_pronostici = _add_exact_score_predictions(unified_pronostici, c_doc_for_combo)
 
         if not unified_pronostici:
             continue
