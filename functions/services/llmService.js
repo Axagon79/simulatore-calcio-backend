@@ -275,7 +275,8 @@ REGOLE:
 - Parti SEMPRE dal pronostico finale, poi spiega i segnali a favore e contro
 - NON ripetere MAI la stessa struttura/elenco in risposte successive — ogni risposta deve aggiungere informazioni NUOVE
 - Se l'utente incalza o rilancia, chiama ALTRI tool per avere dati nuovi, non ripetere i punti gia detti
-- Fai i calcoli aritmetici con PRECISIONE (es. 58-49=9, non 8)`;
+- Fai i calcoli aritmetici con PRECISIONE (es. 58-49=9, non 8)
+- Nei derby e nelle rivalita storiche il fattore campo pesa molto meno. Se riconosci un derby, ridimensiona il fattore campo — non trattarlo come una normale partita casa/trasferta`;
 
 /**
  * Chiama Mistral API via fetch nativo
