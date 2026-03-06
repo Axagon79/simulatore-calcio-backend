@@ -886,7 +886,7 @@ def _apply_segno_mc_filter(unified, simulation_data, odds):
 
     elif decision == 'CONVERTI':
         over15_q = odds.get('over_15', 0) or 0
-        if over15_q >= 1.10:
+        if over15_q >= 1.35:
             # Crea sostituto O1.5
             prob = segno_pred.get('probabilita_stimata', 70)
             sost = {
