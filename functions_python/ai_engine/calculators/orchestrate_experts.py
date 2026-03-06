@@ -1557,6 +1557,25 @@ def orchestrate_date(date_str, dry_run=False):
         # Inserisci nuovi
         coll.insert_many(unified_docs)
 
+        # Salva richieste quote RE per lo scraper SNAI
+        re_requests = []
+        for doc in unified_docs:
+            for p in doc.get('pronostici', []):
+                if p.get('tipo') == 'RISULTATO_ESATTO':
+                    re_requests.append({
+                        'home': doc['home'],
+                        'away': doc['away'],
+                        'league': doc.get('league', ''),
+                        'score': p['pronostico'],
+                        'date': date_str,
+                        'status': 'pending',
+                        'created_at': datetime.now(timezone.utc),
+                    })
+        if re_requests:
+            db['re_quota_requests'].delete_many({'date': date_str})
+            db['re_quota_requests'].insert_many(re_requests)
+            print(f"    RE quota requests: {len(re_requests)} salvate")
+
     return len(unified_docs)
 
 
