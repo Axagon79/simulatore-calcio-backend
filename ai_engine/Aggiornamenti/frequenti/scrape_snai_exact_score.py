@@ -177,22 +177,38 @@ def click_mostra_di_piu(driver):
 def click_risultati_tab(driver):
     """Clicca il bottone 'RISULTATI' nella griglia filtri ScommesseFiltersList.
     NOTA: i bottoni sono duplicati (mobile/desktop). Serve l'ULTIMO match."""
-    try:
-        risultati_btn = None
-        buttons = driver.find_elements(
-            By.CSS_SELECTOR, '[class*="ScommesseFiltersList_button"]'
-        )
-        for btn in buttons:
-            if btn.text.strip().upper() == 'RISULTATI':
-                risultati_btn = btn  # prendi l'ultimo (desktop)
-        if risultati_btn:
-            driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", risultati_btn)
-            time.sleep(1)
-            driver.execute_script("arguments[0].click();", risultati_btn)
-            time.sleep(5)
-            return True
-    except Exception as e:
-        print(f"    Errore click 'RISULTATI': {e}")
+    max_attempts = 2
+    for attempt in range(max_attempts):
+        try:
+            risultati_btn = None
+            buttons = driver.find_elements(
+                By.CSS_SELECTOR, '[class*="ScommesseFiltersList_button"]'
+            )
+            for btn in buttons:
+                if btn.text.strip().upper() == 'RISULTATI':
+                    risultati_btn = btn  # prendi l'ultimo (desktop)
+            if risultati_btn:
+                driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", risultati_btn)
+                time.sleep(1)
+                driver.execute_script("arguments[0].click();", risultati_btn)
+                # Attendi che il dropdown RE appaia (polling fino a 10s)
+                for _ in range(10):
+                    time.sleep(1)
+                    dropdowns = driver.find_elements(By.CSS_SELECTOR, '[class*="ScommesseTableQuotaSelectContainer_button"]')
+                    if dropdowns:
+                        return True
+                # Dropdown non apparso — retry con scroll top + Mostra di piu
+                if attempt < max_attempts - 1:
+                    print(f"    Dropdown RE non apparso, retry ({attempt+1}/{max_attempts})...")
+                    driver.execute_script("window.scrollTo(0, 0);")
+                    time.sleep(1)
+                    click_mostra_di_piu(driver)
+                    time.sleep(1)
+                    continue
+                # Ultimo tentativo fallito, procedi comunque
+                return True
+        except Exception as e:
+            print(f"    Errore click 'RISULTATI': {e}")
     return False
 
 
@@ -324,6 +340,9 @@ def process_requests():
 
             print(f"\n  [{league}] Navigando... ({len(reqs)} richieste)")
             driver.get(url)
+            time.sleep(4)
+            # Refresh per partire puliti (evita stato residuo dalla lega precedente)
+            driver.refresh()
             time.sleep(5)
 
             if first_page:
