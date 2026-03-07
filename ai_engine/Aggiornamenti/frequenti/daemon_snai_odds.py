@@ -175,5 +175,38 @@ def run_snai_loop():
         print(f" ✅ Quote RE completate — {datetime.now().strftime('%H:%M:%S')}")
 
 
+def run_re_loop():
+    """Loop indipendente: scarica quote RE ogni ora al minuto :30, con pausa pipeline."""
+    print(f"\n 💎 DAEMON QUOTE RE avviato — ogni ora al :30")
+    while True:
+        # Pausa pipeline notturna (03:30-09:00)
+        if is_pipeline_window():
+            time.sleep(60)
+            continue
+
+        # Calcola i secondi al prossimo :30
+        now = datetime.now()
+        prossimo = now.replace(minute=30, second=0, microsecond=0)
+        if now >= prossimo:
+            prossimo = prossimo + timedelta(hours=1)
+        attesa = (prossimo - datetime.now()).total_seconds()
+
+        time.sleep(max(0, attesa))
+
+        # Ricontrolla pausa dopo il sleep
+        if is_pipeline_window():
+            continue
+
+        print(f"\n 💎 [RE] Avvio scraper quote RE — {datetime.now().strftime('%H:%M:%S')}")
+        try:
+            run_re_scraper()
+        except Exception as e:
+            print(f"\n❌ [RE] Errore: {e}")
+        print(f" ✅ [RE] Quote RE completate — {datetime.now().strftime('%H:%M:%S')}")
+
+
 if __name__ == "__main__":
+    import threading
+    t = threading.Thread(target=run_re_loop, daemon=True)
+    t.start()
     run_snai_loop()
