@@ -133,6 +133,11 @@ def _apply_multigol(unified, odds):
     if not zone:
         return unified
 
+    # Se c'è Over 2.5 tra i pronostici e la zona è sotto 3-5, upgrade a 3-5 per coerenza
+    has_over25 = any(p.get('pronostico') == 'Over 2.5' for p in unified)
+    if has_over25 and zone['range'] not in ('3-5',):
+        zone = next((z for z in MULTIGOL_ZONES if z['range'] == '3-5'), zone)
+
     # Calcola prob e quota MG per questa zona
     mg_prob = sum(probs[g] for g in zone['goals'])
     mg_quota = round((1 / mg_prob) * MULTIGOL_MARGINE, 2) if mg_prob > 0 else 99
