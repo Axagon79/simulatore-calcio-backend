@@ -133,11 +133,6 @@ def _apply_multigol(unified, odds):
     if not zone:
         return unified
 
-    # Se c'è Over 2.5 tra i pronostici e la zona è sotto 3-5, upgrade a 3-5 per coerenza
-    has_over25 = any(p.get('pronostico') == 'Over 2.5' for p in unified)
-    if has_over25 and zone['range'] not in ('3-5',):
-        zone = next((z for z in MULTIGOL_ZONES if z['range'] == '3-5'), zone)
-
     # Calcola prob e quota MG per questa zona
     mg_prob = sum(probs[g] for g in zone['goals'])
     mg_quota = round((1 / mg_prob) * MULTIGOL_MARGINE, 2) if mg_prob > 0 else 99
@@ -1462,6 +1457,34 @@ def orchestrate_date(date_str, dry_run=False):
             p for p in unified_pronostici
             if (p.get('quota') or 0) >= 1.35
         ]
+
+        # --- COERENZA MG + Over 2.5: upgrade a MG 3-5 ---
+        has_over25 = any(p.get('pronostico') == 'Over 2.5' for p in unified_pronostici)
+        has_mg = next((p for p in unified_pronostici if (p.get('pronostico') or '').startswith('MG ')), None)
+        if has_over25 and has_mg and has_mg['pronostico'] != 'MG 3-5':
+            old_mg = has_mg['pronostico']
+            # Ricalcola quota per zona 3-5
+            u25 = match_odds.get('under_25')
+            if u25:
+                try:
+                    l_tot = _calc_lambda(float(u25))
+                    if l_tot:
+                        zone_35 = next((z for z in MULTIGOL_ZONES if z['range'] == '3-5'), None)
+                        if zone_35:
+                            probs_mg = {g: _poisson(g, l_tot) for g in range(11)}
+                            mg_prob = sum(probs_mg[g] for g in zone_35['goals'])
+                            mg_quota = round((1 / mg_prob) * MULTIGOL_MARGINE, 2) if mg_prob > 0 else 99
+                            has_mg['pronostico'] = 'MG 3-5'
+                            has_mg['quota'] = mg_quota
+                            has_mg['multigol_detail'] = {
+                                'lambda': round(l_tot, 3),
+                                'zone': '3-5',
+                                'goals': zone_35['goals'],
+                                'prob': round(mg_prob * 100, 1),
+                            }
+                            print(f"    🔄 COERENZA MG: {old_mg} → MG 3-5 @{mg_quota} (Over 2.5 presente)")
+                except (TypeError, ValueError):
+                    pass
 
         # --- DEDUP CROSS-SISTEMA: stesso pronostico, fonti diverse → tieni fonte migliore ---
         SOURCE_PRIORITY = {
