@@ -68,6 +68,7 @@ _kill_orphan_chrome()
 
 # Import dello scraper SNAI esistente
 from scrape_snai_odds import run_scraper
+from scrape_snai_exact_score import process_requests as run_re_scraper
 
 # CONFIGURAZIONE — Orari fissi di esecuzione (ore del giorno)
 ORARI_RUN = [1, 9, 12, 15, 18, 21, 23]
@@ -164,6 +165,14 @@ def run_snai_loop():
             print(f"\n❌ Errore durante lo scarico SNAI: {e}")
 
         print(f" ✅ Scraper completato — {datetime.now().strftime('%H:%M:%S')}")
+
+        # --- QUOTE RISULTATO ESATTO ---
+        print(f"\n 💎 Avvio scraper quote RE — {datetime.now().strftime('%H:%M:%S')}")
+        try:
+            run_re_scraper()
+        except Exception as e:
+            print(f"\n❌ Errore durante lo scarico quote RE: {e}")
+        print(f" ✅ Quote RE completate — {datetime.now().strftime('%H:%M:%S')}")
 
 
 if __name__ == "__main__":
