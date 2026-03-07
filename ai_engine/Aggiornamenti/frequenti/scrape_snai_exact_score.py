@@ -310,6 +310,33 @@ def process_requests():
         print("  Nessuna richiesta RE pendente")
         return 0
 
+    # Scarta partite già iniziate
+    now = datetime.now()
+    active = []
+    for req in requests:
+        match_doc = db['daily_predictions_unified'].find_one(
+            {'home': req['home'], 'away': req['away'], 'date': req['date']},
+            {'time': 1}
+        )
+        time_str = match_doc.get('time', '23:59') if match_doc else '23:59'
+        try:
+            match_dt = datetime.strptime(f"{req['date']} {time_str}", "%Y-%m-%d %H:%M")
+        except ValueError:
+            match_dt = datetime.strptime(req['date'], "%Y-%m-%d").replace(hour=23, minute=59)
+        if now >= match_dt:
+            print(f"    {req['home']} vs {req['away']} — partita già iniziata, skip")
+            db['re_quota_requests'].update_one(
+                {'_id': req['_id']},
+                {'$set': {'status': 'expired', 'processed_at': now}}
+            )
+        else:
+            active.append(req)
+    requests = active
+
+    if not requests:
+        print("  Nessuna richiesta RE attiva (tutte scadute)")
+        return 0
+
     print(f"  {len(requests)} richieste RE da processare")
 
     # Raggruppa per lega (1 navigazione per lega)
@@ -356,7 +383,7 @@ def process_requests():
                 for req in reqs:
                     db['re_quota_requests'].update_one(
                         {'_id': req['_id']},
-                        {'$set': {'status': 'nav_error', 'processed_at': datetime.now()}}
+                        {'$set': {'last_error': 'nav_error', 'processed_at': datetime.now()}}
                     )
                 continue
 
@@ -365,7 +392,7 @@ def process_requests():
                 for req in reqs:
                     db['re_quota_requests'].update_one(
                         {'_id': req['_id']},
-                        {'$set': {'status': 'nav_error', 'processed_at': datetime.now()}}
+                        {'$set': {'last_error': 'nav_error', 'processed_at': datetime.now()}}
                     )
                 continue
 
