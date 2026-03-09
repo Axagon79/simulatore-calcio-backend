@@ -240,12 +240,15 @@ function buildCupContext(doc) {
 // Entry point: cerca match e costruisce contesto
 // ══════════════════════════════════════════════
 async function buildMatchContext(db, home, away, date) {
-  // 1. daily_predictions (ha segnali 0-100, strisce, pronostici)
+  // 1. daily_predictions_unified (MoE) con fallback a daily_predictions
   const dp = await findInDailyPredictions(db, home, away, date);
   if (dp) {
+    // Se il doc ha campi unified (analysis_score, segno_dettaglio), usa il contesto ricco
+    const isUnified = dp.analysis_score !== undefined || dp.segno_dettaglio !== undefined;
+    const context = isUnified ? buildUnifiedContextFromDoc(dp) : buildDailyPredictionsContext(dp);
     return {
-      context: buildDailyPredictionsContext(dp),
-      source: 'daily_predictions',
+      context,
+      source: isUnified ? 'daily_predictions_unified' : 'daily_predictions',
       match_info: { home: dp.home, away: dp.away, league: dp.league, date: dp.date, match_time: dp.match_time }
     };
   }
@@ -326,6 +329,13 @@ async function searchMatch(db, query) {
 }
 
 // ══════════════════════════════════════════════
+// Contesto da doc unified (senza query DB — usato da buildMatchContext)
+// ══════════════════════════════════════════════
+function buildUnifiedContextFromDoc(doc) {
+  return _buildUnifiedLines(doc, null);
+}
+
+// ══════════════════════════════════════════════
 // Contesto da daily_predictions_unified (per Analisi Premium)
 // ══════════════════════════════════════════════
 async function buildUnifiedContext(db, home, away, date, section) {
@@ -333,6 +343,11 @@ async function buildUnifiedContext(db, home, away, date, section) {
     .findOne({ home, away, date });
   if (!doc) return null;
 
+  const context = _buildUnifiedLines(doc, section);
+  return { context, source: 'daily_predictions_unified', doc };
+}
+
+function _buildUnifiedLines(doc, section) {
   const lines = [];
   if (section) {
     lines.push(`SEZIONE: ${section}`);
@@ -448,11 +463,7 @@ async function buildUnifiedContext(db, home, away, date, section) {
     lines.push(`\nSCORE COERENZA COMPLESSIVO: ${doc.analysis_score}/100`);
   }
 
-  return {
-    context: lines.join('\n'),
-    source: 'daily_predictions_unified',
-    doc,
-  };
+  return lines.join('\n');
 }
 
 module.exports = { buildMatchContext, searchMatch, buildUnifiedContext };
