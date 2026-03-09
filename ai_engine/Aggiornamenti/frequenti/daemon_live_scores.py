@@ -112,6 +112,17 @@ PAGE_LOAD_WAIT = 5        # Secondi di attesa dopo navigazione
 RESTART_EVERY_N_CYCLES = 50  # Restart preventivo del driver ogni N cicli
 CYCLE_TIMEOUT = 90            # Max secondi per un ciclo, poi watchdog killa Chrome
 _cycle_count = 0          # Contatore cicli per restart periodico
+
+# --- HEARTBEAT (per watchdog esterno) ---
+HEARTBEAT_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "heartbeat_live_scores.txt")
+
+def write_heartbeat():
+    """Scrive timestamp corrente nel file heartbeat — il watchdog lo controlla."""
+    try:
+        with open(HEARTBEAT_FILE, 'w') as f:
+            f.write(datetime.now().isoformat())
+    except:
+        pass
 HOUR_START = 10            # Inizio finestra operativa
 HOUR_END = 1               # Fine (giorno dopo, 01:00)
 
@@ -718,6 +729,7 @@ def main():
                 now = datetime.now()
                 print(f"\r   Fuori finestra operativa ({now.strftime('%H:%M')}). Prossimo check tra {CYCLE_SECONDS}s...", end='')
 
+            write_heartbeat()
             print(f"\n   ⏳ Prossimo ciclo tra {CYCLE_SECONDS}s...")
             time.sleep(CYCLE_SECONDS)
 
