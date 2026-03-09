@@ -243,7 +243,12 @@ async function buildMatchContext(db, home, away, date) {
   // 1. daily_predictions_unified (MoE) con fallback a daily_predictions
   const dp = await findInDailyPredictions(db, home, away, date);
   if (dp) {
-    // Se manca real_score, recuperalo da h2h_by_round
+    // Normalizza: unified usa live_score/live_status, daily_predictions usa real_score
+    if (!dp.real_score && dp.live_score) {
+      dp.real_score = dp.live_score.replace(':', '-');
+      dp.status = dp.live_status || 'Finished';
+    }
+    // Se manca ancora real_score, recuperalo da h2h_by_round
     if (!dp.real_score && dp.date) {
       const startOfDay = new Date(dp.date + 'T00:00:00.000Z');
       const endOfDay = new Date(dp.date + 'T23:59:59.999Z');
@@ -370,9 +375,11 @@ function _buildUnifiedLines(doc, section) {
   lines.push(`PARTITA: ${doc.home} vs ${doc.away}`);
   lines.push(`Campionato: ${doc.league} | Data: ${doc.date} ore ${doc.match_time || '?'}`);
 
-  // Risultato finale (se partita terminata)
-  if (doc.real_score) {
-    lines.push(`RISULTATO FINALE: ${doc.real_score} (${doc.status || 'finita'})`);
+  // Risultato finale (se partita terminata) — unified usa live_score, daily_predictions usa real_score
+  const realScore = doc.real_score || (doc.live_score ? doc.live_score.replace(':', '-') : null);
+  const realStatus = doc.status || doc.live_status || 'finita';
+  if (realScore) {
+    lines.push(`RISULTATO FINALE: ${realScore} (${realStatus})`);
   }
   // Esiti pronostici (se P/L ha già processato)
   const pronosticiConEsito = (doc.pronostici || []).filter(p => p.esito !== undefined && p.esito !== null);
