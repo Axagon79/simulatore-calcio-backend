@@ -243,6 +243,21 @@ async function buildMatchContext(db, home, away, date) {
   // 1. daily_predictions_unified (MoE) con fallback a daily_predictions
   const dp = await findInDailyPredictions(db, home, away, date);
   if (dp) {
+    // Se manca real_score, recuperalo da h2h_by_round
+    if (!dp.real_score && dp.date) {
+      const startOfDay = new Date(dp.date + 'T00:00:00.000Z');
+      const endOfDay = new Date(dp.date + 'T23:59:59.999Z');
+      const h2hResult = await db.collection('h2h_by_round').aggregate([
+        { $unwind: '$matches' },
+        { $match: { 'matches.home': dp.home, 'matches.away': dp.away, 'matches.date_obj': { $gte: startOfDay, $lte: endOfDay } } },
+        { $project: { real_score: '$matches.real_score', status: '$matches.status' } },
+        { $limit: 1 }
+      ]).toArray();
+      if (h2hResult.length > 0 && h2hResult[0].real_score) {
+        dp.real_score = h2hResult[0].real_score;
+        dp.status = h2hResult[0].status || 'Finished';
+      }
+    }
     // Se il doc ha campi unified (analysis_score, segno_dettaglio), usa il contesto ricco
     const isUnified = dp.analysis_score !== undefined || dp.segno_dettaglio !== undefined;
     const context = isUnified ? buildUnifiedContextFromDoc(dp) : buildDailyPredictionsContext(dp);
