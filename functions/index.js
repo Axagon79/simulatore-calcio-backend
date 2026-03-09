@@ -60,6 +60,9 @@ app.use('/standings', standingsRoutes);
 const analyticsRoutes = require('./routes/analyticsRoutes');
 app.use('/analytics', analyticsRoutes);
 
+const feedbackRoutes = require('./routes/feedbackRoutes');
+app.use('/api/feedback-loop', feedbackRoutes);
+
 // ============================================
 // UTILITY FUNCTIONS
 // ============================================

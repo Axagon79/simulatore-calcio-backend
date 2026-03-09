@@ -1,0 +1,907 @@
+{
+  "report_version": "2.2",
+  "generated_at": "2026-03-09T17:09:08Z",
+  "period": {
+    "from": "2026-02-07",
+    "to": "2026-03-09",
+    "days": 30
+  },
+  "overview": {
+    "total_predictions": 697,
+    "correct": 480,
+    "errors": 217,
+    "error_rate": 31.1,
+    "analyzed": 200,
+    "not_analyzed": 17,
+    "by_type": [
+      {
+        "type": "GOL",
+        "total": 376,
+        "errors": 122,
+        "error_rate": 32.4
+      },
+      {
+        "type": "SEGNO",
+        "total": 176,
+        "errors": 55,
+        "error_rate": 31.2
+      },
+      {
+        "type": "DOPPIA_CHANCE",
+        "total": 145,
+        "errors": 40,
+        "error_rate": 27.6
+      }
+    ],
+    "standard": {
+      "total": 654,
+      "correct": 458,
+      "errors": 196,
+      "error_rate": 30.0,
+      "by_type": [
+        {
+          "type": "GOL",
+          "total": 375,
+          "errors": 122,
+          "error_rate": 32.5
+        },
+        {
+          "type": "DOPPIA_CHANCE",
+          "total": 141,
+          "errors": 38,
+          "error_rate": 27.0
+        },
+        {
+          "type": "SEGNO",
+          "total": 138,
+          "errors": 36,
+          "error_rate": 26.1
+        }
+      ]
+    },
+    "alto_rendimento": {
+      "total": 43,
+      "correct": 22,
+      "errors": 21,
+      "error_rate": 48.8,
+      "profit_loss": 172.48,
+      "by_type": [
+        {
+          "type": "DOPPIA_CHANCE",
+          "total": 4,
+          "errors": 2,
+          "error_rate": 50.0
+        },
+        {
+          "type": "SEGNO",
+          "total": 38,
+          "errors": 19,
+          "error_rate": 50.0
+        },
+        {
+          "type": "GOL",
+          "total": 1,
+          "errors": 0,
+          "error_rate": 0.0
+        }
+      ]
+    }
+  },
+  "by_source": [
+    {
+      "source": "C_dg35",
+      "total": 3,
+      "correct": 0,
+      "errors": 3,
+      "error_rate": 100.0,
+      "delta": 70.0,
+      "flag": "⚠️"
+    },
+    {
+      "source": "A_mg",
+      "total": 16,
+      "correct": 8,
+      "errors": 8,
+      "error_rate": 50.0,
+      "delta": 20.0,
+      "flag": "⚠️"
+    },
+    {
+      "source": "C_mc_conv",
+      "total": 2,
+      "correct": 1,
+      "errors": 1,
+      "error_rate": 50.0,
+      "delta": 20.0,
+      "flag": "⚠️"
+    },
+    {
+      "source": "A+S_mg",
+      "total": 23,
+      "correct": 15,
+      "errors": 8,
+      "error_rate": 34.8,
+      "delta": 4.8,
+      "flag": ""
+    },
+    {
+      "source": "A_flip_mg",
+      "total": 6,
+      "correct": 4,
+      "errors": 2,
+      "error_rate": 33.3,
+      "delta": 3.3,
+      "flag": ""
+    },
+    {
+      "source": "C_screm",
+      "total": 166,
+      "correct": 114,
+      "errors": 52,
+      "error_rate": 31.3,
+      "delta": 1.3,
+      "flag": ""
+    },
+    {
+      "source": "C",
+      "total": 181,
+      "correct": 125,
+      "errors": 56,
+      "error_rate": 30.9,
+      "delta": 0.9,
+      "flag": ""
+    },
+    {
+      "source": "A",
+      "total": 78,
+      "correct": 55,
+      "errors": 23,
+      "error_rate": 29.5,
+      "delta": -0.5,
+      "flag": ""
+    },
+    {
+      "source": "C_mg",
+      "total": 17,
+      "correct": 12,
+      "errors": 5,
+      "error_rate": 29.4,
+      "delta": -0.6,
+      "flag": ""
+    },
+    {
+      "source": "A+S",
+      "total": 130,
+      "correct": 95,
+      "errors": 35,
+      "error_rate": 26.9,
+      "delta": -3.1,
+      "flag": "✓"
+    },
+    {
+      "source": "C_combo96",
+      "total": 26,
+      "correct": 23,
+      "errors": 3,
+      "error_rate": 11.5,
+      "delta": -18.5,
+      "flag": "✓"
+    },
+    {
+      "source": "C_hw",
+      "total": 2,
+      "correct": 2,
+      "errors": 0,
+      "error_rate": 0.0,
+      "delta": -30.0,
+      "flag": "✓"
+    },
+    {
+      "source": "C_hw_mc_conv",
+      "total": 2,
+      "correct": 2,
+      "errors": 0,
+      "error_rate": 0.0,
+      "delta": -30.0,
+      "flag": "✓"
+    },
+    {
+      "source": "MC_hw",
+      "total": 1,
+      "correct": 1,
+      "errors": 0,
+      "error_rate": 0.0,
+      "delta": -30.0,
+      "flag": "✓"
+    },
+    {
+      "source": "MC_hw_mc_conv",
+      "total": 1,
+      "correct": 1,
+      "errors": 0,
+      "error_rate": 0.0,
+      "delta": -30.0,
+      "flag": "✓"
+    }
+  ],
+  "by_league": [
+    {
+      "league": "Champions League",
+      "total": 1,
+      "errors": 1,
+      "error_rate": 100.0,
+      "delta": 70.0,
+      "flag": "⚠️"
+    },
+    {
+      "league": "Europa League",
+      "total": 5,
+      "errors": 2,
+      "error_rate": 40.0,
+      "delta": 10.0,
+      "flag": "⚠️"
+    },
+    {
+      "league": "Serie A",
+      "total": 28,
+      "errors": 11,
+      "error_rate": 39.3,
+      "delta": 9.3,
+      "flag": "⚠️"
+    },
+    {
+      "league": "Serie C - Girone B",
+      "total": 41,
+      "errors": 16,
+      "error_rate": 39.0,
+      "delta": 9.0,
+      "flag": "⚠️"
+    },
+    {
+      "league": "Serie C - Girone A",
+      "total": 50,
+      "errors": 19,
+      "error_rate": 38.0,
+      "delta": 8.0,
+      "flag": "⚠️"
+    },
+    {
+      "league": "Major League Soccer",
+      "total": 29,
+      "errors": 11,
+      "error_rate": 37.9,
+      "delta": 7.9,
+      "flag": "⚠️"
+    },
+    {
+      "league": "Premier League",
+      "total": 33,
+      "errors": 12,
+      "error_rate": 36.4,
+      "delta": 6.4,
+      "flag": "⚠️"
+    },
+    {
+      "league": "Championship",
+      "total": 28,
+      "errors": 10,
+      "error_rate": 35.7,
+      "delta": 5.7,
+      "flag": "⚠️"
+    },
+    {
+      "league": "Jupiler Pro League",
+      "total": 26,
+      "errors": 9,
+      "error_rate": 34.6,
+      "delta": 4.6,
+      "flag": ""
+    },
+    {
+      "league": "Eredivisie",
+      "total": 47,
+      "errors": 16,
+      "error_rate": 34.0,
+      "delta": 4.0,
+      "flag": ""
+    },
+    {
+      "league": "2. Bundesliga",
+      "total": 21,
+      "errors": 7,
+      "error_rate": 33.3,
+      "delta": 3.3,
+      "flag": ""
+    },
+    {
+      "league": "Ligue 1",
+      "total": 18,
+      "errors": 6,
+      "error_rate": 33.3,
+      "delta": 3.3,
+      "flag": ""
+    },
+    {
+      "league": "Serie C - Girone C",
+      "total": 36,
+      "errors": 11,
+      "error_rate": 30.6,
+      "delta": 0.6,
+      "flag": ""
+    },
+    {
+      "league": "La Liga",
+      "total": 17,
+      "errors": 5,
+      "error_rate": 29.4,
+      "delta": -0.6,
+      "flag": ""
+    },
+    {
+      "league": "Süper Lig",
+      "total": 17,
+      "errors": 5,
+      "error_rate": 29.4,
+      "delta": -0.6,
+      "flag": ""
+    },
+    {
+      "league": "Ligue 2",
+      "total": 31,
+      "errors": 9,
+      "error_rate": 29.0,
+      "delta": -1.0,
+      "flag": ""
+    },
+    {
+      "league": "Liga Portugal",
+      "total": 23,
+      "errors": 6,
+      "error_rate": 26.1,
+      "delta": -3.9,
+      "flag": "✓"
+    },
+    {
+      "league": "Superligaen",
+      "total": 20,
+      "errors": 5,
+      "error_rate": 25.0,
+      "delta": -5.0,
+      "flag": "✓"
+    },
+    {
+      "league": "Serie B",
+      "total": 38,
+      "errors": 9,
+      "error_rate": 23.7,
+      "delta": -6.3,
+      "flag": "✓"
+    },
+    {
+      "league": "Brasileirão Serie A",
+      "total": 9,
+      "errors": 2,
+      "error_rate": 22.2,
+      "delta": -7.8,
+      "flag": "✓"
+    },
+    {
+      "league": "League of Ireland Premier Division",
+      "total": 9,
+      "errors": 2,
+      "error_rate": 22.2,
+      "delta": -7.8,
+      "flag": "✓"
+    },
+    {
+      "league": "Bundesliga",
+      "total": 26,
+      "errors": 5,
+      "error_rate": 19.2,
+      "delta": -10.8,
+      "flag": "✓"
+    },
+    {
+      "league": "Primera División",
+      "total": 69,
+      "errors": 13,
+      "error_rate": 18.8,
+      "delta": -11.2,
+      "flag": "✓"
+    },
+    {
+      "league": "LaLiga 2",
+      "total": 20,
+      "errors": 3,
+      "error_rate": 15.0,
+      "delta": -15.0,
+      "flag": "✓"
+    },
+    {
+      "league": "Scottish Premiership",
+      "total": 12,
+      "errors": 1,
+      "error_rate": 8.3,
+      "delta": -21.7,
+      "flag": "✓"
+    }
+  ],
+  "alto_rendimento_detail": {
+    "by_quota_range": [
+      {
+        "range": "2.50-2.70",
+        "total": 1,
+        "errors": 1,
+        "error_rate": 100.0,
+        "profit_loss": -1
+      },
+      {
+        "range": "2.70-2.90",
+        "total": 4,
+        "errors": 0,
+        "error_rate": 0.0,
+        "profit_loss": 20.42
+      },
+      {
+        "range": "2.90-3.10",
+        "total": 1,
+        "errors": 0,
+        "error_rate": 0.0,
+        "profit_loss": 8.0
+      },
+      {
+        "range": "3.10-3.50",
+        "total": 13,
+        "errors": 7,
+        "error_rate": 53.8,
+        "profit_loss": 22.11
+      },
+      {
+        "range": ">3.50",
+        "total": 24,
+        "errors": 13,
+        "error_rate": 54.2,
+        "profit_loss": 122.95
+      }
+    ],
+    "total_pl": 172.48
+  },
+  "cross_analysis": {
+    "source_x_league": [
+      {
+        "source": "A+S",
+        "league": "Premier League",
+        "total": 10,
+        "errors": 7,
+        "error_rate": 70.0,
+        "delta": 40.0,
+        "flag": "🔴"
+      },
+      {
+        "source": "C",
+        "league": "Süper Lig",
+        "total": 7,
+        "errors": 4,
+        "error_rate": 57.1,
+        "delta": 27.1,
+        "flag": "🔴"
+      },
+      {
+        "source": "C",
+        "league": "Championship",
+        "total": 7,
+        "errors": 4,
+        "error_rate": 57.1,
+        "delta": 27.1,
+        "flag": "🔴"
+      },
+      {
+        "source": "C_screm",
+        "league": "Serie C - Girone B",
+        "total": 20,
+        "errors": 11,
+        "error_rate": 55.0,
+        "delta": 25.0,
+        "flag": "🔴"
+      },
+      {
+        "source": "C",
+        "league": "Serie A",
+        "total": 10,
+        "errors": 5,
+        "error_rate": 50.0,
+        "delta": 20.0,
+        "flag": "🔴"
+      },
+      {
+        "source": "C",
+        "league": "Ligue 1",
+        "total": 6,
+        "errors": 3,
+        "error_rate": 50.0,
+        "delta": 20.0,
+        "flag": "🔴"
+      },
+      {
+        "source": "A+S",
+        "league": "2. Bundesliga",
+        "total": 8,
+        "errors": 4,
+        "error_rate": 50.0,
+        "delta": 20.0,
+        "flag": "🔴"
+      },
+      {
+        "source": "C",
+        "league": "Serie C - Girone A",
+        "total": 18,
+        "errors": 8,
+        "error_rate": 44.4,
+        "delta": 14.4,
+        "flag": "🟡"
+      },
+      {
+        "source": "C_screm",
+        "league": "Major League Soccer",
+        "total": 7,
+        "errors": 3,
+        "error_rate": 42.9,
+        "delta": 12.9,
+        "flag": "🟡"
+      },
+      {
+        "source": "C",
+        "league": "Eredivisie",
+        "total": 7,
+        "errors": 3,
+        "error_rate": 42.9,
+        "delta": 12.9,
+        "flag": "🟡"
+      },
+      {
+        "source": "A",
+        "league": "Ligue 2",
+        "total": 7,
+        "errors": 3,
+        "error_rate": 42.9,
+        "delta": 12.9,
+        "flag": "🟡"
+      },
+      {
+        "source": "C",
+        "league": "Liga Portugal",
+        "total": 7,
+        "errors": 3,
+        "error_rate": 42.9,
+        "delta": 12.9,
+        "flag": "🟡"
+      },
+      {
+        "source": "C_screm",
+        "league": "Serie C - Girone C",
+        "total": 12,
+        "errors": 5,
+        "error_rate": 41.7,
+        "delta": 11.7,
+        "flag": "🟡"
+      },
+      {
+        "source": "A+S",
+        "league": "La Liga",
+        "total": 5,
+        "errors": 2,
+        "error_rate": 40.0,
+        "delta": 10.0,
+        "flag": "🟡"
+      },
+      {
+        "source": "C_screm",
+        "league": "Ligue 2",
+        "total": 14,
+        "errors": 3,
+        "error_rate": 21.4,
+        "delta": -8.6,
+        "flag": "🟢"
+      }
+    ],
+    "by_quota_range": [
+      {
+        "range": "1.35-1.55",
+        "total": 275,
+        "errors": 60,
+        "error_rate": 21.8
+      },
+      {
+        "range": "1.55-1.75",
+        "total": 215,
+        "errors": 76,
+        "error_rate": 35.3
+      },
+      {
+        "range": "1.75-1.95",
+        "total": 103,
+        "errors": 41,
+        "error_rate": 39.8
+      },
+      {
+        "range": "1.95-2.15",
+        "total": 52,
+        "errors": 16,
+        "error_rate": 30.8
+      },
+      {
+        "range": "2.15-2.35",
+        "total": 7,
+        "errors": 2,
+        "error_rate": 28.6
+      },
+      {
+        "range": "2.35-2.50",
+        "total": 2,
+        "errors": 1,
+        "error_rate": 50.0
+      }
+    ],
+    "quota_x_source": [
+      {
+        "range": "1.75-1.95",
+        "source": "C_mg",
+        "total": 5,
+        "errors": 3,
+        "error_rate": 60.0,
+        "delta": 30.0,
+        "flag": "🔴"
+      },
+      {
+        "range": "1.75-1.95",
+        "source": "A_mg",
+        "total": 14,
+        "errors": 8,
+        "error_rate": 57.1,
+        "delta": 27.1,
+        "flag": "🔴"
+      },
+      {
+        "range": "1.55-1.75",
+        "source": "A+S_mg",
+        "total": 8,
+        "errors": 4,
+        "error_rate": 50.0,
+        "delta": 20.0,
+        "flag": "🔴"
+      },
+      {
+        "range": "1.75-1.95",
+        "source": "C_screm",
+        "total": 10,
+        "errors": 5,
+        "error_rate": 50.0,
+        "delta": 20.0,
+        "flag": "🔴"
+      },
+      {
+        "range": "1.55-1.75",
+        "source": "A",
+        "total": 24,
+        "errors": 11,
+        "error_rate": 45.8,
+        "delta": 15.8,
+        "flag": "🔴"
+      },
+      {
+        "range": "1.35-1.55",
+        "source": "C",
+        "total": 23,
+        "errors": 5,
+        "error_rate": 21.7,
+        "delta": -8.3,
+        "flag": "✓"
+      },
+      {
+        "range": "1.35-1.55",
+        "source": "A+S",
+        "total": 75,
+        "errors": 15,
+        "error_rate": 20.0,
+        "delta": -10.0,
+        "flag": "✓"
+      },
+      {
+        "range": "1.35-1.55",
+        "source": "A",
+        "total": 42,
+        "errors": 8,
+        "error_rate": 19.0,
+        "delta": -11.0,
+        "flag": "✓"
+      },
+      {
+        "range": "1.35-1.55",
+        "source": "A+S_mg",
+        "total": 12,
+        "errors": 2,
+        "error_rate": 16.7,
+        "delta": -13.3,
+        "flag": "✓"
+      },
+      {
+        "range": "1.95-2.15",
+        "source": "C_screm",
+        "total": 7,
+        "errors": 1,
+        "error_rate": 14.3,
+        "delta": -15.7,
+        "flag": "✓"
+      }
+    ]
+  },
+  "weekly_trend": [
+    {
+      "week": "2026-W06",
+      "total": 49,
+      "errors": 17,
+      "error_rate": 34.7,
+      "delta_prev": null,
+      "trend": "—",
+      "small_sample": false
+    },
+    {
+      "week": "2026-W07",
+      "total": 157,
+      "errors": 40,
+      "error_rate": 25.5,
+      "delta_prev": -9.2,
+      "trend": "📉",
+      "small_sample": false
+    },
+    {
+      "week": "2026-W08",
+      "total": 151,
+      "errors": 46,
+      "error_rate": 30.5,
+      "delta_prev": 5.0,
+      "trend": "📈",
+      "small_sample": false
+    },
+    {
+      "week": "2026-W09",
+      "total": 170,
+      "errors": 50,
+      "error_rate": 29.4,
+      "delta_prev": -1.1,
+      "trend": "➡️",
+      "small_sample": false
+    },
+    {
+      "week": "2026-W10",
+      "total": 170,
+      "errors": 64,
+      "error_rate": 37.6,
+      "delta_prev": 8.2,
+      "trend": "📈",
+      "small_sample": false
+    }
+  ],
+  "weekly_warning": null,
+  "patterns_detected": [
+    {
+      "name": "GOL su Major League Soccer",
+      "positive": false,
+      "color": "🔴",
+      "where": "Tipo GOL × Major League Soccer",
+      "total": 12,
+      "errors": 6,
+      "error_rate": 50.0,
+      "delta": 20.0,
+      "impact_pl": -8.42
+    },
+    {
+      "name": "GOL su Serie A",
+      "positive": false,
+      "color": "🔴",
+      "where": "Tipo GOL × Serie A",
+      "total": 13,
+      "errors": 6,
+      "error_rate": 46.2,
+      "delta": 16.2,
+      "impact_pl": -7.1
+    },
+    {
+      "name": "Source C su Serie A",
+      "positive": false,
+      "color": "🔴",
+      "where": "Source C × Serie A",
+      "total": 10,
+      "errors": 5,
+      "error_rate": 50.0,
+      "delta": 20.0,
+      "impact_pl": -6.95
+    },
+    {
+      "name": "Source C_screm su Serie C - Girone B",
+      "positive": false,
+      "color": "🔴",
+      "where": "Source C_screm × Serie C - Girone B",
+      "total": 20,
+      "errors": 11,
+      "error_rate": 55.0,
+      "delta": 25.0,
+      "impact_pl": -6.94
+    },
+    {
+      "name": "Source A+S su Premier League",
+      "positive": false,
+      "color": "🔴",
+      "where": "Source A+S × Premier League",
+      "total": 10,
+      "errors": 7,
+      "error_rate": 70.0,
+      "delta": 40.0,
+      "impact_pl": -5.66
+    },
+    {
+      "name": "GOL su Premier League",
+      "positive": false,
+      "color": "🔴",
+      "where": "Tipo GOL × Premier League",
+      "total": 22,
+      "errors": 10,
+      "error_rate": 45.5,
+      "delta": 15.5,
+      "impact_pl": -3.96
+    },
+    {
+      "name": "GOL su Serie C - Girone A",
+      "positive": false,
+      "color": "🔴",
+      "where": "Tipo GOL × Serie C - Girone A",
+      "total": 29,
+      "errors": 14,
+      "error_rate": 48.3,
+      "delta": 18.3,
+      "impact_pl": -3.49
+    },
+    {
+      "name": "Source A su Primera División",
+      "positive": true,
+      "color": "🟢",
+      "where": "Source A × Primera División",
+      "total": 27,
+      "errors": 4,
+      "error_rate": 14.8,
+      "delta": -15.2,
+      "impact_pl": 17.76
+    },
+    {
+      "name": "Source C su Serie B",
+      "positive": true,
+      "color": "🟢",
+      "where": "Source C × Serie B",
+      "total": 14,
+      "errors": 1,
+      "error_rate": 7.1,
+      "delta": -22.9,
+      "impact_pl": 15.08
+    },
+    {
+      "name": "Source C_screm su Ligue 2",
+      "positive": true,
+      "color": "🟢",
+      "where": "Source C_screm × Ligue 2",
+      "total": 14,
+      "errors": 3,
+      "error_rate": 21.4,
+      "delta": -8.6,
+      "impact_pl": 2.11
+    }
+  ],
+  "recommendations": [
+    "RIDURRE STAKE: Serie A — tasso errore medio 47.9% su 23 pronostici (GOL: 46.2%, Source C: 50.0%). Dimezzare lo stake o escludere questa lega.",
+    "RIDURRE STAKE: Premier League — tasso errore medio 53.2% su 32 pronostici (Source A+S: 70.0%, GOL: 45.5%). Dimezzare lo stake o escludere questa lega.",
+    "MONITORARE: GOL su Major League Soccer — tasso errore 50.0% (+20.0% vs media 30.0%). Campione piccolo (12) ma anomalia forte. Se persiste a 20+ pronostici, escludere.",
+    "ATTENZIONE: Source C_screm su Serie C - Girone B — tasso errore 55.0% (+25.0% vs media 30.0%). P/L: -6.94",
+    "ATTENZIONE: GOL su Serie C - Girone A — tasso errore 48.3% (+18.3% vs media 30.0%). P/L: -3.49",
+    "MANTENERE: Source A su Primera División funziona bene (14.8% errore, -15.2% vs media). P/L: 17.76. Non modificare.",
+    "MANTENERE: Source C su Serie B funziona bene (7.1% errore, -22.9% vs media). P/L: 15.08. Non modificare."
+  ]
+}

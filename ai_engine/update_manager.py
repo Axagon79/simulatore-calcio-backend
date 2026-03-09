@@ -131,6 +131,9 @@ SCRAPER_SEQUENCE = [
       # ⭐ CALCOLO PROFIT/LOSS post-match (aggiorna esito + P/L per ogni pronostico)
       ("calculate_profit_loss.py", "💰 [29/31] Calcolo Profit/Loss", "Profit/loss non calcolati per pronostici passati", CURRENT_DIR),
 
+      # ⭐ FEEDBACK LOOP — Analisi errori pronostici con Mistral AI (solo backend interno)
+      ("feedback_loop_analyzer.py", "🔁 [29.5/33] Feedback Loop — Analisi Errori", "Errori pronostici non analizzati", CURRENT_DIR),
+
       # ⭐ SISTEMA C — PRONOSTICI MONTE CARLO (100 cicli, Master mode 5, collection separata)
       ("run_daily_predictions_engine_c.py", "🎲 [30/31] Pronostici Sistema C (MC)", "Pronostici Monte Carlo non generati", FP_CALCULATORS_DIR),
 
