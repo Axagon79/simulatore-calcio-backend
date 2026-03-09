@@ -92,7 +92,7 @@ const DB_TOOLS = [
 
 /**
  * Partite di oggi (o di una data specifica)
- * Cerca in daily_predictions (ha pronostici) + h2h_by_round (tutte le partite)
+ * Cerca in daily_predictions_unified (MoE) + h2h_by_round (tutte le partite)
  */
 async function executeTodayMatches(db, args) {
   const date = args.date || new Date().toISOString().split('T')[0];
@@ -100,13 +100,12 @@ async function executeTodayMatches(db, args) {
 
   const results = [];
 
-  // 1. daily_predictions — partite con pronostici
+  // 1. daily_predictions_unified (MoE) — partite con pronostici
   const dpQuery = { date };
   if (leagueFilter) {
-    // Match esatto con word boundary — evita "Serie A" che matcha "Brasileirão Serie A"
     dpQuery.league = { $regex: new RegExp(`^${leagueFilter}$`, 'i') };
   }
-  const predictions = await db.collection('daily_predictions')
+  const predictions = await db.collection('daily_predictions_unified')
     .find(dpQuery)
     .project({ home: 1, away: 1, league: 1, date: 1, match_time: 1, decision: 1, pronostici: 1, confidence_segno: 1, confidence_gol: 1, stelle_segno: 1, stelle_gol: 1, odds: 1, real_score: 1, status: 1 })
     .sort({ match_time: 1 })
@@ -138,7 +137,7 @@ async function executeTodayMatches(db, args) {
       confidence_gol: p.confidence_gol,
       stelle_segno: p.stelle_segno,
       stelle_gol: p.stelle_gol,
-      source: 'daily_predictions'
+      source: 'daily_predictions_unified'
     };
     if (p.real_score) entry.risultato = p.real_score;
     if (p.status) entry.status = p.status;

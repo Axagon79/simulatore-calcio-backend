@@ -16,10 +16,13 @@ const NOMI_SEGNALI = {
   strisce: 'strisce',
 };
 
-// ── Ricerca in daily_predictions ──
+// ── Ricerca in daily_predictions_unified (fonte principale MoE) ──
 async function findInDailyPredictions(db, home, away, date) {
   const query = { home, away };
   if (date) query.date = date;
+  // Priorità: unified (MoE), fallback: daily_predictions (Sistema A)
+  const unified = await db.collection('daily_predictions_unified').findOne(query, { sort: { date: -1 } });
+  if (unified) return unified;
   return db.collection('daily_predictions').findOne(query, { sort: { date: -1 } });
 }
 
@@ -278,8 +281,8 @@ async function searchMatch(db, query) {
   const regex = new RegExp(query, 'i');
   const results = [];
 
-  // daily_predictions
-  const dpResults = await db.collection('daily_predictions')
+  // daily_predictions_unified (MoE — fonte principale)
+  const dpResults = await db.collection('daily_predictions_unified')
     .find({ $or: [{ home: regex }, { away: regex }] })
     .sort({ date: -1 })
     .limit(5)
