@@ -259,7 +259,7 @@ async function buildMatchContext(db, home, away, date) {
         { $limit: 1 }
       ]).toArray();
       if (h2hResult.length > 0 && h2hResult[0].real_score) {
-        dp.real_score = h2hResult[0].real_score;
+        dp.real_score = h2hResult[0].real_score.replace(':', '-');
         dp.status = h2hResult[0].status || 'Finished';
       }
     }
