@@ -249,15 +249,19 @@ def run_monte_carlo_verdict_detailed(preloaded_data, home_team, away_team, analy
     
     algo_names = {2: 'Dinamico', 3: 'Tattico', 4: 'Caos', 5: 'Master'}
     
+    import time as _time
+    _total_calc_start = _time.time()
+
     for aid in algos:
         local_results = []
         weights_sum = {}
         params_sum = {}
         scontrini_sum = {'casa': {}, 'ospite': {}}
         valid_cycles = 0
-        
+
         settings_in_ram = load_tuning(aid)
-        
+        _algo_calc_start = _time.time()
+
         for cycle_idx in range(cycles_per_algo):
             with suppress_stdout():
                 s_h, s_a, r_h, r_a = predict_match(home_team, away_team, mode=aid, preloaded_data=preloaded_data)
@@ -378,15 +382,21 @@ def run_monte_carlo_verdict_detailed(preloaded_data, home_team, away_team, analy
                     }
             algos_scontrini_tracking[aid] = scontrini_avg
         
+        _algo_calc_elapsed = _time.time() - _algo_calc_start
+        print(f"⏱️ Algo {algo_names.get(aid, aid)}: {valid_cycles} cicli in {_algo_calc_elapsed:.2f}s ({valid_cycles / max(_algo_calc_elapsed, 0.001):.0f} cicli/s)", file=sys.stderr)
+
         algos_full_results[aid] = local_results.copy()
         top_3 = Counter(local_results).most_common(3)
         algos_stats[aid] = top_3
-        
+
         preview = ", ".join([f"{sc}({freq})" for sc, freq in top_3[:3]])
-        
+
         for sc, freq in top_3:
             nominees.extend([sc] * freq)
-    
+
+    _total_calc_elapsed = _time.time() - _total_calc_start
+    print(f"⏱️ CALCOLO PURO TOTALE: {total_cycles} cicli in {_total_calc_elapsed:.2f}s", file=sys.stderr)
+
     if not nominees:
         return (0, 0), {}, [], {}, {}, 0
     
