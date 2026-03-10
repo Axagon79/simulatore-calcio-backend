@@ -147,6 +147,11 @@ MULTIGOL:
 - "Multigol 3-4" centrato se totale gol e 3 o 4
 - Esempio: 3-1 = 4 gol -> Multigol 3-4 centrato, Multigol 2-3 SBAGLIATO
 
+STRISCE (IMPORTANTE — sono metriche SEPARATE):
+- Le strisce di RISULTATO (vittorie consecutive, imbattibilita) e le strisce GOL (Over/Under consecutivi) sono indipendenti
+- Verifica ciascuna separatamente rispetto al risultato effettivo della partita
+- Esempio: una squadra puo avere striscia di 5 vittorie consecutive MA anche striscia di 3 Under consecutivi — non confondere le due cose
+
 REGOLA FINALE: VERIFICA SEMPRE il risultato col pronostico PRIMA di dire "centrato" o "sbagliato". Se sbagli questa verifica perdi tutta la credibilita
 
 STRATEGIA TOOL (IMPORTANTE):
