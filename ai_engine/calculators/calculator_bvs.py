@@ -8,6 +8,23 @@ teams_collection = db['teams']
 fixtures_collection = db['fixtures']
 h2h_collection = db['h2h_by_round']
 
+def get_team_aliases(team_name):
+    """Recupera tutti i nomi possibili di una squadra (nome + alias)."""
+    team = teams_collection.find_one({
+        "$or": [{"name": team_name}, {"aliases": team_name}]
+    })
+    if not team:
+        return [team_name]
+    names = {team_name, team.get("name", team_name)}
+    for alias in team.get("aliases", []):
+        if isinstance(alias, str):
+            names.add(alias)
+        elif isinstance(alias, dict):
+            for v in alias.values():
+                if isinstance(v, str):
+                    names.add(v)
+    return list(names)
+
 def get_stats_from_ranking(team_name):
     """Recupera statistiche (Casa, Fuori, Totali) dal ranking."""
     team = teams_collection.find_one({
@@ -314,16 +331,15 @@ def get_bvs_score(home_team, away_team):
     qt_1, qt_X, qt_2 = theoretical
     print(f"   [PICCHETTO PROF] 1:{qt_1:.2f} X:{qt_X:.2f} 2:{qt_2:.2f}")
 
-    # 3. RECUPERO QUOTE REALI
+    # 3. RECUPERO QUOTE REALI (con ricerca alias)
+    home_names = get_team_aliases(home_team)
+    away_names = get_team_aliases(away_team)
     pipeline = [
         {"$unwind": "$matches"},
         {"$match": {
-            "$or": [
-                {"matches.home": home_team, "matches.away": away_team, "matches.odds": {"$exists": True}},
-                {"matches.home": {"$regex": f"^{home_team}$", "$options": "i"}, 
-                 "matches.away": {"$regex": f"^{away_team}$", "$options": "i"}, 
-                 "matches.odds": {"$exists": True}}
-            ]
+            "matches.home": {"$in": home_names},
+            "matches.away": {"$in": away_names},
+            "matches.odds": {"$exists": True}
         }},
         {"$sort": {"last_updated": -1}}, 
         {"$limit": 1}, 

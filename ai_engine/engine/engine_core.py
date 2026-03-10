@@ -67,7 +67,8 @@ JSON_KEYS_MAP = {
     2: "ALGO_2",   # Dinamico
     3: "ALGO_3",   # Complesso
     4: "ALGO_4",   # Caos
-    5: "GLOBAL"    # Master
+    5: "GLOBAL",   # Master
+    7: "ALGO_C"    # Sistema C (MC Dedicato)
 }
 
 # 3. Funzione costruttrice del compartimento pesi
@@ -108,7 +109,7 @@ def build_weights_compartment(algo_id):
 # 4. CREAZIONE DEGLI SCOMPARTIMENTI (CACHE)
 WEIGHTS_CACHE = {
     algo_id: build_weights_compartment(algo_id) 
-    for algo_id in [1, 2, 3, 4, 5]
+    for algo_id in [1, 2, 3, 4, 5, 7]
 }
 
 print(f"🎛️ [ENGINE] Tuning Granulare Caricato: {len(WEIGHTS_CACHE)} profili attivi.")
@@ -119,7 +120,8 @@ ALGO_NAMES = {
     2: "DINAMICO (Base)",
     3: "COMPLESSO (Tattico)",
     4: "CAOS (Estremo)",
-    5: "MASTER (Ensemble)"
+    5: "MASTER (Ensemble)",
+    7: "PRONOSTICI (Sistema C)"
 }
 
 
@@ -466,7 +468,7 @@ def predict_match(home_team, away_team, mode=ALGO_MODE, preloaded_data=None):
             'power': h_data.get("home_power", 0), 
             'attack': h_data.get("attack_home", 0), 
             'defense': h_data.get("defense_home", 0),
-            'motivation': h_data.get("motivation", 5.0),
+            'motivation': h_data.get("motivation") or 5.0,
             'strength_score': h_data.get("strength_score", 5.0),
             'rating': h_rating_val,
             'reliability': h_rel,
@@ -478,7 +480,7 @@ def predict_match(home_team, away_team, mode=ALGO_MODE, preloaded_data=None):
             'power': a_data.get("away_power", 0), 
             'attack': a_data.get("attack_away", 0), 
             'defense': a_data.get("defense_away", 0),
-            'motivation': a_data.get("motivation", 5.0),
+            'motivation': a_data.get("motivation") or 5.0,
             'strength_score': a_data.get("strength_score", 5.0),
             'rating': a_rating_val,
             'reliability': a_rel,

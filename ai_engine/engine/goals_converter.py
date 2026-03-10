@@ -29,7 +29,8 @@ def load_tuning(algo_mode="GLOBAL"):
             2: "ALGO_2",
             3: "ALGO_3",
             4: "ALGO_4",
-            5: "ALGO_5"
+            5: "ALGO_5",
+            7: "ALGO_C"
         }
 
         # Determinazione della chiave target
