@@ -2189,15 +2189,17 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
             if matchdata is None:
                 raise ValueError(f"❌ Match {home_team} vs {away_team} non trovato in ALL_ROUNDS!")
             
+            _t_mc_start = time.time()
             res = run_monte_carlo_verdict_detailed(
-                preloaded_data, 
-                home_team, 
-                away_team, 
-                analyzer=analyzer, 
-                cycles=cycles, 
+                preloaded_data,
+                home_team,
+                away_team,
+                analyzer=analyzer,
+                cycles=cycles,
                 algo_id=algo_id,
                 bulk_cache=bulk_cache
             )
+            _t_mc_elapsed = time.time() - _t_mc_start
 
             gh, ga = res[0]
             actual_cycles_executed = res[5] if len(res) > 5 else cycles
@@ -2260,7 +2262,8 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
                 analyzer=analyzer
             )
 
-            log_debug(f"✅ Simulazione completata in: {time.time() - t_loop_start:.3f}s")
+            _t_mc_elapsed = time.time() - t_loop_start
+            log_debug(f"✅ Simulazione completata in: {_t_mc_elapsed:.3f}s")
             log_debug(f"📊 Risultato: {gh}-{ga}, Simulazioni: {len(sim_list)}")
             log_debug(f"⏱️ TOTALE algoritmo singolo: {time.time() - t_algo_start:.3f}s")
 
@@ -2403,6 +2406,7 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
             "cycles_requested": cycles,
             "cycles_executed": actual_cycles_executed,
             "execution_time": (time.time() - start_full_process),
+            "calc_time_seconds": round(_t_mc_elapsed, 3),
             "statistiche": anatomy["statistiche"],
             "cronaca": anatomy["cronaca"],
             "report_scommesse_pro": report_pro,
