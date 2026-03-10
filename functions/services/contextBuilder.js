@@ -3,6 +3,18 @@
  * Sorgenti: daily_predictions, h2h_by_round, matches_champions_league, matches_europa_league
  */
 
+// Helper: genera riga risultato esplicita per il LLM (evita errori interpretazione)
+function _buildScoreLine(home, away, hG, aG, status) {
+  let winner = '';
+  if (hG > aG) winner = ` → ${home} (casa) ha vinto`;
+  else if (aG > hG) winner = ` → ${away} (ospite) ha vinto`;
+  else winner = ` → Pareggio`;
+  const tot = hG + aG;
+  const ou = tot >= 3 ? 'Over 2.5' : 'Under 2.5';
+  const gg = (hG > 0 && aG > 0) ? 'GG' : 'NG';
+  return `RISULTATO FINALE: ${home} ${hG} - ${aG} ${away} (${status})${winner} | Totale gol: ${tot} (${ou}, ${gg})`;
+}
+
 // Mappa nomi interni → nomi leggibili (il LLM non deve mai vedere "bvs" o "lucifero")
 const NOMI_SEGNALI = {
   bvs: 'valore_scommessa',
@@ -63,13 +75,8 @@ function buildDailyPredictionsContext(doc) {
   lines.push(`${doc.is_cup ? 'COPPA EUROPEA' : 'Campionato'}: ${doc.league} | Data: ${doc.date} ore ${doc.match_time || '?'}`);
   if (doc.real_score) {
     const [hG, aG] = doc.real_score.split(/[-:]/).map(Number);
-    let w = '';
-    if (!isNaN(hG) && !isNaN(aG)) {
-      if (hG > aG) w = ` → ${home} (casa) ha vinto`;
-      else if (aG > hG) w = ` → ${away} (ospite) ha vinto`;
-      else w = ` → Pareggio`;
-    }
-    lines.push(`RISULTATO FINALE: ${home} ${hG} - ${aG} ${away} (${doc.status || 'finita'})${w}`);
+    if (!isNaN(hG) && !isNaN(aG)) lines.push(_buildScoreLine(home, away, hG, aG, doc.status || 'finita'));
+    else lines.push(`RISULTATO FINALE: ${doc.real_score} (${doc.status || 'finita'})`);
   }
   lines.push(`Decisione algoritmo: ${doc.decision}`);
 
@@ -152,13 +159,8 @@ function buildH2hContext(result) {
   lines.push(`Stato: ${m.status || '?'}`);
   if (m.real_score) {
     const [hG, aG] = m.real_score.split(/[-:]/).map(Number);
-    let w = '';
-    if (!isNaN(hG) && !isNaN(aG)) {
-      if (hG > aG) w = ` → ${m.home} (casa) ha vinto`;
-      else if (aG > hG) w = ` → ${m.away} (ospite) ha vinto`;
-      else w = ` → Pareggio`;
-    }
-    lines.push(`Risultato: ${m.home} ${hG} - ${aG} ${m.away}${w}`);
+    if (!isNaN(hG) && !isNaN(aG)) lines.push(_buildScoreLine(m.home, m.away, hG, aG, m.status || 'finita'));
+    else lines.push(`Risultato: ${m.real_score}`);
   }
 
   // Quote
@@ -238,12 +240,7 @@ function buildCupContext(doc) {
   lines.push(`Stato: ${doc.status || '?'}`);
 
   if (doc.result && doc.result.home_score != null) {
-    const hG = doc.result.home_score, aG = doc.result.away_score;
-    let w = '';
-    if (hG > aG) w = ` → ${doc.home_team} (casa) ha vinto`;
-    else if (aG > hG) w = ` → ${doc.away_team} (ospite) ha vinto`;
-    else w = ` → Pareggio`;
-    lines.push(`RISULTATO FINALE: ${doc.home_team} ${hG} - ${aG} ${doc.away_team}${w}`);
+    lines.push(_buildScoreLine(doc.home_team, doc.away_team, doc.result.home_score, doc.result.away_score, doc.status || 'finita'));
   }
 
   const odds = doc.odds || {};
@@ -403,13 +400,8 @@ function _buildUnifiedLines(doc, section) {
   const realStatus = doc.status || doc.live_status || 'finita';
   if (realScore) {
     const [hGoals, aGoals] = realScore.split('-').map(Number);
-    let winner = '';
-    if (!isNaN(hGoals) && !isNaN(aGoals)) {
-      if (hGoals > aGoals) winner = ` → ${doc.home} (casa) ha vinto`;
-      else if (aGoals > hGoals) winner = ` → ${doc.away} (ospite) ha vinto`;
-      else winner = ` → Pareggio`;
-    }
-    lines.push(`RISULTATO FINALE: ${doc.home} ${hGoals} - ${aGoals} ${doc.away} (${realStatus})${winner}`);
+    if (!isNaN(hGoals) && !isNaN(aGoals)) lines.push(_buildScoreLine(doc.home, doc.away, hGoals, aGoals, realStatus));
+    else lines.push(`RISULTATO FINALE: ${realScore} (${realStatus})`);
   }
   // Esiti pronostici (se P/L ha già processato)
   const pronosticiConEsito = (doc.pronostici || []).filter(p => p.esito !== undefined && p.esito !== null);
