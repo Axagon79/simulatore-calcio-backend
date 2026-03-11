@@ -1,6 +1,6 @@
 {
   "report_version": "2.2",
-  "generated_at": "2026-03-09T19:14:09Z",
+  "generated_at": "2026-03-09T19:19:42Z",
   "period": {
     "from": "2026-02-07",
     "to": "2026-03-09",
@@ -896,11 +896,11 @@
     }
   ],
   "recommendations": [
-    "RIDURRE STAKE: Serie A — tasso errore medio 47.9% su 23 pronostici (GOL: 46.2%, Source C: 50.0%). Ridurre stake del 40% e richiedere edge minimo 5% per questa lega.",
-    "RIDURRE STAKE: Premier League — tasso errore medio 53.2% su 32 pronostici (Source A+S: 70.0%, GOL: 45.5%). Ridurre stake del 40% e richiedere edge minimo 5% per questa lega.",
+    "RIDURRE STAKE: Serie A — tasso errore medio 47.9% su 23 pronostici (GOL: 46.2%, Source C: 50.0%). Ridurre stake del 40% per GOL e Source C su Serie A e richiedere edge minimo 5%.",
+    "RIDURRE STAKE: Premier League — tasso errore medio 53.2% su 32 pronostici (Source A+S: 70.0%, GOL: 45.5%). Ridurre stake del 40% per Source A+S e GOL su Premier League e richiedere edge minimo 5%.",
     "MONITORARE: GOL su Major League Soccer — tasso errore 50.0% (+20.0% vs media 30.0%). Campione piccolo (12) ma anomalia forte. Se persiste a 20+ pronostici, ridurre stake del 50%.",
-    "ATTENZIONE: Source C_screm su Serie C - Girone B — tasso errore 55.0% (+25.0% vs media 30.0%). P/L: -6.94",
-    "ATTENZIONE: GOL su Serie C - Girone A — tasso errore 48.3% (+18.3% vs media 30.0%). P/L: -3.49",
+    "RIDURRE STAKE: Source C_screm su Serie C - Girone B — tasso errore 55.0% (+25.0% vs media 30.0%). Ridurre stake del 30% e cap confidence a 55%. P/L: -6.94",
+    "RIDURRE STAKE: GOL su Serie C - Girone A — tasso errore 48.3% (+18.3% vs media 30.0%). Ridurre stake del 30% e cap confidence a 55%. P/L: -3.49",
     "MANTENERE: Source A su Primera División funziona bene (14.8% errore, -15.2% vs media). P/L: 17.76. Non modificare.",
     "MANTENERE: Source C su Serie B funziona bene (7.1% errore, -22.9% vs media). P/L: 15.08. Non modificare."
   ]

@@ -202,15 +202,15 @@ PATTERN RILEVATI (basati sui dati, non sui tag Mistral)
 RACCOMANDAZIONI (basate sui pattern rilevati)
 ══════════════════════════════════════════════════════════════════
 
-  1. RIDURRE STAKE: Serie A — tasso errore medio 47.9% su 23 pronostici (GOL: 46.2%, Source C: 50.0%). Ridurre stake del 40% e richiedere edge minimo 5% per questa lega.
+  1. RIDURRE STAKE: Serie A — tasso errore medio 47.9% su 23 pronostici (GOL: 46.2%, Source C: 50.0%). Ridurre stake del 40% per GOL e Source C su Serie A e richiedere edge minimo 5%.
 
-  2. RIDURRE STAKE: Premier League — tasso errore medio 53.2% su 32 pronostici (Source A+S: 70.0%, GOL: 45.5%). Ridurre stake del 40% e richiedere edge minimo 5% per questa lega.
+  2. RIDURRE STAKE: Premier League — tasso errore medio 53.2% su 32 pronostici (Source A+S: 70.0%, GOL: 45.5%). Ridurre stake del 40% per Source A+S e GOL su Premier League e richiedere edge minimo 5%.
 
   3. MONITORARE: GOL su Major League Soccer — tasso errore 50.0% (+20.0% vs media 30.0%). Campione piccolo (12) ma anomalia forte. Se persiste a 20+ pronostici, ridurre stake del 50%.
 
-  4. ATTENZIONE: Source C_screm su Serie C - Girone B — tasso errore 55.0% (+25.0% vs media 30.0%). P/L: -6.94
+  4. RIDURRE STAKE: Source C_screm su Serie C - Girone B — tasso errore 55.0% (+25.0% vs media 30.0%). Ridurre stake del 30% e cap confidence a 55%. P/L: -6.94
 
-  5. ATTENZIONE: GOL su Serie C - Girone A — tasso errore 48.3% (+18.3% vs media 30.0%). P/L: -3.49
+  5. RIDURRE STAKE: GOL su Serie C - Girone A — tasso errore 48.3% (+18.3% vs media 30.0%). Ridurre stake del 30% e cap confidence a 55%. P/L: -3.49
 
   6. MANTENERE: Source A su Primera División funziona bene (14.8% errore, -15.2% vs media). P/L: 17.76. Non modificare.
 

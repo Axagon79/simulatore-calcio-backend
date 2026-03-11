@@ -1135,8 +1135,9 @@ def generate_reports(days=30):
             total_pron = sum(p["total"] for p in pats)
             avg_rate = round(sum(p["error_rate"] * p["total"] for p in pats) / total_pron, 1) if total_pron else 0
             details = ", ".join(f"{p['name'].replace(f' su {lg}', '')}: {p['error_rate']}%" for p in pats[:3])
+            specifics = " e ".join(p['name'].replace(f' su {lg}', '') for p in pats[:3])
             rec = (f"RIDURRE STAKE: {lg} — tasso errore medio {avg_rate}% su {total_pron} pronostici "
-                   f"({details}). Ridurre stake del 40% e richiedere edge minimo 5% per questa lega.")
+                   f"({details}). Ridurre stake del 40% per {specifics} su {lg} e richiedere edge minimo 5%.")
             recommendations.append(rec)
             for p in pats:
                 used_pats.add(id(p))
@@ -1163,8 +1164,8 @@ def generate_reports(days=30):
             action = "CAP CONFIDENCE"
             detail = "Il modello è troppo sicuro. Ridurre confidence massima a 65%."
         else:
-            action = "ATTENZIONE"
-            detail = f"P/L: {pat['impact_pl']}"
+            action = "RIDURRE STAKE"
+            detail = f"Ridurre stake del 30% e cap confidence a 55%. P/L: {pat['impact_pl']}"
         rec = (f"{action}: {pat['name']} — tasso errore {pat['error_rate']}% "
                f"({pat['delta']:+.1f}% vs media {std_error_rate}%). {detail}")
         recommendations.append(rec)
