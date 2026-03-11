@@ -555,12 +555,20 @@ def run_director_loop():
     while True:
         ora_attuale = datetime.now()
 
-        # Gestione Pausa Notturna + Pipeline (03:00-09:00 per evitare conflitti Chrome)
-        if 3 <= ora_attuale.hour < 9:
-            sys.stdout.write(f"\r 💤 [PAUSA] Il Direttore riposa. Sveglia alle 09:00...          ")
+        # Gestione Pausa Notturna + Pipeline (03:55 - fine pipeline, con lock file)
+        _lock_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'log', 'pipeline_running.lock')
+        h, m = ora_attuale.hour, ora_attuale.minute
+        _in_pausa = False
+        if (h == 3 and m >= 55) or (4 <= h < 5) or (h == 5 and m < 30):
+            _in_pausa = True  # Pausa fissa 03:55-05:30
+        elif (h >= 5 or (h == 5 and m >= 30)) and h < 10:
+            _in_pausa = os.path.exists(_lock_file)  # 05:30-10:00: check lock
+        if _in_pausa:
+            lock_status = "🔒 lock attivo" if os.path.exists(_lock_file) else "⏳ attesa"
+            sys.stdout.write(f"\r 💤 [PAUSA PIPELINE] {ora_attuale.strftime('%H:%M:%S')} | {lock_status}          ")
             sys.stdout.flush()
             _was_paused = True
-            time.sleep(1800)
+            time.sleep(60)
             continue
 
         # --- CATCH-UP POST-PAUSA ---

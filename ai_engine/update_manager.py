@@ -3,6 +3,9 @@ import sys
 import subprocess
 import time
 from datetime import datetime, timedelta
+
+# --- LOCK FILE per segnalare ai daemon che la pipeline è attiva ---
+LOCK_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'log', 'pipeline_running.lock')
 def kill_chrome_zombies():
     """Uccide tutti i processi Chrome/chromedriver orfani (Windows)"""
     killed = 0
@@ -211,6 +214,14 @@ def main():
     print("\n🧹 Pulizia Chrome zombie...")
     kill_chrome_zombies()
 
+    # Crea lock file per segnalare ai daemon di restare in pausa
+    try:
+        with open(LOCK_FILE, 'w') as f:
+            f.write(f"Pipeline avviata: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        print(f"🔒 Lock file creato: {LOCK_FILE}")
+    except Exception as e:
+        print(f"⚠️ Impossibile creare lock file: {e}")
+
     report = []
     total_start_time = time.time() # Start Cronometro Globale
 
@@ -411,6 +422,14 @@ def main():
                 print(f"   {line}")
     except Exception as e:
         print(f"   ❌ Analisi professionale errore: {e}")
+
+    # Rimuovi lock file — segnala ai daemon che possono riprendere
+    try:
+        if os.path.exists(LOCK_FILE):
+            os.remove(LOCK_FILE)
+            print(f"🔓 Lock file rimosso — daemon possono riprendere")
+    except Exception as e:
+        print(f"⚠️ Impossibile rimuovere lock file: {e}")
 
     print("\n")
 

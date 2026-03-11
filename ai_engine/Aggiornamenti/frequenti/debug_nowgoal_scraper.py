@@ -1022,16 +1022,33 @@ def run_scraper():
 # --- CONFIGURAZIONE ORARI FISSI ---
 ORARI_RUN = [0, 2, 10, 12, 14, 16, 18, 20, 22]
 
-# --- PAUSA PIPELINE NOTTURNA ---
+# --- PAUSA PIPELINE NOTTURNA (con lock file) ---
 PIPELINE_PAUSE_START_H = 3   # Ora inizio pausa
-PIPELINE_PAUSE_START_M = 30  # Minuto inizio pausa
-PIPELINE_PAUSE_END_H = 9     # Ora fine pausa
+PIPELINE_PAUSE_START_M = 55  # Minuto inizio pausa (03:55)
+PIPELINE_CHECK_LOCK_H = 5    # Dalle 05:30 inizia a controllare il lock
+PIPELINE_CHECK_LOCK_M = 30
+PIPELINE_FALLBACK_H = 10     # Alle 10:00 riprende comunque (fallback crash)
+LOCK_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'log', 'pipeline_running.lock')
 
 def is_pipeline_window():
-    """Pausa durante la pipeline notturna (03:30-09:00) per evitare conflitti Chrome/chromedriver."""
+    """Pausa durante la pipeline notturna. Inizia alle 03:55, finisce quando il lock file sparisce (dopo le 05:30)."""
     now = datetime.now()
-    return (now.hour == PIPELINE_PAUSE_START_H and now.minute >= PIPELINE_PAUSE_START_M) or \
-           (PIPELINE_PAUSE_START_H < now.hour < PIPELINE_PAUSE_END_H)
+    h, m = now.hour, now.minute
+
+    # Prima delle 03:55 → nessuna pausa
+    if h < PIPELINE_PAUSE_START_H or (h == PIPELINE_PAUSE_START_H and m < PIPELINE_PAUSE_START_M):
+        return False
+
+    # Dopo le 10:00 → fallback, riprendi comunque
+    if h >= PIPELINE_FALLBACK_H:
+        return False
+
+    # Tra 03:55 e 05:30 → pausa fissa (inutile controllare, pipeline non è ancora finita)
+    if h < PIPELINE_CHECK_LOCK_H or (h == PIPELINE_CHECK_LOCK_H and m < PIPELINE_CHECK_LOCK_M):
+        return True
+
+    # Dopo le 05:30 → controlla lock file
+    return os.path.exists(LOCK_FILE)
 
 
 def prossimo_orario():
@@ -1063,7 +1080,8 @@ def run_odds_loop():
     while True:
         # --- PAUSA PIPELINE NOTTURNA (03:30-09:00) ---
         if is_pipeline_window():
-            sys.stdout.write(f"\r 💤 [PAUSA PIPELINE] {datetime.now().strftime('%H:%M:%S')} | Ripresa alle 09:00...          ")
+            lock_status = "🔒 lock attivo" if os.path.exists(LOCK_FILE) else "⏳ attesa lock"
+            sys.stdout.write(f"\r 💤 [PAUSA PIPELINE] {datetime.now().strftime('%H:%M:%S')} | {lock_status}          ")
             sys.stdout.flush()
             time.sleep(60)
             continue

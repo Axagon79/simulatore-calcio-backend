@@ -126,16 +126,26 @@ def write_heartbeat():
 HOUR_START = 10            # Inizio finestra operativa
 HOUR_END = 1               # Fine (giorno dopo, 01:00)
 
-# --- PAUSA PIPELINE NOTTURNA ---
+# --- PAUSA PIPELINE NOTTURNA (con lock file) ---
 PIPELINE_PAUSE_START_H = 3   # Ora inizio pausa
-PIPELINE_PAUSE_START_M = 30  # Minuto inizio pausa
-PIPELINE_PAUSE_END_H = 9     # Ora fine pausa
+PIPELINE_PAUSE_START_M = 55  # Minuto inizio pausa (03:55)
+PIPELINE_CHECK_LOCK_H = 5    # Dalle 05:30 inizia a controllare il lock
+PIPELINE_CHECK_LOCK_M = 30
+PIPELINE_FALLBACK_H = 10     # Alle 10:00 riprende comunque (fallback crash)
+LOCK_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'log', 'pipeline_running.lock')
 
 def is_pipeline_window():
-    """Pausa durante la pipeline notturna (03:30-09:00) per evitare conflitti Chrome/chromedriver."""
+    """Pausa durante la pipeline notturna. Inizia alle 03:55, finisce quando il lock file sparisce (dopo le 05:30)."""
     now = datetime.now()
-    return (now.hour == PIPELINE_PAUSE_START_H and now.minute >= PIPELINE_PAUSE_START_M) or \
-           (PIPELINE_PAUSE_START_H < now.hour < PIPELINE_PAUSE_END_H)
+    h, m = now.hour, now.minute
+
+    if h < PIPELINE_PAUSE_START_H or (h == PIPELINE_PAUSE_START_H and m < PIPELINE_PAUSE_START_M):
+        return False
+    if h >= PIPELINE_FALLBACK_H:
+        return False
+    if h < PIPELINE_CHECK_LOCK_H or (h == PIPELINE_CHECK_LOCK_H and m < PIPELINE_CHECK_LOCK_M):
+        return True
+    return os.path.exists(LOCK_FILE)
 
 # --- FUNZIONI MATCHING (copiate da debug_nowgoal_scraper.py) ---
 
@@ -678,7 +688,7 @@ def main():
                     driver = None
                     _current_driver = None
                     _cycle_count = 0
-                    print(f"\n   💤 [PAUSA PIPELINE] Chrome chiuso alle {datetime.now().strftime('%H:%M')}. Ripresa alle 09:00...")
+                    print(f"\n   💤 [PAUSA PIPELINE] Chrome chiuso alle {datetime.now().strftime('%H:%M')}. Ripresa quando pipeline finisce...")
                 time.sleep(60)
                 continue
 
