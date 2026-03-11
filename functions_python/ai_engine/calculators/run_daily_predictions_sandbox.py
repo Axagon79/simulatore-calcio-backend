@@ -3250,14 +3250,21 @@ def generate_bomba_comment(match_data, bomba_result, home_team_doc, away_team_do
 
 # ==================== MAIN ====================
 
-def run_daily_predictions(target_date=None):
-    """Esegue l'intero processo di previsione giornaliera (SANDBOX)."""
+def run_daily_predictions(target_date=None, match_time_filter=None):
+    """Esegue l'intero processo di previsione giornaliera (SANDBOX).
+
+    Args:
+        target_date: data target (default: oggi)
+        match_time_filter: lista di orari per filtrare solo i match di quel gruppo orario.
+    """
 
     # Definisci la data target subito
     target_str = (target_date or datetime.now()).strftime('%Y-%m-%d')
 
     print("\n" + "=" * 70)
     print(f"🧪 DAILY PREDICTIONS SANDBOX - {target_str}")
+    if match_time_filter:
+        print(f"   ⏰ Filtro orario: {match_time_filter}")
     print("=" * 70)
 
     # Carica pesi da MongoDB (o usa default)
@@ -3274,6 +3281,11 @@ def run_daily_predictions(target_date=None):
     # 1a. Recupera partite coppe europee (UCL/UEL)
     cup_matches = get_today_cup_matches(target_date)
     matches = matches + cup_matches
+
+    # 1-filter. Filtra per orario se richiesto
+    if match_time_filter:
+        matches = [m for m in matches if m.get('match_time', '') in match_time_filter]
+        print(f"   ⏰ Match dopo filtro orario: {len(matches)}")
 
     if not matches:
         print("⚠️  Nessuna partita oggi.")
@@ -3561,8 +3573,11 @@ def run_daily_predictions(target_date=None):
     all_results = results + x_factor_results + exact_score_results
 
     if all_results:
-        # Cancella previsioni vecchie per oggi
-        predictions_collection.delete_many({'date': target_str})
+        # Cancella previsioni vecchie per oggi (filtrate per orario se richiesto)
+        delete_filter = {'date': target_str}
+        if match_time_filter:
+            delete_filter['match_time'] = {'$in': match_time_filter}
+        predictions_collection.delete_many(delete_filter)
 
         # Inserisci tutte (normali + X Factor + Risultato Esatto)
         predictions_collection.insert_many(all_results)

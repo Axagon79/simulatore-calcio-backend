@@ -1315,15 +1315,23 @@ def _get_combo_detail(markets_by_sys):
 # =====================================================
 # ORCHESTRAZIONE PRINCIPALE
 # =====================================================
-def orchestrate_date(date_str, dry_run=False):
+def orchestrate_date(date_str, dry_run=False, match_time_filter=None):
     """
     Orchestrazione per una singola data.
     Ritorna il numero di documenti scritti.
+
+    Args:
+        date_str: data in formato YYYY-MM-DD
+        dry_run: se True, non scrive in DB
+        match_time_filter: lista di orari per filtrare solo i match di quel gruppo orario.
     """
     # 1. Carica pronostici dai 3 sistemi
     docs_by_sys = {}
     for sys_id, coll_name in COLLECTIONS.items():
-        docs = list(db[coll_name].find({'date': date_str}))
+        find_filter = {'date': date_str}
+        if match_time_filter:
+            find_filter['match_time'] = {'$in': match_time_filter}
+        docs = list(db[coll_name].find(find_filter))
         idx = {}
         for doc in docs:
             # Salta documenti RISULTATO_ESATTO (duplicati con comment stringa)
@@ -1580,8 +1588,11 @@ def orchestrate_date(date_str, dry_run=False):
     coll = db['daily_predictions_unified']
 
     if not dry_run:
-        # Rimuovi vecchi documenti per questa data
-        coll.delete_many({'date': date_str})
+        # Rimuovi vecchi documenti per questa data (filtrati per orario se richiesto)
+        delete_filter = {'date': date_str}
+        if match_time_filter:
+            delete_filter['match_time'] = {'$in': match_time_filter}
+        coll.delete_many(delete_filter)
         # Inserisci nuovi
         coll.insert_many(unified_docs)
 

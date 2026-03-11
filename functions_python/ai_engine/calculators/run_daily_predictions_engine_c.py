@@ -1042,8 +1042,13 @@ def build_document(match, pronostici, dist, target_str):
 
 # ==================== FASE 7: MAIN ====================
 
-def run_engine_c(target_date=None):
-    """Entry point principale Sistema C."""
+def run_engine_c(target_date=None, match_time_filter=None):
+    """Entry point principale Sistema C.
+
+    Args:
+        target_date: data target (default: oggi)
+        match_time_filter: lista di orari per filtrare solo i match di quel gruppo orario.
+    """
     t_start = time.time()
 
     if target_date:
@@ -1053,10 +1058,18 @@ def run_engine_c(target_date=None):
         target_date = datetime.now()
 
     print(f"\n🚀 SISTEMA C — Generazione pronostici per {target_str}")
+    if match_time_filter:
+        print(f"   ⏰ Filtro orario: {match_time_filter}")
     print(f"   Cicli: {SIMULATION_CYCLES} | Algo: Master (mode {ALGO_MODE})\n")
 
     # 1. Raccolta partite
     matches = get_today_matches(target_date)
+
+    # 1-filter. Filtra per orario se richiesto
+    if match_time_filter:
+        matches = [m for m in matches if m.get('match_time', '') in match_time_filter]
+        print(f"   ⏰ Match dopo filtro orario: {len(matches)}")
+
     if not matches:
         print("❌ Nessuna partita trovata.")
         return
@@ -1137,8 +1150,11 @@ def run_engine_c(target_date=None):
 
     # 3. Salva in DB
     if documents:
-        # Rimuovi vecchi pronostici per la stessa data
-        deleted = predictions_collection.delete_many({'date': target_str})
+        # Rimuovi vecchi pronostici per la stessa data (filtrati per orario se richiesto)
+        delete_filter = {'date': target_str}
+        if match_time_filter:
+            delete_filter['match_time'] = {'$in': match_time_filter}
+        deleted = predictions_collection.delete_many(delete_filter)
         if deleted.deleted_count > 0:
             print(f"\n🗑️ Rimossi {deleted.deleted_count} pronostici precedenti per {target_str}")
 
