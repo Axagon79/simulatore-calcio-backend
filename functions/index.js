@@ -65,7 +65,7 @@ app.use('/api/feedback-loop', feedbackRoutes);
 
 const userConsentRoutes = require('./routes/userConsentRoutes');
 app.use('/user-consent', authenticate, userConsentRoutes);
-nconst walletRoutes = require('./routes/walletRoutes');
+const walletRoutes = require('./routes/walletRoutes');
 app.use('/wallet', authenticate, walletRoutes);
 
 // ============================================
