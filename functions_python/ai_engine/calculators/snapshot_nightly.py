@@ -120,6 +120,7 @@ def run_snapshot_nightly(target_date=None):
             snapshot['pronostici'] = unified_doc.get('pronostici', [])
             snapshot['odds'] = unified_doc.get('odds', {})
         else:
+            snapshot['odds'] = match.get('odds', {})
             no_bet_count += 1
 
         snapshots.append(snapshot)

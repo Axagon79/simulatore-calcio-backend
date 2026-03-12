@@ -231,6 +231,8 @@ def save_snapshot_and_detect_changes(date_str, match_time_filter, version_label)
 
         if unified_doc:
             snapshot['odds'] = unified_doc.get('odds', {})
+        else:
+            snapshot['odds'] = match.get('odds', {})
 
         snapshots.append(snapshot)
 
