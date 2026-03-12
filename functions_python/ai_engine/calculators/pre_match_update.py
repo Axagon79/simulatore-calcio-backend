@@ -15,9 +15,21 @@ import sys
 import os
 import argparse
 import time
+import logging
 from datetime import datetime, timedelta, timezone
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+LOG_FILE = os.path.join(SCRIPT_DIR, 'pre_match_update.log')
+
+# Setup logging su file
+logging.basicConfig(
+    filename=LOG_FILE,
+    level=logging.INFO,
+    format='%(asctime)s | %(levelname)s | %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S',
+)
+logger = logging.getLogger('pre_match_update')
+
 sys.path.insert(0, os.path.join(SCRIPT_DIR, '..'))
 from config import db
 
@@ -445,8 +457,10 @@ def run_full_cycle(date_str, target_date, block_times, run_label):
         queue_notifications(all_changes, date_str, run_label)
 
     elapsed = time.time() - t_start
+    n_changes = sum(len(c['changes']) for c in all_changes)
+    logger.info(f"{run_label} completato in {elapsed:.1f}s — {n_changes} cambiamenti — blocco {block_times}")
     print(f"\n✅ {run_label} completato in {elapsed:.1f}s")
-    print(f"   Cambiamenti rilevati: {sum(len(c['changes']) for c in all_changes)}")
+    print(f"   Cambiamenti rilevati: {n_changes}")
 
 
 # =====================================================
@@ -475,11 +489,13 @@ def main():
         now_minutes = now.hour * 60 + now.minute
 
     now_str = f"{now_minutes // 60:02d}:{now_minutes % 60:02d}"
+    logger.info(f"Avvio — {date_str} alle {now_str}")
     print(f"\n🕐 Pre-Match Update — {date_str} alle {now_str}")
 
     # 1. Recupera partite del giorno
     all_matches = get_all_matches(target_date)
     if not all_matches:
+        logger.info("Nessuna partita oggi")
         print("   Nessuna partita oggi. Uscita.")
         return
 
@@ -520,10 +536,18 @@ def main():
             runs_executed += 1
 
     if runs_executed == 0:
+        logger.info("Nessun blocco pronto — skip")
         print("   Nessun blocco pronto per l'aggiornamento in questo momento.")
     else:
+        logger.info(f"Run eseguiti: {runs_executed}")
         print(f"\n🏁 Totale run eseguiti: {runs_executed}")
 
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+        logger.info("Esecuzione completata OK")
+    except Exception as e:
+        logger.error(f"CRASH: {e}", exc_info=True)
+        print(f"❌ ERRORE: {e}")
+        sys.exit(1)
