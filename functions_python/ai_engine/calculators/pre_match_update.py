@@ -432,10 +432,11 @@ def queue_notifications(all_changes, date_str, run_label):
 # =====================================================
 def get_active_match_times(date_str, block_times):
     """
-    Ritorna solo gli orari del blocco che hanno almeno un pronostico attivo
-    in daily_predictions_unified.
+    Ritorna gli orari del blocco che hanno avuto almeno un pronostico attivo
+    in qualsiasi versione della giornata (prediction_versions), non solo attualmente.
+    Così anche partite diventate NO BET al -3h vengono ricalcolate al -1h.
     """
-    active_docs = list(unified_collection.find({
+    active_docs = list(versions_collection.find({
         'date': date_str,
         'match_time': {'$in': block_times},
         'pronostici': {'$exists': True, '$ne': []}

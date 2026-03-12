@@ -75,7 +75,10 @@ app.get('/prediction-versions', async (req, res) => {
     if (!date) return res.status(400).json({ error: 'Parametro date obbligatorio' });
 
     const filter = { date };
-    if (match_key) filter.match_key = match_key;
+    if (match_key) {
+      // Normalizza: lowercase + spazi → underscore (coerente con snapshot_nightly.py)
+      filter.match_key = String(match_key).toLowerCase().replace(/\s+/g, '_');
+    }
 
     const versions = await req.db.collection('prediction_versions')
       .find(filter)
