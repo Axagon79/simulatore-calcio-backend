@@ -217,7 +217,7 @@ def _calc_streak_score_b(team_name, league_name):
         pipeline = [
             {"$match": {"league": league_name}},
             {"$unwind": "$matches"},
-            {"$match": {"matches.real_score": {"$exists": True, "$ne": "-:-", "$ne": ""}}},
+            {"$match": {"matches.real_score": {"$exists": True, "$ne": None, "$nin": ["-:-", ""]}}},
             {"$sort": {"matches.date_obj": -1}},
             {"$project": {
                 "home": "$matches.home", "away": "$matches.away",
@@ -242,7 +242,7 @@ def _calc_streak_score_b(team_name, league_name):
             count = 0
             for m in team_matches:
                 score = m['score']
-                if ':' not in score:
+                if not score or ':' not in score:
                     break
                 parts = score.split(':')
                 try:

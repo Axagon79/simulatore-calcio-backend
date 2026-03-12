@@ -175,10 +175,14 @@ def get_all_data_bulk(home_team, away_team, league_name, preloaded_rounds=None):
         h_ppg = ranking.get("homePoints", 0) / h_played if h_played > 0 else 0
         a_ppg = ranking.get("awayPoints", 0) / a_played if a_played > 0 else 0
 
+        # Confronto alias-safe: il nome potrebbe essere un alias di home_team
+        team_aliases = [name] + (team.get("aliases", []) if isinstance(team.get("aliases"), list) else list(team.get("aliases", {}).values()))
+        is_home = home_team in team_aliases or name == home_team
+
         team_entry = {
-            "power": scores.get("home_power") if name == home_team else scores.get("away_power"),
-            "attack": scores.get("attack_home") if name == home_team else scores.get("attack_away"),
-            "defense": scores.get("defense_home") if name == home_team else scores.get("defense_away"),
+            "power": scores.get("home_power") if is_home else scores.get("away_power"),
+            "attack": scores.get("attack_home") if is_home else scores.get("attack_away"),
+            "defense": scores.get("defense_home") if is_home else scores.get("defense_away"),
             "motivation": stats.get("motivation", 10.0),
             "strength_score": stats.get("strengthScore09", 5.0),
             "reliability": stats.get("reliability", 5.0) or scores.get("reliability", 5.0),

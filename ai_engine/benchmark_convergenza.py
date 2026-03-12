@@ -26,6 +26,7 @@ for p in [project_root, current_dir, os.path.join(current_dir, 'engine')]:
 from config import db
 from engine.engine_core import predict_match, preload_match_data
 from engine.goals_converter import calculate_goals_from_engine
+from calculators import bulk_manager
 
 # --- IMPORT PRODUCTION (per Sistema C, identico alla pipeline notturna) ---
 def _load_prod_module(filename, module_name):
@@ -47,6 +48,36 @@ preload_match_data_PROD = _prod_ec.preload_match_data
 
 # Pre-carica settings ALGO_C in RAM (come fa run_daily_predictions_engine_c.py)
 _ALGO_C_SETTINGS = load_tuning_PROD(6)  # mode=6 in produzione = ALGO_C
+
+# --- IMPORT MODULO SISTEMA C PRODUZIONE (per simulazione flusso completo) ---
+def _load_prod_calculator(filename, module_name):
+    """Carica un modulo dalla versione PRODUCTION (functions_python/calculators/)."""
+    import importlib.util
+    prod_file = os.path.join(project_root, 'functions_python', 'ai_engine', 'calculators', filename)
+    spec = importlib.util.spec_from_file_location(module_name, prod_file)
+    mod = importlib.util.module_from_spec(spec)
+    # Aggiungi path produzione per risolvere import interni
+    prod_ai = os.path.join(project_root, 'functions_python', 'ai_engine')
+    prod_root = os.path.join(project_root, 'functions_python')
+    for p in [prod_ai, prod_root]:
+        if p not in sys.path:
+            sys.path.insert(0, p)
+    spec.loader.exec_module(mod)
+    return mod
+
+_prod_engine_c = None
+try:
+    _prod_engine_c = _load_prod_calculator('run_daily_predictions_engine_c.py', 'engine_c_prod')
+    print("✅ Modulo produzione Engine C caricato (18 regole + Kelly)")
+except Exception as e:
+    print(f"⚠️  Engine C produzione non caricato: {e}")
+
+_prod_orchestrate = None
+try:
+    _prod_orchestrate = _load_prod_calculator('orchestrate_experts.py', 'orchestrate_prod')
+    print("✅ Modulo produzione Orchestrate caricato (scrematura MoE)")
+except Exception as e:
+    print(f"⚠️  Orchestrate produzione non caricato: {e}")
 print("\n" + "=" * 60)
 print("🔧 ALGO 7 (Sistema C) — Settings da MongoDB algo_c_config:")
 print(f"   DIVISORE_MEDIA_GOL     = {_ALGO_C_SETTINGS.get('DIVISORE_MEDIA_GOL', 'MANCANTE')}")
@@ -79,6 +110,293 @@ def suppress_output():
     """Context manager per silenziare stdout."""
     import contextlib, io
     return contextlib.redirect_stdout(io.StringIO())
+
+
+def build_dist_from_scores(scores_list):
+    """
+    Costruisce il dict distribuzione (identico a run_monte_carlo output)
+    a partire da una lista di stringhe 'gh-ga'.
+    """
+    if not scores_list:
+        return None
+
+    results = []
+    for s in scores_list:
+        parts = s.split('-')
+        results.append((int(parts[0]), int(parts[1])))
+
+    n = len(results)
+    home_wins = sum(1 for g in results if g[0] > g[1])
+    draws = sum(1 for g in results if g[0] == g[1])
+    away_wins = sum(1 for g in results if g[0] < g[1])
+
+    over_15 = sum(1 for g in results if g[0] + g[1] > 1)
+    under_15 = sum(1 for g in results if g[0] + g[1] <= 1)
+    over_25 = sum(1 for g in results if g[0] + g[1] > 2)
+    under_25 = sum(1 for g in results if g[0] + g[1] <= 2)
+    over_35 = sum(1 for g in results if g[0] + g[1] > 3)
+    under_35 = sum(1 for g in results if g[0] + g[1] <= 3)
+
+    gg = sum(1 for g in results if g[0] > 0 and g[1] > 0)
+    ng = sum(1 for g in results if g[0] == 0 or g[1] == 0)
+
+    scores_str = [f"{g[0]}-{g[1]}" for g in results]
+    top_scores = Counter(scores_str).most_common(5)
+
+    avg_gh = sum(g[0] for g in results) / n
+    avg_ga = sum(g[1] for g in results) / n
+
+    return {
+        'home_win_pct': round(home_wins / n * 100, 1),
+        'draw_pct': round(draws / n * 100, 1),
+        'away_win_pct': round(away_wins / n * 100, 1),
+        'over_15_pct': round(over_15 / n * 100, 1),
+        'under_15_pct': round(under_15 / n * 100, 1),
+        'over_25_pct': round(over_25 / n * 100, 1),
+        'under_25_pct': round(under_25 / n * 100, 1),
+        'over_35_pct': round(over_35 / n * 100, 1),
+        'under_35_pct': round(under_35 / n * 100, 1),
+        'gg_pct': round(gg / n * 100, 1),
+        'ng_pct': round(ng / n * 100, 1),
+        'avg_goals_home': round(avg_gh, 2),
+        'avg_goals_away': round(avg_ga, 2),
+        'total_avg_goals': round(avg_gh + avg_ga, 2),
+        'top_scores': top_scores,
+        'valid_cycles': n,
+        'predicted_score': top_scores[0][0] if top_scores else '0-0',
+    }
+
+
+def simula_flusso_produzione(home, away, league, details, match_data, match_label):
+    """
+    Simula il flusso completo Sistema C → 18 regole → Kelly → Scrematura MoE.
+    Salva il risultato in un file separato in benchmark_output/.
+    """
+    if not _prod_engine_c:
+        print("⚠️  Modulo Engine C non disponibile, salto simulazione produzione.")
+        return None
+
+    # 1. Raccogli tutti gli scores dell'algo 7 al livello di cicli più alto
+    max_cycles = max(CYCLE_LEVELS)
+    all_scores = []
+
+    if 7 in details:
+        if max_cycles in details[7]:
+            for (prob, score, top4, scores_raw) in details[7][max_cycles]:
+                all_scores.extend(scores_raw)
+
+    if not all_scores:
+        # Fallback: cerca il livello di cicli più alto disponibile per algo 7
+        if 7 in details:
+            for cl in sorted(details[7].keys(), reverse=True):
+                for (prob, score, top4, scores_raw) in details[7][cl]:
+                    all_scores.extend(scores_raw)
+                if all_scores:
+                    break
+
+    if not all_scores:
+        print("⚠️  Nessun dato Sistema C (algo 7) disponibile per la simulazione.")
+        return None
+
+    # 2. Costruisci distribuzione
+    dist = build_dist_from_scores(all_scores)
+    if not dist:
+        return None
+
+    # 3. Estrai quote dalla partita (h2h_by_round)
+    odds = match_data.get('odds', {}) if match_data else {}
+
+    # 4. FASE 1: 18 Regole decisionali (convert_to_predictions)
+    try:
+        pronostici = _prod_engine_c.convert_to_predictions(dist, odds)
+    except Exception as e:
+        pronostici = []
+        print(f"⚠️  Errore convert_to_predictions: {e}")
+
+    # 5. FASE 2: Kelly + 5 Modificatori (modifica pronostici in-place)
+    try:
+        _prod_engine_c.apply_kelly(pronostici, dist, odds)
+    except Exception as e:
+        print(f"⚠️  Errore apply_kelly: {e}")
+
+    # 6. FASE 3: Scrematura MoE (se disponibile)
+    scrematura_result = None
+    scrematura_log = "Non disponibile (modulo orchestrate non caricato)"
+    if _prod_orchestrate and pronostici:
+        try:
+            # Simula scrematura sul SEGNO
+            unified_copy = [dict(p) for p in pronostici]
+            scrematura_result = _prod_orchestrate._apply_segno_scrematura(
+                unified_copy, odds, {}
+            )
+            scrematura_log = "Applicata"
+        except Exception as e:
+            scrematura_log = f"Errore: {e}"
+
+    # 7. Filtri quote MoE (simulati)
+    filtri_moe = []
+    pronostici_post_moe = []
+    if scrematura_result is not None:
+        source_list = scrematura_result
+    else:
+        source_list = pronostici or []
+
+    for p in source_list:
+        q = p.get('quota', 0) or 0
+        tipo = p.get('tipo', '')
+        pron = p.get('pronostico', '')
+        motivo = None
+
+        if q > 0 and q < 1.35:
+            motivo = f"Quota {q:.2f} < 1.35 (floor globale)"
+        elif tipo == 'SEGNO' and q > 0 and q < 1.50:
+            motivo = f"SEGNO @{q:.2f} < 1.50 (sub break-even)"
+        elif pron == 'Over 2.5' and q > 1.65:
+            motivo = f"Over 2.5 @{q:.2f} > 1.65 (HR drop)"
+
+        if motivo:
+            filtri_moe.append((pron, motivo))
+        else:
+            pronostici_post_moe.append(p)
+
+    # 8. Salva file
+    os.makedirs(os.path.join(current_dir, 'benchmark_output'), exist_ok=True)
+    fname = f"flusso_completo_{match_label}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
+    fpath = os.path.join(current_dir, 'benchmark_output', fname)
+
+    with open(fpath, 'w', encoding='utf-8') as f:
+        f.write(f"{'=' * 95}\n")
+        f.write(f"  SIMULAZIONE FLUSSO PRODUZIONE — {home} vs {away} ({league})\n")
+        f.write(f"  Data: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+        f.write(f"  Cicli MC aggregati: {len(all_scores)} (algo 7 - Sistema C)\n")
+        f.write(f"{'=' * 95}\n\n")
+
+        # --- DISTRIBUZIONE MC ---
+        f.write(f"┌─ DISTRIBUZIONE MONTE CARLO {'─' * 65}\n")
+        f.write(f"│\n")
+        f.write(f"│  1X2:   Casa {dist['home_win_pct']:.1f}%  |  Pareggio {dist['draw_pct']:.1f}%  |  Ospite {dist['away_win_pct']:.1f}%\n")
+        f.write(f"│  O/U:   O1.5 {dist['over_15_pct']:.1f}%  |  O2.5 {dist['over_25_pct']:.1f}%  |  O3.5 {dist['over_35_pct']:.1f}%\n")
+        f.write(f"│         U1.5 {dist['under_15_pct']:.1f}%  |  U2.5 {dist['under_25_pct']:.1f}%  |  U3.5 {dist['under_35_pct']:.1f}%\n")
+        f.write(f"│  GG/NG: GG {dist['gg_pct']:.1f}%  |  NG {dist['ng_pct']:.1f}%\n")
+        f.write(f"│  Gol:   Casa {dist['avg_goals_home']:.2f}  |  Ospite {dist['avg_goals_away']:.2f}  |  Totale {dist['total_avg_goals']:.2f}\n")
+        f.write(f"│  Top RE: ")
+        for score, count in dist['top_scores']:
+            pct = count / dist['valid_cycles'] * 100
+            f.write(f"{score} ({pct:.1f}%)  ")
+        f.write(f"\n│\n")
+        f.write(f"└{'─' * 93}\n\n")
+
+        # --- QUOTE DISPONIBILI ---
+        f.write(f"┌─ QUOTE SNAI {'─' * 80}\n")
+        if odds:
+            for k in ['1', 'X', '2', '1X', 'X2', '12', 'over_15', 'over_25', 'over_35',
+                       'under_15', 'under_25', 'under_35', 'gg', 'ng']:
+                v = odds.get(k)
+                if v:
+                    f.write(f"│  {k:>10}: {v}\n")
+        else:
+            f.write(f"│  (Nessuna quota disponibile)\n")
+        f.write(f"└{'─' * 93}\n\n")
+
+        # --- FASE 1: 18 REGOLE ---
+        f.write(f"┌─ FASE 1: 18 REGOLE DECISIONALI {'─' * 60}\n")
+        f.write(f"│\n")
+        if pronostici:
+            for i, p in enumerate(pronostici, 1):
+                tipo = p.get('tipo', '?')
+                pron = p.get('pronostico', '?')
+                conf = p.get('confidence', 0)
+                stars = p.get('stars', 0)
+                quota = p.get('quota', '-')
+                f.write(f"│  {i}. [{tipo}] {pron}  —  Conf: {conf:.1f}%  Stars: {stars:.1f}  Quota: {quota}\n")
+        else:
+            f.write(f"│  SCARTA — Nessun pronostico emesso dalle 18 regole\n")
+        f.write(f"│\n")
+        f.write(f"└{'─' * 93}\n\n")
+
+        # --- FASE 2: KELLY ---
+        f.write(f"┌─ FASE 2: KELLY 3/4 + 5 MODIFICATORI {'─' * 55}\n")
+        f.write(f"│\n")
+        if pronostici:
+            for i, p in enumerate(pronostici, 1):
+                tipo = p.get('tipo', '?')
+                pron = p.get('pronostico', '?')
+                stake = p.get('stake', '-')
+                stake_min = p.get('stake_min', '-')
+                stake_max = p.get('stake_max', '-')
+                edge = p.get('edge', '-')
+                quota = p.get('quota', '-')
+                prob_est = p.get('probabilita_stimata', '-')
+                prob_mkt = p.get('prob_mercato', '-')
+                f.write(f"│  {i}. [{tipo}] {pron}\n")
+                f.write(f"│     Stake: {stake} (range {stake_min}-{stake_max})  |  Edge: {edge}%\n")
+                f.write(f"│     Prob modello: {prob_est}%  |  Prob mercato: {prob_mkt}%  |  Quota: {quota}\n")
+        else:
+            f.write(f"│  (Nessun pronostico da valutare)\n")
+        f.write(f"│\n")
+        f.write(f"└{'─' * 93}\n\n")
+
+        # --- FASE 3: SCREMATURA MoE ---
+        f.write(f"┌─ FASE 3: SCREMATURA SEGNO MoE {'─' * 62}\n")
+        f.write(f"│\n")
+        f.write(f"│  Status: {scrematura_log}\n")
+        if scrematura_result is not None:
+            # Confronta prima/dopo
+            segno_prima = [p for p in pronostici if p.get('tipo') == 'SEGNO']
+            segno_dopo = [p for p in scrematura_result if p.get('tipo') in ('SEGNO', 'DOPPIA_CHANCE', 'GOL')]
+            if segno_prima:
+                sp = segno_prima[0]
+                quota_segno = sp.get('quota', 0) or 0
+                fascia = ''
+                if quota_segno < 1.45: fascia = '1 (1.00-1.44)'
+                elif 1.45 <= quota_segno < 1.55: fascia = '2 (1.45-1.54) BUONA'
+                elif 1.55 <= quota_segno < 1.65: fascia = '3 (1.55-1.64) BUONA'
+                elif 1.65 <= quota_segno < 1.85: fascia = '4 (1.65-1.84)'
+                elif 1.85 <= quota_segno < 2.10: fascia = '5 (1.85-2.09) BUONA'
+                elif 2.10 <= quota_segno < 2.50: fascia = '6 (2.10-2.49)'
+                elif 2.50 <= quota_segno < 3.70: fascia = '7 (2.50-3.69)'
+                elif quota_segno >= 3.70: fascia = '8 (3.70+)'
+                f.write(f"│  SEGNO originale: {sp.get('pronostico')} @{quota_segno:.2f} → Fascia {fascia}\n")
+
+            f.write(f"│  Pronostici dopo scrematura:\n")
+            for p in scrematura_result:
+                f.write(f"│    [{p.get('tipo')}] {p.get('pronostico')}  @{p.get('quota', '-')}  (source: {p.get('source', 'C')})\n")
+        f.write(f"│\n")
+        f.write(f"└{'─' * 93}\n\n")
+
+        # --- FASE 4: FILTRI QUOTE MoE ---
+        f.write(f"┌─ FASE 4: FILTRI QUOTE MoE {'─' * 66}\n")
+        f.write(f"│\n")
+        if filtri_moe:
+            for pron, motivo in filtri_moe:
+                f.write(f"│  ELIMINATO: {pron} — {motivo}\n")
+        else:
+            f.write(f"│  Nessun pronostico eliminato dai filtri quote\n")
+        f.write(f"│\n")
+        f.write(f"└{'─' * 93}\n\n")
+
+        # --- VERDETTO FINALE ---
+        f.write(f"{'═' * 95}\n")
+        f.write(f"  VERDETTO FINALE — Cosa verrebbe pubblicato su daily_predictions_unified\n")
+        f.write(f"{'═' * 95}\n\n")
+        if pronostici_post_moe:
+            for i, p in enumerate(pronostici_post_moe, 1):
+                tipo = p.get('tipo', '?')
+                pron = p.get('pronostico', '?')
+                conf = p.get('confidence', 0)
+                stake = p.get('stake', '-')
+                quota = p.get('quota', '-')
+                edge = p.get('edge', '-')
+                source = p.get('source', 'engine_c')
+                f.write(f"  ✅ {i}. [{tipo}] {pron}  —  Conf: {conf:.1f}%  Stake: {stake}  Quota: {quota}  Edge: {edge}%  (source: {source})\n")
+            f.write(f"\n  Decisione: {'SEGNO+GOL' if any(p.get('tipo') == 'SEGNO' or p.get('tipo') == 'DOPPIA_CHANCE' for p in pronostici_post_moe) and any(p.get('tipo') == 'GOL' for p in pronostici_post_moe) else 'SEGNO' if any(p.get('tipo') in ('SEGNO', 'DOPPIA_CHANCE') for p in pronostici_post_moe) else 'GOL' if any(p.get('tipo') == 'GOL' for p in pronostici_post_moe) else 'RE'}\n")
+        else:
+            f.write(f"  ❌ SCARTA — Nessun pronostico sopravvive al flusso completo\n")
+
+        f.write(f"\n{'═' * 95}\n")
+
+    print(f"\n📋 Flusso produzione salvato: {fpath}")
+    return fpath
 
 
 def get_round_number(round_name):
@@ -165,7 +483,7 @@ def scegli_partita(round_doc):
         print("❌ Scelta non valida.")
 
 
-def run_cicli(algo_id, preloaded, home, away, cycles):
+def run_cicli(algo_id, preloaded, home, away, cycles, bulk_cache=None):
     """Esegue N cicli Monte Carlo per un singolo algoritmo. Ritorna (lista '1'/'X'/'2', lista scores 'gh-ga')."""
     # Algo 7 = Sistema C: usa predict_match mode=6 + goals_converter PRODUCTION con settings_cache
     is_sistema_c = (algo_id == 7)
@@ -267,7 +585,7 @@ def calcola_stats_gol(scores):
     }
 
 
-def benchmark_partita(home, away, preloaded):
+def benchmark_partita(home, away, preloaded, bulk_cache=None):
     """Esegue il benchmark completo per una partita: tutti gli algo x tutti i livelli cicli x RIPETIZIONI ripetizioni."""
 
     # results[algo_id][cycle_level] = lista di 20 dict {1: %, X: %, 2: %}
@@ -300,7 +618,7 @@ def benchmark_partita(home, away, preloaded):
             for r in range(RIPETIZIONI):
                 if _interrupted:
                     break
-                r1x2, scores = run_cicli(algo_id, preloaded, home, away, cycles)
+                r1x2, scores = run_cicli(algo_id, preloaded, home, away, cycles, bulk_cache=bulk_cache)
                 prob = calcola_prob(r1x2)
                 score_top = risultato_esatto(scores)
                 top4 = top4_risultati(scores)
@@ -561,17 +879,20 @@ def chiedi_configurazione():
             print("   ⚠️  Input non valido, uso default.")
 
     # Ripetizioni
+    default_rip = RIPETIZIONI
     print(f"\n   Default ripetizioni per livello: {RIPETIZIONI}")
-    inp = input(f"   Ripetizioni (INVIO per {RIPETIZIONI}): ").strip()
+    inp = input(f"   Ripetizioni (numero singolo, INVIO per {RIPETIZIONI}): ").strip()
     if inp:
-        try:
-            val = int(inp)
-            if val < 1:
-                raise ValueError
-            RIPETIZIONI = val
-        except ValueError:
-            print("   ⚠️  Input non valido, uso default 20.")
-            RIPETIZIONI = 20
+        if '.' in inp or ',' in inp:
+            print(f"   ⚠️  Le ripetizioni sono un numero singolo, non una lista. Uso default {default_rip}.")
+        else:
+            try:
+                val = int(inp)
+                if val < 1:
+                    raise ValueError
+                RIPETIZIONI = val
+            except ValueError:
+                print(f"   ⚠️  Input non valido, uso default {default_rip}.")
 
     # Algoritmi
     print(f"\n   Algoritmi disponibili:")
@@ -581,7 +902,7 @@ def chiedi_configurazione():
     inp = input("   Algoritmi da testare (es. 1,5,6 — INVIO per tutti): ").strip()
     if inp:
         try:
-            selected = [int(x.strip()) for x in inp.split(',') if x.strip()]
+            selected = [int(x.strip()) for x in inp.replace('.', ',').split(',') if x.strip()]
             invalid = [s for s in selected if s not in ALGO_IDS]
             if invalid:
                 print(f"   ⚠️  Algoritmi non validi: {invalid}, uso tutti.")
@@ -633,14 +954,17 @@ def main():
         match_label = f"{home}_vs_{away}".replace(" ", "_")
         print(f"\n🏟️  Partita selezionata: {home} vs {away}")
 
-        # 4. Preload dati
+        # 4. Preload dati (via bulk_manager, identico alla produzione)
         print("\n📦 Caricamento dati dal DB...", end=" ", flush=True)
         t0 = time.time()
         try:
-            preloaded = preload_match_data(home, away)
+            bulk_cache = bulk_manager.get_all_data_bulk(home, away, league)
+            preloaded = preload_match_data(home, away, bulk_cache=bulk_cache)
             print(f"✅ ({time.time() - t0:.1f}s)")
         except Exception as e:
             print(f"\n❌ Errore preload: {e}")
+            import traceback
+            traceback.print_exc()
             continue
 
         # 5. Benchmark
@@ -648,7 +972,7 @@ def main():
         print(f"   Stima durata: dipende dalla macchina, ~5-15 minuti")
         t_bench = time.time()
 
-        results, details = benchmark_partita(home, away, preloaded)
+        results, details = benchmark_partita(home, away, preloaded, bulk_cache=bulk_cache)
 
         elapsed_total = time.time() - t_bench
         print(f"\n⏱️  BENCHMARK COMPLETATO in {elapsed_total:.0f}s ({elapsed_total/60:.1f} minuti)")
@@ -661,6 +985,13 @@ def main():
 
         # 8. Grafico singola partita
         genera_grafico_convergenza(results, details, home, away, match_label)
+
+        # 9. Simulazione flusso produzione (file separato)
+        if _prod_engine_c and 7 in details:
+            print(f"\n🏭 Simulazione flusso produzione Sistema C...")
+            simula_flusso_produzione(home, away, league, details, match, match_label)
+        elif 7 not in details:
+            print("ℹ️  Algo 7 non incluso nel benchmark, salto simulazione produzione.")
 
         # Salva per comparativo
         all_results.append(results)
