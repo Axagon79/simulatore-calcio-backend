@@ -14,8 +14,8 @@ const TIER_LIMITS = {
 };
 
 const AGGRESSIVENESS_PCT = {
-  conservative: 0.015,
-  moderate: 0.03,
+  conservative: 0.02,
+  moderate: 0.035,
   aggressive: 0.05
 };
 
@@ -28,7 +28,7 @@ const BET_TYPE_MULT = {
 };
 
 function getOddsBandMult(totalOdds) {
-  if (totalOdds < 1.5) return 1.10;
+  if (totalOdds < 1.5) return 1.30;
   if (totalOdds < 2.5) return 1.00;
   if (totalOdds < 5) return 0.80;
   if (totalOdds < 10) return 0.60;
