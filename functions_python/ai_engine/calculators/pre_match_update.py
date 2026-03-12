@@ -210,6 +210,10 @@ def save_snapshot_and_detect_changes(date_str, match_time_filter, version_label)
             old_pronostici = prev_doc.get('pronostici', [])
             changes = detect_changes(old_pronostici, new_pronostici)
 
+        # Recupera mongo_id da unified_doc o dal match h2h
+        home_mongo_id = (unified_doc or {}).get('home_mongo_id') or match.get('home_mongo_id', '')
+        away_mongo_id = (unified_doc or {}).get('away_mongo_id') or match.get('away_mongo_id', '')
+
         snapshot = {
             'match_key': match_key,
             'date': date_str,
@@ -217,6 +221,8 @@ def save_snapshot_and_detect_changes(date_str, match_time_filter, version_label)
             'away': away,
             'league': match.get('_league', ''),
             'match_time': match.get('match_time', ''),
+            'home_mongo_id': home_mongo_id,
+            'away_mongo_id': away_mongo_id,
             'version': version_label,
             'created_at': datetime.now(timezone.utc),
             'pronostici': new_pronostici,

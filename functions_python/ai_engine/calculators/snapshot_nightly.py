@@ -97,6 +97,10 @@ def run_snapshot_nightly(target_date=None):
         match_key = normalize_match_key(date_str, home, away)
         unified_doc = unified_index.get(match_key)
 
+        # Recupera mongo_id da unified_doc o dal match h2h
+        home_mongo_id = (unified_doc or {}).get('home_mongo_id') or match.get('home_mongo_id', '')
+        away_mongo_id = (unified_doc or {}).get('away_mongo_id') or match.get('away_mongo_id', '')
+
         snapshot = {
             'match_key': match_key,
             'date': date_str,
@@ -104,6 +108,8 @@ def run_snapshot_nightly(target_date=None):
             'away': away,
             'league': match.get('_league', ''),
             'match_time': match.get('match_time', ''),
+            'home_mongo_id': home_mongo_id,
+            'away_mongo_id': away_mongo_id,
             'version': 'nightly',
             'created_at': datetime.now(timezone.utc),
             'pronostici': [],
