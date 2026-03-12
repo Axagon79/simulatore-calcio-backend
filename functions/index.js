@@ -68,6 +68,27 @@ app.use('/user-consent', authenticate, userConsentRoutes);
 const walletRoutes = require('./routes/walletRoutes');
 app.use('/wallet', authenticate, walletRoutes);
 
+// GET /prediction-versions — Storico versioni pronostici per match
+app.get('/prediction-versions', async (req, res) => {
+  try {
+    const { date, match_key } = req.query;
+    if (!date) return res.status(400).json({ error: 'Parametro date obbligatorio' });
+
+    const filter = { date };
+    if (match_key) filter.match_key = match_key;
+
+    const versions = await req.db.collection('prediction_versions')
+      .find(filter)
+      .sort({ version_order: 1 })
+      .toArray();
+
+    res.json({ versions });
+  } catch (err) {
+    console.error('Errore GET /prediction-versions:', err);
+    res.status(500).json({ error: 'Errore nel recupero versioni' });
+  }
+});
+
 // ============================================
 // UTILITY FUNCTIONS
 // ============================================
