@@ -430,10 +430,26 @@ def queue_notifications(all_changes, date_str, run_label):
 # =====================================================
 # CICLO COMPLETO PER UN BLOCCO
 # =====================================================
+def get_active_match_times(date_str, block_times):
+    """
+    Ritorna solo gli orari del blocco che hanno almeno un pronostico attivo
+    in daily_predictions_unified.
+    """
+    active_docs = list(unified_collection.find({
+        'date': date_str,
+        'match_time': {'$in': block_times},
+        'pronostici': {'$exists': True, '$ne': []}
+    }, {'match_time': 1}))
+
+    active_times = list(set(doc['match_time'] for doc in active_docs if doc.get('match_time')))
+    return sorted(active_times)
+
+
 def run_full_cycle(date_str, target_date, block_times, run_label):
     """
-    Esegue il ciclo completo A→S→C→MoE per un gruppo orario,
-    poi salva snapshot, rileva cambiamenti, gestisce rimborsi e notifiche.
+    Esegue il ciclo A→S→C→MoE per un gruppo orario.
+    - update_3h: ciclo completo su TUTTE le partite del blocco (incluse scartate)
+    - update_1h: rifinitura chirurgica solo su partite con pronostici attivi
     """
     print(f"\n{'=' * 60}")
     print(f"🔄 PRE-MATCH UPDATE — {run_label} per blocco {block_times}")
@@ -441,18 +457,34 @@ def run_full_cycle(date_str, target_date, block_times, run_label):
 
     t_start = time.time()
 
+    # Per il run -1h, filtra solo partite con pronostici attivi
+    effective_times = block_times
+    if run_label == 'update_1h':
+        effective_times = get_active_match_times(date_str, block_times)
+        if not effective_times:
+            print(f"   ⏭️  Nessuna partita con pronostici attivi nel blocco — skip")
+            # Salva comunque snapshot vuoto per completezza
+            save_snapshot_and_detect_changes(date_str, block_times, run_label)
+            elapsed = time.time() - t_start
+            logger.info(f"{run_label} skip (0 attive) in {elapsed:.1f}s — blocco {block_times}")
+            print(f"\n✅ {run_label} completato in {elapsed:.1f}s (nessuna partita attiva)")
+            return
+        skipped = len(block_times) - len(effective_times)
+        if skipped > 0:
+            print(f"   🎯 Rifinitura: {len(effective_times)} partite attive, {skipped} scartate (skip)")
+
     # 1. Esegui i 4 sistemi con filtro orario
     print(f"\n--- Sistema A ---")
-    run_system_a(target_date=target_date, match_time_filter=block_times)
+    run_system_a(target_date=target_date, match_time_filter=effective_times)
 
     print(f"\n--- Sistema S ---")
-    run_system_s(target_date=target_date, match_time_filter=block_times)
+    run_system_s(target_date=target_date, match_time_filter=effective_times)
 
     print(f"\n--- Sistema C ---")
-    run_system_c(target_date=target_date, match_time_filter=block_times)
+    run_system_c(target_date=target_date, match_time_filter=effective_times)
 
     print(f"\n--- Orchestratore MoE ---")
-    run_orchestrator(date_str, dry_run=False, match_time_filter=block_times)
+    run_orchestrator(date_str, dry_run=False, match_time_filter=effective_times)
 
     # 2. Snapshot + change detection
     all_changes = save_snapshot_and_detect_changes(date_str, block_times, run_label)
