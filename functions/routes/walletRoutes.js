@@ -107,6 +107,33 @@ router.get('/transactions', async (req, res) => {
   }
 });
 
+// GET /wallet/purchases — Acquisti pronostici per data
+router.get('/purchases', async (req, res) => {
+  try {
+    const db = req.db;
+    const userId = req.user.uid;
+    const date = req.query.date;
+
+    const filter = { user_id: userId, type: 'pronostico_sbloccato' };
+    if (date) filter['metadata.date'] = date;
+
+    const purchases = await db.collection('wallet_transactions')
+      .find(filter)
+      .project({ 'metadata.match_key': 1, created_at: 1 })
+      .toArray();
+
+    res.json({
+      purchases: purchases.map(p => ({
+        match_key: p.metadata?.match_key,
+        purchased_at: p.created_at,
+      })),
+    });
+  } catch (err) {
+    console.error('Errore GET /wallet/purchases:', err);
+    res.status(500).json({ error: 'Errore nel recupero acquisti' });
+  }
+});
+
 // POST /wallet/transaction — Registra transazione (uso interno + acquisto pacchetti beta)
 router.post('/transaction', async (req, res) => {
   try {
@@ -129,6 +156,15 @@ router.post('/transaction', async (req, res) => {
 
     if (!validTypes.includes(type)) {
       return res.status(400).json({ error: `Tipo non valido. Valori: ${validTypes.join(', ')}` });
+    }
+
+    // Controlla crediti sufficienti per sblocco pronostico
+    if (type === 'pronostico_sbloccato' && credits_delta < 0) {
+      const currentUser = await db.collection('users').findOne({ firebaseUid: userId });
+      const currentCredits = currentUser?.credits ?? 0;
+      if (currentCredits + credits_delta < 0) {
+        return res.status(400).json({ error: 'Crediti insufficienti' });
+      }
     }
 
     // Aggiorna saldo utente
