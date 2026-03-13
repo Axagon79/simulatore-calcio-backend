@@ -460,8 +460,17 @@ def run_full_cycle(date_str, target_date, block_times, run_label):
 
     t_start = time.time()
 
+    # Filtra partite già iniziate
+    now_mins = int(datetime.now().hour * 60 + datetime.now().minute)
+    effective_times = [t for t in block_times if parse_match_time(t) > now_mins]
+    if not effective_times:
+        print(f"   ⏭️  Tutte le partite del blocco sono già iniziate — skip")
+        return
+    skipped_started = len(block_times) - len(effective_times)
+    if skipped_started > 0:
+        print(f"   ⏩ {skipped_started} partite già iniziate — skip, aggiorno le restanti {len(effective_times)}")
+
     # Per il run -1h, filtra solo partite con pronostici attivi
-    effective_times = block_times
     if run_label == 'update_1h':
         effective_times = get_active_match_times(date_str, block_times)
         if not effective_times:
@@ -553,14 +562,16 @@ def main():
 
     for group_times in groups:
         first_time = group_times[0]
+        last_time = group_times[-1]
         first_minutes = parse_match_time(first_time)
+        last_minutes = parse_match_time(last_time)
         block_key = '_'.join(group_times)
 
         for offset_minutes, run_label in RUNS:
             trigger_minutes = first_minutes - offset_minutes
 
-            # Finestra di tolleranza ±10 minuti
-            if not (trigger_minutes - TOLERANCE_MINUTES <= now_minutes <= trigger_minutes + TOLERANCE_MINUTES):
+            # Esegui se l'ora trigger è passata (ma non oltre l'ultima partita del blocco)
+            if now_minutes < trigger_minutes or now_minutes >= last_minutes:
                 continue
 
             # Controlla se già eseguito
