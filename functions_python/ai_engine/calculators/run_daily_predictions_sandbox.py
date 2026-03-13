@@ -1730,8 +1730,8 @@ def score_affidabilita(match_data):
 
     # Determina chi è la favorita dalle quote
     odds = match_data.get('odds', {})
-    q1 = float(odds.get('1', 99))
-    q2 = float(odds.get('2', 99))
+    q1 = float(odds.get('1') or 99)
+    q2 = float(odds.get('2') or 99)
 
     if q1 < q2:
         # Casa favorita
@@ -1817,8 +1817,8 @@ def score_motivazioni(match_data, home_team_doc, away_team_doc):
 
     # Determina favorita dalle quote
     odds = match_data.get('odds', {})
-    q1 = float(odds.get('1', 99))
-    q2 = float(odds.get('2', 99))
+    q1 = float(odds.get('1') or 99)
+    q2 = float(odds.get('2') or 99)
 
     if q1 < q2:
         mot_favorita = mot_home
@@ -2956,8 +2956,8 @@ def analyze_bomba(match_data, home_team_doc, away_team_doc):
     Cerca segnali anomali a favore della sfavorita.
     """
     odds = match_data.get('odds', {})
-    q1 = float(odds.get('1', 99))
-    q2 = float(odds.get('2', 99))
+    q1 = float(odds.get('1') or 99)
+    q2 = float(odds.get('2') or 99)
     h2h = match_data.get('h2h_data', {})
 
     # Determina chi è la sfavorita
@@ -3087,8 +3087,8 @@ def generate_comment(match_data, segno_result, gol_result, decision_result):
     """
     h2h = match_data.get('h2h_data', {})
     odds = match_data.get('odds', {})
-    q1 = float(odds.get('1', 99))
-    q2 = float(odds.get('2', 99))
+    q1 = float(odds.get('1') or 99)
+    q2 = float(odds.get('2') or 99)
 
     # Determina favorita/sfidante
     if q1 < q2:
@@ -3216,8 +3216,8 @@ def generate_bomba_comment(match_data, bomba_result, home_team_doc, away_team_do
     """Genera commento per le bombe usando il pool JSON."""
     h2h = match_data.get('h2h_data', {})
     odds = match_data.get('odds', {})
-    q1 = float(odds.get('1', 99))
-    q2 = float(odds.get('2', 99))
+    q1 = float(odds.get('1') or 99)
+    q2 = float(odds.get('2') or 99)
 
     if q1 > q2:
         lucifero_sfi = h2h.get('lucifero_home', 0)
@@ -3297,7 +3297,19 @@ def run_daily_predictions(target_date=None, match_time_filter=None):
         print("⚠️  Nessuna partita oggi.")
         return
 
-    # 1b. Costruisci cache strisce per tutte le leghe delle partite di oggi
+    # 1b. Recupera partite già finite da h2h_by_round (per non sovrascrivere pronostici esistenti)
+    finished_keys = set()
+    h2h_today = h2h_collection.find_one({'date': target_str}, {'matches': 1})
+    if h2h_today:
+        for m in h2h_today.get('matches', []):
+            rs = m.get('real_score', '')
+            if rs and rs not in ('-:-', ''):
+                fk = f"{m.get('home', '')}_{m.get('away', '')}"
+                finished_keys.add(fk)
+    if finished_keys:
+        print(f"   ✅ Partite già finite: {len(finished_keys)} — verranno saltate")
+
+    # 1c. Costruisci cache strisce per tutte le leghe delle partite di oggi
     leagues_today = set(m.get('_league', '') for m in matches if m.get('_league'))
     for league in leagues_today:
         build_streak_cache(league)
@@ -3316,13 +3328,25 @@ def run_daily_predictions(target_date=None, match_time_filter=None):
         print(f"\n{'─' * 50}")
         print(f"⚽ {home} vs {away} ({league})")
 
+        # Skip partite già finite — il pronostico precedente resta intatto
+        match_key_check = f"{home}_{away}"
+        if match_key_check in finished_keys:
+            print(f"   ⏭️ Partita già finita — skip (pronostico precedente preservato)")
+            continue
+
         # Recupera dati squadre + analisi (coppe: algoritmo dedicato)
         if match.get('_source') == 'cup':
             home_team_doc = None
             away_team_doc = None
             segno_result = analyze_cup_segno(match)
             if segno_result is None:
-                segno_result = {'score': 0, 'segno': '-', 'segno_blocked': True, 'details': {}}
+                segno_result = {
+                    'score': 0, 'segno': '-', 'segno_blocked': True,
+                    'doppia_chance': None, 'doppia_chance_quota': None,
+                    'odds': {'1': 99, 'X': 99, '2': 99},
+                    'dettaglio': {}, 'dettaglio_raw': {},
+                    'streak_adjustment_segno': 0,
+                }
             gol_result = analyze_cup_gol(match, league)
         else:
             home_team_doc = get_team_data(home)
@@ -3582,9 +3606,13 @@ def run_daily_predictions(target_date=None, match_time_filter=None):
 
     if all_results:
         # Cancella previsioni vecchie per oggi (filtrate per orario se richiesto)
+        # Escludi partite già finite per preservare pronostici e timestamp originali
+        finished_homes = [k.split('_')[0] for k in finished_keys] if finished_keys else []
         delete_filter = {'date': target_str}
         if match_time_filter:
             delete_filter['match_time'] = {'$in': match_time_filter}
+        if finished_homes:
+            delete_filter['home'] = {'$nin': finished_homes}
         predictions_collection.delete_many(delete_filter)
 
         # Inserisci tutte (normali + X Factor + Risultato Esatto)
