@@ -3299,13 +3299,20 @@ def run_daily_predictions(target_date=None, match_time_filter=None):
 
     # 1b. Recupera partite già finite da h2h_by_round (per non sovrascrivere pronostici esistenti)
     finished_keys = set()
-    h2h_today = h2h_collection.find_one({'date': target_str}, {'matches': 1})
-    if h2h_today:
-        for m in h2h_today.get('matches', []):
-            rs = m.get('real_score', '')
-            if rs and rs not in ('-:-', ''):
-                fk = f"{m.get('home', '')}_{m.get('away', '')}"
-                finished_keys.add(fk)
+    target_date_obj = datetime.strptime(target_str, '%Y-%m-%d')
+    day_start = target_date_obj.replace(hour=0, minute=0, second=0)
+    day_end = target_date_obj.replace(hour=23, minute=59, second=59)
+    for h2h_doc in h2h_collection.find(
+        {'matches.date_obj': {'$gte': day_start, '$lte': day_end}},
+        {'matches': 1}
+    ):
+        for m in h2h_doc.get('matches', []):
+            d_obj = m.get('date_obj')
+            if d_obj and day_start <= d_obj <= day_end:
+                rs = m.get('real_score', '')
+                if rs and rs not in ('-:-', '') and rs != '-':
+                    fk = f"{m.get('home', '')}_{m.get('away', '')}"
+                    finished_keys.add(fk)
     if finished_keys:
         print(f"   ✅ Partite già finite: {len(finished_keys)} — verranno saltate")
 
