@@ -142,13 +142,15 @@ PREDICTION_COLLECTIONS = [
 
 # Cerca documenti con date passate dove almeno un pronostico:
 # - non ha profit_loss (pending), oppure
-# - ha esito='void' (rinvio che potrebbe essere stato recuperato)
+# - ha esito='void' (rinvio che potrebbe essere stato recuperato), oppure
+# - ha profit_loss ma manca hit (fix retroattivo)
 query = {
     'date': {'$lt': today},
     'pronostici': {'$elemMatch': {'$or': [
         {'profit_loss': {'$exists': False}},
         {'profit_loss': None},
         {'esito': 'void'},
+        {'hit': None, 'profit_loss': {'$ne': None}},
     ]}},
 }
 
@@ -184,12 +186,15 @@ for coll_name in PREDICTION_COLLECTIONS:
         for i, prono in enumerate(doc.get('pronostici', [])):
             stats['pronostici'] += 1
 
-            # Skip se già calcolato, MA ricalcola i void se ora il risultato esiste
+            # Skip se già calcolato, MA ricalcola se:
+            # - esito='void' e ora il risultato esiste
+            # - hit manca (fix retroattivo)
             was_void = False
             if prono.get('profit_loss') is not None:
-                if prono.get('esito') == 'void' and parsed is not None:
+                if prono.get('hit') is None and parsed is not None:
+                    pass  # Ricalcola per scrivere hit
+                elif prono.get('esito') == 'void' and parsed is not None:
                     was_void = True
-                    # Il risultato è arrivato → ricalcola
                 else:
                     continue
 
@@ -232,6 +237,8 @@ for coll_name in PREDICTION_COLLECTIONS:
 
             updates[f'pronostici.{i}.esito'] = esito
             updates[f'pronostici.{i}.profit_loss'] = pl
+            if esito is True or esito is False:
+                updates[f'pronostici.{i}.hit'] = esito
             stats['aggiornati'] += 1
 
         if updates:
