@@ -1056,9 +1056,9 @@ def cup_potenza(match):
     """Segnale Potenza: ELO (40%) + Quote (35%) + Valore Rosa (25%).
     Ritorna (home_score, away_score) su scala 0-100."""
     odds = match.get('odds', {})
-    q1 = float(odds.get('1', 99))
-    qx = float(odds.get('X', 99))
-    q2 = float(odds.get('2', 99))
+    q1 = float(odds.get('1') or 99)
+    qx = float(odds.get('X') or 99)
+    q2 = float(odds.get('2') or 99)
 
     # Quote: probabilità implicita senza aggio
     total_ip = 0
@@ -1319,9 +1319,15 @@ def analyze_cup_segno(match):
     4 segnali per-team: Forma, Potenza, Rendimento, Solidità.
     Home total vs Away total → favorita + confidence."""
     odds = match.get('odds', {})
-    q1 = float(odds.get('1', 99))
-    qx = float(odds.get('X', 99))
-    q2 = float(odds.get('2', 99))
+    raw_1 = odds.get('1')
+    raw_x = odds.get('X')
+    raw_2 = odds.get('2')
+    if raw_1 is None or raw_x is None or raw_2 is None:
+        print(f"   ⚠️ Quote 1X2 mancanti per {match.get('home')} vs {match.get('away')} — skip SEGNO coppa")
+        return None
+    q1 = float(raw_1)
+    qx = float(raw_x)
+    q2 = float(raw_2)
 
     # Calcola i 4 segnali (ognuno ritorna (home, away))
     forma_h, forma_a = cup_forma(match)
@@ -1632,9 +1638,9 @@ def score_quote(match_data):
     Sotto 1.35 = scarta, sopra 2.20 = penalizzata.
     """
     odds = match_data.get('odds', {})
-    q1 = float(odds.get('1', 99))
-    qx = float(odds.get('X', 99))
-    q2 = float(odds.get('2', 99))
+    q1 = float(odds.get('1') or 99)
+    qx = float(odds.get('X') or 99)
+    q2 = float(odds.get('2') or 99)
 
     if q1 == 99 or q2 == 99:
         return 30  # Dati mancanti
@@ -1938,9 +1944,9 @@ def analyze_segno(match_data, home_team_doc, away_team_doc):
 
     # Determina QUALE segno
     odds = match_data.get('odds', {})
-    q1 = float(odds.get('1', 99))
-    qx = float(odds.get('X', 99))
-    q2 = float(odds.get('2', 99))
+    q1 = float(odds.get('1') or 99)
+    qx = float(odds.get('X') or 99)
+    q2 = float(odds.get('2') or 99)
 
     # Blocco pronostico segno se quota favorita sotto 1.35 (ma analisi resta visibile)
     q_fav = min(q1, q2)
@@ -3315,6 +3321,8 @@ def run_daily_predictions(target_date=None, match_time_filter=None):
             home_team_doc = None
             away_team_doc = None
             segno_result = analyze_cup_segno(match)
+            if segno_result is None:
+                segno_result = {'score': 0, 'segno': '-', 'segno_blocked': True, 'details': {}}
             gol_result = analyze_cup_gol(match, league)
         else:
             home_team_doc = get_team_data(home)
