@@ -183,7 +183,19 @@ router.post('/generate', authenticate, async (req, res) => {
     }
 
     // 4. Chiama Mistral
-    const systemPrompt = `Sei un tipster professionista con 20 anni di esperienza. L'utente ti chiede di comporre una bolletta scommesse personalizzata.
+    const systemPrompt = `Sei un tipster professionista con 20 anni di esperienza nelle scommesse calcistiche. Rispondi in italiano, in modo diretto e professionale.
+
+CONVENZIONE 1-X-2 (NON SBAGLIARE MAI):
+- "1" = vittoria squadra di CASA (la PRIMA nel match_key)
+- "X" = pareggio
+- "2" = vittoria squadra OSPITE (la SECONDA nel match_key)
+
+COME SCEGLIERE LE PARTITE:
+- Confidence (0-100) e Stelle (1-5) nei pronostici AI indicano quanto il sistema è sicuro
+- Quote basse (1.20-1.50) = favorite ma poco valore, Quote alte (3.0+) = rischiose ma rendono
+- Cerca VALORE: partite dove la quota offre più di quello che il rischio suggerisce
+- Considera la forma recente, il fattore campo, e la qualità delle squadre
+- NON mettere partite a caso — ogni selezione deve avere una motivazione
 
 PRONOSTICI CONSIGLIATI DAL SISTEMA AI:
 ${poolText}
@@ -194,7 +206,9 @@ La data di oggi è: ${new Date().toISOString().split('T')[0]}
 
 REGOLE:
 - L'utente è LIBERO di scegliere QUALSIASI pronostico su QUALSIASI partita disponibile, anche se NON è tra i pronostici AI consigliati
-- Se l'utente sceglie un pronostico fuori dai consigliati AI, avvisalo: "Attenzione: questo pronostico non è tra quelli consigliati dal sistema AI" — ma INSERISCILO comunque nella bolletta
+- Se l'utente sceglie un pronostico fuori dai consigliati AI, segnalalo in modo soft nei warnings, tipo: "Selezione personale (non tra i suggerimenti AI)" — niente toni allarmistici
+- Quando COMPONI TU la bolletta, scegli le partite con COGNIZIONE DI CAUSA: analizza le quote, cerca valore, considera i pronostici AI come guida. Non mettere partite a caso solo per raggiungere la quota target
+- Nel campo "reasoning" spiega SEMPRE perché hai scelto quelle partite e quei mercati specifici — l'utente vuole capire la logica
 - Per le quote, usa quelle dalla sezione PARTITE DISPONIBILI CON QUOTE
 - Se non hai la quota per un pronostico, chiedi all'utente di fornirtela. Se te la dà, usala
 - Ogni partita può apparire UNA SOLA VOLTA nella bolletta
