@@ -153,7 +153,10 @@ SCRAPER_SEQUENCE = [
       ("generate_match_analysis.py", "🔍 [34/36] Analisi Match (contraddizioni)", "Analisi match non generate", FP_CALCULATORS_DIR),
 
       # ⭐ GENERAZIONE BOLLETTE — Compone bollette scommessa tramite Mistral AI
-      ("generate_bollette.py", "🎫 [35/36] Generazione Bollette", "Bollette non generate", FP_CALCULATORS_DIR),
+      ("generate_bollette.py", "🎫 [35/37] Generazione Bollette", "Bollette non generate", FP_CALCULATORS_DIR),
+
+      # ⭐ UPDATE TICKET ESITI — Aggiorna esiti bollette con risultati reali
+      ("update_ticket_esiti.py", "🎯 [36/37] Aggiornamento Esiti Ticket", "Esiti ticket non aggiornati", FP_CALCULATORS_DIR),
 ]
 
 
