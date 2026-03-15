@@ -104,11 +104,12 @@ router.post('/generate', authenticate, async (req, res) => {
 
     const docs = await req.db.collection('daily_predictions_unified')
       .find({ date: { $in: dates } })
-      .project({ home: 1, away: 1, date: 1, league: 1, match_time: 1, pronostici: 1 })
+      .project({ home: 1, away: 1, date: 1, league: 1, match_time: 1, pronostici: 1, odds: 1 })
       .toArray();
 
     // Costruisci pool (escludi partite iniziate e RE)
     const pool = [];
+    const allMatches = []; // tutte le partite con odds per selezioni fuori pool
     for (const doc of docs) {
       const matchDate = doc.date;
       const matchTime = doc.match_time || '00:00';
@@ -116,6 +117,14 @@ router.post('/generate', authenticate, async (req, res) => {
         const kickOff = new Date(`${matchDate}T${matchTime}:00`);
         if (kickOff <= now) continue;
       } catch (_) {}
+
+      // Salva partita con odds per selezioni fuori pool
+      allMatches.push({
+        match_key: `${doc.home} vs ${doc.away}|${matchDate}`,
+        home: doc.home, away: doc.away, league: doc.league || '',
+        match_time: matchTime, match_date: matchDate,
+        odds: doc.odds || {},
+      });
 
       for (const p of (doc.pronostici || [])) {
         const quota = p.quota;
@@ -150,37 +159,53 @@ router.post('/generate', authenticate, async (req, res) => {
     }
     let poolText = '';
     for (const date of Object.keys(poolByDate).sort()) {
-      poolText += `\n=== ${date} ===\n`;
+      poolText += `\n=== PRONOSTICI AI — ${date} ===\n`;
       for (const s of poolByDate[date]) {
         poolText += `  ${s.match_key} | ${s.mercato}: ${s.pronostico} @ ${s.quota} | conf=${s.confidence} ★${s.stars}\n`;
       }
     }
 
-    // 3. Chiama Mistral
+    // 3. Costruisci lista partite con odds per selezioni fuori pool
+    let matchesText = '\n=== PARTITE DISPONIBILI CON QUOTE ===\n';
+    for (const m of allMatches) {
+      const o = m.odds;
+      const parts = [];
+      if (o['1']) parts.push(`1=${o['1']}`);
+      if (o['X']) parts.push(`X=${o['X']}`);
+      if (o['2']) parts.push(`2=${o['2']}`);
+      if (o['over_25']) parts.push(`Over2.5=${o['over_25']}`);
+      if (o['under_25']) parts.push(`Under2.5=${o['under_25']}`);
+      if (o['gg']) parts.push(`Goal=${o['gg']}`);
+      if (o['ng']) parts.push(`NoGoal=${o['ng']}`);
+      matchesText += `  ${m.match_key} | ore ${m.match_time} | ${parts.join(', ')}\n`;
+    }
+
+    // 4. Chiama Mistral
     const systemPrompt = `Sei un tipster professionista con 20 anni di esperienza. L'utente ti chiede di comporre una bolletta scommesse personalizzata.
 
-Hai a disposizione questo pool di pronostici generati da un sistema AI:
+PRONOSTICI CONSIGLIATI DAL SISTEMA AI:
 ${poolText}
 
+${matchesText}
+
 REGOLE:
-- Ogni partita può apparire UNA SOLA VOLTA nella bolletta, con UN SOLO mercato
-- La quota totale si calcola MOLTIPLICANDO le quote delle selezioni tra loro
-- Rispetta le indicazioni dell'utente (quota target, numero selezioni, tipo, ecc.)
-- Se l'utente non specifica, usa il tuo giudizio da professionista
-- NON inventare partite o pronostici che non sono nel pool
+- L'utente è LIBERO di scegliere QUALSIASI pronostico su QUALSIASI partita disponibile, anche se NON è tra i pronostici AI consigliati
+- Se l'utente sceglie un pronostico fuori dai consigliati AI, avvisalo: "Attenzione: questo pronostico non è tra quelli consigliati dal sistema AI" — ma INSERISCILO comunque nella bolletta
+- Per le quote, usa quelle dalla sezione PARTITE DISPONIBILI CON QUOTE
+- Se non hai la quota per un pronostico, chiedi all'utente di fornirtela. Se te la dà, usala
+- Ogni partita può apparire UNA SOLA VOLTA nella bolletta
+- La quota totale = prodotto di tutte le quote
+- Per selezioni fuori dai pronostici AI, aggiungi "from_pool": false
 
-FORMATO RISPOSTA — Restituisci SEMPRE un JSON valido. Nessun testo prima o dopo. Nessun markdown.
+FORMATO RISPOSTA — SEMPRE JSON valido. Nessun testo. Nessun markdown.
 
-Se generi o aggiorni una bolletta:
-{"type": "bolletta", "selezioni": [{"match_key": "Home vs Away|YYYY-MM-DD", "mercato": "TIPO", "pronostico": "valore"}], "reasoning": "Motivazione"}
+Bolletta:
+{"type": "bolletta", "selezioni": [{"match_key": "Home vs Away|YYYY-MM-DD", "mercato": "SEGNO", "pronostico": "2", "quota": 1.85, "from_pool": false}], "reasoning": "Motivazione", "warnings": ["SEGNO 2 per Lazio vs Milan non è nei pronostici AI"]}
 
-Se rispondi a una domanda, spieghi una scelta, o dai info sulle partite:
-{"type": "messaggio", "text": "La tua risposta qui..."}
+Risposta testuale:
+{"type": "messaggio", "text": "La tua risposta..."}
 
-Se la richiesta non riguarda calcio/scommesse:
-{"type": "messaggio", "text": "Posso aiutarti a comporre bollette o darti info sulle partite disponibili!"}
-
-match_key, mercato e pronostico devono corrispondere ESATTAMENTE al pool.`;
+match_key deve essere nel formato "Home vs Away|YYYY-MM-DD" delle partite disponibili.`;
 
     const resp = await fetch(MISTRAL_URL, {
       method: 'POST',
@@ -229,33 +254,54 @@ match_key, mercato e pronostico devono corrispondere ESATTAMENTE al pool.`;
       return res.json({ success: false, error: generated.error });
     }
 
-    // 4. Valida selezioni contro il pool (type === 'bolletta' o legacy)
+    // Valida selezioni — dal pool o fuori pool
     const poolIndex = {};
     for (const s of pool) {
       poolIndex[`${s.match_key}|${s.mercato}|${s.pronostico}`] = s;
     }
+    const matchIndex = {};
+    for (const m of allMatches) {
+      matchIndex[m.match_key] = m;
+    }
 
     const selezioni = [];
     let quotaTotale = 1.0;
+    const warnings = generated.warnings || [];
+
     for (const sel of (generated.selezioni || [])) {
       const key = `${sel.match_key}|${sel.mercato}|${sel.pronostico}`;
       const entry = poolIndex[key];
-      if (!entry) continue;
 
-      quotaTotale *= entry.quota;
-      selezioni.push({
-        home: entry.home,
-        away: entry.away,
-        league: entry.league,
-        match_time: entry.match_time,
-        match_date: entry.match_date,
-        mercato: entry.mercato,
-        pronostico: entry.pronostico,
-        quota: entry.quota,
-        confidence: entry.confidence,
-        stars: entry.stars,
-        esito: null,
-      });
+      if (entry) {
+        // Selezione dal pool AI
+        quotaTotale *= entry.quota;
+        selezioni.push({
+          home: entry.home, away: entry.away, league: entry.league,
+          match_time: entry.match_time, match_date: entry.match_date,
+          mercato: entry.mercato, pronostico: entry.pronostico,
+          quota: entry.quota, confidence: entry.confidence, stars: entry.stars,
+          esito: null, from_pool: true,
+        });
+      } else {
+        // Selezione fuori pool — usa dati dalla partita + quota da Mistral
+        const match = matchIndex[sel.match_key];
+        if (!match && !sel.quota) continue; // partita non esiste e nessuna quota
+
+        const quota = sel.quota || 0;
+        if (quota <= 0) continue;
+
+        quotaTotale *= quota;
+        selezioni.push({
+          home: match?.home || sel.match_key.split(' vs ')[0]?.split('|')[0] || '',
+          away: match?.away || sel.match_key.split(' vs ')[1]?.split('|')[0] || '',
+          league: match?.league || '',
+          match_time: match?.match_time || '',
+          match_date: match?.match_date || sel.match_key.split('|')[1] || '',
+          mercato: sel.mercato, pronostico: sel.pronostico,
+          quota: quota, confidence: 0, stars: 0,
+          esito: null, from_pool: false,
+        });
+      }
     }
 
     if (selezioni.length < 1) {
@@ -276,7 +322,7 @@ match_key, mercato e pronostico devono corrispondere ESATTAMENTE al pool.`;
       reasoning: generated.reasoning || '',
     };
 
-    res.json({ success: true, type: 'bolletta', bolletta });
+    res.json({ success: true, type: 'bolletta', bolletta, warnings });
   } catch (err) {
     console.error('Errore POST /bollette/generate:', err);
     res.status(500).json({ success: false, error: 'Errore server' });
