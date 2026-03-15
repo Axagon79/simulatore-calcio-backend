@@ -35,17 +35,19 @@ router.put('/:id/save', authenticate, async (req, res) => {
     if (!doc) return res.status(404).json({ success: false, error: 'Bolletta non trovata' });
 
     const isSaved = (doc.saved_by || []).includes(uid);
+    const stakeAmount = req.body?.stake_amount || 0;
 
     if (isSaved) {
       await req.db.collection('bollette').updateOne(
         { _id: bolId },
-        { $pull: { saved_by: uid } }
+        { $pull: { saved_by: uid }, $unset: { [`user_stakes.${uid}`]: '' } }
       );
     } else {
-      await req.db.collection('bollette').updateOne(
-        { _id: bolId },
-        { $addToSet: { saved_by: uid } }
-      );
+      const update = { $addToSet: { saved_by: uid } };
+      if (stakeAmount > 0) {
+        update.$set = { [`user_stakes.${uid}`]: stakeAmount };
+      }
+      await req.db.collection('bollette').updateOne({ _id: bolId }, update);
     }
 
     res.json({ success: true, saved: !isSaved });
