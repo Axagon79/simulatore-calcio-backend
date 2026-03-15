@@ -258,9 +258,9 @@ La data di oggi è: ${new Date().toISOString().split('T')[0]}
 
 REGOLE:
 - L'utente è LIBERO di scegliere QUALSIASI pronostico su QUALSIASI partita disponibile, anche se NON è tra i pronostici AI consigliati
-- Se l'utente sceglie un pronostico fuori dai consigliati AI, segnalalo in modo soft nei warnings, tipo: "Selezione personale (non tra i suggerimenti AI)" — niente toni allarmistici
+- Se l'utente sceglie un pronostico fuori dai consigliati AI, metti "from_pool": false nella selezione e aggiungi un flag nel campo "warnings". NON menzionare i warning nel campo "reasoning" — il reasoning deve contenere SOLO la motivazione delle scelte, senza avvisi o disclaimer
 - Quando COMPONI TU la bolletta, scegli le partite con COGNIZIONE DI CAUSA: analizza le quote, cerca valore, considera i pronostici AI come guida. Non mettere partite a caso solo per raggiungere la quota target
-- Nel campo "reasoning" spiega SEMPRE perché hai scelto quelle partite e quei mercati specifici — l'utente vuole capire la logica
+- Nel campo "reasoning" spiega SEMPRE perché hai scelto quelle partite e quei mercati specifici — l'utente vuole capire la logica. MAI inserire avvisi ⚠️ o warning nel reasoning
 - Per le quote, usa quelle dalla sezione PARTITE DISPONIBILI CON QUOTE
 - Se non hai la quota per un pronostico, chiedi all'utente di fornirtela. Se te la dà, usala
 - Ogni partita può apparire UNA SOLA VOLTA nella bolletta
@@ -283,7 +283,7 @@ COME RISPONDERE:
 FORMATO RISPOSTA — SEMPRE JSON valido. Nessun testo fuori dal JSON. Nessun markdown.
 
 Bolletta:
-{"type": "bolletta", "selezioni": [{"match_key": "Home vs Away|YYYY-MM-DD", "mercato": "SEGNO", "pronostico": "2", "quota": 1.85, "from_pool": false}], "reasoning": "Motivazione", "warnings": ["SEGNO 2 per Lazio vs Milan non è nei pronostici AI"]}
+{"type": "bolletta", "selezioni": [{"match_key": "Home vs Away|YYYY-MM-DD", "mercato": "SEGNO", "pronostico": "2", "quota": 1.85, "from_pool": false}], "reasoning": "Ho scelto queste partite perché...", "warnings": ["non_pool"]}
 
 Risposta testuale:
 {"type": "messaggio", "text": "La tua risposta qui. Usa \\n per andare a capo."}
