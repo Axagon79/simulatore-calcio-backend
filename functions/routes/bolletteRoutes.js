@@ -24,6 +24,58 @@ router.get('/', async (req, res) => {
 });
 
 // ============================================
+// GET /bollette/storico?date=YYYY-MM-DD — Bollette + stats per data
+// ============================================
+router.get('/storico', async (req, res) => {
+  try {
+    const date = req.query.date;
+    if (!date) return res.status(400).json({ success: false, error: 'Parametro date richiesto' });
+
+    const bollette = await req.db.collection('bollette')
+      .find({ date, custom: { $ne: true } })
+      .sort({ tipo: 1, quota_totale: 1 })
+      .toArray();
+
+    // Stats per fascia
+    const stats = { totale: bollette.length, per_tipo: {} };
+    for (const b of bollette) {
+      const tipo = b.tipo || 'altro';
+      if (!stats.per_tipo[tipo]) stats.per_tipo[tipo] = { totale: 0, vinte: 0, perse: 0, pending: 0 };
+      stats.per_tipo[tipo].totale++;
+      if (b.esito_globale === 'vinta') stats.per_tipo[tipo].vinte++;
+      else if (b.esito_globale === 'persa') stats.per_tipo[tipo].perse++;
+      else stats.per_tipo[tipo].pending++;
+    }
+
+    // Stats globali
+    const vinte = bollette.filter(b => b.esito_globale === 'vinta').length;
+    const perse = bollette.filter(b => b.esito_globale === 'persa').length;
+    const pending = bollette.filter(b => !b.esito_globale).length;
+
+    res.json({
+      success: true, date, bollette,
+      stats: { totale: bollette.length, vinte, perse, pending, per_tipo: stats.per_tipo },
+    });
+  } catch (err) {
+    console.error('Errore GET /bollette/storico:', err);
+    res.status(500).json({ success: false, error: 'Errore server' });
+  }
+});
+
+// ============================================
+// GET /bollette/date-disponibili — Lista date con bollette generate
+// ============================================
+router.get('/date-disponibili', async (req, res) => {
+  try {
+    const dates = await req.db.collection('bollette').distinct('date', { custom: { $ne: true } });
+    res.json({ success: true, dates: dates.sort().reverse() });
+  } catch (err) {
+    console.error('Errore GET /bollette/date-disponibili:', err);
+    res.status(500).json({ success: false, error: 'Errore server' });
+  }
+});
+
+// ============================================
 // PUT /bollette/:id/save — Toggle saved_by (auth)
 // ============================================
 router.put('/:id/save', authenticate, async (req, res) => {
