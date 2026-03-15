@@ -117,10 +117,22 @@ def build_pool(today_str):
          "home_mongo_id": 1, "away_mongo_id": 1, "pronostici": 1, "odds": 1}
     ))
 
+    now = datetime.now()
+
     for doc in docs:
         home = doc.get("home", "")
         away = doc.get("away", "")
         match_date = doc.get("date", "")
+        match_time = doc.get("match_time", "00:00")
+
+        # Escludi partite già iniziate
+        try:
+            kick_off = datetime.strptime(f"{match_date} {match_time}", "%Y-%m-%d %H:%M")
+            if kick_off <= now:
+                continue
+        except ValueError:
+            pass
+
         match_key = f"{home} vs {away}|{match_date}"
 
         for p in doc.get("pronostici", []):
