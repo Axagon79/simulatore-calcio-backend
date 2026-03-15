@@ -68,6 +68,9 @@ app.use('/user-consent', authenticate, userConsentRoutes);
 const walletRoutes = require('./routes/walletRoutes');
 app.use('/wallet', authenticate, walletRoutes);
 
+const bolletteRoutes = require('./routes/bolletteRoutes');
+app.use('/bollette', bolletteRoutes);
+
 // GET /prediction-versions — Storico versioni pronostici per match
 app.get('/prediction-versions', async (req, res) => {
   try {

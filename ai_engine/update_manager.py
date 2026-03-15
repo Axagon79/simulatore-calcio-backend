@@ -141,16 +141,19 @@ SCRAPER_SEQUENCE = [
       ("run_daily_predictions_engine_c.py", "🎲 [30/31] Pronostici Sistema C (MC)", "Pronostici Monte Carlo non generati", FP_CALCULATORS_DIR),
 
       # ⭐ MIXTURE OF EXPERTS — Orchestratore (legge A+C+S, applica routing, scrive in unified)
-      ("orchestrate_experts.py", "🎼 [31/35] Orchestrazione MoE", "Pronostici unified non generati", FP_CALCULATORS_DIR),
+      ("orchestrate_experts.py", "🎼 [31/36] Orchestrazione MoE", "Pronostici unified non generati", FP_CALCULATORS_DIR),
 
       # ⭐ SNAPSHOT NIGHTLY — Salva versione nightly di tutti i match in prediction_versions
-      ("snapshot_nightly.py", "📸 [32/35] Snapshot Nightly (Versioning)", "Storico versioni pronostici non salvato", FP_CALCULATORS_DIR),
+      ("snapshot_nightly.py", "📸 [32/36] Snapshot Nightly (Versioning)", "Storico versioni pronostici non salvato", FP_CALCULATORS_DIR),
 
       # ⭐ SCRAPER RE — Quote Risultato Esatto da SNAI (solo partite con RE prediction)
-      ("scrape_snai_exact_score.py", "💎 [33/35] Quote RE (SNAI)", "Quote risultato esatto mancanti", FREQUENT_DIR),
+      ("scrape_snai_exact_score.py", "💎 [33/36] Quote RE (SNAI)", "Quote risultato esatto mancanti", FREQUENT_DIR),
 
       # ⭐ ANALISI MATCH — Genera analisi free per ogni pronostico unified (22 checker contraddizioni)
-      ("generate_match_analysis.py", "🔍 [34/35] Analisi Match (contraddizioni)", "Analisi match non generate", FP_CALCULATORS_DIR),
+      ("generate_match_analysis.py", "🔍 [34/36] Analisi Match (contraddizioni)", "Analisi match non generate", FP_CALCULATORS_DIR),
+
+      # ⭐ GENERAZIONE BOLLETTE — Compone bollette scommessa tramite Mistral AI
+      ("generate_bollette.py", "🎫 [35/36] Generazione Bollette", "Bollette non generate", FP_CALCULATORS_DIR),
 ]
 
 
