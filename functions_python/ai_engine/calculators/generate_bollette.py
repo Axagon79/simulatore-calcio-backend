@@ -73,7 +73,7 @@ REGOLE COMPOSIZIONE
 2. La stessa partita con lo stesso pronostico PUÒ apparire in bollette diverse, ma ATTENZIONE: non ripetere la stessa selezione in tutte le bollette. Se quella partita va male, perdiamo tutte le bollette in cui compare. Varia e diversifica
 3. Hai a disposizione partite di oggi, domani e dopodomani. Sei libero di scegliere come combinarle: puoi fare bollette miste o concentrate su un giorno solo. Consiglio: cerca di non mettere TUTTE le partite dello stesso giorno in tutte le bollette, ma segui il tuo istinto da professionista
 4. Se ci sono partite di oggi con buoni pronostici, valuta di creare qualche bolletta composta SOLO da partite di oggi (campo "solo_oggi": true), così chi vuole giocare subito ha opzioni pronte. Quante farne lo decidi tu in base al materiale disponibile
-5. Genera al massimo {max_bollette} bollette totali, divise in 3 fasce. Le selettive e bilanciate devono essere la MAGGIORANZA — le ambiziose sono poche, sono il "colpo grosso". Distribuzione consigliata: ~3-4 selettive, ~3-4 bilanciate, ~2-3 ambiziose:
+5. Genera esattamente {max_bollette} bollette totali, divise in 3 fasce. Distribuzione OBBLIGATORIA: 4 selettive, 4 bilanciate, 2 ambiziose:
    - Selettiva: quota totale 1.5 — 3.0 (2 selezioni con quote basse e sicure)
    - Bilanciata: quota totale 3.0 — 8.0 (3-4 selezioni, compromesso rischio/rendimento)
    - Ambiziosa: quota totale 8.0+ (5+ selezioni, alta quota per chi vuole rischiare)
