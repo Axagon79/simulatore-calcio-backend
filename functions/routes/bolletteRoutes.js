@@ -227,8 +227,16 @@ router.post('/generate', authenticate, async (req, res) => {
       if (o['1']) parts.push(`1=${o['1']}`);
       if (o['X']) parts.push(`X=${o['X']}`);
       if (o['2']) parts.push(`2=${o['2']}`);
+      // Doppie chance calcolate
+      if (o['1'] && o['X']) { const dc1x = (1 / (1/o['1'] + 1/o['X'])).toFixed(2); parts.push(`1X=${dc1x}`); }
+      if (o['X'] && o['2']) { const dcx2 = (1 / (1/o['X'] + 1/o['2'])).toFixed(2); parts.push(`X2=${dcx2}`); }
+      if (o['1'] && o['2']) { const dc12 = (1 / (1/o['1'] + 1/o['2'])).toFixed(2); parts.push(`12=${dc12}`); }
+      if (o['over_15']) parts.push(`Over1.5=${o['over_15']}`);
+      if (o['under_15']) parts.push(`Under1.5=${o['under_15']}`);
       if (o['over_25']) parts.push(`Over2.5=${o['over_25']}`);
       if (o['under_25']) parts.push(`Under2.5=${o['under_25']}`);
+      if (o['over_35']) parts.push(`Over3.5=${o['over_35']}`);
+      if (o['under_35']) parts.push(`Under3.5=${o['under_35']}`);
       if (o['gg']) parts.push(`Goal=${o['gg']}`);
       if (o['ng']) parts.push(`NoGoal=${o['ng']}`);
       matchesText += `  ${m.match_key} | ore ${m.match_time} | ${parts.join(', ')}\n`;
@@ -277,6 +285,8 @@ QUOTA TARGET — REGOLA CRITICA:
 - Per raggiungere la quota target, DEVI usare il mercato giusto: se il segno secco (1/2) dà una quota troppo alta, usa la DOPPIA CHANCE (1X/X2) o il NO GOAL che hanno quote più basse. Se serve una quota più alta, usa Over 2.5 o SEGNO X
 - PRIMA scegli le partite, POI calcola il prodotto delle quote. Se non quadra, CAMBIA mercato o partita finché non ti avvicini alla quota richiesta
 - Esempio: se servono 3 partite con quota ~3, puoi usare tre selezioni da ~1.44 ciascuna (1.44 × 1.44 × 1.44 ≈ 3.0). Pensa ai numeri PRIMA di rispondere
+- SCALA DI QUOTA per mercato (dalla più bassa alla più alta): Doppia Chance (1X/X2) ~1.15-1.40 → Under 3.5 ~1.20-1.35 → No Goal ~1.55-1.80 → Under 2.5 ~1.50-1.90 → 1 o 2 secco ~1.30-2.50 → Over 2.5 ~1.70-2.50 → Goal ~1.80-2.30 → X ~3.00-4.50 → Over 3.5 ~2.50+
+- Se una selezione ha quota troppo alta per il target, SCENDI nella scala: invece di Under 2.5 (1.90) prova Under 3.5 (~1.25) — stessa idea ma quota più bassa e più sicura. Invece di SEGNO 1 (1.85) prova Doppia Chance 1X (~1.20)
 
 COME RISPONDERE:
 - Sii COMPLETO e DETTAGLIATO fin dalla prima risposta
