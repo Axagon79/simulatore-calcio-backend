@@ -148,10 +148,12 @@ router.post('/generate', authenticate, async (req, res) => {
     }
 
     // 1. Leggi pool pronostici (oggi + domani + dopodomani, no partite già iniziate)
-    const now = new Date();
+    // Usa ora CET (Europe/Rome) perché match_time è in CET
+    const nowUtc = new Date();
+    const nowCET = new Date(nowUtc.toLocaleString('en-US', { timeZone: 'Europe/Rome' }));
     const dates = [];
     for (let i = 0; i < 3; i++) {
-      const d = new Date(now);
+      const d = new Date(nowCET);
       d.setDate(d.getDate() + i);
       dates.push(d.toISOString().split('T')[0]);
     }
@@ -168,8 +170,10 @@ router.post('/generate', authenticate, async (req, res) => {
       const matchDate = doc.date;
       const matchTime = doc.match_time || '00:00';
       try {
-        const kickOff = new Date(`${matchDate}T${matchTime}:00`);
-        if (kickOff <= now) continue;
+        const [hh, mm] = matchTime.split(':').map(Number);
+        const kickOff = new Date(matchDate);
+        kickOff.setHours(hh, mm, 0, 0);
+        if (kickOff <= nowCET) continue;
       } catch (_) {}
 
       // Salva partita con odds per selezioni fuori pool
@@ -263,6 +267,8 @@ ${poolText}
 ${matchesText}
 
 La data di oggi è: ${new Date().toISOString().split('T')[0]}
+L'ora attuale è: ${new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Rome' })}.
+PARTITE GIÀ INIZIATE: se l'orario della partita è PRIMA dell'ora attuale E la data è oggi, quella partita è GIÀ INIZIATA. NON metterla MAI in bolletta. Esempio: ora sono le 21:00 e una partita è alle 20:45 di oggi → è GIÀ INIZIATA, non usarla.
 
 REGOLE:
 - L'utente è LIBERO di scegliere QUALSIASI pronostico su QUALSIASI partita disponibile, anche se NON è tra i pronostici AI consigliati
@@ -282,17 +288,17 @@ COMPORTAMENTO FONDAMENTALE:
 - Se l'utente NON specifica una quota target, chiedigli anche: "Hai in mente una quota totale target o posso sceglierla io?"
 - Fai ENTRAMBE le domande in un unico messaggio, non in due messaggi separati. Se l'utente risponde che non gli interessa la quota, scegli tu da professionista
 - Se l'utente chiede info sulle partite (non una bolletta), allora puoi elencarle
+- Quando l'utente ti corregge (es. "queste sono già iniziate"), NON elencare le partite rimaste chiedendo "scegli tu". COMPONI SUBITO una nuova bolletta corretta in formato JSON e restituiscila. Sei il tipster, DECIDI TU.
 
-QUOTA TARGET — IMPORTANTISSIMO:
-- L'utente chiede una quota totale specifica. Tu DEVI rispettarla. La quota totale = prodotto delle quote.
-- Se l'utente chiede quota 3 con 3 partite, ogni selezione deve avere quota circa 1.45 (perché 1.45 × 1.45 × 1.45 = 3.05)
-- Se l'utente chiede quota 3 con 2 partite, ogni selezione deve avere quota circa 1.73 (perché 1.73 × 1.73 = 2.99)
-- HAI A DISPOSIZIONE mercati con quote diverse. Usa quelli giusti:
-  * Quote basse (1.15-1.40): Doppia Chance 1X, X2, 12, Under 3.5
-  * Quote medie (1.40-1.70): Under 2.5, NoGoal, Over 1.5
-  * Quote alte (1.70-2.50): Segno 1/2, Goal, Over 2.5
-- Per quota target 3 con 3 partite, scegli mercati con quote intorno a 1.45. Esempio: DC 1X a 1.35 + Under 2.5 a 1.50 + NoGoal a 1.50 = 3.04 ✓
-- CONTROLLA il prodotto prima di rispondere. Se è troppo alto, cambia un segno secco con una doppia chance. Se è troppo basso, cambia una DC con un Under 2.5
+QUOTA TARGET — OBBLIGATORIO:
+- Quota totale = prodotto delle quote singole. Tolleranza: ±10%.
+- PRIMA di rispondere DEVI fare il calcolo. Se sbaglia, CAMBIA selezione.
+- Esempi:
+  * Quota 3, 3 partite → serve media ~1.45 (1.45 × 1.45 × 1.45 = 3.05 ✅)
+  * Quota 3, 4 partite → serve media ~1.32 (1.32 × 1.32 × 1.32 × 1.32 = 3.03 ✅)
+  * Quota 5, 3 partite → serve media ~1.71 (1.71 × 1.71 × 1.71 = 5.00 ✅)
+  * SBAGLIATO: quota target 3, selezioni 1.67 × 1.65 × 1.37 × 1.35 = 5.10 ❌ (troppo alta!)
+- Se metti quote troppo alte o troppo basse, USA MERCATI DIVERSI. Mercati con quote basse: DC, Over 1.5. Mercati con quote medie: Under 2.5, Goal. Mercati con quote alte: 1X2, Under 1.5.
 
 COME RISPONDERE:
 - Sii COMPLETO e DETTAGLIATO fin dalla prima risposta
@@ -303,6 +309,7 @@ COME RISPONDERE:
 - Rispondi in italiano, sii diretto e professionale
 
 FORMATO RISPOSTA — SEMPRE JSON valido. Nessun testo fuori dal JSON. Nessun markdown.
+ATTENZIONE: anche quando CORREGGI un errore o l'utente ti chiede di rifare, rispondi SEMPRE con il JSON bolletta pulito. MAI mettere JSON dentro un blocco di testo o dentro \`\`\`json\`\`\`. Ogni risposta è O una bolletta O un messaggio, mai un mix.
 
 Bolletta:
 {"type": "bolletta", "selezioni": [{"match_key": "Home vs Away|YYYY-MM-DD", "mercato": "SEGNO", "pronostico": "2", "quota": 1.85, "from_pool": false}], "reasoning": "Ho scelto queste partite perché...", "warnings": ["non_pool"]}
