@@ -402,4 +402,72 @@ router.get('/custom', authenticate, async (req, res) => {
   }
 });
 
+// ============================================
+// DELETE /bollette/:id/remove — Rimuove bolletta personalizzata (auth)
+// ============================================
+router.delete('/:id/remove', authenticate, async (req, res) => {
+  try {
+    const bolId = new ObjectId(req.params.id);
+    const uid = req.userId;
+
+    const doc = await req.db.collection('bollette').findOne({ _id: bolId });
+    if (!doc) return res.status(404).json({ success: false, error: 'Bolletta non trovata' });
+
+    // Se è una bolletta custom dell'utente, la elimina completamente
+    if (doc.custom && doc.user_id === uid) {
+      await req.db.collection('bollette').deleteOne({ _id: bolId });
+      return res.json({ success: true, deleted: true });
+    }
+
+    // Se è una bolletta di sistema, rimuove solo il salvataggio dell'utente
+    await req.db.collection('bollette').updateOne(
+      { _id: bolId },
+      { $pull: { saved_by: uid }, $unset: { [`user_stakes.${uid}`]: '' } }
+    );
+    res.json({ success: true, deleted: false, unsaved: true });
+  } catch (err) {
+    console.error('Errore DELETE /bollette/:id/remove:', err);
+    res.status(500).json({ success: false, error: 'Errore server' });
+  }
+});
+
+// ============================================
+// GET /bollette/my — Tutte le bollette dell'utente (salvate + custom, tutti i giorni) (auth)
+// ============================================
+router.get('/my', authenticate, async (req, res) => {
+  try {
+    const uid = req.userId;
+    const bollette = await req.db.collection('bollette')
+      .find({ $or: [{ saved_by: uid }, { custom: true, user_id: uid }] })
+      .sort({ date: -1, generated_at: -1 })
+      .toArray();
+
+    // Stats
+    let vinte = 0, perse = 0, inCorso = 0, totaleStake = 0, totaleProfitto = 0;
+    for (const b of bollette) {
+      const stake = b.user_stakes?.[uid] || 0;
+      totaleStake += stake;
+
+      if (b.esito_globale === 'vinta') {
+        vinte++;
+        totaleProfitto += stake * (b.quota_totale - 1);
+      } else if (b.esito_globale === 'persa') {
+        perse++;
+        totaleProfitto -= stake;
+      } else {
+        inCorso++;
+      }
+    }
+
+    res.json({
+      success: true,
+      bollette,
+      stats: { vinte, perse, in_corso: inCorso, totale: bollette.length, totale_stake: totaleStake, profitto: Math.round(totaleProfitto * 100) / 100 },
+    });
+  } catch (err) {
+    console.error('Errore GET /bollette/my:', err);
+    res.status(500).json({ success: false, error: 'Errore server' });
+  }
+});
+
 module.exports = router;

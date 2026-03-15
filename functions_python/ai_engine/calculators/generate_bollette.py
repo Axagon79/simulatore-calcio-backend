@@ -80,7 +80,8 @@ REGOLE COMPOSIZIONE
    Quante selezioni mettere in ogni bolletta lo decidi tu in base alla tua esperienza
 6. Si consiglia di dare la preferenza a selezioni con confidence e stelle alte, ma fai affidamento alla tua esperienza: se una selezione con stelle più basse ti convince per il contesto della bolletta, usala
 7. Non creare bollette con una sola selezione — almeno 2 selezioni per bolletta
-10. Per ogni bolletta, scrivi una breve motivazione (1 frase) che spiega la logica
+8. Massimo 10 selezioni per bolletta. Se hai in mente più di 10, dividi in 2 bollette separate
+9. Per ogni bolletta, scrivi una breve motivazione (1 frase) che spiega la logica
 
 ═══════════════════════════════════════
 FORMATO OUTPUT — JSON ARRAY
