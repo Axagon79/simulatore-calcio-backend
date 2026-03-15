@@ -12,6 +12,8 @@
     "lint": "eslint .",
     "firebase:init": "firebase init functions",
     "firebase:deploy": "firebase deploy --only functions",
+    "postdeploy:cleanup": "powershell -Command \"'api','delete-prediction-preset','delete-preset','get-cup-matches','get-formations','get-nations','get-prediction-tuning','get-tuning','get-tuning-algo-c','list-prediction-presets','list-presets','load-prediction-preset','load-preset','run-simulation','save-prediction-preset','save-prediction-tuning','save-preset','save-tuning','save-tuning-algo-c' | ForEach-Object { gcloud run revisions list --service=$_ --region=us-central1 --project=puppals-456c7 --format='value(metadata.name)' --sort-by=~metadata.creationTimestamp | Select-Object -Skip 3 | ForEach-Object { gcloud run revisions delete $_ --region=us-central1 --project=puppals-456c7 --quiet } }\"",
+    "deploy": "firebase deploy --only functions && npm run postdeploy:cleanup",
     "firebase:shell": "firebase functions:shell",
     "firebase:logs": "firebase functions:log"
   },
