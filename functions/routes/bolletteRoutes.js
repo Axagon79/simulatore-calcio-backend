@@ -83,7 +83,7 @@ const MISTRAL_MODEL = 'mistral-small-latest';
 
 router.post('/generate', authenticate, async (req, res) => {
   try {
-    const { message } = req.body;
+    const { message, history } = req.body;
     if (!message || !message.trim()) {
       return res.status(400).json({ success: false, error: 'Messaggio richiesto' });
     }
@@ -168,17 +168,17 @@ REGOLE:
 - Rispetta le indicazioni dell'utente (quota target, numero selezioni, tipo, ecc.)
 - Se l'utente non specifica, usa il tuo giudizio da professionista
 - NON inventare partite o pronostici che non sono nel pool
-- Se l'utente chiede informazioni sulle partite (orari, chi gioca, ecc.), rispondi in JSON con: {"info": "Il Milan gioca alle 20:45 contro..."} — usa i dati dal pool
-- Se la richiesta NON riguarda né bollette né partite di calcio, rispondi in JSON con: {"error": "Posso aiutarti a comporre bollette o darti info sulle partite disponibili. Chiedimi!"}
 
-Restituisci SEMPRE un oggetto JSON valido (non un array). Nessun testo prima o dopo. Nessun markdown.
+FORMATO RISPOSTA — Restituisci SEMPRE un JSON valido. Nessun testo prima o dopo. Nessun markdown.
 
-{
-  "selezioni": [
-    { "match_key": "Home vs Away|YYYY-MM-DD", "mercato": "TIPO", "pronostico": "valore" }
-  ],
-  "reasoning": "Breve motivazione"
-}
+Se generi o aggiorni una bolletta:
+{"type": "bolletta", "selezioni": [{"match_key": "Home vs Away|YYYY-MM-DD", "mercato": "TIPO", "pronostico": "valore"}], "reasoning": "Motivazione"}
+
+Se rispondi a una domanda, spieghi una scelta, o dai info sulle partite:
+{"type": "messaggio", "text": "La tua risposta qui..."}
+
+Se la richiesta non riguarda calcio/scommesse:
+{"type": "messaggio", "text": "Posso aiutarti a comporre bollette o darti info sulle partite disponibili!"}
 
 match_key, mercato e pronostico devono corrispondere ESATTAMENTE al pool.`;
 
@@ -192,6 +192,7 @@ match_key, mercato e pronostico devono corrispondere ESATTAMENTE al pool.`;
         model: MISTRAL_MODEL,
         messages: [
           { role: 'system', content: systemPrompt },
+          ...(history || []).map(h => ({ role: h.role, content: h.content })),
           { role: 'user', content: message },
         ],
         temperature: 0.4,
@@ -220,15 +221,15 @@ match_key, mercato e pronostico devono corrispondere ESATTAMENTE al pool.`;
       return res.json({ success: false, error: 'Non ho capito la richiesta. Prova a chiedermi una bolletta, ad esempio: "Fammi una bolletta con quota 5"' });
     }
 
-    // Gestisci risposta errore o info da Mistral
+    // Gestisci risposte non-bolletta
+    if (generated.type === 'messaggio') {
+      return res.json({ success: true, type: 'messaggio', text: generated.text || '' });
+    }
     if (generated.error) {
       return res.json({ success: false, error: generated.error });
     }
-    if (generated.info) {
-      return res.json({ success: false, info: generated.info });
-    }
 
-    // 4. Valida selezioni contro il pool
+    // 4. Valida selezioni contro il pool (type === 'bolletta' o legacy)
     const poolIndex = {};
     for (const s of pool) {
       poolIndex[`${s.match_key}|${s.mercato}|${s.pronostico}`] = s;
@@ -257,8 +258,8 @@ match_key, mercato e pronostico devono corrispondere ESATTAMENTE al pool.`;
       });
     }
 
-    if (selezioni.length < 2) {
-      return res.json({ success: false, error: 'Bolletta generata non valida (meno di 2 selezioni)' });
+    if (selezioni.length < 1) {
+      return res.json({ success: false, error: 'Nessuna selezione valida trovata nel pool' });
     }
 
     quotaTotale = Math.round(quotaTotale * 100) / 100;
@@ -275,7 +276,7 @@ match_key, mercato e pronostico devono corrispondere ESATTAMENTE al pool.`;
       reasoning: generated.reasoning || '',
     };
 
-    res.json({ success: true, bolletta });
+    res.json({ success: true, type: 'bolletta', bolletta });
   } catch (err) {
     console.error('Errore POST /bollette/generate:', err);
     res.status(500).json({ success: false, error: 'Errore server' });
@@ -288,7 +289,7 @@ match_key, mercato e pronostico devono corrispondere ESATTAMENTE al pool.`;
 router.post('/save-custom', authenticate, async (req, res) => {
   try {
     const { bolletta } = req.body;
-    if (!bolletta || !bolletta.selezioni || bolletta.selezioni.length < 2) {
+    if (!bolletta || !bolletta.selezioni || bolletta.selezioni.length < 1) {
       return res.status(400).json({ success: false, error: 'Bolletta non valida' });
     }
 
