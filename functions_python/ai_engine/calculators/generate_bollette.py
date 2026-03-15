@@ -74,13 +74,12 @@ REGOLE COMPOSIZIONE
 3. Hai a disposizione partite di oggi, domani e dopodomani. Sei libero di scegliere come combinarle: puoi fare bollette miste o concentrate su un giorno solo. Consiglio: cerca di non mettere TUTTE le partite dello stesso giorno in tutte le bollette, ma segui il tuo istinto da professionista
 4. Se ci sono partite di oggi con buoni pronostici, valuta di creare qualche bolletta composta SOLO da partite di oggi (campo "solo_oggi": true), così chi vuole giocare subito ha opzioni pronte. Quante farne lo decidi tu in base al materiale disponibile
 5. Genera esattamente {max_bollette} bollette totali, divise in 3 fasce. Distribuzione OBBLIGATORIA: 4 selettive, 4 bilanciate, 2 ambiziose:
-   - Selettiva: quota totale 1.5 — 3.0 (2 selezioni con quote basse e sicure)
-   - Bilanciata: quota totale 3.0 — 8.0 (3-4 selezioni, compromesso rischio/rendimento)
-   - Ambiziosa: quota totale 8.0+ (5+ selezioni, alta quota per chi vuole rischiare)
-6. IMPORTANTE: VARIA il numero di selezioni per bolletta! Non fare sempre 3. Le selettive hanno 2, le bilanciate 3-4, le ambiziose 5-7. Un tipster esperto sa che bollette diverse richiedono composizioni diverse
-7. Si consiglia di dare la preferenza a selezioni con confidence e stelle alte, ma fai affidamento alla tua esperienza: se una selezione con stelle più basse ti convince per il contesto della bolletta, usala
-8. Non creare bollette con una sola selezione
-9. Ogni bolletta deve avere almeno 2 selezioni
+   - Selettiva: quota totale MASSIMO 3.0 — la quota moltiplicata di tutte le selezioni NON deve superare 3.0
+   - Bilanciata: quota totale tra 3.0 e 8.0
+   - Ambiziosa: quota totale superiore a 8.0
+   Quante selezioni mettere in ogni bolletta lo decidi tu in base alla tua esperienza
+6. Si consiglia di dare la preferenza a selezioni con confidence e stelle alte, ma fai affidamento alla tua esperienza: se una selezione con stelle più basse ti convince per il contesto della bolletta, usala
+7. Non creare bollette con una sola selezione — almeno 2 selezioni per bolletta
 10. Per ogni bolletta, scrivi una breve motivazione (1 frase) che spiega la logica
 
 ═══════════════════════════════════════
