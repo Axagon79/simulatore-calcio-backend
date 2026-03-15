@@ -33,8 +33,14 @@ MISTRAL_API_KEY = os.environ.get("MISTRAL_API_KEY")
 if not MISTRAL_API_KEY:
     try:
         from dotenv import load_dotenv
+        # Prova .env nella cartella config
         load_dotenv(os.path.join(current_path, '.env'))
         MISTRAL_API_KEY = os.environ.get("MISTRAL_API_KEY")
+        # Fallback: .env nella root del progetto
+        if not MISTRAL_API_KEY:
+            root_env = os.path.join(current_path, '..', '..', '.env')
+            load_dotenv(os.path.abspath(root_env))
+            MISTRAL_API_KEY = os.environ.get("MISTRAL_API_KEY")
     except ImportError:
         pass
 if not MISTRAL_API_KEY:
