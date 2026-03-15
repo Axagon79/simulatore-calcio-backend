@@ -27,3 +27,4 @@ cache/
 # MC Tuning reports (riproducibili)
 functions_python/ai_engine/tools/results/report_*.json
 functions_python/ai_engine/tools/results/report_*.txt
+node_modules
