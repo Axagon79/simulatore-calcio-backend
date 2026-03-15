@@ -73,10 +73,11 @@ REGOLE COMPOSIZIONE
 2. La stessa partita con lo stesso pronostico PUÒ apparire in bollette diverse, ma ATTENZIONE: non ripetere la stessa selezione in tutte le bollette. Se quella partita va male, perdiamo tutte le bollette in cui compare. Varia e diversifica
 3. Hai a disposizione partite di oggi, domani e dopodomani. Sei libero di scegliere come combinarle: puoi fare bollette miste o concentrate su un giorno solo. Consiglio: cerca di non mettere TUTTE le partite dello stesso giorno in tutte le bollette, ma segui il tuo istinto da professionista
 4. Se ci sono partite di oggi con buoni pronostici, valuta di creare qualche bolletta composta SOLO da partite di oggi (campo "solo_oggi": true), così chi vuole giocare subito ha opzioni pronte. Quante farne lo decidi tu in base al materiale disponibile
-5. Genera al massimo {max_bollette} bollette totali
-   - Selettiva: quota totale 1.5 — 3.0 (poche selezioni, alta probabilità)
-   - Bilanciata: quota totale 3.0 — 8.0 (compromesso rischio/rendimento)
-   - Ambiziosa: quota totale 8.0+ (molte selezioni, alta quota)
+5. Genera al massimo {max_bollette} bollette totali, divise in 3 fasce. Cerca di avere un mix di tutte e 3 le fasce:
+   - Selettiva: quota totale 1.5 — 3.0 (2 selezioni con quote basse e sicure)
+   - Bilanciata: quota totale 3.0 — 8.0 (3-4 selezioni, compromesso rischio/rendimento)
+   - Ambiziosa: quota totale 8.0+ (5+ selezioni, alta quota per chi vuole rischiare)
+6. IMPORTANTE: VARIA il numero di selezioni per bolletta! Non fare sempre 3. Le selettive hanno 2, le bilanciate 3-4, le ambiziose 5-7. Un tipster esperto sa che bollette diverse richiedono composizioni diverse
 7. Si consiglia di dare la preferenza a selezioni con confidence e stelle alte, ma fai affidamento alla tua esperienza: se una selezione con stelle più basse ti convince per il contesto della bolletta, usala
 8. Non creare bollette con una sola selezione
 9. Ogni bolletta deve avere almeno 2 selezioni
@@ -324,12 +325,15 @@ def validate_and_build(raw_bollette, pool, today_str):
                 tipo = t
                 break
 
+        solo_oggi = all(s["match_date"] == today_str for s in selezioni)
+
         counters[tipo] += 1
         label = f"{tipo.capitalize()} #{counters[tipo]}"
 
         bollette_docs.append({
             "date": today_str,
             "tipo": tipo,
+            "solo_oggi": solo_oggi,
             "quota_totale": quota_totale,
             "label": label,
             "selezioni": selezioni,
