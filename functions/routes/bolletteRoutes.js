@@ -221,7 +221,7 @@ match_key deve essere nel formato "Home vs Away|YYYY-MM-DD" delle partite dispon
           { role: 'user', content: message },
         ],
         temperature: 0.4,
-        max_tokens: 2000,
+        max_tokens: 4000,
       }),
     });
 
@@ -243,6 +243,11 @@ match_key deve essere nel formato "Home vs Away|YYYY-MM-DD" delle partite dispon
     try {
       generated = JSON.parse(content);
     } catch (_) {
+      // Se il JSON non è valido, Mistral ha probabilmente risposto in testo libero
+      // Restituiscilo come messaggio testuale
+      if (content && content.length > 5) {
+        return res.json({ success: true, type: 'messaggio', text: content });
+      }
       return res.json({ success: false, error: 'Non ho capito la richiesta. Prova a chiedermi una bolletta, ad esempio: "Fammi una bolletta con quota 5"' });
     }
 
