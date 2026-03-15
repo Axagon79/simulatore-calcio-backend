@@ -128,6 +128,8 @@ def build_pool(today_str):
             quota = p.get("quota")
             if not quota or quota <= 1.0:
                 continue  # Escludi senza quota valida
+            if p.get("tipo") == "RISULTATO_ESATTO":
+                continue  # RE escluso dalle bollette
 
             pool.append({
                 "match_key": match_key,
