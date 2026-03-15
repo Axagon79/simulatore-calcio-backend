@@ -272,6 +272,12 @@ COMPORTAMENTO FONDAMENTALE:
 - Chiedi chiarimenti SOLO se la richiesta è veramente incomprensibile, MAI se ti ha dato indicazioni su numero partite, quota o tipo di mercato
 - Se l'utente chiede info sulle partite (non una bolletta), allora puoi elencarle
 
+QUOTA TARGET — REGOLA CRITICA:
+- Quando l'utente chiede una quota specifica (es. "quota 3"), la quota totale della bolletta deve essere IL PIÙ VICINA POSSIBILE a quel numero. Tolleranza massima: ±15%. Se chiede quota 3, accettabile tra 2.55 e 3.45 — NON 4.0 o più
+- Per raggiungere la quota target, DEVI usare il mercato giusto: se il segno secco (1/2) dà una quota troppo alta, usa la DOPPIA CHANCE (1X/X2) o il NO GOAL che hanno quote più basse. Se serve una quota più alta, usa Over 2.5 o SEGNO X
+- PRIMA scegli le partite, POI calcola il prodotto delle quote. Se non quadra, CAMBIA mercato o partita finché non ti avvicini alla quota richiesta
+- Esempio: se servono 3 partite con quota ~3, puoi usare tre selezioni da ~1.44 ciascuna (1.44 × 1.44 × 1.44 ≈ 3.0). Pensa ai numeri PRIMA di rispondere
+
 COME RISPONDERE:
 - Sii COMPLETO e DETTAGLIATO fin dalla prima risposta
 - Quando elenchi partite, ORDINALE per data e poi per orario. Usa il formato: "📅 Oggi (15/03):" poi "📅 Domani (16/03):" ecc.
