@@ -4,18 +4,64 @@ const { ObjectId } = require('mongodb');
 const authenticate = require('../middleware/auth');
 
 // ============================================
+// Helper: arricchisce bollette con real_score da daily_predictions_unified
+// ============================================
+async function enrichBollette(db, bollette) {
+  if (!bollette.length) return bollette;
+
+  // Raccogli tutte le date delle bollette
+  const dates = [...new Set(bollette.map(b => b.date).filter(Boolean))];
+  if (!dates.length) return bollette;
+
+  // Carica pronostici per quelle date
+  const docs = await db.collection('daily_predictions_unified')
+    .find({ date: { $in: dates } })
+    .project({ home: 1, away: 1, date: 1, real_score: 1, live_score: 1, live_status: 1, live_minute: 1, match_finished: 1 })
+    .toArray();
+
+  // Indice per match_key
+  const scoreIndex = {};
+  for (const d of docs) {
+    const key = `${d.home} vs ${d.away}|${d.date}`;
+    scoreIndex[key] = {
+      real_score: d.real_score || null,
+      live_score: d.live_score || null,
+      live_status: d.live_status || null,
+      live_minute: d.live_minute || null,
+      match_finished: d.match_finished || false,
+    };
+  }
+
+  // Arricchisci selezioni
+  for (const b of bollette) {
+    for (const s of (b.selezioni || [])) {
+      const info = scoreIndex[s.match_key];
+      if (info) {
+        if (info.real_score) s.real_score = info.real_score;
+        if (info.live_score) s.live_score = info.live_score;
+        if (info.live_status) s.live_status = info.live_status;
+        if (info.live_minute) s.live_minute = info.live_minute;
+        if (info.match_finished) s.match_finished = true;
+      }
+    }
+  }
+  return bollette;
+}
+
+// ============================================
 // GET /bollette?date=YYYY-MM-DD
 // Lista bollette per data (default: oggi). Pubblico.
 // ============================================
 router.get('/', async (req, res) => {
   try {
     const date = req.query.date || new Date().toISOString().split('T')[0];
-    const bollette = await req.db.collection('bollette')
+    let bollette = await req.db.collection('bollette')
       .find({ date })
       .sort({ tipo: 1, quota_totale: 1 })
       .project({ reasoning: 0 }) // reasoning solo per debug
       .toArray();
 
+    bollette = await enrichBollette(req.db, bollette);
     res.json({ success: true, date, bollette });
   } catch (err) {
     console.error('Errore GET /bollette:', err);
@@ -31,10 +77,12 @@ router.get('/storico', async (req, res) => {
     const date = req.query.date;
     if (!date) return res.status(400).json({ success: false, error: 'Parametro date richiesto' });
 
-    const bollette = await req.db.collection('bollette')
+    let bollette = await req.db.collection('bollette')
       .find({ date, custom: { $ne: true } })
       .sort({ tipo: 1, quota_totale: 1 })
       .toArray();
+
+    bollette = await enrichBollette(req.db, bollette);
 
     // Stats per fascia
     const stats = { totale: bollette.length, per_tipo: {} };
@@ -536,10 +584,12 @@ router.delete('/:id/remove', authenticate, async (req, res) => {
 router.get('/my', authenticate, async (req, res) => {
   try {
     const uid = req.userId;
-    const bollette = await req.db.collection('bollette')
+    let bollette = await req.db.collection('bollette')
       .find({ $or: [{ saved_by: uid }, { custom: true, user_id: uid }] })
       .sort({ date: -1, generated_at: -1 })
       .toArray();
+
+    bollette = await enrichBollette(req.db, bollette);
 
     // Stats
     let vinte = 0, perse = 0, inCorso = 0, totaleStake = 0, totaleProfitto = 0;
