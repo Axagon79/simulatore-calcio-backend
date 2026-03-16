@@ -116,6 +116,7 @@ IMPORTANTE:
 - match_key deve essere ESATTAMENTE come nel pool (formato "Home vs Away|YYYY-MM-DD")
 - mercato e pronostico devono corrispondere ESATTAMENTE a quelli nel pool
 - Non inventare partite o pronostici che non sono nel pool
+- NON usare MAI il SEGNO X (pareggio) nelle bollette — è troppo imprevedibile
 """
 
 
