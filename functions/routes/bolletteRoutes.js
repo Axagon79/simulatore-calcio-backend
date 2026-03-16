@@ -9,39 +9,83 @@ const authenticate = require('../middleware/auth');
 async function enrichBollette(db, bollette) {
   if (!bollette.length) return bollette;
 
-  // Raccogli tutte le date delle bollette
-  const dates = [...new Set(bollette.map(b => b.date).filter(Boolean))];
+  // Raccogli tutte le date delle bollette + giorno dopo (partite notturne es. 00:30)
+  const dateSet = new Set();
+  for (const b of bollette) {
+    if (!b.date) continue;
+    dateSet.add(b.date);
+    const next = new Date(b.date);
+    next.setDate(next.getDate() + 1);
+    dateSet.add(next.toISOString().split('T')[0]);
+  }
+  const dates = [...dateSet];
   if (!dates.length) return bollette;
 
-  // Carica pronostici per quelle date
-  const docs = await db.collection('daily_predictions_unified')
-    .find({ date: { $in: dates } })
-    .project({ home: 1, away: 1, date: 1, real_score: 1, live_score: 1, live_status: 1, live_minute: 1, match_finished: 1 })
-    .toArray();
+  // Stessa fonte della pagina pronostici: h2h_by_round (come endpoint /live-scores)
+  const dateRanges = dates.map(d => ({
+    start: new Date(d + 'T00:00:00.000Z'),
+    end: new Date(d + 'T23:59:59.999Z'),
+  }));
+  const dateConditions = dateRanges.map(r => ({
+    'matches.date_obj': { $gte: r.start, $lte: r.end }
+  }));
 
-  // Indice per match_key
+  const pipeline = [
+    { $unwind: '$matches' },
+    { $match: { $or: dateConditions } },
+    { $project: {
+      _id: 0,
+      home: '$matches.home',
+      away: '$matches.away',
+      real_score: '$matches.real_score',
+      live_score: '$matches.live_score',
+      live_status: '$matches.live_status',
+      live_minute: '$matches.live_minute',
+    }}
+  ];
+  const scores = await db.collection('h2h_by_round').aggregate(pipeline).toArray();
+
+  // Anche coppe europee (come fa /live-scores)
+  for (const d of dates) {
+    const [y, m, dd] = d.split('-');
+    const cupDatePrefix = `${dd}-${m}-${y}`;
+    for (const cupColl of ['matches_champions_league', 'matches_europa_league']) {
+      const cupMatches = await db.collection(cupColl).find({
+        match_date: { $regex: `^${cupDatePrefix}` }
+      }).toArray();
+      for (const cm of cupMatches) {
+        scores.push({
+          home: cm.home_team,
+          away: cm.away_team,
+          real_score: cm.real_score || null,
+          live_score: cm.live_score || null,
+          live_status: cm.live_status || null,
+          live_minute: cm.live_minute || null,
+        });
+      }
+    }
+  }
+
+  // Indice per home+away
   const scoreIndex = {};
-  for (const d of docs) {
-    const key = `${d.home} vs ${d.away}|${d.date}`;
-    scoreIndex[key] = {
-      real_score: d.real_score || null,
-      live_score: d.live_score || null,
-      live_status: d.live_status || null,
-      live_minute: d.live_minute || null,
-      match_finished: d.match_finished || false,
-    };
+  for (const s of scores) {
+    const key = `${s.home}|${s.away}`;
+    if (!scoreIndex[key] || s.real_score) {
+      scoreIndex[key] = s;
+    }
   }
 
   // Arricchisci selezioni
   for (const b of bollette) {
     for (const s of (b.selezioni || [])) {
-      const info = scoreIndex[s.match_key];
+      const key = `${s.home}|${s.away}`;
+      const info = scoreIndex[key];
       if (info) {
         if (info.real_score) s.real_score = info.real_score;
         if (info.live_score) s.live_score = info.live_score;
         if (info.live_status) s.live_status = info.live_status;
-        if (info.live_minute) s.live_minute = info.live_minute;
-        if (info.match_finished) s.match_finished = true;
+        if (info.live_minute != null) s.live_minute = info.live_minute;
+        if (info.live_status === 'Finished' || info.real_score) s.match_finished = true;
       }
     }
   }
