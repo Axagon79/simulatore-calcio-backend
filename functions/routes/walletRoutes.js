@@ -5,7 +5,7 @@ const router = express.Router();
 router.get('/balance', async (req, res) => {
   try {
     const db = req.db;
-    const userId = req.user.uid;
+    const userId = req.userId;
 
     let userDoc = await db.collection('users').findOne({ firebaseUid: userId });
 
@@ -53,7 +53,7 @@ router.get('/balance', async (req, res) => {
 router.get('/transactions', async (req, res) => {
   try {
     const db = req.db;
-    const userId = req.user.uid;
+    const userId = req.userId;
     const limit = parseInt(req.query.limit) || 50;
     const skip = parseInt(req.query.skip) || 0;
 
@@ -111,7 +111,7 @@ router.get('/transactions', async (req, res) => {
 router.get('/purchases', async (req, res) => {
   try {
     const db = req.db;
-    const userId = req.user.uid;
+    const userId = req.userId;
     const date = req.query.date;
 
     const filter = { user_id: userId, type: 'pronostico_sbloccato' };
@@ -138,7 +138,7 @@ router.get('/purchases', async (req, res) => {
 router.post('/transaction', async (req, res) => {
   try {
     const db = req.db;
-    const userId = req.user.uid;
+    const userId = req.userId;
     const { type, credits_delta, shields_delta, amount_eur, description, metadata } = req.body;
 
     if (!type) {

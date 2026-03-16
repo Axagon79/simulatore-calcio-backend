@@ -5,12 +5,43 @@ const express = require('express');
 const cors = require('cors');
 const { MongoClient } = require('mongodb');
 
+const rateLimit = require('express-rate-limit');
+
 const app = express();
-app.use(cors({ origin: true }));
+
+// --- CORS: solo origini autorizzate ---
+const ALLOWED_ORIGINS = [
+  'https://aisimulator.vercel.app',
+  'http://localhost:5173',
+  'http://localhost:5174'
+];
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || ALLOWED_ORIGINS.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('CORS non autorizzato'));
+    }
+  }
+}));
+
 app.use(express.json());
 
-// Invece di: const MONGO_URI = process.env.MONGO_URI;
-const MONGO_URI="mongodb+srv://Database_User:LPmYAZkzEVxjSaAd@pup-pals-cluster.y1h2r.mongodb.net/football_simulator_db?retryWrites=true&w=majority&appName=pup-pals-cluster"
+// --- Rate limiting: 100 req / 15 min per IP ---
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Troppe richieste, riprova tra qualche minuto.' }
+});
+app.use(limiter);
+
+// --- MongoDB: credenziali da variabile d'ambiente (Firebase Secrets) ---
+const MONGO_URI = process.env.MONGODB_URI || '';
+if (!MONGO_URI) {
+  console.warn('⚠️ MONGODB_URI non configurata — il DB non sarà disponibile fino al deploy.');
+}
 
 let client;
 let db;
@@ -35,7 +66,7 @@ app.use(async (req, res, next) => {
     next();
   } catch (err) {
     console.error('❌ Errore connessione DB:', err);
-    res.status(500).send("Errore di connessione al database");
+    res.status(500).json({ error: "Errore di connessione al database" });
   }
 });
 
@@ -1079,6 +1110,7 @@ exports.api = onRequest({
   memory: "256MiB",
   timeoutSeconds: 60,
   cors: true,
-  invoker: 'public'
+  invoker: 'public',
+  secrets: ['MONGODB_URI']
 }, app);
 // force redeploy

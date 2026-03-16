@@ -2327,7 +2327,14 @@ expect@^29.7.0:
     jest-message-util "^29.7.0"
     jest-util "^29.7.0"
 
-express@^4.21.0, express@^4.21.2:
+express-rate-limit@^8.3.1:
+  version "8.3.1"
+  resolved "https://registry.npmjs.org/express-rate-limit/-/express-rate-limit-8.3.1.tgz"
+  integrity sha512-D1dKN+cmyPWuvB+G2SREQDzPY1agpBIcTa9sJxOPMCNeH3gwzhqJRDWCXW3gg0y//+LQ/8j52JbMROWyrKdMdw==
+  dependencies:
+    ip-address "10.1.0"
+
+express@^4.21.0, express@^4.21.2, "express@>= 4.11":
   version "4.21.2"
   resolved "https://registry.npmjs.org/express/-/express-4.21.2.tgz"
   integrity sha512-28HqgMZAmih1Czt9ny7qr6ek2qddF4FclbMzwhCREB6OFfH+rXAnuNCwo1/wFvrtbgsQDb4kSbX9de9lFbrXnA==
@@ -2996,6 +3003,11 @@ internal-slot@^1.1.0:
     es-errors "^1.3.0"
     hasown "^2.0.2"
     side-channel "^1.1.0"
+
+ip-address@10.1.0:
+  version "10.1.0"
+  resolved "https://registry.npmjs.org/ip-address/-/ip-address-10.1.0.tgz"
+  integrity sha512-XXADHxXmvT9+CRxhXg56LJovE+bmWnEWB78LB83VZTprKTmaC5QfruXocxzTZ2Kl0DNwKuBdlIhjL8LeY8Sf8Q==
 
 ipaddr.js@1.9.1:
   version "1.9.1"
