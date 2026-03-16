@@ -47,7 +47,7 @@ if not MISTRAL_API_KEY:
     print("❌ MISTRAL_API_KEY non trovata!")
     sys.exit(1)
 
-MAX_BOLLETTE = 10
+MAX_BOLLETTE = 15
 
 # Fasce quota totale
 FASCE = {
@@ -73,10 +73,10 @@ REGOLE COMPOSIZIONE
 2. La stessa partita con lo stesso pronostico PUÒ apparire in bollette diverse, ma ATTENZIONE: non ripetere la stessa selezione in tutte le bollette. Se quella partita va male, perdiamo tutte le bollette in cui compare. Varia e diversifica
 3. Hai a disposizione partite di oggi, domani e dopodomani. Sei libero di scegliere come combinarle: puoi fare bollette miste o concentrate su un giorno solo. Consiglio: cerca di non mettere TUTTE le partite dello stesso giorno in tutte le bollette, ma segui il tuo istinto da professionista
 4. Se ci sono partite di oggi con buoni pronostici, valuta di creare qualche bolletta composta SOLO da partite di oggi (campo "solo_oggi": true), così chi vuole giocare subito ha opzioni pronte. Quante farne lo decidi tu in base al materiale disponibile
-5. Genera esattamente {max_bollette} bollette totali, divise in 3 fasce. Distribuzione OBBLIGATORIA: 4 selettive, 4 bilanciate, 2 ambiziose:
+5. Genera esattamente {max_bollette} bollette totali, divise in 3 fasce. OGNI FASCIA DEVE AVERE ALMENO 3 BOLLETTE. Distribuzione consigliata: 5 selettive, 5 bilanciate, 5 ambiziose:
    - Selettiva: quota totale MASSIMO 3.0 — la quota moltiplicata di tutte le selezioni NON deve superare 3.0
    - Bilanciata: quota totale tra 3.0 e 8.0
-   - Ambiziosa: quota totale superiore a 8.0
+   - Ambiziosa: quota totale superiore a 8.0 — usa più selezioni (5-10) o mercati con quote alte (1X2, Under 1.5)
    Quante selezioni mettere in ogni bolletta lo decidi tu in base alla tua esperienza
 6. Si consiglia di dare la preferenza a selezioni con confidence e stelle alte, ma fai affidamento alla tua esperienza: se una selezione con stelle più basse ti convince per il contesto della bolletta, usala
 7. Non creare bollette con una sola selezione — almeno 2 selezioni per bolletta
