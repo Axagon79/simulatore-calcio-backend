@@ -955,10 +955,11 @@ _GOL_DEDUP_RULES = {
 }
 
 
-def _add_exact_score_predictions(unified, c_doc):
-    """Aggiunge pronostici RISULTATO_ESATTO basati su strategia MC.
-    Filtri: somma top4 counts 35-39 o 65-69, Pos1 count 10-11, Pos2 count 20-21.
-    Backtest: 28.9% successo su 728 partite, BE 3.45."""
+def _add_exact_score_predictions(unified, c_doc, match_odds=None):
+    """Aggiunge pronostici RISULTATO_ESATTO basati su strategia MC + filtro discordanza book/MC.
+    Filtro 1 (attuale): somma top4 counts 35-39 o 65-69, Pos1 count 10-11, Pos2 count 20-21.
+    Filtro 2 (nuovo): regole discordanza book/MC per conferma.
+    Backtest combinato: 25.0% su 12 partite."""
     if not c_doc:
         return unified
     sim_data = c_doc.get('simulation_data', {})
@@ -966,13 +967,94 @@ def _add_exact_score_predictions(unified, c_doc):
     if len(top_scores) < 4:
         return unified
 
+    # --- FILTRO 1: metodo attuale (mc_sum + mc_count) ---
     sum_counts = sum(ts[1] for ts in top_scores[:4])
     if not ((35 <= sum_counts <= 39) or (65 <= sum_counts <= 69)):
         return unified
 
-    added = []
     c1 = top_scores[0][1]
     c2 = top_scores[1][1]
+
+    # Nessuna posizione idonea → esci
+    if not (10 <= c1 <= 11) and not (20 <= c2 <= 21):
+        return unified
+
+    # --- FILTRO 2: regole discordanza book/MC ---
+    odds = match_odds or {}
+    if not odds:
+        return unified
+
+    # Calcola probabilità MC dalla distribuzione top_scores
+    total_sims = sum(ts[1] for ts in top_scores)
+    if total_sims == 0:
+        return unified
+
+    p_home_win = 0
+    p_under25 = 0
+    p_nogoal = 0
+    for score_str, count in top_scores:
+        s = str(score_str)
+        parts = s.replace(':', '-').split('-')
+        if len(parts) == 2:
+            try:
+                h, a = int(parts[0]), int(parts[1])
+                if h > a:
+                    p_home_win += count
+                if h + a < 3:
+                    p_under25 += count
+                if h == 0 or a == 0:
+                    p_nogoal += count
+            except ValueError:
+                pass
+
+    p_home_win = p_home_win / total_sims * 100
+    p_away_win = 100 - p_home_win - (sum(c for s, c in top_scores if '-' in str(s) and str(s).split('-')[0] == str(s).split('-')[1]) / total_sims * 100 if total_sims > 0 else 0)
+    p_under25 = p_under25 / total_sims * 100
+    p_nogoal = p_nogoal / total_sims * 100
+
+    # MC favorita = max(home, away)
+    mc_fav_pct = max(p_home_win, p_away_win)
+
+    # Quote book
+    q1 = odds.get('1', 0) or 0
+    q2 = odds.get('2', 0) or 0
+    book_fav_quota = min(q1, q2) if q1 > 0 and q2 > 0 else 0
+    q_over25 = odds.get('over_2_5', 0) or 0
+    q_goal = odds.get('goal', 0) or 0
+
+    # Verifica se passa almeno una regola
+    passes_rule = False
+
+    # R1: Discordanza favorito + partita chiusa → Pos.2
+    if (book_fav_quota > 0 and book_fav_quota < 2.0
+        and mc_fav_pct < 50
+        and p_under25 > 50
+        and p_nogoal > 50):
+        passes_rule = True
+
+    # R2: Concordano favorito, discordano gol → Pos.1
+    if (book_fav_quota > 0 and book_fav_quota < 2.0
+        and q_over25 > 0 and q_over25 < 1.80
+        and q_goal > 0 and q_goal < 1.80
+        and mc_fav_pct >= 50
+        and p_under25 > 50
+        and p_nogoal > 50):
+        passes_rule = True
+
+    # R3: MC incerto + base → Pos.3
+    if (book_fav_quota > 0 and book_fav_quota < 2.0
+        and q_over25 > 0 and q_over25 < 1.80
+        and q_goal > 0 and q_goal < 1.80
+        and 40 <= mc_fav_pct <= 50
+        and p_under25 > 50
+        and p_nogoal > 50):
+        passes_rule = True
+
+    if not passes_rule:
+        return unified
+
+    # --- Aggiungi RE (solo posizioni che passano filtro 1) ---
+    added = []
 
     if 10 <= c1 <= 11:
         score = str(top_scores[0][0]).replace('-', ':')
@@ -1005,7 +1087,7 @@ def _add_exact_score_predictions(unified, c_doc):
         added.append(f"Pos2 {score} (count {c2})")
 
     if added:
-        print(f"    RE: somma={sum_counts}, {', '.join(added)}")
+        print(f"    RE: somma={sum_counts}, regola discordanza OK, {', '.join(added)}")
 
     return unified
 
@@ -1536,7 +1618,7 @@ def orchestrate_date(date_str, dry_run=False, match_time_filter=None):
         unified_pronostici = _dedup_gol_correlati(unified_pronostici)
 
         # --- RISULTATO ESATTO MC (admin-only, bonus separato) ---
-        unified_pronostici = _add_exact_score_predictions(unified_pronostici, c_doc_for_combo)
+        unified_pronostici = _add_exact_score_predictions(unified_pronostici, c_doc_for_combo, match_odds)
 
         if not unified_pronostici:
             continue
