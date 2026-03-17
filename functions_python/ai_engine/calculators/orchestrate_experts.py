@@ -147,10 +147,15 @@ def _apply_multigol(unified, odds):
         pron = p.get('pronostico', '')
         conf = p.get('confidence', 0)
 
+        # GG da Sistema C (conf 60-65) ha ROI +24% — non convertire in MG
+        # Over 1.5 da A+S quota 1.35-1.50 ha HR 87% — non convertire in MG
+        # Under 3.5 da A quota >= 1.35 ha HR 83% — non convertire in MG
+        source = p.get('source', '')
+        quota = p.get('quota') or 0
         is_candidate = (
-            pron == 'Over 1.5' or
-            pron == 'Under 3.5' or
-            (pron in ('Goal', 'NoGoal') and 60 <= conf <= 65)
+            (pron == 'Over 1.5' and not (source == 'A+S' and 1.35 <= quota <= 1.50)) or
+            (pron == 'Under 3.5' and not (source == 'A' and quota >= 1.35)) or
+            (pron in ('Goal', 'NoGoal') and 60 <= conf <= 65 and source != 'C')
         )
 
         if is_candidate:
@@ -518,9 +523,90 @@ def _apply_home_win_combos(unified, odds, simulation_data):
 
 
 # =====================================================
+# DC DOWNGRADE — SEGNO AR + GG conf 60-65 → DC
+# =====================================================
+def _apply_gg_conf_dc_downgrade(unified, c_doc):
+    """
+    Quando Sistema C emette un SEGNO con quota >= 2.51 (Alto Rendimento)
+    e la stessa partita ha GG con gg_pct 60-65%, converte in DC.
+    HR storico 67%, ROI +19.5% su 12 campioni.
+    """
+    if not c_doc:
+        return unified
+
+    # Verifica gg_pct dalla simulation_data
+    sim_data = c_doc.get('simulation_data', {})
+    gg_pct = sim_data.get('gg_pct', 0) or 0
+    if not (60 <= gg_pct <= 65):
+        return unified
+
+    # Quote 1/X/2 dal doc C
+    odds = c_doc.get('odds', {})
+    q1 = float(odds.get('1') or 0)
+    qx = float(odds.get('X') or odds.get('x') or 0)
+    q2 = float(odds.get('2') or 0)
+    if q1 <= 0 or qx <= 0 or q2 <= 0:
+        return unified
+
+    result = []
+    for p in unified:
+        if (p.get('tipo') == 'SEGNO'
+                and p.get('source', '').startswith('C')
+                and (p.get('quota') or 0) >= 2.51):
+
+            pron = p.get('pronostico')
+            if pron == '1':
+                dc_pron = '1X'
+                dc_q = round(1 / (1/q1 + 1/qx), 2)
+            elif pron == '2':
+                dc_pron = 'X2'
+                dc_q = round(1 / (1/qx + 1/q2), 2)
+            else:
+                # SEGNO X — nessun downgrade DC sensato
+                result.append(p)
+                continue
+
+            dc_pred = {
+                'tipo': 'DOPPIA_CHANCE',
+                'pronostico': dc_pron,
+                'quota': dc_q,
+                'confidence': p.get('confidence', 55),
+                'stars': p.get('stars', 3.0),
+                'source': 'C_dc_conv',
+                'routing_rule': 'gg_conf_dc_downgrade',
+                'has_odds': True,
+            }
+            # Kelly con prob_modello 0.70 (storico 67% HR, conservativo)
+            prob_mod = 0.70
+            if dc_q > 1.0:
+                prob_mkt = 1.0 / dc_q
+                edge = prob_mod - prob_mkt
+                if edge > 0:
+                    kelly = 0.75 * (edge * dc_q) / (dc_q - 1)
+                    dc_pred['stake'] = max(1, min(10, round(kelly * 10)))
+                    dc_pred['edge'] = round(edge * 100, 1)
+                else:
+                    dc_pred['stake'] = 1
+                    dc_pred['edge'] = 0
+                dc_pred['prob_mercato'] = round(prob_mkt * 100, 1)
+                dc_pred['prob_modello'] = round(prob_mod * 100, 1)
+                dc_pred['probabilita_stimata'] = round(prob_mod * 100, 1)
+            else:
+                dc_pred['stake'] = 1
+                dc_pred['edge'] = 0
+
+            print(f"    🔄 DC DOWNGRADE: SEGNO {pron} @{p.get('quota', '?')} → DC {dc_pron} @{dc_q} (gg_pct={gg_pct}%)")
+            result.append(dc_pred)
+        else:
+            result.append(p)
+
+    return result
+
+
+# =====================================================
 # SCREMATURA SEGNO PER FASCE DI QUOTA
 # =====================================================
-def _apply_segno_scrematura(unified, odds, base_doc):
+def _apply_segno_scrematura(unified, odds, base_doc, c_doc=None):
     """
     Scrematura SEGNO: nelle fasce di quota deboli, converte il SEGNO
     in Over 1.5, GOL o GG — oppure lo elimina.
@@ -625,14 +711,34 @@ def _apply_segno_scrematura(unified, odds, base_doc):
     fascia = ''
     azione = ''
 
+    def _try_dc_from_segno():
+        """DC coerente col SEGNO originale, quota >= 1.40. Ritorna (pred, azione) o (None, None)."""
+        if segno == '1' and dc_1x_q >= 1.40:
+            sost = _make_sostituto('1X', dc_1x_q)
+            sost['tipo'] = 'DOPPIA_CHANCE'
+            sost['source'] = 'C_screm_dc'
+            sost['routing_rule'] = 'screm_o15_to_dc'
+            return sost, f'DC 1X @{dc_1x_q:.2f}'
+        elif segno == '2' and dc_x2_q >= 1.40:
+            sost = _make_sostituto('X2', dc_x2_q)
+            sost['tipo'] = 'DOPPIA_CHANCE'
+            sost['source'] = 'C_screm_dc'
+            sost['routing_rule'] = 'screm_o15_to_dc'
+            return sost, f'DC X2 @{dc_x2_q:.2f}'
+        return None, None
+
     over25_q = odds.get('over_25', 0) or 0
 
-    # --- FASCIA 1 (1.00-1.44): Escalation O1.5 → O2.5 → GG → SEGNO puro ---
+    # --- FASCIA 1 (1.00-1.44): Escalation O1.5 → DC coerente → O2.5 → GG → SEGNO puro ---
     if quota < 1.45:
         fascia = '1.00-1.44'
-        if over15_q >= 1.35:
+        if over15_q >= 1.50:
             result[segno_idx] = _make_sostituto('Over 1.5', over15_q)
             azione = f'Over 1.5 @{over15_q:.2f}'
+        elif _try_dc_from_segno()[0] is not None:
+            dc_pred, dc_azione = _try_dc_from_segno()
+            result[segno_idx] = dc_pred
+            azione = dc_azione
         elif over25_q >= 1.35:
             result[segno_idx] = _make_sostituto('Over 2.5', over25_q)
             azione = f'Over 2.5 @{over25_q:.2f}'
@@ -649,12 +755,16 @@ def _apply_segno_scrematura(unified, odds, base_doc):
 
     # --- FASCE 2, 3, 5: TIENI SEGNO (buone) — skip automatico sopra ---
 
-    # --- FASCIA 4 (1.65-1.84): Escalation O1.5 → SEGNO puro → ELIMINA ---
+    # --- FASCIA 4 (1.65-1.84): Escalation O1.5 → DC coerente → SEGNO puro → ELIMINA ---
     elif 1.65 <= quota < 1.85:
         fascia = '1.65-1.84'
-        if over15_q >= 1.35:
+        if over15_q >= 1.50:
             result[segno_idx] = _make_sostituto('Over 1.5', over15_q)
             azione = f'Over 1.5 @{over15_q:.2f}'
+        elif _try_dc_from_segno()[0] is not None:
+            dc_pred, dc_azione = _try_dc_from_segno()
+            result[segno_idx] = dc_pred
+            azione = dc_azione
         elif not gol_in_unified:
             # SEGNO puro (nessun GOL in unified) — tieni
             azione = 'TIENI SEGNO (puro, no GOL)'
@@ -663,12 +773,16 @@ def _apply_segno_scrematura(unified, odds, base_doc):
             result.pop(segno_idx)
             azione = 'ELIMINATO'
 
-    # --- FASCIA 6 (2.10-2.49): Escalation O1.5 → O2.5 → DC coerente → ELIMINA ---
+    # --- FASCIA 6 (2.10-2.49): Escalation O1.5 → DC coerente → O2.5 → DC fallback → ELIMINA ---
     elif 2.10 <= quota < 2.50:
         fascia = '2.10-2.49'
-        if over15_q >= 1.35:
+        if over15_q >= 1.50:
             result[segno_idx] = _make_sostituto('Over 1.5', over15_q)
             azione = f'Over 1.5 @{over15_q:.2f}'
+        elif _try_dc_from_segno()[0] is not None:
+            dc_pred, dc_azione = _try_dc_from_segno()
+            result[segno_idx] = dc_pred
+            azione = dc_azione
         elif over25_q >= 1.35:
             result[segno_idx] = _make_sostituto('Over 2.5', over25_q)
             azione = f'Over 2.5 @{over25_q:.2f}'
@@ -732,6 +846,201 @@ def _apply_segno_scrematura(unified, odds, base_doc):
             azione = f'rimosso ({sost_pron} già presente)'
 
     print(f"    🔄 SCREMATURA: SEGNO {segno} @{quota:.2f} → {azione} (fascia {fascia})")
+
+    # --- DC deboli: converti o scarta in base alla fascia di quota ---
+    if segno_idx < len(result):
+        sost = result[segno_idx]
+        if (sost.get('tipo') == 'DOPPIA_CHANCE'
+                and sost.get('routing_rule') == 'scrematura_segno'):
+            dc_q = sost.get('quota') or 0
+
+            # DC quota 1.30-1.40: converti in Over 1.5 se disponibile, altrimenti scarta
+            if 1.30 <= dc_q < 1.40:
+                o15_q = None
+                if c_doc:
+                    for p in c_doc.get('pronostici', []):
+                        if p.get('pronostico') == 'Over 1.5':
+                            o15_q = p.get('quota')
+                            break
+                if o15_q and o15_q >= 1.35:
+                    o15_pred = {
+                        'tipo': 'GOL',
+                        'pronostico': 'Over 1.5',
+                        'quota': o15_q,
+                        'confidence': sost.get('confidence', 55),
+                        'stars': sost.get('stars', 3.0),
+                        'source': 'C_screm_o15',
+                        'routing_rule': 'screm_dc_to_over15',
+                        'has_odds': True,
+                    }
+                    if o15_q > 1.0:
+                        prob_mod = 0.85
+                        prob_mkt = 1.0 / o15_q
+                        edge = prob_mod - prob_mkt
+                        if edge > 0:
+                            kelly = 0.75 * (edge * o15_q) / (o15_q - 1)
+                            o15_pred['stake'] = max(1, min(10, round(kelly * 10)))
+                            o15_pred['edge'] = round(edge * 100, 1)
+                        else:
+                            o15_pred['stake'] = 1
+                            o15_pred['edge'] = 0
+                        o15_pred['prob_mercato'] = round(prob_mkt * 100, 1)
+                        o15_pred['prob_modello'] = round(prob_mod * 100, 1)
+                        o15_pred['probabilita_stimata'] = round(prob_mod * 100, 1)
+                    result[segno_idx] = o15_pred
+                    print(f"    🔄 DC→O15: DC {sost.get('pronostico')} @{dc_q:.2f} → Over 1.5 @{o15_q}")
+                else:
+                    result.pop(segno_idx)
+                    print(f"    🗑️ DC SCARTATA: {sost.get('pronostico')} @{dc_q:.2f} (1.30-1.40), no O1.5")
+
+            # DC quota > 1.60: converti in Under 2.5 se disponibile, altrimenti scarta
+            elif dc_q > 1.60:
+                u25_q = None
+                if c_doc:
+                    for p in c_doc.get('pronostici', []):
+                        if p.get('pronostico') == 'Under 2.5':
+                            u25_q = p.get('quota')
+                            break
+                if u25_q and u25_q >= 1.35:
+                    u25_pred = {
+                        'tipo': 'GOL',
+                        'pronostico': 'Under 2.5',
+                        'quota': u25_q,
+                        'confidence': sost.get('confidence', 55),
+                        'stars': sost.get('stars', 3.0),
+                        'source': 'C_screm_u25',
+                        'routing_rule': 'screm_dc_to_under25',
+                        'has_odds': True,
+                    }
+                    if u25_q > 1.0:
+                        prob_mod = 0.70
+                        prob_mkt = 1.0 / u25_q
+                        edge = prob_mod - prob_mkt
+                        if edge > 0:
+                            kelly = 0.75 * (edge * u25_q) / (u25_q - 1)
+                            u25_pred['stake'] = max(1, min(10, round(kelly * 10)))
+                            u25_pred['edge'] = round(edge * 100, 1)
+                        else:
+                            u25_pred['stake'] = 1
+                            u25_pred['edge'] = 0
+                        u25_pred['prob_mercato'] = round(prob_mkt * 100, 1)
+                        u25_pred['prob_modello'] = round(prob_mod * 100, 1)
+                        u25_pred['probabilita_stimata'] = round(prob_mod * 100, 1)
+                    result[segno_idx] = u25_pred
+                    print(f"    🔄 DC→U25: DC {sost.get('pronostico')} @{dc_q:.2f} → Under 2.5 @{u25_q}")
+                else:
+                    result.pop(segno_idx)
+                    print(f"    🗑️ DC SCARTATA: {sost.get('pronostico')} @{dc_q:.2f} > 1.60, no U2.5")
+
+    return result
+
+
+# =====================================================
+# RECOVERY A+S Over 2.5 debole → alternativa da engine_c
+# =====================================================
+def _apply_weak_o25_recovery(unified, c_doc):
+    """
+    Quando A+S emette Over 2.5 con score < 70, sostituisce con alternativa
+    da engine_c in ordine di priorità:
+    1. SEGNO 1 quota 1.50-2.51 (HR 61%, ROI +25.2% su 23 campioni)
+    2. DC X2 (HR 71.4% su 7 campioni)
+    3. Under 2.5 quota >= 1.35 (HR 66.7% su 12 campioni)
+    4. Nessuna alternativa → scarta
+    """
+    if not c_doc:
+        return unified
+
+    # Trova A+S Over 2.5 con score < 70
+    o25_idx = None
+    o25_pred = None
+    for i, p in enumerate(unified):
+        if (p.get('source') == 'A+S'
+                and p.get('pronostico') == 'Over 2.5'
+                and (p.get('confidence') or 0) < 70):
+            o25_idx = i
+            o25_pred = p
+            break
+
+    if o25_pred is None:
+        return unified
+
+    # Cerca alternative in engine_c
+    ec_preds = {p.get('pronostico'): p for p in c_doc.get('pronostici', [])}
+    odds = c_doc.get('odds', {})
+    q1 = float(odds.get('1') or 0)
+    qx = float(odds.get('X') or odds.get('x') or 0)
+    q2 = float(odds.get('2') or 0)
+
+    result = list(unified)
+
+    def _make_recovery(tipo, pronostico, quota, source, routing_rule, prob_mod):
+        pred = {
+            'tipo': tipo,
+            'pronostico': pronostico,
+            'quota': quota,
+            'confidence': o25_pred.get('confidence', 60),
+            'stars': o25_pred.get('stars', 3.0),
+            'source': source,
+            'routing_rule': routing_rule,
+            'has_odds': True,
+        }
+        if quota and quota > 1.0:
+            prob_mkt = 1.0 / quota
+            edge = prob_mod - prob_mkt
+            if edge > 0:
+                kelly = 0.75 * (edge * quota) / (quota - 1)
+                pred['stake'] = max(1, min(10, round(kelly * 10)))
+                pred['edge'] = round(edge * 100, 1)
+            else:
+                pred['stake'] = 1
+                pred['edge'] = 0
+            pred['prob_mercato'] = round(prob_mkt * 100, 1)
+            pred['prob_modello'] = round(prob_mod * 100, 1)
+            pred['probabilita_stimata'] = round(prob_mod * 100, 1)
+        return pred
+
+    # Verifica che non esista già un SEGNO in unified (evita duplicati)
+    has_segno = any(p.get('tipo') == 'SEGNO' for p in unified)
+
+    # PRIORITÀ 1: SEGNO 1 quota 1.50-2.51
+    segno1 = ec_preds.get('1') or next(
+        (p for p in c_doc.get('pronostici', [])
+         if p.get('tipo') == 'SEGNO' and p.get('pronostico') == '1'), None)
+    if segno1 and not has_segno:
+        sq = segno1.get('quota') or 0
+        if 1.50 <= sq < 2.51:
+            result[o25_idx] = _make_recovery(
+                'SEGNO', '1', sq, 'C_as_segno1_rec', 'as_o25_to_segno1', 0.65)
+            print(f"    🔄 O25 RECOVERY: Over 2.5 A+S (score {o25_pred.get('confidence')}) → SEGNO 1 @{sq:.2f}")
+            return result
+
+    # PRIORITÀ 2: DC X2 (calcolata da quote)
+    if qx > 1 and q2 > 1:
+        dc_q = round(1 / (1/qx + 1/q2), 2)
+        if dc_q >= 1.35:
+            # Verifica che non esista già una DC in unified
+            has_dc = any(p.get('tipo') == 'DOPPIA_CHANCE' for p in unified)
+            if not has_dc:
+                result[o25_idx] = _make_recovery(
+                    'DOPPIA_CHANCE', 'X2', dc_q, 'C_as_dc_rec', 'as_o25_to_dc', 0.70)
+                print(f"    🔄 O25 RECOVERY: Over 2.5 A+S (score {o25_pred.get('confidence')}) → DC X2 @{dc_q:.2f}")
+                return result
+
+    # PRIORITÀ 3: Under 2.5
+    u25 = ec_preds.get('Under 2.5') or next(
+        (p for p in c_doc.get('pronostici', [])
+         if p.get('pronostico') == 'Under 2.5'), None)
+    if u25:
+        uq = u25.get('quota') or 0
+        if uq >= 1.35:
+            result[o25_idx] = _make_recovery(
+                'GOL', 'Under 2.5', uq, 'C_as_u25_rec', 'as_o25_to_under25', 0.67)
+            print(f"    🔄 O25 RECOVERY: Over 2.5 A+S (score {o25_pred.get('confidence')}) → Under 2.5 @{uq:.2f}")
+            return result
+
+    # PRIORITÀ 4: nessuna alternativa → scarta
+    result.pop(o25_idx)
+    print(f"    🗑️ O25 SCARTATO: Over 2.5 A+S (score {o25_pred.get('confidence')}) — no alternative")
     return result
 
 
@@ -1485,8 +1794,80 @@ def orchestrate_date(date_str, dry_run=False, match_time_filter=None):
             unified_pronostici = _apply_x_draw_combos(unified_pronostici, match_odds, sim_data)
             unified_pronostici = _apply_home_win_combos(unified_pronostici, match_odds, sim_data)
 
+        # --- POST-PROCESSING: DC Downgrade — SEGNO AR + GG conf 60-65 → DC ---
+        if c_doc_for_combo:
+            unified_pronostici = _apply_gg_conf_dc_downgrade(unified_pronostici, c_doc_for_combo)
+
         # --- POST-PROCESSING: Scrematura SEGNO per fasce di quota ---
-        unified_pronostici = _apply_segno_scrematura(unified_pronostici, match_odds, base_doc)
+        unified_pronostici = _apply_segno_scrematura(unified_pronostici, match_odds, base_doc, c_doc=c_doc_for_combo)
+
+        # --- POST-PROCESSING: Recovery A+S Over 2.5 debole (score < 70) ---
+        if c_doc_for_combo:
+            unified_pronostici = _apply_weak_o25_recovery(unified_pronostici, c_doc_for_combo)
+
+        # --- FILTRO Under 2.5: quota >= 1.55 solo se engine_c ha SEGNO ---
+        # Fascia 1.35-1.55: HR 78%, emetti sempre
+        # Fascia >= 1.55 senza SEGNO in engine_c: HR 48%, scarta
+        u25_to_remove = set()
+        for i, p in enumerate(unified_pronostici):
+            if (p.get('pronostico') == 'Under 2.5'
+                    and p.get('source') == 'A'
+                    and (p.get('quota') or 0) >= 1.55):
+                # Verifica se engine_c ha SEGNO 1 o 2
+                has_ec_segno = False
+                if c_doc_for_combo:
+                    for ep in c_doc_for_combo.get('pronostici', []):
+                        if ep.get('tipo') == 'SEGNO' and ep.get('pronostico') in ('1', '2'):
+                            has_ec_segno = True
+                            break
+                if not has_ec_segno:
+                    u25_to_remove.add(i)
+                    print(f"    🗑️ U2.5 FILTRO: Under 2.5 @{p.get('quota', '?')} scartato (q>=1.55, no SEGNO in engine_c)")
+        if u25_to_remove:
+            unified_pronostici = [p for i, p in enumerate(unified_pronostici) if i not in u25_to_remove]
+
+        # --- SEGNO EXTRA: Under 2.5 quota >= 1.75 + SEGNO engine_c → aggiungi SEGNO ---
+        # HR storico 83% su entrambi, SEGNO paga il doppio (ROI +247% vs +98%)
+        if c_doc_for_combo:
+            has_segno_unified = any(p.get('tipo') == 'SEGNO' for p in unified_pronostici)
+            if not has_segno_unified:
+                for p in unified_pronostici:
+                    if (p.get('pronostico') == 'Under 2.5'
+                            and p.get('source') == 'A'
+                            and (p.get('quota') or 0) >= 1.75):
+                        # Cerca SEGNO 1 o 2 in engine_c
+                        for ep in c_doc_for_combo.get('pronostici', []):
+                            if ep.get('tipo') == 'SEGNO' and ep.get('pronostico') in ('1', '2'):
+                                sq = ep.get('quota') or 0
+                                if sq >= 1.35:
+                                    segno_extra = {
+                                        'tipo': 'SEGNO',
+                                        'pronostico': ep.get('pronostico'),
+                                        'quota': sq,
+                                        'confidence': ep.get('confidence', 55),
+                                        'stars': ep.get('stars', 3.0),
+                                        'source': 'A_u25_segno_extra',
+                                        'routing_rule': 'u25_high_segno_add',
+                                        'has_odds': True,
+                                    }
+                                    prob_mod = 0.70
+                                    if sq > 1.0:
+                                        prob_mkt = 1.0 / sq
+                                        edge = prob_mod - prob_mkt
+                                        if edge > 0:
+                                            kelly = 0.75 * (edge * sq) / (sq - 1)
+                                            segno_extra['stake'] = max(1, min(10, round(kelly * 10)))
+                                            segno_extra['edge'] = round(edge * 100, 1)
+                                        else:
+                                            segno_extra['stake'] = 1
+                                            segno_extra['edge'] = 0
+                                        segno_extra['prob_mercato'] = round(prob_mkt * 100, 1)
+                                        segno_extra['prob_modello'] = round(prob_mod * 100, 1)
+                                        segno_extra['probabilita_stimata'] = round(prob_mod * 100, 1)
+                                    unified_pronostici.append(segno_extra)
+                                    print(f"    ➕ SEGNO EXTRA: U2.5 @{p.get('quota','?')} + SEGNO {ep.get('pronostico')} @{sq:.2f}")
+                                break
+                        break
 
         # --- DEDUP: Over/Under conflitto S8F vs A → S8F vince ---
         # S8F (scrematura) ROI 4.2% vs A ROI 1.2% → solo contro fonte A
@@ -1508,11 +1889,12 @@ def orchestrate_date(date_str, dry_run=False, match_time_filter=None):
             remove_ids = {id(p) for p in to_remove}
             unified_pronostici = [p for p in unified_pronostici if id(p) not in remove_ids]
 
-        # --- POST-PROCESSING: Over 3.5 @>2.00 → Over 2.5 se quota ≥ 1.35 ---
+        # --- POST-PROCESSING: Over 3.5 @>2.00 → Over 2.5 solo se Q_O25 in [1.75, 2.00) ---
         over25_q = match_odds.get('over_25', 0) or 0
+        dg35_remove = set()
         for i, p in enumerate(unified_pronostici):
             if p.get('pronostico') == 'Over 3.5' and (p.get('quota') or 0) > 2.00:
-                if over25_q >= 1.35:
+                if 1.75 <= over25_q < 2.00:
                     print(f"    🔄 DOWNGRADE: Over 3.5 @{p.get('quota', '?')} → Over 2.5 @{over25_q:.2f}")
                     unified_pronostici[i]['pronostico'] = 'Over 2.5'
                     unified_pronostici[i]['quota'] = over25_q
@@ -1527,6 +1909,12 @@ def orchestrate_date(date_str, dry_run=False, match_time_filter=None):
                             unified_pronostici[i]['stake'] = max(1, min(10, round(kelly * 10)))
                             unified_pronostici[i]['edge'] = round(edge * 100, 1)
                         unified_pronostici[i]['prob_mercato'] = round(prob_mkt * 100, 1)
+                else:
+                    # Q_O25 fuori range [1.75, 2.00) — scarta
+                    print(f"    🗑️ SCARTO: Over 3.5 @{p.get('quota', '?')} — Q_O25 {over25_q:.2f} fuori [1.75, 2.00)")
+                    dg35_remove.add(i)
+        if dg35_remove:
+            unified_pronostici = [p for i, p in enumerate(unified_pronostici) if i not in dg35_remove]
 
         # --- FILTRO OVER 2.5: solo quota <= 1.65 (fasce sicure) ---
         # HR 2 settimane: quota <=1.65 = 73%, quota >1.65 = 42%
