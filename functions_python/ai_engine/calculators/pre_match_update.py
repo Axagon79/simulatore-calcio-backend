@@ -496,7 +496,7 @@ def run_full_cycle(date_str, target_date, block_times, run_label):
     run_system_c(target_date=target_date, match_time_filter=effective_times)
 
     print(f"\n--- Orchestratore MoE ---")
-    run_orchestrator(date_str, dry_run=False, match_time_filter=effective_times)
+    run_orchestrator(date_str, dry_run=False, match_time_filter=effective_times, preserve_analysis=True)
 
     # 2. Snapshot + change detection
     all_changes = save_snapshot_and_detect_changes(date_str, block_times, run_label)

@@ -1706,7 +1706,7 @@ def _get_combo_detail(markets_by_sys):
 # =====================================================
 # ORCHESTRAZIONE PRINCIPALE
 # =====================================================
-def orchestrate_date(date_str, dry_run=False, match_time_filter=None):
+def orchestrate_date(date_str, dry_run=False, match_time_filter=None, preserve_analysis=False):
     """
     Orchestrazione per una singola data.
     Ritorna il numero di documenti scritti.
@@ -1715,6 +1715,8 @@ def orchestrate_date(date_str, dry_run=False, match_time_filter=None):
         date_str: data in formato YYYY-MM-DD
         dry_run: se True, non scrive in DB
         match_time_filter: lista di orari per filtrare solo i match di quel gruppo orario.
+        preserve_analysis: se True, usa update_one/$set per non cancellare i campi
+                          analysis_free/analysis_alerts/analysis_score (usato dal pre-match update).
     """
     # 1. Carica pronostici dai 3 sistemi
     docs_by_sys = {}
@@ -2058,13 +2060,20 @@ def orchestrate_date(date_str, dry_run=False, match_time_filter=None):
     coll = db['daily_predictions_unified']
 
     if not dry_run:
-        # Rimuovi vecchi documenti per questa data (filtrati per orario se richiesto)
-        delete_filter = {'date': date_str}
-        if match_time_filter:
-            delete_filter['match_time'] = {'$in': match_time_filter}
-        coll.delete_many(delete_filter)
-        # Inserisci nuovi
-        coll.insert_many(unified_docs)
+        if preserve_analysis:
+            # Pre-match update: aggiorna solo i campi pronostici, preserva analysis_*
+            for doc in unified_docs:
+                find_filter = {'date': date_str, 'home': doc['home'], 'away': doc['away']}
+                # Rimuovi _id se presente per evitare conflitti con $set
+                update_fields = {k: v for k, v in doc.items() if k != '_id'}
+                result = coll.update_one(find_filter, {'$set': update_fields}, upsert=True)
+        else:
+            # Pipeline notturna: cancella e reinserisci (step 34 rigenera le analisi)
+            delete_filter = {'date': date_str}
+            if match_time_filter:
+                delete_filter['match_time'] = {'$in': match_time_filter}
+            coll.delete_many(delete_filter)
+            coll.insert_many(unified_docs)
 
         # Salva richieste quote RE per lo scraper SNAI
         re_requests = []
