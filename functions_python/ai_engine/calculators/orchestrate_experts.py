@@ -2065,6 +2065,9 @@ def orchestrate_date(date_str, dry_run=False, match_time_filter=None, preserve_a
         for doc in unified_docs:
             generated_keys.add(f"{doc['home']}||{doc['away']}")
 
+        today_str = datetime.now().strftime('%Y-%m-%d')
+        is_anticipata = (today_str < date_str)
+
         if preserve_analysis:
             # Pre-match update: aggiorna solo i campi pronostici, preserva analysis_*
             for doc in unified_docs:
@@ -2072,17 +2075,16 @@ def orchestrate_date(date_str, dry_run=False, match_time_filter=None, preserve_a
                 update_fields = {k: v for k, v in doc.items() if k != '_id'}
                 coll.update_one(find_filter, {
                     '$set': update_fields,
-                    '$setOnInsert': {'origin_date': date_str}
+                    '$setOnInsert': {'origin_date': today_str, 'anticipata': is_anticipata}
                 }, upsert=True)
         else:
             # Pipeline notturna: update_one + upsert (le partite non spariscono mai)
-            today_str = datetime.now().strftime('%Y-%m-%d')
             for doc in unified_docs:
                 find_filter = {'date': date_str, 'home': doc['home'], 'away': doc['away']}
                 update_fields = {k: v for k, v in doc.items() if k != '_id'}
                 coll.update_one(find_filter, {
                     '$set': update_fields,
-                    '$setOnInsert': {'origin_date': today_str}
+                    '$setOnInsert': {'origin_date': today_str, 'anticipata': is_anticipata}
                 }, upsert=True)
 
             # Partite già in DB per questa data ma non rigenerate → diventano NO BET
