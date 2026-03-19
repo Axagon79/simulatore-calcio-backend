@@ -297,8 +297,120 @@ router.post('/generate', authenticate, async (req, res) => {
       }
     }
 
-    if (pool.length < 2) {
-      return res.json({ success: false, error: 'Pool insufficiente per generare una bolletta' });
+    // Filtro data in base alla richiesta dell'utente
+    const msg = message.toLowerCase();
+    const todayDate = dates[0];
+    let filterDates = null;
+
+    const addDays = (n) => {
+      const d = new Date(dates[0] + 'T12:00:00');
+      d.setDate(d.getDate() + n);
+      return d.toISOString().split('T')[0];
+    };
+
+    const getNextDayDate = (dayName) => {
+      const dayNames = { 'domenica': 0, 'lunedi': 1, 'lunedì': 1, 'martedi': 2, 'martedì': 2, 'mercoledi': 3, 'mercoledì': 3, 'giovedi': 4, 'giovedì': 4, 'venerdi': 5, 'venerdì': 5, 'sabato': 6 };
+      const targetDow = dayNames[dayName];
+      if (targetDow === undefined) return null;
+      const today = new Date(dates[0] + 'T12:00:00');
+      const currentDow = today.getDay();
+      let diff = (targetDow - currentDow + 7) % 7;
+      if (diff === 0) diff = 0;
+      const target = new Date(today);
+      target.setDate(today.getDate() + diff);
+      return target.toISOString().split('T')[0];
+    };
+
+    const dateRange = (startOffset, count) => {
+      const result = [];
+      for (let i = 0; i < count; i++) result.push(addDays(startOffset + i));
+      return result;
+    };
+
+    // Giorni relativi
+    if (['oggi', 'stasera', 'questa sera', 'stanotte', 'solo oggi', 'solo stasera'].some(k => msg.includes(k))) {
+      filterDates = [todayDate];
+    } else if (['dopodomani'].some(k => msg.includes(k))) {
+      filterDates = [addDays(2)];
+    } else if (['domani sera', 'domani'].some(k => msg.includes(k))) {
+      filterDates = [addDays(1)];
+    } else if (['tra due giorni', 'fra due giorni', 'tra un paio di giorni', 'fra un paio di giorni'].some(k => msg.includes(k))) {
+      filterDates = [addDays(2)];
+    } else if (['tra tre giorni', 'fra tre giorni'].some(k => msg.includes(k))) {
+      filterDates = [addDays(3)];
+    } else if (['tra quattro giorni', 'fra quattro giorni'].some(k => msg.includes(k))) {
+      filterDates = [addDays(4)];
+    }
+    // Periodi
+    else if (['questo weekend', 'questo fine settimana', 'il weekend', 'il fine settimana', 'sabato e domenica'].some(k => msg.includes(k))) {
+      filterDates = [getNextDayDate('sabato'), getNextDayDate('domenica')].filter(Boolean);
+    } else if (['prossima settimana', 'settimana prossima', 'la prossima settimana', 'la settimana prossima'].some(k => msg.includes(k))) {
+      const today = new Date(dates[0] + 'T12:00:00');
+      const currentDow = today.getDay();
+      const daysToMon = (1 - currentDow + 7) % 7 || 7;
+      filterDates = dateRange(daysToMon, 7);
+    } else if (['questa settimana'].some(k => msg.includes(k))) {
+      const today = new Date(dates[0] + 'T12:00:00');
+      const currentDow = today.getDay();
+      const daysToSun = (7 - currentDow) % 7;
+      filterDates = dateRange(0, daysToSun + 1);
+    } else if (['nei prossimi giorni', 'i prossimi giorni'].some(k => msg.includes(k))) {
+      filterDates = dateRange(0, 4);
+    }
+    // Giorni della settimana specifici
+    else {
+      const dayMatch = msg.match(/(?:quest[oa]\s+)?(luned[iì]|marted[iì]|mercoled[iì]|gioved[iì]|venerd[iì]|sabato|domenica)(?:\s+prossim[oa])?/i);
+      if (dayMatch) {
+        const dayDate = getNextDayDate(dayMatch[1].toLowerCase());
+        if (dayDate) filterDates = [dayDate];
+      }
+    }
+
+    // Date specifiche: "del 27", "del 21 marzo", "27 marzo", "il 25"
+    if (!filterDates) {
+      const dateMatch = msg.match(/(?:del|il|per il|partite?\s+(?:del|il))\s+(\d{1,2})(?:\s+(?:di\s+)?(gennaio|febbraio|marzo|aprile|maggio|giugno|luglio|agosto|settembre|ottobre|novembre|dicembre))?/i);
+      if (dateMatch) {
+        const day = parseInt(dateMatch[1]);
+        const monthNames = { 'gennaio': 0, 'febbraio': 1, 'marzo': 2, 'aprile': 3, 'maggio': 4, 'giugno': 5, 'luglio': 6, 'agosto': 7, 'settembre': 8, 'ottobre': 9, 'novembre': 10, 'dicembre': 11 };
+        const today = new Date(dates[0] + 'T12:00:00');
+        let month = dateMatch[2] ? monthNames[dateMatch[2].toLowerCase()] : today.getMonth();
+        let year = today.getFullYear();
+        const target = new Date(year, month, day, 12, 0, 0);
+        // Se la data è nel passato, vai all'anno/mese prossimo
+        if (target < today && !dateMatch[2]) {
+          target.setMonth(target.getMonth() + 1);
+        }
+        filterDates = [target.toISOString().split('T')[0]];
+      }
+    }
+
+    if (filterDates && filterDates.length > 0) {
+      pool.splice(0, pool.length, ...pool.filter(s => filterDates.includes(s.match_date)));
+      allMatches.splice(0, allMatches.length, ...allMatches.filter(m => filterDates.includes(m.match_date)));
+    }
+
+    if (pool.length < 2 && allMatches.length < 2) {
+      return res.json({
+        success: true,
+        type: 'messaggio',
+        text: 'Per oggi non ci sono più partite disponibili — è troppo tardi e sono tutte già iniziate o terminate. 😊\nSe vuoi posso comporre un biglietto con le partite di domani, dimmi tu!'
+      });
+    }
+
+    // 1b. Filtro pre-Mistral: se l'utente chiede una quota max, escludi selezioni troppo alte
+    const preFilterQuotaMatch = message.match(/quota\s+(?:massim[ao]|max)\s+(\d+(?:[.,]\d+)?)/i);
+    const preFilterQuotaMax = preFilterQuotaMatch ? parseFloat(preFilterQuotaMatch[1].replace(',', '.')) : null;
+    if (preFilterQuotaMax) {
+      // Estrai numero partite richieste (default 3)
+      const numMatch = message.match(/(\d+)\s*(?:partite|selezioni|match)/i);
+      const numPartite = numMatch ? Math.min(parseInt(numMatch[1]), 10) : 3;
+      // Quota massima per singola selezione = radice N-esima della quota target × margine 1.3
+      const quotaMaxSingola = Math.pow(preFilterQuotaMax, 1 / numPartite) * 1.3;
+      const poolFiltrato = pool.filter(s => s.quota <= quotaMaxSingola);
+      // Usa il pool filtrato solo se ha abbastanza selezioni
+      if (poolFiltrato.length >= 2) {
+        pool.splice(0, pool.length, ...poolFiltrato);
+      }
     }
 
     // 2. Serializza pool
@@ -358,7 +470,26 @@ ${poolText}
 
 ${matchesText}
 
-La data di oggi è: ${new Date().toISOString().split('T')[0]}
+La data di oggi è: ${dates[0]} (${new Date(dates[0]).toLocaleDateString('it-IT', { weekday: 'long', timeZone: 'Europe/Rome' })})
+Ieri: ${(() => { const d = new Date(dates[0]); d.setDate(d.getDate()-1); return d.toISOString().split('T')[0]; })()} (${(() => { const d = new Date(dates[0]); d.setDate(d.getDate()-1); return d.toLocaleDateString('it-IT', { weekday: 'long', timeZone: 'Europe/Rome' }); })()})
+Domani: ${dates[1]} (${new Date(dates[1]).toLocaleDateString('it-IT', { weekday: 'long', timeZone: 'Europe/Rome' })})
+Dopodomani: ${dates[2]} (${new Date(dates[2]).toLocaleDateString('it-IT', { weekday: 'long', timeZone: 'Europe/Rome' })})
+${(() => {
+  const today = new Date(dates[0]);
+  const dow = today.getDay(); // 0=dom, 6=sab
+  const daysToSat = (6 - dow + 7) % 7 || 7;
+  const daysToSun = (7 - dow + 7) % 7 || 7;
+  const sat = new Date(today); sat.setDate(today.getDate() + daysToSat);
+  const sun = new Date(today); sun.setDate(today.getDate() + daysToSun);
+  const satStr = sat.toISOString().split('T')[0];
+  const sunStr = sun.toISOString().split('T')[0];
+  const daysToMon = (8 - dow + 7) % 7 || 7;
+  const mon = new Date(today); mon.setDate(today.getDate() + daysToMon);
+  const sun2 = new Date(mon); sun2.setDate(mon.getDate() + 6);
+  const monStr = mon.toISOString().split('T')[0];
+  const sun2Str = sun2.toISOString().split('T')[0];
+  return `Questo weekend: ${satStr} (sabato) e ${sunStr} (domenica)\nProssima settimana: dal ${monStr} (lunedì) al ${sun2Str} (domenica)`;
+})()}
 L'ora attuale è: ${new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Rome' })}.
 PARTITE GIÀ INIZIATE: se l'orario della partita è PRIMA dell'ora attuale E la data è oggi, quella partita è GIÀ INIZIATA. NON metterla MAI in bolletta. Esempio: ora sono le 21:00 e una partita è alle 20:45 di oggi → è GIÀ INIZIATA, non usarla.
 
@@ -383,19 +514,33 @@ COMPORTAMENTO FONDAMENTALE:
 - Chiedi chiarimenti SOLO se la richiesta è veramente incomprensibile, MAI se ti ha dato indicazioni su numero partite, quota o tipo di mercato
 - Se l'utente NON specifica le date (es. "fammi un biglietto con 5 partite"), chiedigli: "Vuoi partite solo di oggi, solo dei prossimi giorni, o un mix?"
 - Se l'utente NON specifica una quota target, chiedigli anche: "Hai in mente una quota totale target o posso sceglierla io?"
+- Se l'utente dice "quota massima di X" significa che la quota totale deve essere il più vicino possibile a X senza superarlo. NON interpretarlo come "stai basso quanto vuoi" — punta sempre vicino al limite. Esempio: "quota massima 5" → punta a 4.5-5.0, NON a 1.97 o 2.50.
 - Fai ENTRAMBE le domande in un unico messaggio, non in due messaggi separati. Se l'utente risponde che non gli interessa la quota, scegli tu da professionista
 - Se l'utente chiede info sulle partite (non una bolletta), allora puoi elencarle
 - Quando l'utente ti corregge (es. "queste sono già iniziate"), NON elencare le partite rimaste chiedendo "scegli tu". COMPONI SUBITO una nuova bolletta corretta in formato JSON e restituiscila. Sei il tipster, DECIDI TU.
-
+- Se l'utente chiede di SOSTITUIRE una selezione (es. "metti il 2 del Nottingham invece della doppia chance"), devi MANTENERE la stessa partita in bolletta con il nuovo mercato/pronostico richiesto, NON eliminarla. Le altre selezioni rimangono invariate. Esempio SBAGLIATO: utente dice "metti il 2 del Nottingham" → tu rimuovi il Nottingham e lasci solo il Betis ❌. Esempio CORRETTO: sostituisci "Doppia Chance X2" con "1X2 ESITO FINALE: 2" sulla stessa partita, mantieni tutte le altre selezioni ✅.
+- Se il pool AI è vuoto o insufficiente ma esistono partite disponibili fuori dal pool, usale per comporre la bolletta scegliendo i mercati dalle quote disponibili in PARTITE DISPONIBILI CON QUOTE. Spiega all'utente che stai usando selezioni fuori dai pronostici AI.
+- Se non ci sono partite disponibili per la data richiesta, NON rispondere con un errore secco. Spiega gentilmente la situazione e proponi un'alternativa (es. partite di domani o dei prossimi giorni).
 QUOTA TARGET — OBBLIGATORIO:
-- Quota totale = prodotto delle quote singole. Tolleranza: ±10%.
-- PRIMA di rispondere DEVI fare il calcolo. Se sbaglia, CAMBIA selezione.
-- Esempi:
-  * Quota 3, 3 partite → serve media ~1.45 (1.45 × 1.45 × 1.45 = 3.05 ✅)
-  * Quota 3, 4 partite → serve media ~1.32 (1.32 × 1.32 × 1.32 × 1.32 = 3.03 ✅)
-  * Quota 5, 3 partite → serve media ~1.71 (1.71 × 1.71 × 1.71 = 5.00 ✅)
-  * SBAGLIATO: quota target 3, selezioni 1.67 × 1.65 × 1.37 × 1.35 = 5.10 ❌ (troppo alta!)
-- Se metti quote troppo alte o troppo basse, USA MERCATI DIVERSI. Mercati con quote basse: DC, Over 1.5. Mercati con quote medie: Under 2.5, Goal. Mercati con quote alte: 1X2, Under 1.5.
+- DEFINIZIONE: "quota totale" = il PRODOTTO di tutte le quote singole. Esempio: tre selezioni a 1.50 × 1.50 × 1.50 = 3.375 quota totale. NON è la quota massima per singola selezione. Quando l'utente dice "quota massimo 3" significa che il PRODOTTO finale deve essere ≤ 3.0, non che ogni singola quota deve essere ≤ 3.0.
+- Quota totale = prodotto delle quote singole. Tolleranza: ±10% sulla quota target.
+- PRIMA di comporre la bolletta, calcola mentalmente il prodotto delle quote che intendi usare. Se il risultato è fuori dal range, CAMBIA le selezioni. Non rispondere finché il calcolo non è corretto.
+- Range accettabile: se l'utente chiede quota 5, la quota totale DEVE essere tra 4.5 e 5.5. QUALSIASI valore fuori da questo range è SBAGLIATO e non va mai inviato.
+
+ESEMPI CORRETTI:
+  * Quota target 5, 3 partite → 1.71 × 1.71 × 1.71 = 5.00 ✅
+  * Quota target 5, 4 partite → 1.50 × 1.50 × 1.50 × 1.48 = 4.99 ✅
+  * Quota target 3, 3 partite → 1.45 × 1.45 × 1.45 = 3.05 ✅
+
+ESEMPI SBAGLIATI — NON FARE MAI:
+  * Quota target 5, selezioni 8.00 × 1.76 = 14.08 ❌ (quasi 3x la quota richiesta!)
+  * Quota target 5, selezioni 8.00 × 1.76 × 1.40 = 19.71 ❌ (4x la quota richiesta!)
+  * Quota target 3, selezioni 1.67 × 1.65 × 1.37 × 1.35 = 5.10 ❌ (troppo alta)
+
+REGOLA ANTI-QUOTA-ALTA: se una singola selezione ha quota ≥ 3.0, il prodotto delle altre deve compensare per stare nel range. Se non riesci a compensare, NON usare quella selezione ad alto rischio.
+- Per quote target basse (3-5): preferisci mercati DC, Over 1.5, Under 2.5, Goal
+- Per quote target medie (5-10): puoi usare qualche 1X2 favorito (quota 1.5-2.0)
+- Per quote alte (10+): puoi usare outsider, ma il calcolo deve comunque tornare
 
 COME RISPONDERE:
 - Sii COMPLETO e DETTAGLIATO fin dalla prima risposta
@@ -403,6 +548,7 @@ COME RISPONDERE:
 - Per ogni partita mostra: nome squadre, orario, e i mercati disponibili con quote
 - Distingui SEMPRE tra oggi, domani, dopodomani — non mescolare le date
 - "Questa sera" significa SOLO partite di OGGI con orario serale, non domani o dopodomani
+- Se l'utente dice "solo partite di oggi" o "solo stasera" o simili, usa ESCLUSIVAMENTE partite con data uguale alla data odierna indicata sopra. NON inserire MAI partite di domani o dopodomani anche se sono nel pool. Verifica sempre il campo match_date di ogni selezione prima di rispondere.
 - Rispondi in italiano, sii diretto e professionale
 
 FORMATO RISPOSTA — SEMPRE JSON valido. Nessun testo fuori dal JSON. Nessun markdown.
@@ -524,6 +670,25 @@ match_key deve essere nel formato "Home vs Away|YYYY-MM-DD" delle partite dispon
 
     quotaTotale = Math.round(quotaTotale * 100) / 100;
 
+    // Rimuovi segno X (pareggio) — vietato per policy
+    const selezioniFiltrate = selezioni.filter(s => s.pronostico !== 'X');
+    let quotaRicalcolata = 1.0;
+    for (const s of selezioniFiltrate) quotaRicalcolata *= s.quota;
+    quotaRicalcolata = Math.round(quotaRicalcolata * 100) / 100;
+    selezioni.splice(0, selezioni.length, ...selezioniFiltrate);
+    quotaTotale = quotaRicalcolata;
+
+    // Rispetta quota massima dichiarata dall'utente
+    const quotaMatch = message.match(/quota\s+(?:massim[ao]|max)\s+(\d+(?:[.,]\d+)?)/i);
+    const quotaMax = quotaMatch ? parseFloat(quotaMatch[1].replace(',', '.')) : null;
+    if (quotaMax && quotaTotale > quotaMax * 1.10) {
+      selezioni.sort((a, b) => b.quota - a.quota);
+      while (selezioni.length > 1 && quotaTotale > quotaMax * 1.10) {
+        selezioni.shift();
+        quotaTotale = Math.round(selezioni.reduce((acc, s) => acc * s.quota, 1.0) * 100) / 100;
+      }
+    }
+
     // Determina tipo
     let tipo = 'ambiziosa';
     if (quotaTotale < 3.0) tipo = 'selettiva';
@@ -548,7 +713,7 @@ match_key deve essere nel formato "Home vs Away|YYYY-MM-DD" delle partite dispon
 // ============================================
 router.post('/save-custom', authenticate, async (req, res) => {
   try {
-    const { bolletta } = req.body;
+    const { bolletta, stake_amount } = req.body;
     if (!bolletta || !bolletta.selezioni || bolletta.selezioni.length < 1) {
       return res.status(400).json({ success: false, error: 'Bolletta non valida' });
     }
@@ -568,6 +733,7 @@ router.post('/save-custom', authenticate, async (req, res) => {
       user_id: req.userId,
       pool_size: 0,
       version: 1,
+      stake_amount: parseFloat(stake_amount) || 0,
     };
 
     const result = await req.db.collection('bollette').insertOne(doc);
