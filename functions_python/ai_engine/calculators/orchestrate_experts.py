@@ -2060,20 +2060,48 @@ def orchestrate_date(date_str, dry_run=False, match_time_filter=None, preserve_a
     coll = db['daily_predictions_unified']
 
     if not dry_run:
+        # Chiavi delle partite generate in questa run (per rilevare quelle non rigenerate)
+        generated_keys = set()
+        for doc in unified_docs:
+            generated_keys.add(f"{doc['home']}||{doc['away']}")
+
         if preserve_analysis:
             # Pre-match update: aggiorna solo i campi pronostici, preserva analysis_*
             for doc in unified_docs:
                 find_filter = {'date': date_str, 'home': doc['home'], 'away': doc['away']}
-                # Rimuovi _id se presente per evitare conflitti con $set
                 update_fields = {k: v for k, v in doc.items() if k != '_id'}
-                result = coll.update_one(find_filter, {'$set': update_fields}, upsert=True)
+                coll.update_one(find_filter, {
+                    '$set': update_fields,
+                    '$setOnInsert': {'origin_date': date_str}
+                }, upsert=True)
         else:
-            # Pipeline notturna: cancella e reinserisci (step 34 rigenera le analisi)
-            delete_filter = {'date': date_str}
-            if match_time_filter:
-                delete_filter['match_time'] = {'$in': match_time_filter}
-            coll.delete_many(delete_filter)
-            coll.insert_many(unified_docs)
+            # Pipeline notturna: update_one + upsert (le partite non spariscono mai)
+            today_str = datetime.now().strftime('%Y-%m-%d')
+            for doc in unified_docs:
+                find_filter = {'date': date_str, 'home': doc['home'], 'away': doc['away']}
+                update_fields = {k: v for k, v in doc.items() if k != '_id'}
+                coll.update_one(find_filter, {
+                    '$set': update_fields,
+                    '$setOnInsert': {'origin_date': today_str}
+                }, upsert=True)
+
+            # Partite già in DB per questa data ma non rigenerate → diventano NO BET
+            if not match_time_filter:
+                existing_docs = list(coll.find({'date': date_str}, {'home': 1, 'away': 1, 'decision': 1}))
+                nobet_count = 0
+                for edoc in existing_docs:
+                    key = f"{edoc['home']}||{edoc['away']}"
+                    if key not in generated_keys and edoc.get('decision') != 'NO_BET':
+                        coll.update_one(
+                            {'_id': edoc['_id']},
+                            {'$set': {
+                                'decision': 'NO_BET',
+                                'pronostici': [{'tipo': 'SEGNO', 'pronostico': 'NO BET', 'confidence': 0}],
+                            }}
+                        )
+                        nobet_count += 1
+                if nobet_count:
+                    print(f"    ⚠️ {nobet_count} partite non rigenerate → NO BET")
 
         # Salva richieste quote RE per lo scraper SNAI
         re_requests = []

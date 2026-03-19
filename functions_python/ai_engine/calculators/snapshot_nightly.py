@@ -132,13 +132,26 @@ def run_snapshot_nightly(target_date=None):
     return len(snapshots)
 
 
+def run_snapshot_nightly_7days():
+    """Salva snapshot nightly per 7 giorni (oggi + 6 futuri), coerente con orchestratore."""
+    print(f"\n📸 Snapshot Nightly — 7 giorni (oggi + 6 futuri)")
+    total = 0
+    for i in range(7):
+        target = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=i)
+        count = run_snapshot_nightly(target)
+        total += count
+    print(f"\n📸 Totale snapshot: {total} su 7 giorni")
+    return total
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Snapshot Nightly — prediction_versions')
-    parser.add_argument('date', nargs='?', help='Data YYYY-MM-DD (default: oggi)')
+    parser.add_argument('date', nargs='?', help='Data YYYY-MM-DD (default: 7 giorni)')
     args = parser.parse_args()
 
-    target = None
     if args.date:
         target = datetime.strptime(args.date, '%Y-%m-%d').replace(tzinfo=timezone.utc)
-
-    run_snapshot_nightly(target)
+        run_snapshot_nightly(target)
+    else:
+        # Senza argomenti: 7 giorni (coerente con orchestratore)
+        run_snapshot_nightly_7days()
