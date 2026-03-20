@@ -101,6 +101,28 @@ def main():
                 alt_key = f"{doc['home']}|||{doc['away']}|||{alt}"
                 results_map.setdefault(alt_key, doc['score'])
 
+    # Fix coppe: aggiorna status/result da live_score per partite finite ma con status=scheduled
+    for coll_name in ['matches_champions_league', 'matches_europa_league']:
+        if coll_name in db.list_collection_names():
+            stale = list(db[coll_name].find({
+                'live_status': 'Finished',
+                'live_score': {'$ne': None},
+                'status': {'$ne': 'finished'}
+            }))
+            for doc in stale:
+                parsed = parse_score(doc['live_score'])
+                if parsed:
+                    db[coll_name].update_one(
+                        {'_id': doc['_id']},
+                        {'$set': {
+                            'status': 'finished',
+                            'result': {'home_score': parsed['home'], 'away_score': parsed['away']},
+                            'real_score': doc['live_score']
+                        }}
+                    )
+            if stale:
+                print(f"  ⚡ {coll_name}: {len(stale)} partite coppa aggiornate da live_score")
+
     # Risultati coppe
     for coll_name in ['matches_champions_league', 'matches_europa_league']:
         if coll_name in db.list_collection_names():
