@@ -68,10 +68,10 @@ function checkPronostico(pronostico, tipo, parsed) {
     return p === parsed.sign;
   }
 
-  // RISULTATO ESATTO: pronostico è "1-0", hit se risultato reale matcha
+  // RISULTATO ESATTO: pronostico è "1:1" o "1-1", hit se risultato reale matcha
   if (tipo === 'RISULTATO_ESATTO') {
-    const realScore = `${parsed.homeGoals}-${parsed.awayGoals}`;
-    return p === realScore;
+    const realScore = `${parsed.home}:${parsed.away}`;
+    return p.replace('-', ':') === realScore;
   }
 
   return null;
