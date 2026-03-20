@@ -105,27 +105,45 @@ def main():
     for coll_name in ['matches_champions_league', 'matches_europa_league']:
         if coll_name in db.list_collection_names():
             for doc in db[coll_name].find(
-                {"$or": [{"real_score": {"$ne": None}}, {"result": {"$exists": True}}]},
-                {"home_team": 1, "away_team": 1, "match_date": 1, "real_score": 1, "result": 1, "status": 1}
+                {"$or": [{"real_score": {"$ne": None}}, {"result": {"$exists": True}}, {"live_score": {"$ne": None}}]},
+                {"home_team": 1, "away_team": 1, "match_date": 1, "real_score": 1, "result": 1, "status": 1, "live_score": 1, "live_status": 1}
             ):
                 rs = doc.get('real_score')
                 if not rs and doc.get('result'):
                     r = doc['result']
                     if r.get('home_score') is not None and r.get('away_score') is not None:
                         rs = f"{r['home_score']}:{r['away_score']}"
+                # Fallback: usa live_score se live_status è Finished
+                if not rs and doc.get('live_score') and (doc.get('live_status') or '').lower() == 'finished':
+                    rs = doc['live_score']
                 if not rs:
                     continue
                 status = (doc.get('status') or '').lower()
-                if status not in ('finished', 'ft'):
+                live_status = (doc.get('live_status') or '').lower()
+                if status not in ('finished', 'ft') and live_status not in ('finished', 'ft'):
                     continue
                 md = doc.get('match_date', '')
                 if md:
                     try:
-                        date_str = md.split(' ')[0]
+                        raw_date = md.split(' ')[0]
+                        # Normalizza: DD-MM-YYYY → YYYY-MM-DD
+                        if len(raw_date) == 10 and raw_date[2] == '-':
+                            date_str = f"{raw_date[6:]}-{raw_date[3:5]}-{raw_date[0:2]}"
+                        else:
+                            date_str = raw_date
                     except:
                         continue
                     key = f"{doc['home_team']}|||{doc['away_team']}|||{date_str}"
                     results_map[key] = rs
+                    # Fallback ±1 giorno per coppe
+                    from datetime import datetime as dt2
+                    try:
+                        d = dt2.strptime(date_str, '%Y-%m-%d')
+                        for delta in [-1, 1]:
+                            alt = (d + timedelta(days=delta)).strftime('%Y-%m-%d')
+                            results_map.setdefault(f"{doc['home_team']}|||{doc['away_team']}|||{alt}", rs)
+                    except:
+                        pass
 
     print(f"  {len(results_map)} risultati caricati.\n")
 
