@@ -169,9 +169,13 @@ def main():
 
     print(f"  {len(results_map)} risultati caricati.\n")
 
-    # 2. Trova bollette con selezioni senza esito
+    # 2. Trova bollette con selezioni senza esito O senza real_score
     bollette = list(db.bollette.find({
-        "selezioni.esito": None
+        "$or": [
+            {"selezioni.esito": None},
+            {"selezioni": {"$elemMatch": {"esito": {"$ne": None}, "real_score": {"$exists": False}}}},
+            {"selezioni": {"$elemMatch": {"esito": {"$ne": None}, "real_score": None}}}
+        ]
     }))
 
     print(f"📋 Bollette con selezioni pending: {len(bollette)}")
