@@ -60,6 +60,9 @@ def check_pronostico(pronostico, tipo, parsed):
         mg = re.match(r'MG\s+(\d+)-(\d+)', p, re.IGNORECASE)
         if mg:
             return int(mg.group(1)) <= parsed['total'] <= int(mg.group(2))
+    if tipo == 'RISULTATO_ESATTO':
+        real_str = f"{parsed['home']}:{parsed['away']}"
+        return p.replace('-', ':') == real_str
     return None
 
 
@@ -200,7 +203,7 @@ for coll_name in PREDICTION_COLLECTIONS:
 
             pronostico = prono.get('pronostico', '')
             tipo = prono.get('tipo', '')
-            stake = prono.get('stake', 0)
+            stake = prono.get('stake') or 0
             quota = prono.get('quota')
 
             esito = check_pronostico(pronostico, tipo, parsed)
