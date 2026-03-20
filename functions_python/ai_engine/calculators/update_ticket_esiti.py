@@ -162,8 +162,8 @@ def main():
         modified = False
 
         for sel in selezioni:
-            if sel.get('esito') is not None:
-                continue  # Già aggiornato
+            if sel.get('esito') is not None and sel.get('real_score'):
+                continue  # Già aggiornato con score
 
             home = sel.get('home', '')
             away = sel.get('away', '')
@@ -182,6 +182,8 @@ def main():
             hit = check_pronostico(sel.get('pronostico', ''), sel.get('mercato', ''), parsed)
             if hit is not None:
                 sel['esito'] = hit
+                sel['real_score'] = real_score
+                sel['match_finished'] = True
                 modified = True
                 sel_updated += 1
 
