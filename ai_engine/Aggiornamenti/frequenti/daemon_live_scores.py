@@ -450,9 +450,13 @@ def run_cycle(driver):
     team_docs = load_team_docs_batch(db_matches)
     print(f"   Team docs caricati: {len(team_docs)}")
 
-    # 3. Scrape NowGoal
+    # 3. Scrape NowGoal — refresh se già sulla pagina, altrimenti naviga
     try:
-        driver.get(LIVE_URL)
+        current = driver.current_url or ''
+        if 'nowgoal' in current:
+            driver.refresh()
+        else:
+            driver.get(LIVE_URL)
         time.sleep(PAGE_LOAD_WAIT)
     except Exception as e:
         print(f"   Errore navigazione: {e}")
@@ -708,6 +712,7 @@ def main():
     chrome_options.add_argument("--log-level=3")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
+    chrome_options.page_load_strategy = 'none'  # Non aspettare caricamento completo (ads bloccano)
 
     driver = None
 
