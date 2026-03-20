@@ -2051,6 +2051,10 @@ def orchestrate_date(date_str, dry_run=False, match_time_filter=None, preserve_a
                     unified_doc[field] = doc[field]
                     break
 
+        # Imposta decision in base ai pronostici generati
+        has_real_tip = any(p.get('pronostico') and p['pronostico'] != 'NO BET' for p in unified_doc.get('pronostici', []))
+        unified_doc['decision'] = 'BET' if has_real_tip else 'NO_BET'
+
         unified_docs.append(unified_doc)
 
     if not unified_docs:
