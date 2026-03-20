@@ -458,6 +458,15 @@ def run_cycle(driver):
         print(f"   Errore navigazione: {e}")
         raise  # Propaga l'errore per triggerare il restart del driver nel main loop
 
+    # Chiudi popup pubblicitario NowGoal (bottone X)
+    try:
+        close_btns = driver.find_elements(By.CSS_SELECTOR, "i.closebtn, .closebtn")
+        for btn in close_btns:
+            driver.execute_script("arguments[0].click()", btn)
+        time.sleep(1)
+    except:
+        pass
+
     # 3b. Ogni ciclo: clicca tab "All" per mostrare TUTTE le partite (incluse leghe minori)
     try:
         all_tab = driver.find_element(By.ID, "li_ShowAll")
@@ -470,18 +479,26 @@ def run_cycle(driver):
     if not _leagues_selected:
         try:
             filter_btn = driver.find_element(By.ID, "li_FilterLea")
-            filter_btn.click()
+            driver.execute_script("arguments[0].click()", filter_btn)
             time.sleep(1)
             links = driver.find_elements(By.CSS_SELECTOR, "#FilterLeaPop a, #FilterLeaPop span")
             for link in links:
                 if "Select All" in link.text:
-                    link.click()
+                    driver.execute_script("arguments[0].click()", link)
                     break
             time.sleep(0.5)
+            confirmed = False
             for link in links:
                 if "Confirm" in link.text:
-                    link.click()
+                    driver.execute_script("arguments[0].click()", link)
+                    confirmed = True
                     break
+            if not confirmed:
+                try:
+                    confirm_btn = driver.find_element(By.CSS_SELECTOR, "span#button.ent, span.ent")
+                    driver.execute_script("arguments[0].click()", confirm_btn)
+                except:
+                    pass
             time.sleep(2)
             _leagues_selected = True
         except Exception as e:

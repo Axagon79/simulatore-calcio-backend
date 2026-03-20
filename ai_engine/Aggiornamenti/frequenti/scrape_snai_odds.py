@@ -180,7 +180,7 @@ def close_cookie_banner(driver):
     try:
         for btn in driver.find_elements(By.CSS_SELECTOR, '[class*="cookiebanner"] button'):
             if 'accett' in btn.text.lower():
-                btn.click()
+                driver.execute_script("arguments[0].click()", btn)
                 time.sleep(1)
                 return True
     except Exception:

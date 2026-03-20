@@ -7,21 +7,32 @@ from datetime import datetime, timedelta
 # --- LOCK FILE per segnalare ai daemon che la pipeline è attiva ---
 LOCK_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'log', 'pipeline_running.lock')
 def kill_chrome_zombies():
-    """Uccide tutti i processi Chrome/chromedriver orfani (Windows)"""
+    """Uccide solo Chrome headless/scoped_dir orfani e chromedriver — MAI il browser utente"""
     killed = 0
-    for proc_name in ['chrome.exe', 'chromedriver.exe']:
-        try:
-            result = subprocess.run(
-                ['taskkill', '/F', '/IM', proc_name, '/T'],
-                capture_output=True, text=True, timeout=10
-            )
-            if result.returncode == 0:
-                lines = [l for l in result.stdout.strip().split('\n') if l.strip()]
-                killed += len(lines)
-        except Exception:
-            pass
+    # Kill chromedriver (sempre sicuro — non è il browser utente)
+    try:
+        result = subprocess.run(
+            ['taskkill', '/F', '/IM', 'chromedriver.exe', '/T'],
+            capture_output=True, text=True, timeout=10
+        )
+        if result.returncode == 0:
+            lines = [l for l in result.stdout.strip().split('\n') if l.strip()]
+            killed += len(lines)
+    except Exception:
+        pass
+    # Kill solo Chrome zombie (headless/scoped_dir con parent morto) — NON il browser utente
+    try:
+        r = subprocess.run(
+            ['powershell', '-Command',
+             '$k=0; Get-CimInstance Win32_Process | Where-Object { $_.Name -eq "chrome.exe" -and ($_.CommandLine -match "scoped_dir|headless|remote-debugging") } | ForEach-Object { $p=Get-Process -Id $_.ParentProcessId -EA SilentlyContinue; if(-not $p){Stop-Process -Id $_.ProcessId -Force -EA SilentlyContinue; $k++} }; Write-Host $k'],
+            capture_output=True, text=True, timeout=30
+        )
+        zombie_count = int(r.stdout.strip()) if r.stdout.strip().isdigit() else 0
+        killed += zombie_count
+    except Exception:
+        pass
     if killed:
-        print(f"   🧹 Cleanup: ~{killed} processi Chrome/chromedriver terminati")
+        print(f"   🧹 Cleanup: ~{killed} processi Chrome zombie/chromedriver terminati")
     else:
         print(f"   🧹 Cleanup: nessun Chrome zombie trovato")
 

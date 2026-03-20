@@ -243,7 +243,7 @@ def _click_tab(driver, tab_name):
         nav_items = driver.find_elements(By.CSS_SELECTOR, "li.nav_selected, li.nav_unselected")
         for el in nav_items:
             if el.text.strip() == tab_name and el.is_displayed():
-                el.click()
+                driver.execute_script("arguments[0].click()", el)
                 time.sleep(2)  # Attendi ricaricamento tabella
                 return True
         return False

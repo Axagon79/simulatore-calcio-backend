@@ -3,6 +3,17 @@ import sys
 import time
 import re
 import json
+import subprocess
+import atexit
+
+_active_driver = None
+def _cleanup():
+    global _active_driver
+    if _active_driver:
+        try: _active_driver.quit()
+        except: pass
+        _active_driver = None
+atexit.register(_cleanup)
 from datetime import datetime
 from typing import Dict, List, Optional, Tuple
 from selenium.webdriver.support.ui import WebDriverWait
@@ -632,10 +643,18 @@ def run_scraper():
     driver = None
     
     try:
-        service = Service(ChromeDriverManager().install())
+        chrome_ver = None
+        try:
+            r = subprocess.run(['reg', 'query', r'HKEY_CURRENT_USER\Software\Google\Chrome\BLBeacon', '/v', 'version'], capture_output=True, text=True, timeout=5)
+            for line in r.stdout.splitlines():
+                if line.strip().startswith('version'):
+                    chrome_ver = line.split()[-1]
+        except: pass
+        service = Service(ChromeDriverManager(driver_version=chrome_ver).install() if chrome_ver else ChromeDriverManager().install())
         driver = webdriver.Chrome(service=service, options=chrome_options)
+        _active_driver = driver
         driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
-        
+
         for league in LEAGUES_CONFIG:
             league_name = league['name']
             league_url = league['url']

@@ -1,6 +1,17 @@
 import os
 import sys
 import time
+import subprocess
+import atexit
+
+_active_driver = None
+def _cleanup():
+    global _active_driver
+    if _active_driver:
+        try: _active_driver.quit()
+        except: pass
+        _active_driver = None
+atexit.register(_cleanup)
 from datetime import datetime, timedelta
 
 # --- FIX PERCORSI ---
@@ -129,8 +140,16 @@ def run_scraper():
     prefs = {"profile.managed_default_content_settings.images": 2}
     chrome_options.add_experimental_option("prefs", prefs)
 
-    service = Service(ChromeDriverManager().install())
+    chrome_ver = None
+    try:
+        r = subprocess.run(['reg', 'query', r'HKEY_CURRENT_USER\Software\Google\Chrome\BLBeacon', '/v', 'version'], capture_output=True, text=True, timeout=5)
+        for line in r.stdout.splitlines():
+            if line.strip().startswith('version'):
+                chrome_ver = line.split()[-1]
+    except: pass
+    service = Service(ChromeDriverManager(driver_version=chrome_ver).install() if chrome_ver else ChromeDriverManager().install())
     driver = webdriver.Chrome(service=service, options=chrome_options)
+    _active_driver = driver
 
     for league in LEAGUES:
         print(f"\n🌍 Scarico {league['name']}...")

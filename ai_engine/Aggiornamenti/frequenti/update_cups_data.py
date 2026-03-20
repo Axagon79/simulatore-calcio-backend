@@ -20,6 +20,7 @@ import time
 import random
 import argparse
 import re
+import subprocess
 from io import StringIO
 from datetime import datetime
 from typing import Dict, List, Optional
@@ -39,6 +40,17 @@ try:
 except ImportError:
     print("⚠️  Selenium non installato. Funzionalità partite/quote non disponibile.")
     SELENIUM_AVAILABLE = False
+
+def _get_chrome_service():
+    """Installa chromedriver allineato alla versione Chrome installata."""
+    chrome_ver = None
+    try:
+        r = subprocess.run(['reg', 'query', r'HKEY_CURRENT_USER\Software\Google\Chrome\BLBeacon', '/v', 'version'], capture_output=True, text=True, timeout=5)
+        for line in r.stdout.splitlines():
+            if line.strip().startswith('version'):
+                chrome_ver = line.split()[-1]
+    except: pass
+    return ChromeDriverManager(driver_version=chrome_ver).install() if chrome_ver else ChromeDriverManager().install()
 
 # Importa configurazione DB
 current_path = os.path.dirname(os.path.abspath(__file__))
@@ -595,7 +607,7 @@ def scrape_nowgoal_matches(competition_code):
     try:
         print("   🌐 Avvio Chrome...")
         driver = webdriver.Chrome(
-            service=Service(ChromeDriverManager().install()),
+            service=Service(_get_chrome_service()),
             options=chrome_options
         )
         
