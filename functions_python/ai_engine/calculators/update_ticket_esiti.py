@@ -43,23 +43,24 @@ def check_pronostico(pronostico, tipo, parsed):
     if not parsed or not pronostico:
         return None
     p = pronostico.strip()
-    if tipo == 'SEGNO':
+    t = tipo.upper() if tipo else ''
+    if t in ('SEGNO', '1X2 ESITO FINALE', '1X2'):
         return parsed['sign'] == p
-    if tipo == 'DOPPIA_CHANCE':
+    if t in ('DOPPIA_CHANCE', 'DOPPIA CHANCE'):
         if p == '1X': return parsed['sign'] in ('1', 'X')
         if p == 'X2': return parsed['sign'] in ('X', '2')
         if p == '12': return parsed['sign'] in ('1', '2')
         return None
-    if tipo == 'GOL':
+    if t in ('GOL', 'GOAL', 'GOAL/NOGOAL', 'U/O'):
         m = re.match(r'(Over|Under)\s+([\d.]+)', p, re.IGNORECASE)
         if m:
             return parsed['total'] > float(m.group(2)) if m.group(1).lower() == 'over' else parsed['total'] < float(m.group(2))
-        if p.lower() == 'goal': return parsed['btts']
-        if p.lower() == 'nogoal': return not parsed['btts']
+        if p.lower() in ('goal', 'si'): return parsed['btts']
+        if p.lower() in ('nogoal', 'no'): return not parsed['btts']
         mg = re.match(r'MG\s+(\d+)-(\d+)', p, re.IGNORECASE)
         if mg:
             return int(mg.group(1)) <= parsed['total'] <= int(mg.group(2))
-    if tipo == 'RISULTATO_ESATTO':
+    if t in ('RISULTATO_ESATTO', 'RISULTATO ESATTO'):
         normalized = p.replace('-', ':')
         return f"{parsed['home']}:{parsed['away']}" == normalized
     return None
