@@ -102,6 +102,9 @@ app.use('/wallet', authenticate, walletRoutes);
 const bolletteRoutes = require('./routes/bolletteRoutes');
 app.use('/bollette', bolletteRoutes);
 
+const onboardingRoutes = require('./routes/onboardingRoutes');
+app.use('/onboarding', authenticate, onboardingRoutes);
+
 // GET /prediction-versions — Storico versioni pronostici per match
 app.get('/prediction-versions', async (req, res) => {
   try {
