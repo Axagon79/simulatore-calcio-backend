@@ -63,12 +63,14 @@ def kill_daemon():
                 pass
     daemon_process = None
 
-    # Killa eventuali Chrome zombie
+    # Killa solo Chrome zombie (headless/scoped_dir) — NON il browser utente
     try:
         subprocess.run(
-            ['taskkill', '/F', '/IM', 'chrome.exe', '/FI', 'WINDOWTITLE eq '],
-            capture_output=True, timeout=10
+            ['powershell', '-Command',
+             'Get-CimInstance Win32_Process | Where-Object { $_.Name -eq "chrome.exe" -and ($_.CommandLine -match "scoped_dir|headless|remote-debugging") } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -EA SilentlyContinue }'],
+            capture_output=True, timeout=30
         )
+        subprocess.run(['taskkill', '/F', '/IM', 'chromedriver.exe'], capture_output=True, timeout=10)
     except:
         pass
 

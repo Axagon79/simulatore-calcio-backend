@@ -607,8 +607,27 @@ def create_driver(service, chrome_options):
     return driver
 
 
+def _get_chrome_version():
+    """Rileva la versione di Chrome installata."""
+    try:
+        r = subprocess.run(
+            ['reg', 'query', r'HKEY_CURRENT_USER\Software\Google\Chrome\BLBeacon', '/v', 'version'],
+            capture_output=True, text=True, timeout=5
+        )
+        for line in r.stdout.splitlines():
+            line = line.strip()
+            if line.startswith('version'):
+                return line.split()[-1]
+    except:
+        pass
+    return None
+
 def _fresh_service():
-    """Crea un nuovo Service con chromedriver fresco (re-installa se necessario)."""
+    """Crea un nuovo Service con chromedriver fresco (versione allineata a Chrome)."""
+    chrome_ver = _get_chrome_version()
+    if chrome_ver:
+        print(f"   [SERVICE] Chrome rilevato: {chrome_ver}")
+        return Service(ChromeDriverManager(driver_version=chrome_ver).install())
     return Service(ChromeDriverManager().install())
 
 
@@ -662,10 +681,13 @@ def run_cycle_with_timeout(driver, timeout=CYCLE_TIMEOUT):
             driver.quit()
         except:
             pass
-        # Kill Chrome zombie residui
+        # Kill solo Chrome/chromedriver figli del nostro processo (non il browser utente)
         try:
-            subprocess.run(['taskkill', '/F', '/IM', 'chrome.exe'], capture_output=True)
-            subprocess.run(['taskkill', '/F', '/IM', 'chromedriver.exe'], capture_output=True)
+            if _current_driver and _current_driver.service and _current_driver.service.process:
+                pid = _current_driver.service.process.pid
+                subprocess.run(['taskkill', '/F', '/T', '/PID', str(pid)], capture_output=True)
+            else:
+                subprocess.run(['taskkill', '/F', '/IM', 'chromedriver.exe'], capture_output=True)
         except:
             pass
         raise TimeoutError(f"Ciclo bloccato per oltre {timeout}s")
