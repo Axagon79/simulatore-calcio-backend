@@ -2072,19 +2072,21 @@ def orchestrate_date(date_str, dry_run=False, match_time_filter=None, preserve_a
             # Pre-match update: aggiorna solo i campi pronostici, preserva analysis_*
             for doc in unified_docs:
                 find_filter = {'date': date_str, 'home': doc['home'], 'away': doc['away']}
-                update_fields = {k: v for k, v in doc.items() if k != '_id'}
+                update_fields = {k: v for k, v in doc.items() if k not in ('_id', 'created_at')}
+                update_fields['updated_at'] = datetime.now(timezone.utc)
                 coll.update_one(find_filter, {
                     '$set': update_fields,
-                    '$setOnInsert': {'origin_date': today_str, 'anticipata': is_anticipata}
+                    '$setOnInsert': {'created_at': datetime.now(timezone.utc), 'origin_date': today_str, 'anticipata': is_anticipata}
                 }, upsert=True)
         else:
             # Pipeline notturna: update_one + upsert (le partite non spariscono mai)
             for doc in unified_docs:
                 find_filter = {'date': date_str, 'home': doc['home'], 'away': doc['away']}
-                update_fields = {k: v for k, v in doc.items() if k != '_id'}
+                update_fields = {k: v for k, v in doc.items() if k not in ('_id', 'created_at')}
+                update_fields['updated_at'] = datetime.now(timezone.utc)
                 coll.update_one(find_filter, {
                     '$set': update_fields,
-                    '$setOnInsert': {'origin_date': today_str, 'anticipata': is_anticipata}
+                    '$setOnInsert': {'created_at': datetime.now(timezone.utc), 'origin_date': today_str, 'anticipata': is_anticipata}
                 }, upsert=True)
 
             # Partite già in DB per questa data ma non rigenerate → diventano NO BET

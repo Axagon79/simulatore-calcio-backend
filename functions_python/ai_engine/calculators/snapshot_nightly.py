@@ -81,8 +81,9 @@ def run_snapshot_nightly(target_date=None):
 
     print(f"   Pronostici unified: {len(unified_docs)}")
 
-    # 3. Elimina eventuali snapshot nightly precedenti per questa data
-    versions_collection.delete_many({'date': date_str, 'version': 'nightly'})
+    # 3. Elimina solo snapshot nightly della STESSA notte (riesecuzione), non delle notti precedenti
+    snapshot_date = datetime.now(timezone.utc).strftime('%Y-%m-%d')
+    versions_collection.delete_many({'date': date_str, 'version': f'nightly_{snapshot_date}'})
 
     # 4. Crea snapshot per ogni match
     snapshots = []
@@ -110,7 +111,7 @@ def run_snapshot_nightly(target_date=None):
             'match_time': match.get('match_time', ''),
             'home_mongo_id': home_mongo_id,
             'away_mongo_id': away_mongo_id,
-            'version': 'nightly',
+            'version': f'nightly_{snapshot_date}',
             'created_at': datetime.now(timezone.utc),
             'pronostici': [],
             'changes': [],
