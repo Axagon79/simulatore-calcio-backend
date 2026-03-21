@@ -249,7 +249,17 @@ app.get('/rounds', async (req, res) => {
         }
         // Se le partite non terminate sono tutte oltre i 7gg, il ciclo prosegue alla giornata dopo
       } else {
-        // Se non è finita nemmeno una partita (giornata totalmente futura), la prendiamo come attuale
+        // Se non è finita nemmeno una partita, verifica se le Scheduled sono tutte nel passato (> 7gg)
+        const allInPast = openMatches.every(m => {
+          const matchDate = new Date(m.date_obj);
+          return matchDate < oggi;
+        });
+        const oldestOpen = new Date(Math.min(...openMatches.map(m => new Date(m.date_obj).getTime())));
+        const daysSinceOldest = (oggi - oldestOpen) / (1000 * 60 * 60 * 24);
+        if (allInPast && daysSinceOldest > 7) {
+          // Giornata rinviata/saltata — prosegui
+          continue;
+        }
         anchorIndex = i;
         break;
       }
