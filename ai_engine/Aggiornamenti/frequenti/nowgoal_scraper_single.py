@@ -54,7 +54,6 @@ LEAGUES_CONFIG = [
     {"name": "Serie C - Girone A", "url": "https://football.nowgoal26.com/subleague/142", "stage": "1525"},
     {"name": "Serie C - Girone B", "url": "https://football.nowgoal26.com/subleague/142", "stage": "1526"},
     {"name": "Serie C - Girone C", "url": "https://football.nowgoal26.com/subleague/142", "stage": "1527"},
-    
     # EUROPA TOP
     {"name": "Premier League", "url": "https://football.nowgoal26.com/league/36"},
     {"name": "La Liga", "url": "https://football.nowgoal26.com/league/31"},
@@ -62,14 +61,12 @@ LEAGUES_CONFIG = [
     {"name": "Ligue 1", "url": "https://football.nowgoal26.com/league/11"},
     {"name": "Eredivisie", "url": "https://football.nowgoal26.com/league/16"},
     {"name": "Liga Portugal", "url": "https://football.nowgoal26.com/league/23"},
-    
-    # 🆕 EUROPA SERIE B
+    # EUROPA SERIE B
     {"name": "Championship", "url": "https://football.nowgoal26.com/league/37"},
     {"name": "LaLiga 2", "url": "https://football.nowgoal26.com/subleague/33"},
     {"name": "2. Bundesliga", "url": "https://football.nowgoal26.com/league/9"},
     {"name": "Ligue 2", "url": "https://football.nowgoal26.com/league/12"},
-    
-    # 🆕 EUROPA NORDICI + EXTRA
+    # EUROPA NORDICI + EXTRA
     {"name": "Scottish Premiership", "url": "https://football.nowgoal26.com/subleague/29"},
     {"name": "Allsvenskan", "url": "https://football.nowgoal26.com/subleague/26"},
     {"name": "Eliteserien", "url": "https://football.nowgoal26.com/subleague/22"},
@@ -77,13 +74,11 @@ LEAGUES_CONFIG = [
     {"name": "Jupiler Pro League", "url": "https://football.nowgoal26.com/subleague/5"},
     {"name": "Süper Lig", "url": "https://football.nowgoal26.com/subleague/30"},
     {"name": "League of Ireland Premier Division", "url": "https://football.nowgoal26.com/subleague/1"},
-    
-    # 🆕 AMERICHE
+    # AMERICHE
     {"name": "Brasileirão Serie A", "url": "https://football.nowgoal26.com/league/4"},
     {"name": "Primera División", "url": "https://football.nowgoal26.com/subleague/2"},
     {"name": "Major League Soccer", "url": "https://football.nowgoal26.com/subleague/21"},
-    
-    # 🆕 ASIA
+    # ASIA
     {"name": "J1 League", "url": "https://football.nowgoal26.com/subleague/25"},
 ]
 
@@ -355,7 +350,7 @@ def get_current_round_from_page(driver) -> Optional[int]:
         WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, "div.schedulis"))
         )
-        current = driver.find_element(By.CSS_SELECTOR, "div.round span.current.on, div.round span.on")
+        current = driver.find_element(By.CSS_SELECTOR, "div.round span.current.on, div.round span.current, div.round span.on")
         round_num = current.get_attribute("round")
         return int(round_num) if round_num else None
     except Exception as e:
@@ -805,7 +800,12 @@ def run_scraper():
                         odds_dict, row_text, has_odds = result
                         
                         if has_odds:
-                            # CASO 1: Partita trovata CON quote ✓
+                            # CASO 1: Partita trovata CON quote — aggiorna solo se diverse
+                            old_1 = match.get('odds', {}).get('1')
+                            old_X = match.get('odds', {}).get('X')
+                            old_2 = match.get('odds', {}).get('2')
+                            if old_1 == odds_dict['1'] and old_X == odds_dict['X'] and old_2 == odds_dict['2']:
+                                continue  # Quote identiche, skip
                             if 'odds' not in match:
                                 match['odds'] = {}
                             match['odds']['1'] = odds_dict['1']
@@ -813,11 +813,11 @@ def run_scraper():
                             match['odds']['2'] = odds_dict['2']
                             match['odds']['src'] = "NowGoal"
                             match['odds']['ts'] = datetime.now()
-                            
+
                             updated_count += 1
                             league_stats['updated'] += 1
                             report_data['summary']['updated'] += 1
-                            
+
                             print("✓", end="", flush=True)
                         else:
                             # CASO 2: Partita trovata SENZA quote ⏳
