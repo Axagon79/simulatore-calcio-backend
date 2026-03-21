@@ -273,31 +273,40 @@ def find_match_with_datetime(home_aliases: List[str], away_aliases: List[str], r
 def click_round_and_wait(driver, round_num: int, timeout: int = 15) -> bool:
     """Clicca su una giornata e attende il caricamento"""
     try:
-        str_round = str(round_num)
-        xpath_list = [
-            f"//div[contains(@class,'subLeague_round')]//a[text()='{str_round}']",
-            f"//td[text()='{str_round}']",
-            f"//li[text()='{str_round}']",
-            f"//a[normalize-space()='{str_round}']"
-        ]
-        
+        # Nuova struttura: <span round="N"> dentro div.round
         element = None
-        for xpath in xpath_list:
-            try:
-                element = driver.find_element(By.XPATH, xpath)
-                if element:
-                    break
-            except:
-                pass
-        
+        try:
+            element = driver.find_element(By.CSS_SELECTOR, f"div.round span[round='{round_num}']")
+        except:
+            pass
+        # Fallback vecchia struttura
+        if not element:
+            for xpath in [
+                f"//div[contains(@class,'subLeague_round')]//a[text()='{round_num}']",
+                f"//a[normalize-space()='{round_num}']"
+            ]:
+                try:
+                    element = driver.find_element(By.XPATH, xpath)
+                    if element: break
+                except:
+                    pass
+
         if not element:
             return False
-        
+
         driver.execute_script("arguments[0].click();", element)
+        # Attendi che lo span cliccato diventi "current on"
+        try:
+            WebDriverWait(driver, timeout).until(
+                lambda d: d.find_element(By.CSS_SELECTOR, f"div.round span[round='{round_num}'].on") or
+                          d.find_element(By.CSS_SELECTOR, f"div.round span[round='{round_num}'].current")
+            )
+        except:
+            pass
         WebDriverWait(driver, timeout).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, "tr[id]"))
+            EC.presence_of_element_located((By.CSS_SELECTOR, "div.schedulis"))
         )
-        time.sleep(1)
+        time.sleep(2)
         return True
     except Exception as e:
         print(f" ⚠️ Errore navigazione giornata {round_num}: {e}")
@@ -306,35 +315,47 @@ def click_round_and_wait(driver, round_num: int, timeout: int = 15) -> bool:
 def get_current_round_from_page(driver) -> Optional[int]:
     """Determina quale giornata è visualizzata"""
     try:
+        # Nuova struttura: <span round="30" class="current on">
         WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, "tr[id]"))
+            EC.presence_of_element_located((By.CSS_SELECTOR, "div.schedulis"))
         )
-        first_row = driver.find_element(By.CSS_SELECTOR, "tr[id]")
-        first_row_text = first_row.text.strip()
-        match = re.match(r'^(\d+)', first_row_text)
-        if match:
-            return int(match.group(1))
+        try:
+            current = driver.find_element(By.CSS_SELECTOR, "div.round span.current")
+            round_attr = current.get_attribute("round")
+            if round_attr:
+                return int(round_attr)
+        except:
+            pass
+        # Fallback: cerca span con classe "on"
+        try:
+            current = driver.find_element(By.CSS_SELECTOR, "div.round span.on")
+            round_attr = current.get_attribute("round")
+            if round_attr:
+                return int(round_attr)
+        except:
+            pass
     except Exception as e:
         print(f" ⚠️ Impossibile leggere giornata: {e}")
     return None
 
 def get_all_match_rows(driver) -> List[Tuple[str, Optional[str]]]:
     """Estrae tutte le righe di partite come (testo, data_t).
-    data_t e' l'attributo data-t del td[name='timeData'], es. '2026-03-04 01:00' (anno incluso).
+    data_t e' l'attributo data-t dello span[name='timeData'], es. '2026-03-04 01:00' (anno incluso).
     """
     try:
-        rows = driver.find_elements(By.CSS_SELECTOR, "tr[id]")
+        divs = driver.find_elements(By.CSS_SELECTOR, "div.schedulis")
         result = []
-        for row in rows:
-            if not row.text.strip():
+        for div in divs:
+            text = div.text.strip()
+            if not text:
                 continue
             data_t = None
             try:
-                td = row.find_element(By.CSS_SELECTOR, "td[name='timeData']")
-                data_t = td.get_attribute("data-t")
+                span = div.find_element(By.CSS_SELECTOR, "span[name='timeData']")
+                data_t = span.get_attribute("data-t")
             except:
                 pass
-            result.append((row.text, data_t))
+            result.append((text, data_t))
         return result
     except:
         return []
@@ -443,15 +464,10 @@ def run_scraper():
                     if not click_round_and_wait(driver, round_num):
                         print(f" ⚠️ Navigazione fallita, skip")
                         continue
-                    
-                    actual_round = get_current_round_from_page(driver)
-                    if actual_round and actual_round != round_num:
-                        print(f" ⚠️ Sulla giornata {actual_round} invece di {round_num}")
-                        continue
                 else:
                     try:
                         WebDriverWait(driver, 15).until(
-                            EC.presence_of_element_located((By.CSS_SELECTOR, "tr[id]"))
+                            EC.presence_of_element_located((By.CSS_SELECTOR, "div.schedulis"))
                         )
                         time.sleep(1)
                     except:
