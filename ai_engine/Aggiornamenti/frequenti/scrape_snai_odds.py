@@ -32,9 +32,12 @@ except ImportError:
     sys.path.append(r"C:\Progetti\simulatore-calcio-backend\ai_engine")
     from config import db
 
+import subprocess as _sp
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
+from webdriver_manager.chrome import ChromeDriverManager
 
 # ============================================================
 #  CONFIGURAZIONE LEGHE — 24 campionati (URL verificati SNAI)
@@ -132,6 +135,15 @@ def get_team_aliases(team_name, team_doc=None):
 # ============================================================
 #  SELENIUM HELPERS
 # ============================================================
+def _get_chrome_version():
+    try:
+        r = _sp.run(['reg', 'query', r'HKEY_CURRENT_USER\Software\Google\Chrome\BLBeacon', '/v', 'version'], capture_output=True, text=True, timeout=5)
+        for line in r.stdout.splitlines():
+            if line.strip().startswith('version'):
+                return line.split()[-1]
+    except: pass
+    return None
+
 def init_driver():
     options = Options()
     options.add_argument('--headless')
@@ -139,7 +151,9 @@ def init_driver():
     options.add_argument('--disable-dev-shm-usage')
     options.add_argument('--window-size=1920,1080')
     options.add_argument('--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36')
-    return webdriver.Chrome(options=options)
+    chrome_ver = _get_chrome_version()
+    service = Service(ChromeDriverManager(driver_version=chrome_ver).install() if chrome_ver else ChromeDriverManager().install())
+    return webdriver.Chrome(service=service, options=options)
 
 
 def get_available_countries(driver):
