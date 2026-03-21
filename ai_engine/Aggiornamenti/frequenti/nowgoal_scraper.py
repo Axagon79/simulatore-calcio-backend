@@ -47,9 +47,9 @@ LEAGUES_CONFIG = [
     # ITALIA
     {"name": "Serie A", "url": "https://football.nowgoal26.com/subleague/34"},
     {"name": "Serie B", "url": "https://football.nowgoal26.com/subleague/40"},
-    {"name": "Serie C - Girone A", "url": "https://football.nowgoal26.com/subleague/142"},
-    {"name": "Serie C - Girone B", "url": "https://football.nowgoal26.com/subleague/2025-2026/142/1526"},
-    {"name": "Serie C - Girone C", "url": "https://football.nowgoal26.com/subleague/2025-2026/142/1527"},
+    {"name": "Serie C - Girone A", "url": "https://football.nowgoal26.com/subleague/142", "stage": "1525"},
+    {"name": "Serie C - Girone B", "url": "https://football.nowgoal26.com/subleague/142", "stage": "1526"},
+    {"name": "Serie C - Girone C", "url": "https://football.nowgoal26.com/subleague/142", "stage": "1527"},
     # EUROPA TOP
     {"name": "Premier League", "url": "https://football.nowgoal26.com/league/36"},
     {"name": "La Liga", "url": "https://football.nowgoal26.com/league/31"},
@@ -188,28 +188,46 @@ def get_round_number_from_text(text):
     match = re.search(r'(\d+)', str(text))
     return int(match.group(1)) if match else 0
 
-def click_specific_round(driver, target_round):
+def click_specific_round(driver, target_round, stage=None):
     try:
-        # Nuova struttura: <span round="N"> dentro div.round
         element = None
-        try:
-            element = driver.find_element(By.CSS_SELECTOR, f"div.round span[round='{target_round}']")
-        except: pass
-        # Fallback vecchia struttura
+        # Se c'è uno stage (Serie C), clicca la giornata dello stage corretto
+        if stage:
+            try:
+                element = driver.find_element(By.CSS_SELECTOR, f"div.round span[round='{target_round}'][stage='{stage}']")
+            except:
+                pass
+        # Altrimenti cerca la giornata visibile
         if not element:
-            for xpath in [
-                f"//div[contains(@class,'subLeague_round')]//a[text()='{target_round}']",
-                f"//a[normalize-space()='{target_round}']"
-            ]:
-                try:
-                    element = driver.find_element(By.XPATH, xpath)
-                    if element: break
-                except: pass
-        if not element: return False
-        driver.execute_script("arguments[0].click();", element)
-        time.sleep(3)
+            try:
+                elements = driver.find_elements(By.CSS_SELECTOR, f"div.round span[round='{target_round}']")
+                for el in elements:
+                    if el.is_displayed():
+                        element = el
+                        break
+            except: pass
+        if not element:
+            return False
+        # Salva contenuto attuale per verificare il cambio
+        try:
+            old_html = driver.find_element(By.CSS_SELECTOR, "div.list").get_attribute("innerHTML")[:200]
+        except:
+            old_html = ""
+        # Click nativo Selenium (l'elemento è visibile e il sito usa onclick bubbling)
+        element.click()
+        # Attendi che il contenuto cambi (max 10 secondi)
+        for _ in range(20):
+            time.sleep(0.5)
+            try:
+                new_html = driver.find_element(By.CSS_SELECTOR, "div.list").get_attribute("innerHTML")[:200]
+                if new_html != old_html:
+                    break
+            except:
+                pass
+        time.sleep(2)
         return True
-    except: return False
+    except:
+        return False
 
 def get_target_rounds(league_name):
     rounds_cursor = db.h2h_by_round.find({"league": league_name})
@@ -225,7 +243,8 @@ def get_target_rounds(league_name):
             break
     if anchor_index == -1: anchor_index = len(rounds_list) - 1
     
-    indices = [anchor_index - 1, anchor_index, anchor_index + 1]
+    # Ordine: CORRENTE, poi PRECEDENTE, poi SUCCESSIVA (senza tornare alla corrente)
+    indices = [anchor_index, anchor_index - 1, anchor_index + 1]
     return [rounds_list[i] for i in indices if 0 <= i < len(rounds_list)]
 
 def run_scraper():
@@ -263,30 +282,49 @@ def run_scraper():
             time.sleep(3)
 
             # Verifica caricamento, retry con refresh se fallisce
+            stage = league.get('stage')
             for attempt in range(3):
                 try:
                     WebDriverWait(driver, 15).until(
                         EC.presence_of_element_located((By.CSS_SELECTOR, "div.schedulis"))
                     )
+                    # Click sul girone se necessario (Serie C: Group A/B/C)
+                    if stage:
+                        try:
+                            stage_btn = driver.find_element(By.CSS_SELECTOR, f"div.stage span[stage='{stage}']")
+                            stage_btn.click()
+                            time.sleep(3)
+                        except:
+                            pass
+                    # Seleziona quote 1X2 (default e AH)
+                    try:
+                        odds_1x2 = driver.find_element(By.CSS_SELECTOR, "li[type='O']")
+                        driver.execute_script("arguments[0].click()", odds_1x2)
+                        time.sleep(3)
+                    except:
+                        pass
                     break
                 except:
                     print(f"   ⚠️ Pagina non caricata, refresh ({attempt+1}/3)...")
                     driver.refresh()
                     time.sleep(5)
 
-            # Seleziona quote 1X2 (default e AH)
-            try:
-                odds_1x2 = driver.find_element(By.CSS_SELECTOR, "li[type='O']")
-                driver.execute_script("arguments[0].click()", odds_1x2)
-                time.sleep(2)
-            except:
-                pass
-
-            for round_doc in rounds_to_process:
+            for idx, round_doc in enumerate(rounds_to_process):
                 round_num = get_round_number_from_text(round_doc['round_name'])
                 print(f"   🔄 {lname} G.{round_num}...", end="")
 
-                click_specific_round(driver, round_num)
+                # La prima giornata (corrente) è già caricata, le altre servono doppio click
+                if idx > 0:
+                    click_specific_round(driver, round_num, stage=stage)
+                    time.sleep(1)
+                    click_specific_round(driver, round_num, stage=stage)
+                    # Dopo click giornata, riseleziona solo 1X2 (il girone resta)
+                    try:
+                        odds_1x2 = driver.find_element(By.CSS_SELECTOR, "li[type='O']")
+                        driver.execute_script("arguments[0].click()", odds_1x2)
+                        time.sleep(3)
+                    except:
+                        pass
 
                 # Nuova struttura: div.schedulis con span.odds
                 from bs4 import BeautifulSoup
@@ -318,6 +356,7 @@ def run_scraper():
                                     pass
                     except: continue
                 
+
                 matches = round_doc['matches']
                 mod = False
                 match_count = 0
@@ -334,6 +373,7 @@ def run_scraper():
                     search_h = []
                     for alias in possible_names_h:
                         search_h.extend(generate_search_names(alias))
+                        search_h.extend(generate_search_names(clean_nowgoal_text(alias)))
                     search_h = list(set(search_h))
 
                     possible_names_a = [m['away'].lower().strip()]
@@ -342,6 +382,7 @@ def run_scraper():
                     search_a = []
                     for alias in possible_names_a:
                         search_a.extend(generate_search_names(alias))
+                        search_a.extend(generate_search_names(clean_nowgoal_text(alias)))
                     search_a = list(set(search_a))
 
                     found_item = None
