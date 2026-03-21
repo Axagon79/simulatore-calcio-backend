@@ -63,22 +63,16 @@ COMPETITIONS = [
     {"name": "Serie C - Girone A", "country": "Italy", "standings_url": "https://football.nowgoal26.com/subleastanding/2025-2026/142/1525", "dual_tables": False},
     {"name": "Serie C - Girone B", "country": "Italy", "standings_url": "https://football.nowgoal26.com/subleastanding/2025-2026/142/1526", "dual_tables": False},
     {"name": "Serie C - Girone C", "country": "Italy", "standings_url": "https://football.nowgoal26.com/subleastanding/2025-2026/142/1527", "dual_tables": False},
-
-    # EUROPA TOP
     {"name": "Premier League", "country": "England", "standings_url": "https://football.nowgoal26.com/leastanding/36", "dual_tables": False},
     {"name": "La Liga", "country": "Spain", "standings_url": "https://football.nowgoal26.com/leastanding/31", "dual_tables": False},
     {"name": "Bundesliga", "country": "Germany", "standings_url": "https://football.nowgoal26.com/leastanding/8", "dual_tables": False},
     {"name": "Ligue 1", "country": "France", "standings_url": "https://football.nowgoal26.com/leastanding/11", "dual_tables": False},
     {"name": "Eredivisie", "country": "Netherlands", "standings_url": "https://football.nowgoal26.com/subleastanding/2025-2026/16/98", "dual_tables": False},
     {"name": "Liga Portugal", "country": "Portugal", "standings_url": "https://football.nowgoal26.com/subleastanding/2025-2026/23/1123", "dual_tables": False},
-
-    # EUROPA SERIE B
     {"name": "Championship", "country": "England", "standings_url": "https://football.nowgoal26.com/subleastanding/2025-2026/37/87", "dual_tables": False},
     {"name": "LaLiga 2", "country": "Spain", "standings_url": "https://football.nowgoal26.com/subleastanding/2025-2026/33/546", "dual_tables": False},
     {"name": "2. Bundesliga", "country": "Germany", "standings_url": "https://football.nowgoal26.com/subleastanding/2025-2026/9/132", "dual_tables": False},
     {"name": "Ligue 2", "country": "France", "standings_url": "https://football.nowgoal26.com/subleastanding/2025-2026/12/1778", "dual_tables": False},
-
-    # EUROPA NORDICI + EXTRA
     {"name": "Scottish Premiership", "country": "Scotland", "standings_url": "https://football.nowgoal26.com/subleastanding/2025-2026/29/2498", "dual_tables": False},
     {"name": "Allsvenskan", "country": "Sweden", "standings_url": "https://football.nowgoal26.com/subleastanding/2026/26/431", "dual_tables": False},
     {"name": "Eliteserien", "country": "Norway", "standings_url": "https://football.nowgoal26.com/subleastanding/2026/22/3219", "dual_tables": False},
@@ -86,13 +80,9 @@ COMPETITIONS = [
     {"name": "Jupiler Pro League", "country": "Belgium", "standings_url": "https://football.nowgoal26.com/subleastanding/2025-2026/5/114", "dual_tables": False},
     {"name": "Süper Lig", "country": "Turkey", "standings_url": "https://football.nowgoal26.com/subleastanding/2025-2026/30/690", "dual_tables": False},
     {"name": "League of Ireland Premier Division", "country": "Ireland", "standings_url": "https://football.nowgoal26.com/subleastanding/2026/1/418", "dual_tables": False},
-
-    # AMERICHE
     {"name": "Brasileirão Serie A", "country": "Brazil", "standings_url": "https://football.nowgoal26.com/leastanding/4", "dual_tables": False},
     {"name": "Primera División", "country": "Argentina", "standings_url": "https://football.nowgoal26.com/subleastanding/2026/2/1232", "dual_tables": True},
     {"name": "Major League Soccer", "country": "USA", "standings_url": "https://football.nowgoal26.com/subleastanding/2026/21/165", "dual_tables": True},
-
-    # ASIA
     {"name": "J1 League", "country": "Japan", "standings_url": "https://football.nowgoal26.com/subleastanding/2026/25/3540", "dual_tables": False},
 ]
 
@@ -132,6 +122,7 @@ def _get_driver():
     options.add_argument("--disable-blink-features=AutomationControlled")
     options.add_argument("--start-maximized")
     options.add_argument("--no-sandbox")
+    options.page_load_strategy = 'eager'
     _driver = uc.Chrome(options=options, headless=True, user_multi_procs=True)
     _driver.set_page_load_timeout(30)
     return _driver
@@ -150,62 +141,57 @@ atexit.register(_quit_driver)
 
 def _parse_standings_table(driver):
     """
-    Parsa la tabella standings attualmente visibile nella pagina.
+    Parsa la tabella standings attualmente visibile nella pagina (nuovo layout NowGoal).
     Restituisce lista di dict con campi: rank, team, transfermarkt_id, points, played,
-    wins, draws, losses, goals_for, goals_against, goal_diff
+    wins, draws, losses, goal_diff
+    Nota: goals_for e goals_against non sono piu disponibili su NowGoal (solo GD).
+    Lo step 5 (scraper_soccerstats) li scrive separatamente nella collection classifiche.
     """
     standings = []
     foundids = 0
 
     try:
-        # Attendi che la tabella si carichi
+        # Attendi che la lista si carichi (nuovo layout: li.standlis)
         WebDriverWait(driver, 15).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, "table tr"))
+            EC.presence_of_element_located((By.CSS_SELECTOR, "li.standlis"))
         )
-        time.sleep(1)  # Stabilizzazione
+        time.sleep(1)
 
-        # Trova tutte le righe della tabella
-        rows = driver.find_elements(By.CSS_SELECTOR, "table tbody tr")
-        if not rows:
-            # Prova senza tbody
-            rows = driver.find_elements(By.CSS_SELECTOR, "table tr")
+        from bs4 import BeautifulSoup
+        soup = BeautifulSoup(driver.page_source, "html.parser")
+        rows = soup.find_all("li", class_="standlis")
 
         for row in rows:
             try:
-                cells = row.find_elements(By.TAG_NAME, "td")
-                if not cells:
-                    cells = row.find_elements(By.TAG_NAME, "th")
-                if len(cells) < 10:
+                spans = row.find_all("span", recursive=False)
+                if len(spans) < 8:
                     continue
 
-                # Colonne NowGoal: R | Team | GP | W | D | L | GF | GA | GD | Pts | ...
-                rank_text = cells[0].text.strip()
+                # Colonne: R | Team | P | W | D | L | GD | PTS
+                rank_em = spans[0].find("em")
+                rank_text = rank_em.get_text(strip=True) if rank_em else ""
                 if not rank_text.isdigit():
                     continue
-
                 rank = int(rank_text)
-                team_name_raw = cells[1].text.strip()
-                # NowGoal aggiunge un numero in coda (badge forma recente, es. "AC Milan 2")
-                # Rimuovi trailing " N" dove N è 1-2 cifre, ma NON se il numero fa parte del nome
-                # (es. "2. Bundesliga" ha il numero all'inizio, non alla fine)
+
+                team_span = spans[1].find("span", class_="name")
+                team_name_raw = team_span.get_text(strip=True) if team_span else ""
                 team_name = re.sub(r'\s+\d{1,2}$', '', team_name_raw)
-                played = to_int(cells[2].text.strip())
-                wins = to_int(cells[3].text.strip())
-                draws = to_int(cells[4].text.strip())
-                losses = to_int(cells[5].text.strip())
-                goals_for = to_int(cells[6].text.strip())
-                goals_against = to_int(cells[7].text.strip())
-                goal_diff = to_int_signed(cells[8].text.strip())
-                points = to_int(cells[9].text.strip())
+
+                # P, W, D, L sono spans con span interno
+                played = to_int(spans[2].get_text(strip=True))
+                wins = to_int(spans[3].get_text(strip=True))
+                draws = to_int(spans[4].get_text(strip=True))
+                losses = to_int(spans[5].get_text(strip=True))
+                goal_diff = to_int_signed(spans[6].get_text(strip=True))
+                points = to_int(spans[7].get_text(strip=True))
 
                 # Cerca transfermarkt_id nel DB
                 tm_id, _ = find_db_data(team_name)
                 if not tm_id:
-                    # Fallback: prova col nome raw (per squadre con numero nel nome)
                     tm_id, _ = find_db_data(team_name_raw)
                 if tm_id:
                     foundids += 1
-                    # Usa il nome ufficiale dal DB (es. "Inter" invece di "Inter Milan")
                     db_name = _tmid_to_name.get(str(tm_id))
                     if db_name:
                         team_name = db_name
@@ -219,8 +205,6 @@ def _parse_standings_table(driver):
                     "wins": wins,
                     "draws": draws,
                     "losses": losses,
-                    "goals_for": goals_for,
-                    "goals_against": goals_against,
                     "goal_diff": goal_diff,
                 }
                 standings.append(teamdata)
@@ -237,14 +221,13 @@ def _parse_standings_table(driver):
 
 def _click_tab(driver, tab_name):
     """Clicca su un tab della tabella standings (Total/Home/Away).
-    I tab NowGoal sono <li class='nav_selected/nav_unselected'>."""
+    Nuovo layout: span dentro #standingType con data-st-type."""
     try:
-        # Cerca tra i <li> con class nav_selected o nav_unselected (match esatto sul testo)
-        nav_items = driver.find_elements(By.CSS_SELECTOR, "li.nav_selected, li.nav_unselected")
-        for el in nav_items:
+        tabs = driver.find_elements(By.CSS_SELECTOR, "#standingType span[data-st-type]")
+        for el in tabs:
             if el.text.strip() == tab_name and el.is_displayed():
                 driver.execute_script("arguments[0].click()", el)
-                time.sleep(2)  # Attendi ricaricamento tabella
+                time.sleep(2)
                 return True
         return False
     except Exception:
@@ -272,16 +255,19 @@ def scrape_nowgoal():
             driver.get(standings_url)
             time.sleep(random.uniform(2.5, 4.0))
 
-            # Verifica che la pagina abbia caricato una tabella standings
-            tables = driver.find_elements(By.CSS_SELECTOR, "table")
-            if not tables:
-                print(f"   ❌ Pagina senza tabella — URL probabilmente errato: {standings_url}")
+            # Attendi caricamento classifica (nuovo layout: li.standlis)
+            try:
+                WebDriverWait(driver, 15).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, "li.standlis"))
+                )
+            except:
+                print(f"   ❌ Pagina senza classifica — URL probabilmente errato: {standings_url}")
                 continue
 
             # Verifica che non sia una pagina di errore/redirect
             current_url = driver.current_url
-            if 'leastanding' not in current_url and 'standing' not in current_url.lower():
-                print(f"   ❌ Redirect a pagina diversa: {current_url}")
+            if 'nowgoal' not in current_url:
+                print(f"   ❌ Redirect a pagina esterna: {current_url}")
                 continue
 
             # 3. Parsa tab "Total" (default)
@@ -317,6 +303,19 @@ def scrape_nowgoal():
 
             # 8. Salva nel DB
             filter_query = {"country": country, "league": league_name}
+
+            # Preserva goals_for/goals_against dallo step 5 (scraper_soccerstats)
+            existing = rankings_collection.find_one(filter_query)
+            if existing:
+                for tbl_key, tbl_data in [("table", table_total), ("table_home", table_home), ("table_away", table_away)]:
+                    old_tbl = {t.get("team", ""): t for t in existing.get(tbl_key, [])}
+                    for team_entry in tbl_data:
+                        old = old_tbl.get(team_entry.get("team", ""), {})
+                        if "goals_for" in old and "goals_for" not in team_entry:
+                            team_entry["goals_for"] = old["goals_for"]
+                        if "goals_against" in old and "goals_against" not in team_entry:
+                            team_entry["goals_against"] = old["goals_against"]
+
             update_doc = {
                 "$set": {
                     "country": country,

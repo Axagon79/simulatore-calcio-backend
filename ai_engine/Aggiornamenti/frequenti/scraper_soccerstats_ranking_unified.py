@@ -31,6 +31,7 @@ from config import db
 
 
 teams_collection = db['teams']
+classifiche_collection = db['classifiche']
 
 SOCCERSTATS_LEAGUES = [
     # ITALIA
@@ -39,7 +40,7 @@ SOCCERSTATS_LEAGUES = [
     {"name": "Serie C - Girone A", "url": "https://www.soccerstats.com/widetable.asp?league=italy3"},
     {"name": "Serie C - Girone B", "url": "https://www.soccerstats.com/widetable.asp?league=italy4"},
     {"name": "Serie C - Girone C", "url": "https://www.soccerstats.com/widetable.asp?league=italy5"},
-    
+
     # EUROPA TOP
     {"name": "Premier League", "url": "https://www.soccerstats.com/widetable.asp?league=england"},
     {"name": "La Liga", "url": "https://www.soccerstats.com/widetable.asp?league=spain"},
@@ -47,14 +48,14 @@ SOCCERSTATS_LEAGUES = [
     {"name": "Ligue 1", "url": "https://www.soccerstats.com/widetable.asp?league=france"},
     {"name": "Eredivisie", "url": "https://www.soccerstats.com/widetable.asp?league=netherlands"},
     {"name": "Liga Portugal", "url": "https://www.soccerstats.com/widetable.asp?league=portugal"},
-    
-    # 🆕 EUROPA SERIE B
+
+    # EUROPA SERIE B
     {"name": "Championship", "url": "https://www.soccerstats.com/widetable.asp?league=england2"},
     {"name": "LaLiga 2", "url": "https://www.soccerstats.com/widetable.asp?league=spain2"},
     {"name": "2. Bundesliga", "url": "https://www.soccerstats.com/widetable.asp?league=germany2"},
     {"name": "Ligue 2", "url": "https://www.soccerstats.com/widetable.asp?league=france2"},
-    
-    # 🆕 EUROPA NORDICI + EXTRA
+
+    # EUROPA NORDICI + EXTRA
     {"name": "Scottish Premiership", "url": "https://www.soccerstats.com/widetable.asp?league=scotland"},
     {"name": "Allsvenskan", "url": "https://www.soccerstats.com/widetable.asp?league=sweden"},
     {"name": "Eliteserien", "url": "https://www.soccerstats.com/widetable.asp?league=norway"},
@@ -62,13 +63,13 @@ SOCCERSTATS_LEAGUES = [
     {"name": "Jupiler Pro League", "url": "https://www.soccerstats.com/widetable.asp?league=belgium"},
     {"name": "Süper Lig", "url": "https://www.soccerstats.com/widetable.asp?league=turkey"},
     {"name": "League of Ireland Premier Division", "url": "https://www.soccerstats.com/widetable.asp?league=ireland"},
-    
-    # 🆕 AMERICHE
+
+    # AMERICHE
     {"name": "Brasileirão Serie A", "url": "https://www.soccerstats.com/widetable.asp?league=brazil"},
     {"name": "Primera División", "url": "https://www.soccerstats.com/widetable.asp?league=argentina"},
     {"name": "Major League Soccer", "url": "https://www.soccerstats.com/widetable.asp?league=usa"},
-    
-    # 🆕 ASIA
+
+    # ASIA
     {"name": "J1 League", "url": "https://www.soccerstats.com/widetable.asp?league=japan"}
 ]
 
@@ -99,6 +100,7 @@ def scrape_unified_ranking():
             # --- LOGICA 2: WIDETABLE (Standard) ---
             rows = soup.find_all("tr")
             updated = 0
+            classifica_teams = []  # Accumula dati per collection classifiche
 
             for row in rows:
                 cells = row.find_all("td")
@@ -172,15 +174,38 @@ def scrape_unified_ranking():
                     res = teams_collection.update_one(filter_q, update_doc)
                     if res.matched_count > 0:
                         updated += 1
-                    else:
-                        # Se non trova nulla, prova a cercare parziale (Extrema Ratio)
-                        # Attenzione: questo potrebbe fare match errati, ma lo teniamo come fallback
-                        pass
+                        # Recupera nome ufficiale dal DB per la classifica
+                        matched_team = teams_collection.find_one(filter_q, {"name": 1})
+                        db_name = matched_team["name"] if matched_team else team_name
+                        gf_total = gf_h + gf_a
+                        ga_total = ga_h + ga_a
+                        classifica_teams.append({
+                            "team": db_name,
+                            "goals_for": gf_total,
+                            "goals_against": ga_total,
+                        })
 
                 except Exception as e:
                     continue
 
             print(f"   ✅ Aggiornate {updated} squadre.")
+
+            # Salva goals_for/goals_against nella collection classifiche
+            if classifica_teams:
+                existing_cls = classifiche_collection.find_one({"league": league['name']})
+                if existing_cls:
+                    for tbl_key in ["table", "table_home", "table_away"]:
+                        old_tbl = existing_cls.get(tbl_key, [])
+                        for entry in old_tbl:
+                            match_gf = next((c for c in classifica_teams if c["team"] == entry.get("team")), None)
+                            if match_gf:
+                                entry["goals_for"] = match_gf["goals_for"]
+                                entry["goals_against"] = match_gf["goals_against"]
+                        classifiche_collection.update_one(
+                            {"league": league['name']},
+                            {"$set": {tbl_key: old_tbl}}
+                        )
+                    print(f"   📊 goals_for/goals_against aggiornati in classifiche ({len(classifica_teams)} squadre)")
 
         except Exception as e:
             print(f"   ❌ Errore: {e}")
