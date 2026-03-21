@@ -39,9 +39,20 @@ print(f"{'='*50}\n")
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from webdriver_manager.chrome import ChromeDriverManager
+
+def _get_chrome_version():
+    try:
+        r = subprocess.run(['reg', 'query', r'HKEY_CURRENT_USER\Software\Google\Chrome\BLBeacon', '/v', 'version'], capture_output=True, text=True, timeout=5)
+        for line in r.stdout.splitlines():
+            if line.strip().startswith('version'):
+                return line.split()[-1]
+    except: pass
+    return None
 
 # --- CONFIGURAZIONE PERCORSI ---
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -282,24 +293,31 @@ def process_league(driver, league_config):
 def scrape_nowgoal_matches(config):
     chrome_options = Options()
     chrome_options.add_argument("--headless")
-    driver = webdriver.Chrome(options=chrome_options)
+    chrome_options.add_argument("--no-sandbox")
+    chrome_ver = _get_chrome_version()
+    service = Service(ChromeDriverManager(driver_version=chrome_ver).install()) if chrome_ver else Service(ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=service, options=chrome_options)
     driver.get(config['nowgoal_url'])
     time.sleep(5)
     soup = BeautifulSoup(driver.page_source, "html.parser")
-    table = soup.find("table", id="Table3")
-    if not table: return
-    rows = table.find_all("tr")
+    match_divs = soup.find_all("div", class_="schedulis")
+    if not match_divs:
+        driver.quit()
+        return
     matches_data = []
-    for row in rows:
-        team_links = row.find_all("a", href=re.compile(r"/team/"))
-        if len(team_links) < 2: continue
-        home, away = team_links[0].get_text(strip=True), team_links[1].get_text(strip=True)
-        score_cell = row.find("div", class_="point")
-        if score_cell:
-            fonts = score_cell.find_all("font")
-            if len(fonts) >= 2:
-                h_s, a_s = fonts[0].get_text(strip=True).replace("-",""), fonts[1].get_text(strip=True).replace("-","")
-                matches_data.append({"home_team": home, "away_team": away, "status": "finished", "result": {"home_score": int(h_s), "away_score": int(a_s)}})
+    for m_div in match_divs:
+        try:
+            home_span = m_div.find("span", class_="home")
+            away_span = m_div.find("span", class_="away")
+            home = home_span.find("span", onclick=re.compile(r"toTeam")).get_text(strip=True) if home_span else ""
+            away = away_span.find("span", onclick=re.compile(r"toTeam")).get_text(strip=True) if away_span else ""
+            if not home or not away: continue
+            score_attr = m_div.get("score", "-")
+            if score_attr and score_attr != "-":
+                parts = re.match(r'(\d+)\s*-\s*(\d+)', score_attr.strip())
+                if parts:
+                    matches_data.append({"home_team": home, "away_team": away, "status": "finished", "result": {"home_score": int(parts.group(1)), "away_score": int(parts.group(2))}})
+        except: continue
     if matches_data:
         coll = db[config['matches_collection']]
         for m in matches_data:
@@ -312,11 +330,11 @@ def _ng_get_current_round(driver):
     """Legge il numero della giornata corrente dalla pagina NowGoal subleague."""
     try:
         WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, "tr[id]"))
+            EC.presence_of_element_located((By.CSS_SELECTOR, "div.schedulis"))
         )
-        first_row = driver.find_element(By.CSS_SELECTOR, "tr[id]")
-        m = re.match(r'^(\d+)', first_row.text.strip())
-        return int(m.group(1)) if m else None
+        current = driver.find_element(By.CSS_SELECTOR, "div.round span.current.on, div.round span.on")
+        round_num = current.get_attribute("round")
+        return int(round_num) if round_num else None
     except Exception:
         return None
 
@@ -324,102 +342,35 @@ def _ng_get_current_round(driver):
 def _ng_click_round(driver, round_num):
     """Clicca sulla giornata indicata e attende il caricamento."""
     try:
-        for xpath in [
-            f"//div[contains(@class,'subLeague_round')]//a[text()='{round_num}']",
-            f"//td[text()='{round_num}']",
-            f"//li[text()='{round_num}']",
-            f"//a[normalize-space()='{round_num}']",
-        ]:
-            try:
-                el = driver.find_element(By.XPATH, xpath)
-                if el:
-                    driver.execute_script("arguments[0].click();", el)
-                    WebDriverWait(driver, 15).until(
-                        EC.presence_of_element_located((By.CSS_SELECTOR, "tr[id]"))
-                    )
-                    time.sleep(1)
-                    return True
-            except Exception:
-                pass
-        return False
+        el = driver.find_element(By.CSS_SELECTOR, f"div.round span[round='{round_num}']")
+        driver.execute_script("arguments[0].click();", el)
+        WebDriverWait(driver, 15).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, "div.schedulis"))
+        )
+        time.sleep(1)
+        return True
     except Exception:
         return False
 
 
 def _ng_extract_scores(driver):
-    """Estrai risultati (score) dalla pagina NowGoal corrente.
-    Strategia 1: BeautifulSoup su Table3 (formato coppe: div.point > font).
-    Strategia 2: Selenium text parsing sulle righe tr[id].
-    Strategia 3: BeautifulSoup su TD con classe specifica score.
-    Debug: stampa info su cosa trova per diagnosi.
-    """
+    """Estrai risultati (score) dalla pagina NowGoal corrente (nuovo layout div.schedulis)."""
     results = []
     soup = BeautifulSoup(driver.page_source, "html.parser")
-
-    # --- Strategia 1: Table3 > div.point > font ---
-    table = soup.find("table", id="Table3")
-    if table:
-        rows_with_teams = 0
-        rows_with_point = 0
-        for row in table.find_all("tr"):
-            team_links = row.find_all("a", href=re.compile(r"/team/"))
-            if len(team_links) < 2:
-                continue
-            rows_with_teams += 1
-            home = team_links[0].get_text(strip=True)
-            away = team_links[1].get_text(strip=True)
-            # Prova div.point > font (formato coppe)
-            score_cell = row.find("div", class_="point")
-            if score_cell:
-                rows_with_point += 1
-                fonts = score_cell.find_all("font")
-                if len(fonts) >= 2:
-                    h_s = fonts[0].get_text(strip=True).replace("-", "")
-                    a_s = fonts[1].get_text(strip=True).replace("-", "")
-                    if h_s.isdigit() and a_s.isdigit():
-                        results.append({"home": home, "away": away, "score": f"{h_s}:{a_s}"})
-                        continue
-            # Prova: qualsiasi TD con testo che sembra uno score (es. "1 - 0", "2:1")
-            for td in row.find_all("td"):
-                td_text = td.get_text(strip=True)
-                m = re.match(r'^(\d+)\s*[-:]\s*(\d+)$', td_text)
-                if m:
-                    results.append({"home": home, "away": away, "score": f"{m.group(1)}:{m.group(2)}"})
-                    break
-    else:
-        pass
-
-    if results:
-        return results
-
-    # --- Strategia 2: Selenium tr[id] — parsing testo righe ---
-    try:
-        sel_rows = driver.find_elements(By.CSS_SELECTOR, "tr[id]")
-        for row in sel_rows:
-            try:
-                row_text = row.text.strip()
-                if not row_text:
-                    continue
-                team_links = row.find_elements(By.CSS_SELECTOR, "a[href*='/team/']")
-                if len(team_links) < 2:
-                    continue
-                home = team_links[0].text.strip()
-                away = team_links[1].text.strip()
-                if not home or not away:
-                    continue
-                # Cerca score: "H - A" nel testo, ma DOPO la data (evita match su "03-01")
-                # Rimuovi la parte data/ora all'inizio, poi cerca score
-                # Formato tipico: "round_num date time Home Away H - A odds..."
-                text_after_away = row_text.split(away)[-1] if away in row_text else row_text
-                score_match = re.search(r'(\d+)\s*-\s*(\d+)', text_after_away)
-                if score_match:
-                    h_s, a_s = score_match.group(1), score_match.group(2)
-                    results.append({"home": home, "away": away, "score": f"{h_s}:{a_s}"})
-            except Exception:
-                continue
-    except Exception:
-        pass
-
+    match_divs = soup.find_all("div", class_="schedulis")
+    for m_div in match_divs:
+        try:
+            home_span = m_div.find("span", class_="home")
+            away_span = m_div.find("span", class_="away")
+            home = home_span.find("span", onclick=re.compile(r"toTeam")).get_text(strip=True) if home_span else ""
+            away = away_span.find("span", onclick=re.compile(r"toTeam")).get_text(strip=True) if away_span else ""
+            if not home or not away: continue
+            score_attr = m_div.get("score", "-")
+            if score_attr and score_attr.strip() != "-":
+                parts = re.match(r'(\d+)\s*-\s*(\d+)', score_attr.strip())
+                if parts:
+                    results.append({"home": home, "away": away, "score": f"{parts.group(1)}:{parts.group(2)}"})
+        except: continue
     return results
 
 
