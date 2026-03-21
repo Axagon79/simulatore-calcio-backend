@@ -824,6 +824,25 @@ router.delete('/:id/remove', authenticate, async (req, res) => {
 });
 
 // ============================================
+// DELETE /bollette/:id/admin-delete — Elimina bolletta (solo admin)
+// ============================================
+router.delete('/:id/admin-delete', authenticate, async (req, res) => {
+  try {
+    const ADMIN_KEY = '000128';
+    const isAdmin = req.headers['x-admin-key'] === ADMIN_KEY;
+    if (!isAdmin) return res.status(403).json({ success: false, error: 'Non autorizzato' });
+
+    const bolId = new ObjectId(req.params.id);
+    const result = await req.db.collection('bollette').deleteOne({ _id: bolId });
+    if (result.deletedCount === 0) return res.status(404).json({ success: false, error: 'Bolletta non trovata' });
+    res.json({ success: true, deleted: true });
+  } catch (err) {
+    console.error('Errore DELETE /bollette/:id/admin-delete:', err);
+    res.status(500).json({ success: false, error: 'Errore server' });
+  }
+});
+
+// ============================================
 // GET /bollette/my — Tutte le bollette dell'utente (salvate + custom, tutti i giorni) (auth)
 // ============================================
 router.get('/my', authenticate, async (req, res) => {
