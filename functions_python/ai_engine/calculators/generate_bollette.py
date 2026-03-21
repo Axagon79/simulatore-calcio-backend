@@ -82,7 +82,11 @@ REGOLE COMPOSIZIONE
    Distribuzione consigliata: 3 oggi, 5 selettive, 5 bilanciate, 5 ambiziose
    Quante selezioni mettere in ogni bolletta lo decidi tu in base alla tua esperienza
 5. Si consiglia di dare la preferenza a selezioni con confidence e stelle alte, ma fai affidamento alla tua esperienza: se una selezione con stelle più basse ti convince per il contesto della bolletta, usala
-6. Per le bollette selettiva/bilanciata/ambiziosa: OGNI bolletta DEVE contenere ALMENO 1 partita di OGGI. L'utente vuole sempre avere qualcosa da seguire subito. Se non ci sono abbastanza partite oggi, metti quelle che ci sono e completa con domani/dopodomani
+6. ⚠️⚠️⚠️ REGOLA OBBLIGATORIA — ALMENO 1 PARTITA DI OGGI ⚠️⚠️⚠️
+   Per le bollette selettiva/bilanciata/ambiziosa: OGNI SINGOLA bolletta DEVE contenere ALMENO 1 partita di OGGI ({today_date}).
+   Questa regola NON è opzionale. Una bolletta senza partite di oggi è INVALIDA e verrà scartata.
+   L'utente vuole SEMPRE avere qualcosa da seguire subito. Se non ci sono abbastanza partite oggi, metti quelle che ci sono e completa con domani/dopodomani.
+   CONTROLLA ogni bolletta prima di inviarla: c'è almeno 1 selezione con data {today_date}? Se no, aggiungila.
 8. Non creare bollette con una sola selezione — almeno 2 selezioni per bolletta
 9. Massimo 10 selezioni per bolletta. Se hai in mente più di 10, dividi in 2 bollette separate
 10. Per ogni bolletta, scrivi una breve motivazione (1 frase) che spiega la logica
@@ -346,6 +350,13 @@ def validate_and_build(raw_bollette, pool, today_str):
 
         quota_totale = round(quota_totale, 2)
 
+        # Check: almeno 1 partita di oggi (per selettiva/bilanciata/ambiziosa)
+        has_today = any(s["match_date"] == today_str for s in selezioni)
+        raw_tipo_check = raw.get("tipo", "").lower().strip()
+        if not has_today and raw_tipo_check not in ("oggi", ""):
+            print(f"  ⚠️ Bolletta {raw_tipo_check} senza partite di oggi — scartata")
+            continue
+
         # Determina tipo — se Mistral ha specificato "oggi", usa quello
         raw_tipo = raw.get("tipo", "").lower().strip()
         solo_oggi = all(s["match_date"] == today_str for s in selezioni)
@@ -505,7 +516,7 @@ def call_mistral_integration(pool_text, fascia, count_needed, today_str):
     if fascia == "oggi":
         quota_rule = "Quote libere, qualsiasi fascia. TUTTE le selezioni DEVONO essere partite di OGGI ({today_str})"
     else:
-        quota_rule = f"Quota totale tra {fascia_range[0]} e {fascia_range[1]}. OGNI bolletta DEVE contenere ALMENO 1 partita di OGGI ({today_str})"
+        quota_rule = f"Quota totale tra {fascia_range[0]} e {fascia_range[1]}. ⚠️ OGNI bolletta DEVE contenere ALMENO 1 partita di OGGI ({today_str}) — bollette senza partite di oggi verranno scartate"
 
     prompt = f"""Sei un tipster professionista. Devi comporre esattamente {count_needed} bollette di tipo "{fascia}".
 {quota_rule}
@@ -514,7 +525,8 @@ REGOLE:
 1. Ogni partita UNA SOLA VOLTA per bolletta, con UN SOLO mercato
 2. Almeno 2 selezioni per bolletta, massimo 10
 3. Le selezioni con _extra_pool=true sono partite fuori dal sistema AI — usale se servono
-4. Restituisci SOLO un array JSON valido. Nessun testo prima o dopo
+4. ⚠️ OBBLIGATORIO: almeno 1 selezione con data {today_str} in ogni bolletta
+5. Restituisci SOLO un array JSON valido. Nessun testo prima o dopo
 
 [
   {{
