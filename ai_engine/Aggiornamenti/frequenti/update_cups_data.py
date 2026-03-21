@@ -614,75 +614,86 @@ def scrape_nowgoal_matches(competition_code):
         print("   📥 Caricamento pagina...")
         driver.get(config['nowgoal_url'])
         
-        # Aspetta che la tabella si carichi
+        # Aspetta che le partite si carichino
         wait = WebDriverWait(driver, 20)
-        wait.until(EC.presence_of_element_located((By.TAG_NAME, "table")))
+        wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.schedulis")))
         
         time.sleep(3)  # Tempo extra per JavaScript
-        
+
+        # Seleziona quote 1X2 (default e AH)
+        try:
+            odds_1x2 = driver.find_element(By.CSS_SELECTOR, "li[type='O']")
+            driver.execute_script("arguments[0].click()", odds_1x2)
+            time.sleep(2)
+        except:
+            print("   ⚠️ Selettore quote 1X2 non trovato")
+
         print("   🔍 Parsing HTML...\n")
         
         soup = BeautifulSoup(driver.page_source, "html.parser")
         
-        # Trova la tabella principale con le partite
-        # Nowgoal usa <table class="items">
-        table = soup.find("table", id="Table3")
-        
-        if not table:
-            print("   ❌ Tabella partite non trovata")
+        # Nuova struttura NowGoal (2026-03): div.schedulis invece di Table3
+        match_divs = soup.find_all("div", class_="schedulis")
+
+        if not match_divs:
+            print("   ❌ Nessuna partita trovata (div.schedulis)")
             return
-        
-        rows = table.find("tbody").find_all("tr") if table.find("tbody") else table.find_all("tr")
-        
-        print(f"   📊 Trovate {len(rows)} righe\n")
-        
-        for i, row in enumerate(rows, 1):
+
+        print(f"   📊 Trovate {len(match_divs)} partite\n")
+
+        for i, m in enumerate(match_divs, 1):
             try:
-                # Estrai testo completo della riga
-                row_text = row.get_text(" ", strip=True)
-                
-                # Cerca celle con nomi squadre
-                cells = row.find_all("td")
-                
-                if len(cells) < 3:
-                    continue
-                
-                # Cerca data/ora (di solito prima colonna)
-                # Cerca la cella con name="timeData"
-                time_cell = row.find("td", attrs={"name": "timeData"})
-                if time_cell:
-                    # Prende il testo visibile e sostituisce <br> con spazio
-                    date_text = time_cell.get_text(separator=" ", strip=True)
-                    date_cell = date_text  # Es: "16-09-2025 17:45"
-                else:
-                    date_cell = None
-                
-                # Cerca nome squadre (di solito hanno class="team" o link)
-                team_links = row.find_all("a", href=re.compile(r"/team/"))
-                
-                if len(team_links) < 2:
-                    continue
-                
-                home_team = team_links[0].get_text(strip=True)
-                away_team = team_links[1].get_text(strip=True)
-                
+                # Home
+                home_span = m.find("span", class_="home")
+                home_team = home_span.find("span", onclick=re.compile(r"toTeam")).get_text(strip=True) if home_span and home_span.find("span", onclick=re.compile(r"toTeam")) else None
+
+                # Away
+                away_span = m.find("span", class_="away")
+                away_team = away_span.find("span", onclick=re.compile(r"toTeam")).get_text(strip=True) if away_span and away_span.find("span", onclick=re.compile(r"toTeam")) else None
+
                 if not home_team or not away_team:
                     continue
-                
-                # Estrai quote
-                odds = extract_odds_from_row(row_text)
-                
-                # Estrai risultato se presente
-                result = parse_match_result(row, row_text)
-                
-                # Determina status
-                if result:
-                    status = "finished"
-                elif odds:
-                    status = "scheduled"
-                else:
-                    status = "scheduled"  # Senza quote ma futura
-                
+
+                # Data
+                date_span = m.find("span", class_="date")
+                date_cell = date_span.get_text(strip=True) if date_span else None
+                # Converti formato visibile (DD-MM HH:MM) in formato completo usando data-t
+                data_t = date_span.get("data-t", "") if date_span else ""
+                if data_t:
+                    # data-t e UTC+8, il testo visibile e CET — usiamo il testo visibile
+                    # Formato: "08-04 20:00" -> "08-04-2026 20:00"
+                    try:
+                        year = data_t[:4]
+                        date_cell = f"{date_cell.replace(' ', f'-{year} ', 1)}" if date_cell and len(date_cell) <= 11 else date_cell
+                    except:
+                        pass
+
+                # Score
+                score_span = m.find("span", class_="score")
+                score_text = score_span.get_text(strip=True) if score_span else "-"
+
+                result = None
+                if score_text != "-":
+                    parts = re.split(r'[-:]', score_text)
+                    if len(parts) == 2:
+                        try:
+                            result = {"home_score": int(parts[0].strip()), "away_score": int(parts[1].strip())}
+                        except:
+                            pass
+
+                status = "finished" if result else "scheduled"
+
+                # Quote (opzionale)
+                odds = None
+                odds_span = m.find("span", class_="odds")
+                if odds_span:
+                    odds_values = odds_span.find_all("span")
+                    if len(odds_values) >= 3:
+                        try:
+                            odds = {"home": float(odds_values[0].get_text(strip=True)), "draw": float(odds_values[1].get_text(strip=True)), "away": float(odds_values[2].get_text(strip=True))}
+                        except:
+                            pass
+
                 match_data = {
                     "home_team": home_team,
                     "away_team": away_team,
@@ -692,25 +703,20 @@ def scrape_nowgoal_matches(competition_code):
                     "match_date": date_cell,
                     "scraped_at": time.strftime("%Y-%m-%d %H:%M:%S")
                 }
-                
+
                 if odds:
-                    match_data["odds"] = {
-                        **odds,
-                        "source": "nowgoal",
-                        "odds_date": time.strftime("%Y-%m-%d %H:%M:%S")
-                    }
-                
+                    match_data["odds"] = {**odds, "source": "nowgoal", "odds_date": time.strftime("%Y-%m-%d %H:%M:%S")}
                 if result:
                     match_data["result"] = result
-                
+
                 matches_data.append(match_data)
-                
+
                 status_icon = "✅" if odds else ("🏁" if result else "⏳")
                 odds_str = f"[{odds['home']:.2f}|{odds['draw']:.2f}|{odds['away']:.2f}]" if odds else "[no odds]"
                 result_str = f" {result['home_score']}-{result['away_score']}" if result else ""
-                
+
                 print(f"   {i:3}. {status_icon} {home_team:<25} vs {away_team:<25} {odds_str}{result_str} [{date_cell}]")
-                
+
             except Exception as e:
                 print(f"   ⚠️  Riga {i}: Errore parsing - {e}")
                 continue
