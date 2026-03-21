@@ -51,9 +51,9 @@ LEAGUES_CONFIG = [
     # ITALIA
     {"name": "Serie A", "url": "https://football.nowgoal26.com/subleague/34"},
     {"name": "Serie B", "url": "https://football.nowgoal26.com/subleague/40"},
-    {"name": "Serie C - Girone A", "url": "https://football.nowgoal26.com/subleague/142"},
-    {"name": "Serie C - Girone B", "url": "https://football.nowgoal26.com/subleague/2025-2026/142/1526"},
-    {"name": "Serie C - Girone C", "url": "https://football.nowgoal26.com/subleague/2025-2026/142/1527"},
+    {"name": "Serie C - Girone A", "url": "https://football.nowgoal26.com/subleague/142", "stage": "1525"},
+    {"name": "Serie C - Girone B", "url": "https://football.nowgoal26.com/subleague/142", "stage": "1526"},
+    {"name": "Serie C - Girone C", "url": "https://football.nowgoal26.com/subleague/142", "stage": "1527"},
     
     # EUROPA TOP
     {"name": "Premier League", "url": "https://football.nowgoal26.com/league/36"},
@@ -281,12 +281,16 @@ def find_match_in_rows(home_aliases: List[str], away_aliases: List[str], rows_te
     for alias in home_aliases:
         for n in generate_search_names(alias.lower()):
             home_search.add(n)
+        for n in generate_search_names(clean_nowgoal_text(alias.lower())):
+            home_search.add(n)
         home_search.add(normalize_name(alias))
     home_search.discard("")
 
     away_search = set()
     for alias in away_aliases:
         for n in generate_search_names(alias.lower()):
+            away_search.add(n)
+        for n in generate_search_names(clean_nowgoal_text(alias.lower())):
             away_search.add(n)
         away_search.add(normalize_name(alias))
     away_search.discard("")
@@ -310,15 +314,36 @@ def find_match_in_rows(home_aliases: List[str], away_aliases: List[str], rows_te
     # Partita non trovata
     return None
 
-def click_round_and_wait(driver, round_num: int, timeout: int = 15) -> bool:
+def click_round_and_wait(driver, round_num: int, timeout: int = 15, stage: str = None) -> bool:
     """Clicca su una giornata e attende il caricamento."""
     try:
-        el = driver.find_element(By.CSS_SELECTOR, f"div.round span[round='{round_num}']")
-        driver.execute_script("arguments[0].click();", el)
-        WebDriverWait(driver, timeout).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, "div.schedulis"))
-        )
-        time.sleep(1)
+        element = None
+        if stage:
+            try:
+                element = driver.find_element(By.CSS_SELECTOR, f"div.round span[round='{round_num}'][stage='{stage}']")
+            except: pass
+        if not element:
+            try:
+                elements = driver.find_elements(By.CSS_SELECTOR, f"div.round span[round='{round_num}']")
+                for el in elements:
+                    if el.is_displayed():
+                        element = el
+                        break
+            except: pass
+        if not element: return False
+        try:
+            old_html = driver.find_element(By.CSS_SELECTOR, "div.list").get_attribute("innerHTML")[:200]
+        except:
+            old_html = ""
+        element.click()
+        for _ in range(20):
+            time.sleep(0.5)
+            try:
+                new_html = driver.find_element(By.CSS_SELECTOR, "div.list").get_attribute("innerHTML")[:200]
+                if new_html != old_html:
+                    break
+            except: pass
+        time.sleep(2)
         return True
     except Exception as e:
         print(f"   ⚠️ Errore navigazione giornata {round_num}: {e}")
@@ -656,11 +681,27 @@ def run_scraper():
             time.sleep(3)
 
             # Verifica caricamento, retry con refresh se fallisce
+            stage = league.get('stage')
             for attempt in range(3):
                 try:
                     WebDriverWait(driver, 15).until(
                         EC.presence_of_element_located((By.CSS_SELECTOR, "div.schedulis"))
                     )
+                    # Click sul girone se necessario (Serie C)
+                    if stage:
+                        try:
+                            stage_btn = driver.find_element(By.CSS_SELECTOR, f"div.stage span[stage='{stage}']")
+                            stage_btn.click()
+                            time.sleep(3)
+                        except:
+                            pass
+                    # Seleziona quote 1X2 (default e AH)
+                    try:
+                        odds_1x2 = driver.find_element(By.CSS_SELECTOR, "li[type='O']")
+                        driver.execute_script("arguments[0].click()", odds_1x2)
+                        time.sleep(3)
+                    except:
+                        pass
                     break
                 except:
                     print(f"   ⚠️ Pagina non caricata, refresh ({attempt+1}/3)...")
@@ -679,37 +720,24 @@ def run_scraper():
             # Questo evita problemi se il sito "perde" la giornata corrente dopo i click
             rounds_to_process = [current_round, current_round - 1, current_round + 1]
             
-            for round_num in rounds_to_process:
+            for idx, round_num in enumerate(rounds_to_process):
                 if round_num < 1:
                     continue
-                
+
                 print(f"\n   ⚙️ Giornata {round_num}")
-                
-                # Naviga alla giornata E ATTENDI sempre
-                if round_num != current_round:
-                    # Giornata diversa: fai click
-                    if not click_round_and_wait(driver, round_num):
-                        print(f"      ⚠️ Navigazione fallita, skip")
-                        continue
-                    
-                    # VERIFICA di essere sulla giornata corretta
-                    actual_round = get_current_round_from_page(driver)
-                    if actual_round and actual_round != round_num:
-                        print(f"      ⚠️ Click non riuscito: sulla giornata {actual_round} invece di {round_num}")
-                        continue
-                    elif actual_round:
-                        print(f"      ✓ Confermata giornata {actual_round}")
-                else:
-                    # Giornata corrente: assicurati che sia caricata
-                    print(f"      ℹ️ Già sulla giornata corrente, attendo caricamento...")
+
+                # La prima giornata (corrente) è già caricata, le altre servono doppio click
+                if idx > 0:
+                    click_round_and_wait(driver, round_num, stage=stage)
+                    time.sleep(1)
+                    click_round_and_wait(driver, round_num, stage=stage)
+                    # Dopo click giornata, riseleziona solo 1X2 (il girone resta)
                     try:
-                        WebDriverWait(driver, 15).until(
-                            EC.presence_of_element_located((By.CSS_SELECTOR, "div.schedulis"))
-                        )
-                        time.sleep(1)
-                    except Exception as e:
-                        print(f"      ⚠️ Timeout caricamento tabella, skip")
-                        continue
+                        odds_1x2 = driver.find_element(By.CSS_SELECTOR, "li[type='O']")
+                        driver.execute_script("arguments[0].click()", odds_1x2)
+                        time.sleep(3)
+                    except:
+                        pass
                 
                 # Recupera partite dal DB
                 round_docs = list(db.h2h_by_round.find({
