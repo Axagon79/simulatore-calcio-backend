@@ -165,13 +165,17 @@ router.get('/all', async (req, res) => {
       .toArray();
 
     // Enrichment solo per bollette non ancora risolte (oggi/recenti)
-    const pending = bollette.filter(b => !b.esito_globale);
-    const resolved = bollette.filter(b => b.esito_globale);
-    if (pending.length > 0) {
-      const enriched = await enrichBollette(req.db, pending);
-      bollette = [...enriched, ...resolved].sort((a, b) =>
-        (b.date || '').localeCompare(a.date || '') || (b.generated_at || '').localeCompare(a.generated_at || '')
-      );
+    try {
+      const pending = bollette.filter(b => !b.esito_globale);
+      const resolved = bollette.filter(b => b.esito_globale);
+      if (pending.length > 0) {
+        const enriched = await enrichBollette(req.db, pending);
+        bollette = [...enriched, ...resolved].sort((a, b) =>
+          (b.date || '').localeCompare(a.date || '') || (b.generated_at || '').localeCompare(a.generated_at || '')
+        );
+      }
+    } catch (enrichErr) {
+      console.error('Enrichment fallito, restituisco bollette senza enrichment:', enrichErr.message);
     }
     res.json({ success: true, bollette });
   } catch (err) {
