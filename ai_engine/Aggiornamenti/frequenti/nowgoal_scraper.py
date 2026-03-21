@@ -50,7 +50,6 @@ LEAGUES_CONFIG = [
     {"name": "Serie C - Girone A", "url": "https://football.nowgoal26.com/subleague/142"},
     {"name": "Serie C - Girone B", "url": "https://football.nowgoal26.com/subleague/2025-2026/142/1526"},
     {"name": "Serie C - Girone C", "url": "https://football.nowgoal26.com/subleague/2025-2026/142/1527"},
-    
     # EUROPA TOP
     {"name": "Premier League", "url": "https://football.nowgoal26.com/league/36"},
     {"name": "La Liga", "url": "https://football.nowgoal26.com/league/31"},
@@ -58,14 +57,12 @@ LEAGUES_CONFIG = [
     {"name": "Ligue 1", "url": "https://football.nowgoal26.com/league/11"},
     {"name": "Eredivisie", "url": "https://football.nowgoal26.com/league/16"},
     {"name": "Liga Portugal", "url": "https://football.nowgoal26.com/league/23"},
-    
-    # 🆕 EUROPA SERIE B
+    # EUROPA SERIE B
     {"name": "Championship", "url": "https://football.nowgoal26.com/league/37"},
     {"name": "LaLiga 2", "url": "https://football.nowgoal26.com/subleague/33"},
     {"name": "2. Bundesliga", "url": "https://football.nowgoal26.com/league/9"},
     {"name": "Ligue 2", "url": "https://football.nowgoal26.com/league/12"},
-    
-    # 🆕 EUROPA NORDICI + EXTRA
+    # EUROPA NORDICI + EXTRA
     {"name": "Scottish Premiership", "url": "https://football.nowgoal26.com/subleague/29"},
     {"name": "Allsvenskan", "url": "https://football.nowgoal26.com/subleague/26"},
     {"name": "Eliteserien", "url": "https://football.nowgoal26.com/subleague/22"},
@@ -73,13 +70,11 @@ LEAGUES_CONFIG = [
     {"name": "Jupiler Pro League", "url": "https://football.nowgoal26.com/subleague/5"},
     {"name": "Süper Lig", "url": "https://football.nowgoal26.com/subleague/30"},
     {"name": "League of Ireland Premier Division", "url": "https://football.nowgoal26.com/subleague/1"},
-    
-    # 🆕 AMERICHE
+    # AMERICHE
     {"name": "Brasileirão Serie A", "url": "https://football.nowgoal26.com/league/4"},
     {"name": "Primera División", "url": "https://football.nowgoal26.com/subleague/2"},
     {"name": "Major League Soccer", "url": "https://football.nowgoal26.com/subleague/21"},
-    
-    # 🆕 ASIA
+    # ASIA
     {"name": "J1 League", "url": "https://football.nowgoal26.com/subleague/25"},
 ]
 
@@ -195,21 +190,23 @@ def get_round_number_from_text(text):
 
 def click_specific_round(driver, target_round):
     try:
-        str_round = str(target_round)
-        xpath_list = [
-            f"//div[contains(@class,'subLeague_round')]//a[text()='{str_round}']",
-            f"//td[text()='{str_round}']",
-            f"//li[text()='{str_round}']",
-            f"//a[normalize-space()='{str_round}']"
-        ]
+        # Nuova struttura: <span round="N"> dentro div.round
         element = None
-        for xpath in xpath_list:
-            try:
-                element = driver.find_element(By.XPATH, xpath)
-                if element: break
-            except: pass
+        try:
+            element = driver.find_element(By.CSS_SELECTOR, f"div.round span[round='{target_round}']")
+        except: pass
+        # Fallback vecchia struttura
+        if not element:
+            for xpath in [
+                f"//div[contains(@class,'subLeague_round')]//a[text()='{target_round}']",
+                f"//a[normalize-space()='{target_round}']"
+            ]:
+                try:
+                    element = driver.find_element(By.XPATH, xpath)
+                    if element: break
+                except: pass
         if not element: return False
-        driver.execute_script("arguments[0].click();", element) 
+        driver.execute_script("arguments[0].click();", element)
         time.sleep(3)
         return True
     except: return False
@@ -265,26 +262,60 @@ def run_scraper():
             driver.get(url)
             time.sleep(3)
 
+            # Verifica caricamento, retry con refresh se fallisce
+            for attempt in range(3):
+                try:
+                    WebDriverWait(driver, 15).until(
+                        EC.presence_of_element_located((By.CSS_SELECTOR, "div.schedulis"))
+                    )
+                    break
+                except:
+                    print(f"   ⚠️ Pagina non caricata, refresh ({attempt+1}/3)...")
+                    driver.refresh()
+                    time.sleep(5)
+
+            # Seleziona quote 1X2 (default e AH)
+            try:
+                odds_1x2 = driver.find_element(By.CSS_SELECTOR, "li[type='O']")
+                driver.execute_script("arguments[0].click()", odds_1x2)
+                time.sleep(2)
+            except:
+                pass
+
             for round_doc in rounds_to_process:
                 round_num = get_round_number_from_text(round_doc['round_name'])
                 print(f"   🔄 {lname} G.{round_num}...", end="")
-                
+
                 click_specific_round(driver, round_num)
-                
-                try: rows = driver.find_elements(By.CSS_SELECTOR, "tr[id]")
-                except: rows = []
-                
+
+                # Nuova struttura: div.schedulis con span.odds
+                from bs4 import BeautifulSoup
+                soup = BeautifulSoup(driver.page_source, "html.parser")
+                match_divs = soup.find_all("div", class_="schedulis")
+
                 scraped_data = []
-                for row in rows:
+                for m_div in match_divs:
                     try:
-                        row_text = row.text.lower()
-                        floats = [float(x) for x in re.findall(r'\d+\.\d{2}', row_text)]
-                        valid_odds = [f for f in floats if 1.01 <= f <= 25.0]
-                        if len(valid_odds) >= 3:
-                            scraped_data.append({
-                                "text": row_text,
-                                "1": valid_odds[0], "X": valid_odds[1], "2": valid_odds[2]
-                            })
+                        # Nomi squadre
+                        home_span = m_div.find("span", class_="home")
+                        away_span = m_div.find("span", class_="away")
+                        home_name = home_span.find("span", onclick=re.compile(r"toTeam")).get_text(strip=True).lower() if home_span and home_span.find("span", onclick=re.compile(r"toTeam")) else ""
+                        away_name = away_span.find("span", onclick=re.compile(r"toTeam")).get_text(strip=True).lower() if away_span and away_span.find("span", onclick=re.compile(r"toTeam")) else ""
+                        row_text = f"{home_name} {away_name}"
+
+                        # Quote da span.odds
+                        odds_span = m_div.find("span", class_="odds")
+                        if odds_span:
+                            odds_values = odds_span.find_all("span")
+                            if len(odds_values) >= 3:
+                                try:
+                                    o1 = float(odds_values[0].get_text(strip=True))
+                                    oX = float(odds_values[1].get_text(strip=True))
+                                    o2 = float(odds_values[2].get_text(strip=True))
+                                    if 1.01 <= o1 <= 25.0 and 1.01 <= oX <= 25.0 and 1.01 <= o2 <= 25.0:
+                                        scraped_data.append({"text": row_text, "1": o1, "X": oX, "2": o2})
+                                except:
+                                    pass
                     except: continue
                 
                 matches = round_doc['matches']
