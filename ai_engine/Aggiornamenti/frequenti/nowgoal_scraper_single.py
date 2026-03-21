@@ -311,79 +311,62 @@ def find_match_in_rows(home_aliases: List[str], away_aliases: List[str], rows_te
     return None
 
 def click_round_and_wait(driver, round_num: int, timeout: int = 15) -> bool:
-    """
-    Clicca su una giornata e attende il caricamento della tabella.
-    Ritorna True se ha successo, False altrimenti.
-    """
+    """Clicca su una giornata e attende il caricamento."""
     try:
-        # Trova l'elemento della giornata
-        str_round = str(round_num)
-        xpath_list = [
-            f"//div[contains(@class,'subLeague_round')]//a[text()='{str_round}']",
-            f"//td[text()='{str_round}']",
-            f"//li[text()='{str_round}']",
-            f"//a[normalize-space()='{str_round}']"
-        ]
-        
-        element = None
-        for xpath in xpath_list:
-            try:
-                element = driver.find_element(By.XPATH, xpath)
-                if element: 
-                    break
-            except:
-                pass
-        
-        if not element:
-            return False
-        
-        # Clicca usando JavaScript per evitare problemi di interception
-        driver.execute_script("arguments[0].click();", element)
-        
-        # Attendi che la tabella si carichi
+        el = driver.find_element(By.CSS_SELECTOR, f"div.round span[round='{round_num}']")
+        driver.execute_script("arguments[0].click();", el)
         WebDriverWait(driver, timeout).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, "tr[id]"))
+            EC.presence_of_element_located((By.CSS_SELECTOR, "div.schedulis"))
         )
-        
-        # Breve pausa per stabilizzazione
         time.sleep(1)
-        
         return True
-        
     except Exception as e:
         print(f"   ⚠️ Errore navigazione giornata {round_num}: {e}")
         return False
 
 def get_current_round_from_page(driver) -> Optional[int]:
-    """
-    Determina quale giornata è attualmente visualizzata nella pagina.
-    Legge il numero dalla prima riga della tabella.
-    """
+    """Determina quale giornata è attualmente visualizzata nella pagina."""
     try:
-        # Attendi che la tabella sia presente
         WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, "tr[id]"))
+            EC.presence_of_element_located((By.CSS_SELECTOR, "div.schedulis"))
         )
-        
-        # Prendi la prima riga
-        first_row = driver.find_element(By.CSS_SELECTOR, "tr[id]")
-        first_row_text = first_row.text.strip()
-        
-        # Il numero di giornata è tipicamente all'inizio (es. "15 14-12 12:30 ...")
-        match = re.match(r'^(\d+)', first_row_text)
-        if match:
-            return int(match.group(1))
-        
+        current = driver.find_element(By.CSS_SELECTOR, "div.round span.current.on, div.round span.on")
+        round_num = current.get_attribute("round")
+        return int(round_num) if round_num else None
     except Exception as e:
         print(f"   ⚠️ Impossibile leggere giornata dalla pagina: {e}")
-    
     return None
 
 def get_all_match_rows(driver) -> List[str]:
-    """Estrae tutte le righe di partite dalla pagina corrente"""
+    """Estrae tutte le righe di partite dalla pagina corrente (nuovo layout div.schedulis)"""
     try:
-        rows = driver.find_elements(By.CSS_SELECTOR, "tr[id]")
-        return [row.text for row in rows if row.text.strip()]
+        # Click 1X2 per avere quote corrette
+        try:
+            odds_btn = driver.find_element(By.CSS_SELECTOR, "li[type='O']")
+            driver.execute_script("arguments[0].click()", odds_btn)
+            time.sleep(2)
+        except: pass
+
+        from bs4 import BeautifulSoup
+        soup = BeautifulSoup(driver.page_source, "html.parser")
+        match_divs = soup.find_all("div", class_="schedulis")
+        rows = []
+        for m_div in match_divs:
+            try:
+                home_span = m_div.find("span", class_="home")
+                away_span = m_div.find("span", class_="away")
+                home = home_span.find("span", onclick=re.compile(r"toTeam")).get_text(strip=True) if home_span else ""
+                away = away_span.find("span", onclick=re.compile(r"toTeam")).get_text(strip=True) if away_span else ""
+                # Quote 1X2
+                odds_span = m_div.find("span", class_="odds")
+                odds_text = ""
+                if odds_span:
+                    vals = [s.get_text(strip=True) for s in odds_span.find_all("span")]
+                    if len(vals) >= 3:
+                        odds_text = f" {vals[0]} {vals[1]} {vals[2]}"
+                rows.append(f"{home} {away}{odds_text}")
+            except: continue
+        return rows
     except:
         return []
 
@@ -671,7 +654,19 @@ def run_scraper():
             # Naviga alla pagina della lega
             driver.get(league_url)
             time.sleep(3)
-            
+
+            # Verifica caricamento, retry con refresh se fallisce
+            for attempt in range(3):
+                try:
+                    WebDriverWait(driver, 15).until(
+                        EC.presence_of_element_located((By.CSS_SELECTOR, "div.schedulis"))
+                    )
+                    break
+                except:
+                    print(f"   ⚠️ Pagina non caricata, refresh ({attempt+1}/3)...")
+                    driver.refresh()
+                    time.sleep(5)
+
             # Determina giornata corrente
             current_round = get_current_round_from_page(driver)
             if not current_round:
@@ -709,9 +704,9 @@ def run_scraper():
                     print(f"      ℹ️ Già sulla giornata corrente, attendo caricamento...")
                     try:
                         WebDriverWait(driver, 15).until(
-                            EC.presence_of_element_located((By.CSS_SELECTOR, "tr[id]"))
+                            EC.presence_of_element_located((By.CSS_SELECTOR, "div.schedulis"))
                         )
-                        time.sleep(1)  # Pausa per stabilizzazione
+                        time.sleep(1)
                     except Exception as e:
                         print(f"      ⚠️ Timeout caricamento tabella, skip")
                         continue
