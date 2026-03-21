@@ -155,6 +155,24 @@ router.get('/storico', async (req, res) => {
 });
 
 // ============================================
+// GET /bollette/all — Tutte le bollette storiche (non custom). Pubblico.
+// ============================================
+router.get('/all', async (req, res) => {
+  try {
+    let bollette = await req.db.collection('bollette')
+      .find({ custom: { $ne: true } })
+      .sort({ date: -1, generated_at: -1 })
+      .toArray();
+
+    bollette = await enrichBollette(req.db, bollette);
+    res.json({ success: true, bollette });
+  } catch (err) {
+    console.error('Errore GET /bollette/all:', err);
+    res.status(500).json({ success: false, error: 'Errore server' });
+  }
+});
+
+// ============================================
 // GET /bollette/date-disponibili — Lista date con bollette generate
 // ============================================
 router.get('/date-disponibili', async (req, res) => {
