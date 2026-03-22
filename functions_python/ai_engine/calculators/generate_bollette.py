@@ -55,7 +55,7 @@ FASCE = {
     "selettiva":  (1.5, 3.5),
     "bilanciata": (3.5, 8.0),
     "ambiziosa":  (8.0, 999.0),
-    "elite":      (1.5, 5.0),     # Solo selezioni elite (almeno 70%)
+    "elite":      (1.5, 8.0),     # Almeno 70% selezioni elite
 }
 
 # --- PROMPT MISTRAL ---
@@ -105,18 +105,21 @@ REGOLE COMPOSIZIONE
    - Usa più selezioni (5-10) o mercati con quote alte (1X2, Under 1.5)
 
    📌 ELITE — Campo "tipo": "elite"
-   - USA ESCLUSIVAMENTE selezioni dal POOL ELITE (la sezione separata in alto)
-   - NON usare selezioni che non sono nel pool elite
-   - ALMENO il 70% delle selezioni DEVE essere ★ELITE (il restante 30% può essere non-elite solo se indispensabile per completare la bolletta)
-   - Almeno 1 bolletta elite deve avere SOLO partite di oggi ({today_date})
-   - Le altre bollette elite possono mischiare oggi/domani/dopodomani
-   - Quota totale MASSIMO 5.00
-   - Minimo 2, massimo 5 selezioni per bolletta
+   - ALMENO il 70% delle selezioni DEVE essere ★ELITE dal POOL ELITE
+   - Il restante 30% DEVE provenire dal POOL COMPLETO (selezioni NON elite)
+   - ⚠️ REGOLA CRITICA: SFRUTTA SEMPRE il 30% non-elite per completare le bollette!
+     Anche se ci sono poche selezioni elite (es. solo 2-3), componi comunque bollette da 3-5 selezioni aggiungendo 1-2 selezioni dal pool completo
+   - Minimo elite richieste: 2 su 3 selezioni, 3 su 4, 4 su 5
+   - Esempio con 3 selezioni: 2 elite + 1 non-elite con quota più alta (es. @2.0)
+   - Esempio con 4 selezioni: 3 elite + 1 non-elite
+   - NON fare bollette elite da sole 2 selezioni — il minimo è 3
+   - Le bollette elite NON hanno vincolo sulle date: possono avere partite di oggi, domani o dopodomani liberamente
+   - Quota totale MASSIMO 8.00
+   - Minimo 3, massimo 5 selezioni per bolletta
    - Quota max per SINGOLA selezione (varia in base al numero di selezioni):
-     • 2 selezioni → ogni quota max 2.24
-     • 3 selezioni → ogni quota max 1.71
-     • 4 selezioni → ogni quota max 1.50
-     • 5 selezioni → ogni quota max 1.38
+     • 3 selezioni → ogni quota max 2.00
+     • 4 selezioni → ogni quota max 1.68
+     • 5 selezioni → ogni quota max 1.52
    - Se non ci sono abbastanza selezioni elite nel pool, genera meno bollette elite (anche 0 se necessario)
 
    Le bollette "oggi" sono SEPARATE e DIVERSE dalle altre — non devono essere le stesse bollette delle altre fasce
@@ -421,10 +424,10 @@ def validate_and_build(raw_bollette, pool, today_str):
 
         quota_totale = round(quota_totale, 2)
 
-        # Check: almeno 1 partita di oggi (per selettiva/bilanciata/ambiziosa)
+        # Check: almeno 1 partita di oggi (per selettiva/bilanciata/ambiziosa, NON per elite)
         has_today = any(s["match_date"] == today_str for s in selezioni)
         raw_tipo_check = raw.get("tipo", "").lower().strip()
-        if not has_today and raw_tipo_check not in ("oggi", ""):
+        if not has_today and raw_tipo_check not in ("oggi", "elite", ""):
             print(f"  ⚠️ Bolletta {raw_tipo_check} senza partite di oggi — scartata")
             continue
 
@@ -433,12 +436,14 @@ def validate_and_build(raw_bollette, pool, today_str):
         solo_oggi = all(s["match_date"] == today_str for s in selezioni)
 
         if raw_tipo == "elite":
-            # Verifica che almeno 70% selezioni siano elite
+            # Verifica che almeno ~70% selezioni siano elite
+            # Minimo elite richieste: 2 su 3, 3 su 4, 4 su 5
             elite_count = sum(1 for s in selezioni if pool_index.get(
                 (f"{s['home']} vs {s['away']}|{s['match_date']}", s['mercato'], s['pronostico']),
                 {}
             ).get("elite", False))
-            if elite_count >= len(selezioni) * 0.7:
+            min_elite = {2: 2, 3: 2, 4: 3, 5: 4}.get(len(selezioni), max(2, int(len(selezioni) * 0.7)))
+            if elite_count >= min_elite:
                 tipo = "elite"
             else:
                 print(f"  ⚠️ Bolletta elite con solo {elite_count}/{len(selezioni)} selezioni elite — riclassificata")
@@ -754,7 +759,7 @@ def main():
         by_tipo.setdefault(b["tipo"], []).append(b)
 
     print(f"\n✅ Salvate {len(bollette_docs)} bollette:")
-    for tipo in ["oggi", "selettiva", "bilanciata", "ambiziosa"]:
+    for tipo in ["oggi", "elite", "selettiva", "bilanciata", "ambiziosa"]:
         if tipo in by_tipo:
             quotes = [b["quota_totale"] for b in by_tipo[tipo]]
             integrated = sum(1 for b in by_tipo[tipo] if b.get("_integrated"))
