@@ -82,6 +82,7 @@ REGOLE COMPOSIZIONE
    Distribuzione consigliata: 3 oggi, 5 selettive, 5 bilanciate, 5 ambiziose
    Quante selezioni mettere in ogni bolletta lo decidi tu in base alla tua esperienza
 5. Si consiglia di dare la preferenza a selezioni con confidence e stelle alte, ma fai affidamento alla tua esperienza: se una selezione con stelle più basse ti convince per il contesto della bolletta, usala
+5b. ⭐ SELEZIONI ELITE ⭐ — Le selezioni marcate con ★ELITE nel pool sono pronostici che matchano pattern storicamente vincenti (hit rate > 80%). Dai loro PRIORITÀ ASSOLUTA: ogni bolletta dovrebbe contenere almeno 1 selezione elite se disponibile. Non forzare combinazioni innaturali, ma a parità di scelta preferisci SEMPRE una selezione elite
 6. ⚠️⚠️⚠️ REGOLA OBBLIGATORIA — ALMENO 1 PARTITA DI OGGI ⚠️⚠️⚠️
    Per le bollette selettiva/bilanciata/ambiziosa: OGNI SINGOLA bolletta DEVE contenere ALMENO 1 partita di OGGI ({today_date}).
    Questa regola NON è opzionale. Una bolletta senza partite di oggi è INVALIDA e verrà scartata.
@@ -175,6 +176,7 @@ def build_pool(today_str):
                 "quota": round(quota, 2),
                 "confidence": p.get("confidence", 0),
                 "stars": p.get("stars", 0),
+                "elite": p.get("elite", False),
             })
 
     print(f"📦 Pool base: {len(pool)} selezioni da {len(docs)} partite ({', '.join(dates)})")
@@ -248,9 +250,10 @@ def serialize_pool_for_prompt(pool):
     for date in sorted(by_date.keys()):
         lines.append(f"\n=== {date} ===")
         for s in by_date[date]:
+            elite_tag = " ★ELITE" if s.get("elite") else ""
             lines.append(
                 f"  {s['match_key']} | {s['mercato']}: {s['pronostico']} "
-                f"@ {s['quota']} | conf={s['confidence']} ★{s['stars']}"
+                f"@ {s['quota']} | conf={s['confidence']} ★{s['stars']}{elite_tag}"
             )
     return "\n".join(lines)
 
