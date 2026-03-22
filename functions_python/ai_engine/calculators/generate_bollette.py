@@ -52,9 +52,10 @@ MAX_BOLLETTE = 18
 # Fasce quota totale
 FASCE = {
     "oggi":       (1.0, 999.0),   # Nessun vincolo quota — solo partite di oggi
-    "selettiva":  (1.5, 3.0),
-    "bilanciata": (3.0, 8.0),
+    "selettiva":  (1.5, 3.5),
+    "bilanciata": (3.5, 8.0),
     "ambiziosa":  (8.0, 999.0),
+    "elite":      (1.5, 5.0),     # Solo selezioni elite (almeno 70%)
 }
 
 # --- PROMPT MISTRAL ---
@@ -74,13 +75,52 @@ REGOLE COMPOSIZIONE
 2. La stessa partita con lo stesso pronostico PUÒ apparire in bollette diverse, ma ATTENZIONE: non ripetere la stessa selezione in tutte le bollette. Se quella partita va male, perdiamo tutte le bollette in cui compare. Varia e diversifica
 3. Hai a disposizione partite di oggi, domani e dopodomani. Sei libero di scegliere come combinarle: puoi fare bollette miste o concentrate su un giorno solo. Consiglio: cerca di non mettere TUTTE le partite dello stesso giorno in tutte le bollette, ma segui il tuo istinto da professionista
 4. Genera esattamente {max_bollette} bollette totali, divise in 4 categorie. OGNI CATEGORIA DEVE AVERE ALMENO 3 BOLLETTE:
-   - Oggi: SOLO partite di oggi ({today_date}). Campo "tipo": "oggi". Quote libere, qualsiasi fascia. Minimo 3 bollette
-   - Selettiva: quota totale MASSIMO 3.0 — la quota moltiplicata di tutte le selezioni NON deve superare 3.0
-   - Bilanciata: quota totale tra 3.0 e 8.0
-   - Ambiziosa: quota totale superiore a 8.0 — usa più selezioni (5-10) o mercati con quote alte (1X2, Under 1.5)
+
+   📌 OGGI — Campo "tipo": "oggi"
+   - SOLO ed ESCLUSIVAMENTE partite di oggi ({today_date}). OGNI selezione deve avere data {today_date}
+   - Se una selezione ha data diversa da {today_date}, NON può stare in una bolletta "oggi"
+   - Quote libere, qualsiasi fascia. Minimo 3 bollette
+
+   📌 SELETTIVA — Campo "tipo": "selettiva"
+   - Quota totale MASSIMO 3.50
+   - Minimo 2, massimo 4 selezioni per bolletta
+   - Quota max per SINGOLA selezione (varia in base al numero di selezioni):
+     • 2 selezioni → ogni quota max 1.85
+     • 3 selezioni → ogni quota max 1.50
+     • 4 selezioni → ogni quota max 1.35
+
+   📌 BILANCIATA — Campo "tipo": "bilanciata"
+   - Quota totale tra 3.50 e 8.00
+   - Minimo 2, massimo 7 selezioni per bolletta
+   - Quota max per SINGOLA selezione (varia in base al numero di selezioni):
+     • 2 selezioni → ogni quota max 2.80
+     • 3 selezioni → ogni quota max 2.00
+     • 4 selezioni → ogni quota max 1.68
+     • 5 selezioni → ogni quota max 1.52
+     • 6 selezioni → ogni quota max 1.41
+     • 7 selezioni → ogni quota max 1.35
+
+   📌 AMBIZIOSA — Campo "tipo": "ambiziosa"
+   - Quota totale superiore a 8.0 — nessun vincolo su singola selezione
+   - Usa più selezioni (5-10) o mercati con quote alte (1X2, Under 1.5)
+
+   📌 ELITE — Campo "tipo": "elite"
+   - USA ESCLUSIVAMENTE selezioni dal POOL ELITE (la sezione separata in alto)
+   - NON usare selezioni che non sono nel pool elite
+   - ALMENO il 70% delle selezioni DEVE essere ★ELITE (il restante 30% può essere non-elite solo se indispensabile per completare la bolletta)
+   - Almeno 1 bolletta elite deve avere SOLO partite di oggi ({today_date})
+   - Le altre bollette elite possono mischiare oggi/domani/dopodomani
+   - Quota totale MASSIMO 5.00
+   - Minimo 2, massimo 5 selezioni per bolletta
+   - Quota max per SINGOLA selezione (varia in base al numero di selezioni):
+     • 2 selezioni → ogni quota max 2.24
+     • 3 selezioni → ogni quota max 1.71
+     • 4 selezioni → ogni quota max 1.50
+     • 5 selezioni → ogni quota max 1.38
+   - Se non ci sono abbastanza selezioni elite nel pool, genera meno bollette elite (anche 0 se necessario)
+
    Le bollette "oggi" sono SEPARATE e DIVERSE dalle altre — non devono essere le stesse bollette delle altre fasce
-   Distribuzione consigliata: 3 oggi, 5 selettive, 5 bilanciate, 5 ambiziose
-   Quante selezioni mettere in ogni bolletta lo decidi tu in base alla tua esperienza
+   Distribuzione consigliata: 3 oggi, 4 selettive, 4 bilanciate, 4 ambiziose, 3 elite
 5. Si consiglia di dare la preferenza a selezioni con confidence e stelle alte, ma fai affidamento alla tua esperienza: se una selezione con stelle più basse ti convince per il contesto della bolletta, usala
 5b. ⭐ SELEZIONI ELITE ⭐ — Le selezioni marcate con ★ELITE nel pool sono pronostici che matchano pattern storicamente vincenti (hit rate > 80%). Dai loro PRIORITÀ ASSOLUTA: ogni bolletta dovrebbe contenere almeno 1 selezione elite se disponibile. Non forzare combinazioni innaturali, ma a parità di scelta preferisci SEMPRE una selezione elite
 6. ⚠️⚠️⚠️ REGOLA OBBLIGATORIA — ALMENO 1 PARTITA DI OGGI ⚠️⚠️⚠️
@@ -88,8 +128,8 @@ REGOLE COMPOSIZIONE
    Questa regola NON è opzionale. Una bolletta senza partite di oggi è INVALIDA e verrà scartata.
    L'utente vuole SEMPRE avere qualcosa da seguire subito. Se non ci sono abbastanza partite oggi, metti quelle che ci sono e completa con domani/dopodomani.
    CONTROLLA ogni bolletta prima di inviarla: c'è almeno 1 selezione con data {today_date}? Se no, aggiungila.
-8. Non creare bollette con una sola selezione — almeno 2 selezioni per bolletta
-9. Massimo 10 selezioni per bolletta. Se hai in mente più di 10, dividi in 2 bollette separate
+8. Non creare bollette con una sola selezione — almeno 2 selezioni per bolletta (selettiva: 2-4, bilanciata: 2-7, ambiziosa: 2-10)
+9. Rispetta SEMPRE i limiti di quota per singola selezione indicati sopra. Se una selezione ha quota troppo alta per quella categoria, NON usarla in quella bolletta
 10. Per ogni bolletta, scrivi una breve motivazione (1 frase) che spiega la logica
 
 ═══════════════════════════════════════
@@ -240,13 +280,40 @@ def deduplicate_pool(pool):
 
 
 def serialize_pool_for_prompt(pool):
-    """Serializza il pool in formato compatto per il prompt Mistral."""
+    """Serializza il pool in formato compatto per il prompt Mistral.
+    Pool elite separato dal pool completo per chiarezza."""
+
+    elite_pool = [s for s in pool if s.get("elite")]
+    lines = []
+
+    # Pool elite separato — per bollette tipo "elite"
+    if elite_pool:
+        lines.append("\n╔══════════════════════════════════════╗")
+        lines.append("║  POOL ELITE — usa SOLO queste per    ║")
+        lines.append("║  bollette di tipo \"elite\"             ║")
+        lines.append("╚══════════════════════════════════════╝")
+        by_date_elite = {}
+        for s in elite_pool:
+            by_date_elite.setdefault(s["match_date"], []).append(s)
+        for date in sorted(by_date_elite.keys()):
+            lines.append(f"\n  --- {date} ---")
+            for s in by_date_elite[date]:
+                lines.append(
+                    f"  {s['match_key']} | {s['mercato']}: {s['pronostico']} "
+                    f"@ {s['quota']} | conf={s['confidence']} ★{s['stars']} ★ELITE"
+                )
+        lines.append(f"\n  Totale selezioni elite: {len(elite_pool)}")
+    else:
+        lines.append("\n⚠️ Nessuna selezione elite disponibile — NON generare bollette elite")
+
+    # Pool completo — per tutte le altre bollette
+    lines.append("\n╔══════════════════════════════════════╗")
+    lines.append("║  POOL COMPLETO — per bollette oggi,  ║")
+    lines.append("║  selettiva, bilanciata, ambiziosa     ║")
+    lines.append("╚══════════════════════════════════════╝")
     by_date = {}
     for s in pool:
-        d = s["match_date"]
-        by_date.setdefault(d, []).append(s)
-
-    lines = []
+        by_date.setdefault(s["match_date"], []).append(s)
     for date in sorted(by_date.keys()):
         lines.append(f"\n=== {date} ===")
         for s in by_date[date]:
@@ -255,6 +322,7 @@ def serialize_pool_for_prompt(pool):
                 f"  {s['match_key']} | {s['mercato']}: {s['pronostico']} "
                 f"@ {s['quota']} | conf={s['confidence']} ★{s['stars']}{elite_tag}"
             )
+
     return "\n".join(lines)
 
 
@@ -306,7 +374,7 @@ def validate_and_build(raw_bollette, pool, today_str):
         pool_index[key] = s
 
     bollette_docs = []
-    counters = {"oggi": 0, "selettiva": 0, "bilanciata": 0, "ambiziosa": 0}
+    counters = {"oggi": 0, "elite": 0, "selettiva": 0, "bilanciata": 0, "ambiziosa": 0}
 
     for raw in raw_bollette:
         selezioni_raw = raw.get("selezioni", [])
@@ -360,17 +428,33 @@ def validate_and_build(raw_bollette, pool, today_str):
             print(f"  ⚠️ Bolletta {raw_tipo_check} senza partite di oggi — scartata")
             continue
 
-        # Determina tipo — se Mistral ha specificato "oggi", usa quello
+        # Determina tipo — rispetta la classificazione di Mistral dove possibile
         raw_tipo = raw.get("tipo", "").lower().strip()
         solo_oggi = all(s["match_date"] == today_str for s in selezioni)
 
-        if raw_tipo == "oggi" and solo_oggi:
+        if raw_tipo == "elite":
+            # Verifica che almeno 70% selezioni siano elite
+            elite_count = sum(1 for s in selezioni if pool_index.get(
+                (f"{s['home']} vs {s['away']}|{s['match_date']}", s['mercato'], s['pronostico']),
+                {}
+            ).get("elite", False))
+            if elite_count >= len(selezioni) * 0.7:
+                tipo = "elite"
+            else:
+                print(f"  ⚠️ Bolletta elite con solo {elite_count}/{len(selezioni)} selezioni elite — riclassificata")
+                tipo = "ambiziosa"
+                for t, (lo, hi) in list(FASCE.items()):
+                    if t in ("oggi", "elite"):
+                        continue
+                    if lo <= quota_totale < hi:
+                        tipo = t
+                        break
+        elif raw_tipo == "oggi" and solo_oggi:
             tipo = "oggi"
         elif raw_tipo == "oggi" and not solo_oggi:
-            # Mistral ha detto "oggi" ma ci sono partite future — classifica normalmente
             tipo = "ambiziosa"
             for t, (lo, hi) in list(FASCE.items()):
-                if t == "oggi":
+                if t in ("oggi", "elite"):
                     continue
                 if lo <= quota_totale < hi:
                     tipo = t
@@ -378,7 +462,7 @@ def validate_and_build(raw_bollette, pool, today_str):
         else:
             tipo = "ambiziosa"
             for t, (lo, hi) in list(FASCE.items()):
-                if t == "oggi":
+                if t in ("oggi", "elite"):
                     continue
                 if lo <= quota_totale < hi:
                     tipo = t
