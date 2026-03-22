@@ -39,6 +39,7 @@ from run_daily_predictions_sandbox import run_daily_predictions as run_system_s
 from run_daily_predictions_engine_c import run_engine_c as run_system_c
 from orchestrate_experts import orchestrate_date as run_orchestrator
 from snapshot_nightly import normalize_match_key, get_all_matches
+from tag_elite import matches_elite
 
 # Collections
 h2h_collection = db['h2h_by_round']
@@ -497,6 +498,26 @@ def run_full_cycle(date_str, target_date, block_times, run_label):
 
     print(f"\n--- Orchestratore MoE ---")
     run_orchestrator(date_str, dry_run=False, match_time_filter=effective_times, preserve_analysis=True)
+
+    # 1b. Ri-tagging Elite dopo orchestratore
+    elite_count = 0
+    elite_docs = list(unified_collection.find(
+        {'date': date_str, 'match_time': {'$in': effective_times}},
+        {'_id': 1, 'pronostici': 1}
+    ))
+    for doc in elite_docs:
+        pronostici = doc.get('pronostici', [])
+        changed_elite = False
+        for p in pronostici:
+            is_elite = matches_elite(p)
+            if p.get('elite') != is_elite:
+                p['elite'] = is_elite
+                changed_elite = True
+            if is_elite:
+                elite_count += 1
+        if changed_elite:
+            unified_collection.update_one({'_id': doc['_id']}, {'$set': {'pronostici': pronostici}})
+    print(f"   👑 Elite ri-taggati: {elite_count} pronostici")
 
     # 2. Snapshot + change detection
     all_changes = save_snapshot_and_detect_changes(date_str, block_times, run_label)

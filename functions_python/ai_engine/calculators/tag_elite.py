@@ -1,7 +1,7 @@
 """
 Step Elite — Tagga i pronostici unified del giorno che matchano i pattern storicamente vincenti.
 Gira subito dopo orchestrate_experts.py (step 31).
-Aggiunge elite: true ai pronostici che soddisfano almeno uno degli 8 pattern.
+Aggiunge elite: true ai pronostici che soddisfano almeno uno dei 16 pattern.
 """
 
 import os
@@ -26,7 +26,7 @@ dates = [(today + timedelta(days=i)).strftime('%Y-%m-%d') for i in range(7)]
 
 
 def matches_elite(p):
-    """Controlla se un pronostico matcha uno degli 8 pattern elite."""
+    """Controlla se un pronostico matcha uno dei 16 pattern elite."""
     tipo = p.get('tipo', '')
     quota = p.get('quota', 0) or 0
     confidence = p.get('confidence', 0) or 0
@@ -37,6 +37,8 @@ def matches_elite(p):
     # NO BET esclusi
     if pronostico == 'NO BET':
         return False
+
+    # === PATTERN ORIGINALI (1-8) ===
 
     # Pattern 1: SEGNO + quota 1.50-1.79 + stelle 3.0-3.5
     if tipo == 'SEGNO' and 1.50 <= quota < 1.80 and 3.0 <= stars < 3.5:
@@ -68,6 +70,40 @@ def matches_elite(p):
 
     # Pattern 8: GOL + source A+S + quota 1.30-1.49
     if tipo == 'GOL' and source == 'A+S' and 1.30 <= quota < 1.50:
+        return True
+
+    # === NUOVI PATTERN (9-16) — Scoperti 22/03/2026 ===
+
+    # Pattern 9: DOPPIA_CHANCE + quota 1.40-1.49 + confidence >= 60 (92.6%, N=27)
+    if tipo == 'DOPPIA_CHANCE' and 1.40 <= quota < 1.50 and confidence >= 60:
+        return True
+
+    # Pattern 10: Multigol 2-4 (88.2%, N=17)
+    if 'MG 2-4' in pronostico or 'Multigol 2-4' in pronostico:
+        return True
+
+    # Pattern 11: GOL + quota 1.30-1.39 + confidence >= 70 (86.4%, N=22)
+    if tipo == 'GOL' and 1.30 <= quota < 1.40 and confidence >= 70:
+        return True
+
+    # Pattern 12: DOPPIA_CHANCE + quota 1.40-1.49 + stelle >= 3.0 (85.3%, N=34)
+    if tipo == 'DOPPIA_CHANCE' and 1.40 <= quota < 1.50 and stars >= 3.0:
+        return True
+
+    # Pattern 13: GOL + quota 1.30-1.39 + source A+S (85.2%, N=27)
+    if tipo == 'GOL' and 1.30 <= quota < 1.40 and source == 'A+S':
+        return True
+
+    # Pattern 14: GOL + quota 1.50-1.59 + source C_screm (84.2%, N=19)
+    if tipo == 'GOL' and 1.50 <= quota < 1.60 and source == 'C_screm':
+        return True
+
+    # Pattern 15: SEGNO + quota 1.80-1.99 + confidence >= 70 (83.3%, N=18)
+    if tipo == 'SEGNO' and 1.80 <= quota < 2.00 and confidence >= 70:
+        return True
+
+    # Pattern 16: DOPPIA_CHANCE + quota 1.40-1.49 (81.2%, N=64)
+    if tipo == 'DOPPIA_CHANCE' and 1.40 <= quota < 1.50:
         return True
 
     return False
