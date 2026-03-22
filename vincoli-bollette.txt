@@ -1,0 +1,83 @@
+REPORT COMPLETO VINCOLI BOLLETTE
+=================================
+
+1. DISTRIBUZIONE BOLLETTE
+--------------------------
+Sezione      | N. bollette | Note
+-------------|-------------|-----
+Oggi         | 3           | Solo partite di oggi
+Elite        | Libero      | Min 70% selezioni elite
+Selettiva    | Max 5       |
+Bilanciata   | Max 5       |
+Ambiziosa    | Max 5       |
+
+
+2. SOGLIE QUOTA TOTALE
+-----------------------
+Sezione      | Min   | Max
+-------------|-------|--------
+Oggi         | —     | — (libera)
+Elite        | —     | 8.00
+Selettiva    | —     | 5.00
+Bilanciata   | 5.00  | 8.00
+Ambiziosa    | 8.00  | — (libera)
+
+
+3. NUMERO SELEZIONI PER BOLLETTA
+----------------------------------
+Sezione      | Min | Max | Diversificazione ideale
+-------------|-----|-----|------------------------
+Oggi         | 2   | 4   | 2, 3, 4
+Elite        | 3   | 5   | 3, 4, 5
+Selettiva    | 2   | 5   | 2, 3, 4, 5
+Bilanciata   | 2   | 7   | 3, 4, 5, 6
+Ambiziosa    | 4   | 8   | 4, 6, 8
+
+
+4. QUOTA MAX PER SINGOLA SELEZIONE
+------------------------------------
+
+SELETTIVA (tot max 5.00):
+N. selezioni | Quota max singola
+-------------|------------------
+2            | 2.20
+3            | 1.70
+4            | 1.50
+5            | 1.38
+
+BILANCIATA (tot 5.00-8.00):
+N. selezioni | Quota max singola
+-------------|------------------
+2            | 2.80
+3            | 2.00
+4            | 1.68
+5            | 1.52
+6            | 1.41
+7            | 1.35
+
+AMBIZIOSA (tot > 8.00):
+N. selezioni | Quota max singola
+-------------|------------------
+4            | 3.00
+5            | 2.50
+6            | 2.20
+7            | 2.00
+8            | 1.80
+
+ELITE (tot max 8.00):
+N. selezioni | Quota max singola
+-------------|------------------
+3            | 2.00
+4            | 1.68
+5            | 1.52
+
+OGGI: nessun vincolo su singola selezione.
+
+
+5. REGOLE EXTRA
+----------------
+- Ogni bolletta (tranne elite) deve avere almeno 1 partita di oggi
+- Elite: almeno 70% selezioni dal pool elite, 30% dal pool completo
+- Non ripetere la stessa selezione in tutte le bollette
+- Pool: partite di oggi, domani e dopodomani
+- Diversificare il numero di selezioni tra bollette della stessa categoria
