@@ -134,6 +134,12 @@ REGOLE COMPOSIZIONE
 8. Non creare bollette con una sola selezione — almeno 2 selezioni per bolletta (selettiva: 2-4, bilanciata: 2-7, ambiziosa: 2-10)
 9. Rispetta SEMPRE i limiti di quota per singola selezione indicati sopra. Se una selezione ha quota troppo alta per quella categoria, NON usarla in quella bolletta
 10. Per ogni bolletta, scrivi una breve motivazione (1 frase) che spiega la logica
+11. ⚠️ DIVERSIFICA IL NUMERO DI SELEZIONI — All'interno di ogni categoria, cerca di VARIARE il numero di selezioni tra le bollette, restando SEMPRE nei limiti della categoria.
+   - Selettiva: varia tra 2, 3 e 4 selezioni (ma ricorda: max 3.50 totale! Con 4 selezioni le quote singole devono essere basse)
+   - Bilanciata: varia tra 3, 4, 5 e 6 selezioni
+   - Ambiziosa: varia tra 4, 6 e 8 selezioni
+   - Elite: varia tra 3, 4 e 5 selezioni
+   ATTENZIONE: il vincolo sulla quota totale ha SEMPRE la priorità. Se per variare il numero di selezioni sfori la quota totale, riduci il numero di selezioni
 
 ═══════════════════════════════════════
 FORMATO OUTPUT — JSON ARRAY
