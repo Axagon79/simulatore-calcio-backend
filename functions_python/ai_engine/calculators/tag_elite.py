@@ -64,8 +64,8 @@ def matches_elite(p):
     if tipo == 'SEGNO' and confidence >= 80:
         return True
 
-    # Pattern 7: DOPPIA_CHANCE + source C_combo96 + quota 1.30-1.49
-    if tipo == 'DOPPIA_CHANCE' and source == 'C_combo96' and 1.30 <= quota < 1.50:
+    # Pattern 7: DOPPIA_CHANCE + quota 1.30-1.49 + confidence 60-69 (80.6%, N=31)
+    if tipo == 'DOPPIA_CHANCE' and 1.30 <= quota < 1.50 and 60 <= confidence < 70:
         return True
 
     # Pattern 8: GOL + source A+S + quota 1.30-1.49
@@ -98,12 +98,12 @@ def matches_elite(p):
     if tipo == 'GOL' and 1.50 <= quota < 1.60 and source == 'C_screm':
         return True
 
-    # Pattern 15: SEGNO + quota 1.80-1.99 + confidence >= 70 (83.3%, N=18)
-    if tipo == 'SEGNO' and 1.80 <= quota < 2.00 and confidence >= 70:
+    # Pattern 15: SEGNO + quota 1.80-1.99 + confidence >= 80 (100%, N=8)
+    if tipo == 'SEGNO' and 1.80 <= quota < 2.00 and confidence >= 80:
         return True
 
-    # Pattern 16: DOPPIA_CHANCE + quota 1.40-1.49 (81.2%, N=64)
-    if tipo == 'DOPPIA_CHANCE' and 1.40 <= quota < 1.50:
+    # Pattern 16: DOPPIA_CHANCE + quota 1.30-1.49 + confidence 70-79 (81.8%, N=11)
+    if tipo == 'DOPPIA_CHANCE' and 1.30 <= quota < 1.50 and 70 <= confidence < 80:
         return True
 
     return False
