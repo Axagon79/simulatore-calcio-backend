@@ -530,7 +530,7 @@ REGOLE:
 - Nel campo "reasoning" spiega SEMPRE perché hai scelto quelle partite e quei mercati specifici — l'utente vuole capire la logica. MAI inserire avvisi ⚠️ o warning nel reasoning
 - Per le quote, usa quelle dalla sezione PARTITE DISPONIBILI CON QUOTE
 - Se non hai la quota per un pronostico, chiedi all'utente di fornirtela. Se te la dà, usala
-- Ogni partita può apparire UNA SOLA VOLTA nella bolletta
+- Ogni partita può apparire UNA SOLA VOLTA nella bolletta — MAI mettere due mercati diversi sulla stessa partita (es. Under 2.5 + DC X2 sulla stessa partita è VIETATO). Se vuoi più selezioni, usa PARTITE DIVERSE
 - La quota totale = prodotto di tutte le quote
 - Per selezioni fuori dai pronostici AI, aggiungi "from_pool": false
 
@@ -707,6 +707,122 @@ match_key deve essere nel formato "Home vs Away|YYYY-MM-DD" delle partite dispon
     quotaRicalcolata = Math.round(quotaRicalcolata * 100) / 100;
     selezioni.splice(0, selezioni.length, ...selezioniFiltrate);
     quotaTotale = quotaRicalcolata;
+
+    // Check partite duplicate: stessa partita non può apparire 2+ volte
+    const matchKeysSet = new Set();
+    const duplicati = [];
+    for (const s of selezioni) {
+      const mk = `${s.home}|${s.away}|${s.match_date}`;
+      if (matchKeysSet.has(mk)) {
+        duplicati.push(`${s.home} vs ${s.away} (${s.match_date})`);
+      } else {
+        matchKeysSet.add(mk);
+      }
+    }
+    if (duplicati.length > 0) {
+      // Retry: manda feedback a Mistral per correggere
+      const feedbackMsg = `ERRORE: hai messo due pronostici diversi sulla stessa partita nella bolletta. `
+        + `Partite duplicate: ${duplicati.join(', ')}. `
+        + `REGOLA: ogni partita può apparire UNA SOLA VOLTA. Sostituisci le selezioni duplicate con partite DIVERSE. `
+        + `Rispondi con la bolletta corretta in JSON.`;
+
+      try {
+        const retryResp = await fetch(MISTRAL_URL, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${MISTRAL_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: MISTRAL_MODEL,
+            messages: [
+              { role: 'system', content: systemPrompt },
+              ...(history || []).map(h => ({ role: h.role, content: h.content })),
+              { role: 'user', content: message },
+              { role: 'assistant', content: content },
+              { role: 'user', content: feedbackMsg },
+            ],
+            temperature: 0.3,
+            max_tokens: 4000,
+          }),
+        });
+
+        if (retryResp.ok) {
+          const retryData = await retryResp.json();
+          let retryContent = (retryData.choices?.[0]?.message?.content || '').trim();
+          if (retryContent.startsWith('```')) {
+            retryContent = retryContent.replace(/^```(?:json)?\s*/, '').replace(/\s*```$/, '');
+          }
+          try {
+            const retryGenerated = JSON.parse(retryContent);
+            if (retryGenerated.type === 'bolletta' && retryGenerated.selezioni) {
+              // Riprocessa le selezioni dal retry
+              const retrySelezioni = [];
+              let retryQuota = 1.0;
+              for (const sel of retryGenerated.selezioni) {
+                const key = `${sel.match_key}|${sel.mercato}|${sel.pronostico}`;
+                const entry = poolIndex[key];
+                if (entry) {
+                  retryQuota *= entry.quota;
+                  retrySelezioni.push({
+                    home: entry.home, away: entry.away, league: entry.league,
+                    match_time: entry.match_time, match_date: entry.match_date,
+                    mercato: entry.mercato, pronostico: entry.pronostico,
+                    quota: entry.quota, confidence: entry.confidence, stars: entry.stars,
+                    esito: null, from_pool: true,
+                  });
+                } else {
+                  const match = matchIndex[sel.match_key];
+                  const quota = sel.quota || 0;
+                  if ((!match && !sel.quota) || quota <= 0) continue;
+                  retryQuota *= quota;
+                  retrySelezioni.push({
+                    home: match?.home || sel.match_key.split(' vs ')[0]?.split('|')[0] || '',
+                    away: match?.away || sel.match_key.split(' vs ')[1]?.split('|')[0] || '',
+                    league: match?.league || '',
+                    match_time: match?.match_time || '',
+                    match_date: match?.match_date || sel.match_key.split('|')[1] || '',
+                    mercato: sel.mercato, pronostico: sel.pronostico,
+                    quota, confidence: 0, stars: 0,
+                    esito: null, from_pool: false,
+                  });
+                }
+              }
+              if (retrySelezioni.length >= 1) {
+                // Verifica che il retry non abbia ancora duplicati
+                const retryKeys = new Set();
+                let stillDup = false;
+                for (const s of retrySelezioni) {
+                  const mk = `${s.home}|${s.away}|${s.match_date}`;
+                  if (retryKeys.has(mk)) { stillDup = true; break; }
+                  retryKeys.add(mk);
+                }
+                if (!stillDup) {
+                  selezioni.splice(0, selezioni.length, ...retrySelezioni);
+                  quotaTotale = Math.round(retryQuota * 100) / 100;
+                  generated.reasoning = retryGenerated.reasoning || generated.reasoning;
+                }
+              }
+            }
+          } catch (_) { /* retry JSON parse failed, prosegui con fallback */ }
+        }
+      } catch (err) {
+        console.error('Errore retry partita duplicata:', err);
+      }
+
+      // Fallback: se dopo il retry ci sono ancora duplicati, rimuovi manualmente
+      const finalKeys = new Set();
+      const finalSelezioni = [];
+      for (const s of selezioni) {
+        const mk = `${s.home}|${s.away}|${s.match_date}`;
+        if (!finalKeys.has(mk)) {
+          finalKeys.add(mk);
+          finalSelezioni.push(s);
+        }
+      }
+      selezioni.splice(0, selezioni.length, ...finalSelezioni);
+      quotaTotale = Math.round(selezioni.reduce((acc, s) => acc * s.quota, 1.0) * 100) / 100;
+    }
 
     // Rispetta quota massima dichiarata dall'utente
     const quotaMatch = message.match(/quota\s+(?:massim[ao]|max)\s+(\d+(?:[.,]\d+)?)/i);
