@@ -20,9 +20,47 @@ debug_snai_sidebar.html
 temp_*.py
 temp_*.png
 _output*.txt
+_clear_premium_cache.py
+_match_missing_aliases.py
 
 # Cache data
 cache/
+
+# Engine runtime data
+ai_engine/engine/last_match_data.json
+
+# Reports (riproducibili dalla pipeline)
+ai_engine/reports/feedback_report_*.json
+ai_engine/reports/feedback_report_*.txt
+ai_engine/reports/weekly/
+
+# Benchmark output
+ai_engine/benchmark_output/
+
+# Snapshot reports
+snapshot-pronostici/report/
+
+# Test/dryrun scripts
+test_*_dryrun.py
+analisi_*.py
+backtest_*.py
+
+# Watchdog/heartbeat
+ai_engine/Aggiornamenti/frequenti/heartbeat_live_scores.txt
+ai_engine/Aggiornamenti/frequenti/watchdog_log.txt
+*.bat
+
+# Temp function files
+functions/tmp_*.js
+functions_python/ai_engine/tmp_*.py
+functions_python/ai_engine/calculators/pre_match_update.log
+
+# Misc
+cors.json
+yarn.lock
+*.jpg
+*.png
+!public/**/*.png
 
 # MC Tuning reports (riproducibili)
 functions_python/ai_engine/tools/results/report_*.json
