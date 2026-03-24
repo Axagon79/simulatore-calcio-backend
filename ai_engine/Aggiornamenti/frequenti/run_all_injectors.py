@@ -78,13 +78,13 @@ def run_all():
         except Exception as e:
             print(f"❌ ERRORE CRITICO FASE 3: {e}")
 
-        # --- FASE 4: FORMAZIONI SERIE C (Sportradar) ---
-        print("\n🔹 [4/4] Formazioni Serie C (Sportradar)...")
+        # --- FASE 4: FORMAZIONI NO-FBREF (Serie C + Liga Portugal 2 + 1. Lig) ---
+        print("\n🔹 [4/4] Formazioni No-FBref (Sportradar)...")
         try:
             from scrape_sportradar_serie_c import scrape_all_teams, inject_formations
             scrape_all_teams()
             inject_formations()
-            print("✅ Fase 4 (Serie C Sportradar) completata.")
+            print("✅ Fase 4 (No-FBref Sportradar) completata.")
         except ImportError:
             print("⚠️ Modulo 'scrape_sportradar_serie_c' non trovato (saltato).")
         except Exception as e:

@@ -1,7 +1,8 @@
 """
-SCRAPER FORMAZIONI SERIE C — Sportradar + Injector h2h_by_round
+SCRAPER FORMAZIONI NO-FBREF — Sportradar + Injector h2h_by_round
 ================================================================
-1. Scarica rose di tutte le 59 squadre Serie C da Sportradar
+Leghe coperte: Serie C (3 gironi), Liga Portugal 2, 1. Lig (Turchia)
+1. Scarica rose da Sportradar per tutte le squadre senza copertura FBref
 2. Genera titolari/panchinari con algoritmo basato su minuti
 3. Inietta formazioni in h2h_by_round (stesso formato FBRef)
 
@@ -44,12 +45,14 @@ FORMATION_MAPPING = {
 }
 
 # ============================================================
-# TEAM IDS — Tutti i 3 gironi Serie C
+# TEAM IDS — Serie C (3 gironi) + Liga Portugal 2 + 1. Lig
 # ============================================================
 
 GIRONI = {
+    # --- SERIE C ---
     "A": {
         "season_id": 133200,
+        "league": "Serie C - Girone A",
         "teams": {
             "ALBINOLEFFE": 2732, "Alcione Milano": 834514, "Arzignano V.": 170634,
             "CITTADELLA": 2717, "Dolomiti Bellunesi": 834506, "FERALPISALO": 37173,
@@ -62,6 +65,7 @@ GIRONI = {
     },
     "B": {
         "season_id": 133202,
+        "league": "Serie C - Girone B",
         "teams": {
             "AREZZO": 2731, "ASCOLI": 2707, "Bra": 111883,
             "Campobasso": 43858, "Carpi": 834548, "Forlì FC": 2783,
@@ -74,6 +78,7 @@ GIRONI = {
     },
     "C": {
         "season_id": 133204,
+        "league": "Serie C - Girone C",
         "teams": {
             "AZ Picerno": 223518, "Atalanta U23": 1037333, "Audace Cerignola": 368732,
             "BENEVENTO": 2759, "CASERTANA": 53857, "COSENZA": 2716,
@@ -83,7 +88,34 @@ GIRONI = {
             "SALERNITANA": 2710, "SIRACUSA": 37177, "Sorrento": 7937,
             "TRAPANI": 43686, "Team Altamura": 368724,
         }
-    }
+    },
+    # --- LIGA PORTUGAL 2 ---
+    "LP2": {
+        "season_id": 132184,
+        "league": "Liga Portugal 2",
+        "teams": {
+            "Maritimo": 3007, "Viseu": 3022, "Torreense": 25787,
+            "Vizela": 5136, "Leiria": 3000, "Sporting Lisbona B": 74467,
+            "Porto B": 74469, "Lourosa": 35174, "Benfica B": 74465,
+            "Chaves": 3025, "Feirense": 4501, "Leixoes": 3018,
+            "Felgueiras": 3030, "Pacos Ferreira": 3003, "Penafiel": 3017,
+            "Farense": 2998, "Portimonense": 3026, "Oliveirense": 21831,
+        }
+    },
+    # --- 1. LIG (Turchia) ---
+    "TR2": {
+        "season_id": 132288,
+        "league": "1. Lig",
+        "teams": {
+            "Erzurum": 55603, "Amed": 225940, "Esenler": 365676,
+            "Corum": 77629, "Bodrumspor": 216876, "Pendik": 7032,
+            "Bandirmaspor": 44320, "Keciorengucu": 6366, "Sivasspor": 3076,
+            "Igdir": 3088, "Van": 24750, "Manisa": 216878,
+            "Bolu": 6414, "Umraniye": 55625, "Sariyer": 4952,
+            "Istanbulspor": 3066, "Serik": 498470, "Sakaryaspor": 3080,
+            "Hatayspor": 3091, "Adana": 3101,
+        }
+    },
 }
 
 # Mapping nomi Sportradar → nomi nel DB teams
@@ -122,6 +154,31 @@ NOME_OVERRIDE = {
     "SIRACUSA": "Siracusa",
     "TRAPANI": "Trapani",
     "Team Altamura": "Altamura",
+    # --- Liga Portugal 2 ---
+    "Maritimo": "Maritimo",
+    "Viseu": "Academico Viseu",
+    "Sporting Lisbona B": "Sporting B",
+    "Porto B": "FC Porto B",
+    "Lourosa": "Lus. Lourosa",
+    "Benfica B": "Benfica B",
+    "Pacos Ferreira": "Pacos Ferreira",
+    # --- 1. Lig ---
+    "Erzurum": "Erzurumspor FK",
+    "Amed": "Amed SK",
+    "Esenler": "E. Erokspor",
+    "Corum": "Corum FK",
+    "Bodrumspor": "Bodrum FK",
+    "Pendik": "Pendikspor",
+    "Bandirmaspor": "Bandirma Spor",
+    "Keciorengucu": "A. Keciörengücü",
+    "Igdir": "Igdir FK",
+    "Van": "Van Spor FK",
+    "Manisa": "Manisa FK",
+    "Bolu": "Boluspor",
+    "Umraniye": "Ümraniyespor",
+    "Sariyer": "Sariyerspor",
+    "Serik": "Serik Spor",
+    "Adana": "Adana Demirspor",
 }
 
 
@@ -130,7 +187,7 @@ NOME_OVERRIDE = {
 # ============================================================
 
 def scrape_all_teams(test_mode=False):
-    """Scarica rose da Sportradar per tutte le 59 squadre Serie C"""
+    """Scarica rose da Sportradar per tutte le squadre senza FBref (Serie C, Liga Portugal 2, 1. Lig)"""
     import undetected_chromedriver as uc
     from selenium.webdriver.common.by import By
 
@@ -139,7 +196,7 @@ def scrape_all_teams(test_mode=False):
     options.add_argument("--start-maximized")
 
     print("=" * 70)
-    print("SCRAPER SPORTRADAR — ROSE SERIE C")
+    print("SCRAPER SPORTRADAR — ROSE NO-FBREF (Serie C + LP2 + 1. Lig)")
     print("=" * 70)
 
     print("\nAvvio Chrome...")
