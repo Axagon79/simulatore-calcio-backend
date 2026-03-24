@@ -52,6 +52,7 @@ LEAGUES = [
     
     # 🆕 EUROPA SERIE B
     {"name": "Championship", "url": "https://www.betexplorer.com/football/england/championship/results/"},
+    {"name": "League One", "url": "https://www.betexplorer.com/football/england/league-one/results/"},
     {"name": "LaLiga 2", "url": "https://www.betexplorer.com/football/spain/laliga2/results/"},
     {"name": "2. Bundesliga", "url": "https://www.betexplorer.com/football/germany/2-bundesliga/results/"},
     {"name": "Ligue 2", "url": "https://www.betexplorer.com/football/france/ligue-2/results/"},
@@ -71,7 +72,18 @@ LEAGUES = [
     {"name": "Major League Soccer", "url": "https://www.betexplorer.com/football/usa/mls/results/"},
     
     # 🆕 ASIA
-    {"name": "J1 League", "url": "https://www.betexplorer.com/football/japan/j1-league/results/"}
+    {"name": "J1 League", "url": "https://www.betexplorer.com/football/japan/j1-league/results/"},
+
+    # NUOVI CAMPIONATI (24/03/2026)
+    {"name": "League Two", "url": "https://www.betexplorer.com/football/england/league-two/results/"},
+    {"name": "Veikkausliiga", "url": "https://www.betexplorer.com/football/finland/veikkausliiga/results/"},
+    {"name": "3. Liga", "url": "https://www.betexplorer.com/football/germany/3-liga/results/"},
+    {"name": "Liga MX", "url": "https://www.betexplorer.com/football/mexico/liga-mx/results/"},
+    {"name": "Eerste Divisie", "url": "https://www.betexplorer.com/football/netherlands/eerste-divisie/results/"},
+    {"name": "Liga Portugal 2", "url": "https://www.betexplorer.com/football/portugal/liga-portugal-2/results/"},
+    {"name": "1. Lig", "url": "https://www.betexplorer.com/football/turkey/1-lig/results/"},
+    {"name": "Saudi Pro League", "url": "https://www.betexplorer.com/football/saudi-arabia/saudi-professional-league/results/"},
+    {"name": "Scottish Championship", "url": "https://www.betexplorer.com/football/scotland/championship/results/"},
 ]
 
 def clean_float(txt):

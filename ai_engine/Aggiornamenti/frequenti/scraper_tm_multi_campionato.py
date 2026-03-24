@@ -145,6 +145,12 @@ COMPETITIONS = [
         "base_domain": BASE_DOMAIN_COM,
     },
     {
+        "name": "League One", "league_code": "GB3",
+        "startseite_url": "https://www.transfermarkt.com/league-one/startseite/wettbewerb/GB3",
+        "table_url": "https://www.transfermarkt.com/league-one/tabelle/wettbewerb/GB3/saison_id/2025",
+        "base_domain": BASE_DOMAIN_COM,
+    },
+    {
         "name": "LaLiga 2", "league_code": "ES2",
         "startseite_url": "https://www.transfermarkt.com/laliga2/startseite/wettbewerb/ES2",
         "table_url": "https://www.transfermarkt.com/laliga2/tabelle/wettbewerb/ES2/saison_id/2025",
@@ -232,6 +238,62 @@ COMPETITIONS = [
         "name": "J1 League", "league_code": "JAP1",
         "startseite_url": "https://www.transfermarkt.com/j1-league/startseite/wettbewerb/JAP1",
         "table_url": "https://www.transfermarkt.com/j1-league/tabelle/wettbewerb/JAP1/saison_id/2025",
+        "base_domain": BASE_DOMAIN_COM,
+    },
+
+    # NUOVI CAMPIONATI (24/03/2026)
+    {
+        "name": "League Two", "league_code": "GB4",
+        "startseite_url": "https://www.transfermarkt.com/league-two/startseite/wettbewerb/GB4",
+        "table_url": "https://www.transfermarkt.com/league-two/tabelle/wettbewerb/GB4/saison_id/2025",
+        "base_domain": BASE_DOMAIN_COM,
+    },
+    {
+        "name": "Veikkausliiga", "league_code": "FI1",
+        "startseite_url": "https://www.transfermarkt.com/veikkausliiga/startseite/wettbewerb/FI1",
+        "table_url": "https://www.transfermarkt.com/veikkausliiga/tabelle/wettbewerb/FI1/saison_id/2025",
+        "base_domain": BASE_DOMAIN_COM,
+    },
+    {
+        "name": "3. Liga", "league_code": "L3",
+        "startseite_url": "https://www.transfermarkt.com/3-liga/startseite/wettbewerb/L3",
+        "table_url": "https://www.transfermarkt.com/3-liga/tabelle/wettbewerb/L3/saison_id/2025",
+        "base_domain": BASE_DOMAIN_COM,
+    },
+    {
+        "name": "Liga MX", "league_code": "MEX1",
+        "startseite_url": "https://www.transfermarkt.com/liga-mx/startseite/wettbewerb/MEX1",
+        "table_url": "https://www.transfermarkt.com/liga-mx/tabelle/wettbewerb/MEX1/saison_id/2025",
+        "base_domain": BASE_DOMAIN_COM,
+    },
+    {
+        "name": "Eerste Divisie", "league_code": "NL2",
+        "startseite_url": "https://www.transfermarkt.com/eerste-divisie/startseite/wettbewerb/NL2",
+        "table_url": "https://www.transfermarkt.com/eerste-divisie/tabelle/wettbewerb/NL2/saison_id/2025",
+        "base_domain": BASE_DOMAIN_COM,
+    },
+    {
+        "name": "Liga Portugal 2", "league_code": "PO2",
+        "startseite_url": "https://www.transfermarkt.com/liga-portugal-2/startseite/wettbewerb/PO2",
+        "table_url": "https://www.transfermarkt.com/liga-portugal-2/tabelle/wettbewerb/PO2/saison_id/2025",
+        "base_domain": BASE_DOMAIN_COM,
+    },
+    {
+        "name": "1. Lig", "league_code": "TR2",
+        "startseite_url": "https://www.transfermarkt.com/1-lig/startseite/wettbewerb/TR2",
+        "table_url": "https://www.transfermarkt.com/1-lig/tabelle/wettbewerb/TR2/saison_id/2025",
+        "base_domain": BASE_DOMAIN_COM,
+    },
+    {
+        "name": "Saudi Pro League", "league_code": "SA1",
+        "startseite_url": "https://www.transfermarkt.com/saudi-pro-league/startseite/wettbewerb/SA1",
+        "table_url": "https://www.transfermarkt.com/saudi-pro-league/tabelle/wettbewerb/SA1/saison_id/2025",
+        "base_domain": BASE_DOMAIN_COM,
+    },
+    {
+        "name": "Scottish Championship", "league_code": "SC2",
+        "startseite_url": "https://www.transfermarkt.com/scottish-championship/startseite/wettbewerb/SC2",
+        "table_url": "https://www.transfermarkt.com/scottish-championship/tabelle/wettbewerb/SC2/saison_id/2025",
         "base_domain": BASE_DOMAIN_COM,
     },
 ]

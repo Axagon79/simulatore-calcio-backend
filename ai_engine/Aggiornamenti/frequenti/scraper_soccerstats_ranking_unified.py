@@ -51,6 +51,7 @@ SOCCERSTATS_LEAGUES = [
 
     # EUROPA SERIE B
     {"name": "Championship", "url": "https://www.soccerstats.com/widetable.asp?league=england2"},
+    {"name": "League One", "url": "https://www.soccerstats.com/widetable.asp?league=england3"},
     {"name": "LaLiga 2", "url": "https://www.soccerstats.com/widetable.asp?league=spain2"},
     {"name": "2. Bundesliga", "url": "https://www.soccerstats.com/widetable.asp?league=germany2"},
     {"name": "Ligue 2", "url": "https://www.soccerstats.com/widetable.asp?league=france2"},
@@ -70,7 +71,18 @@ SOCCERSTATS_LEAGUES = [
     {"name": "Major League Soccer", "url": "https://www.soccerstats.com/widetable.asp?league=usa"},
 
     # ASIA
-    {"name": "J1 League", "url": "https://www.soccerstats.com/widetable.asp?league=japan"}
+    {"name": "J1 League", "url": "https://www.soccerstats.com/widetable.asp?league=japan"},
+
+    # NUOVI CAMPIONATI (24/03/2026)
+    {"name": "League Two", "url": "https://www.soccerstats.com/widetable.asp?league=england4"},
+    {"name": "Veikkausliiga", "url": "https://www.soccerstats.com/widetable.asp?league=finland"},
+    {"name": "3. Liga", "url": "https://www.soccerstats.com/widetable.asp?league=germany3"},
+    {"name": "Liga MX", "url": "https://www.soccerstats.com/widetable.asp?league=mexico"},
+    {"name": "Eerste Divisie", "url": "https://www.soccerstats.com/widetable.asp?league=netherlands2"},
+    {"name": "Liga Portugal 2", "url": "https://www.soccerstats.com/widetable.asp?league=portugal2"},
+    {"name": "1. Lig", "url": "https://www.soccerstats.com/widetable.asp?league=turkey2"},
+    {"name": "Saudi Pro League", "url": "https://www.soccerstats.com/widetable.asp?league=saudiarabia"},
+    {"name": "Scottish Championship", "url": "https://www.soccerstats.com/widetable.asp?league=scotland2"},
 ]
 
 def to_int(val):

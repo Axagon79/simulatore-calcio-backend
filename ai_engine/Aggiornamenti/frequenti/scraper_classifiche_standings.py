@@ -70,6 +70,7 @@ COMPETITIONS = [
     {"name": "Eredivisie", "country": "Netherlands", "standings_url": "https://football.nowgoal26.com/subleastanding/2025-2026/16/98", "dual_tables": False},
     {"name": "Liga Portugal", "country": "Portugal", "standings_url": "https://football.nowgoal26.com/subleastanding/2025-2026/23/1123", "dual_tables": False},
     {"name": "Championship", "country": "England", "standings_url": "https://football.nowgoal26.com/subleastanding/2025-2026/37/87", "dual_tables": False},
+    {"name": "League One", "country": "England", "standings_url": "https://football.nowgoal26.com/leastanding/39", "dual_tables": False},
     {"name": "LaLiga 2", "country": "Spain", "standings_url": "https://football.nowgoal26.com/subleastanding/2025-2026/33/546", "dual_tables": False},
     {"name": "2. Bundesliga", "country": "Germany", "standings_url": "https://football.nowgoal26.com/subleastanding/2025-2026/9/132", "dual_tables": False},
     {"name": "Ligue 2", "country": "France", "standings_url": "https://football.nowgoal26.com/subleastanding/2025-2026/12/1778", "dual_tables": False},
@@ -84,6 +85,17 @@ COMPETITIONS = [
     {"name": "Primera División", "country": "Argentina", "standings_url": "https://football.nowgoal26.com/subleastanding/2026/2/1232", "dual_tables": True},
     {"name": "Major League Soccer", "country": "USA", "standings_url": "https://football.nowgoal26.com/subleastanding/2026/21/165", "dual_tables": True},
     {"name": "J1 League", "country": "Japan", "standings_url": "https://football.nowgoal26.com/subleastanding/2026/25/3540", "dual_tables": False},
+
+    # NUOVI CAMPIONATI (24/03/2026)
+    {"name": "League Two", "country": "England", "standings_url": "https://football.nowgoal26.com/leastanding/35", "dual_tables": False},
+    {"name": "Veikkausliiga", "country": "Finland", "standings_url": "https://football.nowgoal26.com/subleastanding/2026/13/0", "dual_tables": False},
+    {"name": "3. Liga", "country": "Germany", "standings_url": "https://football.nowgoal26.com/leastanding/693", "dual_tables": False},
+    {"name": "Liga MX", "country": "Mexico", "standings_url": "https://football.nowgoal26.com/subleastanding/2025-2026/140/0", "dual_tables": False},
+    {"name": "Eerste Divisie", "country": "Netherlands", "standings_url": "https://football.nowgoal26.com/subleastanding/2025-2026/17/0", "dual_tables": False},
+    {"name": "Liga Portugal 2", "country": "Portugal", "standings_url": "https://football.nowgoal26.com/subleastanding/2025-2026/157/0", "dual_tables": False},
+    {"name": "1. Lig", "country": "Turkey", "standings_url": "https://football.nowgoal26.com/subleastanding/2025-2026/130/0", "dual_tables": False},
+    {"name": "Saudi Pro League", "country": "Saudi Arabia", "standings_url": "https://football.nowgoal26.com/subleastanding/2025-2026/292/0", "dual_tables": False},
+    {"name": "Scottish Championship", "country": "Scotland", "standings_url": "https://football.nowgoal26.com/subleastanding/2025-2026/150/0", "dual_tables": False},
 ]
 
 

@@ -281,8 +281,9 @@ def calculate_team_rating(team_name, verbose=True, bulk_cache=None):
     
     formation_str = team.get("formation", DEFAULT_FORMATION)
     league = team.get("league", "N/A")
-            # ⭐ SERIE C SPECIALE
-    if "Serie C" in league:
+            # ⭐ LEGHE SENZA FBREF (Serie C, Liga Portugal 2, 1. Lig)
+    NO_FBREF_LEAGUES = ["Serie C", "Liga Portugal 2", "1. Lig"]
+    if any(nl in league for nl in NO_FBREF_LEAGUES):
         strength_09 = team.get("stats", {}).get("strengthScore09", 5.0)
 
         rating_0_10 = strength_09 * 0.9

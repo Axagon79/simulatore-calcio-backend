@@ -30,6 +30,7 @@ def get_all_data_bulk(home_team, away_team, league_name, preloaded_rounds=None):
         
         # EUROPA SERIE B
         "Championship": "Championship",
+        "League One": "League One",
         "Laliga 2": "LaLiga 2",
         "2. Bundesliga": "2. Bundesliga",
         "Ligue 2": "Ligue 2",
@@ -51,7 +52,19 @@ def get_all_data_bulk(home_team, away_team, league_name, preloaded_rounds=None):
         "Mls": "Major League Soccer",
         
         # ASIA
-        "J1 League": "J1 League"
+        "J1 League": "J1 League",
+
+        # NUOVI CAMPIONATI (24/03/2026)
+        "League Two": "League Two",
+        "Veikkausliiga": "Veikkausliiga",
+        "3. Liga": "3. Liga",
+        "Liga Mx": "Liga MX",
+        "Liga MX": "Liga MX",
+        "Eerste Divisie": "Eerste Divisie",
+        "Liga Portugal 2": "Liga Portugal 2",
+        "1. Lig": "1. Lig",
+        "Saudi Pro League": "Saudi Pro League",
+        "Scottish Championship": "Scottish Championship",
     }
     league_normalized = league_map.get(league_normalized, league_normalized)
     

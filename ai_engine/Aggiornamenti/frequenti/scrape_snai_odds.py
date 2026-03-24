@@ -58,6 +58,7 @@ LEAGUES_CONFIG = [
 
     # EUROPA SERIE B (4)
     {"name": "Championship", "url": "https://www.snai.it/sport/CALCIO/CHAMPIONSHIP", "sidebar": "INGHILTERRA"},
+    {"name": "League One", "url": "https://www.snai.it/sport/CALCIO/INGHILTERRA%203", "sidebar": "INGHILTERRA"},
     {"name": "LaLiga 2", "url": "https://www.snai.it/sport/CALCIO/SPAGNA%202", "sidebar": "SPAGNA"},
     {"name": "2. Bundesliga", "url": "https://www.snai.it/sport/CALCIO/GERMANIA%202", "sidebar": "GERMANIA"},
     {"name": "Ligue 2", "url": "https://www.snai.it/sport/CALCIO/FRANCIA%202", "sidebar": "FRANCIA"},
@@ -78,6 +79,17 @@ LEAGUES_CONFIG = [
 
     # ASIA (1)
     {"name": "J1 League", "url": "https://www.snai.it/sport/CALCIO/GIAPPONE%201", "sidebar": "GIAPPONE"},
+
+    # NUOVI CAMPIONATI (24/03/2026)
+    {"name": "League Two", "url": "https://www.snai.it/sport/CALCIO/INGHILTERRA%204", "sidebar": "INGHILTERRA"},
+    {"name": "Veikkausliiga", "url": "https://www.snai.it/sport/CALCIO/FINLANDIA%201", "sidebar": "FINLANDIA"},
+    {"name": "3. Liga", "url": "https://www.snai.it/sport/CALCIO/GERMANIA%203", "sidebar": "GERMANIA"},
+    {"name": "Liga MX", "url": "https://www.snai.it/sport/CALCIO/MESSICO%201", "sidebar": "MESSICO"},
+    {"name": "Eerste Divisie", "url": "https://www.snai.it/sport/CALCIO/OLANDA%202", "sidebar": "OLANDA"},
+    {"name": "Liga Portugal 2", "url": "https://www.snai.it/sport/CALCIO/PORTOGALLO%202", "sidebar": "PORTOGALLO"},
+    {"name": "1. Lig", "url": "https://www.snai.it/sport/CALCIO/TURCHIA%202", "sidebar": "TURCHIA"},
+    {"name": "Saudi Pro League", "url": "https://www.snai.it/sport/CALCIO/ARABIA%20SAUDITA%201", "sidebar": "ARABIA SAUDITA"},
+    {"name": "Scottish Championship", "url": "https://www.snai.it/sport/CALCIO/SCOZIA%202", "sidebar": "SCOZIA"},
 
     # COPPE EUROPEE (2) — scrivono in matches_champions_league / matches_europa_league
     # sidebar "EUROPA" = la categoria sotto cui SNAI raggruppa le coppe

@@ -88,9 +88,14 @@ LEAGUES_CONFIG = [
     
     # 🆕 EUROPA SERIE B
     {
-        "name": "Championship", 
+        "name": "Championship",
         "fixtures": "https://fbref.com/en/comps/10/schedule/Championship-Scores-and-Fixtures",
         "stats": "https://fbref.com/en/comps/10/Championship-Stats"
+    },
+    {
+        "name": "League One",
+        "fixtures": "https://fbref.com/en/comps/15/schedule/League-One-Scores-and-Fixtures",
+        "stats": "https://fbref.com/en/comps/15/League-One-Stats"
     },
     {
         "name": "LaLiga 2", 
@@ -167,7 +172,45 @@ LEAGUES_CONFIG = [
         "name": "J1 League", 
         "fixtures": "https://fbref.com/en/comps/25/schedule/J1-League-Scores-and-Fixtures",
         "stats": "https://fbref.com/en/comps/25/J1-League-Stats"
-    }
+    },
+
+    # NUOVI CAMPIONATI (24/03/2026)
+    {
+        "name": "League Two",
+        "fixtures": "https://fbref.com/en/comps/16/schedule/League-Two-Scores-and-Fixtures",
+        "stats": "https://fbref.com/en/comps/16/League-Two-Stats"
+    },
+    {
+        "name": "Veikkausliiga",
+        "fixtures": "https://fbref.com/en/comps/43/schedule/Veikkausliiga-Scores-and-Fixtures",
+        "stats": "https://fbref.com/en/comps/43/Veikkausliiga-Stats"
+    },
+    {
+        "name": "3. Liga",
+        "fixtures": "https://fbref.com/en/comps/59/schedule/3-Liga-Scores-and-Fixtures",
+        "stats": "https://fbref.com/en/comps/59/3-Liga-Stats"
+    },
+    {
+        "name": "Liga MX",
+        "fixtures": "https://fbref.com/en/comps/31/schedule/Liga-MX-Scores-and-Fixtures",
+        "stats": "https://fbref.com/en/comps/31/Liga-MX-Stats"
+    },
+    {
+        "name": "Eerste Divisie",
+        "fixtures": "https://fbref.com/en/comps/51/schedule/Eerste-Divisie-Scores-and-Fixtures",
+        "stats": "https://fbref.com/en/comps/51/Eerste-Divisie-Stats"
+    },
+    # Liga Portugal 2 e 1. Lig NON presenti su FBref
+    {
+        "name": "Saudi Pro League",
+        "fixtures": "https://fbref.com/en/comps/70/schedule/Saudi-Pro-League-Scores-and-Fixtures",
+        "stats": "https://fbref.com/en/comps/70/Saudi-Pro-League-Stats"
+    },
+    {
+        "name": "Scottish Championship",
+        "fixtures": "https://fbref.com/en/comps/72/schedule/Scottish-Championship-Scores-and-Fixtures",
+        "stats": "https://fbref.com/en/comps/72/Scottish-Championship-Stats"
+    },
 ]
 
 def create_scraper():

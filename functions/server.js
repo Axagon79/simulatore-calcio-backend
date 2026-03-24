@@ -89,12 +89,53 @@ app.get('/api/leagues', (req, res) => {
       { id: 'SERIE_C_B', name: 'Serie C - Girone B' },
       { id: 'SERIE_C_C', name: 'Serie C - Girone C' }
     ],
-    'England': [{ id: 'PREMIER_LEAGUE', name: 'Premier League' }],
-    'Spain': [{ id: 'LA_LIGA', name: 'La Liga' }],
-    'Germany': [{ id: 'BUNDESLIGA', name: 'Bundesliga' }],
-    'France': [{ id: 'LIGUE_1', name: 'Ligue 1' }],
-    'Netherlands': [{ id: 'EREDIVISIE', name: 'Eredivisie' }],
-    'Portugal': [{ id: 'LIGA_PORTUGAL', name: 'Liga Portugal' }]
+    'England': [
+      { id: 'PREMIER_LEAGUE', name: 'Premier League' },
+      { id: 'CHAMPIONSHIP', name: 'Championship' },
+      { id: 'LEAGUE_ONE', name: 'League One' },
+      { id: 'LEAGUE_TWO', name: 'League Two' }
+    ],
+    'Spain': [
+      { id: 'LA_LIGA', name: 'La Liga' },
+      { id: 'LA_LIGA_2', name: 'LaLiga 2' }
+    ],
+    'Germany': [
+      { id: 'BUNDESLIGA', name: 'Bundesliga' },
+      { id: 'BUNDESLIGA_2', name: '2. Bundesliga' },
+      { id: 'LIGA_3', name: '3. Liga' }
+    ],
+    'France': [
+      { id: 'LIGUE_1', name: 'Ligue 1' },
+      { id: 'LIGUE_2', name: 'Ligue 2' }
+    ],
+    'Netherlands': [
+      { id: 'EREDIVISIE', name: 'Eredivisie' },
+      { id: 'EERSTE_DIVISIE', name: 'Eerste Divisie' }
+    ],
+    'Portugal': [
+      { id: 'LIGA_PORTUGAL', name: 'Liga Portugal' },
+      { id: 'LIGA_PORTUGAL_2', name: 'Liga Portugal 2' }
+    ],
+    'Scotland': [
+      { id: 'SCOTTISH_PREMIERSHIP', name: 'Scottish Premiership' },
+      { id: 'SCOTTISH_CHAMPIONSHIP', name: 'Scottish Championship' }
+    ],
+    'Sweden': [{ id: 'ALLSVENSKAN', name: 'Allsvenskan' }],
+    'Norway': [{ id: 'ELITESERIEN', name: 'Eliteserien' }],
+    'Denmark': [{ id: 'SUPERLIGAEN', name: 'Superligaen' }],
+    'Belgium': [{ id: 'JUPILER_PRO_LEAGUE', name: 'Jupiler Pro League' }],
+    'Turkey': [
+      { id: 'SUPER_LIG', name: 'Süper Lig' },
+      { id: 'BIR_LIG', name: '1. Lig' }
+    ],
+    'Ireland': [{ id: 'LEAGUE_OF_IRELAND', name: 'League of Ireland' }],
+    'Brazil': [{ id: 'BRASILEIRAO', name: 'Brasileirão' }],
+    'Argentina': [{ id: 'PRIMERA_DIVISION_ARG', name: 'Primera División' }],
+    'USA': [{ id: 'MLS', name: 'MLS' }],
+    'Japan': [{ id: 'J1_LEAGUE', name: 'J1 League' }],
+    'Finland': [{ id: 'VEIKKAUSLIIGA', name: 'Veikkausliiga' }],
+    'Mexico': [{ id: 'LIGA_MX', name: 'Liga MX' }],
+    'Saudi Arabia': [{ id: 'SAUDI_PRO_LEAGUE', name: 'Saudi Pro League' }]
   };
 
   const result = leaguesData[country] || [];

@@ -153,6 +153,14 @@ LEAGUES = [
         "misc_url": "https://fbref.com/en/comps/10/misc/Championship-Stats",
     },
     {
+        "name": "League One", "code": "ENG3", "comp_id": 15,
+        "standard_url": "https://fbref.com/en/comps/15/stats/League-One-Stats",
+        "shooting_url": "https://fbref.com/en/comps/15/shooting/League-One-Stats",
+        "possession_url": "https://fbref.com/en/comps/15/possession/League-One-Stats",
+        "passing_url": "https://fbref.com/en/comps/15/passing/League-One-Stats",
+        "misc_url": "https://fbref.com/en/comps/15/misc/League-One-Stats",
+    },
+    {
         "name": "LaLiga 2", "code": "ESP2", "comp_id": 17,
         "standard_url": "https://fbref.com/en/comps/17/stats/La-Liga-2-Stats",
         "shooting_url": "https://fbref.com/en/comps/17/shooting/La-Liga-2-Stats",
@@ -270,7 +278,66 @@ LEAGUES = [
         "passing_url": "https://fbref.com/en/comps/25/passing/J1-League-Stats",
         "misc_url": "https://fbref.com/en/comps/25/misc/J1-League-Stats",
     },
-    
+
+    # NUOVI CAMPIONATI (24/03/2026)
+    {
+        "name": "League Two", "code": "ENG4", "comp_id": 16,
+        "standard_url": "https://fbref.com/en/comps/16/stats/League-Two-Stats",
+        "shooting_url": "https://fbref.com/en/comps/16/shooting/League-Two-Stats",
+        "possession_url": "https://fbref.com/en/comps/16/possession/League-Two-Stats",
+        "passing_url": "https://fbref.com/en/comps/16/passing/League-Two-Stats",
+        "misc_url": "https://fbref.com/en/comps/16/misc/League-Two-Stats",
+    },
+    {
+        "name": "Veikkausliiga", "code": "FIN1", "comp_id": 43,
+        "standard_url": "https://fbref.com/en/comps/43/stats/Veikkausliiga-Stats",
+        "shooting_url": "https://fbref.com/en/comps/43/shooting/Veikkausliiga-Stats",
+        "possession_url": "https://fbref.com/en/comps/43/possession/Veikkausliiga-Stats",
+        "passing_url": "https://fbref.com/en/comps/43/passing/Veikkausliiga-Stats",
+        "misc_url": "https://fbref.com/en/comps/43/misc/Veikkausliiga-Stats",
+    },
+    {
+        "name": "3. Liga", "code": "GER3", "comp_id": 59,
+        "standard_url": "https://fbref.com/en/comps/59/stats/3-Liga-Stats",
+        "shooting_url": "https://fbref.com/en/comps/59/shooting/3-Liga-Stats",
+        "possession_url": "https://fbref.com/en/comps/59/possession/3-Liga-Stats",
+        "passing_url": "https://fbref.com/en/comps/59/passing/3-Liga-Stats",
+        "misc_url": "https://fbref.com/en/comps/59/misc/3-Liga-Stats",
+    },
+    {
+        "name": "Liga MX", "code": "MEX1", "comp_id": 31,
+        "standard_url": "https://fbref.com/en/comps/31/stats/Liga-MX-Stats",
+        "shooting_url": "https://fbref.com/en/comps/31/shooting/Liga-MX-Stats",
+        "possession_url": "https://fbref.com/en/comps/31/possession/Liga-MX-Stats",
+        "passing_url": "https://fbref.com/en/comps/31/passing/Liga-MX-Stats",
+        "misc_url": "https://fbref.com/en/comps/31/misc/Liga-MX-Stats",
+    },
+    {
+        "name": "Eerste Divisie", "code": "NED2", "comp_id": 51,
+        "standard_url": "https://fbref.com/en/comps/51/stats/Eerste-Divisie-Stats",
+        "shooting_url": "https://fbref.com/en/comps/51/shooting/Eerste-Divisie-Stats",
+        "possession_url": "https://fbref.com/en/comps/51/possession/Eerste-Divisie-Stats",
+        "passing_url": "https://fbref.com/en/comps/51/passing/Eerste-Divisie-Stats",
+        "misc_url": "https://fbref.com/en/comps/51/misc/Eerste-Divisie-Stats",
+    },
+    # Liga Portugal 2 e 1. Lig NON presenti su FBref
+    {
+        "name": "Saudi Pro League", "code": "SAU1", "comp_id": 70,
+        "standard_url": "https://fbref.com/en/comps/70/stats/Saudi-Pro-League-Stats",
+        "shooting_url": "https://fbref.com/en/comps/70/shooting/Saudi-Pro-League-Stats",
+        "possession_url": "https://fbref.com/en/comps/70/possession/Saudi-Pro-League-Stats",
+        "passing_url": "https://fbref.com/en/comps/70/passing/Saudi-Pro-League-Stats",
+        "misc_url": "https://fbref.com/en/comps/70/misc/Saudi-Pro-League-Stats",
+    },
+    {
+        "name": "Scottish Championship", "code": "SCO2", "comp_id": 72,
+        "standard_url": "https://fbref.com/en/comps/72/stats/Scottish-Championship-Stats",
+        "shooting_url": "https://fbref.com/en/comps/72/shooting/Scottish-Championship-Stats",
+        "possession_url": "https://fbref.com/en/comps/72/possession/Scottish-Championship-Stats",
+        "passing_url": "https://fbref.com/en/comps/72/passing/Scottish-Championship-Stats",
+        "misc_url": "https://fbref.com/en/comps/72/misc/Scottish-Championship-Stats",
+    },
+
     # 🆕 COPPE EUROPEE
     {
         "name": "Champions League", "code": "UCL", "comp_id": 8,

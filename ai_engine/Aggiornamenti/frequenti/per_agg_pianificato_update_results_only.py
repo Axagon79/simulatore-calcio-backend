@@ -59,6 +59,7 @@ LEAGUES_CONFIG = [
     
     # 🆕 EUROPA SERIE B
     {"league_name": "Championship", "id_prefix": "Championship", "url": "https://www.betexplorer.com/it/football/england/championship/results/"},
+    {"league_name": "League One", "id_prefix": "LeagueOne", "url": "https://www.betexplorer.com/it/football/england/league-one/results/"},
     {"league_name": "LaLiga 2", "id_prefix": "LaLiga2", "url": "https://www.betexplorer.com/it/football/spain/laliga2/results/"},
     {"league_name": "2. Bundesliga", "id_prefix": "2.Bundesliga", "url": "https://www.betexplorer.com/it/football/germany/2-bundesliga/results/"},
     {"league_name": "Ligue 2", "id_prefix": "Ligue2", "url": "https://www.betexplorer.com/it/football/france/ligue-2/results/"},
@@ -79,6 +80,17 @@ LEAGUES_CONFIG = [
     
     # 🆕 ASIA
     {"league_name": "J1 League", "id_prefix": "J1League", "url": "https://www.betexplorer.com/it/football/japan/j1-league/results/"},
+
+    # NUOVI CAMPIONATI (24/03/2026)
+    {"league_name": "League Two", "id_prefix": "LeagueTwo", "url": "https://www.betexplorer.com/it/football/england/league-two/results/"},
+    {"league_name": "Veikkausliiga", "id_prefix": "Veikkausliiga", "url": "https://www.betexplorer.com/it/football/finland/veikkausliiga/results/"},
+    {"league_name": "3. Liga", "id_prefix": "3.Liga", "url": "https://www.betexplorer.com/it/football/germany/3-liga/results/"},
+    {"league_name": "Liga MX", "id_prefix": "LigaMX", "url": "https://www.betexplorer.com/it/football/mexico/liga-mx/results/"},
+    {"league_name": "Eerste Divisie", "id_prefix": "EersteDivisie", "url": "https://www.betexplorer.com/it/football/netherlands/eerste-divisie/results/"},
+    {"league_name": "Liga Portugal 2", "id_prefix": "LigaPortugal2", "url": "https://www.betexplorer.com/it/football/portugal/liga-portugal-2/results/"},
+    {"league_name": "1. Lig", "id_prefix": "1.Lig", "url": "https://www.betexplorer.com/it/football/turkey/1-lig/results/"},
+    {"league_name": "Saudi Pro League", "id_prefix": "SaudiProLeague", "url": "https://www.betexplorer.com/it/football/saudi-arabia/saudi-professional-league/results/"},
+    {"league_name": "Scottish Championship", "id_prefix": "ScottishChampionship", "url": "https://www.betexplorer.com/it/football/scotland/championship/results/"},
 ]
 
 # --- FUNZIONI UTILS ---

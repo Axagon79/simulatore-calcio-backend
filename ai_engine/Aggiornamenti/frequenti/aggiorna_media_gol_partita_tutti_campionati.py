@@ -46,6 +46,10 @@ LEAGUES_CONFIG = {
         "url_current": "https://www.soccerstats.com/latest.asp?league=england2",
         "url_stats": "https://www.soccerstats.com/latest.asp?league=england2"
     },
+    "League One": {
+        "url_current": "https://www.soccerstats.com/latest.asp?league=england3",
+        "url_stats": "https://www.soccerstats.com/latest.asp?league=england3"
+    },
     "La Liga": {
         "url_current": "https://www.soccerstats.com/latest.asp?league=spain",
         "url_stats": "https://www.soccerstats.com/latest.asp?league=spain"
@@ -129,7 +133,45 @@ LEAGUES_CONFIG = {
     "J1 League": {
         "url_current": "https://www.soccerstats.com/latest.asp?league=japan",
         "url_stats": "https://www.soccerstats.com/latest.asp?league=japan"
-    }
+    },
+
+    # === NUOVI CAMPIONATI (24/03/2026) ===
+    "League Two": {
+        "url_current": "https://www.soccerstats.com/latest.asp?league=england4",
+        "url_stats": "https://www.soccerstats.com/latest.asp?league=england4"
+    },
+    "Veikkausliiga": {
+        "url_current": "https://www.soccerstats.com/latest.asp?league=finland",
+        "url_stats": "https://www.soccerstats.com/latest.asp?league=finland"
+    },
+    "3. Liga": {
+        "url_current": "https://www.soccerstats.com/latest.asp?league=germany3",
+        "url_stats": "https://www.soccerstats.com/latest.asp?league=germany3"
+    },
+    "Liga MX": {
+        "url_current": "https://www.soccerstats.com/latest.asp?league=mexico",
+        "url_stats": "https://www.soccerstats.com/latest.asp?league=mexico"
+    },
+    "Eerste Divisie": {
+        "url_current": "https://www.soccerstats.com/latest.asp?league=netherlands2",
+        "url_stats": "https://www.soccerstats.com/latest.asp?league=netherlands2"
+    },
+    "Liga Portugal 2": {
+        "url_current": "https://www.soccerstats.com/latest.asp?league=portugal2",
+        "url_stats": "https://www.soccerstats.com/latest.asp?league=portugal2"
+    },
+    "1. Lig": {
+        "url_current": "https://www.soccerstats.com/latest.asp?league=turkey2",
+        "url_stats": "https://www.soccerstats.com/latest.asp?league=turkey2"
+    },
+    "Saudi Pro League": {
+        "url_current": "https://www.soccerstats.com/latest.asp?league=saudiarabia",
+        "url_stats": "https://www.soccerstats.com/latest.asp?league=saudiarabia"
+    },
+    "Scottish Championship": {
+        "url_current": "https://www.soccerstats.com/latest.asp?league=scotland2",
+        "url_stats": "https://www.soccerstats.com/latest.asp?league=scotland2"
+    },
 }
 
 HEADERS = {

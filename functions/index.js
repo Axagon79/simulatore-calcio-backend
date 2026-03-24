@@ -184,13 +184,27 @@ app.get('/rounds', async (req, res) => {
       SUPER_LIG: 'Süper Lig',
       LEAGUE_OF_IRELAND: 'League of Ireland Premier Division',
 
+      // 🆕 ENGLAND LEAGUE ONE
+      LEAGUE_ONE: 'League One',
+
       // 🆕 AMERICHE
       BRASILEIRAO: 'Brasileirão Serie A',
       PRIMERA_DIVISION_ARG: 'Primera División',
       MLS: 'Major League Soccer',
 
       // 🆕 ASIA
-      J1_LEAGUE: 'J1 League'
+      J1_LEAGUE: 'J1 League',
+
+      // NUOVI CAMPIONATI (24/03/2026)
+      LEAGUE_TWO: 'League Two',
+      VEIKKAUSLIIGA: 'Veikkausliiga',
+      LIGA_3: '3. Liga',
+      LIGA_MX: 'Liga MX',
+      EERSTE_DIVISIE: 'Eerste Divisie',
+      LIGA_PORTUGAL_2: 'Liga Portugal 2',
+      BIR_LIG: '1. Lig',
+      SAUDI_PRO_LEAGUE: 'Saudi Pro League',
+      SCOTTISH_CHAMPIONSHIP: 'Scottish Championship',
     };
 
     const leagueName = leagueMap[leagueId];
@@ -357,15 +371,29 @@ app.get('/matches', async (req, res) => {
       'SUPER_LIG': 'Süper Lig',
       'LEAGUE_OF_IRELAND': 'League of Ireland Premier Division',
 
+      // 🆕 ENGLAND LEAGUE ONE
+      'LEAGUE_ONE': 'League One',
+
       // 🆕 AMERICHE
       'BRASILEIRAO': 'Brasileirão Serie A',
       'PRIMERA_DIVISION_ARG': 'Primera División',
       'MLS': 'Major League Soccer',
 
       // 🆕 ASIA
-      'J1_LEAGUE': 'J1 League'
+      'J1_LEAGUE': 'J1 League',
+
+      // NUOVI CAMPIONATI (24/03/2026)
+      'LEAGUE_TWO': 'League Two',
+      'VEIKKAUSLIIGA': 'Veikkausliiga',
+      'LIGA_3': '3. Liga',
+      'LIGA_MX': 'Liga MX',
+      'EERSTE_DIVISIE': 'Eerste Divisie',
+      'LIGA_PORTUGAL_2': 'Liga Portugal 2',
+      'BIR_LIG': '1. Lig',
+      'SAUDI_PRO_LEAGUE': 'Saudi Pro League',
+      'SCOTTISH_CHAMPIONSHIP': 'Scottish Championship',
     };
-    
+
     const leagueName = leagueMap[leagueId];
     if (!leagueName) return res.json([]);
 
@@ -652,8 +680,13 @@ app.get('/streaks', async (req, res) => {
       'SCOTTISH_PREMIERSHIP': 'Scottish Premiership', 'ALLSVENSKAN': 'Allsvenskan', 'ELITESERIEN': 'Eliteserien',
       'SUPERLIGAEN': 'Superligaen', 'JUPILER_PRO_LEAGUE': 'Jupiler Pro League', 'SUPER_LIG': 'Süper Lig',
       'LEAGUE_OF_IRELAND': 'League of Ireland Premier Division',
+      'LEAGUE_ONE': 'League One',
       'BRASILEIRAO': 'Brasileirão Serie A', 'PRIMERA_DIVISION_ARG': 'Primera División', 'MLS': 'Major League Soccer',
-      'J1_LEAGUE': 'J1 League'
+      'J1_LEAGUE': 'J1 League',
+      // NUOVI CAMPIONATI (24/03/2026)
+      'LEAGUE_TWO': 'League Two', 'VEIKKAUSLIIGA': 'Veikkausliiga', 'LIGA_3': '3. Liga',
+      'LIGA_MX': 'Liga MX', 'EERSTE_DIVISIE': 'Eerste Divisie', 'LIGA_PORTUGAL_2': 'Liga Portugal 2',
+      'BIR_LIG': '1. Lig', 'SAUDI_PRO_LEAGUE': 'Saudi Pro League', 'SCOTTISH_CHAMPIONSHIP': 'Scottish Championship',
     };
     const leagueName = leagueMap[leagueId];
     if (!leagueName) return res.json({ success: false, error: 'Unknown league: ' + leagueId });
@@ -750,8 +783,13 @@ app.get('/gauge-data', async (req, res) => {
       'SCOTTISH_PREMIERSHIP': 'Scottish Premiership', 'ALLSVENSKAN': 'Allsvenskan', 'ELITESERIEN': 'Eliteserien',
       'SUPERLIGAEN': 'Superligaen', 'JUPILER_PRO_LEAGUE': 'Jupiler Pro League', 'SUPER_LIG': 'Süper Lig',
       'LEAGUE_OF_IRELAND': 'League of Ireland Premier Division',
+      'LEAGUE_ONE': 'League One',
       'BRASILEIRAO': 'Brasileirão Serie A', 'PRIMERA_DIVISION_ARG': 'Primera División', 'MLS': 'Major League Soccer',
-      'J1_LEAGUE': 'J1 League'
+      'J1_LEAGUE': 'J1 League',
+      // NUOVI CAMPIONATI (24/03/2026)
+      'LEAGUE_TWO': 'League Two', 'VEIKKAUSLIIGA': 'Veikkausliiga', 'LIGA_3': '3. Liga',
+      'LIGA_MX': 'Liga MX', 'EERSTE_DIVISIE': 'Eerste Divisie', 'LIGA_PORTUGAL_2': 'Liga Portugal 2',
+      'BIR_LIG': '1. Lig', 'SAUDI_PRO_LEAGUE': 'Saudi Pro League', 'SCOTTISH_CHAMPIONSHIP': 'Scottish Championship',
     };
     const leagueName = leagueMap[leagueId];
 
@@ -1007,7 +1045,9 @@ app.get('/leagues', (req, res) => {
     ],
     'England': [
       { id: 'PREMIER_LEAGUE', name: 'Premier League' },
-      { id: 'CHAMPIONSHIP', name: 'Championship' }
+      { id: 'CHAMPIONSHIP', name: 'Championship' },
+      { id: 'LEAGUE_ONE', name: 'League One' },
+      { id: 'LEAGUE_TWO', name: 'League Two' }
     ],
     'Spain': [
       { id: 'LA_LIGA', name: 'La Liga' },
@@ -1015,25 +1055,41 @@ app.get('/leagues', (req, res) => {
     ],
     'Germany': [
       { id: 'BUNDESLIGA', name: 'Bundesliga' },
-      { id: 'BUNDESLIGA_2', name: '2. Bundesliga' }
+      { id: 'BUNDESLIGA_2', name: '2. Bundesliga' },
+      { id: 'LIGA_3', name: '3. Liga' }
     ],
     'France': [
       { id: 'LIGUE_1', name: 'Ligue 1' },
       { id: 'LIGUE_2', name: 'Ligue 2' }
     ],
-    'Netherlands': [{ id: 'EREDIVISIE', name: 'Eredivisie' }],
-    'Portugal': [{ id: 'LIGA_PORTUGAL', name: 'Liga Portugal' }],
-    'Scotland': [{ id: 'SCOTTISH_PREMIERSHIP', name: 'Scottish Premiership' }],
+    'Netherlands': [
+      { id: 'EREDIVISIE', name: 'Eredivisie' },
+      { id: 'EERSTE_DIVISIE', name: 'Eerste Divisie' }
+    ],
+    'Portugal': [
+      { id: 'LIGA_PORTUGAL', name: 'Liga Portugal' },
+      { id: 'LIGA_PORTUGAL_2', name: 'Liga Portugal 2' }
+    ],
+    'Scotland': [
+      { id: 'SCOTTISH_PREMIERSHIP', name: 'Scottish Premiership' },
+      { id: 'SCOTTISH_CHAMPIONSHIP', name: 'Scottish Championship' }
+    ],
     'Sweden': [{ id: 'ALLSVENSKAN', name: 'Allsvenskan' }],
     'Norway': [{ id: 'ELITESERIEN', name: 'Eliteserien' }],
     'Denmark': [{ id: 'SUPERLIGAEN', name: 'Superligaen' }],
     'Belgium': [{ id: 'JUPILER_PRO_LEAGUE', name: 'Jupiler Pro League' }],
-    'Turkey': [{ id: 'SUPER_LIG', name: 'Süper Lig' }],
+    'Turkey': [
+      { id: 'SUPER_LIG', name: 'Süper Lig' },
+      { id: 'BIR_LIG', name: '1. Lig' }
+    ],
     'Ireland': [{ id: 'LEAGUE_OF_IRELAND', name: 'League of Ireland Premier Division' }],
     'Brazil': [{ id: 'BRASILEIRAO', name: 'Brasileirão Serie A' }],
     'Argentina': [{ id: 'PRIMERA_DIVISION_ARG', name: 'Primera División' }],
     'USA': [{ id: 'MLS', name: 'Major League Soccer' }],
-    'Japan': [{ id: 'J1_LEAGUE', name: 'J1 League' }]
+    'Japan': [{ id: 'J1_LEAGUE', name: 'J1 League' }],
+    'Finland': [{ id: 'VEIKKAUSLIIGA', name: 'Veikkausliiga' }],
+    'Mexico': [{ id: 'LIGA_MX', name: 'Liga MX' }],
+    'Saudi Arabia': [{ id: 'SAUDI_PRO_LEAGUE', name: 'Saudi Pro League' }]
   };
   res.json(leaguesData[country] || []);
 });

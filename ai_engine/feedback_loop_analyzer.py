@@ -587,8 +587,10 @@ STD_QUOTA_RANGES = ["1.35-1.55", "1.55-1.75", "1.75-1.95", "1.95-2.15", "2.15-2.
 AR_QUOTA_RANGES = ["2.50-2.70", "2.70-2.90", "2.90-3.10", "3.10-3.50", ">3.50"]
 QUOTA_RANGES_ORDER = STD_QUOTA_RANGES + AR_QUOTA_RANGES
 MINOR_LEAGUES = {"Serie C - Girone A", "Serie C - Girone B", "Serie C - Girone C",
-                 "Ligue 2", "2. Bundesliga", "LaLiga 2", "Championship",
-                 "League of Ireland Premier Division"}
+                 "Ligue 2", "2. Bundesliga", "LaLiga 2", "Championship", "League One",
+                 "League of Ireland Premier Division",
+                 "League Two", "Veikkausliiga", "3. Liga", "Liga MX", "Eerste Divisie",
+                 "Liga Portugal 2", "1. Lig", "Saudi Pro League", "Scottish Championship"}
 STD_QUOTA_LIMIT = 2.50  # Standard vs Alto Rendimento
 
 

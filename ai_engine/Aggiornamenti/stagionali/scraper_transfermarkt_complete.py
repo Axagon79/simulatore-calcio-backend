@@ -12,7 +12,7 @@ sys.path.insert(0, r"C:\Progetti\simulatore-calcio-backend")
 from config import db
 teams_collection = db["teams"]
 
-# TUTTI I CAMPIONATI PRINCIPALI 
+# TUTTI I CAMPIONATI PRINCIPALI
 LEAGUES_CONFIG = [
     #ITALIA
     {
@@ -82,19 +82,24 @@ LEAGUES_CONFIG = [
         "url_value": "https://www.transfermarkt.it/liga-portugal/startseite/wettbewerb/PO1",
         "url_age": "https://www.transfermarkt.it/liga-portugal/altersschnitt/wettbewerb/PO1/plus/1",
     },
-    
+
     # SUPER LIG
     {
         "name": "Super Lig (Turchia)",
         "url_value": "https://www.transfermarkt.it/super-lig/startseite/wettbewerb/TR1",
         "url_age": "https://www.transfermarkt.it/super-lig/altersschnitt/wettbewerb/TR1/plus/1"
     },
-    
-    # 🆕 EUROPA SERIE B
+
+    # EUROPA SERIE B
     {
         "name": "Championship",
         "url_value": "https://www.transfermarkt.it/championship/startseite/wettbewerb/GB2",
         "url_age": "https://www.transfermarkt.it/championship/altersschnitt/wettbewerb/GB2/plus/1"
+    },
+    {
+        "name": "League One",
+        "url_value": "https://www.transfermarkt.it/league-one/startseite/wettbewerb/GB3",
+        "url_age": "https://www.transfermarkt.it/league-one/altersschnitt/wettbewerb/GB3/plus/1"
     },
     {
         "name": "LaLiga 2",
@@ -112,7 +117,7 @@ LEAGUES_CONFIG = [
         "url_age": "https://www.transfermarkt.it/ligue-2/altersschnitt/wettbewerb/FR2/plus/1"
     },
 
-    # 🆕 EUROPA NORDICI
+    # EUROPA NORDICI
     {
         "name": "Scottish Premiership",
         "url_value": "https://www.transfermarkt.it/premiership/startseite/wettbewerb/SC1",
@@ -144,7 +149,7 @@ LEAGUES_CONFIG = [
         "url_age": "https://www.transfermarkt.it/league-of-ireland-premier-division/altersschnitt/wettbewerb/IR1/plus/1"
     },
 
-    # 🆕 AMERICHE
+    # AMERICHE
     {
         "name": "Brasileirão Serie A",
         "url_value": "https://www.transfermarkt.it/campeonato-brasileiro-serie-a/startseite/wettbewerb/BRA1",
@@ -161,13 +166,59 @@ LEAGUES_CONFIG = [
         "url_age": "https://www.transfermarkt.it/major-league-soccer/altersschnitt/wettbewerb/MLS1/plus/1"
     },
 
-    # 🆕 ASIA
+    # ASIA
     {
         "name": "J1 League",
         "url_value": "https://www.transfermarkt.it/j1-100-year-vision-league/teilnehmer/pokalwettbewerb/J1YV",
         "url_age": "https://www.transfermarkt.it/j1-100-year-vision-league/teilnehmer/pokalwettbewerb/J1YV"
     },
 
+    # NUOVI CAMPIONATI (24/03/2026)
+    {
+        "name": "League Two",
+        "url_value": "https://www.transfermarkt.it/league-two/startseite/wettbewerb/GB4",
+        "url_age": "https://www.transfermarkt.it/league-two/altersschnitt/wettbewerb/GB4/plus/1"
+    },
+    {
+        "name": "Veikkausliiga",
+        "url_value": "https://www.transfermarkt.it/veikkausliiga/startseite/wettbewerb/FI1",
+        "url_age": "https://www.transfermarkt.it/veikkausliiga/altersschnitt/wettbewerb/FI1/plus/1"
+    },
+    {
+        "name": "3. Liga",
+        "url_value": "https://www.transfermarkt.it/3-liga/startseite/wettbewerb/L3",
+        "url_age": "https://www.transfermarkt.it/3-liga/altersschnitt/wettbewerb/L3/plus/1"
+    },
+    {
+        "name": "Liga MX",
+        "url_value": "https://www.transfermarkt.it/liga-mx/startseite/wettbewerb/MEX1",
+        "url_age": "https://www.transfermarkt.it/liga-mx/altersschnitt/wettbewerb/MEX1/plus/1"
+    },
+    {
+        "name": "Eerste Divisie",
+        "url_value": "https://www.transfermarkt.it/eerste-divisie/startseite/wettbewerb/NL2",
+        "url_age": "https://www.transfermarkt.it/eerste-divisie/altersschnitt/wettbewerb/NL2/plus/1"
+    },
+    {
+        "name": "Liga Portugal 2",
+        "url_value": "https://www.transfermarkt.it/liga-portugal-2/startseite/wettbewerb/PO2",
+        "url_age": "https://www.transfermarkt.it/liga-portugal-2/altersschnitt/wettbewerb/PO2/plus/1"
+    },
+    {
+        "name": "1. Lig",
+        "url_value": "https://www.transfermarkt.it/1-lig/startseite/wettbewerb/TR2",
+        "url_age": "https://www.transfermarkt.it/1-lig/altersschnitt/wettbewerb/TR2/plus/1"
+    },
+    {
+        "name": "Saudi Pro League",
+        "url_value": "https://www.transfermarkt.it/saudi-pro-league/startseite/wettbewerb/SA1",
+        "url_age": "https://www.transfermarkt.it/saudi-pro-league/altersschnitt/wettbewerb/SA1/plus/1"
+    },
+    {
+        "name": "Scottish Championship",
+        "url_value": "https://www.transfermarkt.it/scottish-championship/startseite/wettbewerb/SC2",
+        "url_age": "https://www.transfermarkt.it/scottish-championship/altersschnitt/wettbewerb/SC2/plus/1"
+    },
 ]
 
 # Normalizzazione nomi Transfermarkt (varie forme -> nome TM "canonico")

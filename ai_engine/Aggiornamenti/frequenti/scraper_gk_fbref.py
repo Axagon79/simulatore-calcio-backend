@@ -103,6 +103,11 @@ LEAGUES = [
         "keepersadv_url": "https://fbref.com/en/comps/10/keepersadv/Championship-Stats",
     },
     {
+        "name": "League One", "code": "ENG3", "comp_id": 15,
+        "keepers_url": "https://fbref.com/en/comps/15/keepers/League-One-Stats",
+        "keepersadv_url": "https://fbref.com/en/comps/15/keepersadv/League-One-Stats",
+    },
+    {
         "name": "LaLiga 2", "code": "ESP2", "comp_id": 17,
         "keepers_url": "https://fbref.com/en/comps/17/keepers/La-Liga-2-Stats",
         "keepersadv_url": "https://fbref.com/en/comps/17/keepersadv/La-Liga-2-Stats",
@@ -178,7 +183,45 @@ LEAGUES = [
         "keepers_url": "https://fbref.com/en/comps/25/keepers/J1-League-Stats",
         "keepersadv_url": "https://fbref.com/en/comps/25/keepersadv/J1-League-Stats",
     },
-    
+
+    # NUOVI CAMPIONATI (24/03/2026)
+    {
+        "name": "League Two", "code": "ENG4", "comp_id": 16,
+        "keepers_url": "https://fbref.com/en/comps/16/keepers/League-Two-Stats",
+        "keepersadv_url": "https://fbref.com/en/comps/16/keepersadv/League-Two-Stats",
+    },
+    {
+        "name": "Veikkausliiga", "code": "FIN1", "comp_id": 43,
+        "keepers_url": "https://fbref.com/en/comps/43/keepers/Veikkausliiga-Stats",
+        "keepersadv_url": "https://fbref.com/en/comps/43/keepersadv/Veikkausliiga-Stats",
+    },
+    {
+        "name": "3. Liga", "code": "GER3", "comp_id": 59,
+        "keepers_url": "https://fbref.com/en/comps/59/keepers/3-Liga-Stats",
+        "keepersadv_url": "https://fbref.com/en/comps/59/keepersadv/3-Liga-Stats",
+    },
+    {
+        "name": "Liga MX", "code": "MEX1", "comp_id": 31,
+        "keepers_url": "https://fbref.com/en/comps/31/keepers/Liga-MX-Stats",
+        "keepersadv_url": "https://fbref.com/en/comps/31/keepersadv/Liga-MX-Stats",
+    },
+    {
+        "name": "Eerste Divisie", "code": "NED2", "comp_id": 51,
+        "keepers_url": "https://fbref.com/en/comps/51/keepers/Eerste-Divisie-Stats",
+        "keepersadv_url": "https://fbref.com/en/comps/51/keepersadv/Eerste-Divisie-Stats",
+    },
+    # Liga Portugal 2 e 1. Lig NON presenti su FBref
+    {
+        "name": "Saudi Pro League", "code": "SAU1", "comp_id": 70,
+        "keepers_url": "https://fbref.com/en/comps/70/keepers/Saudi-Pro-League-Stats",
+        "keepersadv_url": "https://fbref.com/en/comps/70/keepersadv/Saudi-Pro-League-Stats",
+    },
+    {
+        "name": "Scottish Championship", "code": "SCO2", "comp_id": 72,
+        "keepers_url": "https://fbref.com/en/comps/72/keepers/Scottish-Championship-Stats",
+        "keepersadv_url": "https://fbref.com/en/comps/72/keepersadv/Scottish-Championship-Stats",
+    },
+
     # 🆕 COPPE EUROPEE
     {
         "name": "Champions League", "code": "UCL", "comp_id": 8,

@@ -54,6 +54,7 @@ LEAGUE_TO_SNAI_URL = {
     "Liga Portugal": "https://www.snai.it/sport/CALCIO/PORTOGALLO%201",
     # EUROPA SERIE B
     "Championship": "https://www.snai.it/sport/CALCIO/CHAMPIONSHIP",
+    "League One": "https://www.snai.it/sport/CALCIO/INGHILTERRA%203",
     "LaLiga 2": "https://www.snai.it/sport/CALCIO/SPAGNA%202",
     "2. Bundesliga": "https://www.snai.it/sport/CALCIO/GERMANIA%202",
     "Ligue 2": "https://www.snai.it/sport/CALCIO/FRANCIA%202",
@@ -71,6 +72,16 @@ LEAGUE_TO_SNAI_URL = {
     "Major League Soccer": "https://www.snai.it/sport/CALCIO/USA%20MLS",
     # ASIA
     "J1 League": "https://www.snai.it/sport/CALCIO/GIAPPONE%201",
+    # NUOVI CAMPIONATI (24/03/2026)
+    "League Two": "https://www.snai.it/sport/CALCIO/INGHILTERRA%204",
+    "Veikkausliiga": "https://www.snai.it/sport/CALCIO/FINLANDIA%201",
+    "3. Liga": "https://www.snai.it/sport/CALCIO/GERMANIA%203",
+    "Liga MX": "https://www.snai.it/sport/CALCIO/MESSICO%201",
+    "Eerste Divisie": "https://www.snai.it/sport/CALCIO/OLANDA%202",
+    "Liga Portugal 2": "https://www.snai.it/sport/CALCIO/PORTOGALLO%202",
+    "1. Lig": "https://www.snai.it/sport/CALCIO/TURCHIA%202",
+    "Saudi Pro League": "https://www.snai.it/sport/CALCIO/ARABIA%20SAUDITA%201",
+    "Scottish Championship": "https://www.snai.it/sport/CALCIO/SCOZIA%202",
     # COPPE
     "Champions League": "https://www.snai.it/sport/CALCIO/CHAMPIONS%20LEAGUE",
     "Europa League": "https://www.snai.it/sport/CALCIO/EUROPA%20LEAGUE",

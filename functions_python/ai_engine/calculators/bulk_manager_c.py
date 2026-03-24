@@ -27,6 +27,7 @@ _LEAGUE_MAP = {
     "Eredivisie": "Eredivisie",
     "Liga Portugal": "Liga Portugal",
     "Championship": "Championship",
+    "League One": "League One",
     "Laliga 2": "LaLiga 2",
     "2. Bundesliga": "2. Bundesliga",
     "Ligue 2": "Ligue 2",
@@ -42,7 +43,19 @@ _LEAGUE_MAP = {
     "Brasileirão": "Brasileirão Serie A",
     "Primera División": "Primera División",
     "Mls": "Major League Soccer",
-    "J1 League": "J1 League"
+    "J1 League": "J1 League",
+
+    # NUOVI CAMPIONATI (24/03/2026)
+    "League Two": "League Two",
+    "Veikkausliiga": "Veikkausliiga",
+    "3. Liga": "3. Liga",
+    "Liga Mx": "Liga MX",
+    "Liga MX": "Liga MX",
+    "Eerste Divisie": "Eerste Divisie",
+    "Liga Portugal 2": "Liga Portugal 2",
+    "1. Lig": "1. Lig",
+    "Saudi Pro League": "Saudi Pro League",
+    "Scottish Championship": "Scottish Championship",
 }
 
 

@@ -59,6 +59,7 @@ LEAGUES_CONFIG = [
     {"name": "Liga Portugal", "url": "https://football.nowgoal26.com/league/23"},
     # EUROPA SERIE B
     {"name": "Championship", "url": "https://football.nowgoal26.com/league/37"},
+    {"name": "League One", "url": "https://football.nowgoal26.com/league/39"},
     {"name": "LaLiga 2", "url": "https://football.nowgoal26.com/subleague/33"},
     {"name": "2. Bundesliga", "url": "https://football.nowgoal26.com/league/9"},
     {"name": "Ligue 2", "url": "https://football.nowgoal26.com/league/12"},
@@ -76,6 +77,17 @@ LEAGUES_CONFIG = [
     {"name": "Major League Soccer", "url": "https://football.nowgoal26.com/subleague/21"},
     # ASIA
     {"name": "J1 League", "url": "https://football.nowgoal26.com/subleague/25"},
+
+    # NUOVI CAMPIONATI (24/03/2026)
+    {"name": "League Two", "url": "https://football.nowgoal26.com/league/35"},
+    {"name": "Veikkausliiga", "url": "https://football.nowgoal26.com/subleague/13"},
+    {"name": "3. Liga", "url": "https://football.nowgoal26.com/league/693"},
+    {"name": "Liga MX", "url": "https://football.nowgoal26.com/subleague/140"},
+    {"name": "Eerste Divisie", "url": "https://football.nowgoal26.com/subleague/17"},
+    {"name": "Liga Portugal 2", "url": "https://football.nowgoal26.com/subleague/157"},
+    {"name": "1. Lig", "url": "https://football.nowgoal26.com/subleague/130"},
+    {"name": "Saudi Pro League", "url": "https://football.nowgoal26.com/subleague/292"},
+    {"name": "Scottish Championship", "url": "https://football.nowgoal26.com/subleague/150"},
 ]
 
 def strip_accents(text):

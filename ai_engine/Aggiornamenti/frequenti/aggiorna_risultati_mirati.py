@@ -166,6 +166,7 @@ TARGET_CONFIG = {
     "Eredivisie": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/netherlands/eredivisie/results/", "id_prefix": "Eredivisie", "league_name": "Eredivisie"},
     "Liga Portugal": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/portugal/liga-portugal/results/", "id_prefix": "LigaPortugal", "league_name": "Liga Portugal"},
     "Championship": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/england/championship/results/", "id_prefix": "Championship", "league_name": "Championship"},
+    "League One": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/england/league-one/results/", "id_prefix": "LeagueOne", "league_name": "League One"},
     "LaLiga 2": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/spain/laliga2/results/", "id_prefix": "LaLiga2", "league_name": "LaLiga 2"},
     "2. Bundesliga": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/germany/2-bundesliga/results/", "id_prefix": "2.Bundesliga", "league_name": "2. Bundesliga"},
     "Ligue 2": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/france/ligue-2/results/", "id_prefix": "Ligue2", "league_name": "Ligue 2"},
@@ -189,6 +190,17 @@ TARGET_CONFIG = {
     # e salvarli in h2h_by_round matchando per transfermarkt_id.
     # -------------------------------------------------------------------
     "Major League Soccer": {"tipo": "lega_nowgoal", "nowgoal_url": "https://football.nowgoal26.com/subleague/21", "id_prefix": "MajorLeagueSoccer", "league_name": "Major League Soccer"},
+
+    # NUOVI CAMPIONATI (24/03/2026)
+    "League Two": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/england/league-two/results/", "id_prefix": "LeagueTwo", "league_name": "League Two"},
+    "Veikkausliiga": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/finland/veikkausliiga/results/", "id_prefix": "Veikkausliiga", "league_name": "Veikkausliiga"},
+    "3. Liga": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/germany/3-liga/results/", "id_prefix": "3.Liga", "league_name": "3. Liga"},
+    "Liga MX": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/mexico/liga-mx/results/", "id_prefix": "LigaMX", "league_name": "Liga MX"},
+    "Eerste Divisie": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/netherlands/eerste-divisie/results/", "id_prefix": "EersteDivisie", "league_name": "Eerste Divisie"},
+    "Liga Portugal 2": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/portugal/liga-portugal-2/results/", "id_prefix": "LigaPortugal2", "league_name": "Liga Portugal 2"},
+    "1. Lig": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/turkey/1-lig/results/", "id_prefix": "1.Lig", "league_name": "1. Lig"},
+    "Saudi Pro League": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/saudi-arabia/saudi-professional-league/results/", "id_prefix": "SaudiProLeague", "league_name": "Saudi Pro League"},
+    "Scottish Championship": {"tipo": "lega", "url": "https://www.betexplorer.com/it/football/scotland/championship/results/", "id_prefix": "ScottishChampionship", "league_name": "Scottish Championship"},
 }
 
 # --- FUNZIONI ORIGINALI CAMPIONATI (da per_agg_pianificato_update_results_only.py) ---

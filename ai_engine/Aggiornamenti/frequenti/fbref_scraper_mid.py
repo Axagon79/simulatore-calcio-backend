@@ -142,6 +142,13 @@ LEAGUES = [
         "misc_url": "https://fbref.com/en/comps/10/misc/Championship-Stats",
     },
     {
+        "name": "League One", "code": "ENG3", "comp_id": 15,
+        "standard_url": "https://fbref.com/en/comps/15/stats/League-One-Stats",
+        "passing_url": "https://fbref.com/en/comps/15/passing/League-One-Stats",
+        "defense_url": "https://fbref.com/en/comps/15/defense/League-One-Stats",
+        "misc_url": "https://fbref.com/en/comps/15/misc/League-One-Stats",
+    },
+    {
         "name": "LaLiga 2", "code": "ESP2", "comp_id": 17,
         "standard_url": "https://fbref.com/en/comps/17/stats/La-Liga-2-Stats",
         "passing_url": "https://fbref.com/en/comps/17/passing/La-Liga-2-Stats",
@@ -245,7 +252,59 @@ LEAGUES = [
         "defense_url": "https://fbref.com/en/comps/25/defense/J1-League-Stats",
         "misc_url": "https://fbref.com/en/comps/25/misc/J1-League-Stats",
     },
-    
+
+    # NUOVI CAMPIONATI (24/03/2026)
+    {
+        "name": "League Two", "code": "ENG4", "comp_id": 16,
+        "standard_url": "https://fbref.com/en/comps/16/stats/League-Two-Stats",
+        "passing_url": "https://fbref.com/en/comps/16/passing/League-Two-Stats",
+        "defense_url": "https://fbref.com/en/comps/16/defense/League-Two-Stats",
+        "misc_url": "https://fbref.com/en/comps/16/misc/League-Two-Stats",
+    },
+    {
+        "name": "Veikkausliiga", "code": "FIN1", "comp_id": 43,
+        "standard_url": "https://fbref.com/en/comps/43/stats/Veikkausliiga-Stats",
+        "passing_url": "https://fbref.com/en/comps/43/passing/Veikkausliiga-Stats",
+        "defense_url": "https://fbref.com/en/comps/43/defense/Veikkausliiga-Stats",
+        "misc_url": "https://fbref.com/en/comps/43/misc/Veikkausliiga-Stats",
+    },
+    {
+        "name": "3. Liga", "code": "GER3", "comp_id": 59,
+        "standard_url": "https://fbref.com/en/comps/59/stats/3-Liga-Stats",
+        "passing_url": "https://fbref.com/en/comps/59/passing/3-Liga-Stats",
+        "defense_url": "https://fbref.com/en/comps/59/defense/3-Liga-Stats",
+        "misc_url": "https://fbref.com/en/comps/59/misc/3-Liga-Stats",
+    },
+    {
+        "name": "Liga MX", "code": "MEX1", "comp_id": 31,
+        "standard_url": "https://fbref.com/en/comps/31/stats/Liga-MX-Stats",
+        "passing_url": "https://fbref.com/en/comps/31/passing/Liga-MX-Stats",
+        "defense_url": "https://fbref.com/en/comps/31/defense/Liga-MX-Stats",
+        "misc_url": "https://fbref.com/en/comps/31/misc/Liga-MX-Stats",
+    },
+    {
+        "name": "Eerste Divisie", "code": "NED2", "comp_id": 51,
+        "standard_url": "https://fbref.com/en/comps/51/stats/Eerste-Divisie-Stats",
+        "passing_url": "https://fbref.com/en/comps/51/passing/Eerste-Divisie-Stats",
+        "defense_url": "https://fbref.com/en/comps/51/defense/Eerste-Divisie-Stats",
+        "misc_url": "https://fbref.com/en/comps/51/misc/Eerste-Divisie-Stats",
+    },
+    # Liga Portugal 2 e 1. Lig NON presenti su FBref
+    {
+        "name": "Saudi Pro League", "code": "SAU1", "comp_id": 70,
+        "standard_url": "https://fbref.com/en/comps/70/stats/Saudi-Pro-League-Stats",
+        "passing_url": "https://fbref.com/en/comps/70/passing/Saudi-Pro-League-Stats",
+        "defense_url": "https://fbref.com/en/comps/70/defense/Saudi-Pro-League-Stats",
+        "misc_url": "https://fbref.com/en/comps/70/misc/Saudi-Pro-League-Stats",
+    },
+    {
+        "name": "Scottish Championship", "code": "SCO2", "comp_id": 72,
+        "standard_url": "https://fbref.com/en/comps/72/stats/Scottish-Championship-Stats",
+        "passing_url": "https://fbref.com/en/comps/72/passing/Scottish-Championship-Stats",
+        "defense_url": "https://fbref.com/en/comps/72/defense/Scottish-Championship-Stats",
+        "misc_url": "https://fbref.com/en/comps/72/misc/Scottish-Championship-Stats",
+    },
+
     # 🆕 COPPE EUROPEE
     {
         "name": "Champions League", "code": "UCL", "comp_id": 8,

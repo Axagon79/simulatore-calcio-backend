@@ -137,11 +137,55 @@ NEW_LEAGUES = {
     #     "url_value": "https://www.transfermarkt.it/premier-league/startseite/wettbewerb/IR1"
     # },
     
-    # AMERICHE
-    "Brasileirão Serie A": {
-        "country": "Brazil",
-        "url_value": "https://www.transfermarkt.it/campeonato-brasileiro-serie-a/startseite/wettbewerb/BRA1"
-    },
+    # # LEAGUE ONE (gia aggiunto 24/03/2026)
+    # "League One": {
+    #     "country": "England",
+    #     "url_value": "https://www.transfermarkt.it/league-one/startseite/wettbewerb/GB3"
+    # },
+
+    # AMERICHE (gia aggiunto)
+    # "Brasileirão Serie A": {
+    #     "country": "Brazil",
+    #     "url_value": "https://www.transfermarkt.it/campeonato-brasileiro-serie-a/startseite/wettbewerb/BRA1"
+    # },
+
+    # NUOVI CAMPIONATI (24/03/2026) — gia aggiunto
+    # "League Two": {
+    #     "country": "England",
+    #     "url_value": "https://www.transfermarkt.it/league-two/startseite/wettbewerb/GB4"
+    # },
+    # "Veikkausliiga": {
+    #     "country": "Finland",
+    #     "url_value": "https://www.transfermarkt.it/veikkausliiga/startseite/wettbewerb/FI1"
+    # },
+    # "3. Liga": {
+    #     "country": "Germany",
+    #     "url_value": "https://www.transfermarkt.it/3-liga/startseite/wettbewerb/L3"
+    # },
+    # "Liga MX": {
+    #     "country": "Mexico",
+    #     "url_value": "https://www.transfermarkt.it/liga-mx/startseite/wettbewerb/MEX1"
+    # },
+    # "Eerste Divisie": {
+    #     "country": "Netherlands",
+    #     "url_value": "https://www.transfermarkt.it/eerste-divisie/startseite/wettbewerb/NL2"
+    # },
+    # "Liga Portugal 2": {
+    #     "country": "Portugal",
+    #     "url_value": "https://www.transfermarkt.it/liga-portugal-2/startseite/wettbewerb/PO2"
+    # },
+    # "1. Lig": {
+    #     "country": "Turkey",
+    #     "url_value": "https://www.transfermarkt.it/1-lig/startseite/wettbewerb/TR2"
+    # },
+    # "Saudi Pro League": {
+    #     "country": "Saudi Arabia",
+    #     "url_value": "https://www.transfermarkt.it/saudi-pro-league/startseite/wettbewerb/SA1"
+    # },
+    # "Scottish Championship": {
+    #     "country": "Scotland",
+    #     "url_value": "https://www.transfermarkt.it/scottish-championship/startseite/wettbewerb/SC2"
+    # },
     # "Primera División": {
     #     "country": "Argentina",
     #     "url_value": "https://www.transfermarkt.it/torneo-inicial/startseite/wettbewerb/ARG1"

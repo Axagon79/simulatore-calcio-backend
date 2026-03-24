@@ -2046,6 +2046,7 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
             
             # EUROPA SERIE B
             "Championship": "Championship",
+            "League One": "League One",
             "LaLiga 2": "LaLiga 2",           # ✅ Fix: L maiuscola
             "Laliga 2": "LaLiga 2",           # ✅ Fallback per scrapers
             "2. Bundesliga": "2. Bundesliga",
@@ -2071,7 +2072,19 @@ def run_single_simulation(home_team: str, away_team: str, algo_id: int, cycles: 
             "Mls": "Major League Soccer",             # ✅ Capitalizzato
             
             # ASIA
-            "J1 League": "J1 League"
+            "J1 League": "J1 League",
+
+            # NUOVI CAMPIONATI (24/03/2026)
+            "League Two": "League Two",
+            "Veikkausliiga": "Veikkausliiga",
+            "3. Liga": "3. Liga",
+            "Liga Mx": "Liga MX",
+            "Liga MX": "Liga MX",
+            "Eerste Divisie": "Eerste Divisie",
+            "Liga Portugal 2": "Liga Portugal 2",
+            "1. Lig": "1. Lig",
+            "Saudi Pro League": "Saudi Pro League",
+            "Scottish Championship": "Scottish Championship",
         }
 
         league_clean = league_map.get(league_clean, league_clean)
