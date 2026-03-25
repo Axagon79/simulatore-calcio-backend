@@ -3,14 +3,9 @@ import sys
 import time
 import importlib.util
 import re
+import requests
 from datetime import datetime
 from bs4 import BeautifulSoup
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException, WebDriverException
 
 # --- CONFIGURAZIONE PERCORSI ---
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -94,26 +89,26 @@ LEAGUES_CONFIG = [
 ]
 
 # --- FUNZIONI UTILS ---
+# Cache teams in memoria (1 query invece di ~20000)
+_tm_id_cache = {}
+def _build_tm_cache():
+    if _tm_id_cache: return
+    for t in db[COLLECTION_TEAMS].find({}, {"name": 1, "aliases": 1, "aliases_transfermarkt": 1, "transfermarkt_id": 1}):
+        tm_id = t.get("transfermarkt_id")
+        if not tm_id: continue
+        tm_str = str(tm_id)
+        _tm_id_cache[t["name"]] = tm_str
+        for a in t.get("aliases", []):
+            if isinstance(a, str):
+                _tm_id_cache[a] = tm_str
+        atm = t.get("aliases_transfermarkt")
+        if atm and isinstance(atm, str):
+            _tm_id_cache[atm] = tm_str
+
 def find_team_tm_id(team_name):
-    """
-    STEP 1: Cerca team in collection teams per nome esatto.
-    Ritorna transfermarkt_id o None.
-    """
-    teams_col = db[COLLECTION_TEAMS]
-    
-    # Cerca in name, aliases, aliases_transfermarkt
-    team = teams_col.find_one({
-        "$or": [
-            {"name": team_name},
-            {"aliases": team_name},
-            {"aliases_transfermarkt": team_name}
-        ]
-    })
-    
-    if team and "transfermarkt_id" in team:
-        return str(team["transfermarkt_id"])
-    
-    return None
+    """Cerca team nella cache in memoria. Ritorna transfermarkt_id o None."""
+    _build_tm_cache()
+    return _tm_id_cache.get(team_name)
 
 def extract_round_number(text):
     """Estrae numero round da testo"""
@@ -122,21 +117,7 @@ def extract_round_number(text):
     match = re.search(r'(\d+)', text)
     return match.group(1) if match else None
 
-def setup_selenium_driver():
-    """Configura Chrome WebDriver"""
-    chrome_options = Options()
-    # chrome_options.add_argument('--headless')
-    chrome_options.add_argument('--disable-blink-features=AutomationControlled')
-    chrome_options.add_argument('--window-size=1920,1080')
-    chrome_options.add_argument('--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36')
-    
-    try:
-        driver = webdriver.Chrome(options=chrome_options)
-        driver.set_page_load_timeout(30)
-        return driver
-    except WebDriverException as e:
-        print(f"❌ Errore Chrome WebDriver: {e}")
-        sys.exit(1)
+HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'}
 
 def parse_betexplorer_html(html_content):
     """Parsa HTML BetExplorer"""
@@ -202,7 +183,7 @@ def parse_betexplorer_html(html_content):
     
     return results_by_round
 
-def process_league(driver, h2h_col, league_config):
+def process_league(h2h_col, league_config):
     """
     Processa una lega: scraping + matching + update DB.
     FLOW CORRETTO:
@@ -229,24 +210,16 @@ def process_league(driver, h2h_col, league_config):
     }
     
     try:
-        # Naviga
+        # Scarica pagina con requests (no Selenium)
         if DEBUG_MODE:
             print(f"   🔄 Caricamento pagina...")
-        
-        driver.get(league_config['url'])
-        
-        try:
-            WebDriverWait(driver, 15).until(
-                EC.presence_of_element_located((By.TAG_NAME, "table"))
-            )
-        except TimeoutException:
-            print(f"   ⏱️ Timeout")
+
+        r = requests.get(league_config['url'], headers=HEADERS, timeout=20)
+        if r.status_code != 200:
+            print(f"   ❌ HTTP {r.status_code}")
             return {"updated": 0, "stats": stats, "errors": errors}
-        
-        time.sleep(2)
-        
-        # Parse HTML
-        html_content = driver.page_source
+
+        html_content = r.text
         results = parse_betexplorer_html(html_content)
         
         if not results:
@@ -359,17 +332,13 @@ def process_league(driver, h2h_col, league_config):
 
 def run_auto_update():
     """Main execution"""
-    print("\n🚀 AGGIORNAMENTO BETEXPLORER (SELENIUM - MATCHING DIRETTO)\n")
-    
+    print("\n🚀 AGGIORNAMENTO BETEXPLORER (Requests - NO Selenium)\n")
+
     h2h_col = db[COLLECTION_H2H]
-    
-    print("🌐 Avvio Chrome...")
-    driver = setup_selenium_driver()
-    print("✅ Browser avviato\n")
-    
+
     total_updated = 0
     start_time = time.time()
-    
+
     global_stats = {
         "leagues_processed": 0,
         "total_matches_updated": 0,
@@ -377,34 +346,28 @@ def run_auto_update():
         "teams_not_found": set(),
         "matches_not_found": []
     }
-    
-    try:
-        for idx, league_config in enumerate(LEAGUES_CONFIG, 1):
-            print(f"\n{'='*60}")
-            print(f"[{idx}/{len(LEAGUES_CONFIG)}] {league_config['league_name']}")
-            print(f"{'='*60}")
-            
-            result = process_league(driver, h2h_col, league_config)
-            
-            global_stats["leagues_processed"] += 1
-            global_stats["total_matches_updated"] += result["stats"]["matches_updated"]
-            global_stats["total_already_updated"] += result["stats"]["already_updated"]
-            
-            for team in result["errors"]["teams_not_found"]:
-                global_stats["teams_not_found"].add(team)
-            
-            for match in result["errors"]["matches_not_found"]:
-                match["league"] = league_config["league_name"]
-                global_stats["matches_not_found"].append(match)
-            
-            total_updated += result["updated"]
-            
-            if idx < len(LEAGUES_CONFIG):
-                time.sleep(3)
-    
-    finally:
-        print("\n🔒 Chiusura browser...")
-        driver.quit()
+
+    for idx, league_config in enumerate(LEAGUES_CONFIG, 1):
+        print(f"\n{'='*60}")
+        print(f"[{idx}/{len(LEAGUES_CONFIG)}] {league_config['league_name']}")
+        print(f"{'='*60}")
+
+        result = process_league(h2h_col, league_config)
+
+        global_stats["leagues_processed"] += 1
+        global_stats["total_matches_updated"] += result["stats"]["matches_updated"]
+        global_stats["total_already_updated"] += result["stats"]["already_updated"]
+
+        for team in result["errors"]["teams_not_found"]:
+            global_stats["teams_not_found"].add(team)
+
+        for match in result["errors"]["matches_not_found"]:
+            match["league"] = league_config["league_name"]
+            global_stats["matches_not_found"].append(match)
+
+        total_updated += result["updated"]
+
+        time.sleep(0.5)
     
     total_time = time.time() - start_time
     
