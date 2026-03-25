@@ -71,7 +71,7 @@ SCRAPER_SEQUENCE = [
       # ( FA AGGIORNAMENTO STAGIONALE MEDIE GOL CAMPIONATI )
       ("aggiorna_media_gol_partita_tutti_campionati.py", "📊 [2/22] Media Gol Partita (Campionati)", "Mancano media gol per campionato", FREQUENT_DIR),
 
-      ("scraper_results_fbref.py", "📊 [3/22] Risultati & xG (FBref)", "Mancano risultati recenti e xG", FREQUENT_DIR),
+      ("scraper_results_fbref.py", "📊 [3/22] Risultati & xG (FBref)", "Mancano risultati recenti e xG", FREQUENT_DIR), 
 
       ("scrape_lucifero_betexplorer_safe.py", "🔥 [4/22] Affidabilità squadre (BetExplorer)", "Affidabilità assente", FREQUENT_DIR),
 

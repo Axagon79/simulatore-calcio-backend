@@ -213,9 +213,16 @@ def run_calculator(target_league=None):
         print(f"\n{Fore.CYAN}🚀 RIPRISTINO STRUTTURA COLLEZIONE H2H")
         for i, l in enumerate(leagues_in_db, 1): print(f"  {i}. {l}")
         print(f"  {len(leagues_in_db) + 1}. 🔥 ELABORA TUTTI")
+        print(f"  (puoi selezionare piu campionati separati da virgola, es: 1,3,5)")
         choice = input(f"\n🎯 Scelta: ").strip()
         if not choice: return
-        selected_leagues = leagues_in_db if int(choice) == len(leagues_in_db) + 1 else [leagues_in_db[int(choice) - 1]]
+        if int(choice.split(",")[0]) == len(leagues_in_db) + 1:
+            selected_leagues = leagues_in_db
+        elif "," in choice:
+            indices = [int(x.strip()) - 1 for x in choice.split(",")]
+            selected_leagues = [leagues_in_db[i] for i in indices if 0 <= i < len(leagues_in_db)]
+        else:
+            selected_leagues = [leagues_in_db[int(choice) - 1]]
 
     # --- CACHE H2H IN MEMORIA (evita ~677 find_one singoli) ---
     print("   📥 Caricamento cache H2H in memoria...")

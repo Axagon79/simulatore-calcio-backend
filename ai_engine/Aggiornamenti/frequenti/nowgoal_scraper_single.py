@@ -86,7 +86,7 @@ LEAGUES_CONFIG = [
     {"name": "League Two", "url": "https://football.nowgoal26.com/league/35"},
     {"name": "Veikkausliiga", "url": "https://football.nowgoal26.com/subleague/13"},
     {"name": "3. Liga", "url": "https://football.nowgoal26.com/league/693"},
-    {"name": "Liga MX", "url": "https://football.nowgoal26.com/subleague/140"},
+    {"name": "Liga MX", "url": "https://football.nowgoal26.com/subleague/140", "has_stages": True},
     {"name": "Eerste Divisie", "url": "https://football.nowgoal26.com/subleague/17"},
     {"name": "Liga Portugal 2", "url": "https://football.nowgoal26.com/subleague/157"},
     {"name": "1. Lig", "url": "https://football.nowgoal26.com/subleague/130"},
@@ -356,15 +356,21 @@ def click_round_and_wait(driver, round_num: int, timeout: int = 15, stage: str =
         print(f"   ⚠️ Errore navigazione giornata {round_num}: {e}")
         return False
 
-def get_current_round_from_page(driver) -> Optional[int]:
+def get_current_round_from_page(driver, has_stages=False) -> Optional[int]:
     """Determina quale giornata è attualmente visualizzata nella pagina."""
     try:
         WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, "div.schedulis"))
         )
-        current = driver.find_element(By.CSS_SELECTOR, "div.round span.current.on, div.round span.current, div.round span.on")
-        round_num = current.get_attribute("round")
-        return int(round_num) if round_num else None
+        if has_stages:
+            elements = driver.find_elements(By.CSS_SELECTOR, "div.round span.current")
+            if elements:
+                round_num = elements[-1].get_attribute("round")
+                return int(round_num) if round_num else None
+        else:
+            current = driver.find_element(By.CSS_SELECTOR, "div.round span.current.on, div.round span.current, div.round span.on")
+            round_num = current.get_attribute("round")
+            return int(round_num) if round_num else None
     except Exception as e:
         print(f"   ⚠️ Impossibile leggere giornata dalla pagina: {e}")
     return None
@@ -716,13 +722,22 @@ def run_scraper():
                     time.sleep(5)
 
             # Determina giornata corrente
-            current_round = get_current_round_from_page(driver)
+            has_stages = league.get('has_stages', False)
+            current_round = get_current_round_from_page(driver, has_stages=has_stages)
             if not current_round:
                 print(f"   ⚠️ Impossibile determinare giornata corrente, skip")
                 continue
             
             print(f"   📅 Giornata corrente sul sito: {current_round}")
-            
+
+            # Salva la giornata corrente nel DB per index.js
+            from datetime import datetime, timezone
+            db.league_current_rounds.update_one(
+                {"league": league_name},
+                {"$set": {"current_round": current_round, "updated_at": datetime.now(timezone.utc)}},
+                upsert=True
+            )
+
             # Processa 3 giornate: PRIMA LA CORRENTE, poi le altre
             # Questo evita problemi se il sito "perde" la giornata corrente dopo i click
             rounds_to_process = [current_round, current_round - 1, current_round + 1]
@@ -749,7 +764,7 @@ def run_scraper():
                 # Recupera partite dal DB
                 round_docs = list(db.h2h_by_round.find({
                     "league": league_name,
-                    "round_name": {"$regex": f".*{round_num}.*"}
+                    "round_name": {"$regex": f"^{round_num}\\.Giornata$"}
                 }))
                 
                 if not round_docs:

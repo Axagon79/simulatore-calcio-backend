@@ -82,7 +82,7 @@ LEAGUES_CONFIG = [
     {"name": "League Two", "url": "https://football.nowgoal26.com/league/35"},
     {"name": "Veikkausliiga", "url": "https://football.nowgoal26.com/subleague/13"},
     {"name": "3. Liga", "url": "https://football.nowgoal26.com/league/693"},
-    {"name": "Liga MX", "url": "https://football.nowgoal26.com/subleague/140"},
+    {"name": "Liga MX", "url": "https://football.nowgoal26.com/subleague/140", "has_stages": True},
     {"name": "Eerste Divisie", "url": "https://football.nowgoal26.com/subleague/17"},
     {"name": "Liga Portugal 2", "url": "https://football.nowgoal26.com/subleague/157"},
     {"name": "1. Lig", "url": "https://football.nowgoal26.com/subleague/130"},
@@ -241,21 +241,46 @@ def click_specific_round(driver, target_round, stage=None):
     except:
         return False
 
-def get_target_rounds(league_name):
+def get_target_rounds_from_page(driver, league_name, has_stages=False):
+    """Legge il round corrente dalla pagina NowGoal e restituisce i 3 round dal DB (corrente, -1, +1)."""
+    current_round = None
+    try:
+        if has_stages:
+            elements = driver.find_elements(By.CSS_SELECTOR, "div.round span.current")
+            if elements:
+                current_round = int(elements[-1].get_attribute("round"))
+        else:
+            el = driver.find_element(By.CSS_SELECTOR, "div.round span.current")
+            current_round = int(el.get_attribute("round"))
+    except:
+        pass
+
+    # Salva la giornata corrente nel DB per index.js
+    if current_round is not None:
+        from datetime import datetime, timezone
+        db.league_current_rounds.update_one(
+            {"league": league_name},
+            {"$set": {"current_round": current_round, "updated_at": datetime.now(timezone.utc)}},
+            upsert=True
+        )
+
     rounds_cursor = db.h2h_by_round.find({"league": league_name})
     rounds_list = list(rounds_cursor)
     if not rounds_list: return []
     rounds_list.sort(key=lambda x: get_round_number_from_text(x.get('round_name', '0')))
-    
-    anchor_index = -1
-    for i, r in enumerate(rounds_list):
-        matches = r.get('matches', [])
-        if any(m.get('status') in ['Scheduled', 'Timed'] for m in matches):
-            anchor_index = i
-            break
-    if anchor_index == -1: anchor_index = len(rounds_list) - 1
-    
-    # Ordine: CORRENTE, poi PRECEDENTE, poi SUCCESSIVA (senza tornare alla corrente)
+
+    if current_round is None:
+        # Fallback: ultima giornata
+        anchor_index = len(rounds_list) - 1
+    else:
+        anchor_index = -1
+        for i, r in enumerate(rounds_list):
+            if get_round_number_from_text(r.get('round_name', '0')) == current_round:
+                anchor_index = i
+                break
+        if anchor_index == -1:
+            anchor_index = len(rounds_list) - 1
+
     indices = [anchor_index, anchor_index - 1, anchor_index + 1]
     return [rounds_list[i] for i in indices if 0 <= i < len(rounds_list)]
 
@@ -275,9 +300,6 @@ def run_scraper():
             lname = league['name']
             url = league['url']
             
-            rounds_to_process = get_target_rounds(lname)
-            if not rounds_to_process: continue
-
             if driver is None:
                 chrome_ver = None
                 try:
@@ -320,6 +342,10 @@ def run_scraper():
                     print(f"   ⚠️ Pagina non caricata, refresh ({attempt+1}/3)...")
                     driver.refresh()
                     time.sleep(5)
+
+            has_stages = league.get('has_stages', False)
+            rounds_to_process = get_target_rounds_from_page(driver, lname, has_stages=has_stages)
+            if not rounds_to_process: continue
 
             for idx, round_doc in enumerate(rounds_to_process):
                 round_num = get_round_number_from_text(round_doc['round_name'])

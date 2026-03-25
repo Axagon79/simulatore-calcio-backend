@@ -37,7 +37,6 @@ LEAGUES_TM = [
     {"name": "Serie C - Girone A", "country": "Italy", "url": f"https://www.transfermarkt.it/serie-c-girone-a/gesamtspielplan/wettbewerb/IT3A"},
     {"name": "Serie C - Girone B", "country": "Italy", "url": f"https://www.transfermarkt.it/serie-c-girone-b/gesamtspielplan/wettbewerb/IT3B"},
     {"name": "Serie C - Girone C", "country": "Italy", "url": f"https://www.transfermarkt.it/serie-c-girone-c/gesamtspielplan/wettbewerb/IT3C"},
-
     # EUROPA TOP
     {"name": "Premier League", "country": "England", "url": f"https://www.transfermarkt.it/premier-league/gesamtspielplan/wettbewerb/GB1"},
     {"name": "La Liga", "country": "Spain", "url": f"https://www.transfermarkt.it/laliga/gesamtspielplan/wettbewerb/ES1"},
@@ -45,14 +44,12 @@ LEAGUES_TM = [
     {"name": "Ligue 1", "country": "France", "url": f"https://www.transfermarkt.it/ligue-1/gesamtspielplan/wettbewerb/FR1"},
     {"name": "Eredivisie", "country": "Netherlands", "url": f"https://www.transfermarkt.it/eredivisie/gesamtspielplan/wettbewerb/NL1"},
     {"name": "Liga Portugal", "country": "Portugal", "url": f"https://www.transfermarkt.it/liga-nos/gesamtspielplan/wettbewerb/PO1"},
-
     # EUROPA SERIE B
     {"name": "Championship", "country": "England", "url": f"https://www.transfermarkt.it/championship/gesamtspielplan/wettbewerb/GB2"},
     {"name": "League One", "country": "England", "url": f"https://www.transfermarkt.it/league-one/gesamtspielplan/wettbewerb/GB3"},
     {"name": "LaLiga 2", "country": "Spain", "url": f"https://www.transfermarkt.it/laliga2/gesamtspielplan/wettbewerb/ES2"},
     {"name": "2. Bundesliga", "country": "Germany", "url": f"https://www.transfermarkt.it/2-bundesliga/gesamtspielplan/wettbewerb/L2"},
     {"name": "Ligue 2", "country": "France", "url": f"https://www.transfermarkt.it/ligue-2/gesamtspielplan/wettbewerb/FR2"},
-
     # EUROPA NORDICI + EXTRA
     {"name": "Scottish Premiership", "country": "Scotland", "url": f"https://www.transfermarkt.it/premiership/gesamtspielplan/wettbewerb/SC1"},
     {"name": "Allsvenskan", "country": "Sweden", "url": f"https://www.transfermarkt.it/allsvenskan/gesamtspielplan/wettbewerb/SE1"},
@@ -61,16 +58,14 @@ LEAGUES_TM = [
     {"name": "Jupiler Pro League", "country": "Belgium", "url": f"https://www.transfermarkt.it/jupiler-pro-league/gesamtspielplan/wettbewerb/BE1"},
     {"name": "Süper Lig", "country": "Turkey", "url": f"https://www.transfermarkt.it/super-lig/gesamtspielplan/wettbewerb/TR1"},
     {"name": "League of Ireland Premier Division", "country": "Ireland", "url": f"https://www.transfermarkt.it/league-of-ireland-premier-division/gesamtspielplan/wettbewerb/IR1"},
-
     # AMERICHE
     {"name": "Brasileirão Serie A", "country": "Brazil", "url": f"https://www.transfermarkt.it/campeonato-brasileiro-serie-a/gesamtspielplan/wettbewerb/BRA1"},
     {"name": "Primera División", "country": "Argentina", "url": f"https://www.transfermarkt.it/torneo-inicial/gesamtspielplan/wettbewerb/ARG1"},
     {"name": "Major League Soccer", "country": "USA", "url": f"https://www.transfermarkt.it/major-league-soccer/gesamtspielplan/wettbewerb/MLS1"},
-
     # ASIA
     {"name": "J1 League", "country": "Japan", "url": f"https://www.transfermarkt.it/j1-100-year-vision-league/gesamtspielplan/pokalwettbewerb/J1YV"},
 
-    # NUOVI CAMPIONATI (24/03/2026)
+    # Nuovi campionati (24/03/2026)
     {"name": "League Two", "country": "England", "url": f"https://www.transfermarkt.it/league-two/gesamtspielplan/wettbewerb/GB4"},
     {"name": "Veikkausliiga", "country": "Finland", "url": f"https://www.transfermarkt.it/veikkausliiga/gesamtspielplan/wettbewerb/FI1"},
     {"name": "3. Liga", "country": "Germany", "url": f"https://www.transfermarkt.it/3-liga/gesamtspielplan/wettbewerb/L3"},

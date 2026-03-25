@@ -40,7 +40,6 @@ SOCCERSTATS_LEAGUES = [
     {"name": "Serie C - Girone A", "url": "https://www.soccerstats.com/widetable.asp?league=italy3"},
     {"name": "Serie C - Girone B", "url": "https://www.soccerstats.com/widetable.asp?league=italy4"},
     {"name": "Serie C - Girone C", "url": "https://www.soccerstats.com/widetable.asp?league=italy5"},
-
     # EUROPA TOP
     {"name": "Premier League", "url": "https://www.soccerstats.com/widetable.asp?league=england"},
     {"name": "La Liga", "url": "https://www.soccerstats.com/widetable.asp?league=spain"},
@@ -48,14 +47,11 @@ SOCCERSTATS_LEAGUES = [
     {"name": "Ligue 1", "url": "https://www.soccerstats.com/widetable.asp?league=france"},
     {"name": "Eredivisie", "url": "https://www.soccerstats.com/widetable.asp?league=netherlands"},
     {"name": "Liga Portugal", "url": "https://www.soccerstats.com/widetable.asp?league=portugal"},
-
     # EUROPA SERIE B
     {"name": "Championship", "url": "https://www.soccerstats.com/widetable.asp?league=england2"},
-    {"name": "League One", "url": "https://www.soccerstats.com/widetable.asp?league=england3"},
     {"name": "LaLiga 2", "url": "https://www.soccerstats.com/widetable.asp?league=spain2"},
     {"name": "2. Bundesliga", "url": "https://www.soccerstats.com/widetable.asp?league=germany2"},
     {"name": "Ligue 2", "url": "https://www.soccerstats.com/widetable.asp?league=france2"},
-
     # EUROPA NORDICI + EXTRA
     {"name": "Scottish Premiership", "url": "https://www.soccerstats.com/widetable.asp?league=scotland"},
     {"name": "Allsvenskan", "url": "https://www.soccerstats.com/widetable.asp?league=sweden"},
@@ -64,16 +60,15 @@ SOCCERSTATS_LEAGUES = [
     {"name": "Jupiler Pro League", "url": "https://www.soccerstats.com/widetable.asp?league=belgium"},
     {"name": "Süper Lig", "url": "https://www.soccerstats.com/widetable.asp?league=turkey"},
     {"name": "League of Ireland Premier Division", "url": "https://www.soccerstats.com/widetable.asp?league=ireland"},
-
     # AMERICHE
     {"name": "Brasileirão Serie A", "url": "https://www.soccerstats.com/widetable.asp?league=brazil"},
     {"name": "Primera División", "url": "https://www.soccerstats.com/widetable.asp?league=argentina"},
     {"name": "Major League Soccer", "url": "https://www.soccerstats.com/widetable.asp?league=usa"},
-
     # ASIA
     {"name": "J1 League", "url": "https://www.soccerstats.com/widetable.asp?league=japan"},
 
-    # NUOVI CAMPIONATI (24/03/2026)
+    # Nuovi campionati (24/03/2026)
+    {"name": "League One", "url": "https://www.soccerstats.com/widetable.asp?league=england3"},
     {"name": "League Two", "url": "https://www.soccerstats.com/widetable.asp?league=england4"},
     {"name": "Veikkausliiga", "url": "https://www.soccerstats.com/widetable.asp?league=finland"},
     {"name": "3. Liga", "url": "https://www.soccerstats.com/widetable.asp?league=germany3"},

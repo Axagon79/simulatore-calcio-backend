@@ -225,61 +225,23 @@ app.get('/rounds', async (req, res) => {
       return getRoundNumber(a.round_name) - getRoundNumber(b.round_name);
     });
 
-    // TROVA L'ANCHOR (giornata di riferimento) - Logica blindata: scarta passate e recuperi lontani
+    // TROVA L'ANCHOR: legge la giornata corrente salvata dallo scraper NowGoal
     let anchorIndex = -1;
-    const oggi = new Date();
 
-    // --- TUA LOGICA CORRETTA: CONTROLLO SUI POSTICIPI ---
-    for (let i = 0; i < sortedRounds.length; i++) {
-      const currentRound = sortedRounds[i];
-      const matches = currentRound.matches || [];
-      
-      // 1. Identifichiamo le partite NON terminate (senza risultato)
-      const openMatches = matches.filter(m => m.status === 'Scheduled' || m.status === 'Timed');
+    const currentRoundDoc = await db.collection('league_current_rounds')
+      .findOne({ league: leagueName });
 
-      // Se sono tutte finite, passiamo alla prossima giornata
-      if (openMatches.length === 0) continue;
-
-      // 2. Identifichiamo le partite già FINITE per trovare il "fine turno regolare"
-      const finishedMatches = matches.filter(m => m.status === 'Finished');
-      
-      if (finishedMatches.length > 0) {
-        const finishedDates = finishedMatches.map(m => new Date(m.date_obj).getTime());
-        const lastRegularDate = new Date(Math.max(...finishedDates));
-
-        // 3. Creiamo il limite di 7 giorni dalla fine delle partite regolari
-        const limitDate = new Date(lastRegularDate);
-        limitDate.setDate(limitDate.getDate() + 7);
-
-        // 4. Verifichiamo se tra le partite NON terminate ce n'è almeno una "attuale" (entro 7gg)
-        const hasValidUpcomingMatch = openMatches.some(m => {
-          const matchDate = new Date(m.date_obj);
-          return matchDate >= oggi && matchDate <= limitDate;
-        });
-
-        if (hasValidUpcomingMatch) {
+    if (currentRoundDoc && currentRoundDoc.current_round) {
+      // Cerca la giornata corrispondente nell'elenco ordinato
+      for (let i = 0; i < sortedRounds.length; i++) {
+        if (getRoundNumber(sortedRounds[i].round_name) === currentRoundDoc.current_round) {
           anchorIndex = i;
-          break; 
+          break;
         }
-        // Se le partite non terminate sono tutte oltre i 7gg, il ciclo prosegue alla giornata dopo
-      } else {
-        // Se non è finita nemmeno una partita, verifica se le Scheduled sono tutte nel passato (> 7gg)
-        const allInPast = openMatches.every(m => {
-          const matchDate = new Date(m.date_obj);
-          return matchDate < oggi;
-        });
-        const oldestOpen = new Date(Math.min(...openMatches.map(m => new Date(m.date_obj).getTime())));
-        const daysSinceOldest = (oggi - oldestOpen) / (1000 * 60 * 60 * 24);
-        if (allInPast && daysSinceOldest > 7) {
-          // Giornata rinviata/saltata — prosegui
-          continue;
-        }
-        anchorIndex = i;
-        break;
       }
     }
 
-    // STEP DI RISERVA: Se tutte le partite sono "scadute" o finite, prendiamo l'ultima con risultati
+    // FALLBACK: se non trova nel DB, prende l'ultima giornata con risultati
     if (anchorIndex === -1) {
       for (let i = sortedRounds.length - 1; i >= 0; i--) {
         if (hasFinishedMatches(sortedRounds[i])) {

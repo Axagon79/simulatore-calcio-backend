@@ -159,15 +159,15 @@ def run_injection_att_def(interactive=True):
             # SQUADRA CASA
             if home_team and "scores" in home_team:
                 s = home_team["scores"]
-                dna["home_dna"]["att"] = round((s.get("attack_home", 0) / 15) * 100, 1)
-                dna["home_dna"]["def"] = round((s.get("defense_home", 0) / 10) * 100, 1)
+                dna["home_dna"]["att"] = round(((s.get("attack_home") or 0) / 15) * 100, 1)
+                dna["home_dna"]["def"] = round(((s.get("defense_home") or 0) / 10) * 100, 1)
                 has_changes = True
 
             # SQUADRA TRASFERTA
             if away_team and "scores" in away_team:
                 s = away_team["scores"]
-                dna["away_dna"]["att"] = round((s.get("attack_away", 0) / 15) * 100, 1)
-                dna["away_dna"]["def"] = round((s.get("defense_away", 0) / 10) * 100, 1)
+                dna["away_dna"]["att"] = round(((s.get("attack_away") or 0) / 15) * 100, 1)
+                dna["away_dna"]["def"] = round(((s.get("defense_away") or 0) / 10) * 100, 1)
                 has_changes = True
             
             if has_changes:

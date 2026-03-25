@@ -172,26 +172,22 @@ def esegui_aggiornamento():
             print(" (Nessuna giornata)")
             continue
 
-        # --- IMPLEMENTAZIONE LOGICA ANCHOR (7 GIORNI) ---
+        # --- ANCHOR: legge la giornata corrente dal DB (salvata dallo scraper NowGoal) ---
         anchor_index = -1
-        oggi = datetime.now()
-
-        for i, r in enumerate(rounds_lega):
-            matches = r.get('matches', [])
-            open_matches = [m for m in matches if m.get('status') in ['Scheduled', 'Timed']]
-            if not open_matches: continue
-
-            finished_matches = [m for m in matches if m.get('status') == 'Finished']
-            if finished_matches:
-                last_regular_date = max([get_date_object(m) for m in finished_matches])
-                limit_date = last_regular_date + timedelta(days=7)
-                if any(get_date_object(m) >= oggi and get_date_object(m) <= limit_date for m in open_matches):
+        current_round_doc = db['league_current_rounds'].find_one({"league": lega})
+        if current_round_doc and current_round_doc.get('current_round'):
+            target_round = current_round_doc['current_round']
+            for i, r in enumerate(rounds_lega):
+                if get_round_num(r) == target_round:
                     anchor_index = i
                     break
-            else:
-                anchor_index = i
-                break
-        
+
+        # Fallback: ultima giornata con risultati
+        if anchor_index == -1:
+            for i in range(len(rounds_lega) - 1, -1, -1):
+                if any(m.get('status') == 'Finished' for m in rounds_lega[i].get('matches', [])):
+                    anchor_index = i
+                    break
         if anchor_index == -1: anchor_index = len(rounds_lega) - 1
 
         # Feedback visivo sulla giornata attiva (Sincronizzata con anchor_index)

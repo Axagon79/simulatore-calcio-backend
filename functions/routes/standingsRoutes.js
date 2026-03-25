@@ -29,6 +29,17 @@ const LEAGUE_MAP = {
   'PRIMERA_DIVISION_ARG': 'Primera División',
   'MLS': 'Major League Soccer',
   'J1_LEAGUE': 'J1 League',
+  // Nuovi campionati (24/03/2026)
+  'LEAGUE_ONE': 'League One',
+  'LEAGUE_TWO': 'League Two',
+  'VEIKKAUSLIIGA': 'Veikkausliiga',
+  'LIGA_3': '3. Liga',
+  'LIGA_MX': 'Liga MX',
+  'EERSTE_DIVISIE': 'Eerste Divisie',
+  'LIGA_PORTUGAL_2': 'Liga Portugal 2',
+  'BIR_LIG': '1. Lig',
+  'SAUDI_PRO_LEAGUE': 'Saudi Pro League',
+  'SCOTTISH_CHAMPIONSHIP': 'Scottish Championship',
 };
 
 // GET /standings/:league — classifica completa (totale + casa + trasferta)

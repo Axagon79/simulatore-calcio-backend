@@ -53,20 +53,20 @@ LEAGUES_CONFIG = [
     {"name": "Serie C - Girone A", "url": "https://football.nowgoal26.com/subleague/142"},
     {"name": "Serie C - Girone B", "url": "https://football.nowgoal26.com/subleague/2025-2026/142/1526"},
     {"name": "Serie C - Girone C", "url": "https://football.nowgoal26.com/subleague/2025-2026/142/1527"},
-    # # EUROPA TOP
+    # EUROPA TOP
     {"name": "Premier League", "url": "https://football.nowgoal26.com/league/36"},
     {"name": "La Liga", "url": "https://football.nowgoal26.com/league/31"},
     {"name": "Bundesliga", "url": "https://football.nowgoal26.com/league/8"},
     {"name": "Ligue 1", "url": "https://football.nowgoal26.com/league/11"},
     {"name": "Eredivisie", "url": "https://football.nowgoal26.com/league/16"},
     {"name": "Liga Portugal", "url": "https://football.nowgoal26.com/league/23"},
-    # # EUROPA SERIE B
+    # EUROPA SERIE B
     {"name": "Championship", "url": "https://football.nowgoal26.com/league/37"},
     {"name": "League One", "url": "https://football.nowgoal26.com/league/39"},
     {"name": "LaLiga 2", "url": "https://football.nowgoal26.com/subleague/33"},
     {"name": "2. Bundesliga", "url": "https://football.nowgoal26.com/league/9"},
     {"name": "Ligue 2", "url": "https://football.nowgoal26.com/league/12"},
-    # # EUROPA NORDICI + EXTRA
+    # EUROPA NORDICI + EXTRA
     {"name": "Scottish Premiership", "url": "https://football.nowgoal26.com/subleague/29"},
     {"name": "Allsvenskan", "url": "https://football.nowgoal26.com/subleague/26"},
     {"name": "Eliteserien", "url": "https://football.nowgoal26.com/subleague/22"},
@@ -74,18 +74,18 @@ LEAGUES_CONFIG = [
     {"name": "Jupiler Pro League", "url": "https://football.nowgoal26.com/subleague/5"},
     {"name": "Süper Lig", "url": "https://football.nowgoal26.com/subleague/30"},
     {"name": "League of Ireland Premier Division", "url": "https://football.nowgoal26.com/subleague/1"},
-    # # AMERICHE
+    # AMERICHE
     {"name": "Brasileirão Serie A", "url": "https://football.nowgoal26.com/league/4"},
     {"name": "Primera División", "url": "https://football.nowgoal26.com/subleague/2"},
     {"name": "Major League Soccer", "url": "https://football.nowgoal26.com/subleague/21"},
-    # # ASIA
+    # ASIA
     {"name": "J1 League", "url": "https://football.nowgoal26.com/subleague/25"},
 
     # NUOVI CAMPIONATI (24/03/2026)
     {"name": "League Two", "url": "https://football.nowgoal26.com/league/35"},
     {"name": "Veikkausliiga", "url": "https://football.nowgoal26.com/subleague/13"},
     {"name": "3. Liga", "url": "https://football.nowgoal26.com/league/693"},
-    {"name": "Liga MX", "url": "https://football.nowgoal26.com/subleague/140"},
+    {"name": "Liga MX", "url": "https://football.nowgoal26.com/subleague/140", "has_stages": True},
     {"name": "Eerste Divisie", "url": "https://football.nowgoal26.com/subleague/17"},
     {"name": "Liga Portugal 2", "url": "https://football.nowgoal26.com/subleague/157"},
     {"name": "1. Lig", "url": "https://football.nowgoal26.com/subleague/130"},
@@ -127,6 +127,9 @@ def normalize_name(name: str) -> str:
         return ""
     name = name.lower().strip()
     
+    # Rimuovi trattini (Al-Hilal -> Al Hilal)
+    name = name.replace("-", " ")
+
     # Rimuovi caratteri speciali comuni
     replacements = {
         "ü": "u", "ö": "o", "é": "e", "è": "e", "à": "a", "ì": "i",
@@ -182,8 +185,11 @@ def get_team_aliases(team_name: str, team_doc: Optional[Dict] = None) -> List[st
         aliases.add(normalized)
     
     if team_doc and 'aliases' in team_doc:
-        for alias in team_doc['aliases']:
-            if alias and alias.strip():
+        al = team_doc['aliases']
+        # Supporta sia dict (es. {soccerstats: "X", nowgoal: "Y"}) che list
+        alias_values = al.values() if isinstance(al, dict) else al
+        for alias in alias_values:
+            if isinstance(alias, str) and alias.strip():
                 aliases.add(alias.lower().strip())
                 normalized_alias = normalize_name(alias)
                 if normalized_alias:
@@ -284,13 +290,19 @@ def find_match_with_datetime(home_aliases: List[str], away_aliases: List[str], r
 
     return None
 
-def click_round_and_wait(driver, round_num: int, timeout: int = 15) -> bool:
+def click_round_and_wait(driver, round_num: int, timeout: int = 15, has_stages: bool = False) -> bool:
     """Clicca su una giornata e attende il caricamento"""
     try:
         # Nuova struttura: <span round="N"> dentro div.round
         element = None
         try:
-            element = driver.find_element(By.CSS_SELECTOR, f"div.round span[round='{round_num}']")
+            if has_stages:
+                # Liga MX: round duplicati (Clausura + Apertura), prendi l'ultimo (fase corrente)
+                elements = driver.find_elements(By.CSS_SELECTOR, f"div.round span[round='{round_num}']")
+                if elements:
+                    element = elements[-1]
+            else:
+                element = driver.find_element(By.CSS_SELECTOR, f"div.round span[round='{round_num}']")
         except:
             pass
         # Fallback vecchia struttura
@@ -326,7 +338,7 @@ def click_round_and_wait(driver, round_num: int, timeout: int = 15) -> bool:
         print(f" ⚠️ Errore navigazione giornata {round_num}: {e}")
         return False
 
-def get_current_round_from_page(driver) -> Optional[int]:
+def get_current_round_from_page(driver, has_stages: bool = False) -> Optional[int]:
     """Determina quale giornata è visualizzata"""
     try:
         # Nuova struttura: <span round="30" class="current on">
@@ -334,18 +346,33 @@ def get_current_round_from_page(driver) -> Optional[int]:
             EC.presence_of_element_located((By.CSS_SELECTOR, "div.schedulis"))
         )
         try:
-            current = driver.find_element(By.CSS_SELECTOR, "div.round span.current")
-            round_attr = current.get_attribute("round")
-            if round_attr:
-                return int(round_attr)
+            if has_stages:
+                # Liga MX: round duplicati, prendi l'ultimo span.current (fase corrente)
+                elements = driver.find_elements(By.CSS_SELECTOR, "div.round span.current")
+                if elements:
+                    round_attr = elements[-1].get_attribute("round")
+                    if round_attr:
+                        return int(round_attr)
+            else:
+                current = driver.find_element(By.CSS_SELECTOR, "div.round span.current")
+                round_attr = current.get_attribute("round")
+                if round_attr:
+                    return int(round_attr)
         except:
             pass
         # Fallback: cerca span con classe "on"
         try:
-            current = driver.find_element(By.CSS_SELECTOR, "div.round span.on")
-            round_attr = current.get_attribute("round")
-            if round_attr:
-                return int(round_attr)
+            if has_stages:
+                elements = driver.find_elements(By.CSS_SELECTOR, "div.round span.on")
+                if elements:
+                    round_attr = elements[-1].get_attribute("round")
+                    if round_attr:
+                        return int(round_attr)
+            else:
+                current = driver.find_element(By.CSS_SELECTOR, "div.round span.on")
+                round_attr = current.get_attribute("round")
+                if round_attr:
+                    return int(round_attr)
         except:
             pass
     except Exception as e:
@@ -455,9 +482,11 @@ def run_scraper():
             # Naviga alla pagina
             driver.get(league_url)
             time.sleep(3)
-            
+
+            has_stages = league.get('has_stages', False)
+
             # Determina giornata corrente
-            current_round = get_current_round_from_page(driver)
+            current_round = get_current_round_from_page(driver, has_stages=has_stages)
             if not current_round:
                 print(f" ⚠️ Impossibile determinare giornata corrente, skip")
                 continue
@@ -475,7 +504,7 @@ def run_scraper():
                 
                 # Naviga alla giornata
                 if round_num != current_round:
-                    if not click_round_and_wait(driver, round_num):
+                    if not click_round_and_wait(driver, round_num, has_stages=has_stages):
                         print(f" ⚠️ Navigazione fallita, skip")
                         continue
                 else:
@@ -491,7 +520,7 @@ def run_scraper():
                 # Recupera partite dal DB
                 round_docs = list(db.h2h_by_round.find({
                     "league": league_name,
-                    "round_name": {"$regex": f".*{round_num}.*"}
+                    "round_name": {"$regex": f"^{round_num}\\.Giornata$"}
                 }))
                 
                 if not round_docs:
@@ -517,14 +546,18 @@ def run_scraper():
                     league_stats['processed'] += 1
                     report_data['summary']['total_matches'] += 1
                     
-                    # Recupera alias squadre
-                    home_team_doc = db.teams.find_one({"name": match['home']})
-                    if not home_team_doc:
-                        home_team_doc = db.teams.find_one({"aliases": match['home']})
-                    
-                    away_team_doc = db.teams.find_one({"name": match['away']})
-                    if not away_team_doc:
-                        away_team_doc = db.teams.find_one({"aliases": match['away']})
+                    # Recupera alias squadre (supporta aliases come dict o array)
+                    def _find_team(name):
+                        doc = db.teams.find_one({"name": name})
+                        if not doc:
+                            doc = db.teams.find_one({"aliases.soccerstats": name})
+                        if not doc:
+                            doc = db.teams.find_one({"aliases.nowgoal": name})
+                        if not doc:
+                            doc = db.teams.find_one({"aliases": name})
+                        return doc
+                    home_team_doc = _find_team(match['home'])
+                    away_team_doc = _find_team(match['away'])
                     
                     home_aliases = get_team_aliases(match['home'], home_team_doc)
                     away_aliases = get_team_aliases(match['away'], away_team_doc)
@@ -550,7 +583,7 @@ def run_scraper():
 
 
                     else:
-                        print("✗", end="", flush=True)
+                        league_stats['processed'] += 0  # no-op, match non trovato
                 
                 # Salva modifiche nel DB
                 if updated_count > 0:

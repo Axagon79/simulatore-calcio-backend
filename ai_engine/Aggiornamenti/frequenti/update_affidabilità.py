@@ -50,44 +50,17 @@ def run_update_affidabilità():
         
         if not rounds_lega: continue
 
-        # --- LOGICA "ANCHOR" INTELLIGENTE ---
+        # --- ANCHOR: legge la giornata corrente dal DB (salvata dallo scraper NowGoal) ---
         anchor_index = -1
-        for i, r in enumerate(rounds_lega):
-            matches = r.get('matches', [])
-            open_matches = [m for m in matches if m.get('status') in ['Scheduled', 'Timed']]
-            finished_matches = [m for m in matches if m.get('status') == 'Finished']
-            if not open_matches: continue
-            if finished_matches:
-                dates = []
-                for m in finished_matches:
-                    d_raw = m.get('date_obj') or m.get('utcDate')
-                    if d_raw:
-                        if isinstance(d_raw, str):
-                            try: dates.append(datetime.strptime(d_raw[:10], "%Y-%m-%d"))
-                            except: pass
-                        elif isinstance(d_raw, datetime): dates.append(d_raw)
-                if dates:
-                    last_regular_date = max(dates)
-                    limit_date = last_regular_date + timedelta(days=7)
-                    has_valid_upcoming = False
-                    for m in open_matches:
-                        d_raw = m.get('date_obj') or m.get('utcDate')
-                        match_date = None
-                        if d_raw:
-                            if isinstance(d_raw, str):
-                                try: match_date = datetime.strptime(d_raw[:10], "%Y-%m-%d")
-                                except: pass
-                            elif isinstance(d_raw, datetime): match_date = d_raw
-                        if match_date and match_date >= oggi and match_date <= limit_date:
-                            has_valid_upcoming = True
-                            break
-                    if has_valid_upcoming:
-                        anchor_index = i
-                        break
-            else:
-                anchor_index = i
-                break
-        
+        current_round_doc = db['league_current_rounds'].find_one({"league": lega})
+        if current_round_doc and current_round_doc.get('current_round'):
+            target = current_round_doc['current_round']
+            for i, r in enumerate(rounds_lega):
+                if get_round_num(r) == target:
+                    anchor_index = i
+                    break
+
+        # Fallback: ultima giornata con risultati
         if anchor_index == -1:
              for i in range(len(rounds_lega) - 1, -1, -1):
                  r = rounds_lega[i]

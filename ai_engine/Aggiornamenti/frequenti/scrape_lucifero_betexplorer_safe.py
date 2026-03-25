@@ -41,7 +41,6 @@ LEAGUES = [
     {"name": "Serie C - Girone A", "url": "https://www.betexplorer.com/football/italy/serie-c-group-a/results/"},
     {"name": "Serie C - Girone B", "url": "https://www.betexplorer.com/football/italy/serie-c-group-b/results/"},
     {"name": "Serie C - Girone C", "url": "https://www.betexplorer.com/football/italy/serie-c-group-c/results/"},
-    
     # EUROPA TOP
     {"name": "Premier League", "url": "https://www.betexplorer.com/football/england/premier-league/results/"},
     {"name": "La Liga", "url": "https://www.betexplorer.com/football/spain/laliga/results/"},
@@ -49,15 +48,12 @@ LEAGUES = [
     {"name": "Ligue 1", "url": "https://www.betexplorer.com/football/france/ligue-1/results/"},
     {"name": "Eredivisie", "url": "https://www.betexplorer.com/football/netherlands/eredivisie/results/"},
     {"name": "Liga Portugal", "url": "https://www.betexplorer.com/football/portugal/liga-portugal/results/"},
-    
-    # 🆕 EUROPA SERIE B
+    # EUROPA SERIE B
     {"name": "Championship", "url": "https://www.betexplorer.com/football/england/championship/results/"},
-    {"name": "League One", "url": "https://www.betexplorer.com/football/england/league-one/results/"},
     {"name": "LaLiga 2", "url": "https://www.betexplorer.com/football/spain/laliga2/results/"},
     {"name": "2. Bundesliga", "url": "https://www.betexplorer.com/football/germany/2-bundesliga/results/"},
     {"name": "Ligue 2", "url": "https://www.betexplorer.com/football/france/ligue-2/results/"},
-    
-    # 🆕 EUROPA NORDICI + EXTRA
+    # EUROPA NORDICI + EXTRA
     {"name": "Scottish Premiership", "url": "https://www.betexplorer.com/football/scotland/premiership/results/"},
     {"name": "Allsvenskan", "url": "https://www.betexplorer.com/football/sweden/allsvenskan/results/"},
     {"name": "Eliteserien", "url": "https://www.betexplorer.com/football/norway/eliteserien/results/"},
@@ -65,16 +61,15 @@ LEAGUES = [
     {"name": "Jupiler Pro League", "url": "https://www.betexplorer.com/football/belgium/jupiler-pro-league/results/"},
     {"name": "Süper Lig", "url": "https://www.betexplorer.com/football/turkey/super-lig/results/"},
     {"name": "League of Ireland Premier Division", "url": "https://www.betexplorer.com/football/ireland/premier-division/results/"},
-    
-    # 🆕 AMERICHE
+    # AMERICHE
     {"name": "Brasileirão Serie A", "url": "https://www.betexplorer.com/it/football/brazil/serie-a-betano/results/"},
     {"name": "Primera División", "url": "https://www.betexplorer.com/it/football/argentina/liga-profesional/results/"},
     {"name": "Major League Soccer", "url": "https://www.betexplorer.com/football/usa/mls/results/"},
-    
-    # 🆕 ASIA
+    # ASIA
     {"name": "J1 League", "url": "https://www.betexplorer.com/football/japan/j1-league/results/"},
 
     # NUOVI CAMPIONATI (24/03/2026)
+    {"name": "League One", "url": "https://www.betexplorer.com/football/england/league-one/results/"},
     {"name": "League Two", "url": "https://www.betexplorer.com/football/england/league-two/results/"},
     {"name": "Veikkausliiga", "url": "https://www.betexplorer.com/football/finland/veikkausliiga/results/"},
     {"name": "3. Liga", "url": "https://www.betexplorer.com/football/germany/3-liga/results/"},
