@@ -1,18 +1,9 @@
 import os
 import sys
 import time
-import subprocess
-import atexit
-
-_active_driver = None
-def _cleanup():
-    global _active_driver
-    if _active_driver:
-        try: _active_driver.quit()
-        except: pass
-        _active_driver = None
-atexit.register(_cleanup)
+import requests
 from datetime import datetime, timedelta
+from bs4 import BeautifulSoup
 
 # --- FIX PERCORSI ---
 current_path = os.path.dirname(os.path.abspath(__file__))
@@ -23,13 +14,6 @@ while not os.path.exists(os.path.join(current_path, 'config.py')):
 sys.path.append(current_path)
 
 from config import db
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from webdriver_manager.chrome import ChromeDriverManager
 
 # COLLEZIONE PARALLELA (Sandbox)
 safe_col = db['matches_history_betexplorer']
@@ -136,65 +120,56 @@ def parse_date_cell(date_text):
 
     return "Unknown"
 
-def run_scraper():
-    print("🚀 AVVIO SCRAPER V3 (DATA FIX)...")
-    
-    ALL_MATCHES_BUFFER = []
-    chrome_options = Options()
-    chrome_options.add_argument("--disable-gpu")
-    chrome_options.add_argument("--log-level=3")
-    # Blocca immagini
-    prefs = {"profile.managed_default_content_settings.images": 2}
-    chrome_options.add_experimental_option("prefs", prefs)
+def get_odd(cell):
+    """Estrae la quota da una cella: prima da data-odd, poi da span annidato."""
+    odd = cell.get('data-odd')
+    if odd: return clean_float(odd)
+    span = cell.find('span', attrs={'data-odd': True})
+    if span: return clean_float(span['data-odd'])
+    return None
 
-    chrome_ver = None
-    try:
-        r = subprocess.run(['reg', 'query', r'HKEY_CURRENT_USER\Software\Google\Chrome\BLBeacon', '/v', 'version'], capture_output=True, text=True, timeout=5)
-        for line in r.stdout.splitlines():
-            if line.strip().startswith('version'):
-                chrome_ver = line.split()[-1]
-    except: pass
-    service = Service(ChromeDriverManager(driver_version=chrome_ver).install() if chrome_ver else ChromeDriverManager().install())
-    driver = webdriver.Chrome(service=service, options=chrome_options)
-    _active_driver = driver
+def run_scraper():
+    print("🚀 AVVIO SCRAPER V4 (BeautifulSoup - NO Selenium)...")
+
+    ALL_MATCHES_BUFFER = []
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'}
 
     for league in LEAGUES:
         print(f"\n🌍 Scarico {league['name']}...")
         try:
-            driver.get(league['url'])
-            time.sleep(3) 
+            r = requests.get(league['url'], headers=headers, timeout=20)
+            if r.status_code != 200:
+                print(f"   ❌ HTTP {r.status_code}")
+                continue
 
-            rows = driver.find_elements(By.CSS_SELECTOR, ".table-main tr")
+            soup = BeautifulSoup(r.text, 'html.parser')
+            rows = soup.select('.table-main tr')
             league_count = 0
 
             for row in rows:
                 try:
-                    # Ignora righe header data (es. "Round 15")
-                    if "h-text-left" in row.get_attribute("class") and not row.find_elements(By.TAG_NAME, "a"):
-                        continue
-                    
-                    cells = row.find_elements(By.TAG_NAME, "td")
+                    cells = row.find_all('td')
                     if len(cells) < 5: continue
 
                     # 1. SQUADRE
-                    match_text = cells[0].text
+                    match_text = cells[0].text.strip()
                     if "-" not in match_text: continue
                     parts = match_text.split("-")
                     home = parts[0].strip()
                     away = parts[1].strip()
 
                     # 2. RISULTATO
-                    score_text = cells[1].text
+                    score_text = cells[1].text.strip()
                     if ":" not in score_text: continue
                     score_parts = score_text.split(":")
                     gh = int(score_parts[0])
                     ga = int(score_parts[1])
 
-                    # 3. QUOTE
-                    o1 = clean_float(cells[2].text)
-                    ox = clean_float(cells[3].text)
-                    o2 = clean_float(cells[4].text)
-                    
+                    # 3. QUOTE (da attributo data-odd)
+                    o1 = get_odd(cells[2])
+                    ox = get_odd(cells[3])
+                    o2 = get_odd(cells[4])
+
                     # 4. DATA (Ultima cella)
                     date_text = cells[-1].text
                     formatted_date = parse_date_cell(date_text)
@@ -222,16 +197,15 @@ def run_scraper():
                 except:
                     continue
             print(f"   📦 Trovate: {league_count} partite.")
+            time.sleep(0.5)
 
         except Exception as e:
             print(f"   ❌ Errore: {e}")
 
-    driver.quit()
-
     # SALVATAGGIO FINALE
     if len(ALL_MATCHES_BUFFER) > 50:
         print(f"\n🧹 PULIZIA E SALVATAGGIO IN {safe_col.name}...")
-        safe_col.delete_many({}) 
+        safe_col.delete_many({})
         safe_col.insert_many(ALL_MATCHES_BUFFER)
         print(f"   ✅ Salvate {len(ALL_MATCHES_BUFFER)} partite correttamente.")
     else:
