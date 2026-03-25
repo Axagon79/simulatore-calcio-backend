@@ -294,11 +294,22 @@ def run_scraper():
     
     driver = None
     total_updated = 0
+    league_stats = []  # Report per campionato
+    scraper_start = time.time()
+
+    # Cache tutti i teams per evitare query ripetute (1 query invece di ~1800)
+    _teams_cache = {}
+    for t in db.teams.find({}, {"name": 1, "aliases": 1}):
+        _teams_cache[t['name']] = t
 
     try:
         for league in LEAGUES_CONFIG:
             lname = league['name']
             url = league['url']
+            league_start = time.time()
+            league_found = 0
+            league_updated = 0
+            league_skipped = 0
             
             if driver is None:
                 chrome_ver = None
@@ -313,7 +324,7 @@ def run_scraper():
                 _active_driver = driver
 
             driver.get(url)
-            time.sleep(3)
+            time.sleep(1.5)
 
             # Verifica caricamento, retry con refresh se fallisce
             stage = league.get('stage')
@@ -327,14 +338,14 @@ def run_scraper():
                         try:
                             stage_btn = driver.find_element(By.CSS_SELECTOR, f"div.stage span[stage='{stage}']")
                             stage_btn.click()
-                            time.sleep(3)
+                            time.sleep(1.5)
                         except:
                             pass
                     # Seleziona quote 1X2 (default e AH)
                     try:
                         odds_1x2 = driver.find_element(By.CSS_SELECTOR, "li[type='O']")
                         driver.execute_script("arguments[0].click()", odds_1x2)
-                        time.sleep(3)
+                        time.sleep(1.5)
                     except:
                         pass
                     break
@@ -354,13 +365,13 @@ def run_scraper():
                 # La prima giornata (corrente) è già caricata, le altre servono doppio click
                 if idx > 0:
                     click_specific_round(driver, round_num, stage=stage)
-                    time.sleep(1)
+                    time.sleep(0.5)
                     click_specific_round(driver, round_num, stage=stage)
                     # Dopo click giornata, riseleziona solo 1X2 (il girone resta)
                     try:
                         odds_1x2 = driver.find_element(By.CSS_SELECTOR, "li[type='O']")
                         driver.execute_script("arguments[0].click()", odds_1x2)
-                        time.sleep(3)
+                        time.sleep(1.5)
                     except:
                         pass
 
@@ -370,6 +381,7 @@ def run_scraper():
                 match_divs = soup.find_all("div", class_="schedulis")
 
                 scraped_data = []
+                league_found += len(match_divs)
                 for m_div in match_divs:
                     try:
                         # Nomi squadre
@@ -400,9 +412,9 @@ def run_scraper():
                 match_count = 0
 
                 for m in matches:
-                    # 1. Carichiamo la squadra dal DB per leggere i suoi alias
-                    team_h_doc = db.teams.find_one({"name": m['home']})
-                    team_a_doc = db.teams.find_one({"name": m['away']})
+                    # 1. Carichiamo la squadra dalla cache per leggere i suoi alias
+                    team_h_doc = _teams_cache.get(m['home'])
+                    team_a_doc = _teams_cache.get(m['away'])
 
                     # 2. Creiamo la lista di TUTTI i nomi possibili + varianti senza prefissi/suffissi
                     possible_names_h = [m['home'].lower().strip()]
@@ -485,14 +497,33 @@ def run_scraper():
                     db.h2h_by_round.update_one({"_id": round_doc["_id"]}, {"$set": {"matches": matches}})
                     print(f" ✅ Aggiornate {match_count} quote.")
                     total_updated += match_count
+                    league_updated += match_count
+                    league_skipped += len(matches) - match_count
                 else:
                     print(f" (Nessuna variazione)")
+                    league_skipped += len(matches)
+
+            league_elapsed = time.time() - league_start
+            league_stats.append({"name": lname, "found": league_found, "updated": league_updated, "skipped": league_skipped, "time": league_elapsed})
 
     except Exception as e:
         print(f"❌ Errore: {e}")
     finally:
         if driver: driver.quit()
-        print(f"\n🏁 FINE. Totale Aggiornati: {total_updated}")
+        total_elapsed = time.time() - scraper_start
+        print(f"\n{'='*80}")
+        print(f"📊 RIEPILOGO SCRAPER NOWGOAL (Quote 1X2)")
+        print(f"{'='*80}")
+        print(f"{'Campionato':<35} | {'Trovate':>8} | {'Aggiorn':>8} | {'Saltate':>8} | {'Tempo':>8}")
+        print(f"{'-'*80}")
+        for s in league_stats:
+            print(f"{s['name']:<35} | {s['found']:>8} | {s['updated']:>8} | {s['skipped']:>8} | {s['time']:>6.1f}s")
+        print(f"{'-'*80}")
+        tot_found = sum(s['found'] for s in league_stats)
+        tot_skip = sum(s['skipped'] for s in league_stats)
+        print(f"{'TOTALE':<35} | {tot_found:>8} | {total_updated:>8} | {tot_skip:>8} | {total_elapsed:>6.1f}s")
+        print(f"{'='*80}")
+        print(f"⏱️ Tempo totale: {total_elapsed/60:.1f} minuti")
 
 if __name__ == "__main__":
     run_scraper()
