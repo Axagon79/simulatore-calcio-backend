@@ -13,7 +13,7 @@ def _cleanup():
         except: pass
         _active_driver = None
 atexit.register(_cleanup)
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 # FIX PERCORSI
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -257,7 +257,6 @@ def get_target_rounds_from_page(driver, league_name, has_stages=False):
 
     # Salva la giornata corrente nel DB per index.js
     if current_round is not None:
-        from datetime import datetime, timezone
         db.league_current_rounds.update_one(
             {"league": league_name},
             {"$set": {"current_round": current_round, "updated_at": datetime.now(timezone.utc)}},

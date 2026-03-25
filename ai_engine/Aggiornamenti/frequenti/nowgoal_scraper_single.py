@@ -14,7 +14,7 @@ def _cleanup():
         except: pass
         _active_driver = None
 atexit.register(_cleanup)
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, List, Optional, Tuple
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -731,7 +731,6 @@ def run_scraper():
             print(f"   📅 Giornata corrente sul sito: {current_round}")
 
             # Salva la giornata corrente nel DB per index.js
-            from datetime import datetime, timezone
             db.league_current_rounds.update_one(
                 {"league": league_name},
                 {"$set": {"current_round": current_round, "updated_at": datetime.now(timezone.utc)}},
