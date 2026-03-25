@@ -85,9 +85,9 @@ app.get('/api/leagues', (req, res) => {
     'Italy': [
       { id: 'SERIE_A', name: 'Serie A' },
       { id: 'SERIE_B', name: 'Serie B' },
-      { id: 'SERIE_C_A', name: 'Serie C - Girone A' },
-      { id: 'SERIE_C_B', name: 'Serie C - Girone B' },
-      { id: 'SERIE_C_C', name: 'Serie C - Girone C' }
+      { id: 'SERIE_C_GIRONE_A', name: 'Serie C - Girone A' },
+      { id: 'SERIE_C_GIRONE_B', name: 'Serie C - Girone B' },
+      { id: 'SERIE_C_GIRONE_C', name: 'Serie C - Girone C' }
     ],
     'England': [
       { id: 'PREMIER_LEAGUE', name: 'Premier League' },

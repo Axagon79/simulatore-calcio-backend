@@ -309,9 +309,9 @@ app.get('/matches', async (req, res) => {
     const leagueMap = {
       'SERIE_A': 'Serie A',
       'SERIE_B': 'Serie B',
-      'SERIE_C_A': 'Serie C - Girone A',
-      'SERIE_C_B': 'Serie C - Girone B',
-      'SERIE_C_C': 'Serie C - Girone C',
+      'SERIE_C_GIRONE_A': 'Serie C - Girone A',
+      'SERIE_C_GIRONE_B': 'Serie C - Girone B',
+      'SERIE_C_GIRONE_C': 'Serie C - Girone C',
       'PREMIER_LEAGUE': 'Premier League',
       'LA_LIGA': 'La Liga',
       'BUNDESLIGA': 'Bundesliga',
@@ -402,9 +402,9 @@ app.get('/matches-today', async (req, res) => {
     const reverseLeagueMap = {
       'Serie A': { id: 'SERIE_A', country: 'Italy' },
       'Serie B': { id: 'SERIE_B', country: 'Italy' },
-      'Serie C - Girone A': { id: 'SERIE_C_A', country: 'Italy' },
-      'Serie C - Girone B': { id: 'SERIE_C_B', country: 'Italy' },
-      'Serie C - Girone C': { id: 'SERIE_C_C', country: 'Italy' },
+      'Serie C - Girone A': { id: 'SERIE_C_GIRONE_A', country: 'Italy' },
+      'Serie C - Girone B': { id: 'SERIE_C_GIRONE_B', country: 'Italy' },
+      'Serie C - Girone C': { id: 'SERIE_C_GIRONE_C', country: 'Italy' },
       'Premier League': { id: 'PREMIER_LEAGUE', country: 'England' },
       'La Liga': { id: 'LA_LIGA', country: 'Spain' },
       'Bundesliga': { id: 'BUNDESLIGA', country: 'Germany' },
@@ -635,7 +635,7 @@ app.get('/streaks', async (req, res) => {
     // Converti ID lega → nome nel DB (stessa mappa di /matches)
     const leagueMap = {
       'SERIE_A': 'Serie A', 'SERIE_B': 'Serie B',
-      'SERIE_C_A': 'Serie C - Girone A', 'SERIE_C_B': 'Serie C - Girone B', 'SERIE_C_C': 'Serie C - Girone C',
+      'SERIE_C_GIRONE_A': 'Serie C - Girone A', 'SERIE_C_GIRONE_B': 'Serie C - Girone B', 'SERIE_C_GIRONE_C': 'Serie C - Girone C',
       'PREMIER_LEAGUE': 'Premier League', 'LA_LIGA': 'La Liga', 'BUNDESLIGA': 'Bundesliga',
       'LIGUE_1': 'Ligue 1', 'EREDIVISIE': 'Eredivisie', 'LIGA_PORTUGAL': 'Liga Portugal',
       'CHAMPIONSHIP': 'Championship', 'LA_LIGA_2': 'LaLiga 2', 'BUNDESLIGA_2': '2. Bundesliga', 'LIGUE_2': 'Ligue 2',
@@ -1001,9 +1001,9 @@ app.get('/leagues', (req, res) => {
     'Italy': [
       { id: 'SERIE_A', name: 'Serie A' },
       { id: 'SERIE_B', name: 'Serie B' },
-      { id: 'SERIE_C_A', name: 'Serie C - Girone A' },
-      { id: 'SERIE_C_B', name: 'Serie C - Girone B' },
-      { id: 'SERIE_C_C', name: 'Serie C - Girone C' }
+      { id: 'SERIE_C_GIRONE_A', name: 'Serie C - Girone A' },
+      { id: 'SERIE_C_GIRONE_B', name: 'Serie C - Girone B' },
+      { id: 'SERIE_C_GIRONE_C', name: 'Serie C - Girone C' }
     ],
     'England': [
       { id: 'PREMIER_LEAGUE', name: 'Premier League' },
