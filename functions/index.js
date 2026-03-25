@@ -160,9 +160,9 @@ app.get('/rounds', async (req, res) => {
     const leagueMap = {
       SERIE_A: 'Serie A',
       SERIE_B: 'Serie B',
-      SERIE_C_A: 'Serie C - Girone A',
-      SERIE_C_B: 'Serie C - Girone B',
-      SERIE_C_C: 'Serie C - Girone C',
+      SERIE_C_GIRONE_A: 'Serie C - Girone A',
+      SERIE_C_GIRONE_B: 'Serie C - Girone B',
+      SERIE_C_GIRONE_C: 'Serie C - Girone C',
       PREMIER_LEAGUE: 'Premier League',
       LA_LIGA: 'La Liga',
       BUNDESLIGA: 'Bundesliga',
