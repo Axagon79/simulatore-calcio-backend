@@ -18,34 +18,50 @@ from config import db
 # --- CONFIGURAZIONE ---
 standings_col = db['classifiche']
 matches_col = db['h2h_by_round']
+current_rounds_col = db['league_current_rounds']
 
-def get_round_number(doc):
-    name = doc.get('_id', '') or doc.get('round_name', '')
-    match = re.search(r'(\d+)', str(name))
-    return int(match.group(1)) if match else 999
+def get_round_number_from_text(text):
+    match = re.search(r'(\d+)', str(text))
+    return int(match.group(1)) if match else 0
 
-def find_target_rounds(league_docs):
+def find_target_rounds(league_docs, league_name=None):
+    """Trova i 3 round target (prec/attuale/succ) usando league_current_rounds come ancora."""
     if not league_docs: return []
-    sorted_docs = sorted(league_docs, key=get_round_number)
-    now = datetime.now()
-    closest_index = -1
-    min_diff = float('inf')
-    for i, doc in enumerate(sorted_docs):
-        dates = []
-        for m in doc.get('matches', []):
-            d_raw = m.get('date_obj') or m.get('date')
-            try:
-                if d_raw:
-                    d = d_raw if isinstance(d_raw, datetime) else dateutil.parser.parse(d_raw)
-                    dates.append(d.replace(tzinfo=None))
-            except: pass
-        if dates:
-            avg_date = sum([d.timestamp() for d in dates]) / len(dates)
-            diff = abs(now.timestamp() - avg_date)
-            if diff < min_diff: min_diff = diff; closest_index = i
-    if closest_index == -1: return []
-    start_idx = max(0, closest_index - 1)
-    end_idx = min(len(sorted_docs), closest_index + 2)
+    sorted_docs = sorted(league_docs, key=lambda d: get_round_number_from_text(d.get('round_name', '0')))
+
+    anchor_index = -1
+
+    # Metodo primario: leggi current_round dalla collection league_current_rounds (scritto da nowgoal_scraper)
+    if league_name:
+        cr_doc = current_rounds_col.find_one({"league": league_name})
+        if cr_doc and cr_doc.get("current_round") is not None:
+            current_round = cr_doc["current_round"]
+            for i, doc in enumerate(sorted_docs):
+                if get_round_number_from_text(doc.get('round_name', '0')) == current_round:
+                    anchor_index = i
+                    break
+
+    # Fallback: media date (per leghe non ancora in league_current_rounds)
+    if anchor_index == -1:
+        now = datetime.now()
+        min_diff = float('inf')
+        for i, doc in enumerate(sorted_docs):
+            dates = []
+            for m in doc.get('matches', []):
+                d_raw = m.get('date_obj') or m.get('date')
+                try:
+                    if d_raw:
+                        d = d_raw if isinstance(d_raw, datetime) else dateutil.parser.parse(d_raw)
+                        dates.append(d.replace(tzinfo=None))
+                except: pass
+            if dates:
+                avg_date = sum([d.timestamp() for d in dates]) / len(dates)
+                diff = abs(now.timestamp() - avg_date)
+                if diff < min_diff: min_diff = diff; anchor_index = i
+
+    if anchor_index == -1: return []
+    start_idx = max(0, anchor_index - 1)
+    end_idx = min(len(sorted_docs), anchor_index + 2)
     return sorted_docs[start_idx:end_idx]
 
 def inject_standings_final():
@@ -78,7 +94,7 @@ def inject_standings_final():
             by_league.setdefault(lg, []).append(doc)
     target_ids = []
     for lg_name, lg_docs in by_league.items():
-        target = find_target_rounds(lg_docs)
+        target = find_target_rounds(lg_docs, league_name=lg_name)
         target_ids.extend([d["_id"] for d in target])
     all_target_rounds = list(matches_col.find({"_id": {"$in": target_ids}}))
     print(f"   📋 {len(by_league)} campionati, {len(light_docs)} docs → {len(all_target_rounds)} giornate mirate")

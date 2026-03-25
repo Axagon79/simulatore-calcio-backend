@@ -66,15 +66,25 @@ def get_real_matches_from_db(nation: str, league: str, main_mode: int):
         # ORDINA PER NUMERO GIORNATA (dal tuo codice)
         rounds_list.sort(key=lambda x: get_round_number(x.get('round_name', '0')))
         
-        # TROVA ANCHOR (dal tuo codice ESATTO)
+        # TROVA ANCHOR — metodo primario: league_current_rounds (scritto da nowgoal_scraper)
         anchor_index = -1
-        for i, r in enumerate(rounds_list):
-            if any(m.get('status') in ['Scheduled', 'Timed'] for m in r.get('matches', [])):
-                anchor_index = i
-                break
+        cr_doc = db.league_current_rounds.find_one({"league": league})
+        if cr_doc and cr_doc.get("current_round") is not None:
+            current_round = cr_doc["current_round"]
+            for i, r in enumerate(rounds_list):
+                if get_round_number(r.get('round_name', '0')) == current_round:
+                    anchor_index = i
+                    break
+
+        # Fallback: primo round con partite Scheduled/Timed
+        if anchor_index == -1:
+            for i, r in enumerate(rounds_list):
+                if any(m.get('status') in ['Scheduled', 'Timed'] for m in r.get('matches', [])):
+                    anchor_index = i
+                    break
         if anchor_index == -1:
             for i in range(len(rounds_list) - 1, -1, -1):
-                if has_valid_results(r):  # Funzione dal tuo file
+                if has_valid_results(rounds_list[i]):
                     anchor_index = i
                     break
         
