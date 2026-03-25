@@ -166,6 +166,53 @@ LEAGUES_CONFIG = [
         "url_age": "https://www.transfermarkt.it/major-league-soccer/altersschnitt/wettbewerb/MLS1/plus/1"
     },
 
+    # NUOVI CAMPIONATI (24/03/2026)
+    {
+        "name": "League Two",
+        "url_value": "https://www.transfermarkt.it/league-two/startseite/wettbewerb/GB4",
+        "url_age": "https://www.transfermarkt.it/league-two/altersschnitt/wettbewerb/GB4/plus/1"
+    },
+    {
+        "name": "Veikkausliiga",
+        "url_value": "https://www.transfermarkt.it/veikkausliiga/startseite/wettbewerb/FI1",
+        "url_age": "https://www.transfermarkt.it/veikkausliiga/altersschnitt/wettbewerb/FI1/plus/1"
+    },
+    {
+        "name": "3. Liga",
+        "url_value": "https://www.transfermarkt.it/3-liga/startseite/wettbewerb/L3",
+        "url_age": "https://www.transfermarkt.it/3-liga/altersschnitt/wettbewerb/L3/plus/1"
+    },
+    {
+        "name": "Liga MX",
+        "url_value": "https://www.transfermarkt.it/liga-mx-clausura/startseite/wettbewerb/MEX1",
+        "url_age": "https://www.transfermarkt.it/liga-mx-clausura/altersschnitt/wettbewerb/MEX1/plus/1"
+    },
+    {
+        "name": "Eerste Divisie",
+        "url_value": "https://www.transfermarkt.it/eerste-divisie/startseite/wettbewerb/NL2",
+        "url_age": "https://www.transfermarkt.it/eerste-divisie/altersschnitt/wettbewerb/NL2/plus/1"
+    },
+    {
+        "name": "Liga Portugal 2",
+        "url_value": "https://www.transfermarkt.it/liga-portugal-2/startseite/wettbewerb/PO2",
+        "url_age": "https://www.transfermarkt.it/liga-portugal-2/altersschnitt/wettbewerb/PO2/plus/1"
+    },
+    {
+        "name": "1. Lig",
+        "url_value": "https://www.transfermarkt.it/1-lig/startseite/wettbewerb/TR2",
+        "url_age": "https://www.transfermarkt.it/1-lig/altersschnitt/wettbewerb/TR2/plus/1"
+    },
+    {
+        "name": "Saudi Pro League",
+        "url_value": "https://www.transfermarkt.it/saudi-professional-league/startseite/wettbewerb/SA1",
+        "url_age": "https://www.transfermarkt.it/saudi-professional-league/altersschnitt/wettbewerb/SA1/plus/1"
+    },
+    {
+        "name": "Scottish Championship",
+        "url_value": "https://www.transfermarkt.it/scottish-championship/startseite/wettbewerb/SC2",
+        "url_age": "https://www.transfermarkt.it/scottish-championship/altersschnitt/wettbewerb/SC2/plus/1"
+    },
+
     # ASIA
     {
         "name": "J1 League",
