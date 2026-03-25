@@ -188,6 +188,14 @@ NOME_OVERRIDE = {
 
 def scrape_all_teams(test_mode=False):
     """Scarica rose da Sportradar per tutte le squadre senza FBref (Serie C, Liga Portugal 2, 1. Lig)"""
+
+    # Cache 3 giorni: se il file è recente, salta lo scrape
+    if os.path.exists(CACHE_FILE) and not test_mode:
+        cache_age_hours = (time.time() - os.path.getmtime(CACHE_FILE)) / 3600
+        if cache_age_hours < 72:  # 3 giorni
+            print(f"⏭️ Cache Sportradar recente ({cache_age_hours:.0f}h fa, soglia 72h) — scrape saltato, uso cache esistente.")
+            return
+
     import undetected_chromedriver as uc
     from selenium.webdriver.common.by import By
 
