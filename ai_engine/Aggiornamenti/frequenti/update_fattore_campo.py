@@ -171,35 +171,42 @@ def calculate_field_factor(home_id, home_name, away_id, away_name, league_name=N
 # --- FUNZIONI PER TROVARE LE GIORNATE MIRATE (Prec/Attuale/Succ) ---
 # Copiato da db_updater_bvs.py
 
-def get_round_number(doc):
-    """Estrae il numero di giornata dall'ID documento."""
-    name = doc.get('_id', '') or doc.get('round_name', '')
-    match = re.search(r'(\d+)', str(name))
-    return int(match.group(1)) if match else 999
+def get_round_number_from_text(text):
+    match = re.search(r'(\d+)', str(text))
+    return int(match.group(1)) if match else 0
 
-def find_target_rounds(league_docs):
-    """Trova le 3 giornate da aggiornare: precedente, attuale, successiva."""
+def find_target_rounds(league_docs, league_name=None):
+    """Trova i 3 round target (prec/attuale/succ) usando league_current_rounds come ancora."""
     if not league_docs: return []
-    sorted_docs = sorted(league_docs, key=get_round_number)
-    now = datetime.now()
-    closest_index = -1
-    min_diff = float('inf')
-    for i, doc in enumerate(sorted_docs):
-        dates = []
-        for m in doc.get('matches', []):
-            d_raw = m.get('date_obj') or m.get('date')
-            try:
-                if d_raw:
-                    d = d_raw if isinstance(d_raw, datetime) else dateutil.parser.parse(d_raw)
-                    dates.append(d.replace(tzinfo=None))
-            except: pass
-        if dates:
-            avg_date = sum([d.timestamp() for d in dates]) / len(dates)
-            diff = abs(now.timestamp() - avg_date)
-            if diff < min_diff: min_diff = diff; closest_index = i
-    if closest_index == -1: return []
-    start_idx = max(0, closest_index - 1)
-    end_idx = min(len(sorted_docs), closest_index + 2)
+    sorted_docs = sorted(league_docs, key=lambda d: get_round_number_from_text(d.get('round_name', '0')))
+    anchor_index = -1
+    if league_name:
+        cr_doc = db['league_current_rounds'].find_one({"league": league_name})
+        if cr_doc and cr_doc.get("current_round") is not None:
+            current_round = cr_doc["current_round"]
+            for i, doc in enumerate(sorted_docs):
+                if get_round_number_from_text(doc.get('round_name', '0')) == current_round:
+                    anchor_index = i
+                    break
+    if anchor_index == -1:
+        now = datetime.now()
+        min_diff = float('inf')
+        for i, doc in enumerate(sorted_docs):
+            dates = []
+            for m in doc.get('matches', []):
+                d_raw = m.get('date_obj') or m.get('date')
+                try:
+                    if d_raw:
+                        d = d_raw if isinstance(d_raw, datetime) else dateutil.parser.parse(d_raw)
+                        dates.append(d.replace(tzinfo=None))
+                except: pass
+            if dates:
+                avg_date = sum([d.timestamp() for d in dates]) / len(dates)
+                diff = abs(now.timestamp() - avg_date)
+                if diff < min_diff: min_diff = diff; anchor_index = i
+    if anchor_index == -1: return []
+    start_idx = max(0, anchor_index - 1)
+    end_idx = min(len(sorted_docs), anchor_index + 2)
     return sorted_docs[start_idx:end_idx]
 
 
@@ -261,12 +268,12 @@ def run_updater():
         league_docs = list(h2h_collection.find({"league": league}))
 
         # 3. Trova le 3 giornate mirate
-        target_rounds = find_target_rounds(league_docs)
+        target_rounds = find_target_rounds(league_docs, league_name=league)
 
         if not target_rounds:
             continue
 
-        round_nums = [get_round_number(d) for d in target_rounds]
+        round_nums = [get_round_number_from_text(d.get('round_name', '0')) for d in target_rounds]
         print(f"\n  🏆 {league}: giornate {round_nums}")
         total_rounds += len(target_rounds)
 
