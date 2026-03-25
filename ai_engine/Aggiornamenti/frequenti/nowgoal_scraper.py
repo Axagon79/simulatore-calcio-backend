@@ -300,6 +300,9 @@ def run_scraper():
     _teams_cache = {}
     for t in db.teams.find({}, {"name": 1, "aliases": 1}):
         _teams_cache[t['name']] = t
+        for a in t.get('aliases', []):
+            if isinstance(a, str) and a not in _teams_cache:
+                _teams_cache[a] = t
 
     try:
         for league in LEAGUES_CONFIG:
