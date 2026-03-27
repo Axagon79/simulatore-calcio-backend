@@ -15,6 +15,7 @@ Uso:
 
 import sys
 import os
+import re
 import math
 import argparse
 from datetime import datetime, timedelta, timezone
@@ -1746,6 +1747,32 @@ def orchestrate_date(date_str, dry_run=False, match_time_filter=None, preserve_a
     if not all_match_keys:
         return 0
 
+    # 2b. Costruisci mappa giornata da h2h_by_round per questa data
+    # Cerca tutti i round che contengono partite in questa data
+    _round_map = {}  # (league, home, away) → round_number (int)
+    try:
+        from datetime import timezone as _tz
+        _date_obj = datetime.strptime(date_str, "%Y-%m-%d")
+        _date_start = _date_obj.replace(hour=0, minute=0, second=0)
+        _date_end = _date_obj.replace(hour=23, minute=59, second=59)
+        _rounds = db['h2h_by_round'].find(
+            {'matches.date_obj': {'$gte': _date_start, '$lte': _date_end}},
+            {'league': 1, 'round_name': 1, 'matches.home': 1, 'matches.away': 1, 'matches.date_obj': 1}
+        )
+        for _r in _rounds:
+            _rname = _r.get('round_name', '')
+            _rnum_match = re.search(r'(\d+)', _rname)
+            _rnum = int(_rnum_match.group(1)) if _rnum_match else None
+            if _rnum is None:
+                continue
+            _league = _r.get('league', '')
+            for _m in _r.get('matches', []):
+                _md = _m.get('date_obj')
+                if _md and _date_start <= _md <= _date_end:
+                    _round_map[(_league, _m.get('home', ''), _m.get('away', ''))] = _rnum
+    except Exception as e:
+        print(f"    ⚠️ Errore lookup giornata: {e}")
+
     # 3. Per ogni partita, applica routing
     unified_docs = []
     for match_key in sorted(all_match_keys):
@@ -2050,6 +2077,12 @@ def orchestrate_date(date_str, dry_run=False, match_time_filter=None, preserve_a
                 if doc and field in doc and doc[field]:
                     unified_doc[field] = doc[field]
                     break
+
+        # Giornata (round number) da h2h_by_round
+        _rkey = (unified_doc.get('league', ''), unified_doc.get('home', ''), unified_doc.get('away', ''))
+        _giornata = _round_map.get(_rkey)
+        if _giornata:
+            unified_doc['giornata'] = _giornata
 
         # Imposta decision in base ai pronostici generati
         has_real_tip = any(p.get('pronostico') and p['pronostico'] != 'NO BET' for p in unified_doc.get('pronostici', []))
