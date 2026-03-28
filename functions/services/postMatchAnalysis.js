@@ -590,14 +590,40 @@ async function generateComment(params) {
       }
 
       const parsed = JSON.parse(content);
-      const validation = validateJSON(parsed, inputData);
 
-      if (validation.valid) {
-        return `${parsed.pre_match}\n\n${parsed.partita}\n\n${parsed.resoconto}`;
+      // Se il JSON ha i 3 campi, accettalo al primo tentativo
+      // Il validator fa domande solo dal secondo tentativo in poi
+      if (parsed.pre_match && parsed.partita && parsed.resoconto) {
+        if (attempt === 0) {
+          // Primo tentativo: accetta se ha i 3 campi (validazione soft)
+          const validation = validateJSON(parsed, inputData);
+          if (validation.valid) {
+            return `${parsed.pre_match}\n\n${parsed.partita}\n\n${parsed.resoconto}`;
+          }
+          // Se ha errori critici (esito contraddetto), riprova
+          const critici = validation.questions.filter(q =>
+            q.includes('CENTRATO') || q.includes('SBAGLIATO') || q.includes('non ha segnato') ||
+            q.includes('ha vinto') || q.includes('ha dominato ma ha 0'));
+          if (critici.length === 0) {
+            // Solo errori minori — accetta comunque
+            console.log(`[POST-MATCH] Tentativo 1: errori minori ignorati (${validation.questions.length})`);
+            return `${parsed.pre_match}\n\n${parsed.partita}\n\n${parsed.resoconto}`;
+          }
+          lastQuestions = critici;
+          console.log(`[POST-MATCH] Tentativo 1: ${critici.length} errori critici → ${critici.join(' | ')}`);
+        } else {
+          // Retry: validazione completa
+          const validation = validateJSON(parsed, inputData);
+          if (validation.valid) {
+            return `${parsed.pre_match}\n\n${parsed.partita}\n\n${parsed.resoconto}`;
+          }
+          lastQuestions = validation.questions;
+          console.log(`[POST-MATCH] Tentativo ${attempt + 1}: ${validation.questions.length} domande → ${validation.questions.join(' | ')}`);
+        }
+      } else {
+        lastQuestions = ['Il JSON deve avere 3 campi: pre_match, partita, resoconto.'];
+        console.log(`[POST-MATCH] Tentativo ${attempt + 1}: campi mancanti`);
       }
-
-      lastQuestions = validation.questions;
-      console.log(`[POST-MATCH] Tentativo ${attempt + 1}: ${validation.questions.length} domande → ${validation.questions.join(' | ')}`);
 
     } catch (err) {
       lastQuestions = [`Il formato che hai restituito non era un JSON valido. Ricorda di restituire SOLO la struttura JSON richiesta, senza aggiungere alcun testo o commento fuori dalle parentesi graffe.`];
