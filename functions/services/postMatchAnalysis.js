@@ -136,7 +136,37 @@ function buildStructuredInput(params) {
     // Perche' il pronostico e' centrato/sbagliato
     const pron = _spiegaPronostico(tipo, pronostico, home, away);
     if (esito) {
-      fatti.push(`Il pronostico "${pron}" e' CENTRATO`);
+      // Spiega PERCHE' e' centrato
+      if (/GG|Entrambe segnano/i.test(pron)) {
+        fatti.push(`Il GG e' CENTRATO perche' entrambe le squadre hanno segnato (${hGoals}-${aGoals})`);
+      } else if (/NG|Almeno una non segna/i.test(pron)) {
+        const chi0 = hGoals === 0 ? home : (aGoals === 0 ? away : null);
+        if (chi0) fatti.push(`Il NG e' CENTRATO perche' ${chi0} non ha segnato (0 gol)`);
+        else fatti.push(`Il NG e' CENTRATO`);
+      } else if (/Over\s*(\d+\.?\d*)/.test(pron)) {
+        const thr = pron.match(/Over\s*(\d+\.?\d*)/)[1];
+        fatti.push(`L'Over ${thr} e' CENTRATO perche' ci sono stati ${totalGoals} gol`);
+      } else if (/Under\s*(\d+\.?\d*)/.test(pron)) {
+        const thr = pron.match(/Under\s*(\d+\.?\d*)/)[1];
+        fatti.push(`L'Under ${thr} e' CENTRATO perche' ci sono stati solo ${totalGoals} gol`);
+      } else if (/Vittoria\s+(.+?)\s*\(casa\)/i.test(pron)) {
+        fatti.push(`Il SEGNO 1 e' CENTRATO perche' ${home} ha vinto ${hGoals}-${aGoals}`);
+      } else if (/Vittoria\s+(.+?)\s*\(ospite\)/i.test(pron)) {
+        fatti.push(`Il SEGNO 2 e' CENTRATO perche' ${away} ha vinto ${hGoals}-${aGoals}`);
+      } else if (/Pareggio/i.test(pron)) {
+        fatti.push(`Il PAREGGIO e' CENTRATO (${hGoals}-${aGoals})`);
+      } else if (/DC 1X/i.test(pron)) {
+        fatti.push(`Il DC 1X e' CENTRATO perche' ${home} ${hGoals > aGoals ? 'ha vinto' : 'ha pareggiato'} (${hGoals}-${aGoals})`);
+      } else if (/DC X2/i.test(pron)) {
+        fatti.push(`Il DC X2 e' CENTRATO perche' ${away} ${aGoals > hGoals ? 'ha vinto' : 'ha pareggiato'} (${hGoals}-${aGoals})`);
+      } else if (/DC 12/i.test(pron)) {
+        fatti.push(`Il DC 12 e' CENTRATO perche' non e' finita in pareggio (${hGoals}-${aGoals})`);
+      } else if (/Multigol\s*(\d+)-(\d+)/i.test(pron)) {
+        const mgm = pron.match(/Multigol\s*(\d+)-(\d+)/i);
+        fatti.push(`Il Multigol ${mgm[1]}-${mgm[2]} e' CENTRATO perche' ci sono stati ${totalGoals} gol (dentro il range ${mgm[1]}-${mgm[2]})`);
+      } else {
+        fatti.push(`Il pronostico "${pron}" e' CENTRATO`);
+      }
     } else {
       // Spiega PERCHE' e' sbagliato
       if (/GG|Entrambe segnano/i.test(pron)) {
@@ -155,6 +185,17 @@ function buildStructuredInput(params) {
         if (hGoals <= aGoals) fatti.push(`Il SEGNO 1 e' SBAGLIATO perche' ${home} non ha vinto (${hGoals}-${aGoals})`);
       } else if (/Vittoria\s+(.+?)\s*\(ospite\)/i.test(pron)) {
         if (aGoals <= hGoals) fatti.push(`Il SEGNO 2 e' SBAGLIATO perche' ${away} non ha vinto (${hGoals}-${aGoals})`);
+      } else if (/Pareggio/i.test(pron)) {
+        fatti.push(`Il PAREGGIO e' SBAGLIATO perche' la partita e' finita ${hGoals}-${aGoals}`);
+      } else if (/DC 1X/i.test(pron)) {
+        fatti.push(`Il DC 1X e' SBAGLIATO perche' ${away} ha vinto (${hGoals}-${aGoals}), ${home} non ha ne' vinto ne' pareggiato`);
+      } else if (/DC X2/i.test(pron)) {
+        fatti.push(`Il DC X2 e' SBAGLIATO perche' ${home} ha vinto (${hGoals}-${aGoals}), ${away} non ha ne' vinto ne' pareggiato`);
+      } else if (/DC 12/i.test(pron)) {
+        fatti.push(`Il DC 12 e' SBAGLIATO perche' la partita e' finita in pareggio (${hGoals}-${aGoals})`);
+      } else if (/Multigol\s*(\d+)-(\d+)/i.test(pron)) {
+        const mgm = pron.match(/Multigol\s*(\d+)-(\d+)/i);
+        fatti.push(`Il Multigol ${mgm[1]}-${mgm[2]} e' SBAGLIATO perche' ci sono stati ${totalGoals} gol (servivano tra ${mgm[1]} e ${mgm[2]})`);
       } else {
         fatti.push(`Il pronostico "${pron}" e' SBAGLIATO`);
       }
