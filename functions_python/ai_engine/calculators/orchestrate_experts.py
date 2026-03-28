@@ -2078,6 +2078,8 @@ def orchestrate_date(date_str, dry_run=False, match_time_filter=None, preserve_a
             continue
 
         # --- STAKE EMPIRICO: basato su HR reale per fascia di confidence e mercato ---
+        # ⚠️ PER DISATTIVARE: commentare tutto il blocco fino a "# Costruisci documento unified"
+        # e lo stake tornera' a quello calcolato dal Kelly Criterion (codice sopra)
         # Ogni entry: (conf_min, conf_max, stake) — ordinate per HR decrescente (stake 10 = migliore)
         STAKE_SEGNI = [
             # Lv1 HR 76.8%: 57-59% + 81-86% + 90-92%
