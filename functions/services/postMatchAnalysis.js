@@ -133,69 +133,198 @@ const FORBIDDEN = [/\bxG\b/i, /\bexpected goals?\b/i, /\bMonte Carlo\b/i, /\bcic
   /\bSofaScore\b/i, /\bcoerenza\b/i, /\bconfidence\b/i, /\balgoritmo\b/i,
   /\bsimulazione\b/i, /\/100\b/];
 
-function validateJSON(parsed, inputData, params) {
-  const questions = [];
-
-  // 1. Struttura: campi obbligatori
-  for (const f of REQUIRED_FIELDS) {
-    if (!parsed[f] || typeof parsed[f] !== 'string' || parsed[f].trim().length < 5) {
-      questions.push(`Il campo "${f}" e' vuoto o troppo corto. Scrivi almeno una frase.`);
-    }
-  }
-
-  // 2. Termini tecnici interni
-  const fullText = REQUIRED_FIELDS.map(f => parsed[f] || '').join(' ');
-  for (const regex of FORBIDDEN) {
-    if (regex.test(fullText)) {
-      const match = fullText.match(regex);
-      questions.push(`Hai usato "${match[0]}" che e' un termine tecnico interno. Come lo diresti a un amico al bar?`);
-    }
-  }
-
-  // 3. Coerenza esito — non puoi dire "centrato" se era sbagliato
-  if (inputData.includes('esito=CENTRATO')) {
-    if (/\b(sbagliato|errato|fallito|non ha funzionato)\b/i.test(parsed.esito || '')) {
-      questions.push(`Hai detto che il pronostico e' sbagliato, ma nei dati l'esito e' CENTRATO. Come mai?`);
-    }
-  }
-  if (inputData.includes('esito=SBAGLIATO')) {
-    if (/\b(centrato|azzeccato|perfetto|indovinato)\b/i.test(parsed.esito || '')) {
-      questions.push(`Hai detto che il pronostico e' centrato, ma nei dati l'esito e' SBAGLIATO. Come mai?`);
-    }
-  }
-
-  // 4. Coerenza numeri — se citi un numero, deve corrispondere ai dati
+// Helpers per estrarre dati dall'input
+function _extractFromInput(inputData) {
+  const home = (inputData.match(/partita=(.+?) vs/) || [])[1] || '';
+  const away = (inputData.match(/vs (.+?)\|/) || [])[1] || '';
   const tiripMatch = inputData.match(/tiri_in_porta=(\d+)-(\d+)/);
+  const tiriTotMatch = inputData.match(/tiri_totali=(\d+)-(\d+)/);
+  const possMatch = inputData.match(/possesso=(\d+)-(\d+)/);
+  const occasioniMatch = inputData.match(/grandi_occasioni=(\d+)-(\d+)/);
+  return { home, away, tiripMatch, tiriTotMatch, possMatch, occasioniMatch };
+}
+
+function _checkNumbers(text, pattern, validNums, label) {
+  const questions = [];
+  const matches = [...text.matchAll(pattern)];
+  for (const m of matches) {
+    const nums = [...m[0].matchAll(/\d+/g)].map(x => x[0]);
+    for (const n of nums) {
+      if (!validNums.includes(n)) {
+        questions.push(`Hai scritto ${n} per ${label} ma i dati dicono ${validNums.join('-')}. Usa i numeri corretti: ${validNums.join('-')}.`);
+        return questions; // una domanda per tipo basta
+      }
+    }
+  }
+  return questions;
+}
+
+// ── CHECK 1: pre_match — confronta con dati PRE-MATCH ──
+function _checkPreMatch(text, inputData) {
+  const questions = [];
+  if (!text || text.trim().length < 10) {
+    questions.push(`La sezione "pre_match" e' troppo corta. Analizza i dati pre-partita (quote, probabilita').`);
+    return questions;
+  }
+
+  // Termini vietati
+  for (const regex of FORBIDDEN) {
+    if (regex.test(text)) {
+      const match = text.match(regex);
+      questions.push(`In "pre_match" hai usato "${match[0]}". Come lo diresti a un amico al bar senza termini tecnici?`);
+    }
+  }
+
+  // Controlla che le quote citate corrispondano
+  const quotaMatch = inputData.match(/quota=(\d+\.?\d*)/);
+  if (quotaMatch) {
+    const quota = quotaMatch[1];
+    const quoteInText = [...text.matchAll(/(?:quota|@)\s*(\d+\.?\d*)/gi)];
+    for (const m of quoteInText) {
+      // Tolleranza: la quota puo' essere arrotondata
+      const diff = Math.abs(parseFloat(m[1]) - parseFloat(quota));
+      if (diff > 0.5 && !inputData.includes(m[1])) {
+        questions.push(`In "pre_match" hai citato la quota ${m[1]} ma i dati dicono ${quota}. E' corretto?`);
+      }
+    }
+  }
+
+  return questions;
+}
+
+// ── CHECK 2: partita — confronta con dati POST-MATCH ──
+function _checkPartita(text, inputData) {
+  const questions = [];
+  if (!text || text.trim().length < 10) {
+    questions.push(`La sezione "partita" e' troppo corta. Racconta cosa e' successo in campo.`);
+    return questions;
+  }
+
+  const { home, away, tiripMatch, tiriTotMatch, possMatch } = _extractFromInput(inputData);
+
+  // Termini vietati
+  for (const regex of FORBIDDEN) {
+    if (regex.test(text)) {
+      const match = text.match(regex);
+      questions.push(`In "partita" hai usato "${match[0]}". Come lo diresti senza termini tecnici?`);
+    }
+  }
+
+  // Tiri in porta
   if (tiripMatch) {
     const hSot = tiripMatch[1];
     const aSot = tiripMatch[2];
-    // Se dice "X tiri in porta" e il numero non corrisponde
-    const numbersInText = fullText.match(/(\d+)\s*tiri\s*in\s*porta/gi) || [];
-    for (const nm of numbersInText) {
-      const n = nm.match(/(\d+)/)[1];
-      if (n !== hSot && n !== aSot && n !== String(parseInt(hSot) + parseInt(aSot))) {
-        questions.push(`Hai scritto "${nm}" ma i dati dicono tiri in porta ${hSot}-${aSot}. Quale numero e' corretto?`);
+    const sumSot = String(parseInt(hSot) + parseInt(aSot));
+    questions.push(..._checkNumbers(text, /(\d+)\s*tir[oi]\s*in\s*porta/gi, [hSot, aSot, sumSot], 'tiri in porta'));
+
+    // 0 tiri: se una squadra ha 0 non puo' aver tirato
+    if (parseInt(aSot) === 0 && new RegExp(away + '.{0,50}\\d+\\s*tir[oi]\\s*in\\s*porta', 'i').test(text)) {
+      const m = text.match(new RegExp(away + '.{0,50}(\\d+)\\s*tir[oi]\\s*in\\s*porta', 'i'));
+      if (m && parseInt(m[1]) > 0) {
+        questions.push(`Hai detto che ${away} ha fatto ${m[1]} tiro in porta ma i dati dicono 0. ${away} non ha MAI tirato in porta.`);
+      }
+    }
+    if (parseInt(hSot) === 0 && new RegExp(home + '.{0,50}\\d+\\s*tir[oi]\\s*in\\s*porta', 'i').test(text)) {
+      const m = text.match(new RegExp(home + '.{0,50}(\\d+)\\s*tir[oi]\\s*in\\s*porta', 'i'));
+      if (m && parseInt(m[1]) > 0) {
+        questions.push(`Hai detto che ${home} ha fatto ${m[1]} tiro in porta ma i dati dicono 0. ${home} non ha MAI tirato in porta.`);
+      }
+    }
+
+    // Dominio con 0 tiri
+    if (parseInt(hSot) === 0 && new RegExp(home + '.{0,30}(dominat|dominio|superior)', 'i').test(text)) {
+      questions.push(`Hai detto che ${home} ha dominato ma ha 0 tiri in porta. Come e' possibile?`);
+    }
+    if (parseInt(aSot) === 0 && new RegExp(away + '.{0,30}(dominat|dominio|superior)', 'i').test(text)) {
+      questions.push(`Hai detto che ${away} ha dominato ma ha 0 tiri in porta. Come e' possibile?`);
+    }
+  }
+
+  // Tiri totali
+  if (tiriTotMatch) {
+    const hTot = tiriTotMatch[1];
+    const aTot = tiriTotMatch[2];
+    const sumTot = String(parseInt(hTot) + parseInt(aTot));
+    questions.push(..._checkNumbers(text, /(\d+)\s*tiri\s*totali/gi, [hTot, aTot, sumTot], 'tiri totali'));
+    questions.push(..._checkNumbers(text, /tiri\s*totali\s*[:(]?\s*(\d+)/gi, [hTot, aTot, sumTot], 'tiri totali'));
+  }
+
+  // Possesso
+  if (possMatch) {
+    const hPoss = possMatch[1];
+    const aPoss = possMatch[2];
+    const possInText = [...text.matchAll(/(\d+)\s*%?\s*(?:di\s*)?possesso/gi), ...text.matchAll(/possesso\s*[:(]?\s*(\d+)/gi)];
+    for (const pm of possInText) {
+      const n = pm[1];
+      if (n !== hPoss && n !== aPoss) {
+        questions.push(`Hai scritto possesso ${n}% ma i dati dicono ${hPoss}%-${aPoss}%. Quale e' corretto?`);
+        break;
       }
     }
   }
 
-  // 5. Coerenza dominio — se una squadra ha 0 tiri in porta, non puo' aver "dominato"
+  return questions;
+}
+
+// ── CHECK 3: resoconto — confronta con esito e coerenza tra sezioni ──
+function _checkResoconto(text, inputData, parsedPreMatch, parsedPartita) {
+  const questions = [];
+  if (!text || text.trim().length < 10) {
+    questions.push(`La sezione "resoconto" e' troppo corta. Tira le somme: il pronostico ha funzionato? Il campo confermava?`);
+    return questions;
+  }
+
+  // Termini vietati
+  for (const regex of FORBIDDEN) {
+    if (regex.test(text)) {
+      const match = text.match(regex);
+      questions.push(`In "resoconto" hai usato "${match[0]}". Come lo diresti senza termini tecnici?`);
+    }
+  }
+
+  // Coerenza esito
+  if (inputData.includes('esito=CENTRATO')) {
+    if (/\b(sbagliato|errato|flop|fallito|non ha funzionato)\b/i.test(text)) {
+      questions.push(`Nel resoconto dici che il pronostico e' sbagliato, ma l'esito nei dati e' CENTRATO. Il pronostico ha funzionato, non e' sbagliato.`);
+    }
+  }
+  if (inputData.includes('esito=SBAGLIATO')) {
+    if (/\b(centrato|azzeccato|perfetto|indovinato|ha funzionato)\b/i.test(text)) {
+      questions.push(`Nel resoconto dici che il pronostico e' centrato, ma l'esito nei dati e' SBAGLIATO. Il pronostico NON ha funzionato.`);
+    }
+  }
+
+  // Coerenza logica: se in "partita" dice che una squadra ha dominato, il resoconto non puo' dire il contrario
+  const { home, away, tiripMatch } = _extractFromInput(inputData);
   if (tiripMatch) {
     const hSot = parseInt(tiripMatch[1]);
     const aSot = parseInt(tiripMatch[2]);
-    const home = (inputData.match(/partita=(.+?) vs/) || [])[1] || '';
-    const away = (inputData.match(/vs (.+?)\|/) || [])[1] || '';
-
-    if (hSot === 0 && /\b(dominat|dominio|superior|schiaccia|travolto)\b/i.test(fullText)) {
-      // Controlla che non stia dicendo che la squadra di casa ha dominato
-      if (new RegExp(home + '.{0,30}(dominat|dominio|superior)', 'i').test(fullText)) {
-        questions.push(`Hai detto che ${home} ha dominato ma ha fatto 0 tiri in porta. Come e' possibile?`);
-      }
-    }
-    if (aSot === 0 && new RegExp(away + '.{0,30}(dominat|dominio|superior)', 'i').test(fullText)) {
-      questions.push(`Hai detto che ${away} ha dominato ma ha fatto 0 tiri in porta. Come e' possibile?`);
+    // Se la differenza tiri in porta e' schiacciante (>= 5) e il resoconto dice "partita equilibrata"
+    if (Math.abs(hSot - aSot) >= 5 && /\b(equilibrat|pari|bilanciata|incerta)\b/i.test(text)) {
+      const dominante = hSot > aSot ? home : away;
+      questions.push(`Nel resoconto dici "equilibrata" ma i tiri in porta erano ${hSot}-${aSot}. ${dominante} ha chiaramente dominato, non era equilibrata.`);
     }
   }
+
+  return questions;
+}
+
+// ── VALIDATOR PRINCIPALE: 3 check separati ──
+function validateJSON(parsed, inputData) {
+  const questions = [];
+
+  // Struttura base
+  for (const f of REQUIRED_FIELDS) {
+    if (!parsed[f] || typeof parsed[f] !== 'string') {
+      questions.push(`Il campo "${f}" manca. Il JSON deve avere 3 campi: pre_match, partita, resoconto.`);
+    }
+  }
+  if (questions.length > 0) return { valid: false, questions };
+
+  // 3 check separati
+  questions.push(..._checkPreMatch(parsed.pre_match, inputData));
+  questions.push(..._checkPartita(parsed.partita, inputData));
+  questions.push(..._checkResoconto(parsed.resoconto, inputData, parsed.pre_match, parsed.partita));
 
   return { valid: questions.length === 0, questions };
 }
