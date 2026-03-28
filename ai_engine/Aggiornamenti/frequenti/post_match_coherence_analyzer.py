@@ -440,7 +440,30 @@ def _apply_modifiers_segno(raw_score, pronostico, home_stats, away_stats, risult
     return raw_score
 
 
-def _apply_modifiers_volume(raw_score, direction, home_stats, away_stats, risultato, modifiers_log):
+def check_volume_balance(home_stats, away_stats):
+    """
+    Calcola quanto il volume offensivo e' bilanciato tra le due squadre.
+    Ritorna balance medio 0-1 (0 = tutto da una parte, 1 = perfettamente bilanciato).
+    """
+    balance_keys = ["shots_on_target", "big_chances", "touches_in_opp_box", "xg"]
+    balances = []
+    for key in balance_keys:
+        h = get_stat_or_zero(home_stats, key)
+        a = get_stat_or_zero(away_stats, key)
+        mx = max(h, a)
+        if mx > 0:
+            balances.append(min(h, a) / (mx + 0.001))
+    if not balances:
+        return 0.5
+    return sum(balances) / len(balances)
+
+
+# Intensita bilanciamento per threshold O/U
+# Over 3.5 richiede entrambe le squadre, Over 1.5 basta una sola
+BALANCE_INTENSITY = {1.5: 3, 2.5: 5, 3.5: 8}
+
+
+def _apply_modifiers_volume(raw_score, direction, home_stats, away_stats, risultato, modifiers_log, threshold=2.5):
     """Applica modificatori trasversali per O/U e Multigol."""
     # 1. Efficienza anomala
     anomalies = check_efficiency_anomaly(home_stats, away_stats, risultato)
@@ -464,10 +487,20 @@ def _apply_modifiers_volume(raw_score, direction, home_stats, away_stats, risult
     reds = check_red_card(home_stats, away_stats)
     for side in reds:
         if direction == "over":
-            raw_score -= 5  # meno gol attesi con un uomo in meno
+            raw_score -= 5
         else:
             raw_score += 5
         modifiers_log.append(f"red_card_{side}")
+
+    # 4. Bilanciamento volume — se tutto viene da una parte, Over e' meno probabile
+    balance = check_volume_balance(home_stats, away_stats)
+    intensity = BALANCE_INTENSITY.get(threshold, 5)
+    if balance < 0.15:
+        if direction == "over":
+            raw_score -= intensity
+        else:
+            raw_score += intensity
+        modifiers_log.append(f"unbalanced_volume_{intensity}pt")
 
     return raw_score
 
@@ -599,7 +632,7 @@ def score_over_under(pronostico, home_stats, away_stats, risultato, modifiers_lo
 
     raw_score = _apply_modifiers_volume(
         raw_score, "over" if direction == "Over" else "under",
-        home_stats, away_stats, risultato, modifiers_log)
+        home_stats, away_stats, risultato, modifiers_log, threshold=threshold)
 
     return max(0, min(100, round(raw_score))), indicators
 
@@ -771,8 +804,18 @@ def score_multigol(pronostico, home_stats, away_stats, risultato, modifiers_log)
         raw_score = volume_score * 100
 
     direction = "under" if (low == 0 and high <= 2) else "over"
+    # Threshold equivalente per il bilanciamento: media del range
+    mg_threshold = (low + high) / 2.0
+    # Mappa a 1.5/2.5/3.5 per l'intensita
+    if mg_threshold <= 1.5:
+        bal_threshold = 1.5
+    elif mg_threshold <= 2.5:
+        bal_threshold = 2.5
+    else:
+        bal_threshold = 3.5
     raw_score = _apply_modifiers_volume(
-        raw_score, direction, home_stats, away_stats, risultato, modifiers_log)
+        raw_score, direction, home_stats, away_stats, risultato, modifiers_log,
+        threshold=bal_threshold)
 
     return max(0, min(100, round(raw_score))), indicators
 
