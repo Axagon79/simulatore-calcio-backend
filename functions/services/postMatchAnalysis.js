@@ -557,7 +557,7 @@ function validateJSON(parsed, inputData) {
 async function generateComment(params) {
   const inputData = buildStructuredInput(params);
 
-  const MAX_RETRIES = 2;
+  const MAX_RETRIES = 3;
   let lastQuestions = [];
 
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
@@ -588,7 +588,7 @@ async function generateComment(params) {
       }
 
       lastQuestions = validation.questions;
-      console.log(`[POST-MATCH] Tentativo ${attempt + 1}: ${validation.questions.length} domande`);
+      console.log(`[POST-MATCH] Tentativo ${attempt + 1}: ${validation.questions.length} domande → ${validation.questions.join(' | ')}`);
 
     } catch (err) {
       lastQuestions = [`Il JSON non era valido (${err.message}). Restituisci SOLO un oggetto JSON valido.`];
@@ -596,12 +596,39 @@ async function generateComment(params) {
     }
   }
 
-  return _fallback(params);
+  // Log dettagliato per debug
+  console.log(`[POST-MATCH] FALLBACK per ${params.home} vs ${params.away}. Ultime domande: ${JSON.stringify(lastQuestions)}`);
+  return _fallback(params, lastQuestions);
 }
 
-function _fallback(params) {
-  const { home, away, realScore, pronostico, esito } = params;
-  return `${esito ? 'Pronostico centrato' : 'Pronostico sbagliato'} per ${home} vs ${away} (${realScore}).`;
+function _fallback(params, lastQuestions) {
+  const { home, away, realScore, tipo, pronostico, esito } = params;
+  // In produzione: risposta generica ma corretta basata sui fatti pre-digeriti
+  const pron = _spiegaPronostico(tipo, pronostico, home, away);
+  const esitoStr = esito ? 'Pronostico centrato' : 'Pronostico sbagliato';
+
+  // Costruisci un fallback un po' piu' informativo
+  const risM = realScore.match(/(\d+)-(\d+)/);
+  if (risM) {
+    const hG = parseInt(risM[1]);
+    const aG = parseInt(risM[2]);
+    let motivo = '';
+    if (!esito) {
+      if (/GG|Entrambe/i.test(pron)) {
+        const chi0 = hG === 0 ? home : (aG === 0 ? away : null);
+        if (chi0) motivo = ` — ${chi0} non ha segnato`;
+      } else if (/NG/i.test(pron)) {
+        motivo = ` — entrambe hanno segnato`;
+      } else if (/Over/i.test(pron)) {
+        motivo = ` — solo ${hG + aG} gol totali`;
+      } else if (/Under/i.test(pron)) {
+        motivo = ` — ${hG + aG} gol totali, troppi`;
+      }
+    }
+    return `${esitoStr}: ${pron} per ${home} vs ${away} (${realScore})${motivo}.`;
+  }
+
+  return `${esitoStr} per ${home} vs ${away} (${realScore}).`;
 }
 
 
