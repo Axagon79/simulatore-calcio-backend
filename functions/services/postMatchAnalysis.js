@@ -80,6 +80,53 @@ Esempio 4 (GG centrato, ma fortunato):
 // ═══════════════════════════════════════════════════════════
 
 /**
+ * Traduce tipo+pronostico in linguaggio chiaro per Mistral.
+ * Evita ambiguita tipo "Goal" che Mistral confonde con "gol segnato".
+ */
+function _spiegaPronostico(tipo, pronostico, home, away) {
+  const p = pronostico.toLowerCase().trim();
+
+  // GG/NG
+  if (p === 'goal' || p === 'gol' || p === 'gg')
+    return `Entrambe le squadre segnano (GG) — serviva almeno 1 gol per parte`;
+  if (p === 'no goal' || p === 'no gol' || p === 'nogoal' || p === 'ng')
+    return `Almeno una squadra NON segna (NG) — bastava che una delle due restasse a zero`;
+
+  // Over/Under
+  const ouMatch = pronostico.match(/^(Over|Under|O|U|OV|UN|OVE|UND)\s*(\d+\.?\d*)/i);
+  if (ouMatch) {
+    const dir = ouMatch[1].toLowerCase().startsWith('o') ? 'Over' : 'Under';
+    const thr = ouMatch[2];
+    if (dir === 'Over')
+      return `Over ${thr} — servivano almeno ${Math.ceil(parseFloat(thr))} gol totali nella partita`;
+    else
+      return `Under ${thr} — servivano massimo ${Math.floor(parseFloat(thr))} gol totali`;
+  }
+
+  // SEGNO
+  if (tipo === 'SEGNO') {
+    if (p === '1') return `Vittoria ${home} (casa)`;
+    if (p === '2') return `Vittoria ${away} (ospite)`;
+    if (p === 'x') return `Pareggio`;
+  }
+
+  // DC
+  if (tipo === 'DOPPIA_CHANCE' || p.startsWith('dc') || p.startsWith('d.c')) {
+    if (p.includes('1x') || p === '1x') return `Doppia Chance 1X — ${home} vince o pareggia`;
+    if (p.includes('x2') || p === 'x2') return `Doppia Chance X2 — ${away} vince o pareggia`;
+    if (p.includes('12') || p === '12') return `Doppia Chance 12 — niente pareggio`;
+  }
+
+  // MG
+  const mgMatch = pronostico.match(/MG\s*(\d+)\s*-\s*(\d+)/i);
+  if (mgMatch) return `Multigol ${mgMatch[1]}-${mgMatch[2]} — gol totali tra ${mgMatch[1]} e ${mgMatch[2]}`;
+
+  // Fallback
+  return `${tipo} ${pronostico}`;
+}
+
+
+/**
  * Prepara il contesto dei fatti per Mistral da un pronostico concluso.
  * @param {object} params
  * @param {string} params.home
@@ -99,7 +146,10 @@ function buildFactsForMistral(params) {
   const lines = [];
   lines.push(`PARTITA: ${home} vs ${away}`);
   lines.push(`RISULTATO: ${realScore}`);
-  lines.push(`PRONOSTICO: ${tipo} ${pronostico} → ${esito ? 'CENTRATO' : 'SBAGLIATO'}`);
+
+  // Traduci il pronostico in linguaggio chiaro per Mistral
+  const pronosticoSpiegato = _spiegaPronostico(tipo, pronostico, home, away);
+  lines.push(`PRONOSTICO: ${pronosticoSpiegato} → ${esito ? 'CENTRATO' : 'SBAGLIATO'}`);
 
   // Verdetto coerenza tradotto in linguaggio semplice
   if (postMatchAnalysis) {
