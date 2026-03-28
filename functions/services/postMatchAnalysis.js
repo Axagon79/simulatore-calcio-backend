@@ -27,6 +27,10 @@ Ricevi i dati di una partita in formato strutturato, divisi in PRE-MATCH e POST-
 Restituisci SOLO il JSON. Nessun testo prima o dopo. Nessun markdown.
 Scrivi in italiano, come parleresti a un amico che ti chiede com'e' andata la partita.
 IMPORTANTE: ogni concetto va detto UNA SOLA VOLTA. Se hai gia' detto qualcosa in pre_match, non ripeterlo in partita o resoconto. Ogni sezione aggiunge informazioni NUOVE.
+Usa il passato prossimo ("ha confermato", "ha dominato", "ha segnato"), NON l'imperfetto ("confermava", "dominava"). La partita e' finita, parla di fatti accaduti.
+Resta FOCALIZZATO sul pronostico in questione. Se il pronostico e' GG, parla di GG. Non divagare su Over, Under, risultati esatti o altri mercati che non c'entrano.
+Non dire cose OVVIE dal risultato. Se e' finita 5-0, non dire "il Pisa non ha segnato" — si vede gia dal risultato. Spiega il PERCHE: non ha mai tirato in porta, non ha creato occasioni. Il perche e interessante, il cosa no.
+Non parlare troppo di quote. Le quote sono un dato di contesto, non il centro dell'analisi. Concentrati su cosa e' successo in campo.
 Non usare termini tecnici come xG, expected goals, Monte Carlo, confidence, score di coerenza, algoritmo, SofaScore.`;
 
 
@@ -68,16 +72,8 @@ function buildStructuredInput(params) {
 
   // --- BLOCCO 1: PRIMA DELLA PARTITA ---
   const pre = [];
-  if (quota) pre.push(`quota=${quota}`);
   if (confidence) pre.push(`confidence=${confidence}%`);
   if (stars) pre.push(`stelle=${stars}`);
-  if (odds) {
-    if (odds['1']) pre.push(`quote_1x2=${odds['1']}/${odds['X'] || '?'}/${odds['2'] || '?'}`);
-    if (odds.over_25) pre.push(`quota_over25=${odds.over_25}`);
-    if (odds.under_25) pre.push(`quota_under25=${odds.under_25}`);
-    if (odds.gg) pre.push(`quota_gg=${odds.gg}`);
-    if (odds.ng) pre.push(`quota_ng=${odds.ng}`);
-  }
   if (matchDoc) {
     if (matchDoc.expected_total_goals) pre.push(`gol_attesi=${matchDoc.expected_total_goals}`);
     const sim = matchDoc.simulation_data || {};
