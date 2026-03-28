@@ -97,7 +97,8 @@ function buildStructuredInput(params) {
     const buildRow = (label, stats) => {
       const row = [];
       if (stats.shots_on_target != null) row.push(`tiri_in_porta=${stats.shots_on_target}`);
-      if (stats.total_shots != null) row.push(`tiri_totali=${stats.total_shots}`);
+      const off = (stats.total_shots != null && stats.shots_on_target != null) ? stats.total_shots - stats.shots_on_target : stats.shots_off_target;
+      if (off != null && off > 0) row.push(`tiri_fuori=${off}`);
       if (stats.big_chances != null && stats.big_chances > 0) row.push(`grandi_occasioni=${stats.big_chances}`);
       if (stats.possession != null) row.push(`possesso=${stats.possession}%`);
       if (stats.hit_woodwork != null && stats.hit_woodwork > 0) row.push(`pali=${stats.hit_woodwork}`);
