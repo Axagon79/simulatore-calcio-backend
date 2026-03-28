@@ -14,7 +14,7 @@ const { callMistral } = require('./llmService');
 // PROMPT — Corto. Mistral e' l'esperto, noi diamo i dati.
 // ═══════════════════════════════════════════════════════════
 
-const SYSTEM_PROMPT = `Sei un esperto analista di calcio italiano con 25 anni di esperienza. Analizzi partite gia' giocate commentando cosa e' successo sul campo.
+const SYSTEM_PROMPT = `Sei un esperto analista di calcio con 25 anni di esperienza. Analizzi partite gia' giocate commentando cosa e' successo sul campo.
 
 Ricevi i dati di una partita in formato strutturato, divisi in PRE-MATCH e POST-MATCH. Scrivi la tua analisi in JSON con 3 fasi, sempre in questo ordine:
 
@@ -563,10 +563,10 @@ async function generateComment(params) {
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
     let userMessage = inputData;
 
-    // Retry: poni le domande
+    // Retry: far capire al modello che ha sbagliato, senza confonderlo
     if (attempt > 0 && lastQuestions.length > 0) {
       const domande = lastQuestions.map((q, i) => `${i + 1}. ${q}`).join('\n');
-      userMessage = `${inputData}\n\nHo letto la tua analisi e ho alcune domande:\n${domande}\n\nRiscrivi il JSON tenendo conto di queste domande.`;
+      userMessage = `${inputData}\n\nATTENZIONE: Nel tentativo precedente hai commesso questi errori o incongruenze rispetto ai dati forniti:\n${domande}\n\nAnalizza di nuovo i dati e genera un nuovo JSON corretto, correggendo gli errori indicati e rispettando i dati.`;
     }
 
     try {
@@ -576,12 +576,15 @@ async function generateComment(params) {
       ], { temperature: 0.5, max_tokens: 500 });
 
       let content = (response.content || response).toString().trim();
-      if (content.startsWith('```')) {
-        content = content.replace(/^```(?:json)?\s*/, '').replace(/\s*```$/, '');
+
+      // Estrai JSON in modo sicuro — ignora testo prima/dopo le parentesi graffe
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        content = jsonMatch[0];
       }
 
       const parsed = JSON.parse(content);
-      const validation = validateJSON(parsed, inputData, params);
+      const validation = validateJSON(parsed, inputData);
 
       if (validation.valid) {
         return `${parsed.pre_match}\n\n${parsed.partita}\n\n${parsed.resoconto}`;
@@ -591,7 +594,7 @@ async function generateComment(params) {
       console.log(`[POST-MATCH] Tentativo ${attempt + 1}: ${validation.questions.length} domande → ${validation.questions.join(' | ')}`);
 
     } catch (err) {
-      lastQuestions = [`Il JSON non era valido (${err.message}). Restituisci SOLO un oggetto JSON valido.`];
+      lastQuestions = [`Il formato che hai restituito non era un JSON valido. Ricorda di restituire SOLO la struttura JSON richiesta, senza aggiungere alcun testo o commento fuori dalle parentesi graffe.`];
       console.log(`[POST-MATCH] Tentativo ${attempt + 1}: parse error`);
     }
   }
