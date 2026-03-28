@@ -36,9 +36,17 @@ FORMATO OUTPUT — JSON (4 campi obbligatori)
 {
   "esito": "max 20 parole — dice subito CENTRATO o SBAGLIATO e il tono generale",
   "campo": "max 35 parole — racconta cosa e' successo usando 2-3 stats dai dati",
-  "giudizio": "max 30 parole — dice se la scelta AVEVA SENSO guardando i numeri reali",
+  "giudizio": "max 30 parole — NON giudicare la scelta pre-partita. Descrivi solo cosa ha detto il CAMPO durante i 90 minuti. Il verdetto nei dati (meritata/sfortuna/fortunato/sbagliato) ti dice il tono da usare.",
   "chiusura": "max 20 parole — frase finale che lega tutto"
 }
+
+IMPORTANTE SUL CAMPO "giudizio":
+- NON dire MAI "la scelta era un azzardo" o "il pronostico non aveva senso" — i dati pre-partita potevano essere diversi
+- Devi solo dire COSA HA MOSTRATO IL CAMPO nei 90 minuti
+- Se verdetto=sfortuna: "Il campo confermava la nostra lettura, ma il risultato ha detto altro"
+- Se verdetto=meritata: "I numeri della partita confermano tutto"
+- Se verdetto=fortunato: "Sul campo la storia era diversa, ma ci e' andata bene"
+- Se verdetto=sbagliato: "Il campo ha raccontato una partita diversa da quella che ci aspettavamo"
 
 ═══════════════════════════════════════
 ESEMPI (input → output)
@@ -48,25 +56,25 @@ INPUT:
 partita=Roma vs Empoli|ris=3-0|pron=Vittoria Roma (casa)|esito=CENTRATO|verdetto=meritata|tiri_in_porta=8-1|grandi_occasioni=4-0|poss=65%-35%
 
 OUTPUT:
-{"esito":"Pronostico centrato, la Roma ha vinto meritatamente.","campo":"Dominio totale dei giallorossi: 8 tiri in porta contro 1, 4 occasioni nitide e il 65% di possesso. L'Empoli non ha mai impensierito.","giudizio":"Scelta perfetta, i numeri confermano un dominio senza discussioni.","chiusura":"Vittoria scritta nel destino della partita."}
+{"esito":"Pronostico centrato, la Roma ha vinto meritatamente.","campo":"Dominio totale dei giallorossi: 8 tiri in porta contro 1, 4 occasioni nitide e il 65% di possesso. L'Empoli non ha mai impensierito.","giudizio":"I numeri della partita confermano tutto: la Roma ha controllato dal primo all'ultimo minuto.","chiusura":"Vittoria scritta nel destino della partita."}
 
 INPUT:
 partita=Inter vs Napoli|ris=0-1|pron=Entrambe segnano (GG)|esito=SBAGLIATO|verdetto=sbagliato|tiri_in_porta=2-3|grandi_occasioni=0-1|poss=48%-52%
 
 OUTPUT:
-{"esito":"Pronostico sbagliato, solo il Napoli e' riuscito a segnare.","campo":"L'Inter ha tirato solo 2 volte in porta senza creare nessuna grande occasione. Il Napoli ha gestito la partita con il 52% di possesso e 3 tiri in porta.","giudizio":"Il GG non aveva basi solide: l'Inter non ha mai creato abbastanza per segnare.","chiusura":"Quando una squadra non tira quasi mai in porta, il GG e' un azzardo."}
+{"esito":"Pronostico sbagliato, solo il Napoli e' riuscito a segnare.","campo":"L'Inter ha tirato solo 2 volte in porta senza creare nessuna grande occasione. Il Napoli ha gestito con il 52% di possesso.","giudizio":"Il campo ha mostrato un'Inter che non ha mai creato abbastanza per andare in gol. Partita a senso unico nella creazione.","chiusura":"Senza occasioni vere, il gol non puo' arrivare."}
 
 INPUT:
 partita=Milan vs Juve|ris=1-2|pron=Vittoria Milan (casa)|esito=SBAGLIATO|verdetto=sfortuna|tiri_in_porta=7-3|grandi_occasioni=3-1|poss=58%-42%|pali=2-0
 
 OUTPUT:
-{"esito":"Pronostico sbagliato, ma il Milan meritava molto di piu'.","campo":"Il Milan ha dominato con 7 tiri in porta contro 3, 3 grandi occasioni e 2 pali colpiti. La Juve ha fatto il minimo per portare a casa i 3 punti.","giudizio":"La scelta era giustissima: il campo diceva Milan in lungo e in largo. Pura sfortuna.","chiusura":"Una di quelle serate dove il calcio ti punisce senza motivo."}
+{"esito":"Pronostico sbagliato, ma il Milan meritava molto di piu'.","campo":"Il Milan ha dominato con 7 tiri in porta contro 3, 3 grandi occasioni e 2 pali colpiti. La Juve ha fatto il minimo indispensabile.","giudizio":"Il campo confermava la nostra lettura: il Milan ha fatto tutto tranne segnare abbastanza. Pura sfortuna.","chiusura":"Una di quelle serate dove il calcio ti punisce senza motivo."}
 
 INPUT:
 partita=Lazio vs Genoa|ris=2-1|pron=Entrambe segnano (GG)|esito=CENTRATO|verdetto=fortunato|tiri_in_porta=5-1|grandi_occasioni=3-0|poss=62%-38%
 
 OUTPUT:
-{"esito":"Pronostico centrato, ma con un bel po' di fortuna.","campo":"La Lazio ha dominato con 5 tiri in porta e 3 grandi occasioni. Il Genoa ha segnato con l'unico tiro in porta della partita, senza creare altro.","giudizio":"Il GG e' uscito per un episodio: il Genoa non ha mai giocato per segnare. Ci e' andata bene.","chiusura":"Risultato giusto sulla carta, ma il campo racconta un'altra storia."}`;
+{"esito":"Pronostico centrato, ma con un bel po' di fortuna.","campo":"La Lazio ha dominato con 5 tiri in porta e 3 grandi occasioni. Il Genoa ha segnato con l'unico tiro in porta della partita.","giudizio":"Sul campo la partita era tutta della Lazio. Il gol del Genoa e' arrivato dal nulla, un episodio piu' che una creazione.","chiusura":"Ci e' andata bene, il campo raccontava un'altra storia."}`;
 
 
 // ═══════════════════════════════════════════════════════════
