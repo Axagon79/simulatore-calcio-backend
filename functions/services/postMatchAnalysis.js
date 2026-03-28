@@ -316,6 +316,7 @@ function _checkPartita(text, inputData) {
     const aSot = tiripMatch[2];
     const sumSot = String(parseInt(hSot) + parseInt(aSot));
     questions.push(..._checkNumbers(text, /(\d+)\s*tir[oi]\s*in\s*porta/gi, [hSot, aSot, sumSot], 'tiri in porta'));
+    questions.push(..._checkNumbers(text, /tir[oi]\s*in\s*porta\s*[:(]?\s*(\d+)\s*(?:a|contro|-|–)\s*(\d+)/gi, [hSot, aSot, sumSot], 'tiri in porta'));
 
     // 0 tiri: se una squadra ha 0 non puo' aver tirato
     if (parseInt(aSot) === 0 && new RegExp(away + '.{0,50}\\d+\\s*tir[oi]\\s*in\\s*porta', 'i').test(text)) {
@@ -347,6 +348,7 @@ function _checkPartita(text, inputData) {
     const sumTot = String(parseInt(hTot) + parseInt(aTot));
     questions.push(..._checkNumbers(text, /(\d+)\s*tiri\s*totali/gi, [hTot, aTot, sumTot], 'tiri totali'));
     questions.push(..._checkNumbers(text, /tiri\s*totali\s*[:(]?\s*(\d+)/gi, [hTot, aTot, sumTot], 'tiri totali'));
+    questions.push(..._checkNumbers(text, /tiri\s*totali\s*(\d+)\s*(?:a|contro|-|–)\s*(\d+)/gi, [hTot, aTot, sumTot], 'tiri totali'));
   }
 
   // Possesso
