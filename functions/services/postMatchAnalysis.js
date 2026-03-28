@@ -92,29 +92,23 @@ function buildStructuredInput(params) {
     lines.push(`\nPRIMA DELLA PARTITA (dati pre-match):\n${pre.join('|')}`);
   }
 
-  // --- BLOCCO 2: DOPO LA PARTITA ---
+  // --- BLOCCO 2: DOPO LA PARTITA (tabella per squadra) ---
   if (homeStats && awayStats) {
-    const post = [];
-    const add = (label, hKey) => {
-      const h = homeStats[hKey]; const a = awayStats[hKey];
-      if (h != null) post.push(`${label}=${h}-${a ?? '?'}`);
-    };
-    const addIfPositive = (label, hKey) => {
-      const h = homeStats[hKey]; const a = awayStats[hKey];
-      if ((h && h > 0) || (a && a > 0)) post.push(`${label}=${h ?? 0}-${a ?? 0}`);
+    const buildRow = (label, stats) => {
+      const row = [];
+      if (stats.shots_on_target != null) row.push(`tiri_in_porta=${stats.shots_on_target}`);
+      if (stats.total_shots != null) row.push(`tiri_totali=${stats.total_shots}`);
+      if (stats.big_chances != null && stats.big_chances > 0) row.push(`grandi_occasioni=${stats.big_chances}`);
+      if (stats.possession != null) row.push(`possesso=${stats.possession}%`);
+      if (stats.hit_woodwork != null && stats.hit_woodwork > 0) row.push(`pali=${stats.hit_woodwork}`);
+      if (stats.big_saves != null && stats.big_saves > 0) row.push(`grandi_parate=${stats.big_saves}`);
+      if (stats.red_cards != null && stats.red_cards > 0) row.push(`espulsioni=${stats.red_cards}`);
+      return `${label}: ${row.join(', ')}`;
     };
 
-    add('tiri_in_porta', 'shots_on_target');
-    addIfPositive('grandi_occasioni', 'big_chances');
-    add('possesso', 'possession');
-    add('tiri_totali', 'total_shots');
-    addIfPositive('pali', 'hit_woodwork');
-    addIfPositive('grandi_parate', 'big_saves');
-    addIfPositive('espulsioni', 'red_cards');
-
-    if (post.length > 0) {
-      lines.push(`\nDOPO LA PARTITA (statistiche reali del campo):\n${post.join('|')}`);
-    }
+    lines.push(`\nDOPO LA PARTITA (statistiche reali del campo):`);
+    lines.push(buildRow(home, homeStats));
+    lines.push(buildRow(away, awayStats));
   }
 
   // --- BLOCCO 3: FATTI GIA' INTERPRETATI (aiuto per Mistral) ---
