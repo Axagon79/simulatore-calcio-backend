@@ -31,10 +31,18 @@ router.get('/context', async (req, res) => {
     const matchData = extractMatchDataFromContext(result.context);
     let analysis;
     if (matchData && matchData.pronostici.length > 0) {
-      const postMatchComment = await generateMatchPostMatchAnalysis(req.db, home, away, date || undefined);
-      if (postMatchComment) {
-        analysis = postMatchComment;
+      try {
+        console.log(`[CHAT/CONTEXT] Flusso post-match per ${home} vs ${away} (${date}), ${matchData.pronostici.length} pronostici`);
+        const postMatchComment = await generateMatchPostMatchAnalysis(req.db, home, away, date || undefined);
+        console.log(`[CHAT/CONTEXT] Risultato post-match: ${postMatchComment ? postMatchComment.substring(0, 100) : 'NULL'}`);
+        if (postMatchComment) {
+          analysis = postMatchComment;
+        }
+      } catch (pmErr) {
+        console.error(`[CHAT/CONTEXT] ERRORE post-match: ${pmErr.message}`);
       }
+    } else {
+      console.log(`[CHAT/CONTEXT] No matchData o no pronostici, flusso generico`);
     }
 
     // Fallback: analisi generica (pre-partita o partita senza stats)
