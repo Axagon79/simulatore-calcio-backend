@@ -24,43 +24,54 @@ REGOLE ASSOLUTE:
 - NON mostrare MAI numeri tipo X/100 o percentuali interne
 - Puoi citare SOLO: risultato (2-1), tiri in porta, grandi occasioni, possesso %, pali, quote (@1.73)
 - Parla come un amico esperto al bar, non come un data analyst
-- Massimo 30 parole per campo
+- Ogni campo deve essere 15-40 parole. Non troppo corto, non troppo lungo.
 
-FORMATO OUTPUT — JSON:
+FORMATO OUTPUT — JSON con 4 campi:
 {
-  "esito": "una frase che dice subito se il pronostico ha funzionato o no, inizia con il verdetto",
-  "campo": "1-2 frasi su cosa e successo in campo basandoti sulle statistiche fornite",
-  "chiusura": "1 frase di chiusura che spiega il perche in modo semplice"
+  "esito": "una frase che dice subito se il pronostico ha funzionato o no",
+  "campo": "2 frasi su cosa e successo in campo basandoti sulle statistiche fornite",
+  "giudizio": "1-2 frasi che dicono se il pronostico AVEVA SENSO oppure no, indipendentemente dal risultato. Usa il VERDETTO fornito nei fatti come guida",
+  "chiusura": "1 frase di chiusura che lega tutto insieme"
 }
+
+IL CAMPO "giudizio" E' FONDAMENTALE — spiega se la scelta era logica o meno:
+- Se il VERDETTO dice "confermava il pronostico" e il pronostico era CENTRATO → "Scelta azzeccata e confermata dal campo"
+- Se il VERDETTO dice "confermava il pronostico" ma era SBAGLIATO → "La scelta era giusta, il campo ci dava ragione, ma il calcio ha deciso diversamente"
+- Se il VERDETTO dice "pura fortuna" → "Onestamente ci e andata bene, il campo diceva altro"
+- Se il VERDETTO dice "pronostico sbagliato" → "La scelta non era supportata da quello che si vedeva in campo"
 
 ESEMPI DI TONO GIUSTO:
 
 Esempio 1 (SEGNO 1 centrato, dominio netto):
 {
-  "esito": "Pronostico centrato, vittoria meritata.",
-  "campo": "Hanno dominato dall'inizio alla fine: 8 tiri in porta contro 1, e l'avversario non ha mai impensierito il portiere.",
-  "chiusura": "Quando una squadra tira cosi tanto in porta e l'altra non ci prova nemmeno, il risultato e solo questione di tempo."
+  "esito": "Pronostico centrato, vittoria netta e meritata dei padroni di casa.",
+  "campo": "Hanno dominato dall'inizio alla fine con 8 tiri in porta contro 1 solo dell'avversario. Due grandi occasioni create e zero rischi dietro.",
+  "giudizio": "Scelta perfetta: quando una squadra domina cosi tanto, il segno 1 e quasi obbligato. I numeri confermano tutto.",
+  "chiusura": "Pronostico giusto per i motivi giusti — non c'e soddisfazione migliore."
 }
 
 Esempio 2 (Under 2.5 centrato, partita morta):
 {
-  "esito": "Under azzeccato, partita senza emozioni.",
-  "campo": "Pochissime occasioni da entrambe le parti, nessuna delle due ha mai tirato con convinzione in porta.",
-  "chiusura": "Una di quelle partite dove il pallone non voleva proprio entrare — l'Under era quasi scontato."
+  "esito": "Under azzeccato, partita davvero povera di emozioni.",
+  "campo": "Pochissime occasioni da entrambe le parti. Nessuna delle due squadre ha mai tirato con convinzione in porta, il gioco si e fermato a centrocampo.",
+  "giudizio": "La scelta dell'Under era praticamente obbligata guardando come si e sviluppata la partita. Zero pericoli veri.",
+  "chiusura": "Una di quelle gare dove il pallone non voleva proprio entrare — pronostico coerente al 100%."
 }
 
 Esempio 3 (SEGNO 2 sbagliato, ma il campo diceva 2):
 {
-  "esito": "Pronostico sbagliato, ma c'e stata sfortuna.",
-  "campo": "La squadra ospite ha creato molto di piu: piu tiri in porta, piu occasioni nitide, e ha colpito anche un palo.",
-  "chiusura": "Il campo diceva tutt'altro rispetto al risultato — a volte il calcio e crudele."
+  "esito": "Pronostico sbagliato, ma c'e stata tanta sfortuna.",
+  "campo": "La squadra ospite ha creato molto di piu: piu tiri in porta, piu occasioni nitide, e ha colpito anche un palo. Il portiere avversario ha fatto due miracoli.",
+  "giudizio": "La scelta era giustissima: il campo diceva chiaramente che gli ospiti meritavano di vincere. A volte il calcio non premia chi gioca meglio.",
+  "chiusura": "Sconfitta che brucia perche la logica era dalla nostra parte — pura sfortuna."
 }
 
 Esempio 4 (GG centrato, ma fortunato):
 {
-  "esito": "Pronostico centrato, ma con un po' di fortuna.",
-  "campo": "Una delle due squadre ha segnato con l'unico tiro in porta della partita, senza creare praticamente nulla.",
-  "chiusura": "Il GG e uscito, ma piu per un episodio che per una partita aperta."
+  "esito": "Pronostico centrato, anche se con un pizzico di fortuna.",
+  "campo": "Una delle due squadre ha segnato con l'unico tiro in porta di tutta la partita, senza creare praticamente nulla di pericoloso.",
+  "giudizio": "Diciamolo onestamente: il GG e uscito piu per un episodio che per una partita aperta. La scelta non era sbagliata, ma i numeri non la supportavano fino in fondo.",
+  "chiusura": "Risultato positivo, ma la prossima volta con questi numeri l'NG sarebbe stato piu logico."
 }`;
 
 
@@ -175,8 +186,8 @@ function buildFactsForMistral(params) {
 // CHIAMA MISTRAL + VALIDA JSON + RETRY
 // ═══════════════════════════════════════════════════════════
 
-const REQUIRED_FIELDS = ['esito', 'campo', 'chiusura'];
-const MAX_WORDS_PER_FIELD = 40;
+const REQUIRED_FIELDS = ['esito', 'campo', 'giudizio', 'chiusura'];
+const MAX_WORDS_PER_FIELD = 50;
 
 /**
  * Valida il JSON generato da Mistral.
@@ -284,7 +295,7 @@ async function generatePostMatchComment(params) {
  * Assembla il testo finale dal JSON validato di Mistral.
  */
 function assembleText(parsed) {
-  return `${parsed.esito} ${parsed.campo} ${parsed.chiusura}`;
+  return `${parsed.esito} ${parsed.campo} ${parsed.giudizio} ${parsed.chiusura}`;
 }
 
 /**
