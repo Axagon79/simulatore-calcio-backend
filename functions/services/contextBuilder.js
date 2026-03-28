@@ -283,6 +283,16 @@ async function buildMatchContext(db, home, away, date) {
         dp.status = h2hResult[0].status || 'Finished';
       }
     }
+    // Se la partita e' conclusa, arricchisci con stats SofaScore post-partita
+    if (dp.real_score) {
+      const postMatchStats = await db.collection('post_match_stats').findOne(
+        { home: dp.home, away: dp.away, date: dp.date },
+        { projection: { home_stats: 1, away_stats: 1 } }
+      );
+      if (postMatchStats) {
+        dp._post_match_stats = postMatchStats;
+      }
+    }
     // Se il doc ha campi unified (analysis_score, segno_dettaglio), usa il contesto ricco
     const isUnified = dp.analysis_score !== undefined || dp.segno_dettaglio !== undefined;
     const context = isUnified ? buildUnifiedContextFromDoc(dp) : buildDailyPredictionsContext(dp);
@@ -410,6 +420,50 @@ function _buildUnifiedLines(doc, section) {
     for (const p of pronosticiConEsito) {
       const res = p.esito === true ? 'CENTRATO' : 'SBAGLIATO';
       lines.push(`  ${p.tipo} ${p.pronostico} @${p.quota || '?'} → ${res}`);
+      // Analisi post-partita (Fase 1) se disponibile
+      const pma = p.post_match_analysis;
+      if (pma) {
+        lines.push(`    Coerenza col campo: ${pma.coherence_score}/100 (${pma.verdict})`);
+        if (pma.modifiers_applied && pma.modifiers_applied.length > 0) {
+          lines.push(`    Fattori: ${pma.modifiers_applied.join(', ')}`);
+        }
+      }
+    }
+  }
+
+  // Stats post-partita SofaScore (se disponibili)
+  const pms = doc._post_match_stats;
+  if (pms && pms.home_stats) {
+    const hs = pms.home_stats;
+    const as = pms.away_stats || {};
+    lines.push(`\nSTATISTICHE REALI POST-PARTITA (SofaScore):`);
+    const statKeys = [
+      ['xg', 'Expected Goals (xG)'],
+      ['shots_on_target', 'Tiri in porta'],
+      ['big_chances', 'Grandi occasioni'],
+      ['big_chances_scored', 'Grandi occasioni segnate'],
+      ['big_chances_missed', 'Grandi occasioni mancate'],
+      ['touches_in_opp_box', 'Tocchi in area avversaria'],
+      ['shots_inside_box', 'Tiri in area'],
+      ['total_shots', 'Tiri totali'],
+      ['hit_woodwork', 'Pali/traverse'],
+      ['big_saves', 'Grandi parate'],
+      ['saves', 'Parate'],
+      ['corners', 'Calci d\'angolo'],
+      ['possession', 'Possesso palla %'],
+      ['blocked_shots', 'Tiri bloccati'],
+      ['through_balls', 'Passaggi filtranti'],
+      ['final_third_entries', 'Entrate ultimo terzo'],
+      ['fouls', 'Falli commessi'],
+      ['yellow_cards', 'Ammonizioni'],
+      ['red_cards', 'Espulsioni'],
+    ];
+    for (const [key, label] of statKeys) {
+      const hv = hs[key];
+      const av = as[key];
+      if (hv !== undefined && hv !== null) {
+        lines.push(`  ${label}: ${doc.home} ${hv} - ${doc.away} ${av ?? '?'}`);
+      }
     }
   }
 
