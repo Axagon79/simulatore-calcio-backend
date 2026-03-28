@@ -45,25 +45,25 @@ ESEMPI (input → output)
 ═══════════════════════════════════════
 
 INPUT:
-partita=Roma vs Empoli|ris=3-0|pron=Vittoria Roma (casa)|esito=CENTRATO|verdetto=meritata|sot=8-1|bc=4-0|poss=65%-35%
+partita=Roma vs Empoli|ris=3-0|pron=Vittoria Roma (casa)|esito=CENTRATO|verdetto=meritata|tiri_in_porta=8-1|grandi_occasioni=4-0|poss=65%-35%
 
 OUTPUT:
 {"esito":"Pronostico centrato, la Roma ha vinto meritatamente.","campo":"Dominio totale dei giallorossi: 8 tiri in porta contro 1, 4 occasioni nitide e il 65% di possesso. L'Empoli non ha mai impensierito.","giudizio":"Scelta perfetta, i numeri confermano un dominio senza discussioni.","chiusura":"Vittoria scritta nel destino della partita."}
 
 INPUT:
-partita=Inter vs Napoli|ris=0-1|pron=Entrambe segnano (GG)|esito=SBAGLIATO|verdetto=sbagliato|sot=2-3|bc=0-1|poss=48%-52%
+partita=Inter vs Napoli|ris=0-1|pron=Entrambe segnano (GG)|esito=SBAGLIATO|verdetto=sbagliato|tiri_in_porta=2-3|grandi_occasioni=0-1|poss=48%-52%
 
 OUTPUT:
 {"esito":"Pronostico sbagliato, solo il Napoli e' riuscito a segnare.","campo":"L'Inter ha tirato solo 2 volte in porta senza creare nessuna grande occasione. Il Napoli ha gestito la partita con il 52% di possesso e 3 tiri in porta.","giudizio":"Il GG non aveva basi solide: l'Inter non ha mai creato abbastanza per segnare.","chiusura":"Quando una squadra non tira quasi mai in porta, il GG e' un azzardo."}
 
 INPUT:
-partita=Milan vs Juve|ris=1-2|pron=Vittoria Milan (casa)|esito=SBAGLIATO|verdetto=sfortuna|sot=7-3|bc=3-1|poss=58%-42%|pali=2-0
+partita=Milan vs Juve|ris=1-2|pron=Vittoria Milan (casa)|esito=SBAGLIATO|verdetto=sfortuna|tiri_in_porta=7-3|grandi_occasioni=3-1|poss=58%-42%|pali=2-0
 
 OUTPUT:
 {"esito":"Pronostico sbagliato, ma il Milan meritava molto di piu'.","campo":"Il Milan ha dominato con 7 tiri in porta contro 3, 3 grandi occasioni e 2 pali colpiti. La Juve ha fatto il minimo per portare a casa i 3 punti.","giudizio":"La scelta era giustissima: il campo diceva Milan in lungo e in largo. Pura sfortuna.","chiusura":"Una di quelle serate dove il calcio ti punisce senza motivo."}
 
 INPUT:
-partita=Lazio vs Genoa|ris=2-1|pron=Entrambe segnano (GG)|esito=CENTRATO|verdetto=fortunato|sot=5-1|bc=3-0|poss=62%-38%
+partita=Lazio vs Genoa|ris=2-1|pron=Entrambe segnano (GG)|esito=CENTRATO|verdetto=fortunato|tiri_in_porta=5-1|grandi_occasioni=3-0|poss=62%-38%
 
 OUTPUT:
 {"esito":"Pronostico centrato, ma con un bel po' di fortuna.","campo":"La Lazio ha dominato con 5 tiri in porta e 3 grandi occasioni. Il Genoa ha segnato con l'unico tiro in porta della partita, senza creare altro.","giudizio":"Il GG e' uscito per un episodio: il Genoa non ha mai giocato per segnare. Ci e' andata bene.","chiusura":"Risultato giusto sulla carta, ma il campo racconta un'altra storia."}`;
@@ -114,7 +114,7 @@ function _verdettoBrief(esito, verdict) {
 
 /**
  * Costruisce la riga dati strutturata (come match_key dei ticket).
- * Formato compatto: partita=X|ris=X|pron=X|esito=X|verdetto=X|sot=X|bc=X|poss=X|pali=X
+ * Formato compatto: partita=X|ris=X|pron=X|esito=X|verdetto=X|tiri_in_porta=X|grandi_occasioni=X|poss=X|pali=X
  */
 function buildStructuredInput(params) {
   const { home, away, realScore, tipo, pronostico, esito, postMatchAnalysis, homeStats, awayStats, quota } = params;
@@ -132,12 +132,12 @@ function buildStructuredInput(params) {
   if (homeStats && awayStats) {
     const hSot = homeStats.shots_on_target ?? '?';
     const aSot = awayStats.shots_on_target ?? '?';
-    parts.push(`sot=${hSot}-${aSot}`);
+    parts.push(`tiri_in_porta=${hSot}-${aSot}`);
 
     const hBc = homeStats.big_chances;
     const aBc = awayStats.big_chances;
     if (hBc != null || aBc != null) {
-      parts.push(`bc=${hBc ?? 0}-${aBc ?? 0}`);
+      parts.push(`grandi_occasioni=${hBc ?? 0}-${aBc ?? 0}`);
     }
 
     const hPoss = homeStats.possession;
