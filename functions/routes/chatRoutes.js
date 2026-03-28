@@ -9,6 +9,7 @@ const { buildMatchContext, searchMatch, buildUnifiedContext } = require('../serv
 const { WEB_SEARCH_TOOL, handleToolCalls } = require('../services/webSearch');
 const { DB_TOOLS } = require('../services/dbTools');
 const { validateChatResponse, extractMatchDataFromContext } = require('../services/responseValidator');
+const { generateMatchPostMatchAnalysis } = require('../services/postMatchAnalysis');
 
 // ── GET /chat/context?home=X&away=Y&date=Z ──
 // Genera analisi iniziale per una partita
@@ -25,20 +26,20 @@ router.get('/context', async (req, res) => {
     }
 
     const userInfo = { pageContext: pageContext || '', isAdmin: isAdmin === 'true' };
-    let analysis = await generateAnalysis(result.context, userInfo);
 
-    // Validazione post-partita: controlla la risposta e riprova se viola regole
+    // Se la partita e' conclusa e ha stats SofaScore, usa il flusso strutturato (pattern ticket)
     const matchData = extractMatchDataFromContext(result.context);
-    if (matchData) {
-      const MAX_RETRIES = 2;
-      for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
-        const validation = validateChatResponse(analysis, matchData);
-        if (validation.valid) break;
-        console.log(`[CHAT/CONTEXT] Validazione fallita (tentativo ${attempt + 1}): ${validation.violations.join(', ')}`);
-        // Richiama Mistral con feedback di correzione
-        const correctionPrompt = `${result.context}\n\n---\nLA TUA RISPOSTA PRECEDENTE:\n${analysis}\n\n${validation.feedback}`;
-        analysis = await generateAnalysis(correctionPrompt, userInfo);
+    let analysis;
+    if (matchData && matchData.pronostici.length > 0) {
+      const postMatchComment = await generateMatchPostMatchAnalysis(req.db, home, away, date || undefined);
+      if (postMatchComment) {
+        analysis = postMatchComment;
       }
+    }
+
+    // Fallback: analisi generica (pre-partita o partita senza stats)
+    if (!analysis) {
+      analysis = await generateAnalysis(result.context, userInfo);
     }
 
     res.json({
