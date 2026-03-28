@@ -318,15 +318,15 @@ function _checkPartita(text, inputData) {
     questions.push(..._checkNumbers(text, /(\d+)\s*tir[oi]\s*in\s*porta/gi, [hSot, aSot, sumSot], 'tiri in porta'));
     questions.push(..._checkNumbers(text, /tir[oi]\s*in\s*porta\s*[:(]?\s*(\d+)\s*(?:a|contro|-|–)\s*(\d+)/gi, [hSot, aSot, sumSot], 'tiri in porta'));
 
-    // 0 tiri: se una squadra ha 0 non puo' aver tirato
-    if (parseInt(aSot) === 0 && new RegExp(away + '.{0,50}\\d+\\s*tir[oi]\\s*in\\s*porta', 'i').test(text)) {
-      const m = text.match(new RegExp(away + '.{0,50}(\\d+)\\s*tir[oi]\\s*in\\s*porta', 'i'));
+    // 0 tiri: se una squadra ha 0 non puo' aver tirato — check diretto sul nome squadra
+    if (parseInt(aSot) === 0) {
+      const m = text.match(new RegExp(away + '.{0,20}(\\d+)\\s*tir[oi]\\s*in\\s*porta', 'i'));
       if (m && parseInt(m[1]) > 0) {
         questions.push(`Hai detto che ${away} ha fatto ${m[1]} tiro in porta ma i dati dicono 0. ${away} non ha MAI tirato in porta.`);
       }
     }
-    if (parseInt(hSot) === 0 && new RegExp(home + '.{0,50}\\d+\\s*tir[oi]\\s*in\\s*porta', 'i').test(text)) {
-      const m = text.match(new RegExp(home + '.{0,50}(\\d+)\\s*tir[oi]\\s*in\\s*porta', 'i'));
+    if (parseInt(hSot) === 0) {
+      const m = text.match(new RegExp(home + '.{0,20}(\\d+)\\s*tir[oi]\\s*in\\s*porta', 'i'));
       if (m && parseInt(m[1]) > 0) {
         questions.push(`Hai detto che ${home} ha fatto ${m[1]} tiro in porta ma i dati dicono 0. ${home} non ha MAI tirato in porta.`);
       }
@@ -379,14 +379,10 @@ function _checkPartitaLogica(text, inputData) {
   const aGoals = parseInt(risMatch[2]);
   const totalGoals = hGoals + aGoals;
 
-  // Se ci sono stati gol, non puoi dire "non c'è stato nessun gol" o "senza gol"
+  // "Senza gol" generico quando ci sono gol — solo frasi che parlano della partita intera
   if (totalGoals > 0) {
-    if (/\b(nessun gol|zero gol|senza gol|non .{0,15}segnat[oi]|non .{0,15}gol)\b/i.test(text)) {
-      // Controlla che non stia parlando di una squadra specifica
-      const noGoalGeneric = /\b(nessun gol|zero gol|senza gol)\b/i.test(text);
-      if (noGoalGeneric) {
-        questions.push(`Hai scritto "nessun gol" o "senza gol" ma la partita e' finita ${hGoals}-${aGoals} (${totalGoals} gol totali). Come mai?`);
-      }
+    if (/\b(partita senza gol|nessun gol nella partita|zero gol totali)\b/i.test(text)) {
+      questions.push(`Hai scritto "senza gol" riferito alla partita ma sono stati segnati ${totalGoals} gol (${hGoals}-${aGoals}).`);
     }
   }
 
@@ -415,7 +411,7 @@ function _checkPartitaLogica(text, inputData) {
     const whoDidntScore = hGoals === 0 ? home : (aGoals === 0 ? away : null);
     if (whoDidntScore && totalGoals > 0) {
       // Se dice "non ci sono stati gol" quando ce ne sono stati, e' sbagliato
-      if (/\bnon .{0,10}stat[oi] .{0,10}gol\b/i.test(text) || /\bnessun gol\b/i.test(text)) {
+      if (/\b(partita senza gol|nessun gol nella partita|non ci sono stati gol)\b/i.test(text)) {
         questions.push(`Il GG e' sbagliato perche' ${whoDidntScore} non ha segnato (0 gol), non perche' non ci sono stati gol. La partita e' finita ${hGoals}-${aGoals} con ${totalGoals} gol totali.`);
       }
     }
@@ -518,14 +514,15 @@ function validateJSON(parsed, inputData) {
       }
     }
 
-    // "Pareggio" quando non lo e'
-    if (hG !== aG && /\b(pareggio|parità|pari|finita pari)\b/i.test(allText) && !/\b(non .{0,10}pareggio|evitare il pareggio|senza pareggio)\b/i.test(allText)) {
+    // "Pareggio" quando non lo e' — solo se dice esplicitamente "e' finita in pareggio" o "pareggio finale"
+    if (hG !== aG && /\b(finit[ao] in pareggio|pareggio finale|risultato.*pareggio|e' .*pareggio)\b/i.test(allText)) {
       questions.push(`Hai parlato di "pareggio" ma la partita e' finita ${hG}-${aG}. Non e' un pareggio.`);
     }
 
-    // "Senza gol" / "zero gol" quando ce ne sono
-    if (totG > 0 && /\b(senza gol|zero gol|nessun gol|0 gol)\b/i.test(allText)) {
-      questions.push(`Hai scritto "senza gol" o "zero gol" ma la partita e' finita ${hG}-${aG} con ${totG} gol. Correggi.`);
+    // "Senza gol" / "zero gol" — solo se si riferisce alla partita intera, non a una squadra
+    // "senza gol per il Pisa" e' corretto, "partita senza gol" no
+    if (totG > 0 && /\b(partita senza gol|zero gol totali|nessun gol in partita|nessun gol nella partita)\b/i.test(allText)) {
+      questions.push(`Hai scritto "senza gol" riferito alla partita ma sono stati segnati ${totG} gol (${hG}-${aG}). Correggi.`);
     }
   }
 
