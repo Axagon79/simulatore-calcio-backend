@@ -16,17 +16,16 @@ const { callMistral } = require('./llmService');
 
 const SYSTEM_PROMPT = `Sei un match analyst sincero e diretto. Traduci i numeri in linguaggio semplice, come se stessi parlando con un amico al bar che ti chiede com'e' andata la partita.
 
-Ricevi i dati di una partita in formato strutturato, divisi in PRE-MATCH e POST-MATCH. Scrivi la tua analisi in JSON con 3 fasi, sempre in questo ordine:
+Ricevi i dati di una partita in formato strutturato. Scrivi la tua analisi in JSON con 2 campi:
 
 {
-  "pre_match": "Analisi dei dati PRIMA della partita: cosa dicevano le quote, le probabilita', le nostre previsioni. Il pronostico aveva senso? Era rischioso? Le quote lo supportavano?",
-  "partita": "Analisi di cosa e' successo IN CAMPO: racconta la partita basandoti sulle statistiche reali. Chi ha dominato, chi ha creato, chi ha sofferto.",
-  "resoconto": "Tira le somme: il pronostico e' stato centrato o sbagliato? Il campo confermava le previsioni o le contraddiceva? Verdetto finale."
+  "partita": "Racconta cosa e' successo in campo basandoti sulle statistiche reali. Chi ha dominato, chi ha creato, chi ha sofferto. Fallo in 4-5 frasi.",
+  "verdetto": "Una frase secca: il pronostico ha funzionato o no, e perche' in base a quello che hai raccontato sopra."
 }
 
 Restituisci SOLO il JSON. Nessun testo prima o dopo. Nessun markdown.
 Scrivi in italiano, come parleresti a un amico che ti chiede com'e' andata la partita.
-IMPORTANTE: ogni concetto va detto UNA SOLA VOLTA. Se hai gia' detto qualcosa in pre_match, non ripeterlo in partita o resoconto. Ogni sezione aggiunge informazioni NUOVE.
+IMPORTANTE: non ripetere lo stesso concetto. Il verdetto deve aggiungere qualcosa di nuovo rispetto alla partita, non riformulare le stesse cose.
 Usa il passato prossimo ("ha confermato", "ha dominato", "ha segnato"), NON l'imperfetto ("confermava", "dominava"). La partita e' finita, parla di fatti accaduti.
 Resta FOCALIZZATO sul pronostico in questione. Se il pronostico e' GG, parla di GG. Non divagare su Over, Under, risultati esatti o altri mercati che non c'entrano.
 Non dire cose OVVIE dal risultato. Se e' finita 5-0, non dire "il Pisa non ha segnato" — si vede gia dal risultato. Spiega il PERCHE: non ha mai tirato in porta, non ha creato occasioni. Il perche e interessante, il cosa no.
@@ -71,26 +70,7 @@ function buildStructuredInput(params) {
 
   lines.push(`partita=${home} vs ${away}|ris=${realScore}|pron=${_spiegaPronostico(tipo, pronostico, home, away)}|esito=${esito ? 'CENTRATO' : 'SBAGLIATO'}`);
 
-  // --- BLOCCO 1: PRIMA DELLA PARTITA ---
-  const pre = [];
-  if (confidence) pre.push(`confidence=${confidence}%`);
-  if (stars) pre.push(`stelle=${stars}`);
-  if (matchDoc) {
-    if (matchDoc.expected_total_goals) pre.push(`gol_attesi=${matchDoc.expected_total_goals}`);
-    const sim = matchDoc.simulation_data || {};
-    if (sim.home_win_pct !== undefined) {
-      pre.push(`prob_casa=${sim.home_win_pct}%`);
-      pre.push(`prob_pari=${sim.draw_pct}%`);
-      pre.push(`prob_ospite=${sim.away_win_pct}%`);
-    }
-    if (sim.over_25_pct !== undefined) pre.push(`prob_over25=${sim.over_25_pct}%`);
-    if (sim.gg_pct !== undefined) pre.push(`prob_gg=${sim.gg_pct}%`);
-  }
-  if (pre.length > 0) {
-    lines.push(`\nPRIMA DELLA PARTITA (dati pre-match):\n${pre.join('|')}`);
-  }
-
-  // --- BLOCCO 2: DOPO LA PARTITA (tabella per squadra) ---
+  // --- STATISTICHE REALI (tabella per squadra) ---
   if (homeStats && awayStats) {
     const buildRow = (label, stats) => {
       const row = [];
@@ -219,7 +199,7 @@ function buildStructuredInput(params) {
 // Se trova problemi, fa DOMANDE a Mistral.
 // ═══════════════════════════════════════════════════════════
 
-const REQUIRED_FIELDS = ['pre_match', 'partita', 'resoconto'];
+const REQUIRED_FIELDS = ['partita', 'verdetto'];
 
 // Termini tecnici interni che l'utente non deve vedere
 const FORBIDDEN = [/\bxG\b/i, /\bexpected goals?\b/i, /\bMonte Carlo\b/i, /\bcicli\b/i,
@@ -465,20 +445,30 @@ function validateJSON(parsed, inputData) {
   // Struttura base
   for (const f of REQUIRED_FIELDS) {
     if (!parsed[f] || typeof parsed[f] !== 'string') {
-      questions.push(`Il campo "${f}" manca. Il JSON deve avere 3 campi: pre_match, partita, resoconto.`);
+      questions.push(`Il campo "${f}" manca. Il JSON deve avere 2 campi: partita, verdetto.`);
     }
   }
   if (questions.length > 0) return { valid: false, questions };
 
-  // 3 check separati + check logica
-  questions.push(..._checkPreMatch(parsed.pre_match, inputData));
+  // Check partita + logica + verdetto
   questions.push(..._checkPartita(parsed.partita, inputData));
   questions.push(..._checkPartitaLogica(parsed.partita, inputData));
-  questions.push(..._checkPartitaLogica(parsed.resoconto, inputData)); // anche nel resoconto
-  questions.push(..._checkResoconto(parsed.resoconto, inputData, parsed.pre_match, parsed.partita));
+  questions.push(..._checkPartitaLogica(parsed.verdetto, inputData));
 
-  // Check semantico su TUTTE le sezioni
-  const allText = `${parsed.pre_match || ''} ${parsed.partita || ''} ${parsed.resoconto || ''}`;
+  // Coerenza esito nel verdetto
+  if (inputData.includes('esito=CENTRATO')) {
+    if (/\b(sbagliato|errato|flop|fallito|non ha funzionato)\b/i.test(parsed.verdetto || '')) {
+      questions.push(`Nel verdetto dici sbagliato ma l'esito e' CENTRATO. Correggi.`);
+    }
+  }
+  if (inputData.includes('esito=SBAGLIATO')) {
+    if (/\b(centrato|azzeccato|perfetto|indovinato|ha funzionato)\b/i.test(parsed.verdetto || '')) {
+      questions.push(`Nel verdetto dici centrato ma l'esito e' SBAGLIATO. Correggi.`);
+    }
+  }
+
+  // Check semantico su tutto
+  const allText = `${parsed.partita || ''} ${parsed.verdetto || ''}`;
   const { home, away, tiripMatch: tp } = _extractFromInput(inputData);
   const risM = inputData.match(/ris=(\d+)-(\d+)/);
 
@@ -585,12 +575,12 @@ async function generateComment(params) {
 
       // Se il JSON ha i 3 campi, accettalo al primo tentativo
       // Il validator fa domande solo dal secondo tentativo in poi
-      if (parsed.pre_match && parsed.partita && parsed.resoconto) {
+      if (parsed.partita && parsed.verdetto) {
         if (attempt === 0) {
           // Primo tentativo: accetta se ha i 3 campi (validazione soft)
           const validation = validateJSON(parsed, inputData);
           if (validation.valid) {
-            return `${parsed.pre_match}\n\n${parsed.partita}\n\n${parsed.resoconto}`;
+            return `${parsed.partita}\n\n${parsed.verdetto}`;
           }
           // Se ha errori critici (esito contraddetto), riprova
           const critici = validation.questions.filter(q =>
@@ -599,7 +589,7 @@ async function generateComment(params) {
           if (critici.length === 0) {
             // Solo errori minori — accetta comunque
             console.log(`[POST-MATCH] Tentativo 1: errori minori ignorati (${validation.questions.length})`);
-            return `${parsed.pre_match}\n\n${parsed.partita}\n\n${parsed.resoconto}`;
+            return `${parsed.partita}\n\n${parsed.verdetto}`;
           }
           lastQuestions = critici;
           console.log(`[POST-MATCH] Tentativo 1: ${critici.length} errori critici → ${critici.join(' | ')}`);
@@ -607,13 +597,13 @@ async function generateComment(params) {
           // Retry: validazione completa
           const validation = validateJSON(parsed, inputData);
           if (validation.valid) {
-            return `${parsed.pre_match}\n\n${parsed.partita}\n\n${parsed.resoconto}`;
+            return `${parsed.partita}\n\n${parsed.verdetto}`;
           }
           lastQuestions = validation.questions;
           console.log(`[POST-MATCH] Tentativo ${attempt + 1}: ${validation.questions.length} domande → ${validation.questions.join(' | ')}`);
         }
       } else {
-        lastQuestions = ['Il JSON deve avere 3 campi: pre_match, partita, resoconto.'];
+        lastQuestions = ['Il JSON deve avere 2 campi: partita, verdetto.'];
         console.log(`[POST-MATCH] Tentativo ${attempt + 1}: campi mancanti`);
       }
 
