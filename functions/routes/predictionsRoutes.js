@@ -1124,53 +1124,59 @@ router.get('/monthly-pl', async (req, res) => {
     const selectedDate = date || new Date().toISOString().slice(0, 10);
     const monthStart = selectedDate.slice(0, 8) + '01';
 
-    const docs = await req.db.collection('daily_predictions_unified')
-      .find(
-        { date: { $gte: monthStart, $lte: selectedDate } },
-        { projection: { pronostici: 1 } }
-      ).toArray();
+    // Query parallela: mese + totale storico
+    const [monthDocs, allDocs] = await Promise.all([
+      req.db.collection('daily_predictions_unified')
+        .find({ date: { $gte: monthStart, $lte: selectedDate } }, { projection: { pronostici: 1 } }).toArray(),
+      req.db.collection('daily_predictions_unified')
+        .find({ date: { $lte: selectedDate }, 'pronostici.esito': { $exists: true } }, { projection: { pronostici: 1 } }).toArray(),
+    ]);
 
-    const sezioni = {
-      tutti: { pl: 0, bets: 0, wins: 0, staked: 0 },
-      elite: { pl: 0, bets: 0, wins: 0, staked: 0 },
-      alto_rendimento: { pl: 0, bets: 0, wins: 0, staked: 0 },
-    };
+    function calcSezioni(docs) {
+      const sez = {
+        tutti: { pl: 0, bets: 0, wins: 0, staked: 0 },
+        elite: { pl: 0, bets: 0, wins: 0, staked: 0 },
+        alto_rendimento: { pl: 0, bets: 0, wins: 0, staked: 0 },
+      };
+      for (const doc of docs) {
+        for (const p of (doc.pronostici || [])) {
+          const esito = p.esito;
+          if (esito === undefined || esito === null || esito === 'void') continue;
+          const quota = p.quota || 0;
+          const stake = p.stake || 1;
+          if (quota <= 1) continue;
+          if (p.pronostico === 'NO BET' || p.tipo === 'RISULTATO_ESATTO') continue;
 
-    for (const doc of docs) {
-      for (const p of (doc.pronostici || [])) {
-        const esito = p.esito;
-        if (esito === undefined || esito === null || esito === 'void') continue;
-        const quota = p.quota || 0;
-        const stake = p.stake || 1;
-        if (quota <= 1) continue;
-        if (p.pronostico === 'NO BET' || p.tipo === 'RISULTATO_ESATTO') continue;
+          const profit = esito === true ? (quota - 1) * stake : -stake;
+          const isHit = esito === true;
 
-        const profit = esito === true ? (quota - 1) * stake : -stake;
-        const isHit = esito === true;
+          sez.tutti.bets++; sez.tutti.staked += stake; sez.tutti.pl += profit;
+          if (isHit) sez.tutti.wins++;
 
-        sezioni.tutti.bets++; sezioni.tutti.staked += stake; sezioni.tutti.pl += profit;
-        if (isHit) sezioni.tutti.wins++;
+          if (p.elite) {
+            sez.elite.bets++; sez.elite.staked += stake; sez.elite.pl += profit;
+            if (isHit) sez.elite.wins++;
+          }
 
-        if (p.elite) {
-          sezioni.elite.bets++; sezioni.elite.staked += stake; sezioni.elite.pl += profit;
-          if (isHit) sezioni.elite.wins++;
-        }
-
-        if ((p.confidence || 0) >= 70 && (p.stars || 0) >= 4) {
-          sezioni.alto_rendimento.bets++; sezioni.alto_rendimento.staked += stake; sezioni.alto_rendimento.pl += profit;
-          if (isHit) sezioni.alto_rendimento.wins++;
+          if ((p.confidence || 0) >= 70 && (p.stars || 0) >= 4) {
+            sez.alto_rendimento.bets++; sez.alto_rendimento.staked += stake; sez.alto_rendimento.pl += profit;
+            if (isHit) sez.alto_rendimento.wins++;
+          }
         }
       }
+      for (const s of Object.values(sez)) {
+        s.pl = Math.round(s.pl * 100) / 100;
+        s.staked = Math.round(s.staked * 100) / 100;
+        s.hr = s.bets > 0 ? Math.round((s.wins / s.bets) * 1000) / 10 : 0;
+        s.roi = s.staked > 0 ? Math.round((s.pl / s.staked) * 1000) / 10 : 0;
+      }
+      return sez;
     }
 
-    for (const s of Object.values(sezioni)) {
-      s.pl = Math.round(s.pl * 100) / 100;
-      s.staked = Math.round(s.staked * 100) / 100;
-      s.hr = s.bets > 0 ? Math.round((s.wins / s.bets) * 1000) / 10 : 0;
-      s.roi = s.staked > 0 ? Math.round((s.pl / s.staked) * 1000) / 10 : 0;
-    }
+    const sezioni = calcSezioni(monthDocs);
+    const totale = calcSezioni(allDocs);
 
-    res.json({ success: true, from: monthStart, to: selectedDate, sezioni });
+    res.json({ success: true, from: monthStart, to: selectedDate, sezioni, totale });
   } catch (error) {
     res.status(500).json({ error: 'Errore monthly-pl', details: error.message });
   }
