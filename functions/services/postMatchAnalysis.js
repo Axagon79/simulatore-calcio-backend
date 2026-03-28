@@ -484,6 +484,60 @@ function validateJSON(parsed, inputData) {
   questions.push(..._checkPartitaLogica(parsed.resoconto, inputData)); // anche nel resoconto
   questions.push(..._checkResoconto(parsed.resoconto, inputData, parsed.pre_match, parsed.partita));
 
+  // Check semantico su TUTTE le sezioni
+  const allText = `${parsed.pre_match || ''} ${parsed.partita || ''} ${parsed.resoconto || ''}`;
+  const { home, away, tiripMatch: tp } = _extractFromInput(inputData);
+  const risM = inputData.match(/ris=(\d+)-(\d+)/);
+
+  if (risM) {
+    const hG = parseInt(risM[1]);
+    const aG = parseInt(risM[2]);
+    const totG = hG + aG;
+
+    // "Partita noiosa/morta/senza emozioni" quando ci sono 4+ gol
+    if (totG >= 4 && /\b(noios[ae]|mort[ae]|senza emozion|piatt[ae]|soporífera|soporifera)\b/i.test(allText)) {
+      questions.push(`Hai descritto la partita come "noiosa" o "senza emozioni" ma sono stati segnati ${totG} gol. Una partita con ${totG} gol non e' noiosa.`);
+    }
+
+    // "Goleada/valanga/massacro" quando ci sono 1-2 gol
+    if (totG <= 2 && /\b(goleada|valanga|massacro|distruzion|annientat|demolit)\b/i.test(allText)) {
+      questions.push(`Hai usato termini come "goleada" o "massacro" ma ci sono stati solo ${totG} gol. Non e' una goleada.`);
+    }
+
+    // "Ha vinto X" quando ha vinto Y
+    if (hG > aG) {
+      // Casa ha vinto
+      if (new RegExp(away + '.{0,20}(ha vinto|vittoria|trionfato|si .{0,5}impost)', 'i').test(allText)) {
+        questions.push(`Hai detto che ${away} ha vinto ma il risultato e' ${hG}-${aG}: ha vinto ${home}. Correggi.`);
+      }
+    } else if (aG > hG) {
+      if (new RegExp(home + '.{0,20}(ha vinto|vittoria|trionfato|si .{0,5}impost)', 'i').test(allText)) {
+        questions.push(`Hai detto che ${home} ha vinto ma il risultato e' ${hG}-${aG}: ha vinto ${away}. Correggi.`);
+      }
+    }
+
+    // "Pareggio" quando non lo e'
+    if (hG !== aG && /\b(pareggio|parità|pari|finita pari)\b/i.test(allText) && !/\b(non .{0,10}pareggio|evitare il pareggio|senza pareggio)\b/i.test(allText)) {
+      questions.push(`Hai parlato di "pareggio" ma la partita e' finita ${hG}-${aG}. Non e' un pareggio.`);
+    }
+
+    // "Senza gol" / "zero gol" quando ce ne sono
+    if (totG > 0 && /\b(senza gol|zero gol|nessun gol|0 gol)\b/i.test(allText)) {
+      questions.push(`Hai scritto "senza gol" o "zero gol" ma la partita e' finita ${hG}-${aG} con ${totG} gol. Correggi.`);
+    }
+  }
+
+  // "Possesso equilibrato" quando e' 70-30
+  if (tp) {
+    const possM = inputData.match(/possesso=(\d+)-(\d+)/);
+    if (possM) {
+      const diff = Math.abs(parseInt(possM[1]) - parseInt(possM[2]));
+      if (diff >= 25 && /\b(possesso equilibrat|possesso simil|possesso pari|alla pari nel possesso)\b/i.test(allText)) {
+        questions.push(`Hai detto "possesso equilibrato" ma i dati dicono ${possM[1]}%-${possM[2]}%. Una differenza di ${diff}% non e' equilibrata.`);
+      }
+    }
+  }
+
   return { valid: questions.length === 0, questions };
 }
 
