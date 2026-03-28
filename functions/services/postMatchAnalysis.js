@@ -318,25 +318,27 @@ function _checkPartita(text, inputData) {
     questions.push(..._checkNumbers(text, /(\d+)\s*tir[oi]\s*in\s*porta/gi, [hSot, aSot, sumSot], 'tiri in porta'));
     questions.push(..._checkNumbers(text, /tir[oi]\s*in\s*porta\s*[:(]?\s*(\d+)\s*(?:a|contro|-|–)\s*(\d+)/gi, [hSot, aSot, sumSot], 'tiri in porta'));
 
-    // 0 tiri: se una squadra ha 0 non puo' aver tirato — check diretto sul nome squadra
+    // 0 tiri: se una squadra ha 0, non puo' aver tirato
+    // Pattern stretto: "Pisa con 7 tiri in porta" o "Pisa ha fatto 7 tiri in porta"
+    // NON becca: "Pisa ha subito 7 tiri in porta" (quelli sono del Como)
     if (parseInt(aSot) === 0) {
-      const m = text.match(new RegExp(away + '.{0,20}(\\d+)\\s*tir[oi]\\s*in\\s*porta', 'i'));
+      const m = text.match(new RegExp(away + '.{0,10}(?:con|ha fatto|ha avuto|ha tirato)\\s*(\\d+)\\s*tir[oi]\\s*in\\s*porta', 'i'));
       if (m && parseInt(m[1]) > 0) {
         questions.push(`Hai detto che ${away} ha fatto ${m[1]} tiro in porta ma i dati dicono 0. ${away} non ha MAI tirato in porta.`);
       }
     }
     if (parseInt(hSot) === 0) {
-      const m = text.match(new RegExp(home + '.{0,20}(\\d+)\\s*tir[oi]\\s*in\\s*porta', 'i'));
+      const m = text.match(new RegExp(home + '.{0,10}(?:con|ha fatto|ha avuto|ha tirato)\\s*(\\d+)\\s*tir[oi]\\s*in\\s*porta', 'i'));
       if (m && parseInt(m[1]) > 0) {
         questions.push(`Hai detto che ${home} ha fatto ${m[1]} tiro in porta ma i dati dicono 0. ${home} non ha MAI tirato in porta.`);
       }
     }
 
-    // Dominio con 0 tiri
-    if (parseInt(hSot) === 0 && new RegExp(home + '.{0,30}(dominat|dominio|superior)', 'i').test(text)) {
+    // Dominio con 0 tiri — solo se dice "X ha dominato", non "X è stato dominato"
+    if (parseInt(hSot) === 0 && new RegExp(home + '.{0,15}ha (dominat|avuto il dominio|mostrato superiorit)', 'i').test(text)) {
       questions.push(`Hai detto che ${home} ha dominato ma ha 0 tiri in porta. Come e' possibile?`);
     }
-    if (parseInt(aSot) === 0 && new RegExp(away + '.{0,30}(dominat|dominio|superior)', 'i').test(text)) {
+    if (parseInt(aSot) === 0 && new RegExp(away + '.{0,15}ha (dominat|avuto il dominio|mostrato superiorit)', 'i').test(text)) {
       questions.push(`Hai detto che ${away} ha dominato ma ha 0 tiri in porta. Come e' possibile?`);
     }
   }
