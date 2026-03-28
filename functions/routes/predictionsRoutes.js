@@ -1116,4 +1116,29 @@ router.get('/daily-predictions-unified', async (req, res) => {
   }
 });
 
+// ── GET /predictions/monthly-pl ──
+// P/L mensile pre-calcolato (un numero dal DB, zero calcoli)
+router.get('/monthly-pl', async (req, res) => {
+  try {
+    const { month } = req.query;
+    const monthLabel = month || new Date().toISOString().slice(0, 7); // "2026-03"
+    const stats = await req.db.collection('monthly_stats').findOne({ month: monthLabel });
+    if (!stats) {
+      return res.json({ success: true, month: monthLabel, sezioni: {
+        tutti: { pl: 0, bets: 0, wins: 0, hr: 0, roi: 0, staked: 0 },
+        elite: { pl: 0, bets: 0, wins: 0, hr: 0, roi: 0, staked: 0 },
+        alto_rendimento: { pl: 0, bets: 0, wins: 0, hr: 0, roi: 0, staked: 0 },
+      }});
+    }
+    res.json({
+      success: true,
+      month: stats.month,
+      sezioni: stats.sezioni || {},
+      updated_at: stats.updated_at,
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Errore monthly-pl', details: error.message });
+  }
+});
+
 module.exports = { router, parseScore, checkPronostico, getQuotaForPronostico, getFinishedResults };

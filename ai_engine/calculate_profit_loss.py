@@ -271,3 +271,91 @@ for coll_name, stats in global_stats.items():
     print(f"      Recuperati:{stats['recuperati']} (void→risultato)")
     print(f"      Errori:    {stats['errori']}")
 print(f"\nFine: {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}")
+
+# ==================== P/L MENSILE PRE-CALCOLATO ====================
+# Aggiorna monthly_stats con il P/L progressivo del mese corrente
+try:
+    now = datetime.now()
+    month_start = now.strftime('%Y-%m-01')
+    month_end = now.strftime('%Y-%m-%d')
+    month_label = now.strftime('%Y-%m')
+
+    # Query tutti i pronostici unified del mese con esito
+    month_docs = list(db.daily_predictions_unified.find(
+        {'date': {'$gte': month_start, '$lte': month_end}},
+        {'pronostici': 1}
+    ))
+
+    # Calcola P/L per sezione: tutti, elite, alto_rendimento
+    sezioni = {
+        'tutti': {'pl': 0.0, 'bets': 0, 'wins': 0, 'staked': 0.0},
+        'elite': {'pl': 0.0, 'bets': 0, 'wins': 0, 'staked': 0.0},
+        'alto_rendimento': {'pl': 0.0, 'bets': 0, 'wins': 0, 'staked': 0.0},
+    }
+
+    for doc in month_docs:
+        for p in doc.get('pronostici', []):
+            esito = p.get('esito')
+            if esito is None or esito == 'void':
+                continue
+            quota = p.get('quota', 0) or 0
+            stake = p.get('stake', 1) or 1
+            if quota <= 1:
+                continue
+            pronostico = p.get('pronostico', '')
+            if pronostico == 'NO BET':
+                continue
+
+            is_elite = p.get('elite', False)
+            # Alto rendimento = confidence >= 70 e stelle >= 4
+            conf = p.get('confidence', 0) or 0
+            stars = p.get('stars', 0) or 0
+            is_alto = conf >= 70 and stars >= 4
+
+            profit = (quota - 1) * stake if esito is True else -stake
+
+            for sez_key in ['tutti']:
+                sezioni[sez_key]['bets'] += 1
+                sezioni[sez_key]['staked'] += stake
+                sezioni[sez_key]['pl'] += profit
+                if esito is True:
+                    sezioni[sez_key]['wins'] += 1
+
+            if is_elite:
+                sezioni['elite']['bets'] += 1
+                sezioni['elite']['staked'] += stake
+                sezioni['elite']['pl'] += profit
+                if esito is True:
+                    sezioni['elite']['wins'] += 1
+
+            if is_alto:
+                sezioni['alto_rendimento']['bets'] += 1
+                sezioni['alto_rendimento']['staked'] += stake
+                sezioni['alto_rendimento']['pl'] += profit
+                if esito is True:
+                    sezioni['alto_rendimento']['wins'] += 1
+
+    # Salva nel DB
+    for sez_key, s in sezioni.items():
+        s['pl'] = round(s['pl'], 2)
+        s['staked'] = round(s['staked'], 2)
+        s['roi'] = round((s['pl'] / s['staked']) * 100, 1) if s['staked'] > 0 else 0
+        s['hr'] = round((s['wins'] / s['bets']) * 100, 1) if s['bets'] > 0 else 0
+
+    db.monthly_stats.update_one(
+        {'month': month_label},
+        {'$set': {
+            'month': month_label,
+            'sezioni': sezioni,
+            'updated_at': now,
+        }},
+        upsert=True
+    )
+
+    for sez_key, s in sezioni.items():
+        if s['bets'] > 0:
+            pl_color = '🟢' if s['pl'] >= 0 else '🔴'
+            print(f"  {pl_color} {sez_key}: {'+' if s['pl'] >= 0 else ''}{s['pl']}u "
+                  f"({s['wins']}/{s['bets']} = {s['hr']}% HR, ROI {'+' if s['roi'] >= 0 else ''}{s['roi']}%)")
+except Exception as e:
+    print(f"\n⚠️ Errore calcolo P/L mensile: {e}")
