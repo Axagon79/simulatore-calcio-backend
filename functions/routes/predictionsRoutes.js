@@ -1116,26 +1116,61 @@ router.get('/daily-predictions-unified', async (req, res) => {
   }
 });
 
-// ── GET /predictions/monthly-pl ──
-// P/L mensile pre-calcolato (un numero dal DB, zero calcoli)
+// ── GET /predictions/monthly-pl?date=2026-03-20 ──
+// P/L mensile accumulato dal primo del mese fino alla data selezionata
 router.get('/monthly-pl', async (req, res) => {
   try {
-    const { month } = req.query;
-    const monthLabel = month || new Date().toISOString().slice(0, 7); // "2026-03"
-    const stats = await req.db.collection('monthly_stats').findOne({ month: monthLabel });
-    if (!stats) {
-      return res.json({ success: true, month: monthLabel, sezioni: {
-        tutti: { pl: 0, bets: 0, wins: 0, hr: 0, roi: 0, staked: 0 },
-        elite: { pl: 0, bets: 0, wins: 0, hr: 0, roi: 0, staked: 0 },
-        alto_rendimento: { pl: 0, bets: 0, wins: 0, hr: 0, roi: 0, staked: 0 },
-      }});
+    const { date } = req.query;
+    const selectedDate = date || new Date().toISOString().slice(0, 10);
+    const monthStart = selectedDate.slice(0, 8) + '01';
+
+    const docs = await req.db.collection('daily_predictions_unified')
+      .find(
+        { date: { $gte: monthStart, $lte: selectedDate } },
+        { projection: { pronostici: 1 } }
+      ).toArray();
+
+    const sezioni = {
+      tutti: { pl: 0, bets: 0, wins: 0, staked: 0 },
+      elite: { pl: 0, bets: 0, wins: 0, staked: 0 },
+      alto_rendimento: { pl: 0, bets: 0, wins: 0, staked: 0 },
+    };
+
+    for (const doc of docs) {
+      for (const p of (doc.pronostici || [])) {
+        const esito = p.esito;
+        if (esito === undefined || esito === null || esito === 'void') continue;
+        const quota = p.quota || 0;
+        const stake = p.stake || 1;
+        if (quota <= 1) continue;
+        if (p.pronostico === 'NO BET' || p.tipo === 'RISULTATO_ESATTO') continue;
+
+        const profit = esito === true ? (quota - 1) * stake : -stake;
+        const isHit = esito === true;
+
+        sezioni.tutti.bets++; sezioni.tutti.staked += stake; sezioni.tutti.pl += profit;
+        if (isHit) sezioni.tutti.wins++;
+
+        if (p.elite) {
+          sezioni.elite.bets++; sezioni.elite.staked += stake; sezioni.elite.pl += profit;
+          if (isHit) sezioni.elite.wins++;
+        }
+
+        if ((p.confidence || 0) >= 70 && (p.stars || 0) >= 4) {
+          sezioni.alto_rendimento.bets++; sezioni.alto_rendimento.staked += stake; sezioni.alto_rendimento.pl += profit;
+          if (isHit) sezioni.alto_rendimento.wins++;
+        }
+      }
     }
-    res.json({
-      success: true,
-      month: stats.month,
-      sezioni: stats.sezioni || {},
-      updated_at: stats.updated_at,
-    });
+
+    for (const s of Object.values(sezioni)) {
+      s.pl = Math.round(s.pl * 100) / 100;
+      s.staked = Math.round(s.staked * 100) / 100;
+      s.hr = s.bets > 0 ? Math.round((s.wins / s.bets) * 1000) / 10 : 0;
+      s.roi = s.staked > 0 ? Math.round((s.pl / s.staked) * 1000) / 10 : 0;
+    }
+
+    res.json({ success: true, from: monthStart, to: selectedDate, sezioni });
   } catch (error) {
     res.status(500).json({ error: 'Errore monthly-pl', details: error.message });
   }
