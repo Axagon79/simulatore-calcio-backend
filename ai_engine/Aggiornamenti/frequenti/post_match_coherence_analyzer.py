@@ -850,9 +850,9 @@ def analyze_pronostico(prono, home_stats, away_stats, risultato):
 
     # Normalizza alias tipo
     tipo_normalized = tipo
-    if tipo.upper() in ('DC', 'D.C.', 'DOPPIACHANCE', 'DOPPIA CHANCE'):
+    if tipo.upper().replace('.', '').replace('-', '').replace(' ', '').replace('_', '') in ('DC', 'DOPPIACHANCE', 'DOPPIAC'):
         tipo_normalized = 'DOPPIA_CHANCE'
-    elif tipo.upper() in ('MG', 'MULTIGOL', 'MULTI_GOL'):
+    elif tipo.upper().replace('.', '').replace('-', '').replace(' ', '').replace('_', '') in ('MG', 'MULTIGOL', 'MULTIGOAL'):
         tipo_normalized = 'MG'
 
     # Normalizza alias pronostici
