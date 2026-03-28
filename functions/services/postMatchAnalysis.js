@@ -573,9 +573,15 @@ async function generateComment(params) {
       const response = await callMistral([
         { role: 'system', content: SYSTEM_PROMPT },
         { role: 'user', content: userMessage },
-      ], { temperature: 0.5, max_tokens: 500 });
+      ], { temperature: 0.5, maxTokens: 500 });
 
-      let content = (response.content || response).toString().trim();
+      let content = (response.content || response || '').toString().trim();
+      console.log(`[POST-MATCH] Tentativo ${attempt + 1} raw (${content.length} chars): ${content.substring(0, 200)}`);
+
+      if (!content) {
+        lastQuestions = ['Risposta vuota. Genera il JSON richiesto.'];
+        continue;
+      }
 
       // Estrai JSON in modo sicuro — ignora testo prima/dopo le parentesi graffe
       const jsonMatch = content.match(/\{[\s\S]*\}/);
