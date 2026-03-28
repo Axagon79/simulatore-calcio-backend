@@ -529,6 +529,12 @@ function validateJSON(parsed, inputData) {
     }
   }
 
+  // Tono autodistruttivo — non demolire il pronostico
+  if (/\b(clamorosamente sbagliato|flop totale|disastro|disastroso|imbarazzante|figuraccia|ridicolo|assurdo|folle|pazzesco errore|errore madornale)\b/i.test(allText)) {
+    const match = allText.match(/\b(clamorosamente sbagliato|flop totale|disastro|disastroso|imbarazzante|figuraccia|ridicolo|assurdo|folle|pazzesco errore|errore madornale)\b/i);
+    questions.push(`Hai usato "${match[0]}" che e' un tono troppo negativo. Il pronostico puo' essere sbagliato ma non serve demolirlo. Riformula in modo piu' equilibrato — tipo "il campo ha detto altro" o "non e' andata come previsto".`);
+  }
+
   // "Possesso equilibrato" quando e' 70-30
   if (tp) {
     const possM = inputData.match(/possesso=(\d+)-(\d+)/);
