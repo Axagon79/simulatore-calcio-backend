@@ -848,11 +848,18 @@ def analyze_pronostico(prono, home_stats, away_stats, risultato):
 
     modifiers_log = []
 
+    # Normalizza alias pronostici
+    pron_normalized = pronostico
+    if pronostico.lower() in ('goal', 'gol'):
+        pron_normalized = 'GG'
+    elif pronostico.lower() in ('no goal', 'no gol', 'nogoal'):
+        pron_normalized = 'NG'
+
     if tipo == 'SEGNO':
         score, indicators = score_segno(pronostico, home_stats, away_stats, risultato, modifiers_log)
     elif tipo == 'GOL':
-        if pronostico in ('GG', 'NG'):
-            score, indicators = score_gg_ng(pronostico, home_stats, away_stats, risultato, modifiers_log)
+        if pron_normalized in ('GG', 'NG'):
+            score, indicators = score_gg_ng(pron_normalized, home_stats, away_stats, risultato, modifiers_log)
         elif pronostico.startswith('MG'):
             score, indicators = score_multigol(pronostico, home_stats, away_stats, risultato, modifiers_log)
         elif pronostico.startswith('Over') or pronostico.startswith('Under'):
@@ -869,7 +876,7 @@ def analyze_pronostico(prono, home_stats, away_stats, risultato):
     # Boost dominanza Tier A: se i campi principali puntano chiaramente
     # in una direzione, non lasciare che i Tier C/D annacquino il segnale
     # invert=True per Under e NG: indicatori bassi = pronostico coerente
-    invert_tier_a = pronostico.startswith('Under') or pronostico == 'NG'
+    invert_tier_a = pronostico.startswith('Under') or pron_normalized == 'NG'
     # Per Multigol range basso (0-1, 0-2) si inverte anche
     if pronostico.startswith('MG'):
         mg_m = re.match(r'MG\s+(\d+)-(\d+)', pronostico)
