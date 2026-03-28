@@ -26,6 +26,7 @@ Ricevi i dati di una partita in formato strutturato, divisi in PRE-MATCH e POST-
 
 Restituisci SOLO il JSON. Nessun testo prima o dopo. Nessun markdown.
 Scrivi in italiano, come parleresti a un amico che ti chiede com'e' andata la partita.
+IMPORTANTE: ogni concetto va detto UNA SOLA VOLTA. Se hai gia' detto qualcosa in pre_match, non ripeterlo in partita o resoconto. Ogni sezione aggiunge informazioni NUOVE.
 Non usare termini tecnici come xG, expected goals, Monte Carlo, confidence, score di coerenza, algoritmo, SofaScore.`;
 
 
