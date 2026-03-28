@@ -187,6 +187,26 @@ function buildStructuredInput(params) {
       if (aSot === 0) fatti.push(`${away} non ha MAI tirato in porta`);
     }
 
+    // Verdetto coerenza Fase 1 — tradotto per Mistral
+    if (postMatchAnalysis && postMatchAnalysis.verdict) {
+      const v = postMatchAnalysis.verdict;
+      if (esito) {
+        // HIT
+        if (v === 'COERENTE') fatti.push(`VERDETTO COERENZA: il campo ha confermato pienamente il pronostico — scelta giusta per i motivi giusti`);
+        else if (v === 'RAGIONEVOLE') fatti.push(`VERDETTO COERENZA: il campo supportava il pronostico — buona scelta`);
+        else if (v === 'INCERTO') fatti.push(`VERDETTO COERENZA: partita equilibrata, poteva andare in entrambi i modi`);
+        else if (v === 'FORZATO') fatti.push(`VERDETTO COERENZA: il campo non supportava il pronostico — c'e' stata fortuna`);
+        else fatti.push(`VERDETTO COERENZA: il campo diceva il contrario — pura fortuna`);
+      } else {
+        // MISS
+        if (v === 'COERENTE') fatti.push(`VERDETTO COERENZA: il campo dava ragione al pronostico — pura sfortuna, il risultato non rispecchia la partita`);
+        else if (v === 'RAGIONEVOLE') fatti.push(`VERDETTO COERENZA: il pronostico aveva basi solide — sfortuna`);
+        else if (v === 'INCERTO') fatti.push(`VERDETTO COERENZA: partita equilibrata, poteva andare in entrambi i modi`);
+        else if (v === 'FORZATO') fatti.push(`VERDETTO COERENZA: il campo non supportava il pronostico`);
+        else fatti.push(`VERDETTO COERENZA: il campo diceva chiaramente il contrario — pronostico non supportato dai numeri`);
+      }
+    }
+
     lines.push(`\nFATTI CHIAVE (gia' interpretati, NON contraddirli):\n- ${fatti.join('\n- ')}`);
   }
 
