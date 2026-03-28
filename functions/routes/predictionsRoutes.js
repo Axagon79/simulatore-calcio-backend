@@ -1137,6 +1137,7 @@ router.get('/monthly-pl', async (req, res) => {
     function calcSezioni(docs) {
       const sez = {
         tutti: { pl: 0, bets: 0, wins: 0, staked: 0 },
+        pronostici: { pl: 0, bets: 0, wins: 0, staked: 0 },
         elite: { pl: 0, bets: 0, wins: 0, staked: 0 },
         alto_rendimento: { pl: 0, bets: 0, wins: 0, staked: 0 },
       };
@@ -1147,20 +1148,36 @@ router.get('/monthly-pl', async (req, res) => {
           const quota = p.quota || 0;
           const stake = p.stake || 1;
           if (quota <= 1) continue;
-          if (p.pronostico === 'NO BET' || p.tipo === 'RISULTATO_ESATTO') continue;
+          if (p.pronostico === 'NO BET') continue;
 
           const profit = esito === true ? (quota - 1) * stake : -stake;
           const isHit = esito === true;
 
+          // Soglia quota: DC < 2.00 = pronostici, DC >= 2.00 = alto rendimento
+          // Altri: < 2.51 = pronostici, >= 2.51 = alto rendimento
+          // RISULTATO_ESATTO = sempre alto rendimento
+          const soglia = p.tipo === 'DOPPIA_CHANCE' ? 2.00 : 2.51;
+          const isAltoRendimento = p.tipo === 'RISULTATO_ESATTO' || quota >= soglia;
+          const isPronostici = !isAltoRendimento && p.tipo !== 'RISULTATO_ESATTO';
+
+          // Tutti (somma di pronostici + alto rendimento, senza doppi)
           sez.tutti.bets++; sez.tutti.staked += stake; sez.tutti.pl += profit;
           if (isHit) sez.tutti.wins++;
 
+          // Pronostici (quota bassa)
+          if (isPronostici) {
+            sez.pronostici.bets++; sez.pronostici.staked += stake; sez.pronostici.pl += profit;
+            if (isHit) sez.pronostici.wins++;
+          }
+
+          // Elite (tag elite, può essere in pronostici o alto rendimento)
           if (p.elite) {
             sez.elite.bets++; sez.elite.staked += stake; sez.elite.pl += profit;
             if (isHit) sez.elite.wins++;
           }
 
-          if ((p.confidence || 0) >= 70 && (p.stars || 0) >= 4) {
+          // Alto rendimento (quota alta + risultati esatti)
+          if (isAltoRendimento) {
             sez.alto_rendimento.bets++; sez.alto_rendimento.staked += stake; sez.alto_rendimento.pl += profit;
             if (isHit) sez.alto_rendimento.wins++;
           }
