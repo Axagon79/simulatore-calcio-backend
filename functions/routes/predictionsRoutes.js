@@ -1125,14 +1125,59 @@ router.get('/monthly-pl', async (req, res) => {
     const monthStart = selectedDate.slice(0, 8) + '01';
 
     // Query parallela: giorno + mese + totale storico
+    const proj = { pronostici: 1, live_score: 1, live_status: 1, match_time: 1, date: 1 };
     const [dayDocs, monthDocs, allDocs] = await Promise.all([
       req.db.collection('daily_predictions_unified')
-        .find({ date: selectedDate }, { projection: { pronostici: 1 } }).toArray(),
+        .find({ date: selectedDate }, { projection: proj }).toArray(),
       req.db.collection('daily_predictions_unified')
-        .find({ date: { $gte: monthStart, $lte: selectedDate } }, { projection: { pronostici: 1 } }).toArray(),
+        .find({ date: { $gte: monthStart, $lte: selectedDate } }, { projection: proj }).toArray(),
       req.db.collection('daily_predictions_unified')
-        .find({ date: { $lte: selectedDate }, 'pronostici.esito': { $exists: true } }, { projection: { pronostici: 1 } }).toArray(),
+        .find({ date: { $lte: selectedDate } }, { projection: proj }).toArray(),
     ]);
+
+    // Calcola esito al volo da live_score quando esito non e' ancora nel DB
+    function calcHitFromScore(score, pronostico, tipo) {
+      if (!score) return null;
+      const parts = score.split(':');
+      if (parts.length !== 2) return null;
+      const h = parseInt(parts[0]), a = parseInt(parts[1]);
+      if (isNaN(h) || isNaN(a)) return null;
+      const total = h + a;
+      const pLow = pronostico.toLowerCase();
+      if (tipo === 'SEGNO') {
+        const sign = h > a ? '1' : h === a ? 'X' : '2';
+        return pronostico === sign;
+      }
+      if (tipo === 'DOPPIA_CHANCE') {
+        const sign = h > a ? '1' : h === a ? 'X' : '2';
+        if (pronostico === '1X') return sign === '1' || sign === 'X';
+        if (pronostico === 'X2') return sign === 'X' || sign === '2';
+        if (pronostico === '12') return sign === '1' || sign === '2';
+        return null;
+      }
+      if (tipo === 'GOL') {
+        if (pLow === 'goal' || pLow === 'gg') return h > 0 && a > 0;
+        if (pLow === 'no goal' || pLow === 'ng') return h === 0 || a === 0;
+        if (pLow.startsWith('over')) { const thr = parseFloat(pronostico.split(' ')[1]); return total > thr; }
+        if (pLow.startsWith('under')) { const thr = parseFloat(pronostico.split(' ')[1]); return total < thr; }
+        const mg = pronostico.match(/^MG\s+(\d+)-(\d+)/i);
+        if (mg) return total >= parseInt(mg[1]) && total <= parseInt(mg[2]);
+      }
+      if (tipo === 'RISULTATO_ESATTO') {
+        return `${h}:${a}` === pronostico.replace('-', ':');
+      }
+      return null;
+    }
+
+    function isMatchOver(doc) {
+      if (doc.live_status === 'Finished') return true;
+      if (doc.date && doc.match_time) {
+        const kickoff = new Date(`${doc.date}T${doc.match_time}:00`);
+        const elapsed = (Date.now() - kickoff.getTime()) / (1000 * 60);
+        if (elapsed > 130) return true;
+      }
+      return false;
+    }
 
     function calcSezioni(docs) {
       const sez = {
@@ -1142,8 +1187,15 @@ router.get('/monthly-pl', async (req, res) => {
         alto_rendimento: { pl: 0, bets: 0, wins: 0, staked: 0 },
       };
       for (const doc of docs) {
+        const liveScore = doc.live_score || null;
+        const matchOver = isMatchOver(doc);
+
         for (const p of (doc.pronostici || [])) {
-          const esito = p.esito;
+          // Usa esito dal DB se disponibile, altrimenti calcola da live_score
+          let esito = p.esito;
+          if ((esito === undefined || esito === null) && liveScore && matchOver) {
+            esito = calcHitFromScore(liveScore, p.pronostico, p.tipo);
+          }
           if (esito === undefined || esito === null || esito === 'void') continue;
           const quota = p.quota || 0;
           const stake = p.stake || 1;
