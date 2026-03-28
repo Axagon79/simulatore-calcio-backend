@@ -2034,6 +2034,43 @@ def orchestrate_date(date_str, dry_run=False, match_time_filter=None, preserve_a
         # --- DEDUP GOL CORRELATI: rimuove ridondanze/conflitti tra pronostici GOL ---
         unified_pronostici = _dedup_gol_correlati(unified_pronostici)
 
+        # --- DEDUP DC CONTRASTANTI: se c'è sia 1X che X2, tieni la migliore ---
+        dc_preds = [p for p in unified_pronostici if p.get('tipo') == 'DOPPIA_CHANCE']
+        dc_prons = [p.get('pronostico') for p in dc_preds]
+        if '1X' in dc_prons and 'X2' in dc_prons:
+            dc_1x = next(p for p in dc_preds if p.get('pronostico') == '1X')
+            dc_x2 = next(p for p in dc_preds if p.get('pronostico') == 'X2')
+            elite_1x = dc_1x.get('elite', False)
+            elite_x2 = dc_x2.get('elite', False)
+
+            if elite_1x and not elite_x2:
+                # Step 1: elite batte non-elite
+                winner, loser = dc_1x, dc_x2
+                reason = "elite vs non-elite"
+            elif elite_x2 and not elite_1x:
+                winner, loser = dc_x2, dc_1x
+                reason = "elite vs non-elite"
+            else:
+                # Step 2: entrambe elite (o entrambe non-elite)
+                # Media tra probabilità implicita quota favorita e confidence
+                q1 = float(match_odds.get('1') or 0)
+                q2 = float(match_odds.get('2') or 0)
+                # Per DC 1X: prob implicita = 1/quota_1, per DC X2: prob implicita = 1/quota_2
+                prob_1x = (1.0 / q1 * 100) if q1 > 1 else 50
+                prob_x2 = (1.0 / q2 * 100) if q2 > 1 else 50
+                score_1x = (prob_1x + (dc_1x.get('confidence') or 50)) / 2
+                score_x2 = (prob_x2 + (dc_x2.get('confidence') or 50)) / 2
+
+                if score_1x >= score_x2:
+                    winner, loser = dc_1x, dc_x2
+                else:
+                    winner, loser = dc_x2, dc_1x
+                reason = f"score 1X={score_1x:.1f} vs X2={score_x2:.1f}"
+
+            unified_pronostici = [p for p in unified_pronostici if p is not loser]
+            print(f"    ⚔️ DC CONTRASTANTI: tenuto {winner['pronostico']} @{winner.get('quota','?')}, "
+                  f"rimosso {loser['pronostico']} @{loser.get('quota','?')} ({reason})")
+
         # --- RISULTATO ESATTO MC (admin-only, bonus separato) ---
         unified_pronostici = _add_exact_score_predictions(unified_pronostici, c_doc_for_combo, match_odds)
 
