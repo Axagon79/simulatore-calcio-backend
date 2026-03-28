@@ -286,9 +286,10 @@ try:
         {'pronostici': 1}
     ))
 
-    # Calcola P/L per sezione: tutti, elite, alto_rendimento
+    # Calcola P/L per sezione (stessa logica del frontend: filtro per quota)
     sezioni = {
         'tutti': {'pl': 0.0, 'bets': 0, 'wins': 0, 'staked': 0.0},
+        'pronostici': {'pl': 0.0, 'bets': 0, 'wins': 0, 'staked': 0.0},
         'elite': {'pl': 0.0, 'bets': 0, 'wins': 0, 'staked': 0.0},
         'alto_rendimento': {'pl': 0.0, 'bets': 0, 'wins': 0, 'staked': 0.0},
     }
@@ -303,31 +304,43 @@ try:
             if quota <= 1:
                 continue
             pronostico = p.get('pronostico', '')
+            tipo = p.get('tipo', '')
             if pronostico == 'NO BET':
                 continue
 
-            is_elite = p.get('elite', False)
-            # Alto rendimento = confidence >= 70 e stelle >= 4
-            conf = p.get('confidence', 0) or 0
-            stars = p.get('stars', 0) or 0
-            is_alto = conf >= 70 and stars >= 4
-
             profit = (quota - 1) * stake if esito is True else -stake
 
-            for sez_key in ['tutti']:
-                sezioni[sez_key]['bets'] += 1
-                sezioni[sez_key]['staked'] += stake
-                sezioni[sez_key]['pl'] += profit
-                if esito is True:
-                    sezioni[sez_key]['wins'] += 1
+            # Soglia quota: DC < 2.00 = pronostici, DC >= 2.00 = alto rendimento
+            # Altri: < 2.51 = pronostici, >= 2.51 = alto rendimento
+            # RISULTATO_ESATTO = sempre alto rendimento
+            soglia = 2.00 if tipo == 'DOPPIA_CHANCE' else 2.51
+            is_alto = tipo == 'RISULTATO_ESATTO' or quota >= soglia
+            is_pronostici = not is_alto and tipo != 'RISULTATO_ESATTO'
 
-            if is_elite:
+            # Tutti (somma senza doppi)
+            sezioni['tutti']['bets'] += 1
+            sezioni['tutti']['staked'] += stake
+            sezioni['tutti']['pl'] += profit
+            if esito is True:
+                sezioni['tutti']['wins'] += 1
+
+            # Pronostici (quota bassa)
+            if is_pronostici:
+                sezioni['pronostici']['bets'] += 1
+                sezioni['pronostici']['staked'] += stake
+                sezioni['pronostici']['pl'] += profit
+                if esito is True:
+                    sezioni['pronostici']['wins'] += 1
+
+            # Elite (trasversale)
+            if p.get('elite', False):
                 sezioni['elite']['bets'] += 1
                 sezioni['elite']['staked'] += stake
                 sezioni['elite']['pl'] += profit
                 if esito is True:
                     sezioni['elite']['wins'] += 1
 
+            # Alto rendimento (quota alta + RE)
             if is_alto:
                 sezioni['alto_rendimento']['bets'] += 1
                 sezioni['alto_rendimento']['staked'] += stake
