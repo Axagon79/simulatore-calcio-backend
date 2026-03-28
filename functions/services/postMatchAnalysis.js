@@ -16,13 +16,12 @@ const { callMistral } = require('./llmService');
 
 const SYSTEM_PROMPT = `Sei un esperto analista di calcio italiano con 25 anni di esperienza. Analizzi partite gia' giocate commentando cosa e' successo sul campo.
 
-Ricevi i dati reali della partita in formato strutturato. Scrivi la tua analisi in JSON con questi 4 campi:
+Ricevi i dati di una partita in formato strutturato, divisi in PRE-MATCH e POST-MATCH. Scrivi la tua analisi in JSON con 3 fasi, sempre in questo ordine:
 
 {
-  "esito": "Il pronostico ha funzionato o no? Dillo subito, chiaro.",
-  "campo": "Cosa e' successo in campo? Racconta la partita basandoti sui numeri.",
-  "giudizio": "Guardando i numeri reali della partita, il risultato rispecchia quello che si e' visto in campo oppure no?",
-  "chiusura": "Una frase di chiusura."
+  "pre_match": "Analisi dei dati PRIMA della partita: cosa dicevano le quote, le probabilita', le nostre previsioni. Il pronostico aveva senso? Era rischioso? Le quote lo supportavano?",
+  "partita": "Analisi di cosa e' successo IN CAMPO: racconta la partita basandoti sulle statistiche reali. Chi ha dominato, chi ha creato, chi ha sofferto.",
+  "resoconto": "Tira le somme: il pronostico e' stato centrato o sbagliato? Il campo confermava le previsioni o le contraddiceva? Verdetto finale."
 }
 
 Restituisci SOLO il JSON. Nessun testo prima o dopo. Nessun markdown.
@@ -59,24 +58,50 @@ function _spiegaPronostico(tipo, pronostico, home, away) {
 }
 
 function buildStructuredInput(params) {
-  const { home, away, realScore, tipo, pronostico, esito, postMatchAnalysis, homeStats, awayStats, quota } = params;
+  const { home, away, realScore, tipo, pronostico, esito, postMatchAnalysis,
+          homeStats, awayStats, quota, confidence, stars, odds, matchDoc } = params;
 
-  const parts = [];
-  parts.push(`partita=${home} vs ${away}`);
-  parts.push(`ris=${realScore}`);
-  parts.push(`pron=${_spiegaPronostico(tipo, pronostico, home, away)}`);
-  parts.push(`esito=${esito ? 'CENTRATO' : 'SBAGLIATO'}`);
+  const lines = [];
 
+  lines.push(`partita=${home} vs ${away}|ris=${realScore}|pron=${_spiegaPronostico(tipo, pronostico, home, away)}|esito=${esito ? 'CENTRATO' : 'SBAGLIATO'}`);
+
+  // --- BLOCCO 1: PRIMA DELLA PARTITA ---
+  const pre = [];
+  if (quota) pre.push(`quota=${quota}`);
+  if (confidence) pre.push(`confidence=${confidence}%`);
+  if (stars) pre.push(`stelle=${stars}`);
+  if (odds) {
+    if (odds['1']) pre.push(`quote_1x2=${odds['1']}/${odds['X'] || '?'}/${odds['2'] || '?'}`);
+    if (odds.over_25) pre.push(`quota_over25=${odds.over_25}`);
+    if (odds.under_25) pre.push(`quota_under25=${odds.under_25}`);
+    if (odds.gg) pre.push(`quota_gg=${odds.gg}`);
+    if (odds.ng) pre.push(`quota_ng=${odds.ng}`);
+  }
+  if (matchDoc) {
+    if (matchDoc.expected_total_goals) pre.push(`gol_attesi=${matchDoc.expected_total_goals}`);
+    const sim = matchDoc.simulation_data || {};
+    if (sim.home_win_pct !== undefined) {
+      pre.push(`prob_casa=${sim.home_win_pct}%`);
+      pre.push(`prob_pari=${sim.draw_pct}%`);
+      pre.push(`prob_ospite=${sim.away_win_pct}%`);
+    }
+    if (sim.over_25_pct !== undefined) pre.push(`prob_over25=${sim.over_25_pct}%`);
+    if (sim.gg_pct !== undefined) pre.push(`prob_gg=${sim.gg_pct}%`);
+  }
+  if (pre.length > 0) {
+    lines.push(`\nPRIMA DELLA PARTITA (dati pre-match):\n${pre.join('|')}`);
+  }
+
+  // --- BLOCCO 2: DOPO LA PARTITA ---
   if (homeStats && awayStats) {
-    const add = (label, hKey, aKey) => {
-      const h = homeStats[hKey];
-      const a = awayStats[aKey || hKey];
-      if (h != null) parts.push(`${label}=${h}-${a ?? '?'}`);
+    const post = [];
+    const add = (label, hKey) => {
+      const h = homeStats[hKey]; const a = awayStats[hKey];
+      if (h != null) post.push(`${label}=${h}-${a ?? '?'}`);
     };
-    const addIfPositive = (label, hKey, aKey) => {
-      const h = homeStats[hKey];
-      const a = awayStats[aKey || hKey];
-      if ((h && h > 0) || (a && a > 0)) parts.push(`${label}=${h ?? 0}-${a ?? 0}`);
+    const addIfPositive = (label, hKey) => {
+      const h = homeStats[hKey]; const a = awayStats[hKey];
+      if ((h && h > 0) || (a && a > 0)) post.push(`${label}=${h ?? 0}-${a ?? 0}`);
     };
 
     add('tiri_in_porta', 'shots_on_target');
@@ -86,11 +111,13 @@ function buildStructuredInput(params) {
     addIfPositive('pali', 'hit_woodwork');
     addIfPositive('grandi_parate', 'big_saves');
     addIfPositive('espulsioni', 'red_cards');
+
+    if (post.length > 0) {
+      lines.push(`\nDOPO LA PARTITA (statistiche reali del campo):\n${post.join('|')}`);
+    }
   }
 
-  if (quota) parts.push(`quota=${quota}`);
-
-  return parts.join('|');
+  return lines.join('\n');
 }
 
 
@@ -99,7 +126,7 @@ function buildStructuredInput(params) {
 // Se trova problemi, fa DOMANDE a Mistral.
 // ═══════════════════════════════════════════════════════════
 
-const REQUIRED_FIELDS = ['esito', 'campo', 'giudizio', 'chiusura'];
+const REQUIRED_FIELDS = ['pre_match', 'partita', 'resoconto'];
 
 // Termini tecnici interni che l'utente non deve vedere
 const FORBIDDEN = [/\bxG\b/i, /\bexpected goals?\b/i, /\bMonte Carlo\b/i, /\bcicli\b/i,
@@ -208,7 +235,7 @@ async function generateComment(params) {
       const validation = validateJSON(parsed, inputData, params);
 
       if (validation.valid) {
-        return `${parsed.esito} ${parsed.campo} ${parsed.giudizio} ${parsed.chiusura}`;
+        return `${parsed.pre_match}\n\n${parsed.partita}\n\n${parsed.resoconto}`;
       }
 
       lastQuestions = validation.questions;
@@ -236,7 +263,8 @@ function _fallback(params) {
 async function generateMatchPostMatchAnalysis(db, home, away, date) {
   const pred = await db.collection('daily_predictions_unified').findOne(
     { home, away, date },
-    { projection: { pronostici: 1, real_score: 1, live_score: 1 } }
+    { projection: { pronostici: 1, real_score: 1, live_score: 1, odds: 1,
+                     expected_total_goals: 1, simulation_data: 1, confidence_segno: 1, confidence_gol: 1 } }
   );
   if (!pred) return null;
 
@@ -261,6 +289,10 @@ async function generateMatchPostMatchAnalysis(db, home, away, date) {
       pronostico: p.pronostico,
       esito: p.esito === true,
       quota: p.quota,
+      confidence: p.confidence,
+      stars: p.stars,
+      odds: pred.odds,
+      matchDoc: pred,
       postMatchAnalysis: p.post_match_analysis || null,
       homeStats: pms ? pms.home_stats : null,
       awayStats: pms ? pms.away_stats : null,
