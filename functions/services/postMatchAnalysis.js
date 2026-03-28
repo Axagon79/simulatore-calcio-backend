@@ -117,6 +117,65 @@ function buildStructuredInput(params) {
     }
   }
 
+  // --- BLOCCO 3: FATTI GIA' INTERPRETATI (aiuto per Mistral) ---
+  const risMatch = realScore.match(/(\d+)-(\d+)/);
+  if (risMatch) {
+    const hGoals = parseInt(risMatch[1]);
+    const aGoals = parseInt(risMatch[2]);
+    const totalGoals = hGoals + aGoals;
+    const fatti = [];
+
+    // Chi ha segnato
+    fatti.push(`${home} ha segnato ${hGoals} gol, ${away} ha segnato ${aGoals} gol, totale ${totalGoals} gol`);
+
+    // Chi ha vinto
+    if (hGoals > aGoals) fatti.push(`${home} ha vinto`);
+    else if (aGoals > hGoals) fatti.push(`${away} ha vinto`);
+    else fatti.push(`Pareggio`);
+
+    // Perche' il pronostico e' centrato/sbagliato
+    const pron = _spiegaPronostico(tipo, pronostico, home, away);
+    if (esito) {
+      fatti.push(`Il pronostico "${pron}" e' CENTRATO`);
+    } else {
+      // Spiega PERCHE' e' sbagliato
+      if (/GG|Entrambe segnano/i.test(pron)) {
+        const chi0 = hGoals === 0 ? home : (aGoals === 0 ? away : null);
+        if (chi0) fatti.push(`Il GG e' SBAGLIATO perche' ${chi0} non ha segnato (0 gol)`);
+        else fatti.push(`Il GG e' SBAGLIATO`);
+      } else if (/NG|Almeno una non segna/i.test(pron)) {
+        fatti.push(`Il NG e' SBAGLIATO perche' entrambe le squadre hanno segnato (${hGoals}-${aGoals})`);
+      } else if (/Over\s*(\d+\.?\d*)/.test(pron)) {
+        const thr = pron.match(/Over\s*(\d+\.?\d*)/)[1];
+        fatti.push(`L'Over ${thr} e' SBAGLIATO perche' ci sono stati solo ${totalGoals} gol (servivano almeno ${Math.ceil(parseFloat(thr))})`);
+      } else if (/Under\s*(\d+\.?\d*)/.test(pron)) {
+        const thr = pron.match(/Under\s*(\d+\.?\d*)/)[1];
+        fatti.push(`L'Under ${thr} e' SBAGLIATO perche' ci sono stati ${totalGoals} gol (servivano massimo ${Math.floor(parseFloat(thr))})`);
+      } else if (/Vittoria\s+(.+?)\s*\(casa\)/i.test(pron)) {
+        if (hGoals <= aGoals) fatti.push(`Il SEGNO 1 e' SBAGLIATO perche' ${home} non ha vinto (${hGoals}-${aGoals})`);
+      } else if (/Vittoria\s+(.+?)\s*\(ospite\)/i.test(pron)) {
+        if (aGoals <= hGoals) fatti.push(`Il SEGNO 2 e' SBAGLIATO perche' ${away} non ha vinto (${hGoals}-${aGoals})`);
+      } else {
+        fatti.push(`Il pronostico "${pron}" e' SBAGLIATO`);
+      }
+    }
+
+    // Chi ha dominato in campo
+    if (homeStats && awayStats) {
+      const hSot = homeStats.shots_on_target ?? 0;
+      const aSot = awayStats.shots_on_target ?? 0;
+      if (hSot > aSot * 2 && hSot >= 5) {
+        fatti.push(`${home} ha dominato il campo (${hSot} tiri in porta contro ${aSot})`);
+      } else if (aSot > hSot * 2 && aSot >= 5) {
+        fatti.push(`${away} ha dominato il campo (${aSot} tiri in porta contro ${hSot})`);
+      }
+      if (hSot === 0) fatti.push(`${home} non ha MAI tirato in porta`);
+      if (aSot === 0) fatti.push(`${away} non ha MAI tirato in porta`);
+    }
+
+    lines.push(`\nFATTI CHIAVE (gia' interpretati, NON contraddirli):\n- ${fatti.join('\n- ')}`);
+  }
+
   return lines.join('\n');
 }
 
