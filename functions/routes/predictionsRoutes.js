@@ -1124,8 +1124,10 @@ router.get('/monthly-pl', async (req, res) => {
     const selectedDate = date || new Date().toISOString().slice(0, 10);
     const monthStart = selectedDate.slice(0, 8) + '01';
 
-    // Query parallela: mese + totale storico
-    const [monthDocs, allDocs] = await Promise.all([
+    // Query parallela: giorno + mese + totale storico
+    const [dayDocs, monthDocs, allDocs] = await Promise.all([
+      req.db.collection('daily_predictions_unified')
+        .find({ date: selectedDate }, { projection: { pronostici: 1 } }).toArray(),
       req.db.collection('daily_predictions_unified')
         .find({ date: { $gte: monthStart, $lte: selectedDate } }, { projection: { pronostici: 1 } }).toArray(),
       req.db.collection('daily_predictions_unified')
@@ -1173,10 +1175,11 @@ router.get('/monthly-pl', async (req, res) => {
       return sez;
     }
 
+    const giorno = calcSezioni(dayDocs);
     const sezioni = calcSezioni(monthDocs);
     const totale = calcSezioni(allDocs);
 
-    res.json({ success: true, from: monthStart, to: selectedDate, sezioni, totale });
+    res.json({ success: true, from: monthStart, to: selectedDate, giorno, sezioni, totale });
   } catch (error) {
     res.status(500).json({ error: 'Errore monthly-pl', details: error.message });
   }
