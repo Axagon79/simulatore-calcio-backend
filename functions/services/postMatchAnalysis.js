@@ -266,6 +266,62 @@ function _checkPartita(text, inputData) {
   return questions;
 }
 
+// ── CHECK 2b: partita — coerenza logica col risultato ──
+function _checkPartitaLogica(text, inputData) {
+  const questions = [];
+  const { home, away } = _extractFromInput(inputData);
+  const risMatch = inputData.match(/ris=(\d+)-(\d+)/);
+  if (!risMatch) return questions;
+
+  const hGoals = parseInt(risMatch[1]);
+  const aGoals = parseInt(risMatch[2]);
+  const totalGoals = hGoals + aGoals;
+
+  // Se ci sono stati gol, non puoi dire "non c'è stato nessun gol" o "senza gol"
+  if (totalGoals > 0) {
+    if (/\b(nessun gol|zero gol|senza gol|non .{0,15}segnat[oi]|non .{0,15}gol)\b/i.test(text)) {
+      // Controlla che non stia parlando di una squadra specifica
+      const noGoalGeneric = /\b(nessun gol|zero gol|senza gol)\b/i.test(text);
+      if (noGoalGeneric) {
+        questions.push(`Hai scritto "nessun gol" o "senza gol" ma la partita e' finita ${hGoals}-${aGoals} (${totalGoals} gol totali). Come mai?`);
+      }
+    }
+  }
+
+  // Se una squadra ha segnato X gol, non puoi dire che "non ha segnato"
+  if (hGoals > 0) {
+    const homeNotScored = new RegExp(home + '.{0,30}(non ha segnat|non .{0,10}gol|senza segna|non .{0,10}rete)', 'i');
+    if (homeNotScored.test(text)) {
+      questions.push(`Hai detto che ${home} non ha segnato ma il risultato e' ${hGoals}-${aGoals}. ${home} ha fatto ${hGoals} gol.`);
+    }
+    const homeNoGoalWay = new RegExp(home + '.{0,30}(non ha trovato la via del gol|non .{0,15}riuscit.{0,5}segna)', 'i');
+    if (homeNoGoalWay.test(text)) {
+      questions.push(`Hai detto che ${home} non ha trovato la via del gol ma ha fatto ${hGoals} gol. Come e' possibile?`);
+    }
+  }
+  if (aGoals > 0) {
+    const awayNotScored = new RegExp(away + '.{0,30}(non ha segnat|non .{0,10}gol|senza segna|non .{0,10}rete)', 'i');
+    if (awayNotScored.test(text)) {
+      questions.push(`Hai detto che ${away} non ha segnato ma il risultato e' ${hGoals}-${aGoals}. ${away} ha fatto ${aGoals} gol.`);
+    }
+  }
+
+  // Se il pronostico era GG ed e' SBAGLIATO, il motivo e' che UNA squadra non ha segnato, non che "non ci sono gol"
+  const pronMatch = inputData.match(/pron=(.+?)\|/);
+  if (pronMatch && /GG|Entrambe segnano/i.test(pronMatch[1]) && inputData.includes('esito=SBAGLIATO')) {
+    // Chi non ha segnato?
+    const whoDidntScore = hGoals === 0 ? home : (aGoals === 0 ? away : null);
+    if (whoDidntScore && totalGoals > 0) {
+      // Se dice "non ci sono stati gol" quando ce ne sono stati, e' sbagliato
+      if (/\bnon .{0,10}stat[oi] .{0,10}gol\b/i.test(text) || /\bnessun gol\b/i.test(text)) {
+        questions.push(`Il GG e' sbagliato perche' ${whoDidntScore} non ha segnato (0 gol), non perche' non ci sono stati gol. La partita e' finita ${hGoals}-${aGoals} con ${totalGoals} gol totali.`);
+      }
+    }
+  }
+
+  return questions;
+}
+
 // ── CHECK 3: resoconto — confronta con esito e coerenza tra sezioni ──
 function _checkResoconto(text, inputData, parsedPreMatch, parsedPartita) {
   const questions = [];
@@ -321,9 +377,11 @@ function validateJSON(parsed, inputData) {
   }
   if (questions.length > 0) return { valid: false, questions };
 
-  // 3 check separati
+  // 3 check separati + check logica
   questions.push(..._checkPreMatch(parsed.pre_match, inputData));
   questions.push(..._checkPartita(parsed.partita, inputData));
+  questions.push(..._checkPartitaLogica(parsed.partita, inputData));
+  questions.push(..._checkPartitaLogica(parsed.resoconto, inputData)); // anche nel resoconto
   questions.push(..._checkResoconto(parsed.resoconto, inputData, parsed.pre_match, parsed.partita));
 
   return { valid: questions.length === 0, questions };
