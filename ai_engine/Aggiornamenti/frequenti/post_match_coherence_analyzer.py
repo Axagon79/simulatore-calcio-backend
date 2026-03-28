@@ -848,6 +848,13 @@ def analyze_pronostico(prono, home_stats, away_stats, risultato):
 
     modifiers_log = []
 
+    # Normalizza alias tipo
+    tipo_normalized = tipo
+    if tipo.upper() in ('DC', 'D.C.', 'DOPPIACHANCE', 'DOPPIA CHANCE'):
+        tipo_normalized = 'DOPPIA_CHANCE'
+    elif tipo.upper() in ('MG', 'MULTIGOL', 'MULTI_GOL'):
+        tipo_normalized = 'MG'
+
     # Normalizza alias pronostici
     pron_normalized = pronostico
     if pronostico.lower() in ('goal', 'gol'):
@@ -855,9 +862,9 @@ def analyze_pronostico(prono, home_stats, away_stats, risultato):
     elif pronostico.lower() in ('no goal', 'no gol', 'nogoal'):
         pron_normalized = 'NG'
 
-    if tipo == 'SEGNO':
+    if tipo_normalized == 'SEGNO':
         score, indicators = score_segno(pronostico, home_stats, away_stats, risultato, modifiers_log)
-    elif tipo == 'GOL':
+    elif tipo_normalized == 'GOL':
         if pron_normalized in ('GG', 'NG'):
             score, indicators = score_gg_ng(pron_normalized, home_stats, away_stats, risultato, modifiers_log)
         elif pronostico.startswith('MG'):
@@ -866,9 +873,9 @@ def analyze_pronostico(prono, home_stats, away_stats, risultato):
             score, indicators = score_over_under(pronostico, home_stats, away_stats, risultato, modifiers_log)
         else:
             return None
-    elif tipo == 'DOPPIA_CHANCE':
+    elif tipo_normalized == 'DOPPIA_CHANCE':
         score, indicators = score_doppia_chance(pronostico, home_stats, away_stats, risultato, modifiers_log)
-    elif tipo == 'MG':
+    elif tipo_normalized == 'MG':
         score, indicators = score_multigol(pronostico, home_stats, away_stats, risultato, modifiers_log)
     else:
         return None
@@ -894,7 +901,7 @@ def analyze_pronostico(prono, home_stats, away_stats, risultato):
     return {
         "coherence_score": score,
         "verdict": verdict,
-        "market_type": tipo,
+        "market_type": tipo_normalized,
         "phase": 1,
         "indicators": indicators,
         "modifiers_applied": modifiers_log,
