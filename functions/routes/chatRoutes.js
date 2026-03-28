@@ -8,6 +8,7 @@ const { generateAnalysis, chatWithContext, chatDashboard, generateMatchAnalysisP
 const { buildMatchContext, searchMatch, buildUnifiedContext } = require('../services/contextBuilder');
 const { WEB_SEARCH_TOOL, handleToolCalls } = require('../services/webSearch');
 const { DB_TOOLS } = require('../services/dbTools');
+const { validateChatResponse, extractMatchDataFromContext } = require('../services/responseValidator');
 
 // ── GET /chat/context?home=X&away=Y&date=Z ──
 // Genera analisi iniziale per una partita
@@ -24,7 +25,21 @@ router.get('/context', async (req, res) => {
     }
 
     const userInfo = { pageContext: pageContext || '', isAdmin: isAdmin === 'true' };
-    const analysis = await generateAnalysis(result.context, userInfo);
+    let analysis = await generateAnalysis(result.context, userInfo);
+
+    // Validazione post-partita: controlla la risposta e riprova se viola regole
+    const matchData = extractMatchDataFromContext(result.context);
+    if (matchData) {
+      const MAX_RETRIES = 2;
+      for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+        const validation = validateChatResponse(analysis, matchData);
+        if (validation.valid) break;
+        console.log(`[CHAT/CONTEXT] Validazione fallita (tentativo ${attempt + 1}): ${validation.violations.join(', ')}`);
+        // Richiama Mistral con feedback di correzione
+        const correctionPrompt = `${result.context}\n\n---\nLA TUA RISPOSTA PRECEDENTE:\n${analysis}\n\n${validation.feedback}`;
+        analysis = await generateAnalysis(correctionPrompt, userInfo);
+      }
+    }
 
     res.json({
       success: true,
@@ -85,6 +100,21 @@ router.post('/message', async (req, res) => {
       finalReply = await handleToolCalls(reply, messages, req.db);
     } else {
       finalReply = reply.content;
+    }
+
+    // Validazione post-partita per i follow-up
+    const matchDataMsg = extractMatchDataFromContext(contextText);
+    if (matchDataMsg && finalReply) {
+      const MAX_RETRIES = 2;
+      for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+        const validation = validateChatResponse(finalReply, matchDataMsg);
+        if (validation.valid) break;
+        console.log(`[CHAT/MESSAGE] Validazione fallita (tentativo ${attempt + 1}): ${validation.violations.join(', ')}`);
+        // Richiama con feedback
+        const correctionMsg = `${validation.feedback}\n\nRispondi alla domanda dell'utente: ${message}`;
+        const retryReply = await chatWithContext(contextText, correctionMsg, history || [], [], userInfo);
+        finalReply = retryReply.content || finalReply;
+      }
     }
 
     res.json({ success: true, reply: finalReply });
