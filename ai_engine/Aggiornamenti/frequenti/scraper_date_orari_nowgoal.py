@@ -245,10 +245,10 @@ def extract_datetime_from_row(row_text: str) -> Optional[Tuple[str, str]]:
         pass
     return None
 
-def find_match_with_datetime(home_aliases: List[str], away_aliases: List[str], rows: List[Tuple[str, Optional[str]]]) -> Optional[Tuple[str, str, str]]:
+def find_match_with_datetime(home_aliases: List[str], away_aliases: List[str], rows: List[Tuple[str, Optional[str], Optional[str]]]) -> Optional[Tuple[str, str, str, Optional[str]]]:
     """
-    Cerca una partita nelle righe e ritorna (data, orario, row_text) se trovata.
-    rows e' una lista di (row_text, data_t) dove data_t e' es. '2026-03-04 01:00'.
+    Cerca una partita nelle righe e ritorna (data, orario, row_text, match_status) se trovata.
+    rows e' una lista di (row_text, data_t, match_status) dove data_t e' es. '2026-03-04 01:00'.
     """
     home_search = set()
     for alias in home_aliases:
@@ -264,7 +264,7 @@ def find_match_with_datetime(home_aliases: List[str], away_aliases: List[str], r
         away_search.add(normalize_name(alias))
     away_search.discard("")
 
-    for row_text, data_t in rows:
+    for row_text, data_t, match_status in rows:
         row_clean = clean_nowgoal_text(row_text.lower())
 
         home_found = any(re.search(r'\b' + re.escape(n) + r'\b', row_clean) for n in home_search)
@@ -278,12 +278,12 @@ def find_match_with_datetime(home_aliases: List[str], away_aliases: List[str], r
                 date_str, time_str = datetime_result
                 if 'independiente' in row_clean or 'talleres' in row_clean:
                     print(f"\n      [DBG] row_text='{row_text[:80]}' → date={date_str} time={time_str} data_t={data_t}")
-                return (date_str, time_str, row_text)
+                return (date_str, time_str, row_text, match_status)
             # Fallback: data-t (NB: timezone server, potrebbe essere diverso da CET)
             if data_t:
                 try:
                     dt = datetime.strptime(data_t[:16], "%Y-%m-%d %H:%M")
-                    return (dt.strftime("%Y-%m-%d"), dt.strftime("%H:%M"), row_text)
+                    return (dt.strftime("%Y-%m-%d"), dt.strftime("%H:%M"), row_text, match_status)
                 except:
                     pass
             return None
@@ -379,9 +379,10 @@ def get_current_round_from_page(driver, has_stages: bool = False) -> Optional[in
         print(f" ⚠️ Impossibile leggere giornata: {e}")
     return None
 
-def get_all_match_rows(driver) -> List[Tuple[str, Optional[str]]]:
-    """Estrae tutte le righe di partite come (testo, data_t).
+def get_all_match_rows(driver) -> List[Tuple[str, Optional[str], Optional[str]]]:
+    """Estrae tutte le righe di partite come (testo, data_t, match_status).
     data_t e' l'attributo data-t dello span[name='timeData'], es. '2026-03-04 01:00' (anno incluso).
+    match_status e' il testo dello stato (es. 'Postp.', 'Susp.') se non e' un risultato normale.
     """
     try:
         divs = driver.find_elements(By.CSS_SELECTOR, "div.schedulis")
@@ -396,7 +397,17 @@ def get_all_match_rows(driver) -> List[Tuple[str, Optional[str]]]:
                 data_t = span.get_attribute("data-t")
             except:
                 pass
-            result.append((text, data_t))
+            # Leggi stato partita (Postp., Susp., Canc., ecc.)
+            match_status = None
+            try:
+                score_span = div.find_element(By.CSS_SELECTOR, "span.score")
+                score_text = score_span.text.strip()
+                # Se non è un risultato (X - X) e non è una lineetta/vuoto → è uno stato speciale
+                if score_text and score_text != '-' and not re.match(r'^\d+\s*-\s*\d+$', score_text):
+                    match_status = score_text
+            except:
+                pass
+            result.append((text, data_t, match_status))
         return result
     except:
         return []
@@ -566,20 +577,28 @@ def run_scraper():
                     result = find_match_with_datetime(home_aliases, away_aliases, all_rows)
                     
                     if result:
-                        date_str, time_str, _ = result
-                        
+                        date_str, time_str, _, m_status = result
+
                         # Converti in oggetto datetime UTC (MongoDB lo salverà come ISODate)
                         date_obj_utc = convert_to_utc(date_str, time_str)        # datetime object
                         match_time_formatted = format_match_time(time_str)        # "20:45"
-                        
+
                         # Aggiorna nel match
                         match['date_obj'] = date_obj_utc          # MongoDB: ISODate("2026-02-04T20:45:00.000Z")
                         match['match_time'] = match_time_formatted # String: "20:45"
-                        
+
+                        # Stato speciale (Postp., Susp., Canc., ecc.)
+                        if m_status:
+                            match['match_status_detail'] = m_status
+                            print(f"⚠{m_status}", end="", flush=True)
+                        else:
+                            # Rimuovi stato speciale se la partita torna normale
+                            match.pop('match_status_detail', None)
+                            print("✓", end="", flush=True)
+
                         updated_count += 1
                         league_stats['updated'] += 1
                         report_data['summary']['updated'] += 1
-                        print("✓", end="", flush=True)
 
 
                     else:
@@ -591,7 +610,22 @@ def run_scraper():
                         {"_id": round_doc["_id"]},
                         {"$set": {"matches": matches}}
                     )
-                
+
+                    # Propaga match_status_detail anche in daily_predictions_unified
+                    for match in matches:
+                        m_status_detail = match.get('match_status_detail')
+                        if m_status_detail:
+                            db.daily_predictions_unified.update_many(
+                                {"home": match['home'], "away": match['away'], "league": league_name},
+                                {"$set": {"match_status_detail": m_status_detail}}
+                            )
+                        else:
+                            # Rimuovi se la partita torna normale
+                            db.daily_predictions_unified.update_many(
+                                {"home": match['home'], "away": match['away'], "league": league_name, "match_status_detail": {"$exists": True}},
+                                {"$unset": {"match_status_detail": ""}}
+                            )
+
                 print(f" ({updated_count}/{len(matches)})")
             
             report_data['leagues'].append(league_stats)

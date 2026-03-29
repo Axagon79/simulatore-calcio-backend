@@ -235,9 +235,10 @@ def get_team_aliases(team_name: str, team_doc: Optional[Dict] = None) -> List[st
 
 
 def strip_ranking(name: str) -> str:
-    """Rimuove il numero di ranking iniziale e finale (es. '2 Chelsea' -> 'Chelsea', 'Angers 3' -> 'Angers')"""
+    """Rimuove il numero di ranking iniziale/finale e testo tra parentesi (es. '2 Chelsea' -> 'Chelsea', 'Uniao Leiria(N)' -> 'Uniao Leiria')"""
     name = re.sub(r'^\d+\s+', '', name.strip())   # Ranking iniziale
     name = re.sub(r'\s+\d{1,2}$', '', name.strip())  # Ranking finale
+    name = re.sub(r'\s*\([^)]*\)', '', name)  # Testo tra parentesi
     return name.strip()
 
 
@@ -588,6 +589,13 @@ def run_cycle(driver):
             updated_count += 1
             cup_tag = " [CUP]" if is_cup else ""
             print(f"   {new_status:8s} {new_minute:3d}' | {home} {new_score} {away}{cup_tag}")
+
+            # Propaga live_score/live_status/live_minute anche in daily_predictions_unified
+            if not is_cup:
+                db.daily_predictions_unified.update_many(
+                    {"home": home, "away": away},
+                    {"$set": {"live_score": new_score, "live_status": new_status, "live_minute": new_minute}}
+                )
 
     print(f"\n   Matched: {matched_count} | Aggiornati: {updated_count}")
 
