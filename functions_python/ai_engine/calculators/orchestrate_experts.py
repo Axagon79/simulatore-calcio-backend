@@ -1053,6 +1053,170 @@ def _apply_weak_o25_recovery(unified, c_doc):
 # Pattern: classifica i top4 MC scores per segno e applica regole
 # Decisioni: TIENI (mantieni segno), CONVERTI (→ O1.5), BLOCCA (rimuovi)
 
+def _apply_diamond_recovery(unified_pronostici, docs_by_sys, match_key, match_odds):
+    """
+    Recovery pattern diamante: recupera pronostici scartati che matchano pattern ad alta HR.
+    Va eseguito DOPO tutti i filtri e dedup.
+    Analisi 29/03/2026: 8 pattern con HR 68-90% tra pronostici scartati.
+    REGOLA: si attiva SOLO su partite senza pronostici reali (NO BET o vuote).
+    """
+    # Mercati già coperti — il recovery aggiunge solo mercati mancanti
+    existing = set()
+    existing_markets = set()  # 'GOL', 'SEGNO', 'DOPPIA_CHANCE'
+    for p in unified_pronostici:
+        pron = p.get('pronostico', '')
+        tipo = p.get('tipo', '')
+        if pron and pron != 'NO BET' and tipo != 'RISULTATO_ESATTO':
+            existing.add((tipo, pron))
+            existing_markets.add(tipo)
+
+    # Carica pronostici dai 3 sistemi
+    sys_preds = {}  # sys_id -> list of {tipo, pronostico, confidence, quota}
+    for sys_id in ['A', 'S', 'C']:
+        doc = docs_by_sys[sys_id].get(match_key)
+        if doc:
+            sys_preds[sys_id] = [
+                {
+                    'tipo': p.get('tipo', ''),
+                    'pronostico': p.get('pronostico', ''),
+                    'confidence': p.get('confidence', 0),
+                    'quota': p.get('quota', 0) or 0,
+                    'stars': p.get('stars', 0),
+                    'probabilita_stimata': p.get('probabilita_stimata'),
+                }
+                for p in doc.get('pronostici', [])
+                if p.get('pronostico') and p['pronostico'] != 'NO BET' and p.get('tipo') != 'RISULTATO_ESATTO'
+            ]
+        else:
+            sys_preds[sys_id] = []
+
+    # Helper: cerca pronostico in un sistema
+    def find_pred(sys_id, tipo, pronostico):
+        for p in sys_preds.get(sys_id, []):
+            if p['tipo'] == tipo and p['pronostico'].lower().strip() == pronostico.lower().strip():
+                return p
+        return None
+
+    # Spread quote 1X2
+    q1 = float(match_odds.get('1') or 0)
+    q2 = float(match_odds.get('2') or 0)
+    min_q = min(q1, q2) if q1 > 0 and q2 > 0 else 0
+    max_q = max(q1, q2) if q1 > 0 and q2 > 0 else 0
+    spread = round(max_q - min_q, 2) if min_q > 0 else 0
+
+    recovered = []
+
+    # === PATTERN 1 & 2: Under 3.5, Sistema A/S, conf 60+ ===
+    if 'GOL' not in existing_markets:
+        for sys_id in ['A', 'S']:
+            pred = find_pred(sys_id, 'GOL', 'Under 3.5')
+            if pred and pred['confidence'] >= 60 and pred['quota'] >= 1.35:
+                recovered.append({**pred, 'source': f'{sys_id}_diamond_u35', 'routing_rule': 'diamond_pattern_1_2'})
+                existing.add(('GOL', 'Under 3.5'))
+
+                print(f"    💎 DIAMOND P1/2: Under 3.5 recuperato da {sys_id} conf={pred['confidence']:.0f} @{pred['quota']:.2f}")
+                break
+
+    # === PATTERN 4: Over 1.5, Sistema A, conf 65+ ===
+    if 'GOL' not in existing_markets:
+        pred = find_pred('A', 'GOL', 'Over 1.5')
+        if pred and pred['confidence'] >= 65 and pred['quota'] >= 1.35:
+            recovered.append({**pred, 'source': 'A_diamond_o15', 'routing_rule': 'diamond_pattern_4'})
+            existing.add(('GOL', 'Over 1.5'))
+            existing_markets.add('GOL')
+            print(f"    💎 DIAMOND P4: Over 1.5 recuperato da A conf={pred['confidence']:.0f} @{pred['quota']:.2f}")
+
+    # === PATTERN 24: Under 3.5, A+S concordano, conf 65+ ===
+    if 'GOL' not in existing_markets:
+        pred_a = find_pred('A', 'GOL', 'Under 3.5')
+        pred_s = find_pred('S', 'GOL', 'Under 3.5')
+        if pred_a and pred_s and pred_a['confidence'] >= 65 and pred_s['confidence'] >= 65:
+            best = pred_a if pred_a['confidence'] >= pred_s['confidence'] else pred_s
+            if best['quota'] >= 1.35:
+                recovered.append({**best, 'source': 'AS_diamond_u35', 'routing_rule': 'diamond_pattern_24'})
+                existing.add(('GOL', 'Under 3.5'))
+
+                print(f"    💎 DIAMOND P24: Under 3.5 A+S concordano conf_a={pred_a['confidence']:.0f} conf_s={pred_s['confidence']:.0f}")
+
+    # === PATTERN 23: Under 3.5, A+C concordano, conf 65+ ===
+    if 'GOL' not in existing_markets:
+        pred_a = find_pred('A', 'GOL', 'Under 3.5')
+        pred_c = find_pred('C', 'GOL', 'Under 3.5')
+        if pred_a and pred_c and pred_a['confidence'] >= 65 and pred_c['confidence'] >= 65:
+            best = pred_a if pred_a['confidence'] >= pred_c['confidence'] else pred_c
+            if best['quota'] >= 1.35:
+                recovered.append({**best, 'source': 'AC_diamond_u35', 'routing_rule': 'diamond_pattern_23'})
+                existing.add(('GOL', 'Under 3.5'))
+
+                print(f"    💎 DIAMOND P23: Under 3.5 A+C concordano conf_a={pred_a['confidence']:.0f} conf_c={pred_c['confidence']:.0f}")
+
+    # === PATTERN 14: Goal/GG, Sistema C, conf 65+ ===
+    if 'GOL' not in existing_markets:
+        pred = find_pred('C', 'GOL', 'Goal')
+        if not pred:
+            pred = find_pred('C', 'GOL', 'GG')
+        if pred and pred['confidence'] >= 65 and pred['quota'] >= 1.35:
+            recovered.append({**pred, 'pronostico': 'Goal', 'source': 'C_diamond_goal', 'routing_rule': 'diamond_pattern_14'})
+            existing.add(('GOL', 'Goal'))
+            existing_markets.add('GOL')
+            print(f"    💎 DIAMOND P14: Goal recuperato da C conf={pred['confidence']:.0f} @{pred['quota']:.2f}")
+
+    # === PATTERN 5: Over 1.5, Sistema C, conf 75+ (due vie) ===
+    if 'GOL' not in existing_markets:
+        pred = find_pred('C', 'GOL', 'Over 1.5')
+        if pred and pred['confidence'] >= 75 and pred['quota'] >= 1.35:
+            via_a = spread <= 1.0 and pred['quota'] >= 1.45
+            via_b = pred['confidence'] >= 80 and pred['quota'] >= 1.50
+            if via_a or via_b:
+                via = 'A' if via_a else 'B'
+                recovered.append({**pred, 'source': f'C_diamond_o15_via{via}', 'routing_rule': 'diamond_pattern_5'})
+                existing.add(('GOL', 'Over 1.5'))
+
+                print(f"    💎 DIAMOND P5: Over 1.5 recuperato da C via {via} conf={pred['confidence']:.0f} @{pred['quota']:.2f} spread={spread}")
+
+    # === PATTERN 18: Over 2.5, 3/3 concordano, gerarchia ===
+    if 'GOL' not in existing_markets:
+        pred_a = find_pred('A', 'GOL', 'Over 2.5')
+        pred_s = find_pred('S', 'GOL', 'Over 2.5')
+        pred_c = find_pred('C', 'GOL', 'Over 2.5')
+        if pred_a and pred_s and pred_c:
+            confs = [pred_a['confidence'], pred_s['confidence'], pred_c['confidence']]
+            avg_conf = sum(confs) / 3
+            min_conf = min(confs)
+            best = max([pred_a, pred_s, pred_c], key=lambda p: p['confidence'])
+
+            if avg_conf >= 65 and best['quota'] >= 1.35:
+                if min_conf >= 70:
+                    level = 1
+                elif min_conf >= 65 and best['quota'] >= 1.50:
+                    level = 2
+                else:
+                    level = 3
+
+                recovered.append({**best, 'source': f'ASC_diamond_o25_L{level}', 'routing_rule': f'diamond_pattern_18_L{level}'})
+                existing.add(('GOL', 'Over 2.5'))
+
+                print(f"    💎 DIAMOND P18 L{level}: Over 2.5 3/3 concordano min_conf={min_conf:.0f} avg={avg_conf:.0f} @{best['quota']:.2f}")
+
+    # === PATTERN 10: SEGNO 1, Sistema C, conf 70-79, quota >= 1.50 ===
+    if 'SEGNO' not in existing_markets:
+        pred = find_pred('C', 'SEGNO', '1')
+        if pred and 70 <= pred['confidence'] < 80 and pred['quota'] >= 1.50:
+            recovered.append({**pred, 'source': 'C_diamond_segno1', 'routing_rule': 'diamond_pattern_10'})
+            existing.add(('SEGNO', '1'))
+            pass  # no market lock
+            print(f"    💎 DIAMOND P10: SEGNO 1 recuperato da C conf={pred['confidence']:.0f} @{pred['quota']:.2f}")
+
+    # (Pattern 18 già gestito sopra)
+
+    # Aggiungi has_odds ai recuperati
+    for r in recovered:
+        r['has_odds'] = True
+        r['diamond'] = True  # Flag per identificare i recuperati
+
+    return unified_pronostici + recovered
+
+
 def _apply_segno_mc_filter(unified, simulation_data, odds):
     """
     Filtro SEGNO basato su pattern Monte Carlo top4.
@@ -2073,6 +2237,9 @@ def orchestrate_date(date_str, dry_run=False, match_time_filter=None, preserve_a
 
         # --- RISULTATO ESATTO MC (admin-only, bonus separato) ---
         unified_pronostici = _add_exact_score_predictions(unified_pronostici, c_doc_for_combo, match_odds)
+
+        # --- DIAMOND RECOVERY: recupera pronostici scartati con pattern ad alta HR ---
+        unified_pronostici = _apply_diamond_recovery(unified_pronostici, docs_by_sys, match_key, match_odds)
 
         if not unified_pronostici:
             continue
