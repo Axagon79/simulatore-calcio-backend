@@ -8,7 +8,7 @@ if (!MISTRAL_API_KEY) {
   console.error('MISTRAL_API_KEY non configurata! Usa: firebase functions:config:set mistral.api_key="TUA_CHIAVE"');
 }
 const MISTRAL_URL = 'https://api.mistral.ai/v1/chat/completions';
-const MODEL = 'mistral-small-latest';
+const MODEL = 'mistral-medium-2508';
 
 // System prompt del Coach AI (PROVVISORIO — da migliorare dopo test reali)
 const TODAY = new Date().toISOString().split('T')[0]; // "YYYY-MM-DD"

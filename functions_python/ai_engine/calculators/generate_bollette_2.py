@@ -28,7 +28,7 @@ except ImportError:
 
 # --- CONFIGURAZIONE ---
 MISTRAL_URL = "https://api.mistral.ai/v1/chat/completions"
-MISTRAL_MODEL = "mistral-small-latest"
+MISTRAL_MODEL = "mistral-medium-2508"
 MISTRAL_API_KEY = os.environ.get("MISTRAL_API_KEY")
 if not MISTRAL_API_KEY:
     try:
@@ -227,6 +227,18 @@ IMPORTANTE:
 """
 
 
+def _sanitize_and_parse_json(content):
+    """Sanitizza la risposta Mistral e parsa il JSON.
+    Rimuove markdown wrapping e caratteri di controllo invalidi."""
+    content = content.strip()
+    if content.startswith("```"):
+        content = re.sub(r'^```(?:json)?\s*', '', content)
+        content = re.sub(r'\s*```$', '', content)
+    # Rimuovi caratteri di controllo dentro le stringhe JSON (tab, newline, etc.)
+    content = re.sub(r'[\x00-\x1f\x7f](?!["\\/bfnrtu])', ' ', content)
+    return json.loads(content)
+
+
 def build_pool(today_str):
     """Costruisce il pool di selezioni dai pronostici unified per 3 giorni."""
     today = datetime.strptime(today_str, "%Y-%m-%d")
@@ -417,14 +429,8 @@ def call_mistral(pool_text, today_str):
         resp.raise_for_status()
         break
 
-    content = resp.json()["choices"][0]["message"]["content"].strip()
-
-    # Rimuovi markdown wrapping
-    if content.startswith("```"):
-        content = re.sub(r'^```(?:json)?\s*', '', content)
-        content = re.sub(r'\s*```$', '', content)
-
-    return json.loads(content)
+    content = resp.json()["choices"][0]["message"]["content"]
+    return _sanitize_and_parse_json(content)
 
 
 def _classify_tipo(raw_tipo, selezioni, quota_totale, pool_index, today_str):
@@ -868,7 +874,7 @@ def build_extra_pool(today_str, existing_match_keys):
     return extra_pool
 
 
-def call_mistral_integration(pool, fascia, count_needed, today_str):
+def call_mistral_integration(pool, fascia, count_needed, today_str, extra_context=""):
     """Chiama Mistral per generare solo le bollette mancanti di una fascia."""
     c = CATEGORY_CONSTRAINTS[fascia]
 
@@ -934,6 +940,9 @@ REGOLE:
 
 match_key, mercato e pronostico devono corrispondere ESATTAMENTE al pool."""
 
+    if extra_context:
+        prompt += f"\n\n⚠️ ATTENZIONE — ERRORI PRECEDENTI:\n{extra_context}"
+
     headers = {
         "Authorization": f"Bearer {MISTRAL_API_KEY}",
         "Content-Type": "application/json",
@@ -948,15 +957,18 @@ match_key, mercato e pronostico devono corrispondere ESATTAMENTE al pool."""
         "max_tokens": 4000,
     }
 
-    resp = requests.post(MISTRAL_URL, headers=headers, json=payload, timeout=120)
-    resp.raise_for_status()
+    for attempt in range(3):
+        resp = requests.post(MISTRAL_URL, headers=headers, json=payload, timeout=120)
+        if resp.status_code == 429 and attempt < 2:
+            wait = 30 * (attempt + 1)
+            print(f"   ⏳ Rate limit 429, attendo {wait}s...")
+            time.sleep(wait)
+            continue
+        resp.raise_for_status()
+        break
 
-    content = resp.json()["choices"][0]["message"]["content"].strip()
-    if content.startswith("```"):
-        content = re.sub(r'^```(?:json)?\s*', '', content)
-        content = re.sub(r'\s*```$', '', content)
-
-    return json.loads(content)
+    content = resp.json()["choices"][0]["message"]["content"]
+    return _sanitize_and_parse_json(content)
 
 
 def build_feedback_prompt(errors, valid_docs, counters, today_str):
@@ -1026,189 +1038,264 @@ def call_mistral_retry(pool_text, today_str, original_response, feedback):
     resp = requests.post(MISTRAL_URL, headers=headers, json=payload, timeout=120)
     resp.raise_for_status()
 
-    content = resp.json()["choices"][0]["message"]["content"].strip()
-    if content.startswith("```"):
-        content = re.sub(r'^```(?:json)?\s*', '', content)
-        content = re.sub(r'\s*```$', '', content)
+    content = resp.json()["choices"][0]["message"]["content"]
+    return _sanitize_and_parse_json(content)
 
-    return json.loads(content)
+
+def _check_feasibility(fascia, pool, today_str):
+    """Verifica se e' matematicamente possibile generare bollette per questa fascia.
+    Returns: (feasible: bool, reason: str, section_pool: list)
+    """
+    c = CATEGORY_CONSTRAINTS.get(fascia, {})
+    min_sel = c.get("min_sel", 2)
+    min_quota = c.get("min_quota")
+    max_quota = c.get("max_quota")
+
+    # Filtra pool per la sezione
+    if fascia == "oggi":
+        section_pool = [s for s in pool if s.get("match_date") == today_str]
+    else:
+        section_pool = pool
+
+    # Check 1: abbastanza selezioni?
+    # Conta partite uniche (ogni partita puo' apparire 1 volta per bolletta)
+    unique_matches = set(s.get("match_key", "") for s in section_pool)
+    if len(unique_matches) < min_sel:
+        return False, f"solo {len(unique_matches)} partite uniche, servono almeno {min_sel}", section_pool
+
+    # Check 2: elite — servono selezioni elite
+    if fascia == "elite":
+        elite_count = sum(1 for s in section_pool if s.get("elite"))
+        if elite_count < 2:
+            return False, f"solo {elite_count} selezioni elite, servono almeno 2", section_pool
+
+    # Check 3: quota minima raggiungibile?
+    if min_quota:
+        # Prendi le quote piu' alte per partita unica
+        best_by_match = {}
+        for s in section_pool:
+            mk = s.get("match_key", "")
+            q = s.get("quota", 0) or 0
+            if mk not in best_by_match or q > best_by_match[mk]:
+                best_by_match[mk] = q
+        # Quota max = prodotto delle N quote piu' alte
+        top_quotes = sorted(best_by_match.values(), reverse=True)[:c.get("max_sel", 8)]
+        if len(top_quotes) >= min_sel:
+            max_achievable = 1.0
+            for q in top_quotes[:min_sel]:
+                max_achievable *= q
+            if max_achievable < min_quota * 0.9:  # 10% tolleranza
+                return False, f"quota max raggiungibile ~{max_achievable:.1f}, minimo {min_quota}", section_pool
+
+    # Check 4: quota massima rispettabile?
+    if max_quota:
+        # Prendi le quote piu' basse per partita unica
+        lowest_by_match = {}
+        for s in section_pool:
+            mk = s.get("match_key", "")
+            q = s.get("quota", 0) or 0
+            if q > 1.0 and (mk not in lowest_by_match or q < lowest_by_match[mk]):
+                lowest_by_match[mk] = q
+        low_quotes = sorted(lowest_by_match.values())[:min_sel]
+        if len(low_quotes) >= min_sel:
+            min_achievable = 1.0
+            for q in low_quotes:
+                min_achievable *= q
+            if min_achievable > max_quota * 1.1:  # 10% tolleranza
+                return False, f"quota min raggiungibile ~{min_achievable:.1f}, massimo {max_quota}", section_pool
+
+    return True, "OK", section_pool
+
+
+def _generate_for_section(fascia, needed, pool, today_str, bollette_docs, counters):
+    """Genera bollette per una singola sezione con retry.
+    Returns: lista di bollette valide per questa sezione.
+    """
+    # Check fattibilita'
+    feasible, reason, section_pool = _check_feasibility(fascia, pool, today_str)
+    if not feasible:
+        print(f"   ⛔ Impossibile: {reason}")
+        return []
+
+    print(f"   📋 Pool per {fascia}: {len(section_pool)} selezioni")
+
+    # Chiamata Mistral (retry 429 gestito dentro call_mistral_integration)
+    raw = None
+    try:
+        raw = call_mistral_integration(section_pool, fascia, needed, today_str)
+    except Exception as e:
+        print(f"   ❌ Errore Mistral per {fascia}: {e}")
+        return []
+
+    if not isinstance(raw, list):
+        print(f"   ❌ Risposta non valida per {fascia}")
+        return []
+
+    # Valida
+    valid, errors, new_counters = validate_with_errors(
+        raw, section_pool, today_str,
+        existing_counters=counters,
+        existing_docs=bollette_docs
+    )
+
+    # Fix: bollette "oggi" devono avere SOLO partite di oggi
+    if fascia == "oggi":
+        valid = [
+            doc for doc in valid
+            if all(s.get("match_date") == today_str for s in doc.get("selezioni", []))
+        ]
+
+    # Limita al numero richiesto
+    valid = valid[:needed]
+
+    if errors:
+        print(f"   ⚠️ {len(errors)} errori per {fascia}")
+        for err in errors[:3]:
+            print(f"      [{err['code']}] {err['feedback'][:100]}")
+
+    # Se non abbastanza, retry fino a 2 volte con feedback specifico
+    for retry_attempt in range(2):
+        still_needed = needed - len(valid)
+        if still_needed <= 0 or not errors:
+            break
+        print(f"   🔄 Retry {fascia} #{retry_attempt+1}: mancano {still_needed} bollette...")
+
+        # Costruisci feedback specifico con errori e suggerimenti
+        error_lines = [f"- {err['feedback']}" for err in errors[:5]]
+        c = CATEGORY_CONSTRAINTS.get(fascia, {})
+        feedback_text = (
+            f"ERRORI nelle bollette {fascia} precedenti:\n"
+            + "\n".join(error_lines)
+            + f"\n\nRICORDA le regole per {fascia}:"
+            + f"\n- Quota totale: min {c.get('min_quota', 'libera')}, max {c.get('max_quota', 'libera')}"
+            + f"\n- Selezioni: min {c.get('min_sel', 2)}, max {c.get('max_sel', 8)}"
+            + f"\n- Genera esattamente {still_needed} bollette {fascia} VALIDE"
+            + f"\n- Ogni bolletta DEVE avere almeno 1 partita di oggi ({today_str})"
+            + f"\n- NON ripetere bollette gia' accettate"
+        )
+        if c.get('quota_singola'):
+            for n, q in sorted(c['quota_singola'].items()):
+                feedback_text += f"\n- Con {n} selezioni: ogni quota max {q}"
+
+        try:
+            retry_raw = call_mistral_integration(section_pool, fascia, still_needed, today_str, extra_context=feedback_text)
+            if isinstance(retry_raw, list):
+                retry_valid, errors, new_counters = validate_with_errors(
+                    retry_raw, section_pool, today_str,
+                    existing_counters=new_counters,
+                    existing_docs=bollette_docs + valid
+                )
+                if fascia == "oggi":
+                    retry_valid = [
+                        doc for doc in retry_valid
+                        if all(s.get("match_date") == today_str for s in doc.get("selezioni", []))
+                    ]
+                retry_valid = retry_valid[:still_needed]
+                valid.extend(retry_valid)
+                if retry_valid:
+                    print(f"   ✅ Retry: +{len(retry_valid)} bollette {fascia}")
+                if errors:
+                    print(f"   ⚠️ Retry: ancora {len(errors)} errori")
+        except Exception as e:
+            print(f"   ❌ Errore retry {fascia}: {e}")
+            break
+
+    # Assegna tipo e label
+    existing_count = sum(1 for b in bollette_docs if b.get("tipo") == fascia)
+    for doc in valid:
+        existing_count += 1
+        doc["tipo"] = fascia
+        doc["label"] = f"{fascia.capitalize()} #{existing_count}"
+
+    # Aggiorna counters
+    counters.update(new_counters)
+
+    return valid
 
 
 def main():
     print("\n" + "=" * 60)
-    print("🎫 GENERAZIONE BOLLETTE — Step 35")
+    print("🎫 GENERAZIONE BOLLETTE — Step 35 (Sequenziale)")
     print("=" * 60)
 
     today_str = datetime.now().strftime("%Y-%m-%d")
 
-    # 1. Costruisci pool
+    # 1. Costruisci pool base (pronostici AI)
     pool = build_pool(today_str)
-
-    # 2. Recupera selezioni da bollette saltate ieri
     recovered = recover_from_yesterday(today_str)
     if recovered:
         pool.extend(recovered)
-
-    # 3. Deduplica
     pool = deduplicate_pool(pool)
-    print(f"📊 Pool finale: {len(pool)} selezioni uniche")
+    print(f"📊 Pool AI: {len(pool)} selezioni uniche")
 
-    if len(pool) < 3:
-        print("⚠️ Pool troppo piccolo (< 3 selezioni). Nessuna bolletta generata.")
+    # 2. Pool esteso (h2h_by_round con quote)
+    existing_match_keys = set(s["match_key"] for s in pool)
+    extra = build_extra_pool(today_str, existing_match_keys)
+    extended_pool = pool + extra
+    extended_pool = deduplicate_pool(extended_pool)
+    print(f"📊 Pool esteso: {len(extended_pool)} selezioni ({len(extra)} extra da h2h)")
+
+    if len(extended_pool) < 2:
+        print("⚠️ Pool troppo piccolo (< 2 selezioni). Nessuna bolletta generata.")
         return
 
-    # 4. Serializza e chiama Mistral
-    pool_text = serialize_pool_for_prompt(pool)
-    print(f"🤖 Chiamata Mistral ({MISTRAL_MODEL})...")
+    # 3. Generazione sequenziale per sezione
+    bollette_docs = []
+    counters = {"oggi": 0, "elite": 0, "selettiva": 0, "bilanciata": 0, "ambiziosa": 0}
 
-    try:
-        raw_bollette = call_mistral(pool_text, today_str)
-    except json.JSONDecodeError:
-        # #15: JSON malformato — retry con temperatura piu' bassa
-        print("  ⚠️ JSON malformato, retry...")
-        try:
-            raw_bollette = call_mistral(pool_text, today_str)
-        except Exception as e:
-            print(f"❌ Errore Mistral (retry JSON): {e}")
-            return
-    except Exception as e:
-        print(f"❌ Errore Mistral: {e}")
-        return
+    # Target bollette per sezione
+    SECTION_TARGETS = {
+        "oggi":       3,
+        "elite":      3,
+        "selettiva":  5,
+        "bilanciata": 5,
+        "ambiziosa":  5,
+    }
 
-    if not isinstance(raw_bollette, list):
-        print(f"❌ Risposta Mistral non e' un array: {type(raw_bollette)}")
-        return
+    SECTION_ORDER = ["oggi", "elite", "selettiva", "bilanciata", "ambiziosa"]
 
-    print(f"📝 Mistral ha proposto {len(raw_bollette)} bollette")
+    for fascia in SECTION_ORDER:
+        target = SECTION_TARGETS[fascia]
+        print(f"\n{'─'*50}")
+        print(f"📌 SEZIONE {fascia.upper()} — target: {target} bollette")
+        print(f"{'─'*50}")
 
-    # 5. Valida con raccolta errori
-    bollette_docs, validation_errors, counters = validate_with_errors(
-        raw_bollette, pool, today_str
-    )
+        new_bollette = _generate_for_section(
+            fascia, target, extended_pool, today_str, bollette_docs, counters
+        )
 
-    print(f"   ✅ {len(bollette_docs)} valide, ❌ {len(validation_errors)} errori")
-    for err in validation_errors:
-        print(f"   ⚠️ [{err['code']}] {err['feedback'][:120]}")
+        if new_bollette:
+            bollette_docs.extend(new_bollette)
+            print(f"   ✅ {fascia.upper()}: {len(new_bollette)} bollette generate")
+        else:
+            print(f"   ⚠️ {fascia.upper()}: nessuna bolletta valida")
 
-    # 6. Retry con feedback se ci sono errori significativi
-    if validation_errors and MAX_RETRY_FEEDBACK > 0:
-        # Calcola quante bollette mancano
-        missing_count = 0
-        for tipo in ["oggi", "selettiva", "bilanciata", "ambiziosa"]:
-            actual = counters.get(tipo, 0)
-            if actual < 3:
-                missing_count += 3 - actual
-
-        if missing_count > 0 or len(validation_errors) >= 3:
-            print(f"\n🔄 Retry con feedback ({len(validation_errors)} errori, "
-                  f"{missing_count} bollette mancanti)...")
-
-            feedback = build_feedback_prompt(
-                validation_errors, bollette_docs, counters, today_str
-            )
-
-            try:
-                retry_raw = call_mistral_retry(
-                    pool_text, today_str, raw_bollette, feedback
-                )
-                if isinstance(retry_raw, list):
-                    retry_valid, retry_errors, counters = validate_with_errors(
-                        retry_raw, pool, today_str, existing_counters=counters,
-                        existing_docs=bollette_docs
-                    )
-                    if retry_valid:
-                        bollette_docs.extend(retry_valid)
-                        print(f"   ✅ Retry: +{len(retry_valid)} bollette valide")
-                    if retry_errors:
-                        print(f"   ⚠️ Retry: ancora {len(retry_errors)} errori")
-                        for err in retry_errors[:5]:
-                            print(f"      [{err['code']}] {err['feedback'][:100]}")
-            except Exception as e:
-                print(f"   ❌ Errore retry: {e}")
+        # Pausa tra sezioni per evitare rate limit Mistral
+        time.sleep(5)
 
     if not bollette_docs:
-        print("⚠️ Nessuna bolletta valida dopo validazione e retry.")
+        print("\n⚠️ Nessuna bolletta generata.")
         return
 
-    # 7. Integrazione per fasce ancora carenti (dopo retry)
-    by_tipo = {}
-    for b in bollette_docs:
-        by_tipo.setdefault(b["tipo"], []).append(b)
-
-    fasce_carenti = {}
-    for fascia in ["oggi", "selettiva", "bilanciata", "ambiziosa"]:
-        count = len(by_tipo.get(fascia, []))
-        if count < 3:
-            fasce_carenti[fascia] = 3 - count
-
-    if fasce_carenti:
-        print(f"\n⚠️ Fasce ancora carenti: "
-              f"{', '.join(f'{f} (mancano {n})' for f, n in fasce_carenti.items())}")
-        print("🔄 Caricamento pool esteso da h2h_by_round...")
-
-        existing_match_keys = set(s["match_key"] for s in pool)
-        extra = build_extra_pool(today_str, existing_match_keys)
-        extended_pool = pool + extra
-        extended_pool = deduplicate_pool(extended_pool)
-        print(f"📊 Pool esteso: {len(extended_pool)} selezioni ({len(extra)} extra)")
-
-        for fascia, needed in fasce_carenti.items():
-            print(f"🤖 Integrazione {fascia}: generazione {needed} bollette...")
-            try:
-                # Per bollette "oggi": usa SOLO partite di oggi
-                integration_pool = [s for s in extended_pool if s.get("match_date") == today_str] if fascia == "oggi" else extended_pool
-                raw_extra = call_mistral_integration(
-                    integration_pool, fascia, needed, today_str
-                )
-                if isinstance(raw_extra, list):
-                    extra_valid, _, counters = validate_with_errors(
-                        raw_extra, extended_pool, today_str,
-                        existing_counters=counters,
-                        existing_docs=bollette_docs
-                    )
-                    # Fix #16: limita al numero richiesto
-                    extra_valid = extra_valid[:needed]
-                    # Fix: bollette "oggi" devono avere SOLO partite di oggi
-                    if fascia == "oggi":
-                        extra_valid = [
-                            doc for doc in extra_valid
-                            if all(s.get("match_date") == today_str for s in doc.get("selezioni", []))
-                        ]
-                    existing_count = len(by_tipo.get(fascia, []))
-                    for doc in extra_valid:
-                        existing_count += 1
-                        doc["tipo"] = fascia
-                        doc["label"] = f"{fascia.capitalize()} #{existing_count}"
-                        doc["_integrated"] = True
-                    bollette_docs.extend(extra_valid)
-                    by_tipo.setdefault(fascia, []).extend(extra_valid)
-                    print(f"   ✅ Aggiunte {len(extra_valid)} bollette {fascia}")
-                else:
-                    print(f"   ❌ Risposta non valida per {fascia}")
-            except Exception as e:
-                print(f"   ❌ Errore integrazione {fascia}: {e}")
-
-    # 8. Salva su MongoDB
+    # 4. Salva su MongoDB
     coll = db.bollette
     deleted = coll.delete_many({"date": today_str, "custom": {"$ne": True}})
     if deleted.deleted_count > 0:
-        print(f"🗑️ Rimosse {deleted.deleted_count} bollette precedenti per {today_str}")
+        print(f"\n🗑️ Rimosse {deleted.deleted_count} bollette precedenti per {today_str}")
 
     coll.insert_many(bollette_docs)
 
-    # Riepilogo finale
+    # 5. Riepilogo finale
     by_tipo = {}
     for b in bollette_docs:
         by_tipo.setdefault(b["tipo"], []).append(b)
 
     print(f"\n✅ Salvate {len(bollette_docs)} bollette:")
-    for tipo in ["oggi", "elite", "selettiva", "bilanciata", "ambiziosa"]:
+    for tipo in SECTION_ORDER:
         if tipo in by_tipo:
             quotes = [b["quota_totale"] for b in by_tipo[tipo]]
             n_sel_list = [len(b["selezioni"]) for b in by_tipo[tipo]]
-            integrated = sum(1 for b in by_tipo[tipo] if b.get("_integrated"))
-            extra_label = f" ({integrated} integrate)" if integrated else ""
-            print(f"   {tipo.upper()}: {len(by_tipo[tipo])}{extra_label} "
+            print(f"   {tipo.upper()}: {len(by_tipo[tipo])} "
                   f"— quote: {quotes} — selezioni: {n_sel_list}")
 
 

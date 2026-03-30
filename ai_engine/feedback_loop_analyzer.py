@@ -28,7 +28,7 @@ except ImportError:
 
 # --- CONFIGURAZIONE ---
 MISTRAL_URL = "https://api.mistral.ai/v1/chat/completions"
-MISTRAL_MODEL = "mistral-small-latest"
+MISTRAL_MODEL = "mistral-medium-2508"
 MISTRAL_API_KEY = os.environ.get("MISTRAL_API_KEY")
 if not MISTRAL_API_KEY:
     # Prova a caricare da .env

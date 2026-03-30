@@ -255,7 +255,7 @@ router.get('/saved', authenticate, async (req, res) => {
 // L'utente descrive cosa vuole, Mistral compone la bolletta dal pool
 // ============================================
 const MISTRAL_URL = 'https://api.mistral.ai/v1/chat/completions';
-const MISTRAL_MODEL = 'mistral-small-latest';
+const MISTRAL_MODEL = 'mistral-medium-2508';
 
 router.post('/generate', authenticate, async (req, res) => {
   try {
