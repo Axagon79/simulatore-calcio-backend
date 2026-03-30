@@ -611,8 +611,21 @@ def run_scraper():
                         {"$set": {"matches": matches}}
                     )
 
-                    # Propaga match_status_detail anche in daily_predictions_unified
+                    # Propaga date, match_time, match_status_detail in unified e prediction_versions
                     for match in matches:
+                        date_obj = match.get('date_obj')
+                        match_time = match.get('match_time', '')
+                        if date_obj:
+                            new_date = date_obj.strftime('%Y-%m-%d') if hasattr(date_obj, 'strftime') else str(date_obj)[:10]
+                            # Aggiorna date e match_time in unified e prediction_versions
+                            for coll_name in ['daily_predictions_unified', 'prediction_versions']:
+                                coll = db[coll_name]
+                                # Aggiorna tutti i documenti di questa partita (qualsiasi data vecchia)
+                                coll.update_many(
+                                    {"home": match['home'], "away": match['away'], "league": league_name},
+                                    {"$set": {"date": new_date, "match_time": match_time}}
+                                )
+
                         m_status_detail = match.get('match_status_detail')
                         if m_status_detail:
                             db.daily_predictions_unified.update_many(
