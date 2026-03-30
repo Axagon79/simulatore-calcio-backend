@@ -6,7 +6,7 @@ import ctypes  # // aggiunto per: nascondere la finestra
 ctypes.windll.kernel32.SetConsoleTitleW("Aggiornamento Quote Calcio (debug_nowgoal_scraper.py)")
 import msvcrt  # // aggiunto per: tasto H e battito cardiaco
 import json
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import atexit
 import signal
 import subprocess
@@ -140,6 +140,18 @@ LEAGUES_CONFIG = [
     
     # 🆕 ASIA
     {"name": "J1 League", "url": "https://football.nowgoal26.com/subleague/25"},
+
+    # NUOVI CAMPIONATI (24/03/2026)
+    {"name": "League One", "url": "https://football.nowgoal26.com/league/39"},
+    {"name": "League Two", "url": "https://football.nowgoal26.com/league/35"},
+    {"name": "Veikkausliiga", "url": "https://football.nowgoal26.com/subleague/13"},
+    {"name": "3. Liga", "url": "https://football.nowgoal26.com/league/693"},
+    {"name": "Liga MX", "url": "https://football.nowgoal26.com/subleague/140", "has_stages": True},
+    {"name": "Eerste Divisie", "url": "https://football.nowgoal26.com/subleague/17"},
+    {"name": "Liga Portugal 2", "url": "https://football.nowgoal26.com/subleague/157"},
+    {"name": "1. Lig", "url": "https://football.nowgoal26.com/subleague/130"},
+    {"name": "Saudi Pro League", "url": "https://football.nowgoal26.com/subleague/292"},
+    {"name": "Scottish Championship", "url": "https://football.nowgoal26.com/subleague/150"},
 ]
 
 def strip_accents(text):
@@ -171,87 +183,76 @@ def generate_search_names(name):
     return list(set(names))
 
 def normalize_name(name: str) -> str:
-    """Normalizza il nome di una squadra rimuovendo prefissi comuni e caratteri speciali"""
-    if not name: 
-        return ""
-    
+    if not name: return ""
     name = name.lower().strip()
-    
-    # Rimuovi caratteri speciali comuni
+
+    # --- DIZIONARIO DI CORREZIONI MASSIVO ---
     replacements = {
-        "ü": "u", "ö": "o", "é": "e", "è": "e", "à": "a", "ì": "i",
-        "ñ": "n", "ã": "a", "ç": "c", "á": "a", "í": "i",
-        "ó": "o", "ú": "u", "ê": "e", "ô": "o", "â": "a",
-    }
-    
-    for old, new in replacements.items():
-        name = name.replace(old, new)
-    
-    # Rimuovi prefissi comuni
-    prefixes = ["fc ", "cf ", "ac ", "as ", "sc ", "us ", "ss ", "asd ", "asc "]
-    for prefix in prefixes:
-        if name.startswith(prefix):
-            name = name[len(prefix):]
-    
-    # Rimuovi suffissi comuni
-    suffixes = [" fc", " cf", " ac", " calcio", " 1913", " 1928", " 1918", " united", " city"]
-    for suffix in suffixes:
-        if name.endswith(suffix):
-            name = name[:-len(suffix)]
-    
-    # Normalizzazioni specifiche per squadre comuni
-    specific_mappings = {
-        # Italia
-        "inter milan": "inter",
-        "inter milano": "inter",
-        "juve next gen": "juventus u23",
-        "juventus ng": "juventus u23",
-        "hellas verona": "verona",
+        # --- GENERALE & PREFISSI/SUFFISSI ---
+        "fc ": "", "cf ": "", "ac ": "", "as ": "", "sc ": "", "us ": "", "ss ": "",
+        "calcio": "", "team ": "", "sport": "", "1918": "", "1913": "", "1928": "",
+        "united": "utd", "city": "ci", # Normalizzazione generica
+
+        # --- CARATTERI SPECIALI ---
+        "ü": "u", "ö": "o", "é": "e", "è": "e", "ì": "i", "ñ": "n", "ã": "a", "ç": "c",
+        "südtirol": "sudtirol", "köln": "koln",
+
+        # --- SERIE A/B/C (ITALIA) ---
+        "inter milan": "inter", "inter u23": "inter",
+        "juve next gen": "juventus", "juventus u23": "juventus", "juve stabia": "juve",
+        "atalanta u23": "atalanta", "milan futuro": "milan",
         "giana erminio": "giana",
-        
-        # Inghilterra
-        "manchester utd": "manchester united",
-        "man utd": "manchester united",
+        "virtus verona": "virtus", "virtus entella": "entella",
+        "audace cerignola": "cerignola", "team altamura": "altamura",
+        "albinoLeffe": "albinoleffe", "arzignano": "arzignano",
+        "sorrento": "sorrento", "picerno": "picerno", "latina": "latina",
+        "benevento": "benevento", "avellino": "avellino",
+        "catania": "catania", "foggia": "foggia", "crotone": "crotone",
+
+        # --- PREMIER LEAGUE (INGHILTERRA) ---
+        "manchester utd.": "manchester united", "man utd": "manchester united",
         "man city": "manchester city",
-        "nott'm forest": "nottingham forest",
-        "nottingham": "nottingham forest",
-        "west ham utd": "west ham",
-        "brighton": "brighton hove albion",
-        "wolves": "wolverhampton",
-        
-        # Spagna
-        "atletico": "atletico madrid",
-        "barcellona": "barcelona",
-        "siviglia": "sevilla",
-        "celta de vigo": "celta vigo",
-        "celta": "celta vigo",
+        "nott'm forest": "nottingham forest", "nottingham": "nottingham forest",
+        "west ham utd.": "west ham", "west ham united": "west ham",
+        "brighton": "brighton hove albion", "wolves": "wolverhampton",
+        "newcastle": "newcastle united", "leeds": "leeds united",
+
+        # --- LA LIGA (SPAGNA) ---
+        "atlético": "atletico madrid", "atletico": "atletico madrid",
+        "barcellona": "barcelona", "siviglia": "sevilla",
+        "celta de vigo": "celta vigo", "celta": "celta vigo",
+        "rayo vallecano": "rayo", "alavés": "alaves",
         "athletic club": "athletic bilbao",
-        
-        # Germania
-        "bayern": "bayern munchen",
-        "bayern monaco": "bayern munchen",
-        "leverkusen": "bayer leverkusen",
+
+        # --- BUNDESLIGA (GERMANIA) ---
+        "bayern": "bayern munchen", "bayern monaco": "bayern munchen",
+        "leverkusen": "bayer leverkusen", "bayer": "bayer leverkusen",
         "dortmund": "borussia dortmund",
-        "leipzig": "rb leipzig",
-        "lipsia": "rb leipzig",
-        "gladbach": "monchengladbach",
-        "m'gladbach": "monchengladbach",
-        
-        # Francia
-        "marsiglia": "marseille",
-        "nizza": "nice",
-        "lione": "lyon",
+        "magonza": "mainz", "mainz 05": "mainz",
+        "colonia": "koln", "fc koln": "koln",
+        "friburgo": "freiburg",
+        "eintracht": "eintracht frankfurt",
+        "stoccarda": "stuttgart",
+        "lipsia": "rb leipzig", "leipzig": "rb leipzig",
+        "bor. m'gladbach": "borussia monchengladbach", "gladbach": "monchengladbach",
+
+        # --- LIGUE 1 (FRANCIA) ---
+        "marsiglia": "marseille", "olympique marseille": "marseille",
+        "nizza": "nice", "ogc nice": "nice",
+        "lione": "lyon", "olymp. lione": "lyon",
+        "stade rennes": "rennes",
         "psg": "paris saint germain",
-        
-        # Altri
-        "sporting cp": "sporting",
-        "sporting lisbona": "sporting",
+
+        # --- EREDIVISIE & PORTOGALLO ---
+        "psv": "psv eindhoven", "az alkmaar": "az",
+        "sporting cp": "sporting", "sporting lisbona": "sporting",
+        "vit. guimarães": "vitoria guimaraes",
     }
-    
-    for old, new in specific_mappings.items():
-        if old in name:
-            name = name.replace(old, new)
-    
+
+    for k, v in replacements.items():
+        if k in name:
+            name = name.replace(k, v)
+
     return name.strip()
 
 def get_team_aliases(team_name: str, team_doc: Optional[Dict] = None) -> List[str]:
@@ -377,74 +378,92 @@ def find_match_in_rows(home_aliases: List[str], away_aliases: List[str], rows_da
 
     return best_match
 
-def click_round_and_wait(driver, round_num: int, timeout: int = 15) -> bool:
-    """
-    Clicca su una giornata e attende il caricamento della tabella.
-    Ritorna True se ha successo, False altrimenti.
-    """
+def click_round_and_wait(driver, round_num: int, stage=None) -> bool:
     try:
-        # Trova l'elemento della giornata
-        str_round = str(round_num)
-        xpath_list = [
-            f"//div[contains(@class,'subLeague_round')]//a[text()='{str_round}']",
-            f"//td[text()='{str_round}']",
-            f"//li[text()='{str_round}']",
-            f"//a[normalize-space()='{str_round}']"
-        ]
-        
         element = None
-        for xpath in xpath_list:
+        # Se c'è uno stage (Serie C), clicca la giornata dello stage corretto
+        if stage:
             try:
-                element = driver.find_element(By.XPATH, xpath)
-                if element: 
+                element = driver.find_element(By.CSS_SELECTOR, f"div.round span[round='{round_num}'][stage='{stage}']")
+            except:
+                pass
+        # Altrimenti cerca la giornata visibile
+        if not element:
+            try:
+                elements = driver.find_elements(By.CSS_SELECTOR, f"div.round span[round='{round_num}']")
+                for el in elements:
+                    if el.is_displayed():
+                        element = el
+                        break
+            except:
+                pass
+        if not element:
+            return False
+        # Salva contenuto attuale per verificare il cambio
+        try:
+            old_html = driver.find_element(By.CSS_SELECTOR, "div.list").get_attribute("innerHTML")[:200]
+        except:
+            old_html = ""
+        # Click nativo Selenium
+        element.click()
+        # Attendi che il contenuto cambi (max 10 secondi)
+        for _ in range(20):
+            time.sleep(0.5)
+            try:
+                new_html = driver.find_element(By.CSS_SELECTOR, "div.list").get_attribute("innerHTML")[:200]
+                if new_html != old_html:
                     break
             except:
                 pass
-        
-        if not element:
-            return False
-        
-        # Clicca usando JavaScript per evitare problemi di interception
-        driver.execute_script("arguments[0].click();", element)
-        
-        # Attendi che la tabella si carichi
-        WebDriverWait(driver, timeout).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, "tr[id]"))
-        )
-        
-        # Breve pausa per stabilizzazione
-        time.sleep(1)
-        
+        time.sleep(2)
         return True
-        
-    except Exception as e:
-        print(f"   ⚠️ Errore navigazione giornata {round_num}: {e}")
+    except:
         return False
 
-def get_current_round_from_page(driver) -> Optional[int]:
-    """
-    Determina quale giornata è attualmente visualizzata nella pagina.
-    Legge il numero dalla prima riga della tabella.
-    """
+def get_round_number_from_text(text):
+    match = re.search(r'(\d+)', str(text))
+    return int(match.group(1)) if match else 0
+
+def get_target_rounds_from_page(driver, league_name, has_stages=False):
+    """Legge il round corrente dalla pagina NowGoal e restituisce i 3 round dal DB (corrente, -1, +1)."""
+    current_round = None
     try:
-        # Attendi che la tabella sia presente
-        WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, "tr[id]"))
+        if has_stages:
+            elements = driver.find_elements(By.CSS_SELECTOR, "div.round span.current")
+            if elements:
+                current_round = int(elements[-1].get_attribute("round"))
+        else:
+            el = driver.find_element(By.CSS_SELECTOR, "div.round span.current")
+            current_round = int(el.get_attribute("round"))
+    except:
+        pass
+
+    # Salva la giornata corrente nel DB per index.js
+    if current_round is not None:
+        db.league_current_rounds.update_one(
+            {"league": league_name},
+            {"$set": {"current_round": current_round, "updated_at": datetime.now(timezone.utc)}},
+            upsert=True
         )
-        
-        # Prendi la prima riga
-        first_row = driver.find_element(By.CSS_SELECTOR, "tr[id]")
-        first_row_text = first_row.text.strip()
-        
-        # Il numero di giornata è tipicamente all'inizio (es. "15 14-12 12:30 ...")
-        match = re.match(r'^(\d+)', first_row_text)
-        if match:
-            return int(match.group(1))
-        
-    except Exception as e:
-        print(f"   ⚠️ Impossibile leggere giornata dalla pagina: {e}")
-    
-    return None
+
+    rounds_cursor = db.h2h_by_round.find({"league": league_name})
+    rounds_list = list(rounds_cursor)
+    if not rounds_list: return []
+    rounds_list.sort(key=lambda x: get_round_number_from_text(x.get('round_name', '0')))
+
+    if current_round is None:
+        anchor_index = len(rounds_list) - 1
+    else:
+        anchor_index = -1
+        for i, r in enumerate(rounds_list):
+            if get_round_number_from_text(r.get('round_name', '0')) == current_round:
+                anchor_index = i
+                break
+        if anchor_index == -1:
+            anchor_index = len(rounds_list) - 1
+
+    indices = [anchor_index, anchor_index - 1, anchor_index + 1]
+    return [rounds_list[i] for i in indices if 0 <= i < len(rounds_list)]
 
 def get_all_match_rows(driver) -> List[Dict]:
     """Estrae tutte le righe di partite dalla pagina corrente.
@@ -758,39 +777,30 @@ def run_scraper():
             # Naviga alla pagina della lega
             driver.get(league_url)
             time.sleep(3)
-            
-            # Determina giornata corrente
-            current_round = get_current_round_from_page(driver)
-            if not current_round:
+
+            # Determina giornata corrente e recupera i 3 round dal DB (identico alla produzione)
+            has_stages = league.get("has_stages", False)
+            rounds_to_process = get_target_rounds_from_page(driver, league_name, has_stages=has_stages)
+            if not rounds_to_process:
                 print(f"   ⚠️ Impossibile determinare giornata corrente, skip")
                 continue
-            
-            print(f"   📅 Giornata corrente sul sito: {current_round}")
-            
-            # Processa 3 giornate: PRIMA LA CORRENTE, poi le altre
-            # Questo evita problemi se il sito "perde" la giornata corrente dopo i click
-            rounds_to_process = [current_round, current_round - 1, current_round + 1]
-            
-            for round_num in rounds_to_process:
-                if round_num < 1:
-                    continue
-                
+
+            # La prima giornata restituita è quella corrente (anchor)
+            current_round_num = get_round_number_from_text(rounds_to_process[0].get('round_name', '0'))
+            print(f"   📅 Giornata corrente sul sito: {current_round_num}")
+
+            for round_doc in rounds_to_process:
+                round_num = get_round_number_from_text(round_doc.get('round_name', '0'))
+
                 print(f"\n   ⚙️ Giornata {round_num}")
-                
+
                 # Naviga alla giornata E ATTENDI sempre
-                if round_num != current_round:
+                stage = league.get("stage")
+                if round_num != current_round_num:
                     # Giornata diversa: fai click
-                    if not click_round_and_wait(driver, round_num):
+                    if not click_round_and_wait(driver, round_num, stage=stage):
                         print(f"      ⚠️ Navigazione fallita, skip")
                         continue
-                    
-                    # VERIFICA di essere sulla giornata corretta
-                    actual_round = get_current_round_from_page(driver)
-                    if actual_round and actual_round != round_num:
-                        print(f"      ⚠️ Click non riuscito: sulla giornata {actual_round} invece di {round_num}")
-                        continue
-                    elif actual_round:
-                        print(f"      ✓ Confermata giornata {actual_round}")
                 else:
                     # Giornata corrente: assicurati che sia caricata
                     print(f"      ℹ️ Già sulla giornata corrente, attendo caricamento...")
@@ -798,22 +808,11 @@ def run_scraper():
                         WebDriverWait(driver, 15).until(
                             EC.presence_of_element_located((By.CSS_SELECTOR, "tr[id]"))
                         )
-                        time.sleep(1)  # Pausa per stabilizzazione
+                        time.sleep(1)
                     except Exception as e:
                         print(f"      ⚠️ Timeout caricamento tabella, skip")
                         continue
-                
-                # Recupera partite dal DB
-                round_docs = list(db.h2h_by_round.find({
-                    "league": league_name,
-                    "round_name": {"$regex": f".*{round_num}.*"}
-                }))
-                
-                if not round_docs:
-                    print(f"      ℹ️ Nessuna partita nel DB")
-                    continue
-                
-                round_doc = round_docs[0]
+
                 matches = round_doc.get('matches', [])
                 
                 print(f"      📊 {len(matches)} partite da processare")
