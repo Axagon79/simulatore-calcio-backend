@@ -461,8 +461,9 @@ def _classify_tipo(raw_tipo, selezioni, quota_totale, pool_index, today_str):
 
 
 
-def validate_with_errors(raw_bollette, pool, today_str, existing_counters=None):
+def validate_with_errors(raw_bollette, pool, today_str, existing_counters=None, existing_docs=None):
     """Valida le bollette e raccoglie errori strutturati per feedback a Mistral.
+    existing_docs: bollette già accettate (per check duplicati cross-retry).
     Returns: (valid_docs, errors, counters)
     """
     pool_index = {}
@@ -470,6 +471,8 @@ def validate_with_errors(raw_bollette, pool, today_str, existing_counters=None):
         key = (s["match_key"], s["mercato"], s["pronostico"])
         pool_index[key] = s
 
+    # existing_docs serve solo per il check duplicati cross-retry
+    _all_accepted = list(existing_docs) if existing_docs else []
     valid_docs = []
     errors = []
     counters = dict(existing_counters) if existing_counters else {
@@ -661,6 +664,34 @@ def validate_with_errors(raw_bollette, pool, today_str, existing_counters=None):
             })
             continue
 
+        # --- #16: bolletta duplicata (stesse selezioni di una già accettata) ---
+        bolletta_fingerprint = frozenset(
+            f"{s['home']}|{s['away']}|{s['match_date']}|{s['mercato']}|{s['pronostico']}"
+            for s in selezioni
+        )
+        is_duplicate = False
+        for existing_doc in _all_accepted + valid_docs:
+            existing_fp = frozenset(
+                f"{s['home']}|{s['away']}|{s['match_date']}|{s['mercato']}|{s['pronostico']}"
+                for s in existing_doc["selezioni"]
+            )
+            if bolletta_fingerprint == existing_fp:
+                is_duplicate = True
+                break
+            # Anche bollette con 80%+ selezioni in comune sono troppo simili
+            overlap = len(bolletta_fingerprint & existing_fp)
+            if overlap >= max(2, len(bolletta_fingerprint) * 0.8):
+                is_duplicate = True
+                break
+        if is_duplicate:
+            errors.append({
+                "code": "BOLLETTA_DUPLICATA",
+                "bolletta_idx": i, "tipo": tipo,
+                "feedback": f"Bolletta #{i+1} ({tipo}): identica o troppo simile a una gia' accettata. "
+                           f"Cambia almeno 2 selezioni per renderla diversa"
+            })
+            continue
+
         # --- Bolletta valida ---
         counters[tipo] += 1
         label = f"{tipo.capitalize()} #{counters[tipo]}"
@@ -728,9 +759,12 @@ def build_extra_pool(today_str, existing_match_keys):
     now = datetime.now()
 
     extra_pool = []
+    # Cerca partite per date_obj dentro matches[] (non campo date a livello documento)
+    date_start = datetime.strptime(dates[0], "%Y-%m-%d")
+    date_end = datetime.strptime(dates[-1], "%Y-%m-%d").replace(hour=23, minute=59, second=59)
     rounds = list(db.h2h_by_round.find(
-        {"date": {"$in": dates}},
-        {"date": 1, "matches": 1, "league": 1}
+        {"matches.date_obj": {"$gte": date_start, "$lte": date_end}},
+        {"league": 1, "matches": 1}
     ))
 
     for rnd in rounds:
@@ -738,8 +772,13 @@ def build_extra_pool(today_str, existing_match_keys):
         for m in rnd.get("matches", []):
             home = m.get("home", "")
             away = m.get("away", "")
-            match_date = m.get("date_obj", rnd.get("date", ""))
+            match_date = m.get("date_obj")
+            if not match_date:
+                continue
             if isinstance(match_date, datetime):
+                # Filtra solo partite nei 3 giorni
+                if match_date < date_start or match_date > date_end:
+                    continue
                 match_date = match_date.strftime("%Y-%m-%d")
             match_time = m.get("match_time", "00:00")
             match_key = f"{home} vs {away}|{match_date}"
@@ -776,22 +815,22 @@ def build_extra_pool(today_str, existing_match_keys):
                 mercati.append(("SEGNO", "X", o["X"]))
             if o.get("2"):
                 mercati.append(("SEGNO", "2", o["2"]))
-            if o.get("over_2_5"):
-                mercati.append(("GOL", "Over 2.5", o["over_2_5"]))
-            if o.get("under_2_5"):
-                mercati.append(("GOL", "Under 2.5", o["under_2_5"]))
-            if o.get("over_1_5"):
-                mercati.append(("GOL", "Over 1.5", o["over_1_5"]))
-            if o.get("under_1_5"):
-                mercati.append(("GOL", "Under 1.5", o["under_1_5"]))
-            if o.get("over_3_5"):
-                mercati.append(("GOL", "Over 3.5", o["over_3_5"]))
-            if o.get("under_3_5"):
-                mercati.append(("GOL", "Under 3.5", o["under_3_5"]))
-            if o.get("goal"):
-                mercati.append(("GOL", "Goal", o["goal"]))
-            if o.get("nogoal"):
-                mercati.append(("GOL", "NoGoal", o["nogoal"]))
+            if o.get("over_25") or o.get("over_2_5"):
+                mercati.append(("GOL", "Over 2.5", o.get("over_25") or o.get("over_2_5")))
+            if o.get("under_25") or o.get("under_2_5"):
+                mercati.append(("GOL", "Under 2.5", o.get("under_25") or o.get("under_2_5")))
+            if o.get("over_15") or o.get("over_1_5"):
+                mercati.append(("GOL", "Over 1.5", o.get("over_15") or o.get("over_1_5")))
+            if o.get("under_15") or o.get("under_1_5"):
+                mercati.append(("GOL", "Under 1.5", o.get("under_15") or o.get("under_1_5")))
+            if o.get("over_35") or o.get("over_3_5"):
+                mercati.append(("GOL", "Over 3.5", o.get("over_35") or o.get("over_3_5")))
+            if o.get("under_35") or o.get("under_3_5"):
+                mercati.append(("GOL", "Under 3.5", o.get("under_35") or o.get("under_3_5")))
+            if o.get("gg") or o.get("goal"):
+                mercati.append(("GOL", "Goal", o.get("gg") or o.get("goal")))
+            if o.get("ng") or o.get("nogoal"):
+                mercati.append(("GOL", "NoGoal", o.get("ng") or o.get("nogoal")))
 
             # DC calcolate
             if o.get("1") and o.get("X"):
@@ -1074,7 +1113,8 @@ def main():
                 )
                 if isinstance(retry_raw, list):
                     retry_valid, retry_errors, counters = validate_with_errors(
-                        retry_raw, pool, today_str, existing_counters=counters
+                        retry_raw, pool, today_str, existing_counters=counters,
+                        existing_docs=bollette_docs
                     )
                     if retry_valid:
                         bollette_docs.extend(retry_valid)
@@ -1115,16 +1155,25 @@ def main():
         for fascia, needed in fasce_carenti.items():
             print(f"🤖 Integrazione {fascia}: generazione {needed} bollette...")
             try:
+                # Per bollette "oggi": usa SOLO partite di oggi
+                integration_pool = [s for s in extended_pool if s.get("match_date") == today_str] if fascia == "oggi" else extended_pool
                 raw_extra = call_mistral_integration(
-                    extended_pool, fascia, needed, today_str
+                    integration_pool, fascia, needed, today_str
                 )
                 if isinstance(raw_extra, list):
                     extra_valid, _, counters = validate_with_errors(
                         raw_extra, extended_pool, today_str,
-                        existing_counters=counters
+                        existing_counters=counters,
+                        existing_docs=bollette_docs
                     )
                     # Fix #16: limita al numero richiesto
                     extra_valid = extra_valid[:needed]
+                    # Fix: bollette "oggi" devono avere SOLO partite di oggi
+                    if fascia == "oggi":
+                        extra_valid = [
+                            doc for doc in extra_valid
+                            if all(s.get("match_date") == today_str for s in doc.get("selezioni", []))
+                        ]
                     existing_count = len(by_tipo.get(fascia, []))
                     for doc in extra_valid:
                         existing_count += 1
