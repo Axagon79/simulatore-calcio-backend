@@ -7,11 +7,12 @@ Indicatori (tutti per singola quota 1/X/2 dove applicabile):
 2. Alert Break-even (delta_pp > aggio specifico)
 3. Direzione movimento (conferma/dubbio/stabile)
 4. V-Index Relativo (potenziale perso vs apertura)
-5. V-Index Assoluto (quota vs fair odds apertura)
+5. V-Index Assoluto (quota vs media fair book + qt modello, con aggio live ridistribuito)
 6. Rendimento + HWR/DR/AWR + aggio per quota
 """
 import os
 import sys
+import re
 from datetime import datetime, timezone
 
 # --- Fix percorsi ---
@@ -137,27 +138,60 @@ def calcola_v_index_relativo(q_apertura, q_chiusura):
     return {"valore": round(v_rel, 2)}
 
 
-def calcola_v_index_assoluto(q_chiusura, q_apertura, somma_p_apertura):
+def calcola_v_index_assoluto_tutti(q1_ap, qx_ap, q2_ap, q1_ch, qx_ch, q2_ch,
+                                   qt_1=None, qt_x=None, qt_2=None):
     """
-    Indicatore 5: V-Index Assoluto.
-    Fair_Odds_Apertura = 1 / ((1/Q_Apertura) / Somma_P_Apertura)
-    V_Abs = (Q_Chiusura / Fair_Odds) × 100
-    Ritorna: {"valore": float}
+    Indicatore 5: V-Index Assoluto (tutti e 3 i segni).
+
+    Formula:
+    1. Probabilità fair apertura book (senza aggio)
+    2. Media con probabilità nostro modello (qt) se disponibili
+    3. Estrai distribuzione aggio dalle quote live
+    4. Applica aggio alle probabilità di riferimento
+    5. Confronta quota live vs quota riferimento con aggio
+
+    V_Abs > 100 → quota di valore (book paga più del riferimento)
+    V_Abs < 100 → quota compressa (nessun valore)
+
+    Ritorna: {"1": {"valore": float}, "X": {"valore": float}, "2": {"valore": float}}
     """
-    if not q_chiusura or not q_apertura or somma_p_apertura <= 0:
-        return {"valore": 0.0}
+    if not all([q1_ap, qx_ap, q2_ap, q1_ch, qx_ch, q2_ch]):
+        return {"1": {"valore": 0.0}, "X": {"valore": 0.0}, "2": {"valore": 0.0}}
 
-    p_ap = prob_implicita(q_apertura)
-    if p_ap <= 0:
-        return {"valore": 0.0}
+    segni = ['1', 'X', '2']
+    q_ap = {'1': q1_ap, 'X': qx_ap, '2': q2_ap}
+    q_ch = {'1': q1_ch, 'X': qx_ch, '2': q2_ch}
 
-    fair_prob = p_ap / somma_p_apertura
-    if fair_prob <= 0:
-        return {"valore": 0.0}
+    # Passo 1: probabilità fair apertura book (senza aggio)
+    somma_p_ap = sum(1.0 / q_ap[s] for s in segni)
+    p_fair_ap = {s: (1.0 / q_ap[s]) / somma_p_ap for s in segni}
 
-    fair_odds = 1.0 / fair_prob
-    v_abs = (q_chiusura / fair_odds) * 100
-    return {"valore": round(v_abs, 2)}
+    # Passo 1b: media con nostro modello (se disponibile)
+    if qt_1 and qt_x and qt_2 and all(q > 0 for q in [qt_1, qt_x, qt_2]):
+        qt = {'1': qt_1, 'X': qt_x, '2': qt_2}
+        p_stat = {s: 1.0 / qt[s] for s in segni}
+        p_ref = {s: (p_fair_ap[s] + p_stat[s]) / 2.0 for s in segni}
+    else:
+        # Fallback: solo fair odds apertura
+        p_ref = p_fair_ap
+
+    # Passo 2: distribuzione aggio delle quote live
+    p_live = {s: 1.0 / q_ch[s] for s in segni}
+    overround_live = sum(p_live[s] for s in segni)
+    aggio_segno = {s: p_live[s] - (p_live[s] / overround_live) for s in segni}
+
+    # Passo 3: applica aggio al riferimento → quota riferimento finale
+    result = {}
+    for s in segni:
+        p_ref_adj = p_ref[s] + aggio_segno[s]
+        if p_ref_adj <= 0:
+            result[s] = {"valore": 0.0}
+            continue
+        q_ref = 1.0 / p_ref_adj
+        v_abs = (q_ch[s] / q_ref) * 100.0
+        result[s] = {"valore": round(v_abs, 2)}
+
+    return result
 
 
 def calcola_rendimento(q1, qx, q2):
@@ -198,9 +232,10 @@ def calcola_rendimento(q1, qx, q2):
     }
 
 
-def calcola_tutti_indicatori(doc):
+def calcola_tutti_indicatori(doc, qt_1=None, qt_x=None, qt_2=None):
     """
     Funzione master: prende un documento quote_anomale, calcola tutti i 6 indicatori.
+    qt_1/qt_x/qt_2: quote teoriche dal nostro modello (da h2h_by_round).
     Ritorna un dict con tutti gli indicatori da salvare nel documento.
     """
     qa = doc.get("quote_apertura", {})
@@ -258,12 +293,12 @@ def calcola_tutti_indicatori(doc):
         "2": calcola_v_index_relativo(q2_ap, q2_ch),
     }
 
-    # 5. V-Index Assoluto (per quota)
-    v_index_abs = {
-        "1": calcola_v_index_assoluto(q1_ch, q1_ap, somma_p_ap),
-        "X": calcola_v_index_assoluto(qx_ch, qx_ap, somma_p_ap),
-        "2": calcola_v_index_assoluto(q2_ch, q2_ap, somma_p_ap),
-    }
+    # 5. V-Index Assoluto (per quota) — confronto con media fair book + qt modello
+    v_index_abs = calcola_v_index_assoluto_tutti(
+        q1_ap, qx_ap, q2_ap,
+        q1_ch, qx_ch, q2_ch,
+        qt_1=qt_1, qt_x=qt_x, qt_2=qt_2,
+    )
 
     # 6. Rendimento (per match — apertura e chiusura)
     rendimento_apertura = calcola_rendimento(q1_ap, qx_ap, q2_ap)
@@ -285,6 +320,68 @@ def calcola_tutti_indicatori(doc):
 # ESECUZIONE: leggi da MongoDB, calcola, riscrivi
 # =============================================================================
 
+def _norm_name(name):
+    """Normalizza nome squadra per confronto fuzzy."""
+    return re.sub(r'[^a-z0-9]', '', name.lower().strip())
+
+
+def _preload_qt_cache(target_date, leagues):
+    """
+    Precarica qt_1/qt_X/qt_2 da h2h_by_round per tutte le leghe e data.
+    Ritorna dict: (league, norm_home, norm_away) → (qt_1, qt_X, qt_2)
+    """
+    cache = {}
+    for league in leagues:
+        rounds = list(db.h2h_by_round.find(
+            {"league": league},
+            {"matches.home": 1, "matches.away": 1, "matches.date": 1,
+             "matches.date_obj": 1, "matches.h2h_data.qt_1": 1,
+             "matches.h2h_data.qt_X": 1, "matches.h2h_data.qt_2": 1}
+        ))
+        for round_doc in rounds:
+            for m in round_doc.get('matches', []):
+                # Controlla data
+                m_date = m.get('date_obj') or m.get('date', '')
+                if hasattr(m_date, 'strftime'):
+                    m_date_str = m_date.strftime('%Y-%m-%d')
+                else:
+                    m_date_str = str(m_date)[:10]
+
+                if m_date_str != target_date:
+                    continue
+
+                h2h = m.get('h2h_data', {})
+                qt_1 = h2h.get('qt_1')
+                qt_x = h2h.get('qt_X')
+                qt_2 = h2h.get('qt_2')
+
+                if qt_1 and qt_x and qt_2:
+                    home_n = _norm_name(m.get('home', ''))
+                    away_n = _norm_name(m.get('away', ''))
+                    cache[(league, home_n, away_n)] = (qt_1, qt_x, qt_2)
+
+    return cache
+
+
+def _lookup_qt(cache, league, home_raw, away_raw):
+    """Cerca qt nella cache con matching fuzzy dei nomi."""
+    home_n = _norm_name(home_raw)
+    away_n = _norm_name(away_raw)
+
+    # Match esatto
+    if (league, home_n, away_n) in cache:
+        return cache[(league, home_n, away_n)]
+
+    # Match parziale (uno contenuto nell'altro)
+    for (lg, h, a), qt in cache.items():
+        if lg != league:
+            continue
+        if (home_n in h or h in home_n) and (away_n in a or a in away_n):
+            return qt
+
+    return None, None, None
+
+
 def calcola_e_aggiorna(target_date=None):
     """
     Legge tutti i documenti quote_anomale per una data,
@@ -304,12 +401,26 @@ def calcola_e_aggiorna(target_date=None):
     docs = list(collection.find(filtro))
     print(f"📊 Documenti da elaborare: {len(docs)}")
 
+    # Precarica qt da h2h_by_round
+    leagues = set(d.get("league", "") for d in docs if d.get("league"))
+    qt_cache = _preload_qt_cache(target_date, leagues) if target_date else {}
+    print(f"🔑 Qt caricate da h2h_by_round: {len(qt_cache)} partite")
+
     calcolati = 0
     errori = 0
+    qt_trovate = 0
 
     for doc in docs:
         try:
-            indicatori = calcola_tutti_indicatori(doc)
+            # Cerca qt per questa partita
+            qt_1, qt_x, qt_2 = _lookup_qt(
+                qt_cache, doc.get("league", ""),
+                doc.get("home_raw", ""), doc.get("away_raw", "")
+            )
+            if qt_1:
+                qt_trovate += 1
+
+            indicatori = calcola_tutti_indicatori(doc, qt_1=qt_1, qt_x=qt_x, qt_2=qt_2)
             if indicatori is None:
                 continue
 
@@ -341,6 +452,7 @@ def calcola_e_aggiorna(target_date=None):
             errori += 1
 
     print(f"✅ Indicatori calcolati: {calcolati}")
+    print(f"🔑 Qt modello trovate: {qt_trovate}/{calcolati}")
     if errori:
         print(f"❌ Errori: {errori}")
 
