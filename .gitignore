@@ -54,6 +54,7 @@ ai_engine/Aggiornamenti/frequenti/watchdog_log.txt
 functions/tmp_*.js
 functions_python/ai_engine/tmp_*.py
 functions_python/ai_engine/calculators/pre_match_update.log
+ai_engine/Aggiornamenti/frequenti/pre_match_quote_anomale.log
 
 # Misc
 cors.json
