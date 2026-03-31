@@ -105,6 +105,9 @@ app.use('/bollette', bolletteRoutes);
 const onboardingRoutes = require('./routes/onboardingRoutes');
 app.use('/onboarding', authenticate, onboardingRoutes);
 
+const quoteAnomaleRoutes = require('./routes/quoteAnomaleRoutes');
+app.use('/quote-anomale', quoteAnomaleRoutes);
+
 // GET /prediction-versions — Storico versioni pronostici per match
 app.get('/prediction-versions', async (req, res) => {
   try {

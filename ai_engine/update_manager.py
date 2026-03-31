@@ -170,7 +170,10 @@ SCRAPER_SEQUENCE = [
       ("update_ticket_esiti.py", "🎯 [36/37] Aggiornamento Esiti Ticket", "Esiti ticket non aggiornati", FP_CALCULATORS_DIR),
 
       # ⭐ GENERAZIONE BOLLETTE — Compone bollette scommessa tramite Mistral AI
-      ("generate_bollette_2.py", "🎫 [37/37] Generazione Bollette", "Bollette non generate", FP_CALCULATORS_DIR),
+      ("generate_bollette_2.py", "🎫 [37/38] Generazione Bollette", "Bollette non generate", FP_CALCULATORS_DIR),
+
+      # ⭐ QUOTE ANOMALE — Scrapa quote apertura da LuckSport (pre-match -2h aggiornerà le live)
+      ("scraper_quote_anomale_lucksport.py", "📈 [38/38] Quote Anomale (LuckSport)", "Quote anomale apertura non scrapeate", FREQUENT_DIR),
 ]
 
 
