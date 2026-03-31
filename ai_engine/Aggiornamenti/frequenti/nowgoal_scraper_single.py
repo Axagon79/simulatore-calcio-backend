@@ -636,12 +636,46 @@ def save_report(report_data: Dict, output_dir: str = "scraper_reports"):
     
     return json_file, txt_file
 
+def _crea_driver():
+    """Crea e configura un nuovo Chrome driver headless"""
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--log-level=3")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
+
+    chrome_ver = None
+    try:
+        r = subprocess.run(['reg', 'query', r'HKEY_CURRENT_USER\Software\Google\Chrome\BLBeacon', '/v', 'version'],
+                           capture_output=True, text=True, timeout=5)
+        for line in r.stdout.splitlines():
+            if line.strip().startswith('version'):
+                chrome_ver = line.split()[-1]
+    except:
+        pass
+
+    service = Service(ChromeDriverManager(driver_version=chrome_ver).install() if chrome_ver else ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=service, options=chrome_options)
+    driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+    return driver
+
+
+def _driver_vivo(driver) -> bool:
+    """Controlla se la sessione Chrome è ancora attiva"""
+    try:
+        _ = driver.title
+        return True
+    except Exception:
+        return False
+
+
 def run_scraper():
     """Funzione principale dello scraper"""
-    
+
     print("\n🚀 AVVIO SCRAPER QUOTE CALCIO")
     print("="*80)
-    
+
     report_data = {
         'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         'summary': {
@@ -653,44 +687,59 @@ def run_scraper():
         'leagues': [],
         'issues': []
     }
-    
-    chrome_options = Options()
-    chrome_options.add_argument("--headless")
-    chrome_options.add_argument("--disable-gpu")
-    chrome_options.add_argument("--log-level=3")
-    chrome_options.add_argument("--no-sandbox")
-    chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
-    
+
     driver = None
-    
+    league_count = 0
+
     try:
-        chrome_ver = None
-        try:
-            r = subprocess.run(['reg', 'query', r'HKEY_CURRENT_USER\Software\Google\Chrome\BLBeacon', '/v', 'version'], capture_output=True, text=True, timeout=5)
-            for line in r.stdout.splitlines():
-                if line.strip().startswith('version'):
-                    chrome_ver = line.split()[-1]
-        except: pass
-        service = Service(ChromeDriverManager(driver_version=chrome_ver).install() if chrome_ver else ChromeDriverManager().install())
-        driver = webdriver.Chrome(service=service, options=chrome_options)
+        driver = _crea_driver()
+        global _active_driver
         _active_driver = driver
-        driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
 
         for league in LEAGUES_CONFIG:
             league_name = league['name']
             league_url = league['url']
-            
+            league_count += 1
+
             print(f"\n📋 {league_name}")
             print("-"*40)
-            
+
             league_stats = {
                 'name': league_name,
                 'processed': 0,
                 'updated': 0
             }
-            
-            # Naviga alla pagina della lega
-            driver.get(league_url)
+
+            # Pulizia memoria ogni 5 campionati
+            if league_count % 5 == 0:
+                try:
+                    driver.execute_cdp_cmd("Network.clearBrowserCache", {})
+                    driver.execute_cdp_cmd("Network.clearBrowserCookies", {})
+                    print("   🧹 Memoria Chrome svuotata.")
+                except Exception:
+                    pass
+
+            # Naviga alla pagina con recovery se la sessione è morta
+            try:
+                if not _driver_vivo(driver):
+                    raise Exception("sessione morta")
+                driver.get(league_url)
+            except Exception as nav_err:
+                print(f"   ⚠️ Chrome crash ({nav_err.__class__.__name__}), ricreo il browser...")
+                try:
+                    driver.quit()
+                except Exception:
+                    pass
+                try:
+                    driver = _crea_driver()
+                    _active_driver = driver
+                    driver.get(league_url)
+                    print("   ✅ Browser ricreato, continuo.")
+                except Exception as e2:
+                    print(f"   ❌ Impossibile ricreare Chrome: {e2}. Salto {league_name}.")
+                    report_data['leagues'].append(league_stats)
+                    continue
+
             time.sleep(3)
 
             # Verifica caricamento, retry con refresh se fallisce
@@ -791,6 +840,7 @@ def run_scraper():
                 # Processa ogni partita
                 updated_count = 0
                 found_without_odds_count = 0
+                identical_count = 0
                 
                 for match in matches:
                     league_stats['processed'] += 1
@@ -831,6 +881,8 @@ def run_scraper():
                             old_X = match.get('odds', {}).get('X')
                             old_2 = match.get('odds', {}).get('2')
                             if old_1 == odds_dict['1'] and old_X == odds_dict['X'] and old_2 == odds_dict['2']:
+                                identical_count += 1
+                                print("=", end="", flush=True)
                                 continue  # Quote identiche, skip
                             if 'odds' not in match:
                                 match['odds'] = {}
@@ -882,14 +934,17 @@ def run_scraper():
                     )
                 
                 print(f" ({updated_count}/{len(matches)})")
-                
+
                 # Statistiche dettagliate
+                if identical_count > 0:
+                    print(f"      = {identical_count} quote già aggiornate (identiche, nessuna modifica)")
                 if found_without_odds_count > 0:
                     print(f"      ⏳ {found_without_odds_count} partite trovate ma senza quote (normali per partite future)")
-                
-                # Se TUTTE le partite falliscono (né quote né trovate), dump completo per debug
-                if updated_count == 0 and found_without_odds_count == 0 and len(matches) > 0:
-                    print(f"\n      ⚠️ ATTENZIONE: 0 partite trovate su {len(matches)}!")
+
+                # Dump solo se partite NON trovate per niente (non coperte da identiche o senza quote)
+                truly_not_found = len(matches) - updated_count - identical_count - found_without_odds_count
+                if truly_not_found > 0:
+                    print(f"\n      ⚠️ ATTENZIONE: {truly_not_found} partite non trovate su {len(matches)}!")
                     print(f"      📄 DUMP RIGHE SITO (prime 3):")
                     for i, row in enumerate(all_rows[:3]):
                         print(f"         [{i+1}] {row[:120]}")

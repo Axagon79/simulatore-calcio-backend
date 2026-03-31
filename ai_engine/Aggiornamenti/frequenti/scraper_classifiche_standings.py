@@ -125,19 +125,58 @@ def find_db_data(scraped_name):
 # --- DRIVER SELENIUM ---
 _driver = None
 
-def _get_driver():
-    global _driver
-    if _driver:
-        return _driver
-    print("   🌐 Avvio Chrome (undetected_chromedriver)...")
+def _crea_chrome():
+    """Crea un nuovo Chrome driver."""
     options = uc.ChromeOptions()
     options.add_argument("--disable-blink-features=AutomationControlled")
     options.add_argument("--start-maximized")
     options.add_argument("--no-sandbox")
     options.page_load_strategy = 'eager'
-    _driver = uc.Chrome(options=options, headless=True, user_multi_procs=True)
-    _driver.set_page_load_timeout(30)
+    d = uc.Chrome(options=options, headless=True, user_multi_procs=True)
+    d.set_page_load_timeout(30)
+    return d
+
+def _driver_vivo():
+    """Controlla se la sessione Chrome è ancora attiva."""
+    global _driver
+    if not _driver:
+        return False
+    try:
+        _ = _driver.title
+        return True
+    except Exception:
+        return False
+
+def _get_driver():
+    global _driver
+    if _driver_vivo():
+        return _driver
+    if _driver:
+        try:
+            _driver.quit()
+        except Exception:
+            pass
+        _driver = None
+    print("   🌐 Avvio Chrome (undetected_chromedriver)...")
+    _driver = _crea_chrome()
     return _driver
+
+def _ricrea_driver():
+    """Chiude Chrome e lo ricrea da zero."""
+    global _driver
+    print("   🔄 Sessione morta — ricreo Chrome...")
+    try:
+        _driver.quit()
+    except Exception:
+        pass
+    _driver = None
+    try:
+        _driver = _crea_chrome()
+        print("   ✅ Chrome ricreato con successo!")
+        return _driver
+    except Exception as e:
+        print(f"   ❌ Impossibile ricreare Chrome: {e}")
+        return None
 
 def _quit_driver():
     global _driver
@@ -250,17 +289,36 @@ def scrape_nowgoal():
     """Scarica classifiche da NowGoal per tutte le competizioni."""
     print("🏆 AVVIO SCRAPER CLASSIFICHE NOWGOAL (Selenium)")
     driver = _get_driver()
+    league_count = 0
 
     for comp in COMPETITIONS:
         league_name = comp['name']
         country = comp['country']
         standings_url = comp['standings_url']
+        league_count += 1
 
         print(f"\n🌍 Scarico: {league_name} ({country})...")
 
         try:
+            # Pulizia memoria ogni 5 campionati
+            if league_count % 5 == 0:
+                try:
+                    driver.execute_cdp_cmd("Network.clearBrowserCache", {})
+                    driver.execute_cdp_cmd("Network.clearBrowserCookies", {})
+                    print("   🧹 Memoria Chrome svuotata.")
+                except Exception:
+                    pass
+
             # Pausa anti-ban
             time.sleep(random.uniform(2.0, 4.0))
+
+            # Controlla sessione e ricrea se morta
+            if not _driver_vivo():
+                new_driver = _ricrea_driver()
+                if not new_driver:
+                    print(f"   ❌ Impossibile ricreare Chrome. Salto {league_name}.")
+                    continue
+                driver = new_driver
 
             # Naviga direttamente alla pagina standings
             print(f"   📊 URL: {standings_url}")
@@ -344,6 +402,11 @@ def scrape_nowgoal():
 
         except Exception as e:
             print(f"   ❌ Errore: {e}")
+            # Se la sessione è morta, ricrea il driver per il prossimo campionato
+            if not _driver_vivo():
+                new_driver = _ricrea_driver()
+                if new_driver:
+                    driver = new_driver
 
     print(f"\n✅ Scraping classifiche completato!")
 

@@ -10,11 +10,13 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 
 """
-APRISCATOLE V3.5 - NO PROFILO + FIX FOCUS
+APRISCATOLE V4.0 - ANTI-CRASH + PULIZIA MEMORIA
 1. Niente memoria (parte pulito ogni volta).
 2. Usa Raggi X (JS) per cercare il checkbox.
 3. Usa TASTIERA (TAB+SPAZIO) con il FIX del click sullo sfondo.
 4. Se fallisce, aspetta l'utente senza chiudersi.
+5. Svuota memoria Chrome ogni 5 navigazioni per evitare crash.
+6. Se la sessione muore, ricrea il browser automaticamente.
 """
 
 class BrowserIntelligente:
@@ -22,6 +24,7 @@ class BrowserIntelligente:
         # Porta Chrome separata per esecuzione parallela (env da update_manager)
         self._debug_port = int(os.environ.get("CHROME_DEBUG_PORT", "9222"))
         self._user_data_dir = tempfile.mkdtemp(prefix=f"fbref_chrome_{self._debug_port}_")
+        self._nav_count = 0  # Contatore navigazioni per pulizia periodica
 
         print(f"🤖 [Gestore Accessi] Avvio Chrome (porta {self._debug_port})...")
 
@@ -146,14 +149,73 @@ class BrowserIntelligente:
         except Exception as e:
             pass
 
+    def _svuota_memoria(self):
+        """Svuota cache, cookie e memoria del browser per evitare crash"""
+        try:
+            self.driver.execute_cdp_cmd("Network.clearBrowserCache", {})
+            self.driver.execute_cdp_cmd("Network.clearBrowserCookies", {})
+            # Forza garbage collection della pagina
+            self.driver.execute_script("window.gc && window.gc();")
+            print("   🧹 Memoria Chrome svuotata.")
+        except Exception:
+            pass
+
+    def _ricrea_browser(self):
+        """Ricrea il browser da zero quando la sessione muore"""
+        print("   🔄 Sessione morta — ricreo Chrome...")
+        try:
+            self.driver.quit()
+        except Exception:
+            pass
+
+        # Nuova directory temporanea per partire puliti
+        self._user_data_dir = tempfile.mkdtemp(prefix=f"fbref_chrome_{self._debug_port}_")
+
+        options = uc.ChromeOptions()
+        options.add_argument("--disable-blink-features=AutomationControlled")
+        options.add_argument("--start-maximized")
+        options.add_argument("--no-sandbox")
+        options.add_argument(f"--remote-debugging-port={self._debug_port}")
+        options.add_argument(f"--user-data-dir={self._user_data_dir}")
+
+        try:
+            self.driver = uc.Chrome(options=options, headless=False, user_multi_procs=True)
+            self._nav_count = 0
+            print("   ✅ Chrome ricreato con successo!")
+            return True
+        except Exception as e2:
+            print(f"   ❌ Impossibile ricreare Chrome: {e2}")
+            return False
+
+    def _sessione_viva(self):
+        """Controlla se la sessione Chrome è ancora attiva"""
+        try:
+            _ = self.driver.title
+            return True
+        except Exception:
+            return False
+
     def get(self, url, timeout=60):
+        # Pulizia preventiva ogni 5 navigazioni
+        self._nav_count += 1
+        if self._nav_count % 5 == 0:
+            self._svuota_memoria()
+
+        # Se la sessione è già morta, ricrea prima di navigare
+        if not self._sessione_viva():
+            if not self._ricrea_browser():
+                class RispostaErrore:
+                    text = ""
+                    status_code = 500
+                return RispostaErrore()
+
         try:
             self.driver.get(url)
             time.sleep(random.uniform(4, 7))
-            
+
             # GESTIONE BLOCCO (Ciclo infinito finché non si sblocca)
             attempts = 0
-            
+
             while "Just a moment" in self.driver.title or "Cloudflare" in self.driver.page_source:
                 if attempts % 5 == 0:
                     print(f"   🛡️ Muro attivo... Tentativo sblocco {attempts+1}...")
@@ -161,33 +223,50 @@ class BrowserIntelligente:
                 # 1. Prova tecnica Raggi X (più precisa)
                 if self.tecnica_raggi_x():
                     time.sleep(2)
-                
+
                 # 2. Prova tecnica Tastiera (col fix del focus)
                 self.tecnica_tastiera_fixata()
-                
+
                 # Controllo se ci siamo sbloccati
                 if "Stats" in self.driver.title or "FBREF" in self.driver.title:
                     print("   ✅ SBLOCCATO! Procedo...")
                     break
-                
+
                 time.sleep(2)
                 attempts += 1
-                
+
                 # Timeout di sicurezza (~1 minuto) per evitare loop infiniti
                 if attempts > 30:
                     print("   ⚠️ Impossibile sbloccare dopo 30 tentativi. Salto pagina.")
                     break
-            
+
             # Risposta
             class RispostaFinta:
                 def __init__(self, html_content):
                     self.text = html_content
                     self.content = html_content.encode('utf-8')
                     self.status_code = 200
-            
+
             return RispostaFinta(self.driver.page_source)
 
         except Exception as e:
+            error_msg = str(e).lower()
+            # Sessione morta durante la navigazione — ricrea e riprova
+            if "invalid session" in error_msg or "not connected" in error_msg:
+                print(f"   ⚠️ Sessione crashata durante navigazione. Tento recovery...")
+                if self._ricrea_browser():
+                    try:
+                        self.driver.get(url)
+                        time.sleep(random.uniform(4, 7))
+                        class RispostaFinta:
+                            def __init__(self, html_content):
+                                self.text = html_content
+                                self.content = html_content.encode('utf-8')
+                                self.status_code = 200
+                        return RispostaFinta(self.driver.page_source)
+                    except Exception as e2:
+                        print(f"   ❌ Recovery fallito: {e2}")
+
             print(f"   ❌ Errore navigazione: {e}")
             class RispostaErrore:
                 text = ""

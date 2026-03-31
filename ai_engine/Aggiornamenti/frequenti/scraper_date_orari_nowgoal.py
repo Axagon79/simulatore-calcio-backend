@@ -439,11 +439,45 @@ def format_match_time(time_str: str) -> str:
         return time_str
 
 
+def _crea_driver():
+    """Crea e configura un nuovo Chrome driver headless"""
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--log-level=3")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
+
+    chrome_ver = None
+    try:
+        r = subprocess.run(['reg', 'query', r'HKEY_CURRENT_USER\Software\Google\Chrome\BLBeacon', '/v', 'version'],
+                           capture_output=True, text=True, timeout=5)
+        for line in r.stdout.splitlines():
+            if line.strip().startswith('version'):
+                chrome_ver = line.split()[-1]
+    except:
+        pass
+
+    service = Service(ChromeDriverManager(driver_version=chrome_ver).install() if chrome_ver else ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=service, options=chrome_options)
+    driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+    return driver
+
+
+def _driver_vivo(driver) -> bool:
+    """Controlla se la sessione Chrome è ancora attiva"""
+    try:
+        _ = driver.title
+        return True
+    except Exception:
+        return False
+
+
 def run_scraper():
     """Funzione principale dello scraper"""
     print("\n🕐 AVVIO SCRAPER DATE E ORARI NOWGOAL")
     print("="*80)
-    
+
     report_data = {
         'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         'summary': {
@@ -454,44 +488,59 @@ def run_scraper():
         },
         'leagues': []
     }
-    
-    chrome_options = Options()
-    chrome_options.add_argument("--headless")
-    chrome_options.add_argument("--disable-gpu")
-    chrome_options.add_argument("--log-level=3")
-    chrome_options.add_argument("--no-sandbox")
-    chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
-    
+
     driver = None
-    
+    league_count = 0
+
     try:
-        chrome_ver = None
-        try:
-            r = subprocess.run(['reg', 'query', r'HKEY_CURRENT_USER\Software\Google\Chrome\BLBeacon', '/v', 'version'], capture_output=True, text=True, timeout=5)
-            for line in r.stdout.splitlines():
-                if line.strip().startswith('version'):
-                    chrome_ver = line.split()[-1]
-        except: pass
-        service = Service(ChromeDriverManager(driver_version=chrome_ver).install() if chrome_ver else ChromeDriverManager().install())
-        driver = webdriver.Chrome(service=service, options=chrome_options)
+        driver = _crea_driver()
+        global _active_driver
         _active_driver = driver
-        driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
-        
+
         for league in LEAGUES_CONFIG:
             league_name = league['name']
             league_url = league['url']
-            
+            league_count += 1
+
             print(f"\n📋 {league_name}")
             print("-"*40)
-            
+
             league_stats = {
                 'name': league_name,
                 'processed': 0,
                 'updated': 0
             }
-            
-            # Naviga alla pagina
-            driver.get(league_url)
+
+            # Pulizia memoria ogni 5 campionati
+            if league_count % 5 == 0:
+                try:
+                    driver.execute_cdp_cmd("Network.clearBrowserCache", {})
+                    driver.execute_cdp_cmd("Network.clearBrowserCookies", {})
+                    print("   🧹 Memoria Chrome svuotata.")
+                except Exception:
+                    pass
+
+            # Naviga alla pagina con recovery se la sessione è morta
+            try:
+                if not _driver_vivo(driver):
+                    raise Exception("sessione morta")
+                driver.get(league_url)
+            except Exception as nav_err:
+                print(f"   ⚠️ Chrome crash ({nav_err.__class__.__name__}), ricreo il browser...")
+                try:
+                    driver.quit()
+                except Exception:
+                    pass
+                try:
+                    driver = _crea_driver()
+                    _active_driver = driver
+                    driver.get(league_url)
+                    print("   ✅ Browser ricreato, continuo.")
+                except Exception as e2:
+                    print(f"   ❌ Impossibile ricreare Chrome: {e2}. Salto {league_name}.")
+                    report_data['leagues'].append(league_stats)
+                    continue
+
             time.sleep(3)
 
             has_stages = league.get('has_stages', False)
