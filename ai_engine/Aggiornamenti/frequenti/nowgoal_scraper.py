@@ -360,15 +360,17 @@ def run_scraper():
             rounds_to_process = get_target_rounds_from_page(driver, lname, has_stages=has_stages)
             if not rounds_to_process: continue
 
-            for idx, round_doc in enumerate(rounds_to_process):
+            current_round_num = get_round_number_from_text(rounds_to_process[0]['round_name']) if rounds_to_process else 0
+
+            for round_doc in rounds_to_process:
                 round_num = get_round_number_from_text(round_doc['round_name'])
                 print(f"   🔄 {lname} G.{round_num}...", end="")
 
-                # La prima giornata (corrente) è già caricata, le altre servono doppio click
-                if idx > 0:
-                    click_specific_round(driver, round_num, stage=stage)
-                    time.sleep(0.5)
-                    click_specific_round(driver, round_num, stage=stage)
+                if round_num != current_round_num:
+                    # Giornata diversa: click singolo + attendi cambio contenuto
+                    if not click_specific_round(driver, round_num, stage=stage):
+                        print(f" ⚠️ Navigazione fallita, skip")
+                        continue
                     # Dopo click giornata, riseleziona solo 1X2 (il girone resta)
                     try:
                         odds_1x2 = driver.find_element(By.CSS_SELECTOR, "li[type='O']")
@@ -376,6 +378,16 @@ def run_scraper():
                         time.sleep(1.5)
                     except:
                         pass
+                else:
+                    # Giornata corrente: assicurati che sia caricata
+                    try:
+                        WebDriverWait(driver, 15).until(
+                            EC.presence_of_element_located((By.CSS_SELECTOR, "div.schedulis"))
+                        )
+                        time.sleep(1)
+                    except:
+                        print(f" ⚠️ Timeout, skip")
+                        continue
 
                 # Nuova struttura: div.schedulis con span.odds
                 from bs4 import BeautifulSoup

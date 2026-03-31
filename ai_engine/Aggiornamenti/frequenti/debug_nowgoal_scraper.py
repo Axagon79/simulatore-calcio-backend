@@ -109,7 +109,7 @@ LEAGUES_CONFIG = [
     {"name": "Serie C - Girone A", "url": "https://football.nowgoal26.com/subleague/142"},
     {"name": "Serie C - Girone B", "url": "https://football.nowgoal26.com/subleague/2025-2026/142/1526"},
     {"name": "Serie C - Girone C", "url": "https://football.nowgoal26.com/subleague/2025-2026/142/1527"},
-    
+
     # EUROPA TOP
     {"name": "Premier League", "url": "https://football.nowgoal26.com/league/36"},
     {"name": "La Liga", "url": "https://football.nowgoal26.com/league/31"},
@@ -117,14 +117,14 @@ LEAGUES_CONFIG = [
     {"name": "Ligue 1", "url": "https://football.nowgoal26.com/league/11"},
     {"name": "Eredivisie", "url": "https://football.nowgoal26.com/league/16"},
     {"name": "Liga Portugal", "url": "https://football.nowgoal26.com/league/23"},
-    
-    # 🆕 EUROPA SERIE B
+
+    # EUROPA SERIE B
     {"name": "Championship", "url": "https://football.nowgoal26.com/league/37"},
     {"name": "LaLiga 2", "url": "https://football.nowgoal26.com/subleague/33"},
     {"name": "2. Bundesliga", "url": "https://football.nowgoal26.com/league/9"},
     {"name": "Ligue 2", "url": "https://football.nowgoal26.com/league/12"},
-    
-    # 🆕 EUROPA NORDICI + EXTRA
+
+    # EUROPA NORDICI + EXTRA
     {"name": "Scottish Premiership", "url": "https://football.nowgoal26.com/subleague/29"},
     {"name": "Allsvenskan", "url": "https://football.nowgoal26.com/subleague/26"},
     {"name": "Eliteserien", "url": "https://football.nowgoal26.com/subleague/22"},
@@ -132,13 +132,13 @@ LEAGUES_CONFIG = [
     {"name": "Jupiler Pro League", "url": "https://football.nowgoal26.com/subleague/5"},
     {"name": "Süper Lig", "url": "https://football.nowgoal26.com/subleague/30"},
     {"name": "League of Ireland Premier Division", "url": "https://football.nowgoal26.com/subleague/1"},
-    
-    # 🆕 AMERICHE
+
+    # AMERICHE
     {"name": "Brasileirão Serie A", "url": "https://football.nowgoal26.com/league/4"},
     {"name": "Primera División", "url": "https://football.nowgoal26.com/subleague/2"},
     {"name": "Major League Soccer", "url": "https://football.nowgoal26.com/subleague/21"},
-    
-    # 🆕 ASIA
+
+    # ASIA
     {"name": "J1 League", "url": "https://football.nowgoal26.com/subleague/25"},
 
     # NUOVI CAMPIONATI (24/03/2026)
@@ -372,7 +372,10 @@ def find_match_in_rows(home_aliases: List[str], away_aliases: List[str], rows_da
             score = max(len(m) for m in home_matches) + max(len(m) for m in away_matches)
 
             if score > best_score:
-                odds = extract_odds_from_row(full_text)
+                # Usa odds dal dict (nuovo layout) o fallback a parsing testo
+                odds = row.get("odds") if isinstance(row, dict) else None
+                if odds is None:
+                    odds = extract_odds_from_row(full_text)
                 best_match = (odds, full_text, odds is not None)
                 best_score = score
 
@@ -467,34 +470,55 @@ def get_target_rounds_from_page(driver, league_name, has_stages=False):
 
 def get_all_match_rows(driver) -> List[Dict]:
     """Estrae tutte le righe di partite dalla pagina corrente.
-    Ritorna lista di dict: {full_text, home_text, away_text}
-    Home/away estratti dai link <a href='/team/summary/'>."""
+    Layout nuovo NowGoal: div.schedulis con span.home/away e span.odds.
+    Ritorna lista di dict: {full_text, home_text, away_text, odds}"""
     try:
-        rows = driver.find_elements(By.CSS_SELECTOR, "tr[id]")
+        from bs4 import BeautifulSoup
+        soup = BeautifulSoup(driver.page_source, "html.parser")
+        match_divs = soup.find_all("div", class_="schedulis")
         result = []
-        for row in rows:
-            full_text = row.text.strip()
-            if not full_text:
-                continue
-
-            # Estrai home/away dai link squadra
-            home_text = ""
-            away_text = ""
+        for m_div in match_divs:
             try:
-                team_links = row.find_elements(By.CSS_SELECTOR, "a[href*='/team/summary/']")
-                if len(team_links) >= 2:
-                    home_text = team_links[0].text.strip().lower()
-                    away_text = team_links[1].text.strip().lower()
-                elif len(team_links) == 1:
-                    home_text = team_links[0].text.strip().lower()
-            except:
-                pass
+                # Nomi squadre
+                home_span = m_div.find("span", class_="home")
+                away_span = m_div.find("span", class_="away")
+                home_text = ""
+                away_text = ""
+                if home_span:
+                    team_el = home_span.find("span", onclick=re.compile(r"toTeam"))
+                    if team_el:
+                        home_text = team_el.get_text(strip=True).lower()
+                if away_span:
+                    team_el = away_span.find("span", onclick=re.compile(r"toTeam"))
+                    if team_el:
+                        away_text = team_el.get_text(strip=True).lower()
 
-            result.append({
-                "full_text": full_text,
-                "home_text": home_text,
-                "away_text": away_text
-            })
+                full_text = f"{home_text} {away_text}"
+
+                # Quote da span.odds
+                odds = None
+                odds_span = m_div.find("span", class_="odds")
+                if odds_span:
+                    odds_values = odds_span.find_all("span")
+                    if len(odds_values) >= 3:
+                        try:
+                            o1 = float(odds_values[0].get_text(strip=True))
+                            oX = float(odds_values[1].get_text(strip=True))
+                            o2 = float(odds_values[2].get_text(strip=True))
+                            if 1.01 <= o1 <= 25.0 and 1.01 <= oX <= 25.0 and 1.01 <= o2 <= 25.0:
+                                odds = {"1": o1, "X": oX, "2": o2}
+                        except:
+                            pass
+
+                if home_text or away_text:
+                    result.append({
+                        "full_text": full_text,
+                        "home_text": home_text,
+                        "away_text": away_text,
+                        "odds": odds,
+                    })
+            except:
+                continue
         return result
     except:
         return []
@@ -776,7 +800,35 @@ def run_scraper():
             
             # Naviga alla pagina della lega
             driver.get(league_url)
-            time.sleep(3)
+            time.sleep(1.5)
+
+            # Attendi caricamento con retry
+            stage = league.get("stage")
+            for attempt in range(3):
+                try:
+                    WebDriverWait(driver, 15).until(
+                        EC.presence_of_element_located((By.CSS_SELECTOR, "div.schedulis"))
+                    )
+                    # Click sul girone se necessario (Serie C: Group A/B/C)
+                    if stage:
+                        try:
+                            stage_btn = driver.find_element(By.CSS_SELECTOR, f"div.stage span[stage='{stage}']")
+                            stage_btn.click()
+                            time.sleep(1.5)
+                        except:
+                            pass
+                    # Seleziona quote 1X2
+                    try:
+                        odds_1x2 = driver.find_element(By.CSS_SELECTOR, "li[type='O']")
+                        driver.execute_script("arguments[0].click()", odds_1x2)
+                        time.sleep(1.5)
+                    except:
+                        pass
+                    break
+                except:
+                    print(f"   ⚠️ Pagina non caricata, refresh ({attempt+1}/3)...")
+                    driver.refresh()
+                    time.sleep(5)
 
             # Determina giornata corrente e recupera i 3 round dal DB (identico alla produzione)
             has_stages = league.get("has_stages", False)
@@ -795,18 +847,24 @@ def run_scraper():
                 print(f"\n   ⚙️ Giornata {round_num}")
 
                 # Naviga alla giornata E ATTENDI sempre
-                stage = league.get("stage")
                 if round_num != current_round_num:
                     # Giornata diversa: fai click
                     if not click_round_and_wait(driver, round_num, stage=stage):
                         print(f"      ⚠️ Navigazione fallita, skip")
                         continue
+                    # Dopo click giornata, riseleziona 1X2
+                    try:
+                        odds_1x2 = driver.find_element(By.CSS_SELECTOR, "li[type='O']")
+                        driver.execute_script("arguments[0].click()", odds_1x2)
+                        time.sleep(1.5)
+                    except:
+                        pass
                 else:
                     # Giornata corrente: assicurati che sia caricata
                     print(f"      ℹ️ Già sulla giornata corrente, attendo caricamento...")
                     try:
                         WebDriverWait(driver, 15).until(
-                            EC.presence_of_element_located((By.CSS_SELECTOR, "tr[id]"))
+                            EC.presence_of_element_located((By.CSS_SELECTOR, "div.schedulis"))
                         )
                         time.sleep(1)
                     except Exception as e:
@@ -1133,4 +1191,12 @@ def run_odds_loop():
         print(f" ✅ Scraper completato — {datetime.now().strftime('%H:%M:%S')}")
 
 if __name__ == "__main__":
-    run_odds_loop()
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--test", action="store_true", help="Esegui una volta sola (senza daemon loop)")
+    args = parser.parse_args()
+
+    if args.test:
+        run_scraper()
+    else:
+        run_odds_loop()
