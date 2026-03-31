@@ -12,7 +12,6 @@ Indicatori (tutti per singola quota 1/X/2 dove applicabile):
 """
 import os
 import sys
-import re
 from datetime import datetime, timezone
 
 # --- Fix percorsi ---
@@ -320,27 +319,68 @@ def calcola_tutti_indicatori(doc, qt_1=None, qt_x=None, qt_2=None):
 # ESECUZIONE: leggi da MongoDB, calcola, riscrivi
 # =============================================================================
 
-def _norm_name(name):
-    """Normalizza nome squadra per confronto fuzzy."""
-    return re.sub(r'[^a-z0-9]', '', name.lower().strip())
+def _build_alias_cache():
+    """
+    Carica db.teams e costruisce una mappa alias→nome canonico.
+    Ogni alias (name, aliases[], aliases_transfermarkt) viene mappato lowercase al name.
+    """
+    cache = {}  # alias_lower → canonical_name
+    all_teams = list(db.teams.find({}, {"name": 1, "aliases": 1, "aliases_transfermarkt": 1}))
+    for t in all_teams:
+        canonical = t.get("name", "")
+        if not canonical:
+            continue
+        # name stesso
+        cache[canonical.lower()] = canonical
+        # aliases array
+        for a in t.get("aliases", []):
+            if a:
+                cache[a.lower()] = canonical
+        # aliases_transfermarkt (può essere stringa o array)
+        atm = t.get("aliases_transfermarkt", [])
+        if isinstance(atm, str):
+            if atm:
+                cache[atm.lower()] = canonical
+        elif isinstance(atm, list):
+            for a in atm:
+                if a:
+                    cache[a.lower()] = canonical
+    return cache
+
+
+# Cache alias globale (caricata una volta)
+_ALIAS_CACHE = None
+
+def _get_alias_cache():
+    global _ALIAS_CACHE
+    if _ALIAS_CACHE is None:
+        _ALIAS_CACHE = _build_alias_cache()
+        print(f"🏷️  Alias cache caricata: {len(_ALIAS_CACHE)} voci")
+    return _ALIAS_CACHE
+
+
+def _resolve_name(raw_name):
+    """Risolve un nome raw al nome canonico via alias cache. Ritorna None se non trovato."""
+    cache = _get_alias_cache()
+    return cache.get(raw_name.lower().strip())
 
 
 def _preload_qt_cache(target_date, leagues):
     """
-    Precarica qt_1/qt_X/qt_2 da h2h_by_round per tutte le leghe e data.
-    Ritorna dict: (league, norm_home, norm_away) → (qt_1, qt_X, qt_2)
+    Precarica qt_1/qt_X/qt_2 + real_score da h2h_by_round per tutte le leghe e data.
+    Ritorna dict: (league, canonical_home, canonical_away) → {qt_1, qt_X, qt_2, real_score}
     """
     cache = {}
     for league in leagues:
         rounds = list(db.h2h_by_round.find(
             {"league": league},
             {"matches.home": 1, "matches.away": 1, "matches.date": 1,
-             "matches.date_obj": 1, "matches.h2h_data.qt_1": 1,
+             "matches.date_obj": 1, "matches.real_score": 1,
+             "matches.h2h_data.qt_1": 1,
              "matches.h2h_data.qt_X": 1, "matches.h2h_data.qt_2": 1}
         ))
         for round_doc in rounds:
             for m in round_doc.get('matches', []):
-                # Controlla data
                 m_date = m.get('date_obj') or m.get('date', '')
                 if hasattr(m_date, 'strftime'):
                     m_date_str = m_date.strftime('%Y-%m-%d')
@@ -351,35 +391,41 @@ def _preload_qt_cache(target_date, leagues):
                     continue
 
                 h2h = m.get('h2h_data', {})
-                qt_1 = h2h.get('qt_1')
-                qt_x = h2h.get('qt_X')
-                qt_2 = h2h.get('qt_2')
-
-                if qt_1 and qt_x and qt_2:
-                    home_n = _norm_name(m.get('home', ''))
-                    away_n = _norm_name(m.get('away', ''))
-                    cache[(league, home_n, away_n)] = (qt_1, qt_x, qt_2)
+                home = m.get('home', '')
+                away = m.get('away', '')
+                cache[(league, home, away)] = {
+                    "qt_1": h2h.get('qt_1'),
+                    "qt_X": h2h.get('qt_X'),
+                    "qt_2": h2h.get('qt_2'),
+                    "real_score": m.get('real_score'),
+                }
 
     return cache
 
 
-def _lookup_qt(cache, league, home_raw, away_raw):
-    """Cerca qt nella cache con matching fuzzy dei nomi."""
-    home_n = _norm_name(home_raw)
-    away_n = _norm_name(away_raw)
+def _lookup_h2h(cache, league, home_raw, away_raw, alias_mancanti=None):
+    """Cerca dati h2h (qt + real_score) nella cache risolvendo i nomi raw tramite alias db.teams.
+    Se alias_mancanti è una lista, aggiunge i nomi non risolti per il report finale.
+    Ritorna dict con qt_1, qt_X, qt_2, real_score oppure None."""
+    home_canonical = _resolve_name(home_raw)
+    away_canonical = _resolve_name(away_raw)
 
-    # Match esatto
-    if (league, home_n, away_n) in cache:
-        return cache[(league, home_n, away_n)]
+    # Log nomi non risolti
+    if alias_mancanti is not None:
+        if not home_canonical:
+            alias_mancanti.append({"nome": home_raw, "league": league, "ruolo": "home"})
+        if not away_canonical:
+            alias_mancanti.append({"nome": away_raw, "league": league, "ruolo": "away"})
 
-    # Match parziale (uno contenuto nell'altro)
-    for (lg, h, a), qt in cache.items():
-        if lg != league:
-            continue
-        if (home_n in h or h in home_n) and (away_n in a or a in away_n):
-            return qt
+    if home_canonical and away_canonical:
+        if (league, home_canonical, away_canonical) in cache:
+            return cache[(league, home_canonical, away_canonical)]
 
-    return None, None, None
+    # Fallback: prova match diretto (se h2h_by_round usa lo stesso nome)
+    if (league, home_raw, away_raw) in cache:
+        return cache[(league, home_raw, away_raw)]
+
+    return None
 
 
 def calcola_e_aggiorna(target_date=None):
@@ -409,22 +455,33 @@ def calcola_e_aggiorna(target_date=None):
     calcolati = 0
     errori = 0
     qt_trovate = 0
+    alias_mancanti = []
 
     for doc in docs:
         try:
-            # Cerca qt per questa partita
-            qt_1, qt_x, qt_2 = _lookup_qt(
+            # Cerca qt + real_score per questa partita
+            h2h_data = _lookup_h2h(
                 qt_cache, doc.get("league", ""),
-                doc.get("home_raw", ""), doc.get("away_raw", "")
+                doc.get("home_raw", ""), doc.get("away_raw", ""),
+                alias_mancanti=alias_mancanti
             )
-            if qt_1:
+            qt_1 = qt_x = qt_2 = None
+            real_score = None
+            if h2h_data:
+                qt_1 = h2h_data.get("qt_1")
+                qt_x = h2h_data.get("qt_X")
+                qt_2 = h2h_data.get("qt_2")
+                real_score = h2h_data.get("real_score")
+            if qt_1 and qt_x and qt_2:
                 qt_trovate += 1
 
             indicatori = calcola_tutti_indicatori(doc, qt_1=qt_1, qt_x=qt_x, qt_2=qt_2)
             if indicatori is None:
                 continue
 
-            # Salva indicatori nel documento (livello top)
+            # Salva indicatori + risultato nel documento
+            if real_score:
+                indicatori["real_score"] = real_score
             update_ops = {"$set": indicatori}
 
             # Arricchisci l'ultimo snapshot dello storico con gli indicatori
@@ -455,6 +512,33 @@ def calcola_e_aggiorna(target_date=None):
     print(f"🔑 Qt modello trovate: {qt_trovate}/{calcolati}")
     if errori:
         print(f"❌ Errori: {errori}")
+
+    # Report alias mancanti — squadre non trovate in db.teams
+    # Deduplica per nome
+    visti = set()
+    unici = []
+    for am in alias_mancanti:
+        if am["nome"] not in visti:
+            visti.add(am["nome"])
+            unici.append(am)
+
+    if unici:
+        print(f"\n⚠️  ALIAS MANCANTI in db.teams ({len(unici)} squadre) — vedi log/alias_mancanti_lucksport.txt")
+
+    # Salva su file (sovrascrive ad ogni run)
+    log_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(current_dir))), "log")
+    os.makedirs(log_dir, exist_ok=True)
+    log_path = os.path.join(log_dir, "alias_mancanti_lucksport.txt")
+    with open(log_path, "w", encoding="utf-8") as f:
+        f.write(f"# Alias mancanti LuckSport — {datetime.now().strftime('%Y-%m-%d %H:%M')}\n")
+        f.write(f"# Data analizzata: {target_date or 'tutte'}\n")
+        f.write(f"# Squadre non trovate in db.teams (aggiungere come alias)\n\n")
+        if unici:
+            for am in sorted(unici, key=lambda x: (x["league"], x["nome"])):
+                f.write(f"{am['nome']}  |  {am['league']}\n")
+        else:
+            f.write("Nessun alias mancante ✓\n")
+    print(f"📄 Log alias salvato in: {log_path}")
 
     return calcolati, errori
 
