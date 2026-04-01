@@ -109,7 +109,7 @@ LEAGUE_MAP = {
     "FIN D1": "Veikkausliiga",
     "DEN D1": "Superligaen",
     "DEN SASL": "Superligaen",          # Potrebbe essere questo il codice, teniamo entrambi
-    "NORW": "Eliteserien",
+    "NOR PR": "Eliteserien",
     "NOR D1": "Eliteserien",
     # IRLANDA
     "IRE PR": "League of Ireland Premier Division",

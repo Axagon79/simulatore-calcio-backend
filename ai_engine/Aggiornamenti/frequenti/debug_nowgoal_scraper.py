@@ -574,6 +574,15 @@ def analyze_missing_match(
         r = all_rows[idx]
         return (r["full_text"] if isinstance(r, dict) else r)[:200]
 
+    # Salva le righe del sito per il report
+    righe_sito = []
+    for row in all_rows:
+        if isinstance(row, dict):
+            righe_sito.append(f"{row.get('home_text','')} vs {row.get('away_text','')}")
+        else:
+            righe_sito.append(str(row)[:120])
+    analysis["dettagli"]["righe_sito"] = righe_sito
+
     # Analizza i risultati
     if not home_found_in and not away_found_in:
         analysis["motivi"].append("NESSUNA_SQUADRA_TROVATA")
@@ -614,10 +623,10 @@ def save_report(report_data: Dict, output_dir: str = "scraper_reports"):
     """Salva il report in formato JSON e TXT"""
     
     os.makedirs(output_dir, exist_ok=True)
-    
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    json_file = os.path.join(output_dir, f"report_{timestamp}.json")
-    txt_file = os.path.join(output_dir, f"report_{timestamp}.txt")
+
+    # Sovrascrive sempre lo stesso file (evita accumulo di migliaia di report)
+    json_file = os.path.join(output_dir, "report_latest.json")
+    txt_file = os.path.join(output_dir, "report_latest.txt")
     
     # File JSON
     with open(json_file, 'w', encoding='utf-8') as f:
@@ -663,7 +672,7 @@ def save_report(report_data: Dict, output_dir: str = "scraper_reports"):
                 
                 for team, count in sorted_teams:
                     f.write(f"❌ {team} ({count} partite mancanti)\n")
-                    
+
                     # Mostra gli alias usati per questa squadra
                     for issue in non_trovate:
                         if team in issue['partita']:
@@ -673,11 +682,27 @@ def save_report(report_data: Dict, output_dir: str = "scraper_reports"):
                                 aliases = dettagli.get('alias_casa', [])
                             else:
                                 aliases = dettagli.get('alias_trasferta', [])
-                            
+
                             if aliases:
-                                f.write(f"   Alias usati: {', '.join(aliases[:5])}\n")
-                                break
-                    
+                                f.write(f"   Alias provati: {', '.join(aliases[:5])}\n")
+
+                            # Mostra cosa c'è sul sito per questa giornata
+                            righe_sito = dettagli.get('righe_sito', [])
+                            if righe_sito:
+                                # Cerca la riga che potrebbe contenere questa squadra
+                                team_lower = team.lower()
+                                candidata = None
+                                for riga in righe_sito:
+                                    # Match parziale: cerca parole del nome team nella riga
+                                    parole = [p for p in team_lower.split() if len(p) > 2]
+                                    if any(p in riga.lower() for p in parole):
+                                        candidata = riga
+                                        break
+                                if candidata:
+                                    f.write(f"   📄 Sul sito: {candidata}\n")
+                                    f.write(f"   💡 AGGIUNGI come alias il nome esatto dal sito\n")
+                            break
+
                     f.write("\n")
                 
                 f.write("\n💡 SUGGERIMENTI:\n")
@@ -707,23 +732,38 @@ def save_report(report_data: Dict, output_dir: str = "scraper_reports"):
                     for issue in issues[:10]:  # Max 10 esempi per motivo
                         f.write(f"  • {issue['partita']}\n")
                         f.write(f"    Lega: {issue['lega']} - Giornata: {issue['giornata']}\n")
-                        
+
                         dettagli = issue.get('dettagli', {})
                         if 'nota' in dettagli:
                             f.write(f"    Nota: {dettagli['nota']}\n")
-                        
+
+                        # Mostra alias provati
+                        alias_c = dettagli.get('alias_casa', [])
+                        alias_t = dettagli.get('alias_trasferta', [])
+                        if alias_c:
+                            f.write(f"    🏠 Alias casa: {', '.join(alias_c[:5])}\n")
+                        if alias_t:
+                            f.write(f"    🏟️ Alias trasf: {', '.join(alias_t[:5])}\n")
+
                         # 🔍 MOSTRA LA RIGA ESEMPIO CON SUGGERIMENTO
                         if 'riga_esempio' in dettagli:
-                            f.write(f"\n    📄 RIGA SUL SITO:\n")
+                            f.write(f"    📄 RIGA SUL SITO:\n")
                             f.write(f"    {dettagli['riga_esempio']}\n")
                             if 'suggerimento' in dettagli:
                                 f.write(f"    💡 {dettagli['suggerimento']}\n")
-                        
+
+                        # Mostra TUTTE le righe del sito per questa giornata
+                        righe_sito = dettagli.get('righe_sito', [])
+                        if righe_sito and 'NESSUNA_SQUADRA' in str(issue.get('motivi', [])):
+                            f.write(f"    📋 Righe sul sito ({len(righe_sito)}):\n")
+                            for riga in righe_sito:
+                                f.write(f"       {riga}\n")
+
                         if 'righe_casa' in dettagli:
                             f.write(f"    ⚠️ Casa trovata in altre righe\n")
                         if 'righe_trasferta' in dettagli:
                             f.write(f"    ⚠️ Trasferta trovata in altre righe\n")
-                        
+
                         f.write("\n")
                     
                     if len(issues) > 10:
