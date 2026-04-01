@@ -15,6 +15,10 @@ scraper_reports/
 # Calibration snapshots
 calibration_snapshot_*.json
 
+# Firebase
+firebase-debug.log
+firebase-debug.*.log
+
 # Debug/temp files
 debug_snai_sidebar.html
 temp_*.py
