@@ -250,17 +250,16 @@ def scrape_all_teams(test_mode=False):
                     # Cerca le tabelle
                     tables = driver.find_elements(By.TAG_NAME, "table")
 
-                    # Trova la tabella rosa (quella con più righe e nomi "Cognome, Nome")
+                    # Trova la tabella rosa (unica con "Formazione" nel thead)
                     roster_table = None
                     for table in tables:
-                        rows = table.find_elements(By.TAG_NAME, "tr")
-                        if len(rows) > 15:  # La rosa ha almeno 15+ righe
-                            # Verifica che abbia nomi nel formato "Cognome, Nome"
-                            sample_cells = table.find_elements(By.TAG_NAME, "td")
-                            sample_text = " ".join([c.text for c in sample_cells[:20]])
-                            if "," in sample_text and any(r in sample_text for r in ["POR", "DIF", "CENT", "ATT"]):
+                        try:
+                            thead = table.find_element(By.TAG_NAME, "thead")
+                            if "Formazione" in thead.text:
                                 roster_table = table
                                 break
+                        except Exception:
+                            continue
 
                     if not roster_table:
                         print(f"  ⚠️ Tabella rosa non trovata!")
