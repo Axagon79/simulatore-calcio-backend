@@ -196,6 +196,8 @@ router.get('/predictions', async (req, res) => {
             tipo: p.tipo,
             confidence: p.confidence ?? null,
             sezione: doc.sezione ?? null,
+            home: doc.home,
+            away: doc.away,
           });
         }
       }
