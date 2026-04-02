@@ -1016,6 +1016,12 @@ def _apply_weak_o25_recovery(unified, c_doc):
             return result
 
     # PRIORITÀ 2: DC X2 (calcolata da quote)
+    # Se c'è già un SEGNO, la DC potrebbe contraddirlo (es. SEGNO 1 + DC X2)
+    # In quel caso elimina l'Over 2.5 debole senza sostituire
+    if has_segno:
+        result.pop(o25_idx)
+        print(f"    🗑️ O25 SCARTATO: Over 2.5 A+S (score {o25_pred.get('confidence')}) — SEGNO già presente, DC sarebbe incoerente")
+        return result
     if qx > 1 and q2 > 1:
         dc_q = round(1 / (1/qx + 1/q2), 2)
         if dc_q >= 1.35:
@@ -1576,6 +1582,15 @@ def _dedup_gol_correlati(unified):
         return unified
 
     to_remove = set()
+
+    # Rimuovi duplicati identici (stesso pronostico, source diversa) — tieni il primo
+    seen_pron = {}
+    for i, name in gol_preds:
+        if name in seen_pron:
+            to_remove.add(i)
+            print(f"    🔀 DEDUP GOL: duplicato {name} ({unified[i].get('source','')}) — tenuto {unified[seen_pron[name]].get('source','')}")
+        else:
+            seen_pron[name] = i
 
     # Controlla ogni coppia
     for a_idx in range(len(gol_preds)):

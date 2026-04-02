@@ -195,17 +195,22 @@ def get_team_aliases(team_name: str, team_doc: Optional[Dict] = None) -> List[st
                 if normalized_alias:
                     aliases.add(normalized_alias)
     
+    # Aggiungi singole parole del nome come alias, ma escludi parole troppo comuni
+    COMMON_WORDS = {"town", "city", "united", "rovers", "athletic", "county", "wanderers",
+                    "albion", "orient", "forest", "villa", "palace", "hotspur", "wednesday",
+                    "stanley", "argyle", "dons", "vale", "rangers", "real", "club", "sport",
+                    "sporting", "dynamo", "lokomotiv", "spartak", "torpedo"}
     words = team_name.lower().split()
     if len(words) > 1:
         for word in words:
-            if len(word) >= 4:
+            if len(word) >= 4 and word not in COMMON_WORDS:
                 aliases.add(word)
     
     if normalized:
         words_norm = normalized.split()
         if len(words_norm) > 1:
             for word in words_norm:
-                if len(word) >= 4:
+                if len(word) >= 4 and word not in COMMON_WORDS:
                     aliases.add(word)
     
     aliases.discard("")
