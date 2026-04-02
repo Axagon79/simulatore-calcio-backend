@@ -429,6 +429,16 @@ app.get('/matches-today', async (req, res) => {
       'Primera División': { id: 'PRIMERA_DIVISION_ARG', country: 'Argentina' },
       'Major League Soccer': { id: 'MLS', country: 'USA' },
       'J1 League': { id: 'J1_LEAGUE', country: 'Japan' },
+      'League One': { id: 'LEAGUE_ONE', country: 'England' },
+      'League Two': { id: 'LEAGUE_TWO', country: 'England' },
+      'Veikkausliiga': { id: 'VEIKKAUSLIIGA', country: 'Finland' },
+      '3. Liga': { id: 'LIGA_3', country: 'Germany' },
+      'Liga MX': { id: 'LIGA_MX', country: 'Mexico' },
+      'Eerste Divisie': { id: 'EERSTE_DIVISIE', country: 'Netherlands' },
+      'Liga Portugal 2': { id: 'LIGA_PORTUGAL_2', country: 'Portugal' },
+      '1. Lig': { id: 'BIR_LIG', country: 'Turkey' },
+      'Saudi Pro League': { id: 'SAUDI_PRO_LEAGUE', country: 'Saudi Arabia' },
+      'Scottish Championship': { id: 'SCOTTISH_CHAMPIONSHIP', country: 'Scotland' },
     };
 
     const pipeline = [
