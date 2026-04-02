@@ -88,7 +88,7 @@ LEAGUES = [
         "defense_url": "https://fbref.com/en/comps/18/defense/Serie-B-Stats",
         "misc_url": "https://fbref.com/en/comps/18/misc/Serie-B-Stats",
     },
-    
+
     # EUROPA TOP
     {
         "name": "Premier League", "code": "ENG1", "comp_id": 9,
@@ -132,7 +132,7 @@ LEAGUES = [
         "defense_url": "https://fbref.com/en/comps/32/defense/Primeira-Liga-Stats",
         "misc_url": "https://fbref.com/en/comps/32/misc/Primeira-Liga-Stats",
     },
-    
+
     # 🆕 EUROPA SERIE B
     {
         "name": "Championship", "code": "ENG2", "comp_id": 10,
@@ -169,7 +169,7 @@ LEAGUES = [
         "defense_url": "https://fbref.com/en/comps/60/defense/Ligue-2-Stats",
         "misc_url": "https://fbref.com/en/comps/60/misc/Ligue-2-Stats",
     },
-    
+
     # 🆕 EUROPA NORDICI + EXTRA
     {
         "name": "Scottish Premiership", "code": "SCO1", "comp_id": 40,
@@ -220,7 +220,7 @@ LEAGUES = [
         "defense_url": "https://fbref.com/en/comps/80/defense/League-of-Ireland-Premier-Division-Stats",
         "misc_url": "https://fbref.com/en/comps/80/misc/League-of-Ireland-Premier-Division-Stats",
     },
-    
+
     # 🆕 AMERICHE
     {
         "name": "Brasileirão Serie A", "code": "BRA1", "comp_id": 24,
