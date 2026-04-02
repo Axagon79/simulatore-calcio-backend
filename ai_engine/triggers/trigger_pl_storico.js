@@ -21,7 +21,7 @@ exports = async function(changeEvent) {
   if (!doc || !doc.date) return;
 
   const targetDate = doc.date;
-  const db = context.services.get("mongodb-atlas").db(changeEvent.ns.db);
+  const db = context.services.get("pup-pals-cluster").db(changeEvent.ns.db);
 
   // Recupera pronostici del giorno + risultati reali da h2h_by_round in parallelo
   const startOfDay = new Date(targetDate + "T00:00:00.000Z");
