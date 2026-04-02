@@ -83,8 +83,36 @@ def check_pronostico(pronostico, tipo, parsed):
     return None
 
 
-def calcola_pl_giorno(docs):
+def get_results_map(target_date):
+    """Recupera risultati reali da h2h_by_round per una data specifica."""
+    from datetime import datetime as dt
+    try:
+        start = dt.strptime(target_date, "%Y-%m-%d")
+        end = dt.strptime(target_date + "T23:59:59", "%Y-%m-%dT%H:%M:%S")
+        pipeline = [
+            {"$unwind": "$matches"},
+            {"$match": {
+                "matches.status": "Finished",
+                "matches.real_score": {"$ne": None},
+                "matches.date_obj": {"$gte": start, "$lte": end}
+            }},
+            {"$project": {
+                "_id": 0,
+                "home": "$matches.home",
+                "away": "$matches.away",
+                "real_score": "$matches.real_score"
+            }}
+        ]
+        results = list(db.h2h_by_round.aggregate(pipeline))
+        return {f"{r['home']}|||{r['away']}": r['real_score'] for r in results}
+    except Exception:
+        return {}
+
+
+def calcola_pl_giorno(docs, results_map=None):
     """Calcola P/L per sezione da una lista di documenti dello stesso giorno."""
+    if results_map is None:
+        results_map = {}
     sez = {
         'tutti': {'pl': 0, 'bets': 0, 'wins': 0, 'staked': 0},
         'pronostici': {'pl': 0, 'bets': 0, 'wins': 0, 'staked': 0},
@@ -93,23 +121,28 @@ def calcola_pl_giorno(docs):
     }
 
     for doc in docs:
-        score = doc.get('live_score')
-        match_over = False
-        if doc.get('live_status') == 'Finished':
-            match_over = True
-        elif doc.get('date') and doc.get('match_time'):
-            try:
-                kickoff = datetime.strptime(f"{doc['date']}T{doc['match_time']}", "%Y-%m-%dT%H:%M")
-                elapsed = (datetime.utcnow() - kickoff).total_seconds() / 60
-                if elapsed > 130:
-                    match_over = True
-            except Exception:
-                pass
+        # Priorità score: 1) real_score da h2h_by_round, 2) live_score dal daemon
+        home = doc.get('home', '')
+        away = doc.get('away', '')
+        real_score = results_map.get(f"{home}|||{away}")
+        score = real_score or doc.get('live_score')
+        match_over = True if real_score else False
+        if not match_over:
+            if doc.get('live_status') == 'Finished':
+                match_over = True
+            elif doc.get('date') and doc.get('match_time'):
+                try:
+                    kickoff = datetime.strptime(f"{doc['date']}T{doc['match_time']}", "%Y-%m-%dT%H:%M")
+                    elapsed = (datetime.utcnow() - kickoff).total_seconds() / 60
+                    if elapsed > 130:
+                        match_over = True
+                except Exception:
+                    pass
 
         for p in doc.get('pronostici', []):
             esito = p.get('esito')
 
-            # Se non c'è esito, prova a calcolarlo dal live_score
+            # Se non c'è esito, prova a calcolarlo da score (h2h > live_score)
             if esito is None and score and match_over:
                 parsed = parse_score(score)
                 if parsed:
@@ -177,7 +210,7 @@ def main():
     print("\n Caricamento documenti da daily_predictions_unified...")
     all_docs = list(db.daily_predictions_unified.find(
         {},
-        {'date': 1, 'pronostici': 1, 'live_score': 1, 'live_status': 1, 'match_time': 1}
+        {'date': 1, 'home': 1, 'away': 1, 'pronostici': 1, 'live_score': 1, 'live_status': 1, 'match_time': 1}
     ))
     print(f"  {len(all_docs)} documenti trovati")
 
@@ -201,7 +234,8 @@ def main():
 
     for date in dates:
         docs = by_date[date]
-        sez = calcola_pl_giorno(docs)
+        results_map = get_results_map(date)
+        sez = calcola_pl_giorno(docs, results_map)
 
         # Salta giorni senza bet
         if sez['tutti']['bets'] == 0:

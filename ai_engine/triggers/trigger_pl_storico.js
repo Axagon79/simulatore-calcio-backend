@@ -23,10 +23,35 @@ exports = async function(changeEvent) {
   const targetDate = doc.date;
   const db = context.services.get("mongodb-atlas").db(changeEvent.ns.db);
 
-  // Recupera tutti i pronostici del giorno
-  const dayDocs = await db.collection("daily_predictions_unified")
-    .find({ date: targetDate })
-    .toArray();
+  // Recupera pronostici del giorno + risultati reali da h2h_by_round in parallelo
+  const startOfDay = new Date(targetDate + "T00:00:00.000Z");
+  const endOfDay = new Date(targetDate + "T23:59:59.999Z");
+
+  const [dayDocs, h2hResults] = await Promise.all([
+    db.collection("daily_predictions_unified")
+      .find({ date: targetDate })
+      .toArray(),
+    db.collection("h2h_by_round").aggregate([
+      { $unwind: "$matches" },
+      { $match: {
+        "matches.status": "Finished",
+        "matches.real_score": { $ne: null },
+        "matches.date_obj": { $gte: startOfDay, $lte: endOfDay }
+      }},
+      { $project: {
+        _id: 0,
+        home: "$matches.home",
+        away: "$matches.away",
+        real_score: "$matches.real_score"
+      }}
+    ]).toArray()
+  ]);
+
+  // Mappa risultati reali: "home|||away" → real_score
+  const resultsMap = {};
+  for (const r of h2hResults) {
+    resultsMap[`${r.home}|||${r.away}`] = r.real_score;
+  }
 
   // --- Helper: parse score "H:A" ---
   function parseScore(s) {
@@ -86,8 +111,10 @@ exports = async function(changeEvent) {
   };
 
   for (const doc of dayDocs) {
-    const score = doc.live_score || null;
-    const matchOver = (() => {
+    // Priorità score: 1) real_score da h2h_by_round, 2) live_score dal daemon
+    const realScore = resultsMap[`${doc.home}|||${doc.away}`] || null;
+    const score = realScore || doc.live_score || null;
+    const matchOver = realScore ? true : (() => {
       if (doc.live_status === "Finished") return true;
       if (doc.date && doc.match_time) {
         const kickoff = new Date(`${doc.date}T${doc.match_time}:00`);
@@ -98,7 +125,7 @@ exports = async function(changeEvent) {
     })();
 
     for (const p of (doc.pronostici || [])) {
-      // Priorità: esito dallo step 29, poi calcolo da score
+      // Priorità: esito dallo step 29, poi calcolo da score (h2h > live_score)
       let esito = p.esito;
       if ((esito === undefined || esito === null) && score && matchOver) {
         const parsed = parseScore(score);
