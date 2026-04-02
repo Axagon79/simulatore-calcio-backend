@@ -27,13 +27,21 @@ app.use(cors({
 
 app.use(express.json());
 
-// --- Rate limiting: 100 req / 15 min per IP ---
+// --- Rate limiting: 500 req / 15 min per IP (skip per admin/localhost) ---
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 500,
   standardHeaders: true,
   legacyHeaders: false,
-  message: { error: 'Troppe richieste, riprova tra qualche minuto.' }
+  message: { error: 'Troppe richieste, riprova tra qualche minuto.' },
+  skip: (req) => {
+    // Skip per localhost
+    const ip = req.ip || req.connection?.remoteAddress || '';
+    if (ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1') return true;
+    // Skip per admin (header custom)
+    if (req.headers['x-admin-key'] === '000128') return true;
+    return false;
+  }
 });
 app.use(limiter);
 
