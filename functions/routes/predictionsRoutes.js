@@ -1124,16 +1124,23 @@ router.get('/monthly-pl', async (req, res) => {
     const selectedDate = date || new Date().toISOString().slice(0, 10);
     const monthStart = selectedDate.slice(0, 8) + '01';
 
-    // Query parallela: giorno + mese + totale storico + risultati reali da h2h_by_round
-    const proj = { pronostici: 1, live_score: 1, live_status: 1, match_time: 1, date: 1, home: 1, away: 1 };
+    // Cross-match solo ultimi 3 giorni (le partite più vecchie hanno già esito nel DB dallo step 29)
+    const recentStart = new Date(selectedDate + 'T00:00:00Z');
+    recentStart.setDate(recentStart.getDate() - 2);
+    const recentFrom = recentStart.toISOString().slice(0, 10);
+
+    // Projection: home/away servono solo per il cross-match recente
+    const projFull = { pronostici: 1, live_score: 1, live_status: 1, match_time: 1, date: 1, home: 1, away: 1 };
+    const projLight = { pronostici: 1, date: 1 };
+
     const [dayDocs, monthDocs, allDocs, resultsMap] = await Promise.all([
       req.db.collection('daily_predictions_unified')
-        .find({ date: selectedDate }, { projection: proj }).toArray(),
+        .find({ date: selectedDate }, { projection: projFull }).toArray(),
       req.db.collection('daily_predictions_unified')
-        .find({ date: { $gte: monthStart, $lte: selectedDate } }, { projection: proj }).toArray(),
+        .find({ date: { $gte: monthStart, $lte: selectedDate } }, { projection: projFull }).toArray(),
       req.db.collection('daily_predictions_unified')
-        .find({ date: { $lte: selectedDate } }, { projection: proj }).toArray(),
-      getFinishedResults(req.db, { from: monthStart, to: selectedDate }),
+        .find({ date: { $lte: selectedDate } }, { projection: projLight }).toArray(),
+      getFinishedResults(req.db, { from: recentFrom, to: selectedDate }),
     ]);
 
     function calcSezioni(docs) {
