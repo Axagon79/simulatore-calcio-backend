@@ -1124,60 +1124,17 @@ router.get('/monthly-pl', async (req, res) => {
     const selectedDate = date || new Date().toISOString().slice(0, 10);
     const monthStart = selectedDate.slice(0, 8) + '01';
 
-    // Query parallela: giorno + mese + totale storico
-    const proj = { pronostici: 1, live_score: 1, live_status: 1, match_time: 1, date: 1 };
-    const [dayDocs, monthDocs, allDocs] = await Promise.all([
+    // Query parallela: giorno + mese + totale storico + risultati reali da h2h_by_round
+    const proj = { pronostici: 1, live_score: 1, live_status: 1, match_time: 1, date: 1, home: 1, away: 1 };
+    const [dayDocs, monthDocs, allDocs, resultsMap] = await Promise.all([
       req.db.collection('daily_predictions_unified')
         .find({ date: selectedDate }, { projection: proj }).toArray(),
       req.db.collection('daily_predictions_unified')
         .find({ date: { $gte: monthStart, $lte: selectedDate } }, { projection: proj }).toArray(),
       req.db.collection('daily_predictions_unified')
         .find({ date: { $lte: selectedDate } }, { projection: proj }).toArray(),
+      getFinishedResults(req.db, { from: monthStart, to: selectedDate }),
     ]);
-
-    // Calcola esito al volo da live_score quando esito non e' ancora nel DB
-    function calcHitFromScore(score, pronostico, tipo) {
-      if (!score) return null;
-      const parts = score.split(':');
-      if (parts.length !== 2) return null;
-      const h = parseInt(parts[0]), a = parseInt(parts[1]);
-      if (isNaN(h) || isNaN(a)) return null;
-      const total = h + a;
-      const pLow = pronostico.toLowerCase();
-      if (tipo === 'SEGNO') {
-        const sign = h > a ? '1' : h === a ? 'X' : '2';
-        return pronostico === sign;
-      }
-      if (tipo === 'DOPPIA_CHANCE') {
-        const sign = h > a ? '1' : h === a ? 'X' : '2';
-        if (pronostico === '1X') return sign === '1' || sign === 'X';
-        if (pronostico === 'X2') return sign === 'X' || sign === '2';
-        if (pronostico === '12') return sign === '1' || sign === '2';
-        return null;
-      }
-      if (tipo === 'GOL') {
-        if (pLow === 'goal' || pLow === 'gg') return h > 0 && a > 0;
-        if (pLow === 'no goal' || pLow === 'ng') return h === 0 || a === 0;
-        if (pLow.startsWith('over')) { const thr = parseFloat(pronostico.split(' ')[1]); return total > thr; }
-        if (pLow.startsWith('under')) { const thr = parseFloat(pronostico.split(' ')[1]); return total < thr; }
-        const mg = pronostico.match(/^MG\s+(\d+)-(\d+)/i);
-        if (mg) return total >= parseInt(mg[1]) && total <= parseInt(mg[2]);
-      }
-      if (tipo === 'RISULTATO_ESATTO') {
-        return `${h}:${a}` === pronostico.replace('-', ':');
-      }
-      return null;
-    }
-
-    function isMatchOver(doc) {
-      if (doc.live_status === 'Finished') return true;
-      if (doc.date && doc.match_time) {
-        const kickoff = new Date(`${doc.date}T${doc.match_time}:00`);
-        const elapsed = (Date.now() - kickoff.getTime()) / (1000 * 60);
-        if (elapsed > 130) return true;
-      }
-      return false;
-    }
 
     function calcSezioni(docs) {
       const sez = {
@@ -1187,14 +1144,27 @@ router.get('/monthly-pl', async (req, res) => {
         alto_rendimento: { pl: 0, bets: 0, wins: 0, staked: 0 },
       };
       for (const doc of docs) {
-        const liveScore = doc.live_score || null;
-        const matchOver = isMatchOver(doc);
+        // Priorità risultati: 1) real_score da h2h_by_round, 2) live_score dal daemon
+        const realScore = resultsMap[`${doc.home}|||${doc.away}|||${doc.date}`] || null;
+        const score = realScore || doc.live_score || null;
+        const matchOver = realScore ? true : (() => {
+          if (doc.live_status === 'Finished') return true;
+          if (doc.date && doc.match_time) {
+            const kickoff = new Date(`${doc.date}T${doc.match_time}:00`);
+            const elapsed = (Date.now() - kickoff.getTime()) / (1000 * 60);
+            if (elapsed > 130) return true;
+          }
+          return false;
+        })();
 
         for (const p of (doc.pronostici || [])) {
-          // Usa esito dal DB se disponibile, altrimenti calcola da live_score
+          // Priorità esito: 1) esito dal DB (step 29), 2) calcolo da score
           let esito = p.esito;
-          if ((esito === undefined || esito === null) && liveScore && matchOver) {
-            esito = calcHitFromScore(liveScore, p.pronostico, p.tipo);
+          if ((esito === undefined || esito === null) && score && matchOver) {
+            const parsed = parseScore(score);
+            if (parsed) {
+              esito = checkPronostico(p.pronostico, p.tipo, parsed);
+            }
           }
           if (esito === undefined || esito === null || esito === 'void') continue;
           const quota = p.quota || 0;
@@ -1205,30 +1175,23 @@ router.get('/monthly-pl', async (req, res) => {
           const profit = esito === true ? (quota - 1) * stake : -stake;
           const isHit = esito === true;
 
-          // Soglia quota: DC < 2.00 = pronostici, DC >= 2.00 = alto rendimento
-          // Altri: < 2.51 = pronostici, >= 2.51 = alto rendimento
-          // RISULTATO_ESATTO = sempre alto rendimento
           const soglia = p.tipo === 'DOPPIA_CHANCE' ? 2.00 : 2.51;
           const isAltoRendimento = p.tipo === 'RISULTATO_ESATTO' || quota >= soglia;
           const isPronostici = !isAltoRendimento && p.tipo !== 'RISULTATO_ESATTO';
 
-          // Tutti (somma di pronostici + alto rendimento, senza doppi)
           sez.tutti.bets++; sez.tutti.staked += stake; sez.tutti.pl += profit;
           if (isHit) sez.tutti.wins++;
 
-          // Pronostici (quota bassa)
           if (isPronostici) {
             sez.pronostici.bets++; sez.pronostici.staked += stake; sez.pronostici.pl += profit;
             if (isHit) sez.pronostici.wins++;
           }
 
-          // Elite (tag elite, può essere in pronostici o alto rendimento)
           if (p.elite) {
             sez.elite.bets++; sez.elite.staked += stake; sez.elite.pl += profit;
             if (isHit) sez.elite.wins++;
           }
 
-          // Alto rendimento (quota alta + risultati esatti)
           if (isAltoRendimento) {
             sez.alto_rendimento.bets++; sez.alto_rendimento.staked += stake; sez.alto_rendimento.pl += profit;
             if (isHit) sez.alto_rendimento.wins++;
