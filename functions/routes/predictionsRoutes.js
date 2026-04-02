@@ -1026,14 +1026,29 @@ router.get('/daily-predictions-unified', async (req, res) => {
   console.log('🎼 [UNIFIED] Richiesta per:', date);
 
   try {
-    const [predictions, resultsMap] = await Promise.all([
-      req.db.collection('daily_predictions_unified')
-        .find({ date }, { projection: { _id: 0 } })
-        .toArray(),
-      getFinishedResults(req.db, date)
-    ]);
+    const predictions = await req.db.collection('daily_predictions_unified')
+      .find({ date }, { projection: { _id: 0 } })
+      .toArray();
+
+    // Controlla se qualche prediction manca di real_score (fallback per sicurezza)
+    const needsCrossMatch = predictions.some(p => !p.real_score && !p.real_sign);
+    let resultsMap = {};
+    if (needsCrossMatch) {
+      resultsMap = await getFinishedResults(req.db, date);
+    }
 
     for (const pred of predictions) {
+      // Se real_score è già nel documento (dal trigger/backfill), usalo
+      if (pred.real_score) {
+        // hit già calcolato dal trigger/backfill, assicura coerenza
+        if (!pred.real_sign) {
+          const parsed = parseScore(pred.real_score);
+          pred.real_sign = parsed ? parsed.sign : null;
+        }
+        continue;
+      }
+
+      // Fallback: cross-match con h2h_by_round (solo se necessario)
       const realScore = resultsMap[`${pred.home}|||${pred.away}|||${pred.date}`] || null;
       pred.real_score = realScore;
 
