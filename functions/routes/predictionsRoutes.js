@@ -1116,173 +1116,21 @@ router.get('/daily-predictions-unified', async (req, res) => {
   }
 });
 
-// --- CACHE: Totale storico P/L (TTL 10 minuti) ---
-const totalePLCache = new Map();
-const TOTALE_CACHE_TTL = 10 * 60 * 1000;
+// [RIMOSSO] monthly-pl — sostituito da /pl-storico + calcolo client-side (PLStoricoContext)
 
-// ── GET /predictions/monthly-pl?date=2026-03-20 ──
-// P/L mensile accumulato dal primo del mese fino alla data selezionata
-router.get('/monthly-pl', async (req, res) => {
+// ── GET /predictions/pl-storico ──
+// Restituisce TUTTI i dati P/L giorno-per-giorno dalla collection pl_storico.
+// Lettura pura, nessun calcolo. I dati sono aggiornati dal Trigger Atlas.
+router.get('/pl-storico', async (req, res) => {
   try {
-    const { date } = req.query;
-    const selectedDate = date || new Date().toISOString().slice(0, 10);
-    const monthStart = selectedDate.slice(0, 8) + '01';
+    const docs = await req.db.collection('pl_storico')
+      .find({}, { projection: { _id: 0 } })
+      .sort({ date: 1 })
+      .toArray();
 
-    // Cross-match solo ultimi 3 giorni (le partite più vecchie hanno già esito nel DB dallo step 29)
-    const recentStart = new Date(selectedDate + 'T00:00:00Z');
-    recentStart.setDate(recentStart.getDate() - 2);
-    const recentFrom = recentStart.toISOString().slice(0, 10);
-
-    const projFull = { pronostici: 1, live_score: 1, live_status: 1, match_time: 1, date: 1, home: 1, away: 1 };
-
-    const [dayDocs, monthDocs, resultsMap] = await Promise.all([
-      req.db.collection('daily_predictions_unified')
-        .find({ date: selectedDate }, { projection: projFull }).toArray(),
-      req.db.collection('daily_predictions_unified')
-        .find({ date: { $gte: monthStart, $lte: selectedDate } }, { projection: projFull }).toArray(),
-      getFinishedResults(req.db, { from: recentFrom, to: selectedDate }),
-    ]);
-
-    function calcSezioni(docs) {
-      const sez = {
-        tutti: { pl: 0, bets: 0, wins: 0, staked: 0 },
-        pronostici: { pl: 0, bets: 0, wins: 0, staked: 0 },
-        elite: { pl: 0, bets: 0, wins: 0, staked: 0 },
-        alto_rendimento: { pl: 0, bets: 0, wins: 0, staked: 0 },
-      };
-      for (const doc of docs) {
-        const realScore = resultsMap[`${doc.home}|||${doc.away}|||${doc.date}`] || null;
-        const score = realScore || doc.live_score || null;
-        const matchOver = realScore ? true : (() => {
-          if (doc.live_status === 'Finished') return true;
-          if (doc.date && doc.match_time) {
-            const kickoff = new Date(`${doc.date}T${doc.match_time}:00`);
-            const elapsed = (Date.now() - kickoff.getTime()) / (1000 * 60);
-            if (elapsed > 130) return true;
-          }
-          return false;
-        })();
-
-        for (const p of (doc.pronostici || [])) {
-          let esito = p.esito;
-          if ((esito === undefined || esito === null) && score && matchOver) {
-            const parsed = parseScore(score);
-            if (parsed) {
-              esito = checkPronostico(p.pronostico, p.tipo, parsed);
-            }
-          }
-          if (esito === undefined || esito === null || esito === 'void') continue;
-          const quota = p.quota || 0;
-          const stake = p.stake || 1;
-          if (quota <= 1) continue;
-          if (p.pronostico === 'NO BET') continue;
-
-          const profit = esito === true ? (quota - 1) * stake : -stake;
-          const isHit = esito === true;
-
-          const soglia = p.tipo === 'DOPPIA_CHANCE' ? 2.00 : 2.51;
-          const isAltoRendimento = p.tipo === 'RISULTATO_ESATTO' || quota >= soglia;
-          const isPronostici = !isAltoRendimento && p.tipo !== 'RISULTATO_ESATTO';
-
-          sez.tutti.bets++; sez.tutti.staked += stake; sez.tutti.pl += profit;
-          if (isHit) sez.tutti.wins++;
-
-          if (isPronostici) {
-            sez.pronostici.bets++; sez.pronostici.staked += stake; sez.pronostici.pl += profit;
-            if (isHit) sez.pronostici.wins++;
-          }
-
-          if (p.elite) {
-            sez.elite.bets++; sez.elite.staked += stake; sez.elite.pl += profit;
-            if (isHit) sez.elite.wins++;
-          }
-
-          if (isAltoRendimento) {
-            sez.alto_rendimento.bets++; sez.alto_rendimento.staked += stake; sez.alto_rendimento.pl += profit;
-            if (isHit) sez.alto_rendimento.wins++;
-          }
-        }
-      }
-      for (const s of Object.values(sez)) {
-        s.pl = Math.round(s.pl * 100) / 100;
-        s.staked = Math.round(s.staked * 100) / 100;
-        s.hr = s.bets > 0 ? Math.round((s.wins / s.bets) * 1000) / 10 : 0;
-        s.roi = s.staked > 0 ? Math.round((s.pl / s.staked) * 1000) / 10 : 0;
-      }
-      return sez;
-    }
-
-    // Calcolo totale storico con cache (10 min TTL)
-    const totaleCacheKey = selectedDate;
-    const cachedTotale = totalePLCache.get(totaleCacheKey);
-    let totale;
-    if (cachedTotale && (Date.now() - cachedTotale.ts) < TOTALE_CACHE_TTL) {
-      totale = cachedTotale.data;
-    } else {
-      // Aggregation MongoDB: calcola P/L direttamente nel DB senza scaricare tutti i documenti
-      const totaleAgg = await req.db.collection('daily_predictions_unified').aggregate([
-        { $match: { date: { $lte: selectedDate } } },
-        { $unwind: '$pronostici' },
-        { $match: {
-          'pronostici.esito': { $in: [true, false] },
-          'pronostici.quota': { $gt: 1 },
-          'pronostici.pronostico': { $ne: 'NO BET' }
-        }},
-        { $project: {
-          esito: '$pronostici.esito',
-          quota: '$pronostici.quota',
-          stake: { $ifNull: ['$pronostici.stake', 1] },
-          tipo: '$pronostici.tipo',
-          elite: { $ifNull: ['$pronostici.elite', false] },
-        }},
-        { $group: {
-          _id: null,
-          tutti_bets: { $sum: 1 },
-          tutti_wins: { $sum: { $cond: ['$esito', 1, 0] } },
-          tutti_staked: { $sum: '$stake' },
-          tutti_pl: { $sum: { $cond: ['$esito', { $multiply: [{ $subtract: ['$quota', 1] }, '$stake'] }, { $multiply: ['$stake', -1] }] } },
-          // Pronostici (quota bassa): DC < 2.00, altri < 2.51, no RE
-          pron_bets: { $sum: { $cond: [{ $and: [{ $ne: ['$tipo', 'RISULTATO_ESATTO'] }, { $lt: ['$quota', { $cond: [{ $eq: ['$tipo', 'DOPPIA_CHANCE'] }, 2.00, 2.51] }] }] }, 1, 0] } },
-          pron_wins: { $sum: { $cond: [{ $and: ['$esito', { $ne: ['$tipo', 'RISULTATO_ESATTO'] }, { $lt: ['$quota', { $cond: [{ $eq: ['$tipo', 'DOPPIA_CHANCE'] }, 2.00, 2.51] }] }] }, 1, 0] } },
-          pron_staked: { $sum: { $cond: [{ $and: [{ $ne: ['$tipo', 'RISULTATO_ESATTO'] }, { $lt: ['$quota', { $cond: [{ $eq: ['$tipo', 'DOPPIA_CHANCE'] }, 2.00, 2.51] }] }] }, '$stake', 0] } },
-          pron_pl: { $sum: { $cond: [{ $and: [{ $ne: ['$tipo', 'RISULTATO_ESATTO'] }, { $lt: ['$quota', { $cond: [{ $eq: ['$tipo', 'DOPPIA_CHANCE'] }, 2.00, 2.51] }] }] }, { $cond: ['$esito', { $multiply: [{ $subtract: ['$quota', 1] }, '$stake'] }, { $multiply: ['$stake', -1] }] }, 0] } },
-          // Elite
-          elite_bets: { $sum: { $cond: ['$elite', 1, 0] } },
-          elite_wins: { $sum: { $cond: [{ $and: ['$esito', '$elite'] }, 1, 0] } },
-          elite_staked: { $sum: { $cond: ['$elite', '$stake', 0] } },
-          elite_pl: { $sum: { $cond: ['$elite', { $cond: ['$esito', { $multiply: [{ $subtract: ['$quota', 1] }, '$stake'] }, { $multiply: ['$stake', -1] }] }, 0] } },
-          // Alto rendimento (RE o quota alta)
-          ar_bets: { $sum: { $cond: [{ $or: [{ $eq: ['$tipo', 'RISULTATO_ESATTO'] }, { $gte: ['$quota', { $cond: [{ $eq: ['$tipo', 'DOPPIA_CHANCE'] }, 2.00, 2.51] }] }] }, 1, 0] } },
-          ar_wins: { $sum: { $cond: [{ $and: ['$esito', { $or: [{ $eq: ['$tipo', 'RISULTATO_ESATTO'] }, { $gte: ['$quota', { $cond: [{ $eq: ['$tipo', 'DOPPIA_CHANCE'] }, 2.00, 2.51] }] }] }] }, 1, 0] } },
-          ar_staked: { $sum: { $cond: [{ $or: [{ $eq: ['$tipo', 'RISULTATO_ESATTO'] }, { $gte: ['$quota', { $cond: [{ $eq: ['$tipo', 'DOPPIA_CHANCE'] }, 2.00, 2.51] }] }] }, '$stake', 0] } },
-          ar_pl: { $sum: { $cond: [{ $or: [{ $eq: ['$tipo', 'RISULTATO_ESATTO'] }, { $gte: ['$quota', { $cond: [{ $eq: ['$tipo', 'DOPPIA_CHANCE'] }, 2.00, 2.51] }] }] }, { $cond: ['$esito', { $multiply: [{ $subtract: ['$quota', 1] }, '$stake'] }, { $multiply: ['$stake', -1] }] }, 0] } },
-        }}
-      ]).toArray();
-
-      const r = totaleAgg[0] || {};
-      const fmt = (pl, bets, wins, staked) => ({
-        pl: Math.round((pl || 0) * 100) / 100,
-        bets: bets || 0,
-        wins: wins || 0,
-        staked: Math.round((staked || 0) * 100) / 100,
-        hr: bets > 0 ? Math.round((wins / bets) * 1000) / 10 : 0,
-        roi: staked > 0 ? Math.round((pl / staked) * 1000) / 10 : 0,
-      });
-      totale = {
-        tutti: fmt(r.tutti_pl, r.tutti_bets, r.tutti_wins, r.tutti_staked),
-        pronostici: fmt(r.pron_pl, r.pron_bets, r.pron_wins, r.pron_staked),
-        elite: fmt(r.elite_pl, r.elite_bets, r.elite_wins, r.elite_staked),
-        alto_rendimento: fmt(r.ar_pl, r.ar_bets, r.ar_wins, r.ar_staked),
-      };
-      totalePLCache.set(totaleCacheKey, { ts: Date.now(), data: totale });
-    }
-
-    const giorno = calcSezioni(dayDocs);
-    const sezioni = calcSezioni(monthDocs);
-
-    res.json({ success: true, from: monthStart, to: selectedDate, giorno, sezioni, totale });
+    res.json({ success: true, data: docs });
   } catch (error) {
-    res.status(500).json({ error: 'Errore monthly-pl', details: error.message });
+    res.status(500).json({ error: 'Errore pl-storico', details: error.message });
   }
 });
 
