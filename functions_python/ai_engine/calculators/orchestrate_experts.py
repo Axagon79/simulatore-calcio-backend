@@ -104,6 +104,82 @@ def _score_to_sign(score_str):
     return '2'
 
 
+def _apply_goal_quota_conversion(unified, odds):
+    """
+    Conversione Goal (BTTS) per fasce di quota tossiche:
+    - @1.90-1.99: HR BTTS 31%, Under 2.5 92% → converti in Under 2.5
+    - @1.70-1.79: HR BTTS 56%, Over 1.5 80% → converti in Over 1.5
+    - @1.80-1.89: HR BTTS 55% → resta Goal
+    """
+    if not odds:
+        return unified
+
+    result = []
+    for p in unified:
+        if p.get('pronostico') != 'Goal' or p.get('tipo') != 'GOL':
+            result.append(p)
+            continue
+
+        q = p.get('quota') or 0
+
+        # Fascia 1.90-1.99 → Under 2.5
+        if 1.90 <= q < 2.00:
+            u25_q = float(odds.get('under_25') or 0)
+            if u25_q > 1.0:
+                p['pronostico'] = 'Under 2.5'
+                p['quota'] = u25_q
+                p['source'] = p.get('source', 'C') + '_goal_conv'
+                p['routing_rule'] = 'goal_to_u25'
+                p['has_odds'] = True
+                # Ricalcola stake con Kelly 3/4
+                prob_mod = 0.70  # storico U2.5 92% in questa fascia, conservativo
+                prob_mkt = 1.0 / u25_q
+                edge = prob_mod - prob_mkt
+                if edge > 0:
+                    kelly = 0.75 * (edge * u25_q - (1 - edge)) / (u25_q - 1)
+                    p['stake'] = max(1, min(10, round(kelly * 10)))
+                    p['edge'] = round(edge * 100, 1)
+                else:
+                    p['stake'] = 1
+                    p['edge'] = 0
+                p['prob_mercato'] = round(prob_mkt * 100, 1)
+                p['prob_modello'] = round(prob_mod * 100, 1)
+                p['probabilita_stimata'] = round(prob_mod * 100, 1)
+                print(f"    🔄 GOAL→U2.5: Goal @{q:.2f} → Under 2.5 @{u25_q:.2f}")
+            result.append(p)
+
+        # Fascia 1.70-1.79 → Over 1.5
+        elif 1.70 <= q < 1.80:
+            o15_q = float(odds.get('over_15') or 0)
+            if o15_q > 1.0:
+                p['pronostico'] = 'Over 1.5'
+                p['quota'] = o15_q
+                p['source'] = p.get('source', 'C') + '_goal_conv'
+                p['routing_rule'] = 'goal_to_o15'
+                p['has_odds'] = True
+                prob_mod = 0.78  # storico O1.5 80% in questa fascia, conservativo
+                prob_mkt = 1.0 / o15_q
+                edge = prob_mod - prob_mkt
+                if edge > 0:
+                    kelly = 0.75 * (edge * o15_q - (1 - edge)) / (o15_q - 1)
+                    p['stake'] = max(1, min(10, round(kelly * 10)))
+                    p['edge'] = round(edge * 100, 1)
+                else:
+                    p['stake'] = 1
+                    p['edge'] = 0
+                p['prob_mercato'] = round(prob_mkt * 100, 1)
+                p['prob_modello'] = round(prob_mod * 100, 1)
+                p['probabilita_stimata'] = round(prob_mod * 100, 1)
+                print(f"    🔄 GOAL→O1.5: Goal @{q:.2f} → Over 1.5 @{o15_q:.2f}")
+            result.append(p)
+
+        else:
+            # 1.80-1.89 e altre fasce: resta Goal
+            result.append(p)
+
+    return result
+
+
 def _apply_multigol(unified, odds):
     """
     Post-processing: sostituisce pronostici deboli con Multi-goal.
@@ -713,8 +789,8 @@ def _apply_segno_scrematura(unified, odds, base_doc, c_doc=None):
     azione = ''
 
     def _try_dc_from_segno():
-        """DC coerente col SEGNO originale, quota >= 1.40. Ritorna (pred, azione) o (None, None)."""
-        if segno == '1' and dc_1x_q >= 1.40:
+        """DC coerente col SEGNO originale. 1X solo >= 1.65, X2 >= 1.40. Ritorna (pred, azione) o (None, None)."""
+        if segno == '1' and dc_1x_q >= 1.65:
             sost = _make_sostituto('1X', dc_1x_q)
             sost['tipo'] = 'DOPPIA_CHANCE'
             sost['source'] = 'C_screm_dc'
@@ -733,7 +809,7 @@ def _apply_segno_scrematura(unified, odds, base_doc, c_doc=None):
     # --- FASCIA 1 (1.00-1.44): Escalation O1.5 → DC coerente → O2.5 → GG → SEGNO puro ---
     if quota < 1.45:
         fascia = '1.00-1.44'
-        if over15_q >= 1.50:
+        if over15_q >= 1.40:
             result[segno_idx] = _make_sostituto('Over 1.5', over15_q)
             azione = f'Over 1.5 @{over15_q:.2f}'
         elif _try_dc_from_segno()[0] is not None:
@@ -759,7 +835,7 @@ def _apply_segno_scrematura(unified, odds, base_doc, c_doc=None):
     # --- FASCIA 4 (1.65-1.84): Escalation O1.5 → DC coerente → SEGNO puro → ELIMINA ---
     elif 1.65 <= quota < 1.85:
         fascia = '1.65-1.84'
-        if over15_q >= 1.50:
+        if over15_q >= 1.40:
             result[segno_idx] = _make_sostituto('Over 1.5', over15_q)
             azione = f'Over 1.5 @{over15_q:.2f}'
         elif _try_dc_from_segno()[0] is not None:
@@ -777,7 +853,7 @@ def _apply_segno_scrematura(unified, odds, base_doc, c_doc=None):
     # --- FASCIA 6 (2.10-2.49): Escalation O1.5 → DC coerente → O2.5 → DC fallback → ELIMINA ---
     elif 2.10 <= quota < 2.50:
         fascia = '2.10-2.49'
-        if over15_q >= 1.50:
+        if over15_q >= 1.40:
             result[segno_idx] = _make_sostituto('Over 1.5', over15_q)
             azione = f'Over 1.5 @{over15_q:.2f}'
         elif _try_dc_from_segno()[0] is not None:
@@ -788,10 +864,11 @@ def _apply_segno_scrematura(unified, odds, base_doc, c_doc=None):
             result[segno_idx] = _make_sostituto('Over 2.5', over25_q)
             azione = f'Over 2.5 @{over25_q:.2f}'
         else:
-            # DC coerente col segno: SEGNO 1 → DC 1X, SEGNO 2 → DC X2
+            # DC coerente col segno: SEGNO 1 → DC 1X (solo >= 1.65), SEGNO 2 → DC X2 (>= 1.35)
             dc_q = dc_1x_q if segno == '1' else dc_x2_q if segno == '2' else 0
             dc_label = '1X' if segno == '1' else 'X2' if segno == '2' else None
-            if dc_q >= 1.35 and dc_label:
+            dc_min = 1.65 if dc_label == '1X' else 1.35
+            if dc_q >= dc_min and dc_label:
                 sost = _make_sostituto(dc_label, dc_q)
                 sost['tipo'] = 'DOPPIA_CHANCE'
                 result[segno_idx] = sost
@@ -800,19 +877,29 @@ def _apply_segno_scrematura(unified, odds, base_doc, c_doc=None):
                 result.pop(segno_idx)
                 azione = 'ELIMINATO'
 
-    # --- FASCIA 7 (2.50-3.69): SEGNO → DC coerente ---
+    # --- FASCIA 7 (2.50-3.69): O1.5 → DC coerente (solo X2 o 1X >= 1.65) ---
     elif 2.50 <= quota < 3.70:
         fascia = '2.50-3.69'
-        dc_q = dc_1x_q if segno == '1' else dc_x2_q if segno == '2' else 0
-        dc_label = '1X' if segno == '1' else 'X2' if segno == '2' else None
-        if dc_label:
-            sost = _make_sostituto(dc_label, dc_q if dc_q >= 1.35 else None)
-            sost['tipo'] = 'DOPPIA_CHANCE'
-            result[segno_idx] = sost
-            azione = f'DC {dc_label} @{dc_q:.2f}' if dc_q >= 1.35 else f'DC {dc_label} (in attesa quota)'
+        if over15_q >= 1.40:
+            result[segno_idx] = _make_sostituto('Over 1.5', over15_q)
+            azione = f'Over 1.5 @{over15_q:.2f}'
         else:
-            result.pop(segno_idx)
-            azione = 'ELIMINATO'
+            dc_q = dc_1x_q if segno == '1' else dc_x2_q if segno == '2' else 0
+            dc_label = '1X' if segno == '1' else 'X2' if segno == '2' else None
+            # 1X solo se quota >= 1.65 (sotto non rende), X2 ok da 1.35
+            dc_min = 1.65 if dc_label == '1X' else 1.35
+            if dc_label and dc_q >= dc_min:
+                sost = _make_sostituto(dc_label, dc_q)
+                sost['tipo'] = 'DOPPIA_CHANCE'
+                result[segno_idx] = sost
+                azione = f'DC {dc_label} @{dc_q:.2f}'
+            elif dc_label and dc_q >= 1.35:
+                # 1X con quota < 1.65: tieni SEGNO originale (più profittevole)
+                azione = 'TIENI SEGNO (1X quota troppo bassa)'
+                return unified
+            else:
+                result.pop(segno_idx)
+                azione = 'ELIMINATO'
 
     # --- FASCIA 8 (3.70+): SEGNO resta (AR) + AGGIUNGI DC coerente ---
     elif quota >= 3.70:
@@ -1990,8 +2077,11 @@ def orchestrate_date(date_str, dry_run=False, match_time_filter=None, preserve_a
         # Applica routing
         unified_pronostici = route_predictions(preds_by_sys, markets_by_sys)
 
-        # --- POST-PROCESSING: Multi-goal su pronostici deboli ---
+        # --- POST-PROCESSING: Conversione Goal per fasce quota tossiche ---
         match_odds = base_doc.get('odds', {})
+        unified_pronostici = _apply_goal_quota_conversion(unified_pronostici, match_odds)
+
+        # --- POST-PROCESSING: Multi-goal su pronostici deboli ---
         unified_pronostici = _apply_multigol(unified_pronostici, match_odds)
 
         # --- POST-PROCESSING: Combo #96 — SEGNO 2 → DC X2 ---
