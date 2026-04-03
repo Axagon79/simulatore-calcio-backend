@@ -35,13 +35,66 @@ def to_ita(date_str):
 
 
 def from_ita(date_str):
-    """DD/MM/YYYY → YYYY-MM-DD per il database."""
+    """Accetta vari formati (DD/MM/YYYY, DD-MM-YYYY, DDMMYYYY, DD.MM.YYYY) → YYYY-MM-DD."""
     if not date_str:
         return date_str
-    try:
-        return datetime.strptime(date_str, "%d/%m/%Y").strftime("%Y-%m-%d")
-    except ValueError:
-        return date_str
+    # Rimuovi separatori e prova come 8 cifre
+    digits = re.sub(r'[/\-.]', '', date_str)
+    if len(digits) == 8 and digits.isdigit():
+        try:
+            return datetime.strptime(digits, "%d%m%Y").strftime("%Y-%m-%d")
+        except ValueError:
+            pass
+    # Prova formati con separatori
+    for fmt in ("%d/%m/%Y", "%d-%m-%Y", "%d.%m.%Y", "%Y-%m-%d"):
+        try:
+            return datetime.strptime(date_str, fmt).strftime("%Y-%m-%d")
+        except ValueError:
+            continue
+    return None
+
+
+def ask_date(prompt, default_ita):
+    """Chiede una data con validazione e conferma. Ritorna YYYY-MM-DD o None se annullato."""
+    while True:
+        val = input(f"{prompt} [{default_ita}]: ").strip()
+        if val == '0':
+            return None
+        if not val:
+            return from_ita(default_ita)
+        result = from_ita(val)
+        if not result:
+            print("    ⚠️ Formato non valido. Usa GG/MM/AAAA (es. 20/04/2026)")
+            continue
+        # Se l'input non era già nel formato pulito, chiedi conferma
+        result_ita = to_ita(result)
+        if val != result_ita:
+            conferma = input(f"    → Intendi {result_ita}? (S/N): ").strip().upper()
+            if conferma != 'S':
+                continue
+        return result
+
+
+def ask_time(prompt, default_time):
+    """Chiede un orario con validazione e conferma. Ritorna HH:MM o None se annullato."""
+    while True:
+        val = input(f"{prompt} [{default_time}]: ").strip()
+        if val == '0':
+            return None
+        if not val:
+            return default_time
+        # Accetta HHMM o HH:MM
+        digits = val.replace(':', '')
+        if len(digits) == 4 and digits.isdigit():
+            formatted = f"{digits[:2]}:{digits[2:]}"
+            if val != formatted:
+                conferma = input(f"    → Intendi {formatted}? (S/N): ").strip().upper()
+                if conferma != 'S':
+                    continue
+            return formatted
+        if re.match(r'^\d{1,2}:\d{2}$', val):
+            return val
+        print("    ⚠️ Formato non valido. Usa HH:MM (es. 20:45)")
 
 
 def load_pending():
@@ -250,17 +303,14 @@ def manual_correction():
                     print(f"  Orario attuale: {old_time}")
                     print(f"\n  Inserisci i nuovi valori (invio per mantenere, 0 per annullare):")
 
-                    new_date_input = input(f"  Nuova data (GG/MM/AAAA) [{old_date_ita}]: ").strip()
-                    if new_date_input == '0':
+                    new_date = ask_date("  Nuova data (GG/MM/AAAA)", old_date_ita)
+                    if new_date is None:
                         print("  Annullato.")
                         continue
-                    new_time = input(f"  Nuovo orario (HH:MM) [{old_time}]: ").strip()
-                    if new_time == '0':
+                    new_time = ask_time("  Nuovo orario (HH:MM)", old_time)
+                    if new_time is None:
                         print("  Annullato.")
                         continue
-
-                    new_date = from_ita(new_date_input) if new_date_input else old_date_db
-                    new_time = new_time if new_time else old_time
 
                     if new_date == old_date_db and new_time == old_time:
                         print("\n  Nessuna modifica (valori identici).")
@@ -341,13 +391,21 @@ def pending_menu(data):
                 apply_change(c)
                 applied += 1
             elif risposta == 'M':
-                default_date = to_ita(c['old_date'] or c['new_date'])
+                default_date_ita = to_ita(c['old_date'] or c['new_date'])
                 default_time = c['old_time'] or c['new_time']
                 print(f"    Inserisci i dati corretti (invio = valore tra parentesi):")
-                manual_date = input(f"    Data (GG/MM/AAAA) [{default_date}]: ").strip()
-                manual_time = input(f"    Orario (HH:MM) [{default_time}]: ").strip()
-                c['new_date'] = from_ita(manual_date) if manual_date else (c['old_date'] or c['new_date'])
-                c['new_time'] = manual_time if manual_time else default_time
+                manual_date = ask_date("    Data (GG/MM/AAAA)", default_date_ita)
+                if manual_date is None:
+                    skipped += 1
+                    print("    ❌ Annullato")
+                    continue
+                manual_time = ask_time("    Orario (HH:MM)", default_time)
+                if manual_time is None:
+                    skipped += 1
+                    print("    ❌ Annullato")
+                    continue
+                c['new_date'] = manual_date
+                c['new_time'] = manual_time
                 apply_change(c)
                 applied += 1
             else:
