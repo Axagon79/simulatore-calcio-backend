@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 
+// Versione corrente dei termini — aggiornare quando cambiano T&C
+const CURRENT_VERSION = '1.1';
+
 // GET /user-consent/status — controlla se l'utente ha accettato i termini
 router.get('/status', async (req, res) => {
   try {
@@ -14,7 +17,11 @@ router.get('/status', async (req, res) => {
       return res.json({ accepted: false });
     }
 
-    const accepted = !!(doc.termsAccepted && doc.privacyAccepted && doc.disclaimerAccepted);
+    const accepted = !!(
+      doc.termsAccepted?.version === CURRENT_VERSION &&
+      doc.privacyAccepted &&
+      doc.disclaimerAccepted
+    );
     res.json({ accepted, consents: doc });
   } catch (err) {
     console.error('Errore GET /user-consent/status:', err);
@@ -28,7 +35,7 @@ router.post('/accept', async (req, res) => {
     const db = req.db;
     const now = new Date().toISOString();
     const ip = req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unknown';
-    const version = '1.0';
+    const version = CURRENT_VERSION;
 
     const update = {
       $set: {
