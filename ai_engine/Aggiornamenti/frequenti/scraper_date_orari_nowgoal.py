@@ -36,6 +36,12 @@ except ImportError:
     except:
         sys.exit(1)
 
+import json as _json
+
+# File pending per le modifiche date/orari da approvare manualmente
+_PENDING_PATH = os.path.join(project_root, "log", "date_orari_pending.json")
+_pending_changes = []  # accumulatore in-memory, scritto su file alla fine
+
 try:
     from selenium import webdriver
     from selenium.webdriver.chrome.service import Service
@@ -637,61 +643,38 @@ def run_scraper():
                         date_obj_utc = convert_to_utc(date_str, time_str)        # datetime object
                         match_time_formatted = format_match_time(time_str)        # "20:45"
 
-                        # Aggiorna nel match
-                        match['date_obj'] = date_obj_utc          # MongoDB: ISODate("2026-02-04T20:45:00.000Z")
-                        match['match_time'] = match_time_formatted # String: "20:45"
+                        # Confronta con valori esistenti
+                        old_date_obj = match.get('date_obj')
+                        old_match_time = match.get('match_time', '')
+                        old_date_str = old_date_obj.strftime('%Y-%m-%d') if hasattr(old_date_obj, 'strftime') else str(old_date_obj)[:10] if old_date_obj else None
+                        new_date_str = date_obj_utc.strftime('%Y-%m-%d')
 
-                        # Stato speciale (Postp., Susp., Canc., ecc.)
-                        if m_status:
-                            match['match_status_detail'] = m_status
-                            print(f"⚠{m_status}", end="", flush=True)
+                        date_changed = old_date_str != new_date_str
+                        time_changed = old_match_time != match_time_formatted
+
+                        if date_changed or time_changed:
+                            # Differenza trovata — NON modifica, accumula nel pending
+                            _pending_changes.append({
+                                "league": league_name,
+                                "home": match['home'],
+                                "away": match['away'],
+                                "old_date": old_date_str,
+                                "new_date": new_date_str,
+                                "old_time": old_match_time,
+                                "new_time": match_time_formatted,
+                                "status": m_status,
+                                "round_id": str(round_doc["_id"]),
+                            })
+                            print("△", end="", flush=True)
+                            updated_count += 1
+                            league_stats['updated'] += 1
+                            report_data['summary']['updated'] += 1
                         else:
-                            # Rimuovi stato speciale se la partita torna normale
-                            match.pop('match_status_detail', None)
-                            print("✓", end="", flush=True)
-
-                        updated_count += 1
-                        league_stats['updated'] += 1
-                        report_data['summary']['updated'] += 1
+                            print("=", end="", flush=True)
 
 
                     else:
                         league_stats['processed'] += 0  # no-op, match non trovato
-                
-                # Salva modifiche nel DB
-                if updated_count > 0:
-                    db.h2h_by_round.update_one(
-                        {"_id": round_doc["_id"]},
-                        {"$set": {"matches": matches}}
-                    )
-
-                    # Propaga date, match_time, match_status_detail in unified e prediction_versions
-                    for match in matches:
-                        date_obj = match.get('date_obj')
-                        match_time = match.get('match_time', '')
-                        if date_obj:
-                            new_date = date_obj.strftime('%Y-%m-%d') if hasattr(date_obj, 'strftime') else str(date_obj)[:10]
-                            # Aggiorna date e match_time in unified e prediction_versions
-                            for coll_name in ['daily_predictions_unified', 'prediction_versions']:
-                                coll = db[coll_name]
-                                # Aggiorna tutti i documenti di questa partita (qualsiasi data vecchia)
-                                coll.update_many(
-                                    {"home": match['home'], "away": match['away'], "league": league_name},
-                                    {"$set": {"date": new_date, "match_time": match_time}}
-                                )
-
-                        m_status_detail = match.get('match_status_detail')
-                        if m_status_detail:
-                            db.daily_predictions_unified.update_many(
-                                {"home": match['home'], "away": match['away'], "league": league_name},
-                                {"$set": {"match_status_detail": m_status_detail}}
-                            )
-                        else:
-                            # Rimuovi se la partita torna normale
-                            db.daily_predictions_unified.update_many(
-                                {"home": match['home'], "away": match['away'], "league": league_name, "match_status_detail": {"$exists": True}},
-                                {"$unset": {"match_status_detail": ""}}
-                            )
 
                 print(f" ({updated_count}/{len(matches)})")
             
@@ -713,14 +696,31 @@ def run_scraper():
     report_data['summary']['not_updated'] = total - updated
     if total > 0:
         report_data['summary']['success_rate'] = (updated / total) * 100
-    
+
     print("\n" + "="*80)
     print("📊 RIEPILOGO FINALE")
     print("="*80)
     print(f"🎯 Partite totali: {total}")
-    print(f"✅ Date/Orari aggiornati: {updated}")
-    print(f"❌ Non aggiornati: {total - updated}")
-    print(f"📈 Successo: {report_data['summary']['success_rate']:.1f}%")
+    print(f"△ Differenze trovate: {len(_pending_changes)}")
+    print(f"= Invariate: {total - len(_pending_changes)}")
+
+    # Salva pending JSON se ci sono differenze
+    if _pending_changes:
+        with open(_PENDING_PATH, "w", encoding="utf-8") as f:
+            _json.dump({
+                "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "count": len(_pending_changes),
+                "changes": _pending_changes,
+            }, f, ensure_ascii=False, indent=2)
+        print(f"\n⚠️  {len(_pending_changes)} modifiche in attesa di approvazione!")
+        print(f"📄 File: {_PENDING_PATH}")
+        print(f"\n👉 Per applicare le modifiche lancia: python applica_date_orari.py")
+    else:
+        # Nessuna differenza — pulisci eventuale pending vecchio
+        if os.path.exists(_PENDING_PATH):
+            os.remove(_PENDING_PATH)
+        print("\n✅ Nessuna differenza trovata, nulla da modificare.")
+
     print("\n✅ Scraper completato!")
 
 if __name__ == "__main__":
