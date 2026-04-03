@@ -151,6 +151,43 @@ def _sync_results_to_predictions(updated_results):
     if total_synced > 0:
         print(f"   📋 Sync: {total_synced} pronostici aggiornati con risultati")
 
+
+def _sync_results_to_quote_anomale(updated_results):
+    """Propaga risultati finali alla collection quote_anomale.
+    updated_results: lista di (home, away, date_str, score)
+    Scrive real_score dove mancante, matchando per nome canonico + date ±1 giorno.
+    """
+    if not updated_results:
+        return
+    total_synced = 0
+    for home, away, date_str, score in updated_results:
+        dates_to_try = [date_str]
+        try:
+            d = datetime.strptime(date_str, '%Y-%m-%d')
+            dates_to_try.append((d - timedelta(days=1)).strftime('%Y-%m-%d'))
+            dates_to_try.append((d + timedelta(days=1)).strftime('%Y-%m-%d'))
+        except ValueError:
+            pass
+        try:
+            result = db.quote_anomale.update_many(
+                {
+                    'home': home,
+                    'away': away,
+                    'date': {'$in': dates_to_try},
+                    '$or': [
+                        {'real_score': None},
+                        {'real_score': {'$exists': False}},
+                    ],
+                },
+                {'$set': {'real_score': score}}
+            )
+            total_synced += result.modified_count
+        except Exception:
+            pass
+    if total_synced > 0:
+        print(f"   📊 Sync: {total_synced} quote_anomale aggiornate con risultati")
+
+
 # --- TARGET_CONFIG UNIFICATO ---
 # // modificato per: contenere tutte le chiavi richieste dalle funzioni originali
 TARGET_CONFIG = {
@@ -291,6 +328,7 @@ def process_league(driver, league_config):
 
     # Sync risultati alle collection pronostici (live_score + live_status)
     _sync_results_to_predictions(updated_for_sync)
+    _sync_results_to_quote_anomale(updated_for_sync)
 
     # Log differenziato in base all'attività svolta
     if totale_aggiornati > 0:
@@ -492,6 +530,7 @@ def scrape_nowgoal_league(config):
 
     # Sync risultati alle collection pronostici (live_score + live_status)
     _sync_results_to_predictions(updated_for_sync)
+    _sync_results_to_quote_anomale(updated_for_sync)
 
     if totale_aggiornati > 0:
         print(f"✅ {config['league_name']}: Aggiornati {totale_aggiornati} risultati (via NowGoal).")
