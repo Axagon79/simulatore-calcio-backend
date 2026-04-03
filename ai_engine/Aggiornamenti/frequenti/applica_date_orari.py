@@ -54,10 +54,23 @@ def from_ita(date_str):
     return None
 
 
+class ExitScript(Exception):
+    """Eccezione per uscire dallo script in qualsiasi punto."""
+    pass
+
+
+def safe_input(prompt):
+    """Input che intercetta Q/q per uscire dallo script."""
+    val = input(prompt).strip()
+    if val.upper() == 'Q':
+        raise ExitScript()
+    return val
+
+
 def ask_date(prompt, default_ita):
     """Chiede una data con validazione e conferma. Ritorna YYYY-MM-DD o None se annullato."""
     while True:
-        val = input(f"{prompt} [{default_ita}]: ").strip()
+        val = safe_input(f"{prompt} [{default_ita}]: ")
         if val == '0':
             return None
         if not val:
@@ -69,7 +82,7 @@ def ask_date(prompt, default_ita):
         # Se l'input non era già nel formato pulito, chiedi conferma
         result_ita = to_ita(result)
         if val != result_ita:
-            conferma = input(f"    → Intendi {result_ita}? (S/N): ").strip().upper()
+            conferma = safe_input(f"    → Intendi {result_ita}? (S/N): ").upper()
             if conferma != 'S':
                 continue
         return result
@@ -78,7 +91,7 @@ def ask_date(prompt, default_ita):
 def ask_time(prompt, default_time):
     """Chiede un orario con validazione e conferma. Ritorna HH:MM o None se annullato."""
     while True:
-        val = input(f"{prompt} [{default_time}]: ").strip()
+        val = safe_input(f"{prompt} [{default_time}]: ")
         if val == '0':
             return None
         if not val:
@@ -88,7 +101,7 @@ def ask_time(prompt, default_time):
         if len(digits) == 4 and digits.isdigit():
             formatted = f"{digits[:2]}:{digits[2:]}"
             if val != formatted:
-                conferma = input(f"    → Intendi {formatted}? (S/N): ").strip().upper()
+                conferma = safe_input(f"    → Intendi {formatted}? (S/N): ").upper()
                 if conferma != 'S':
                     continue
             return formatted
@@ -97,7 +110,7 @@ def ask_time(prompt, default_time):
         # Solo ore (es. "20" → "20:00")
         if re.match(r'^\d{1,2}$', val) and 0 <= int(val) <= 23:
             formatted = f"{int(val):02d}:00"
-            conferma = input(f"    → Intendi {formatted}? (S/N): ").strip().upper()
+            conferma = safe_input(f"    → Intendi {formatted}? (S/N): ").upper()
             if conferma == 'S':
                 return formatted
             continue
@@ -208,7 +221,7 @@ def manual_correction():
         print(f"\n  [0] Torna al menu principale")
         print()
 
-        idx = input("Scegli nazione (numero): ").strip()
+        idx = safe_input("Scegli nazione (numero): ")
         if idx == '0':
             return
         try:
@@ -228,7 +241,7 @@ def manual_correction():
             print(f"\n  [0] Indietro (nazioni)")
             print()
 
-            idx = input("Scegli campionato (numero): ").strip()
+            idx = safe_input("Scegli campionato (numero): ")
             if idx == '0':
                 break
             try:
@@ -263,7 +276,7 @@ def manual_correction():
                 print(f"\n  [0] Indietro (campionati)")
                 print()
 
-                idx = input("Scegli giornata (numero): ").strip()
+                idx = safe_input("Scegli giornata (numero): ")
                 if idx == '0':
                     break
                 try:
@@ -296,7 +309,7 @@ def manual_correction():
                     print(f"\n  [0] Indietro (giornate)")
                     print()
 
-                    idx = input("Scegli partita (numero): ").strip()
+                    idx = safe_input("Scegli partita (numero): ")
                     if idx == '0':
                         break
                     try:
@@ -331,7 +344,7 @@ def manual_correction():
 
                     print(f"\n  Riepilogo: {match['home']} vs {match['away']}")
                     print(f"  {old_date_ita} {old_time}  →  {to_ita(new_date)} {new_time}")
-                    conferma = input("\n  Confermi? (S/N): ").strip().upper()
+                    conferma = safe_input("\n  Confermi? (S/N): ").upper()
                     if conferma != 'S':
                         print("  Annullato.")
                         continue
@@ -364,7 +377,7 @@ def pending_menu(data):
     print("  [N] Torna indietro")
     print()
 
-    scelta = input("Scelta: ").strip().upper()
+    scelta = safe_input("Scelta: ").upper()
 
     if scelta == 'N':
         return
@@ -375,7 +388,7 @@ def pending_menu(data):
 
     if scelta == 'T':
         show_changes(changes)
-        conferma = input("Confermi di applicare TUTTE? (S/N): ").strip().upper()
+        conferma = safe_input("Confermi di applicare TUTTE? (S/N): ").upper()
         if conferma != 'S':
             print("Annullato.")
             return
@@ -399,7 +412,7 @@ def pending_menu(data):
                 print(f"  ORARIO ORIGINALE: {c['old_time'] or 'N/A'}")
                 print(f"  ORARIO NOWGOAL:   {c['new_time']}")
 
-            risposta = input("  (S=applica NowGoal / N=scarta / M=inserisci manualmente): ").strip().upper()
+            risposta = safe_input("  (S=applica NowGoal / N=scarta / M=inserisci manualmente): ").upper()
             if risposta == 'S':
                 apply_change(c)
                 applied += 1
@@ -449,7 +462,7 @@ def main():
     print("  [N] Esci")
     print()
 
-    scelta = input("Scelta: ").strip().upper()
+    scelta = safe_input("Scelta: ").upper()
 
     if scelta == 'N':
         print("Uscita.")
@@ -470,4 +483,9 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except ExitScript:
+        print("\n\n👋 Uscita dallo script.")
+    except KeyboardInterrupt:
+        print("\n\n👋 Uscita dallo script.")
