@@ -108,6 +108,11 @@ except ImportError:
 LIVE_URL = "https://live4.nowgoal26.com/"
 CYCLE_SECONDS = 120       # Ogni 2 minuti
 _leagues_selected = False  # Flag: "Select All" leagues già cliccato
+
+# Squadre U21/U20/giovanili che giocano in campionati regolari — bypass skip
+_YOUTH_WHITELIST = {
+    'Utrecht U21',
+}
 PAGE_LOAD_WAIT = 5        # Secondi di attesa dopo navigazione
 RESTART_EVERY_N_CYCLES = 50  # Restart preventivo del driver ogni N cicli
 CYCLE_TIMEOUT = 90            # Max secondi per un ciclo, poi watchdog killa Chrome
@@ -348,7 +353,8 @@ def parse_nowgoal_live_page(driver) -> List[Dict]:
             # Skip partite giovanili/riserve/femminili (evita falsi match con prime squadre)
             _skip_patterns = ('Reserves', 'Reserve', 'U21', 'U20', 'U19', 'U18', 'U17', 'Youth', '(W)', '(w)', 'Women')
             if any(p in home_text or p in away_text for p in _skip_patterns):
-                continue
+                if home_text not in _YOUTH_WHITELIST and away_text not in _YOUTH_WHITELIST:
+                    continue
 
             # Determina stato
             if status_text.isdigit():
