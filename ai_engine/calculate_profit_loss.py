@@ -202,6 +202,8 @@ for coll_name in PREDICTION_COLLECTIONS:
                     continue
 
             pronostico = prono.get('pronostico', '')
+            if pronostico == 'NO BET':
+                continue
             tipo = prono.get('tipo', '')
             stake = prono.get('stake') or 0
             quota = prono.get('quota')
