@@ -134,9 +134,15 @@ def apply_change(c):
 
     # 1. Aggiorna in h2h_by_round
     if round_id:
+        # _id può essere ObjectId o stringa
+        try:
+            rid = ObjectId(round_id)
+        except Exception:
+            rid = round_id
+
         new_date_obj = datetime.strptime(f"{new_date} {new_time}", "%Y-%m-%d %H:%M")
         db.h2h_by_round.update_one(
-            {"_id": ObjectId(round_id), "matches.home": home, "matches.away": away},
+            {"_id": rid, "matches.home": home, "matches.away": away},
             {"$set": {
                 "matches.$.date_obj": new_date_obj,
                 "matches.$.match_time": new_time,
@@ -145,12 +151,12 @@ def apply_change(c):
         # Stato speciale
         if m_status:
             db.h2h_by_round.update_one(
-                {"_id": ObjectId(round_id), "matches.home": home, "matches.away": away},
+                {"_id": rid, "matches.home": home, "matches.away": away},
                 {"$set": {"matches.$.match_status_detail": m_status}}
             )
         else:
             db.h2h_by_round.update_one(
-                {"_id": ObjectId(round_id), "matches.home": home, "matches.away": away},
+                {"_id": rid, "matches.home": home, "matches.away": away},
                 {"$unset": {"matches.$.match_status_detail": ""}}
             )
 
