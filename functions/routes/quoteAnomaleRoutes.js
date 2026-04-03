@@ -236,4 +236,89 @@ router.get('/predictions', async (req, res) => {
   }
 });
 
+// POST /quote-anomale/analysis-premium
+// Genera analisi AI (Mistral) per una partita — Premium only
+router.post('/analysis-premium', async (req, res) => {
+  try {
+    const { match_key, date, isAdmin } = req.body;
+
+    if (!match_key || !date) {
+      return res.status(400).json({ success: false, error: 'Missing match_key or date' });
+    }
+    // Solo admin/premium
+    if (isAdmin !== true && isAdmin !== 'true') {
+      return res.status(403).json({ success: false, error: 'Premium analysis is admin-only' });
+    }
+
+    // 1. Leggi doc quote_anomale
+    const qa = await req.db.collection('quote_anomale')
+      .findOne({ date, match_key }, { projection: { _id: 0, storico: 0 } });
+
+    if (!qa) {
+      return res.json({ success: false, error: 'Partita non trovata in quote_anomale' });
+    }
+
+    // 2. Cache check
+    if (qa.analysis_premium) {
+      return res.json({ success: true, analysis: qa.analysis_premium, cached: true });
+    }
+
+    // 3. Cerca pronostici in daily_predictions_unified (match per home/away)
+    const homeName = qa.home && qa.home !== '-' ? qa.home : qa.home_raw;
+    const awayName = qa.away && qa.away !== '-' ? qa.away : qa.away_raw;
+
+    let pronostici = [];
+    const pred = await req.db.collection('daily_predictions_unified')
+      .findOne(
+        { date, home: { $regex: new RegExp(homeName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') } },
+        { projection: { _id: 0, pronostici: 1 } }
+      );
+    if (pred && pred.pronostici) {
+      pronostici = pred.pronostici.map(p => ({
+        tipo: p.tipo,
+        pronostico: p.pronostico,
+        quota: p.quota ?? null,
+        confidence: p.confidence ?? null,
+        stars: p.stars ?? null,
+        stake: p.stake ?? null,
+        edge: p.edge ?? null,
+        elite: p.elite ?? false,
+      }));
+    }
+
+    // 4. Componi JSON per Mistral (solo campi utili)
+    const matchJson = {
+      league: qa.league || qa.league_raw || '',
+      match_time: qa.match_time || '',
+      home: homeName,
+      away: awayName,
+      quote_apertura: qa.quote_apertura,
+      quote_chiusura: qa.quote_chiusura || null,
+      semaforo: qa.semaforo || null,
+      alert_breakeven: qa.alert_breakeven || null,
+      direzione: qa.direzione || null,
+      v_index_abs: qa.v_index_abs || null,
+      v_index_rel: qa.v_index_rel || null,
+      rendimento_apertura: qa.rendimento_apertura || null,
+      rendimento_chiusura: qa.rendimento_chiusura || null,
+    };
+    if (pronostici.length > 0) {
+      matchJson.pronostici = pronostici;
+    }
+
+    // 5. Chiama Mistral
+    const { generateOddsMonitorAnalysis } = require('../services/llmService');
+    const analysis = await generateOddsMonitorAnalysis(matchJson);
+
+    // 6. Salva in cache
+    await req.db.collection('quote_anomale')
+      .updateOne({ date, match_key }, { $set: { analysis_premium: analysis } });
+
+    res.json({ success: true, analysis, cached: false });
+  } catch (error) {
+    console.error('[QUOTE-ANOMALE/ANALYSIS-PREMIUM]', error.message);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 module.exports = router;
