@@ -6,6 +6,7 @@ e permette di applicarle selettivamente al database.
 import os
 import sys
 import json
+import re
 from datetime import datetime
 from bson import ObjectId
 
@@ -103,135 +104,166 @@ def apply_change(c):
 
 
 def manual_correction():
-    """Correzione manuale: nazione → campionato → giornata → partita → data/orario."""
+    """Correzione manuale: nazione → campionato → giornata → partita → data/orario.
+    [0] ad ogni livello per tornare indietro."""
 
-    print(f"\n{'='*80}")
-    print("✏️  CORREZIONE MANUALE DATE/ORARI")
-    print(f"{'='*80}")
+    while True:
+        print(f"\n{'='*80}")
+        print("✏️  CORREZIONE MANUALE DATE/ORARI")
+        print(f"{'='*80}")
 
-    # 1. Nazione
-    countries = db.h2h_by_round.distinct("country")
-    countries = sorted([c for c in countries if c])
+        # 1. Nazione
+        countries = db.h2h_by_round.distinct("country")
+        countries = sorted([c for c in countries if c])
 
-    print(f"\nNazioni disponibili:\n")
-    for i, c in enumerate(countries):
-        print(f"  [{i+1}] {c}")
-    print()
+        print(f"\nNazioni disponibili:\n")
+        for i, c in enumerate(countries):
+            print(f"  [{i+1}] {c}")
+        print(f"\n  [0] Torna al menu principale")
+        print()
 
-    idx = input("Scegli nazione (numero): ").strip()
-    try:
-        country = countries[int(idx) - 1]
-    except (ValueError, IndexError):
-        print("Scelta non valida.")
-        return
+        idx = input("Scegli nazione (numero): ").strip()
+        if idx == '0':
+            return
+        try:
+            country = countries[int(idx) - 1]
+        except (ValueError, IndexError):
+            print("Scelta non valida.")
+            continue
 
-    # 2. Campionato
-    leagues = db.h2h_by_round.distinct("league", {"country": country})
-    leagues = sorted([l for l in leagues if l])
+        # 2. Campionato
+        while True:
+            leagues = db.h2h_by_round.distinct("league", {"country": country})
+            leagues = sorted([l for l in leagues if l])
 
-    print(f"\nCampionati {country}:\n")
-    for i, l in enumerate(leagues):
-        print(f"  [{i+1}] {l}")
-    print()
+            print(f"\nCampionati {country}:\n")
+            for i, l in enumerate(leagues):
+                print(f"  [{i+1}] {l}")
+            print(f"\n  [0] Indietro (nazioni)")
+            print()
 
-    idx = input("Scegli campionato (numero): ").strip()
-    try:
-        league = leagues[int(idx) - 1]
-    except (ValueError, IndexError):
-        print("Scelta non valida.")
-        return
+            idx = input("Scegli campionato (numero): ").strip()
+            if idx == '0':
+                break
+            try:
+                league = leagues[int(idx) - 1]
+            except (ValueError, IndexError):
+                print("Scelta non valida.")
+                continue
 
-    # 3. Giornata
-    rounds = list(db.h2h_by_round.find(
-        {"country": country, "league": league},
-        {"round_name": 1, "_id": 1}
-    ).sort("round_name", 1))
+            # 3. Giornata
+            while True:
+                def _round_sort_key(r):
+                    """Estrae il numero dalla giornata per ordinamento numerico."""
+                    m = re.match(r'(\d+)', r.get('round_name') or '0')
+                    return int(m.group(1)) if m else 0
 
-    if not rounds:
-        print(f"Nessuna giornata trovata per {league}")
-        return
+                rounds = sorted(
+                    list(db.h2h_by_round.find(
+                        {"country": country, "league": league},
+                        {"round_name": 1, "_id": 1}
+                    )),
+                    key=_round_sort_key
+                )
 
-    print(f"\nGiornate {league}:\n")
-    for i, r in enumerate(rounds):
-        rname = r.get("round_name") or "N/A"
-        print(f"  [{i+1}] {rname}")
-    print()
+                if not rounds:
+                    print(f"Nessuna giornata trovata per {league}")
+                    break
 
-    idx = input("Scegli giornata (numero): ").strip()
-    try:
-        round_doc = rounds[int(idx) - 1]
-    except (ValueError, IndexError):
-        print("Scelta non valida.")
-        return
+                print(f"\nGiornate {league}:\n")
+                for i, r in enumerate(rounds):
+                    rname = r.get("round_name") or "N/A"
+                    print(f"  [{i+1}] {rname}")
+                print(f"\n  [0] Indietro (campionati)")
+                print()
 
-    # Carica il doc completo con i matches
-    full_doc = db.h2h_by_round.find_one({"_id": round_doc["_id"]})
-    matches = full_doc.get("matches", [])
-    round_id = str(full_doc["_id"])
+                idx = input("Scegli giornata (numero): ").strip()
+                if idx == '0':
+                    break
+                try:
+                    round_doc = rounds[int(idx) - 1]
+                except (ValueError, IndexError):
+                    print("Scelta non valida.")
+                    continue
 
-    if not matches:
-        print("Nessuna partita in questa giornata.")
-        return
+                # Carica il doc completo con i matches
+                full_doc = db.h2h_by_round.find_one({"_id": round_doc["_id"]})
+                matches = full_doc.get("matches", [])
+                round_id = str(full_doc["_id"])
 
-    # 4. Partita
-    print(f"\nPartite {round_doc.get('round_name', '')}:\n")
-    for i, m in enumerate(matches):
-        date_obj = m.get("date_obj")
-        date_str = date_obj.strftime("%Y-%m-%d") if hasattr(date_obj, "strftime") else str(date_obj)[:10] if date_obj else "N/A"
-        time_str = m.get("match_time", "N/A")
-        status = m.get("status", "")
-        score = m.get("real_score", "")
-        extra = f" [{status}]" if status else ""
-        extra += f" {score}" if score else ""
-        print(f"  [{i+1}] {m['home']} vs {m['away']}  |  {date_str} {time_str}{extra}")
-    print()
+                if not matches:
+                    print("Nessuna partita in questa giornata.")
+                    continue
 
-    idx = input("Scegli partita (numero): ").strip()
-    try:
-        match = matches[int(idx) - 1]
-    except (ValueError, IndexError):
-        print("Scelta non valida.")
-        return
+                # 4. Partita
+                while True:
+                    print(f"\nPartite {round_doc.get('round_name', '')}:\n")
+                    for i, m in enumerate(matches):
+                        date_obj = m.get("date_obj")
+                        date_str = date_obj.strftime("%Y-%m-%d") if hasattr(date_obj, "strftime") else str(date_obj)[:10] if date_obj else "N/A"
+                        time_str = m.get("match_time", "N/A")
+                        status = m.get("status", "")
+                        score = m.get("real_score", "")
+                        extra = f" [{status}]" if status else ""
+                        extra += f" {score}" if score else ""
+                        print(f"  [{i+1}] {m['home']} vs {m['away']}  |  {date_str} {time_str}{extra}")
+                    print(f"\n  [0] Indietro (giornate)")
+                    print()
 
-    # 5. Mostra dati attuali e chiedi nuovi
-    old_date_obj = match.get("date_obj")
-    old_date = old_date_obj.strftime("%Y-%m-%d") if hasattr(old_date_obj, "strftime") else str(old_date_obj)[:10] if old_date_obj else "N/A"
-    old_time = match.get("match_time", "N/A")
+                    idx = input("Scegli partita (numero): ").strip()
+                    if idx == '0':
+                        break
+                    try:
+                        match = matches[int(idx) - 1]
+                    except (ValueError, IndexError):
+                        print("Scelta non valida.")
+                        continue
 
-    print(f"\n  Partita: {match['home']} vs {match['away']}")
-    print(f"  Data attuale: {old_date}")
-    print(f"  Orario attuale: {old_time}")
-    print(f"\n  Inserisci i nuovi valori (invio per mantenere il valore attuale):")
+                    # 5. Mostra dati attuali e chiedi nuovi
+                    old_date_obj = match.get("date_obj")
+                    old_date = old_date_obj.strftime("%Y-%m-%d") if hasattr(old_date_obj, "strftime") else str(old_date_obj)[:10] if old_date_obj else "N/A"
+                    old_time = match.get("match_time", "N/A")
 
-    new_date = input(f"  Nuova data (YYYY-MM-DD) [{old_date}]: ").strip()
-    new_time = input(f"  Nuovo orario (HH:MM) [{old_time}]: ").strip()
+                    print(f"\n  Partita: {match['home']} vs {match['away']}")
+                    print(f"  Data attuale: {old_date}")
+                    print(f"  Orario attuale: {old_time}")
+                    print(f"\n  Inserisci i nuovi valori (invio per mantenere, 0 per annullare):")
 
-    new_date = new_date if new_date else old_date
-    new_time = new_time if new_time else old_time
+                    new_date = input(f"  Nuova data (YYYY-MM-DD) [{old_date}]: ").strip()
+                    if new_date == '0':
+                        print("  Annullato.")
+                        continue
+                    new_time = input(f"  Nuovo orario (HH:MM) [{old_time}]: ").strip()
+                    if new_time == '0':
+                        print("  Annullato.")
+                        continue
 
-    if new_date == old_date and new_time == old_time:
-        print("\n  Nessuna modifica (valori identici).")
-        return
+                    new_date = new_date if new_date else old_date
+                    new_time = new_time if new_time else old_time
 
-    print(f"\n  Riepilogo: {match['home']} vs {match['away']}")
-    print(f"  {old_date} {old_time}  →  {new_date} {new_time}")
-    conferma = input("\n  Confermi? (S/N): ").strip().upper()
-    if conferma != 'S':
-        print("  Annullato.")
-        return
+                    if new_date == old_date and new_time == old_time:
+                        print("\n  Nessuna modifica (valori identici).")
+                        continue
 
-    # 6. Applica
-    change = {
-        "league": league,
-        "home": match["home"],
-        "away": match["away"],
-        "new_date": new_date,
-        "new_time": new_time,
-        "status": None,
-        "round_id": round_id,
-    }
-    apply_change(change)
-    print(f"\n✅ Correzione applicata!")
+                    print(f"\n  Riepilogo: {match['home']} vs {match['away']}")
+                    print(f"  {old_date} {old_time}  →  {new_date} {new_time}")
+                    conferma = input("\n  Confermi? (S/N): ").strip().upper()
+                    if conferma != 'S':
+                        print("  Annullato.")
+                        continue
+
+                    # 6. Applica
+                    change = {
+                        "league": league,
+                        "home": match["home"],
+                        "away": match["away"],
+                        "new_date": new_date,
+                        "new_time": new_time,
+                        "status": None,
+                        "round_id": round_id,
+                    }
+                    apply_change(change)
+                    print(f"\n✅ Correzione applicata!")
 
 
 def pending_menu(data):
