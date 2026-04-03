@@ -24,6 +24,26 @@ from config import db
 PENDING_PATH = os.path.join(os.path.dirname(current_dir), "date_orari", "date_orari_pending.json")
 
 
+def to_ita(date_str):
+    """YYYY-MM-DD → DD/MM/YYYY per visualizzazione."""
+    if not date_str or date_str == 'N/A':
+        return date_str or 'N/A'
+    try:
+        return datetime.strptime(date_str, "%Y-%m-%d").strftime("%d/%m/%Y")
+    except ValueError:
+        return date_str
+
+
+def from_ita(date_str):
+    """DD/MM/YYYY → YYYY-MM-DD per il database."""
+    if not date_str:
+        return date_str
+    try:
+        return datetime.strptime(date_str, "%d/%m/%Y").strftime("%Y-%m-%d")
+    except ValueError:
+        return date_str
+
+
 def load_pending():
     if not os.path.exists(PENDING_PATH):
         return None
@@ -39,8 +59,8 @@ def show_changes(changes):
     for i, c in enumerate(changes):
         print(f"  [{i+1}] {c['league']} | {c['home']} vs {c['away']}")
         if c['old_date'] != c['new_date']:
-            print(f"      DATA ORIGINALE (Step 11): {c['old_date'] or 'N/A'}")
-            print(f"      DATA NOWGOAL (Step 12):   {c['new_date']}")
+            print(f"      DATA ORIGINALE (Step 11): {to_ita(c['old_date'])}")
+            print(f"      DATA NOWGOAL (Step 12):   {to_ita(c['new_date'])}")
         if c['old_time'] != c['new_time']:
             print(f"      ORARIO ORIGINALE: {c['old_time'] or 'N/A'}")
             print(f"      ORARIO NOWGOAL:   {c['new_time']}")
@@ -200,7 +220,7 @@ def manual_correction():
                     print(f"\nPartite {round_doc.get('round_name', '')}:\n")
                     for i, m in enumerate(matches):
                         date_obj = m.get("date_obj")
-                        date_str = date_obj.strftime("%Y-%m-%d") if hasattr(date_obj, "strftime") else str(date_obj)[:10] if date_obj else "N/A"
+                        date_str = date_obj.strftime("%d/%m/%Y") if hasattr(date_obj, "strftime") else "N/A"
                         time_str = m.get("match_time", "N/A")
                         status = m.get("status", "")
                         score = m.get("real_score", "")
@@ -221,16 +241,17 @@ def manual_correction():
 
                     # 5. Mostra dati attuali e chiedi nuovi
                     old_date_obj = match.get("date_obj")
-                    old_date = old_date_obj.strftime("%Y-%m-%d") if hasattr(old_date_obj, "strftime") else str(old_date_obj)[:10] if old_date_obj else "N/A"
+                    old_date_db = old_date_obj.strftime("%Y-%m-%d") if hasattr(old_date_obj, "strftime") else str(old_date_obj)[:10] if old_date_obj else "N/A"
+                    old_date_ita = to_ita(old_date_db)
                     old_time = match.get("match_time", "N/A")
 
                     print(f"\n  Partita: {match['home']} vs {match['away']}")
-                    print(f"  Data attuale: {old_date}")
+                    print(f"  Data attuale: {old_date_ita}")
                     print(f"  Orario attuale: {old_time}")
                     print(f"\n  Inserisci i nuovi valori (invio per mantenere, 0 per annullare):")
 
-                    new_date = input(f"  Nuova data (YYYY-MM-DD) [{old_date}]: ").strip()
-                    if new_date == '0':
+                    new_date_input = input(f"  Nuova data (GG/MM/AAAA) [{old_date_ita}]: ").strip()
+                    if new_date_input == '0':
                         print("  Annullato.")
                         continue
                     new_time = input(f"  Nuovo orario (HH:MM) [{old_time}]: ").strip()
@@ -238,15 +259,15 @@ def manual_correction():
                         print("  Annullato.")
                         continue
 
-                    new_date = new_date if new_date else old_date
+                    new_date = from_ita(new_date_input) if new_date_input else old_date_db
                     new_time = new_time if new_time else old_time
 
-                    if new_date == old_date and new_time == old_time:
+                    if new_date == old_date_db and new_time == old_time:
                         print("\n  Nessuna modifica (valori identici).")
                         continue
 
                     print(f"\n  Riepilogo: {match['home']} vs {match['away']}")
-                    print(f"  {old_date} {old_time}  →  {new_date} {new_time}")
+                    print(f"  {old_date_ita} {old_time}  →  {to_ita(new_date)} {new_time}")
                     conferma = input("\n  Confermi? (S/N): ").strip().upper()
                     if conferma != 'S':
                         print("  Annullato.")
@@ -309,8 +330,8 @@ def pending_menu(data):
         for i, c in enumerate(changes):
             print(f"\n[{i+1}/{len(changes)}] {c['league']} | {c['home']} vs {c['away']}")
             if c['old_date'] != c['new_date']:
-                print(f"  DATA ORIGINALE (Step 11): {c['old_date'] or 'N/A'}")
-                print(f"  DATA NOWGOAL (Step 12):   {c['new_date']}")
+                print(f"  DATA ORIGINALE (Step 11): {to_ita(c['old_date'])}")
+                print(f"  DATA NOWGOAL (Step 12):   {to_ita(c['new_date'])}")
             if c['old_time'] != c['new_time']:
                 print(f"  ORARIO ORIGINALE: {c['old_time'] or 'N/A'}")
                 print(f"  ORARIO NOWGOAL:   {c['new_time']}")
@@ -320,11 +341,13 @@ def pending_menu(data):
                 apply_change(c)
                 applied += 1
             elif risposta == 'M':
+                default_date = to_ita(c['old_date'] or c['new_date'])
+                default_time = c['old_time'] or c['new_time']
                 print(f"    Inserisci i dati corretti (invio = valore tra parentesi):")
-                manual_date = input(f"    Data (YYYY-MM-DD) [{c['old_date'] or c['new_date']}]: ").strip()
-                manual_time = input(f"    Orario (HH:MM) [{c['old_time'] or c['new_time']}]: ").strip()
-                c['new_date'] = manual_date if manual_date else (c['old_date'] or c['new_date'])
-                c['new_time'] = manual_time if manual_time else (c['old_time'] or c['new_time'])
+                manual_date = input(f"    Data (GG/MM/AAAA) [{default_date}]: ").strip()
+                manual_time = input(f"    Orario (HH:MM) [{default_time}]: ").strip()
+                c['new_date'] = from_ita(manual_date) if manual_date else (c['old_date'] or c['new_date'])
+                c['new_time'] = manual_time if manual_time else default_time
                 apply_change(c)
                 applied += 1
             else:
