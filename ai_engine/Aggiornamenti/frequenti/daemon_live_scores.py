@@ -597,6 +597,15 @@ def run_cycle(driver):
                     {"$set": {"live_score": new_score, "live_status": new_status, "live_minute": new_minute}}
                 )
 
+            # Propaga a quote_anomale: live sempre, real_score solo se Finished
+            qa_set = {"live_score": new_score, "live_status": new_status, "live_minute": new_minute}
+            if new_status == "Finished":
+                qa_set["real_score"] = new_score
+            db.quote_anomale.update_many(
+                {"home": home, "away": away},
+                {"$set": qa_set}
+            )
+
     print(f"\n   Matched: {matched_count} | Aggiornati: {updated_count}")
 
     elapsed = (datetime.now() - cycle_start).total_seconds()
