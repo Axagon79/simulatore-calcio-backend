@@ -94,6 +94,13 @@ def ask_time(prompt, default_time):
             return formatted
         if re.match(r'^\d{1,2}:\d{2}$', val):
             return val
+        # Solo ore (es. "20" → "20:00")
+        if re.match(r'^\d{1,2}$', val) and 0 <= int(val) <= 23:
+            formatted = f"{int(val):02d}:00"
+            conferma = input(f"    → Intendi {formatted}? (S/N): ").strip().upper()
+            if conferma == 'S':
+                return formatted
+            continue
         print("    ⚠️ Formato non valido. Usa HH:MM (es. 20:45)")
 
 
