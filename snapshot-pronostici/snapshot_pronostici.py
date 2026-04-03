@@ -98,9 +98,9 @@ def format_tip_line(t, is_last=True):
     connector = "└─" if is_last else "├─"
     tipo = t.get("tipo", "")
     pronostico = t.get("pronostico", "")
-    quota = t.get("quota", "-")
-    conf = t.get("confidence", 0)
-    stake = t.get("stake", "-")
+    quota = t.get("quota") or "-"
+    conf = t.get("confidence") or 0
+    stake = t.get("stake") or "-"
     source = t.get("source", "")
 
     # Allineamento colonne
