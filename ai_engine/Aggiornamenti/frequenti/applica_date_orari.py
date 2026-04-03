@@ -1,7 +1,8 @@
 """
-APPLICA DATE & ORARI — Script interattivo
+APPLICA DATE & ORARI + STATO PARTITA — Script interattivo
 Legge le differenze trovate dallo step 12 (scraper_date_orari_nowgoal.py)
 e permette di applicarle selettivamente al database.
+Include anche la gestione dello stato partita (posticipata, annullata, ecc.)
 """
 import os
 import sys
@@ -22,6 +23,15 @@ if project_root not in sys.path:
 from config import db
 
 PENDING_PATH = os.path.join(os.path.dirname(current_dir), "date_orari", "date_orari_pending.json")
+
+# Stati predefiniti per le partite
+MATCH_STATUSES = [
+    ("Postp.", "Posticipata"),
+    ("Cancelled", "Annullata"),
+    ("Suspended", "Sospesa"),
+    ("Abandoned", "Abbandonata"),
+    ("Walkover", "Walkover / Vittoria a tavolino"),
+]
 
 
 def to_ita(date_str):
@@ -363,6 +373,287 @@ def manual_correction():
                     print(f"\n✅ Correzione applicata!")
 
 
+def apply_status_change(round_id, home, away, league, new_status):
+    """Applica solo il cambio di stato a una partita (senza toccare date/orari)."""
+    # _id può essere ObjectId o stringa
+    try:
+        rid = ObjectId(round_id)
+    except Exception:
+        rid = round_id
+
+    if new_status:
+        # Imposta lo stato
+        db.h2h_by_round.update_one(
+            {"_id": rid, "matches.home": home, "matches.away": away},
+            {"$set": {"matches.$.match_status_detail": new_status}}
+        )
+        db.daily_predictions_unified.update_many(
+            {"home": home, "away": away, "league": league},
+            {"$set": {"match_status_detail": new_status}}
+        )
+        print(f"    ✅ Stato impostato: {new_status}")
+    else:
+        # Rimuovi lo stato
+        db.h2h_by_round.update_one(
+            {"_id": rid, "matches.home": home, "matches.away": away},
+            {"$unset": {"matches.$.match_status_detail": ""}}
+        )
+        db.daily_predictions_unified.update_many(
+            {"home": home, "away": away, "league": league, "match_status_detail": {"$exists": True}},
+            {"$unset": {"match_status_detail": ""}}
+        )
+        print(f"    ✅ Stato rimosso (partita ripristinata a normale)")
+
+
+def change_match_status():
+    """Cambia lo stato di una partita: posticipata, annullata, sospesa, ecc.
+    Navigazione: Nazione → Campionato → Giornata → Partita → Stato."""
+
+    while True:
+        print(f"\n{'='*80}")
+        print("🔄 CAMBIA STATO PARTITA")
+        print(f"{'='*80}")
+
+        # 1. Nazione
+        countries = db.h2h_by_round.distinct("country")
+        countries = sorted([c for c in countries if c])
+
+        print(f"\nNazioni disponibili:\n")
+        for i, c in enumerate(countries):
+            print(f"  [{i+1}] {c}")
+        print(f"\n  [0] Torna al menu principale")
+        print()
+
+        idx = safe_input("Scegli nazione (numero): ")
+        if idx == '0':
+            return
+        try:
+            country = countries[int(idx) - 1]
+        except (ValueError, IndexError):
+            print("Scelta non valida.")
+            continue
+
+        # 2. Campionato
+        while True:
+            leagues = db.h2h_by_round.distinct("league", {"country": country})
+            leagues = sorted([l for l in leagues if l])
+
+            print(f"\nCampionati {country}:\n")
+            for i, l in enumerate(leagues):
+                print(f"  [{i+1}] {l}")
+            print(f"\n  [0] Indietro (nazioni)")
+            print()
+
+            idx = safe_input("Scegli campionato (numero): ")
+            if idx == '0':
+                break
+            try:
+                league = leagues[int(idx) - 1]
+            except (ValueError, IndexError):
+                print("Scelta non valida.")
+                continue
+
+            # 3. Giornata
+            while True:
+                def _round_sort_key(r):
+                    m = re.match(r'(\d+)', r.get('round_name') or '0')
+                    return int(m.group(1)) if m else 0
+
+                rounds = sorted(
+                    list(db.h2h_by_round.find(
+                        {"country": country, "league": league},
+                        {"round_name": 1, "_id": 1}
+                    )),
+                    key=_round_sort_key
+                )
+
+                if not rounds:
+                    print(f"Nessuna giornata trovata per {league}")
+                    break
+
+                print(f"\nGiornate {league}:\n")
+                for i, r in enumerate(rounds):
+                    rname = r.get("round_name") or "N/A"
+                    print(f"  [{i+1}] {rname}")
+                print(f"\n  [0] Indietro (campionati)")
+                print()
+
+                idx = safe_input("Scegli giornata (numero): ")
+                if idx == '0':
+                    break
+                try:
+                    round_doc = rounds[int(idx) - 1]
+                except (ValueError, IndexError):
+                    print("Scelta non valida.")
+                    continue
+
+                full_doc = db.h2h_by_round.find_one({"_id": round_doc["_id"]})
+                matches = full_doc.get("matches", [])
+                round_id = str(full_doc["_id"])
+
+                if not matches:
+                    print("Nessuna partita in questa giornata.")
+                    continue
+
+                # 4. Partita
+                while True:
+                    print(f"\nPartite {round_doc.get('round_name', '')}:\n")
+                    for i, m in enumerate(matches):
+                        date_obj = m.get("date_obj")
+                        date_str = date_obj.strftime("%d/%m/%Y") if hasattr(date_obj, "strftime") else "N/A"
+                        time_str = m.get("match_time", "N/A")
+                        status_detail = m.get("match_status_detail", "")
+                        tag = f" ⚠️ [{status_detail}]" if status_detail else ""
+                        print(f"  [{i+1}] {m['home']} vs {m['away']}  |  {date_str} {time_str}{tag}")
+                    print(f"\n  [0] Indietro (giornate)")
+                    print()
+
+                    idx = safe_input("Scegli partita (numero): ")
+                    if idx == '0':
+                        break
+                    try:
+                        match = matches[int(idx) - 1]
+                    except (ValueError, IndexError):
+                        print("Scelta non valida.")
+                        continue
+
+                    # 5. Mostra stato attuale e scegli nuovo
+                    current_status = match.get("match_status_detail")
+                    print(f"\n  Partita: {match['home']} vs {match['away']}")
+                    if current_status:
+                        print(f"  Stato attuale: ⚠️ {current_status}")
+                    else:
+                        print(f"  Stato attuale: ✅ Normale (nessuno stato speciale)")
+
+                    print(f"\n  Scegli nuovo stato:\n")
+                    for i, (code, label) in enumerate(MATCH_STATUSES):
+                        marker = " ← attuale" if code == current_status else ""
+                        print(f"    [{i+1}] {label} ({code}){marker}")
+                    print(f"    [L] Testo libero")
+                    if current_status:
+                        print(f"    [R] Rimuovi stato (ripristina a normale)")
+                    print(f"    [0] Annulla")
+                    print()
+
+                    scelta = safe_input("  Scelta: ").upper()
+                    if scelta == '0':
+                        continue
+
+                    new_status = None
+                    if scelta == 'R' and current_status:
+                        new_status = None  # rimuovi
+                        label_display = "RIMOSSO (normale)"
+                    elif scelta == 'L':
+                        new_status = safe_input("  Scrivi lo stato: ").strip()
+                        if not new_status:
+                            print("  Annullato.")
+                            continue
+                        label_display = new_status
+                    else:
+                        try:
+                            idx_s = int(scelta) - 1
+                            new_status = MATCH_STATUSES[idx_s][0]
+                            label_display = f"{MATCH_STATUSES[idx_s][1]} ({new_status})"
+                        except (ValueError, IndexError):
+                            print("  Scelta non valida.")
+                            continue
+
+                    # Per stati che implicano rinvio, chiedi cosa fare con la data
+                    new_date = None
+                    new_time = None
+                    date_action = None
+                    if new_status in ('Postp.', 'Suspended') and scelta != 'R':
+                        old_date_obj = match.get("date_obj")
+                        old_date_db = old_date_obj.strftime("%Y-%m-%d") if hasattr(old_date_obj, "strftime") else "N/A"
+                        old_date_ita = to_ita(old_date_db)
+                        old_time = match.get("match_time", "N/A")
+
+                        print(f"\n  Data attuale: {old_date_ita} {old_time}")
+                        print(f"\n  Cosa vuoi fare con la data?")
+                        print(f"    [1] Inserisci nuova data/orario")
+                        print(f"    [2] Data da destinarsi (TBD)")
+                        print(f"    [3] Lascia la data com'è")
+                        print(f"    [0] Annulla tutto")
+                        print()
+
+                        date_choice = safe_input("  Scelta: ")
+                        if date_choice == '0':
+                            print("  Annullato.")
+                            continue
+                        elif date_choice == '1':
+                            date_action = 'manual'
+                            new_date = ask_date("  Nuova data (GG/MM/AAAA)", old_date_ita)
+                            if new_date is None:
+                                print("  Annullato.")
+                                continue
+                            new_time = ask_time("  Nuovo orario (HH:MM)", old_time)
+                            if new_time is None:
+                                print("  Annullato.")
+                                continue
+                        elif date_choice == '2':
+                            date_action = 'tbd'
+                        else:
+                            date_action = 'keep'
+
+                    # Conferma riepilogo
+                    if scelta == 'R':
+                        print(f"\n  Stato: ⚠️ {current_status}  →  ✅ Normale")
+                    elif current_status:
+                        print(f"\n  Stato: ⚠️ {current_status}  →  ⚠️ {label_display}")
+                    else:
+                        print(f"\n  Stato: ✅ Normale  →  ⚠️ {label_display}")
+
+                    if date_action == 'manual':
+                        print(f"  Data: →  {to_ita(new_date)} {new_time}")
+                    elif date_action == 'tbd':
+                        print(f"  Data: →  Da destinarsi (TBD)")
+
+                    conferma = safe_input("  Confermi? (S/N): ").upper()
+                    if conferma != 'S':
+                        print("  Annullato.")
+                        continue
+
+                    # Applica stato
+                    apply_status_change(round_id, match['home'], match['away'], league, new_status)
+
+                    # Applica cambio data se richiesto
+                    if date_action == 'manual' and new_date and new_time:
+                        old_date_obj = match.get("date_obj")
+                        old_date_db = old_date_obj.strftime("%Y-%m-%d") if hasattr(old_date_obj, "strftime") else "N/A"
+                        change = {
+                            "league": league,
+                            "home": match["home"],
+                            "away": match["away"],
+                            "new_date": new_date,
+                            "new_time": new_time,
+                            "status": new_status,
+                            "round_id": round_id,
+                        }
+                        apply_change(change)
+                    elif date_action == 'tbd':
+                        # Salva "TBD" come orario per indicare data da destinarsi
+                        try:
+                            rid = ObjectId(round_id)
+                        except Exception:
+                            rid = round_id
+                        db.h2h_by_round.update_one(
+                            {"_id": rid, "matches.home": match['home'], "matches.away": match['away']},
+                            {"$set": {"matches.$.match_time": "TBD"}}
+                        )
+                        db.daily_predictions_unified.update_many(
+                            {"home": match['home'], "away": match['away'], "league": league},
+                            {"$set": {"match_time": "TBD"}}
+                        )
+                        print(f"    ✅ Orario impostato a TBD")
+
+                    # Aggiorna in memoria locale
+                    if new_status:
+                        match['match_status_detail'] = new_status
+                    elif 'match_status_detail' in match:
+                        del match['match_status_detail']
+                    print(f"\n✅ Stato aggiornato!")
+
+
 def pending_menu(data):
     """Sotto-menu per gestire le modifiche pending dallo step 12."""
     changes = data['changes']
@@ -454,11 +745,12 @@ def main():
     print("📅 GESTIONE DATE & ORARI")
     print(f"{'='*80}\n")
 
-    print("  [1] Correzione manuale (scegli campionato e partita)")
+    print("  [1] Correzione manuale date/orari (scegli campionato e partita)")
     if has_pending:
         print(f"  [2] Modifiche in attesa dallo Step 12 ({pending_count} pending)")
     else:
         print("  [2] Modifiche in attesa dallo Step 12 (nessuna)")
+    print("  [3] Cambia stato partita (posticipata, annullata, ecc.)")
     print("  [N] Esci")
     print()
 
@@ -477,6 +769,10 @@ def main():
             print("\n✅ Nessuna modifica in attesa.")
             return
         pending_menu(data)
+        return
+
+    if scelta == '3':
+        change_match_status()
         return
 
     print("Scelta non valida.")
