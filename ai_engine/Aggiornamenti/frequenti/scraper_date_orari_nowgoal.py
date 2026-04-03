@@ -39,7 +39,7 @@ except ImportError:
 import json as _json
 
 # File pending per le modifiche date/orari da approvare manualmente
-_PENDING_PATH = os.path.join(project_root, "log", "date_orari_pending.json")
+_PENDING_PATH = os.path.join(os.path.dirname(current_dir), "date_orari", "date_orari_pending.json")
 _pending_changes = []  # accumulatore in-memory, scritto su file alla fine
 
 try:

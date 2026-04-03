@@ -20,7 +20,7 @@ if project_root not in sys.path:
 
 from config import db
 
-PENDING_PATH = os.path.join(project_root, "log", "date_orari_pending.json")
+PENDING_PATH = os.path.join(os.path.dirname(current_dir), "date_orari", "date_orari_pending.json")
 
 
 def load_pending():
