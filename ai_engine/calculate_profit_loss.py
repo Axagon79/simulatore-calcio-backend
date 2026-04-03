@@ -148,7 +148,7 @@ PREDICTION_COLLECTIONS = [
 # - ha esito='void' (rinvio che potrebbe essere stato recuperato), oppure
 # - ha profit_loss ma manca hit (fix retroattivo)
 query = {
-    'date': {'$lt': today},
+    'date': {'$lte': today},
     'pronostici': {'$elemMatch': {'$or': [
         {'profit_loss': {'$exists': False}},
         {'profit_loss': None},

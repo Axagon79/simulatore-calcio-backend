@@ -78,17 +78,26 @@ router.get('/predictions', async (req, res) => {
       return res.json({ success: false, message: 'Parametro date richiesto (YYYY-MM-DD)' });
     }
 
-    // Normalizza: lowercase, rimuovi accenti, solo lettere/numeri/spazi
+    // Normalizza: lowercase, rimuovi accenti, suffissi club, solo lettere/numeri/spazi
     function norm(s) {
-      return s.toLowerCase().trim()
+      let n = s.toLowerCase().trim()
         .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
         .replace(/[^a-z0-9\s]/g, '')
         .replace(/\s+/g, ' ').trim();
+      // Rimuovi suffissi comuni (fc, afc, sc, etc.)
+      for (const suf of [' fc', ' afc', ' sc', ' ac', ' cf', ' ssc', ' calcio']) {
+        if (n.endsWith(suf)) n = n.slice(0, -suf.length).trim();
+      }
+      // Rimuovi prefissi comuni
+      for (const pre of ['fc ', 'cf ', 'ac ', 'as ', 'sc ', 'us ', 'ss ']) {
+        if (n.startsWith(pre)) n = n.slice(pre.length).trim();
+      }
+      return n;
     }
 
     // 1. Carica le partite quote_anomale
     const qaMatches = await req.db.collection('quote_anomale')
-      .find({ date }, { projection: { _id: 0, match_key: 1, home_raw: 1, away_raw: 1, league: 1 } })
+      .find({ date }, { projection: { _id: 0, match_key: 1, home_raw: 1, away_raw: 1, home: 1, away: 1, league: 1 } })
       .toArray();
 
     // 2. Carica alias da db.teams (includo league per disambiguare)
@@ -131,11 +140,18 @@ router.get('/predictions', async (req, res) => {
     const qaByTeams = {};       // "canonical_home|||canonical_away" → match_key (fallback)
     const qaLeagueMap = {};     // match_key → norm(league) di quote_anomale
     for (const qa of qaMatches) {
-      const teamKey = `${resolve(qa.home_raw)}|||${resolve(qa.away_raw)}`;
+      // Usa nome canonico (da db.teams) se disponibile, altrimenti raw
+      const homeName = qa.home && qa.home !== '-' ? qa.home : qa.home_raw;
+      const awayName = qa.away && qa.away !== '-' ? qa.away : qa.away_raw;
+      const teamKey = `${resolve(homeName)}|||${resolve(awayName)}`;
       qaByTeams[teamKey] = qa.match_key;
+      // Aggiungi anche con home_raw come fallback
+      const rawKey = `${resolve(qa.home_raw)}|||${resolve(qa.away_raw)}`;
+      if (rawKey !== teamKey) qaByTeams[rawKey] = qa.match_key;
       if (qa.league) {
         const nl = norm(qa.league);
         qaByLeagueTeams[`${nl}|||${teamKey}`] = qa.match_key;
+        if (rawKey !== teamKey) qaByLeagueTeams[`${nl}|||${rawKey}`] = qa.match_key;
         qaLeagueMap[qa.match_key] = nl;
       }
     }

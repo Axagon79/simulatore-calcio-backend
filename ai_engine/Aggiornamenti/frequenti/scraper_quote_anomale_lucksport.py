@@ -40,6 +40,102 @@ except ImportError:
         sys.exit(1)
 
 from bs4 import BeautifulSoup
+from bson import ObjectId
+
+
+# --- Team Matching ---
+def _normalize_name(name: str) -> str:
+    """Normalizza nome squadra per matching."""
+    if not name:
+        return ""
+    name = name.lower().strip()
+    replacements = {
+        "ü": "u", "ö": "o", "é": "e", "è": "e", "à": "a", "ì": "i",
+        "ñ": "n", "ã": "a", "ç": "c", "á": "a", "í": "i",
+        "ó": "o", "ú": "u", "ê": "e", "ô": "o", "â": "a",
+    }
+    for old, new in replacements.items():
+        name = name.replace(old, new)
+    name = name.replace("-", " ")
+    name = re.sub(r'\s+', ' ', name).strip()
+    # Rimuovi suffissi tipici di LuckSport
+    for suffix in [" f.c.", " fc", " a.f.c.", " afc", " s.c.", " sc",
+                   " a.c.", " ac", " s.s.c.", " cf", " c.f.",
+                   " (mg)", " (sp)", " (rj)", " (rs)", " (pr)", " (ba)",
+                   " (ce)", " (sc)", " (go)", " (al)", " (pa)", " (ma)",
+                   " (mt)", " (am)", " (pi)", " (se)", " (pe)", " (es)",
+                   " (df)", " (ms)", " (rn)", " (pb)", " (to)"]:
+        if name.endswith(suffix):
+            name = name[:-len(suffix)].strip()
+    for prefix in ["fc ", "cf ", "ac ", "as ", "sc ", "us ", "ss ", "asd ", "asc "]:
+        if name.startswith(prefix):
+            name = name[len(prefix):]
+    return name.strip()
+
+
+def _build_team_cache():
+    """Costruisce cache di matching: norm(name/alias) → {name, _id}."""
+    cache = {}
+    for team in db.teams.find({}, {"name": 1, "aliases": 1, "league": 1}):
+        tid = str(team["_id"])
+        tname = team.get("name", "")
+        tleague = team.get("league", "")
+        entry = {"name": tname, "_id": tid, "league": tleague}
+        # Nome principale
+        norm = _normalize_name(tname)
+        if norm:
+            cache[norm] = entry
+        # Alias
+        for alias in team.get("aliases", []):
+            if alias and alias.strip():
+                norm_a = _normalize_name(alias)
+                if norm_a:
+                    cache.setdefault(norm_a, entry)
+    return cache
+
+
+def _match_team(raw_name, team_cache, league=None):
+    """
+    Cerca una squadra nel cache.
+    Restituisce (canonical_name, mongo_id) oppure (None, None).
+    """
+    norm = _normalize_name(raw_name)
+    if not norm:
+        return None, None
+
+    # 1. Match esatto
+    if norm in team_cache:
+        t = team_cache[norm]
+        return t["name"], t["_id"]
+
+    # 2. Match parziale: il nome normalizzato contiene o è contenuto
+    #    Prova con parole principali (>=4 caratteri)
+    words = [w for w in norm.split() if len(w) >= 4]
+    candidates = []
+    for key, entry in team_cache.items():
+        # Se il nome LuckSport contiene il nome DB (o viceversa)
+        if norm in key or key in norm:
+            candidates.append((entry, len(key)))
+            continue
+        # Match per parole chiave
+        key_words = set(key.split())
+        if words and key_words:
+            overlap = len(set(words) & key_words)
+            if overlap >= 1 and overlap >= len(words) * 0.5:
+                candidates.append((entry, overlap * 10 + len(key)))
+
+    if candidates:
+        # Preferisci match nello stesso campionato
+        if league:
+            norm_league = _normalize_name(league)
+            same_league = [c for c in candidates if _normalize_name(c[0].get("league", "")) == norm_league]
+            if same_league:
+                best = max(same_league, key=lambda x: x[1])
+                return best[0]["name"], best[0]["_id"]
+        best = max(candidates, key=lambda x: x[1])
+        return best[0]["name"], best[0]["_id"]
+
+    return None, None
 
 try:
     from selenium import webdriver
@@ -371,6 +467,42 @@ def salva_in_mongodb(matches, mode="apertura"):
     """
     collection = db[COLLECTION]
 
+    # Team matching
+    print("🔗 Matching squadre con db.teams...")
+    team_cache = _build_team_cache()
+    matched_count = 0
+    unmatched_names = []
+
+    for m in matches:
+        h_name, h_id = _match_team(m["home_raw"], team_cache, m.get("league"))
+        a_name, a_id = _match_team(m["away_raw"], team_cache, m.get("league"))
+        m["home"] = h_name or m["home_raw"]
+        m["away"] = a_name or m["away_raw"]
+        m["home_mongo_id"] = h_id
+        m["away_mongo_id"] = a_id
+        if h_id and a_id:
+            matched_count += 1
+        else:
+            if not h_id:
+                unmatched_names.append(f"  ❓ {m['home_raw']} ({m.get('league','?')})")
+            if not a_id:
+                unmatched_names.append(f"  ❓ {m['away_raw']} ({m.get('league','?')})")
+
+    print(f"   ✅ Matchate: {matched_count}/{len(matches)}")
+    if unmatched_names:
+        # Deduplica
+        seen = set()
+        unique = []
+        for u in unmatched_names:
+            if u not in seen:
+                seen.add(u)
+                unique.append(u)
+        print(f"   ❌ Squadre non trovate ({len(unique)}):")
+        for u in unique[:20]:
+            print(u)
+        if len(unique) > 20:
+            print(f"   ... e altre {len(unique) - 20}")
+
     inseriti = 0
     aggiornati = 0
     errori = 0
@@ -389,20 +521,33 @@ def salva_in_mongodb(matches, mode="apertura"):
                     "quote": m["quote_apertura"],
                 }
 
+                insert_fields = {
+                    "home_raw": m["home_raw"],
+                    "away_raw": m["away_raw"],
+                    "league_raw": m["league_raw"],
+                    "quote_apertura": m["quote_apertura"],
+                    "ts_apertura": now,
+                    "n_aggiornamenti": 0,
+                    "storico": [snapshot_apertura],
+                }
+
+                # home/away/league vanno in $set (aggiornabili ad ogni run)
+                set_fields = {
+                    "home": m["home"],
+                    "away": m["away"],
+                    "league": m["league"],
+                    "match_time": m["match_time"],
+                }
+                if m.get("home_mongo_id"):
+                    set_fields["home_mongo_id"] = m["home_mongo_id"]
+                if m.get("away_mongo_id"):
+                    set_fields["away_mongo_id"] = m["away_mongo_id"]
+
                 result = collection.update_one(
                     {"date": date, "match_key": match_key},
                     {
-                        "$setOnInsert": {
-                            "home_raw": m["home_raw"],
-                            "away_raw": m["away_raw"],
-                            "league": m["league"],
-                            "league_raw": m["league_raw"],
-                            "match_time": m["match_time"],
-                            "quote_apertura": m["quote_apertura"],
-                            "ts_apertura": now,
-                            "n_aggiornamenti": 0,
-                            "storico": [snapshot_apertura],
-                        }
+                        "$setOnInsert": insert_fields,
+                        "$set": set_fields,
                     },
                     upsert=True
                 )
@@ -422,16 +567,23 @@ def salva_in_mongodb(matches, mode="apertura"):
                     "quote": quote_live,
                 }
 
+                set_fields = {
+                    "quote_chiusura": quote_live,
+                    "ts_chiusura": now,
+                    "home": m["home"],
+                    "away": m["away"],
+                }
+                if m.get("home_mongo_id"):
+                    set_fields["home_mongo_id"] = m["home_mongo_id"]
+                if m.get("away_mongo_id"):
+                    set_fields["away_mongo_id"] = m["away_mongo_id"]
+
                 result = collection.update_one(
                     {"date": date, "match_key": match_key},
                     {
-                        "$set": {
-                            "quote_chiusura": quote_live,
-                            "ts_chiusura": now,
-                        },
+                        "$set": set_fields,
                         "$inc": {"n_aggiornamenti": 1},
                         "$push": {"storico": snapshot},
-                        # Se non esiste ancora, crea con apertura
                         "$setOnInsert": {
                             "home_raw": m["home_raw"],
                             "away_raw": m["away_raw"],
