@@ -183,6 +183,9 @@ for coll_name in PREDICTION_COLLECTIONS:
         away = doc.get('away', '')
         key = f"{home}|||{away}|||{date}"
         real_score = results_map.get(key)
+        # Fallback: usa live_score dal documento se h2h_by_round non ha il risultato
+        if not real_score and doc.get('live_status') == 'Finished' and doc.get('live_score'):
+            real_score = doc['live_score']
         parsed = parse_score(real_score) if real_score else None
 
         updates = {}
