@@ -126,6 +126,8 @@ def _apply_goal_quota_conversion(unified, odds):
         if 1.90 <= q < 2.00:
             u25_q = float(odds.get('under_25') or 0)
             if u25_q > 1.0:
+                p['original_pronostico'] = 'Goal'
+                p['original_quota'] = q
                 p['pronostico'] = 'Under 2.5'
                 p['quota'] = u25_q
                 p['source'] = p.get('source', 'C') + '_goal_conv'
@@ -152,6 +154,8 @@ def _apply_goal_quota_conversion(unified, odds):
         elif 1.70 <= q < 1.80:
             o15_q = float(odds.get('over_15') or 0)
             if o15_q > 1.0:
+                p['original_pronostico'] = 'Goal'
+                p['original_quota'] = q
                 p['pronostico'] = 'Over 1.5'
                 p['quota'] = o15_q
                 p['source'] = p.get('source', 'C') + '_goal_conv'
@@ -205,6 +209,8 @@ def _apply_gol_low_stake_to_nogoal(unified, odds):
             if ng_q > 1.0:
                 old_pr = pr
                 old_q = p.get('quota', 0)
+                p['original_pronostico'] = old_pr
+                p['original_quota'] = old_q
                 p['pronostico'] = 'NoGoal'
                 p['quota'] = ng_q
                 p['tipo'] = 'GOL'
@@ -250,6 +256,8 @@ def _apply_gol_stake3_filter(unified):
             or (stake == 7 and (p.get('quota') or 0) < 1.40)  # BE 92.4%, irraggiungibile
         ):
             old_pr = pr
+            p['original_pronostico'] = old_pr
+            p['original_quota'] = p.get('quota', 0)
             p['pronostico'] = 'NO BET'
             p['quota'] = 0
             p['stake'] = 0
@@ -276,6 +284,8 @@ def _apply_segno_low_stake_filter(unified):
 
         # SEGNO puro stake 1 quota < 1.60
         if tipo == 'SEGNO' and stake == 1 and pr != 'NO BET' and quota < 1.60:
+            p['original_pronostico'] = pr
+            p['original_quota'] = quota
             p['pronostico'] = 'NO BET'
             p['quota'] = 0
             p['stake'] = 0
@@ -284,6 +294,8 @@ def _apply_segno_low_stake_filter(unified):
 
         # X2 stake 2
         elif tipo == 'DOPPIA_CHANCE' and stake == 2 and pr == 'X2':
+            p['original_pronostico'] = pr
+            p['original_quota'] = quota
             p['pronostico'] = 'NO BET'
             p['quota'] = 0
             p['stake'] = 0
@@ -292,6 +304,8 @@ def _apply_segno_low_stake_filter(unified):
 
         # SEGNO puro stake 2 quota 1.90-1.99 o >= 2.10
         elif tipo == 'SEGNO' and stake == 2 and pr != 'NO BET' and ((1.90 <= quota < 2.00) or quota >= 2.10):
+            p['original_pronostico'] = pr
+            p['original_quota'] = quota
             p['pronostico'] = 'NO BET'
             p['quota'] = 0
             p['stake'] = 0
@@ -321,6 +335,8 @@ def _apply_dc_stake1_to_under25(unified, odds):
         if u25_q > 1.0:
             old_pr = p['pronostico']
             old_q = p.get('quota', 0)
+            p['original_pronostico'] = old_pr
+            p['original_quota'] = old_q
             p['pronostico'] = 'Under 2.5'
             p['quota'] = u25_q
             p['tipo'] = 'GOL'
@@ -364,6 +380,8 @@ def _apply_mg23_stake4_to_under25(unified, odds):
             u25_q = float(odds.get('under_25') or 0)
             if u25_q > 1.0:
                 old_q = p.get('quota', 0)
+                p['original_pronostico'] = 'MG 2-3'
+                p['original_quota'] = old_q
                 p['pronostico'] = 'Under 2.5'
                 p['quota'] = u25_q
                 p['tipo'] = 'GOL'
@@ -403,6 +421,8 @@ def _apply_gol_stake4_quota_filter(unified):
             and 1.80 <= (p.get('quota') or 0) < 1.90):
             old_pr = p['pronostico']
             old_q = p.get('quota', 0)
+            p['original_pronostico'] = old_pr
+            p['original_quota'] = old_q
             p['pronostico'] = 'NO BET'
             p['quota'] = 0
             p['stake'] = 0
@@ -430,6 +450,8 @@ def _apply_over15_stake5_low_to_under25(unified, odds):
             u25_q = float(odds.get('under_25') or 0)
             if u25_q > 1.0:
                 old_q = p.get('quota', 0)
+                p['original_pronostico'] = 'Over 1.5'
+                p['original_quota'] = old_q
                 p['pronostico'] = 'Under 2.5'
                 p['quota'] = u25_q
                 p['tipo'] = 'GOL'
@@ -485,6 +507,8 @@ def _apply_gol_stake7_filter(unified, odds):
 
         if nobet:
             old_pr = pr
+            p['original_pronostico'] = old_pr
+            p['original_quota'] = quota
             p['pronostico'] = 'NO BET'
             p['routing_rule'] = f'{tag}_nobet'
             print(f"    🚫 GOL(s7) NO BET: {old_pr} @{quota:.2f} [{tag}]")
@@ -512,6 +536,8 @@ def _apply_gol_stake5_q160_to_nogoal(unified, odds):
             if ng_q > 1.0:
                 old_pr = p['pronostico']
                 old_q = p.get('quota', 0)
+                p['original_pronostico'] = old_pr
+                p['original_quota'] = old_q
                 p['pronostico'] = 'NoGoal'
                 p['quota'] = ng_q
                 p['tipo'] = 'GOL'
@@ -557,6 +583,8 @@ def _apply_dc_stake4_to_nogoal(unified, odds):
         if ng_q > 1.0:
             old_pr = p['pronostico']
             old_q = p.get('quota', 0)
+            p['original_pronostico'] = old_pr
+            p['original_quota'] = old_q
             p['pronostico'] = 'NoGoal'
             p['quota'] = ng_q
             p['tipo'] = 'GOL'
@@ -600,6 +628,8 @@ def _apply_o25_stake6_to_goal(unified, odds):
             gg_q = float(odds.get('gg') or 0)
             if gg_q > 1.0:
                 old_q = p.get('quota', 0)
+                p['original_pronostico'] = 'Over 2.5'
+                p['original_quota'] = old_q
                 p['pronostico'] = 'Goal'
                 p['quota'] = gg_q
                 p['tipo'] = 'GOL'
@@ -655,6 +685,8 @@ def _apply_segno_stake9_conversions(unified, odds):
             if gg_q > 1.0:
                 old_pr = pr
                 old_q = quota
+                p['original_pronostico'] = old_pr
+                p['original_quota'] = old_q
                 p['pronostico'] = 'Goal'
                 p['quota'] = gg_q
                 p['tipo'] = 'GOL'
@@ -683,6 +715,8 @@ def _apply_segno_stake9_conversions(unified, odds):
             ng_q = float(odds.get('ng') or 0)
             if ng_q > 1.0:
                 old_q = quota
+                p['original_pronostico'] = 'X2'
+                p['original_quota'] = old_q
                 p['pronostico'] = 'NoGoal'
                 p['quota'] = ng_q
                 p['tipo'] = 'GOL'
@@ -732,6 +766,8 @@ def _apply_se2_stake8_filter(unified):
             and p.get('pronostico') == '2'
             and 1.90 <= (p.get('quota') or 0) < 2.00):
             old_q = p.get('quota', 0)
+            p['original_pronostico'] = '2'
+            p['original_quota'] = old_q
             p['pronostico'] = 'NO BET'
             p['quota'] = 0
             p['stake'] = 0
@@ -806,6 +842,8 @@ def _apply_segno_stake6_conversion(unified, odds):
             if o25_q > 1.0:
                 old_pr = pr
                 old_q = p.get('quota', 0)
+                p['original_pronostico'] = old_pr
+                p['original_quota'] = old_q
                 p['pronostico'] = 'Over 2.5'
                 p['quota'] = o25_q
                 p['tipo'] = 'GOL'
@@ -835,6 +873,8 @@ def _apply_segno_stake6_conversion(unified, odds):
             if gg_q > 1.0:
                 old_pr = pr
                 old_q = p.get('quota', 0)
+                p['original_pronostico'] = old_pr
+                p['original_quota'] = old_q
                 p['pronostico'] = 'Goal'
                 p['quota'] = gg_q
                 p['tipo'] = 'GOL'
@@ -1334,6 +1374,8 @@ def _apply_gg_conf_dc_downgrade(unified, c_doc):
                 'stars': p.get('stars', 3.0),
                 'source': 'C_dc_conv',
                 'routing_rule': 'gg_conf_dc_downgrade',
+                'original_pronostico': pron,
+                'original_quota': p.get('quota', 0),
                 'has_odds': True,
             }
             # Kelly con prob_modello 0.70 (storico 67% HR, conservativo)
@@ -1408,6 +1450,8 @@ def _apply_segno_scrematura(unified, odds, base_doc, c_doc=None):
             'stars': segno_pred.get('stars', 3),
             'source': segno_pred.get('source', '') + '_screm',
             'routing_rule': 'scrematura_segno',
+            'original_pronostico': segno,
+            'original_quota': quota,
             'has_odds': nuova_quota is not None and nuova_quota > 0,
         }
         prob = segno_pred.get('probabilita_stimata', 60)
@@ -1427,6 +1471,8 @@ def _apply_segno_scrematura(unified, odds, base_doc, c_doc=None):
     def _make_segno_x(q_x):
         """Crea pronostico SEGNO X sostitutivo."""
         p = deepcopy(segno_pred)
+        p['original_pronostico'] = segno
+        p['original_quota'] = quota
         p['pronostico'] = 'X'
         p['quota'] = q_x
         p['source'] = segno_pred.get('source', '') + '_screm_x'
@@ -1642,6 +1688,8 @@ def _apply_segno_scrematura(unified, odds, base_doc, c_doc=None):
                         'stars': sost.get('stars', 3.0),
                         'source': 'C_screm_o15',
                         'routing_rule': 'screm_dc_to_over15',
+                        'original_pronostico': segno,
+                        'original_quota': quota,
                         'has_odds': True,
                     }
                     if o15_q > 1.0:
@@ -1681,6 +1729,8 @@ def _apply_segno_scrematura(unified, odds, base_doc, c_doc=None):
                         'stars': sost.get('stars', 3.0),
                         'source': 'C_screm_u25',
                         'routing_rule': 'screm_dc_to_under25',
+                        'original_pronostico': segno,
+                        'original_quota': quota,
                         'has_odds': True,
                     }
                     if u25_q > 1.0:
@@ -1753,6 +1803,8 @@ def _apply_weak_o25_recovery(unified, c_doc):
             'stars': o25_pred.get('stars', 3.0),
             'source': source,
             'routing_rule': routing_rule,
+            'original_pronostico': 'Over 2.5',
+            'original_quota': o25_pred.get('quota', 0),
             'has_odds': True,
         }
         if quota and quota > 1.0:
@@ -2147,6 +2199,8 @@ def _apply_segno_mc_filter(unified, simulation_data, odds):
                 'stars': segno_pred.get('stars', 3),
                 'source': segno_pred.get('source', '') + '_mc_conv',
                 'routing_rule': 'mc_filter_convert',
+                'original_pronostico': segno,
+                'original_quota': quota,
                 'has_odds': True,
             }
             if over15_q > 1.0:
