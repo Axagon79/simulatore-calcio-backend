@@ -70,4 +70,7 @@ yarn.lock
 # MC Tuning reports (riproducibili)
 functions_python/ai_engine/tools/results/report_*.json
 functions_python/ai_engine/tools/results/report_*.txt
+# Date/orari pending (step 12 dry-run)
+ai_engine/Aggiornamenti/date_orari/date_orari_pending.json
+
 node_modules
