@@ -222,11 +222,14 @@ def get_team_aliases(team_name: str, team_doc: Optional[Dict] = None) -> List[st
     aliases.discard("")
     return list(aliases)
 
-def extract_datetime_from_row(row_text: str) -> Optional[Tuple[str, str]]:
+def extract_datetime_from_row(row_text: str, data_t: Optional[str] = None) -> Optional[Tuple[str, str]]:
     """
     Estrae data e orario da una riga di testo di Nowgoal.
     Formato tipico: "25 03-02 21:00 Team A vs Team B ..."
-    Ritorna (data, orario) o None
+    Ritorna (data, orario) o None.
+
+    L'anno viene preso dal data-t (attributo HTML con anno esatto, es. '2026-03-04 01:00').
+    Il testo visibile ha solo giorno-mese e orario CET (quello corretto per l'Italia).
     """
     try:
         # Pattern per data e ora: "DD-MM HH:MM"
@@ -234,21 +237,26 @@ def extract_datetime_from_row(row_text: str) -> Optional[Tuple[str, str]]:
         match = re.search(r'(\d{2})-(\d{2})\s+(\d{2}):(\d{2})', row_text)
         if match:
             day, month, hour, minute = match.groups()
-            # Anno corrente (o prossimo se il mese è passato)
-            current_year = datetime.now().year
 
-            # Anno corretto: se la data con anno corrente è entro 14 giorni nel passato
-            # oppure nel futuro → anno corrente. Altrimenti è un match dell'anno prossimo.
-            # FIX: evita che partite di febbraio vengano assegnate al 2027 quando il pipeline
-            # gira il 1° marzo (mese 2 < mese 3 → l'old logic usava current_year + 1, sbagliato).
-            month_int = int(month)
-            try:
-                try_this_year = datetime(current_year, month_int, int(day))
-                days_ago = (datetime.now() - try_this_year).days
-                year = current_year if (try_this_year > datetime.now() or days_ago <= 14) else current_year + 1
-            except ValueError:
-                year = current_year
-            
+            # Anno dal data-t (fonte affidabile — NowGoal include l'anno completo)
+            year = None
+            if data_t and len(data_t) >= 4:
+                try:
+                    year = int(data_t[:4])
+                except ValueError:
+                    pass
+
+            # Fallback: deduzione dall'anno corrente (solo se data-t non disponibile)
+            if not year:
+                current_year = datetime.now().year
+                month_int = int(month)
+                try:
+                    try_this_year = datetime(current_year, month_int, int(day))
+                    days_ago = (datetime.now() - try_this_year).days
+                    year = current_year if (try_this_year > datetime.now() or days_ago <= 180) else current_year + 1
+                except ValueError:
+                    year = current_year
+
             date_str = f"{year}-{month}-{day}"
             time_str = f"{hour}:{minute}"
             return (date_str, time_str)
@@ -283,8 +291,9 @@ def find_match_with_datetime(home_aliases: List[str], away_aliases: List[str], r
 
         if home_found and away_found:
             # PRIORITÀ: testo visibile = orario CET italiano (quello che l'utente vede)
-            # data-t è in timezone server NowGoal (UTC+8 Pechino) → NON usarlo come prima scelta
-            datetime_result = extract_datetime_from_row(row_text)
+            # data-t è in timezone server NowGoal (UTC+8 Pechino) → NON usarlo per orario
+            # MA l'anno nel data-t è affidabile → lo passiamo per evitare di indovinare
+            datetime_result = extract_datetime_from_row(row_text, data_t)
             if datetime_result:
                 date_str, time_str = datetime_result
                 if 'independiente' in row_clean or 'talleres' in row_clean:
