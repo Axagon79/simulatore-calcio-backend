@@ -180,6 +180,689 @@ def _apply_goal_quota_conversion(unified, odds):
     return result
 
 
+def _apply_gol_low_stake_to_nogoal(unified, odds):
+    """
+    Conversione Goal (BTTS) a bassa confidence → NoGoal.
+    - Stake 1: QUALSIASI GOL → NoGoal (storico 92.3% NoGoal, 12/13)
+    - Stake 2: solo Goal (BTTS) → NoGoal (storico 75.0% NoGoal, 21/28)
+    """
+    if not odds:
+        return unified
+
+    result = []
+    for p in unified:
+        if p.get('pronostico') == 'NO BET' or p.get('tipo') != 'GOL':
+            result.append(p)
+            continue
+
+        stake = p.get('stake', 0)
+        pr = p.get('pronostico', '')
+
+        # Stake 1: qualsiasi GOL → NoGoal
+        # Stake 2: solo Goal (BTTS) → NoGoal
+        if stake == 1 or (stake == 2 and pr == 'Goal'):
+            ng_q = float(odds.get('ng') or 0)
+            if ng_q > 1.0:
+                old_pr = pr
+                old_q = p.get('quota', 0)
+                p['pronostico'] = 'NoGoal'
+                p['quota'] = ng_q
+                p['tipo'] = 'GOL'
+                p['source'] = p.get('source', '?') + f'_gol_s{stake}_conv'
+                p['routing_rule'] = f'gol_s{stake}_to_ng'
+                p['has_odds'] = True
+                prob_mod = 0.80 if stake == 1 else 0.72  # conservativo vs storico 92%/75%
+                prob_mkt = 1.0 / ng_q
+                edge = prob_mod - prob_mkt
+                if edge > 0:
+                    kelly = 0.75 * (edge * ng_q - (1 - edge)) / (ng_q - 1)
+                    p['stake'] = max(1, min(10, round(kelly * 10)))
+                    p['edge'] = round(edge * 100, 1)
+                else:
+                    p['stake'] = 1
+                    p['edge'] = 0
+                p['prob_mercato'] = round(prob_mkt * 100, 1)
+                p['prob_modello'] = round(prob_mod * 100, 1)
+                p['probabilita_stimata'] = round(prob_mod * 100, 1)
+                print(f"    🔄 GOL(s{stake})→NG: {old_pr} @{old_q:.2f} → NoGoal @{ng_q:.2f}")
+            result.append(p)
+            continue
+
+        result.append(p)
+
+    return result
+
+
+def _apply_gol_stake3_filter(unified):
+    """
+    Filtro GOL: pronostici tossici → NO BET.
+    Stake 3: Over 2.5 -18.09u, MG 2-3 -12.39u.
+    Stake 4: Over 2.5 -8.84u (19 tips, HR 57.9%, quota media 1.55 — sotto BE).
+    Stake 7 quota <1.40: 10 tips, 80% HR ma BE 92.4% (P/L -13.30u) — rumore.
+    """
+    result = []
+    for p in unified:
+        stake = p.get('stake', 0)
+        pr = p.get('pronostico', '')
+        if p.get('tipo') == 'GOL' and (
+            (stake == 3 and pr in ('Over 2.5', 'MG 2-3'))
+            or (stake == 4 and pr == 'Over 2.5')
+            or (stake == 7 and (p.get('quota') or 0) < 1.40)  # BE 92.4%, irraggiungibile
+        ):
+            old_pr = pr
+            p['pronostico'] = 'NO BET'
+            p['quota'] = 0
+            p['stake'] = 0
+            p['routing_rule'] = f'gol_s{stake}_filter'
+            print(f"    🚫 GOL(s{stake}) filtro: {old_pr} → NO BET")
+        result.append(p)
+    return result
+
+
+def _apply_segno_low_stake_filter(unified):
+    """
+    Filtri SEGNO/DC a basso stake:
+    - SEGNO puro stake 1 quota < 1.60 → NO BET (HR 33.3%, P/L -2.93u)
+    - X2 stake 2 → NO BET (HR 56.2%, P/L -4.26u)
+    - SEGNO puro stake 2 quota 1.90-1.99 → NO BET (HR 25%, P/L -4.18u)
+    - SEGNO puro stake 2 quota >= 2.10 → NO BET (HR 25%, P/L -3.70u)
+    """
+    result = []
+    for p in unified:
+        pr = p.get('pronostico', '')
+        tipo = p.get('tipo', '')
+        stake = p.get('stake', 0)
+        quota = p.get('quota') or 0
+
+        # SEGNO puro stake 1 quota < 1.60
+        if tipo == 'SEGNO' and stake == 1 and pr != 'NO BET' and quota < 1.60:
+            p['pronostico'] = 'NO BET'
+            p['quota'] = 0
+            p['stake'] = 0
+            p['routing_rule'] = 'segno_s1_low_q_filter'
+            print(f"    🚫 SEGNO(s1) filtro: {pr} @{quota:.2f} → NO BET (quota < 1.60)")
+
+        # X2 stake 2
+        elif tipo == 'DOPPIA_CHANCE' and stake == 2 and pr == 'X2':
+            p['pronostico'] = 'NO BET'
+            p['quota'] = 0
+            p['stake'] = 0
+            p['routing_rule'] = 'x2_s2_filter'
+            print(f"    🚫 X2(s2) filtro: X2 @{quota:.2f} → NO BET")
+
+        # SEGNO puro stake 2 quota 1.90-1.99 o >= 2.10
+        elif tipo == 'SEGNO' and stake == 2 and pr != 'NO BET' and ((1.90 <= quota < 2.00) or quota >= 2.10):
+            p['pronostico'] = 'NO BET'
+            p['quota'] = 0
+            p['stake'] = 0
+            p['routing_rule'] = 'segno_s2_toxic_q_filter'
+            print(f"    🚫 SEGNO(s2) filtro: {pr} @{quota:.2f} → NO BET (fascia tossica)")
+
+        result.append(p)
+    return result
+
+
+def _apply_dc_stake1_to_under25(unified, odds):
+    """
+    Conversione DC stake 1 → Under 2.5.
+    Storico feb-mar: DC stake 1 HR 52.4% (P/L -3.86u),
+    ma Under 2.5 nelle stesse partite 66.7%.
+    """
+    if not odds:
+        return unified
+
+    result = []
+    for p in unified:
+        if p.get('tipo') != 'DOPPIA_CHANCE' or p.get('stake', 0) != 1 or p.get('pronostico') == 'NO BET':
+            result.append(p)
+            continue
+
+        u25_q = float(odds.get('under_25') or 0)
+        if u25_q > 1.0:
+            old_pr = p['pronostico']
+            old_q = p.get('quota', 0)
+            p['pronostico'] = 'Under 2.5'
+            p['quota'] = u25_q
+            p['tipo'] = 'GOL'
+            p['source'] = p.get('source', '?') + '_dc_s1_conv'
+            p['routing_rule'] = 'dc_s1_to_u25'
+            p['has_odds'] = True
+            prob_mod = 0.63  # conservativo vs storico 66.7%
+            prob_mkt = 1.0 / u25_q
+            edge = prob_mod - prob_mkt
+            if edge > 0:
+                kelly = 0.75 * (edge * u25_q - (1 - edge)) / (u25_q - 1)
+                p['stake'] = max(1, min(10, round(kelly * 10)))
+                p['edge'] = round(edge * 100, 1)
+            else:
+                p['stake'] = 1
+                p['edge'] = 0
+            p['prob_mercato'] = round(prob_mkt * 100, 1)
+            p['prob_modello'] = round(prob_mod * 100, 1)
+            p['probabilita_stimata'] = round(prob_mod * 100, 1)
+            print(f"    🔄 DC(s1)→U2.5: {old_pr} @{old_q:.2f} → Under 2.5 @{u25_q:.2f}")
+        result.append(p)
+
+    return result
+
+
+def _apply_mg23_stake4_to_under25(unified, odds):
+    """
+    Conversione MG 2-3 stake 4 → Under 2.5.
+    Storico feb-mar: MG 2-3 stake 4 HR 38.5% (P/L -14.52u),
+    ma Under 2.5 nelle stesse partite 69.2%.
+    DEVE girare PRIMA del filtro fascia 1.80-1.89.
+    """
+    if not odds:
+        return unified
+
+    result = []
+    for p in unified:
+        if (p.get('tipo') == 'GOL'
+            and p.get('stake', 0) == 4
+            and p.get('pronostico') == 'MG 2-3'):
+            u25_q = float(odds.get('under_25') or 0)
+            if u25_q > 1.0:
+                old_q = p.get('quota', 0)
+                p['pronostico'] = 'Under 2.5'
+                p['quota'] = u25_q
+                p['tipo'] = 'GOL'
+                p['source'] = p.get('source', '?') + '_mg23_s4_conv'
+                p['routing_rule'] = 'mg23_s4_to_u25'
+                p['has_odds'] = True
+                prob_mod = 0.66  # conservativo vs storico 69.2%
+                prob_mkt = 1.0 / u25_q
+                edge = prob_mod - prob_mkt
+                if edge > 0:
+                    kelly = 0.75 * (edge * u25_q - (1 - edge)) / (u25_q - 1)
+                    p['stake'] = max(1, min(10, round(kelly * 10)))
+                    p['edge'] = round(edge * 100, 1)
+                else:
+                    p['stake'] = 1
+                    p['edge'] = 0
+                p['prob_mercato'] = round(prob_mkt * 100, 1)
+                p['prob_modello'] = round(prob_mod * 100, 1)
+                p['probabilita_stimata'] = round(prob_mod * 100, 1)
+                print(f"    🔄 MG23(s4)→U2.5: MG 2-3 @{old_q:.2f} → Under 2.5 @{u25_q:.2f}")
+        result.append(p)
+
+    return result
+
+
+def _apply_gol_stake4_quota_filter(unified):
+    """
+    Filtro GOL stake 4 fascia quota 1.80-1.89 → NO BET.
+    Storico feb-mar: 7/21 HR 33.3%, P/L -32.12u.
+    DEVE girare DOPO la conversione MG 2-3 → U2.5 (che cambia quota).
+    """
+    result = []
+    for p in unified:
+        if (p.get('tipo') == 'GOL'
+            and p.get('stake', 0) == 4
+            and p.get('pronostico') != 'NO BET'
+            and 1.80 <= (p.get('quota') or 0) < 1.90):
+            old_pr = p['pronostico']
+            old_q = p.get('quota', 0)
+            p['pronostico'] = 'NO BET'
+            p['quota'] = 0
+            p['stake'] = 0
+            p['routing_rule'] = 'gol_s4_q180_filter'
+            print(f"    🚫 GOL(s4) filtro quota: {old_pr} @{old_q:.2f} → NO BET (fascia 1.80-1.89)")
+        result.append(p)
+    return result
+
+
+def _apply_over15_stake5_low_to_under25(unified, odds):
+    """
+    Conversione Over 1.5 stake 5 quota < 1.40 → Under 2.5.
+    Storico feb-mar: 7/11 HR 63.6% (P/L -7.65u), BE=74% irraggiungibile.
+    Under 2.5 nelle stesse partite 72.7%. Nelle 4 perse, U2.5 4/4 (100%).
+    """
+    if not odds:
+        return unified
+
+    result = []
+    for p in unified:
+        if (p.get('tipo') == 'GOL'
+            and p.get('stake', 0) == 5
+            and p.get('pronostico') == 'Over 1.5'
+            and (p.get('quota') or 0) < 1.40):
+            u25_q = float(odds.get('under_25') or 0)
+            if u25_q > 1.0:
+                old_q = p.get('quota', 0)
+                p['pronostico'] = 'Under 2.5'
+                p['quota'] = u25_q
+                p['tipo'] = 'GOL'
+                p['source'] = p.get('source', '?') + '_o15_s5_conv'
+                p['routing_rule'] = 'o15_s5_low_to_u25'
+                p['has_odds'] = True
+                prob_mod = 0.69  # conservativo vs storico 72.7%
+                prob_mkt = 1.0 / u25_q
+                edge = prob_mod - prob_mkt
+                if edge > 0:
+                    kelly = 0.75 * (edge * u25_q - (1 - edge)) / (u25_q - 1)
+                    p['stake'] = max(1, min(10, round(kelly * 10)))
+                    p['edge'] = round(edge * 100, 1)
+                else:
+                    p['stake'] = 1
+                    p['edge'] = 0
+                p['prob_mercato'] = round(prob_mkt * 100, 1)
+                p['prob_modello'] = round(prob_mod * 100, 1)
+                p['probabilita_stimata'] = round(prob_mod * 100, 1)
+                print(f"    🔄 O1.5(s5,<1.40)→U2.5: Over 1.5 @{old_q:.2f} → Under 2.5 @{u25_q:.2f}")
+        result.append(p)
+
+    return result
+
+
+def _apply_gol_stake7_filter(unified, odds):
+    """
+    Filtro GOL stake 7 — sub-mercati irrecuperabili → NO BET:
+    - Under 2.5: 5/11 HR 45.5% (BE 67.9%, P/L -24.64u) — impossibile recuperare
+    - MG 2-3: 1/2 HR 50% (P/L -0.84u) — campione piccolo, marginale
+    - Quota 1.90-1.99: 0/2 (P/L -14.00u) — zero vittorie
+    NG rate globale 45% → conversione a NoGoal NON funziona.
+    """
+    result = []
+    for p in unified:
+        if p.get('tipo') != 'GOL' or p.get('stake', 0) != 7 or p.get('pronostico') == 'NO BET':
+            result.append(p)
+            continue
+
+        pr = p.get('pronostico', '')
+        quota = p.get('quota') or 0
+        nobet = False
+
+        if pr == 'Under 2.5':
+            nobet = True
+            tag = 'u25_s7'
+        elif pr == 'MG 2-3':
+            nobet = True
+            tag = 'mg23_s7'
+        elif 1.90 <= quota < 2.00:
+            nobet = True
+            tag = 'gol_s7_q190'
+
+        if nobet:
+            old_pr = pr
+            p['pronostico'] = 'NO BET'
+            p['routing_rule'] = f'{tag}_nobet'
+            print(f"    🚫 GOL(s7) NO BET: {old_pr} @{quota:.2f} [{tag}]")
+        result.append(p)
+
+    return result
+
+
+def _apply_gol_stake5_q160_to_nogoal(unified, odds):
+    """
+    Conversione GOL stake 5 fascia quota 1.60-1.69 → NoGoal.
+    Storico feb-mar: 9/19 HR 47.4% (P/L -21.50u),
+    ma NoGoal nelle stesse partite 63.2%. Nelle 10 perse, NG 9/10 (90%).
+    """
+    if not odds:
+        return unified
+
+    result = []
+    for p in unified:
+        if (p.get('tipo') == 'GOL'
+            and p.get('stake', 0) == 5
+            and p.get('pronostico') != 'NO BET'
+            and 1.60 <= (p.get('quota') or 0) < 1.70):
+            ng_q = float(odds.get('ng') or 0)
+            if ng_q > 1.0:
+                old_pr = p['pronostico']
+                old_q = p.get('quota', 0)
+                p['pronostico'] = 'NoGoal'
+                p['quota'] = ng_q
+                p['tipo'] = 'GOL'
+                p['source'] = p.get('source', '?') + '_gol_s5_q160_conv'
+                p['routing_rule'] = 'gol_s5_q160_to_ng'
+                p['has_odds'] = True
+                prob_mod = 0.60  # conservativo vs storico 63.2%
+                prob_mkt = 1.0 / ng_q
+                edge = prob_mod - prob_mkt
+                if edge > 0:
+                    kelly = 0.75 * (edge * ng_q - (1 - edge)) / (ng_q - 1)
+                    p['stake'] = max(1, min(10, round(kelly * 10)))
+                    p['edge'] = round(edge * 100, 1)
+                else:
+                    p['stake'] = 1
+                    p['edge'] = 0
+                p['prob_mercato'] = round(prob_mkt * 100, 1)
+                p['prob_modello'] = round(prob_mod * 100, 1)
+                p['probabilita_stimata'] = round(prob_mod * 100, 1)
+                print(f"    🔄 GOL(s5,q160)→NG: {old_pr} @{old_q:.2f} → NoGoal @{ng_q:.2f}")
+        result.append(p)
+
+    return result
+
+
+def _apply_dc_stake4_to_nogoal(unified, odds):
+    """
+    Conversione DC stake 4 → NoGoal.
+    Storico feb-mar: DC stake 4 HR 60.0% (P/L -8.24u),
+    ma NoGoal nelle stesse partite 73.7% (P/L +29.20u).
+    NoGoal assente nel sistema → diversifica il portafoglio.
+    """
+    if not odds:
+        return unified
+
+    result = []
+    for p in unified:
+        if p.get('tipo') != 'DOPPIA_CHANCE' or p.get('stake', 0) != 4 or p.get('pronostico') == 'NO BET':
+            result.append(p)
+            continue
+
+        ng_q = float(odds.get('ng') or 0)
+        if ng_q > 1.0:
+            old_pr = p['pronostico']
+            old_q = p.get('quota', 0)
+            p['pronostico'] = 'NoGoal'
+            p['quota'] = ng_q
+            p['tipo'] = 'GOL'
+            p['source'] = p.get('source', '?') + '_dc_s4_conv'
+            p['routing_rule'] = 'dc_s4_to_ng'
+            p['has_odds'] = True
+            prob_mod = 0.70  # conservativo vs storico 73.7%
+            prob_mkt = 1.0 / ng_q
+            edge = prob_mod - prob_mkt
+            if edge > 0:
+                kelly = 0.75 * (edge * ng_q - (1 - edge)) / (ng_q - 1)
+                p['stake'] = max(1, min(10, round(kelly * 10)))
+                p['edge'] = round(edge * 100, 1)
+            else:
+                p['stake'] = 1
+                p['edge'] = 0
+            p['prob_mercato'] = round(prob_mkt * 100, 1)
+            p['prob_modello'] = round(prob_mod * 100, 1)
+            p['probabilita_stimata'] = round(prob_mod * 100, 1)
+            print(f"    🔄 DC(s4)→NG: {old_pr} @{old_q:.2f} → NoGoal @{ng_q:.2f}")
+        result.append(p)
+
+    return result
+
+
+def _apply_o25_stake6_to_goal(unified, odds):
+    """
+    Conversione Over 2.5 stake 6 → Goal (BTTS).
+    Storico feb-mar: O2.5 stake 6 HR 61.3% (P/L -13.80u),
+    ma BTTS nelle stesse 31 partite 74.2% (P/L +28.20u).
+    prob_mod = 0.70 (conservativo vs 74.2%) → Kelly abbassa stake di 1-2 punti.
+    """
+    if not odds:
+        return unified
+
+    result = []
+    for p in unified:
+        if (p.get('tipo') == 'GOL'
+            and p.get('stake', 0) == 6
+            and p.get('pronostico') == 'Over 2.5'):
+            gg_q = float(odds.get('gg') or 0)
+            if gg_q > 1.0:
+                old_q = p.get('quota', 0)
+                p['pronostico'] = 'Goal'
+                p['quota'] = gg_q
+                p['tipo'] = 'GOL'
+                p['source'] = p.get('source', '?') + '_o25_s6_conv'
+                p['routing_rule'] = 'o25_s6_to_goal'
+                p['has_odds'] = True
+                prob_mod = 0.70  # conservativo vs storico 74.2%
+                prob_mkt = 1.0 / gg_q
+                edge = prob_mod - prob_mkt
+                if edge > 0:
+                    kelly = 0.75 * (edge * gg_q - (1 - edge)) / (gg_q - 1)
+                    p['stake'] = max(1, min(10, round(kelly * 10)))
+                    p['edge'] = round(edge * 100, 1)
+                else:
+                    p['stake'] = 1
+                    p['edge'] = 0
+                p['prob_mercato'] = round(prob_mkt * 100, 1)
+                p['prob_modello'] = round(prob_mod * 100, 1)
+                p['probabilita_stimata'] = round(prob_mod * 100, 1)
+                print(f"    🔄 O2.5(s6)→Goal: Over 2.5 @{old_q:.2f} → Goal @{gg_q:.2f}")
+        result.append(p)
+
+    return result
+
+
+def _apply_segno_stake9_conversions(unified, odds):
+    """
+    Conversioni SEGNO stake 9 per fasce problematiche:
+    - Fascia 1.50-1.59: DC X2 o SEGNO 2 → Goal (BTTS 5/6=83.3%, prob_mod=0.70)
+    - Fascia 1.80-1.99: DC X2 → NoGoal (NG 4/5=80%, prob_mod=0.65)
+    - Fascia 1.80-1.99: SEGNO 2 → mantieni ma cap stake a 6 (da 9, -3 punti)
+    """
+    if not odds:
+        return unified
+
+    result = []
+    for p in unified:
+        tipo = p.get('tipo', '')
+        stake = p.get('stake', 0)
+        pr = p.get('pronostico', '')
+        quota = p.get('quota') or 0
+
+        if stake != 9 or pr == 'NO BET':
+            result.append(p)
+            continue
+
+        # Fascia 1.50-1.59: DC X2 o SEGNO 2 → Goal (BTTS)
+        if 1.50 <= quota < 1.60 and (
+            (tipo == 'DOPPIA_CHANCE' and pr == 'X2') or
+            (tipo == 'SEGNO' and pr == '2')
+        ):
+            gg_q = float(odds.get('gg') or 0)
+            if gg_q > 1.0:
+                old_pr = pr
+                old_q = quota
+                p['pronostico'] = 'Goal'
+                p['quota'] = gg_q
+                p['tipo'] = 'GOL'
+                p['source'] = p.get('source', '?') + '_segno_s9_f150_conv'
+                p['routing_rule'] = 'segno_s9_f150_to_goal'
+                p['has_odds'] = True
+                prob_mod = 0.70  # conservativo vs storico 83.3%
+                prob_mkt = 1.0 / gg_q
+                edge = prob_mod - prob_mkt
+                if edge > 0:
+                    kelly = 0.75 * (edge * gg_q - (1 - edge)) / (gg_q - 1)
+                    p['stake'] = max(1, min(10, round(kelly * 10)))
+                    p['edge'] = round(edge * 100, 1)
+                else:
+                    p['stake'] = 1
+                    p['edge'] = 0
+                p['prob_mercato'] = round(prob_mkt * 100, 1)
+                p['prob_modello'] = round(prob_mod * 100, 1)
+                p['probabilita_stimata'] = round(prob_mod * 100, 1)
+                print(f"    🔄 SEGNO(s9,q1.50)→Goal: {old_pr} @{old_q:.2f} → Goal @{gg_q:.2f}")
+            result.append(p)
+            continue
+
+        # Fascia 1.80-1.99: DC X2 → NoGoal
+        if 1.80 <= quota < 2.00 and tipo == 'DOPPIA_CHANCE' and pr == 'X2':
+            ng_q = float(odds.get('ng') or 0)
+            if ng_q > 1.0:
+                old_q = quota
+                p['pronostico'] = 'NoGoal'
+                p['quota'] = ng_q
+                p['tipo'] = 'GOL'
+                p['source'] = p.get('source', '?') + '_dcx2_s9_f180_conv'
+                p['routing_rule'] = 'dcx2_s9_f180_to_ng'
+                p['has_odds'] = True
+                prob_mod = 0.65  # conservativo vs storico 80%
+                prob_mkt = 1.0 / ng_q
+                edge = prob_mod - prob_mkt
+                if edge > 0:
+                    kelly = 0.75 * (edge * ng_q - (1 - edge)) / (ng_q - 1)
+                    p['stake'] = max(1, min(10, round(kelly * 10)))
+                    p['edge'] = round(edge * 100, 1)
+                else:
+                    p['stake'] = 1
+                    p['edge'] = 0
+                p['prob_mercato'] = round(prob_mkt * 100, 1)
+                p['prob_modello'] = round(prob_mod * 100, 1)
+                p['probabilita_stimata'] = round(prob_mod * 100, 1)
+                print(f"    🔄 DCX2(s9,q1.80)→NG: X2 @{old_q:.2f} → NoGoal @{ng_q:.2f}")
+            result.append(p)
+            continue
+
+        # Fascia 1.80-1.99: SEGNO 2 → mantieni ma cap stake a 6
+        if 1.80 <= quota < 2.00 and tipo == 'SEGNO' and pr == '2':
+            p['stake'] = 6
+            p['routing_rule'] = 'se2_s9_f180_cap6'
+            print(f"    📉 SE:2(s9,q1.80) cap stake: 9 → 6 ({pr} @{quota:.2f})")
+            result.append(p)
+            continue
+
+        result.append(p)
+
+    return result
+
+
+def _apply_se2_stake8_filter(unified):
+    """
+    Filtro SEGNO 2 stake 8 fascia quota 1.90-1.99 → NO BET.
+    Storico feb-mar: 2/7 HR 28.6% (P/L -23.60u).
+    ⚠️ Range 1.90-1.99 (NON >=1.90): la fascia 2.00-2.50 ha 5/9 HR 55.6% (+8.40u), va preservata.
+    """
+    result = []
+    for p in unified:
+        if (p.get('tipo') == 'SEGNO'
+            and p.get('stake', 0) == 8
+            and p.get('pronostico') == '2'
+            and 1.90 <= (p.get('quota') or 0) < 2.00):
+            old_q = p.get('quota', 0)
+            p['pronostico'] = 'NO BET'
+            p['quota'] = 0
+            p['stake'] = 0
+            p['routing_rule'] = 'se2_s8_q190_filter'
+            print(f"    🚫 SE:2(s8) filtro: 2 @{old_q:.2f} → NO BET (fascia 1.90-1.99)")
+        result.append(p)
+    return result
+
+
+def _apply_gol_stake8_cap(unified):
+    """
+    Cap stake GOL stake 8 fascia quota 1.50-1.59: 8 → 6.
+    Storico feb-mar: 7/13 HR 53.8% (P/L -18.00u), sotto BE 64.9%.
+    Le altre fasce funzionano bene (1.40-1.49: 84.6%, 1.60+: 100%).
+    """
+    result = []
+    for p in unified:
+        if (p.get('tipo') == 'GOL'
+            and p.get('stake', 0) == 8
+            and p.get('pronostico') != 'NO BET'
+            and 1.50 <= (p.get('quota') or 0) < 1.60):
+            p['stake'] = 6
+            p['routing_rule'] = 'gol_s8_q150_cap6'
+            print(f"    📉 GOL(s8) cap stake: 8 → 6 ({p.get('pronostico','')} @{p.get('quota',0):.2f})")
+        result.append(p)
+    return result
+
+
+def _apply_segno_stake7_cap(unified):
+    """
+    Cap stake SEGNO+DC stake 7 nelle fasce deboli: 7 → 5.
+    - Fascia <1.40: 0/1 (BE 71.9%, irraggiungibile)
+    - Fascia 1.40-1.49: 3/5 HR 60% (BE 69.4%, P/L -4.48u)
+    - Fascia 1.60-1.69: 5/9 HR 55.6% (BE 61%, P/L -6.51u)
+    Le fasce 1.50-1.59 (88.9%) e 1.80+ (69.2%+) restano a stake 7.
+    """
+    result = []
+    for p in unified:
+        tipo = p.get('tipo', '')
+        stake = p.get('stake', 0)
+        quota = p.get('quota') or 0
+        if (stake == 7
+            and tipo in ('SEGNO', 'DOPPIA_CHANCE')
+            and p.get('pronostico') != 'NO BET'
+            and (quota < 1.50 or (1.60 <= quota < 1.70))):
+            p['stake'] = 5
+            p['routing_rule'] = 'segno_s7_weak_q_cap5'
+            print(f"    📉 SEGNO(s7) cap stake: 7 → 5 ({p.get('pronostico','')} @{quota:.2f})")
+        result.append(p)
+    return result
+
+
+def _apply_segno_stake6_conversion(unified, odds):
+    """
+    Conversione SEGNO stake 6 → mercati più profittevoli.
+    Pattern storico feb-mar:
+    - SEGNO puro stake 6: HR 50%, Over 2.5 57% → converti in Over 2.5
+    - DC stake 6: HR 60%, BTTS 65% → converti in Goal
+    """
+    if not odds:
+        return unified
+
+    result = []
+    for p in unified:
+        tipo = p.get('tipo', '')
+        stake = p.get('stake', 0)
+        pr = p.get('pronostico', '')
+
+        # SEGNO puro stake 6 → Over 2.5
+        if tipo == 'SEGNO' and stake == 6 and pr != 'NO BET':
+            o25_q = float(odds.get('over_25') or 0)
+            if o25_q > 1.0:
+                old_pr = pr
+                old_q = p.get('quota', 0)
+                p['pronostico'] = 'Over 2.5'
+                p['quota'] = o25_q
+                p['tipo'] = 'GOL'
+                p['source'] = p.get('source', '?') + '_segno_s6_conv'
+                p['routing_rule'] = 'segno_s6_to_o25'
+                p['has_odds'] = True
+                prob_mod = 0.57
+                prob_mkt = 1.0 / o25_q
+                edge = prob_mod - prob_mkt
+                if edge > 0:
+                    kelly = 0.75 * (edge * o25_q - (1 - edge)) / (o25_q - 1)
+                    p['stake'] = max(1, min(10, round(kelly * 10)))
+                    p['edge'] = round(edge * 100, 1)
+                else:
+                    p['stake'] = 1
+                    p['edge'] = 0
+                p['prob_mercato'] = round(prob_mkt * 100, 1)
+                p['prob_modello'] = round(prob_mod * 100, 1)
+                p['probabilita_stimata'] = round(prob_mod * 100, 1)
+                print(f"    🔄 SEGNO(s6)→O2.5: {old_pr} @{old_q:.2f} → Over 2.5 @{o25_q:.2f}")
+            result.append(p)
+            continue
+
+        # DC stake 6 → Goal (BTTS)
+        if tipo == 'DOPPIA_CHANCE' and stake == 6 and pr != 'NO BET':
+            gg_q = float(odds.get('gg') or 0)
+            if gg_q > 1.0:
+                old_pr = pr
+                old_q = p.get('quota', 0)
+                p['pronostico'] = 'Goal'
+                p['quota'] = gg_q
+                p['tipo'] = 'GOL'
+                p['source'] = p.get('source', '?') + '_dc_s6_conv'
+                p['routing_rule'] = 'dc_s6_to_goal'
+                p['has_odds'] = True
+                prob_mod = 0.65
+                prob_mkt = 1.0 / gg_q
+                edge = prob_mod - prob_mkt
+                if edge > 0:
+                    kelly = 0.75 * (edge * gg_q - (1 - edge)) / (gg_q - 1)
+                    p['stake'] = max(1, min(10, round(kelly * 10)))
+                    p['edge'] = round(edge * 100, 1)
+                else:
+                    p['stake'] = 1
+                    p['edge'] = 0
+                p['prob_mercato'] = round(prob_mkt * 100, 1)
+                p['prob_modello'] = round(prob_mod * 100, 1)
+                p['probabilita_stimata'] = round(prob_mod * 100, 1)
+                print(f"    🔄 DC(s6)→Goal: {old_pr} @{old_q:.2f} → Goal @{gg_q:.2f}")
+            result.append(p)
+            continue
+
+        result.append(p)
+
+    return result
+
+
 def _apply_multigol(unified, odds):
     """
     Post-processing: sostituisce pronostici deboli con Multi-goal.
@@ -2077,9 +2760,7 @@ def orchestrate_date(date_str, dry_run=False, match_time_filter=None, preserve_a
         # Applica routing
         unified_pronostici = route_predictions(preds_by_sys, markets_by_sys)
 
-        # --- POST-PROCESSING: Conversione Goal per fasce quota tossiche ---
         match_odds = base_doc.get('odds', {})
-        unified_pronostici = _apply_goal_quota_conversion(unified_pronostici, match_odds)
 
         # --- POST-PROCESSING: Multi-goal su pronostici deboli ---
         unified_pronostici = _apply_multigol(unified_pronostici, match_odds)
@@ -2414,6 +3095,28 @@ def orchestrate_date(date_str, dry_run=False, match_time_filter=None, preserve_a
             p['stake'] = new_stake
             if old_stake != new_stake:
                 pass  # silenzioso — troppi log altrimenti
+
+        # --- CONVERSIONI POST-STAKE (ricalcolano stake sul nuovo pronostico) ---
+        # ⚠️ ORDINE IMPORTANTE: le conversioni devono girare PRIMA dei filtri quota,
+        # perché cambiano il pronostico e la quota (es. MG 2-3 @1.88 → U2.5 @1.55).
+        # Se il filtro fascia 1.80-1.89 girasse prima, cancellerebbe tips convertibili.
+        unified_pronostici = _apply_goal_quota_conversion(unified_pronostici, match_odds)
+        unified_pronostici = _apply_gol_low_stake_to_nogoal(unified_pronostici, match_odds)
+        unified_pronostici = _apply_gol_stake3_filter(unified_pronostici)
+        unified_pronostici = _apply_mg23_stake4_to_under25(unified_pronostici, match_odds)  # PRIMA del filtro quota
+        unified_pronostici = _apply_gol_stake4_quota_filter(unified_pronostici)             # DOPO la conversione MG 2-3
+        unified_pronostici = _apply_over15_stake5_low_to_under25(unified_pronostici, match_odds)
+        unified_pronostici = _apply_gol_stake5_q160_to_nogoal(unified_pronostici, match_odds)
+        unified_pronostici = _apply_gol_stake7_filter(unified_pronostici, match_odds)
+        unified_pronostici = _apply_o25_stake6_to_goal(unified_pronostici, match_odds)
+        unified_pronostici = _apply_segno_low_stake_filter(unified_pronostici)
+        unified_pronostici = _apply_dc_stake1_to_under25(unified_pronostici, match_odds)
+        unified_pronostici = _apply_dc_stake4_to_nogoal(unified_pronostici, match_odds)
+        unified_pronostici = _apply_segno_stake6_conversion(unified_pronostici, match_odds)
+        unified_pronostici = _apply_segno_stake9_conversions(unified_pronostici, match_odds)
+        unified_pronostici = _apply_se2_stake8_filter(unified_pronostici)
+        unified_pronostici = _apply_segno_stake7_cap(unified_pronostici)
+        unified_pronostici = _apply_gol_stake8_cap(unified_pronostici)
 
         # Costruisci documento unified
         unified_doc = {}
