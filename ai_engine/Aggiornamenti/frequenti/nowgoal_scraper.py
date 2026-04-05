@@ -283,17 +283,41 @@ def get_target_rounds_from_page(driver, league_name, has_stages=False):
     indices = [anchor_index, anchor_index - 1, anchor_index + 1]
     return [rounds_list[i] for i in indices if 0 <= i < len(rounds_list)]
 
+def create_driver(chrome_options):
+    """Crea una nuova istanza ChromeDriver con cleanup garantito."""
+    global _active_driver
+    chrome_ver = None
+    try:
+        r = subprocess.run(['reg', 'query', r'HKEY_CURRENT_USER\Software\Google\Chrome\BLBeacon', '/v', 'version'], capture_output=True, text=True, timeout=5)
+        for line in r.stdout.splitlines():
+            if line.strip().startswith('version'):
+                chrome_ver = line.split()[-1]
+    except: pass
+    service = Service(ChromeDriverManager(driver_version=chrome_ver).install() if chrome_ver else ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=service, options=chrome_options)
+    _active_driver = driver
+    return driver
+
+def is_driver_alive(driver):
+    """Verifica se la sessione ChromeDriver è ancora attiva."""
+    try:
+        _ = driver.title
+        return True
+    except:
+        return False
+
 def run_scraper():
     print(f"\n🚀 AVVIO SCRAPER (LOGICA STRICT: Aggiorna se diverse o scadute)")
-    
+
     chrome_options = Options()
-    # chrome_options.add_argument("--headless") 
+    # chrome_options.add_argument("--headless")
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--log-level=3")
-    
+
     driver = None
     total_updated = 0
     league_stats = []  # Report per campionato
+    failed_leagues = []  # Campionati falliti
     scraper_start = time.time()
 
     # Cache tutti i teams per evitare query ripetute (1 query invece di ~1800)
@@ -304,27 +328,28 @@ def run_scraper():
             if isinstance(a, str) and a not in _teams_cache:
                 _teams_cache[a] = t
 
-    try:
-        for league in LEAGUES_CONFIG:
-            lname = league['name']
-            url = league['url']
-            league_start = time.time()
-            league_found = 0
-            league_updated = 0
-            league_skipped = 0
-            
-            if driver is None:
-                chrome_ver = None
-                try:
-                    r = subprocess.run(['reg', 'query', r'HKEY_CURRENT_USER\Software\Google\Chrome\BLBeacon', '/v', 'version'], capture_output=True, text=True, timeout=5)
-                    for line in r.stdout.splitlines():
-                        if line.strip().startswith('version'):
-                            chrome_ver = line.split()[-1]
-                except: pass
-                service = Service(ChromeDriverManager(driver_version=chrome_ver).install() if chrome_ver else ChromeDriverManager().install())
-                driver = webdriver.Chrome(service=service, options=chrome_options)
-                _active_driver = driver
+    for league in LEAGUES_CONFIG:
+        lname = league['name']
+        url = league['url']
+        league_start = time.time()
+        league_found = 0
+        league_updated = 0
+        league_skipped = 0
 
+        # Crea driver se necessario o se sessione morta
+        if driver is None or not is_driver_alive(driver):
+            if driver is not None:
+                print(f"   🔄 Sessione morta, ricreo ChromeDriver...")
+                try: driver.quit()
+                except: pass
+            try:
+                driver = create_driver(chrome_options)
+            except Exception as e:
+                print(f"   ❌ Impossibile creare ChromeDriver: {e}")
+                failed_leagues.append({"name": lname, "error": str(e)})
+                continue
+
+        try:
             driver.get(url)
             time.sleep(1.5)
 
@@ -520,24 +545,38 @@ def run_scraper():
             league_elapsed = time.time() - league_start
             league_stats.append({"name": lname, "found": league_found, "updated": league_updated, "skipped": league_skipped, "time": league_elapsed})
 
-    except Exception as e:
-        print(f"❌ Errore: {e}")
-    finally:
-        if driver: driver.quit()
-        total_elapsed = time.time() - scraper_start
-        print(f"\n{'='*80}")
-        print(f"📊 RIEPILOGO SCRAPER NOWGOAL (Quote 1X2)")
-        print(f"{'='*80}")
-        print(f"{'Campionato':<35} | {'Trovate':>8} | {'Aggiorn':>8} | {'Saltate':>8} | {'Tempo':>8}")
-        print(f"{'-'*80}")
-        for s in league_stats:
-            print(f"{s['name']:<35} | {s['found']:>8} | {s['updated']:>8} | {s['skipped']:>8} | {s['time']:>6.1f}s")
-        print(f"{'-'*80}")
-        tot_found = sum(s['found'] for s in league_stats)
-        tot_skip = sum(s['skipped'] for s in league_stats)
-        print(f"{'TOTALE':<35} | {tot_found:>8} | {total_updated:>8} | {tot_skip:>8} | {total_elapsed:>6.1f}s")
-        print(f"{'='*80}")
-        print(f"⏱️ Tempo totale: {total_elapsed/60:.1f} minuti")
+        except Exception as e:
+            print(f"❌ Errore {lname}: {e}")
+            failed_leagues.append({"name": lname, "error": str(e)})
+            league_elapsed = time.time() - league_start
+            league_stats.append({"name": lname, "found": league_found, "updated": league_updated, "skipped": league_skipped, "time": league_elapsed})
+            # Sessione probabilmente morta — forza ricreazione al prossimo campionato
+            try: driver.quit()
+            except: pass
+            driver = None
+
+    # --- CLEANUP E RIEPILOGO ---
+    if driver:
+        try: driver.quit()
+        except: pass
+    total_elapsed = time.time() - scraper_start
+    print(f"\n{'='*80}")
+    print(f"📊 RIEPILOGO SCRAPER NOWGOAL (Quote 1X2)")
+    print(f"{'='*80}")
+    print(f"{'Campionato':<35} | {'Trovate':>8} | {'Aggiorn':>8} | {'Saltate':>8} | {'Tempo':>8}")
+    print(f"{'-'*80}")
+    for s in league_stats:
+        print(f"{s['name']:<35} | {s['found']:>8} | {s['updated']:>8} | {s['skipped']:>8} | {s['time']:>6.1f}s")
+    print(f"{'-'*80}")
+    tot_found = sum(s['found'] for s in league_stats)
+    tot_skip = sum(s['skipped'] for s in league_stats)
+    print(f"{'TOTALE':<35} | {tot_found:>8} | {total_updated:>8} | {tot_skip:>8} | {total_elapsed:>6.1f}s")
+    print(f"{'='*80}")
+    if failed_leagues:
+        print(f"\n⚠️ CAMPIONATI CON ERRORI ({len(failed_leagues)}):")
+        for fl in failed_leagues:
+            print(f"   ❌ {fl['name']}: {fl['error'][:100]}")
+    print(f"⏱️ Tempo totale: {total_elapsed/60:.1f} minuti")
 
 if __name__ == "__main__":
     run_scraper()
