@@ -206,7 +206,9 @@ def _apply_gol_low_stake_to_nogoal(unified, odds):
         # Stake 2: solo Goal (BTTS) → NoGoal
         if stake == 1 or (stake == 2 and pr == 'Goal'):
             ng_q = float(odds.get('ng') or 0)
-            if ng_q > 1.0:
+            # Stake 1: soglia NG <= 1.67 (sopra, mercato dice GG probabile)
+            # Stake 2: nessuna soglia (regola già in positivo +9.0u Delta CF)
+            if ng_q > 1.0 and (stake == 2 or ng_q <= 1.67):
                 old_pr = pr
                 old_q = p.get('quota', 0)
                 p['original_pronostico'] = old_pr
@@ -239,21 +241,65 @@ def _apply_gol_low_stake_to_nogoal(unified, odds):
     return result
 
 
-def _apply_gol_stake3_filter(unified):
+def _apply_gol_stake3_filter(unified, odds=None):
     """
-    Filtro GOL: pronostici tossici → NO BET.
-    Stake 3: Over 2.5 -18.09u, MG 2-3 -12.39u.
-    Stake 4: Over 2.5 -8.84u (19 tips, HR 57.9%, quota media 1.55 — sotto BE).
-    Stake 7 quota <1.40: 10 tips, 80% HR ma BE 92.4% (P/L -13.30u) — rumore.
+    Filtro GOL: pronostici tossici → NO BET o conversione MG.
+    Stake 3: Over 2.5, MG 2-3 → NO BET.
+    Stake 4: Over 2.5 → MG dinamico (O2.5 ≤1.55 → MG 3-5, >1.55 → MG 2-4).
+    Stake 7 quota <1.40 → NO BET.
     """
     result = []
     for p in unified:
         stake = p.get('stake', 0)
         pr = p.get('pronostico', '')
+
+        # Stake 4 Over 2.5 → conversione MG dinamico
+        if (p.get('tipo') == 'GOL' and stake == 4 and pr == 'Over 2.5' and odds):
+            old_pr = pr
+            old_q = p.get('quota', 0) or 0
+
+            # Calcola lambda da Under 2.5
+            u25_q = odds.get('under_25')
+            l_tot = _calc_lambda(float(u25_q)) if u25_q else None
+
+            if l_tot and old_q > 0:
+                # MG dinamico: O2.5 bassa (≤1.55) → 3-5, alta (>1.55) → 2-4
+                if old_q <= 1.55:
+                    mg_range = '3-5'
+                    mg_goals = [3, 4, 5]
+                else:
+                    mg_range = '2-4'
+                    mg_goals = [2, 3, 4]
+
+                probs = {g: _poisson(g, l_tot) for g in range(11)}
+                mg_prob = sum(probs[g] for g in mg_goals)
+                mg_quota = round((1 / mg_prob) * MULTIGOL_MARGINE, 2) if mg_prob > 0 else 99
+
+                if mg_quota >= MULTIGOL_QUOTA_MIN:
+                    p['original_pronostico'] = old_pr
+                    p['original_quota'] = old_q
+                    p['pronostico'] = f'MG {mg_range}'
+                    p['quota'] = mg_quota
+                    p['routing_rule'] = 'gol_s4_to_mg'
+                    print(f"    🔄 GOL(s4) O2.5 @{old_q:.2f} → MG {mg_range} @{mg_quota:.2f}")
+                    result.append(p)
+                    continue
+
+            # Fallback: se non riesce a calcolare MG → NO BET
+            p['original_pronostico'] = old_pr
+            p['original_quota'] = old_q
+            p['pronostico'] = 'NO BET'
+            p['quota'] = 0
+            p['stake'] = 0
+            p['routing_rule'] = 'gol_s4_filter'
+            print(f"    🚫 GOL(s4) filtro: {old_pr} → NO BET (no MG disponibile)")
+            result.append(p)
+            continue
+
+        # Stake 3 e Stake 7 → NO BET come prima
         if p.get('tipo') == 'GOL' and (
             (stake == 3 and pr in ('Over 2.5', 'MG 2-3'))
-            or (stake == 4 and pr == 'Over 2.5')
-            or (stake == 7 and (p.get('quota') or 0) < 1.40)  # BE 92.4%, irraggiungibile
+            or (stake == 7 and (p.get('quota') or 0) < 1.40)
         ):
             old_pr = pr
             p['original_pronostico'] = old_pr
@@ -1325,11 +1371,13 @@ def _apply_home_win_combos(unified, odds, simulation_data):
 # =====================================================
 # DC DOWNGRADE — SEGNO AR + GG conf 60-65 → DC
 # =====================================================
-def _apply_gg_conf_dc_downgrade(unified, c_doc):
+def _apply_gg_conf_dc_downgrade(unified, c_doc, match_odds=None):
     """
     Quando Sistema C emette un SEGNO con quota >= 2.51 (Alto Rendimento)
-    e la stessa partita ha GG con gg_pct 60-65%, converte in DC.
-    HR storico 67%, ROI +19.5% su 12 campioni.
+    e la stessa partita ha GG con gg_pct 60-65%:
+    1. Tieni il segno originale ma ricalcola stake (media Kelly@50% + originale)
+    2. Aggiungi pronostico NoGoal se non esiste già un GOL nella partita
+    Storico: 10/12 NoGoal, segno HR ~50% su quote alte.
     """
     if not c_doc:
         return unified
@@ -1340,13 +1388,8 @@ def _apply_gg_conf_dc_downgrade(unified, c_doc):
     if not (60 <= gg_pct <= 65):
         return unified
 
-    # Quote 1/X/2 dal doc C
-    odds = c_doc.get('odds', {})
-    q1 = float(odds.get('1') or 0)
-    qx = float(odds.get('X') or odds.get('x') or 0)
-    q2 = float(odds.get('2') or 0)
-    if q1 <= 0 or qx <= 0 or q2 <= 0:
-        return unified
+    # Controlla se esiste già un pronostico GOL nella partita
+    has_gol = any(p.get('tipo') == 'GOL' for p in unified)
 
     result = []
     for p in unified:
@@ -1355,50 +1398,60 @@ def _apply_gg_conf_dc_downgrade(unified, c_doc):
                 and (p.get('quota') or 0) >= 2.51):
 
             pron = p.get('pronostico')
-            if pron == '1':
-                dc_pron = '1X'
-                dc_q = round(1 / (1/q1 + 1/qx), 2)
-            elif pron == '2':
-                dc_pron = 'X2'
-                dc_q = round(1 / (1/qx + 1/q2), 2)
-            else:
-                # SEGNO X — nessun downgrade DC sensato
+            if pron not in ('1', '2'):
                 result.append(p)
                 continue
 
-            dc_pred = {
-                'tipo': 'DOPPIA_CHANCE',
-                'pronostico': dc_pron,
-                'quota': dc_q,
-                'confidence': p.get('confidence', 55),
-                'stars': p.get('stars', 3.0),
-                'source': 'C_dc_conv',
-                'routing_rule': 'gg_conf_dc_downgrade',
-                'original_pronostico': pron,
-                'original_quota': p.get('quota', 0),
-                'has_odds': True,
-            }
-            # Kelly con prob_modello 0.70 (storico 67% HR, conservativo)
-            prob_mod = 0.70
-            if dc_q > 1.0:
-                prob_mkt = 1.0 / dc_q
-                edge = prob_mod - prob_mkt
-                if edge > 0:
-                    kelly = 0.75 * (edge * dc_q) / (dc_q - 1)
-                    dc_pred['stake'] = max(1, min(10, round(kelly * 10)))
-                    dc_pred['edge'] = round(edge * 100, 1)
-                else:
-                    dc_pred['stake'] = 1
-                    dc_pred['edge'] = 0
-                dc_pred['prob_mercato'] = round(prob_mkt * 100, 1)
-                dc_pred['prob_modello'] = round(prob_mod * 100, 1)
-                dc_pred['probabilita_stimata'] = round(prob_mod * 100, 1)
-            else:
-                dc_pred['stake'] = 1
-                dc_pred['edge'] = 0
+            quota = p.get('quota', 0)
+            orig_stake = p.get('stake', 1)
 
-            print(f"    🔄 DC DOWNGRADE: SEGNO {pron} @{p.get('quota', '?')} → DC {dc_pron} @{dc_q} (gg_pct={gg_pct}%)")
-            result.append(dc_pred)
+            # 1) Ricalcola stake segno: media(Kelly@50%, stake_originale)
+            prob_mod_segno = 0.50
+            if quota > 1.0:
+                prob_mkt = 1.0 / quota
+                edge = prob_mod_segno - prob_mkt
+                if edge > 0:
+                    kelly = 0.75 * (edge * quota - (1 - edge)) / (quota - 1)
+                    kelly_stake = max(1, min(10, round(kelly * 10)))
+                else:
+                    kelly_stake = 1
+                new_stake = max(1, round((kelly_stake + orig_stake) / 2))
+                p['stake'] = new_stake
+                p['routing_rule'] = 'gg_conf_dc_downgrade'
+                print(f"    🎯 GG-DC: SEGNO {pron} @{quota:.2f} stake {orig_stake}→{new_stake} (gg_pct={gg_pct}%)")
+
+            result.append(p)
+
+            # 2) Aggiungi NoGoal se non c'è già un pronostico GOL
+            if not has_gol and match_odds:
+                ng_q = float(match_odds.get('ng') or 0)
+                if ng_q > 1.0:
+                    prob_mod_ng = 0.83  # storico 10/12 NoGoal
+                    prob_mkt_ng = 1.0 / ng_q
+                    edge_ng = prob_mod_ng - prob_mkt_ng
+                    ng_pred = {
+                        'tipo': 'GOL',
+                        'pronostico': 'NoGoal',
+                        'quota': ng_q,
+                        'confidence': p.get('confidence', 55),
+                        'stars': p.get('stars', 3.0),
+                        'source': p.get('source', '') + '_gg_ng_add',
+                        'routing_rule': 'gg_conf_dc_downgrade',
+                        'has_odds': True,
+                    }
+                    if edge_ng > 0:
+                        kelly_ng = 0.75 * (edge_ng * ng_q - (1 - edge_ng)) / (ng_q - 1)
+                        ng_pred['stake'] = max(1, min(10, round(kelly_ng * 10)))
+                        ng_pred['edge'] = round(edge_ng * 100, 1)
+                    else:
+                        ng_pred['stake'] = 1
+                        ng_pred['edge'] = 0
+                    ng_pred['prob_mercato'] = round(prob_mkt_ng * 100, 1)
+                    ng_pred['prob_modello'] = round(prob_mod_ng * 100, 1)
+                    ng_pred['probabilita_stimata'] = round(prob_mod_ng * 100, 1)
+                    result.append(ng_pred)
+                    has_gol = True  # evita duplicati se più segni
+                    print(f"    ➕ GG-DC: +NoGoal @{ng_q:.2f} (stake {ng_pred['stake']})")
         else:
             result.append(p)
 
@@ -1653,6 +1706,18 @@ def _apply_segno_scrematura(unified, odds, base_doc, c_doc=None):
     else:
         return unified
 
+    # --- SOGLIA DIFFERENZA QUOTA: se la conversione abbassa la quota oltre il 43%, tieni il SEGNO ---
+    # Analisi storica 2 mesi (132 casi): soglia -43% = punto ottimale HR/PL (+245u vs +116u)
+    SCR_MAX_QUOTA_DROP_PCT = -43
+    if segno_idx < len(result) and azione != 'ELIMINATO':
+        sost = result[segno_idx]
+        nuova_q = sost.get('quota', 0) or 0
+        if quota > 0 and nuova_q > 0:
+            pct_diff = (nuova_q - quota) / quota * 100
+            if pct_diff < SCR_MAX_QUOTA_DROP_PCT:
+                print(f"    SOGLIA SCREM: {segno} @{quota:.2f} -> @{nuova_q:.2f} ({pct_diff:.0f}%) supera {SCR_MAX_QUOTA_DROP_PCT}% — tieni originale")
+                return unified
+
     # --- DEDUP: se il sostituto è un mercato già presente nell'unified, rimuovi il SEGNO ---
     if segno_idx < len(result):
         sost = result[segno_idx]
@@ -1846,8 +1911,8 @@ def _apply_weak_o25_recovery(unified, c_doc):
         return result
     if qx > 1 and q2 > 1:
         dc_q = round(1 / (1/qx + 1/q2), 2)
-        if dc_q >= 1.35:
-            # Verifica che non esista già una DC in unified
+        if 2.00 <= dc_q <= 2.50:
+            # Converti a X2 solo se quota tra 2.00-2.50 (storico: 2 SALV, 1 DANN, P/L +27.9u)
             has_dc = any(p.get('tipo') == 'DOPPIA_CHANCE' for p in unified)
             if not has_dc:
                 result[o25_idx] = _make_recovery(
@@ -2129,8 +2194,8 @@ def _apply_segno_mc_filter(unified, simulation_data, odds):
     # ASSENTE: segno pronosticato 0/4
     elif pron_count == 0:
         if gg_count >= 2:
-            decision = 'CONVERTI'
-            reason = 'ASSENTE + GG>=2 → O1.5'
+            decision = 'BLOCCA'
+            reason = 'ASSENTE + GG>=2 (ex-converti, disattivato)'
         else:
             decision = 'BLOCCA'
             reason = 'ASSENTE senza gol'
@@ -2147,14 +2212,14 @@ def _apply_segno_mc_filter(unified, simulation_data, odds):
             reason = f'3su4+X margine {max_margin}>=3 (93% HR)'
         elif max_margin == 2:
             if total_goals >= 8:
-                decision = 'CONVERTI'
-                reason = f'3su4+X margine=2 gol={total_goals}>=8 → O1.5'
+                decision = 'BLOCCA'
+                reason = f'3su4+X margine=2 gol={total_goals}>=8 (ex-converti, disattivato)'
             else:
                 decision = 'BLOCCA'
                 reason = f'3su4+X margine=2 gol={total_goals}<8 (56% HR)'
         else:
-            decision = 'CONVERTI'
-            reason = f'3su4+X margine {max_margin}<=1 → O1.5'
+            decision = 'BLOCCA'
+            reason = f'3su4+X margine {max_margin}<=1 (ex-converti, disattivato)'
 
     # 3su4 + OPPOSTO
     elif pron_count == 3 and has_opposite:
@@ -2162,8 +2227,8 @@ def _apply_segno_mc_filter(unified, simulation_data, odds):
             decision = 'BLOCCA'
             reason = f'3su4+OPP spread={spread}<5 (50% HR)'
         else:
-            decision = 'CONVERTI'
-            reason = f'3su4+OPP spread={spread}>=5 → O1.5'
+            decision = 'BLOCCA'
+            reason = f'3su4+OPP spread={spread}>=5 (ex-converti, disattivato)'
 
     # 2su4
     elif pron_count == 2:
@@ -2829,7 +2894,7 @@ def orchestrate_date(date_str, dry_run=False, match_time_filter=None, preserve_a
 
         # --- POST-PROCESSING: DC Downgrade — SEGNO AR + GG conf 60-65 → DC ---
         if c_doc_for_combo:
-            unified_pronostici = _apply_gg_conf_dc_downgrade(unified_pronostici, c_doc_for_combo)
+            unified_pronostici = _apply_gg_conf_dc_downgrade(unified_pronostici, c_doc_for_combo, match_odds=match_odds)
 
         # --- POST-PROCESSING: Scrematura SEGNO per fasce di quota ---
         unified_pronostici = _apply_segno_scrematura(unified_pronostici, match_odds, base_doc, c_doc=c_doc_for_combo)
@@ -3156,7 +3221,7 @@ def orchestrate_date(date_str, dry_run=False, match_time_filter=None, preserve_a
         # Se il filtro fascia 1.80-1.89 girasse prima, cancellerebbe tips convertibili.
         unified_pronostici = _apply_goal_quota_conversion(unified_pronostici, match_odds)
         unified_pronostici = _apply_gol_low_stake_to_nogoal(unified_pronostici, match_odds)
-        unified_pronostici = _apply_gol_stake3_filter(unified_pronostici)
+        unified_pronostici = _apply_gol_stake3_filter(unified_pronostici, match_odds)
         unified_pronostici = _apply_mg23_stake4_to_under25(unified_pronostici, match_odds)  # PRIMA del filtro quota
         unified_pronostici = _apply_gol_stake4_quota_filter(unified_pronostici)             # DOPO la conversione MG 2-3
         unified_pronostici = _apply_over15_stake5_low_to_under25(unified_pronostici, match_odds)
@@ -3295,6 +3360,8 @@ def orchestrate_date(date_str, dry_run=False, match_time_filter=None, preserve_a
             db['re_quota_requests'].insert_many(re_requests)
             print(f"    RE quota requests: {len(re_requests)} salvate")
 
+    if dry_run:
+        return unified_docs
     return len(unified_docs)
 
 
@@ -3327,7 +3394,8 @@ def main():
 
         total = 0
         for dt in dates:
-            count = orchestrate_date(dt, dry_run=args.dry_run)
+            result = orchestrate_date(dt, dry_run=args.dry_run)
+            count = len(result) if isinstance(result, list) else result
             total += count
             status = '[DRY]' if args.dry_run else '[OK]'
             print(f"  {dt}: {count} partite {status}")
@@ -3341,7 +3409,8 @@ def main():
             print(f"\n  MoE Orchestratore — Data: {date_str}")
             if args.dry_run:
                 print("  [DRY RUN — nessuna scrittura]")
-            count = orchestrate_date(date_str, dry_run=args.dry_run)
+            result = orchestrate_date(date_str, dry_run=args.dry_run)
+            count = len(result) if isinstance(result, list) else result
             print(f"  Partite scritte: {count}")
         else:
             # Nessun argomento → 7 giorni (oggi + 6 futuri), come Sistema A e C
@@ -3352,7 +3421,8 @@ def main():
             for i in range(7):
                 target = datetime.now() + timedelta(days=i)
                 date_str = target.strftime('%Y-%m-%d')
-                count = orchestrate_date(date_str, dry_run=args.dry_run)
+                result = orchestrate_date(date_str, dry_run=args.dry_run)
+                count = len(result) if isinstance(result, list) else result
                 total += count
                 status = '[DRY]' if args.dry_run else '[OK]'
                 print(f"  {date_str}: {count} partite {status}")
