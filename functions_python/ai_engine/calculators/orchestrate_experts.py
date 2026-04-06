@@ -202,15 +202,37 @@ def _apply_gol_low_stake_to_nogoal(unified, odds):
         stake = p.get('stake', 0)
         pr = p.get('pronostico', '')
 
-        # Stake 1: qualsiasi GOL → NoGoal
-        # Stake 2: solo Goal (BTTS) → NoGoal
+        # Stake 1: qualsiasi GOL → NoGoal (soglia NG <= 1.67)
+        # Stake 2: solo Goal (BTTS) → NoGoal (gerarchia 3 livelli, altrimenti NO BET)
         if stake == 1 or (stake == 2 and pr == 'Goal'):
             ng_q = float(odds.get('ng') or 0)
-            # Stake 1: soglia NG <= 1.67 (sopra, mercato dice GG probabile)
-            # Stake 2: nessuna soglia (regola già in positivo +9.0u Delta CF)
-            if ng_q > 1.0 and (stake == 2 or ng_q <= 1.67):
+            old_q = p.get('quota', 0) or 0
+
+            if stake == 1:
+                # Stake 1: soglia semplice NG <= 1.67
+                should_convert = ng_q > 1.0 and ng_q <= 1.67
+            else:
+                # Stake 2: gerarchia 3 livelli basata su analisi 27 casi (72% HR)
+                # DQ = differenza quote (NG - Goal)
+                dq = ng_q - old_q if ng_q > 0 and old_q > 0 else -999
+                l1 = ng_q >= 1.75 and dq > -0.15       # 70% HR, zona sicura
+                l2 = old_q <= 2.30 and ng_q <= 1.60     # 75% HR, NG bassa
+                l3 = old_q <= 2.05 and 1.65 <= ng_q <= 1.69  # 75% HR, NG media
+                should_convert = ng_q > 1.0 and (l1 or l2 or l3)
+                # Se non passa nessun livello → NO BET (non emettere nemmeno l'originale)
+                if ng_q > 1.0 and not should_convert:
+                    p['original_pronostico'] = pr
+                    p['original_quota'] = old_q
+                    p['pronostico'] = 'NO BET'
+                    p['quota'] = 0
+                    p['stake'] = 0
+                    p['routing_rule'] = 'gol_s2_to_ng'
+                    print(f"    🚫 GOL(s2) gerarchia: {pr} @{old_q:.2f} NG @{ng_q:.2f} → NO BET (nessun livello)")
+                    result.append(p)
+                    continue
+
+            if should_convert:
                 old_pr = pr
-                old_q = p.get('quota', 0)
                 p['original_pronostico'] = old_pr
                 p['original_quota'] = old_q
                 p['pronostico'] = 'NoGoal'
@@ -1920,16 +1942,36 @@ def _apply_weak_o25_recovery(unified, c_doc):
                 print(f"    🔄 O25 RECOVERY: Over 2.5 A+S (score {o25_pred.get('confidence')}) → DC X2 @{dc_q:.2f}")
                 return result
 
-    # PRIORITÀ 3: Under 2.5
+    # PRIORITÀ 3: Under 2.5 — gerarchia 2 livelli (78% HR vs 64% attuale)
+    # L1: DQ ≤ 0 (U2.5 costa meno di O2.5, mercato favorisce Under) → 100% HR
+    # L2: DQ > 0 + U2.5 ≥ 2.10 → 60% HR
+    # Altrimenti: NO BET
     u25 = ec_preds.get('Under 2.5') or next(
         (p for p in c_doc.get('pronostici', [])
          if p.get('pronostico') == 'Under 2.5'), None)
     if u25:
         uq = u25.get('quota') or 0
-        if uq >= 1.35:
+        o25_q = o25_pred.get('quota') or 0
+        dq = uq - o25_q if uq > 0 and o25_q > 0 else 999
+        l1 = dq <= 0                    # U2.5 ≤ O2.5: mercato favorisce Under
+        l2 = dq > 0 and uq >= 2.10     # U2.5 alta ma ≥ 2.10
+
+        if uq >= 1.35 and (l1 or l2):
+            lvl = 'L1' if l1 else 'L2'
             result[o25_idx] = _make_recovery(
                 'GOL', 'Under 2.5', uq, 'C_as_u25_rec', 'as_o25_to_under25', 0.67)
-            print(f"    🔄 O25 RECOVERY: Over 2.5 A+S (score {o25_pred.get('confidence')}) → Under 2.5 @{uq:.2f}")
+            print(f"    🔄 O25 RECOVERY({lvl}): Over 2.5 @{o25_q:.2f} → Under 2.5 @{uq:.2f} (DQ={dq:+.2f})")
+            return result
+
+        if uq > 0 and not (l1 or l2):
+            # Nessun livello soddisfatto → NO BET
+            result[o25_idx] = {
+                'tipo': 'GOL', 'pronostico': 'NO BET', 'quota': 0, 'stake': 0,
+                'original_pronostico': 'Over 2.5', 'original_quota': o25_q,
+                'routing_rule': 'as_o25_to_under25',
+                'source': o25_pred.get('source', ''),
+            }
+            print(f"    🚫 O25 RECOVERY: Over 2.5 @{o25_q:.2f}, U2.5 @{uq:.2f} (DQ={dq:+.2f}) → NO BET (fuori gerarchia)")
             return result
 
     # PRIORITÀ 4: nessuna alternativa → scarta
