@@ -895,6 +895,7 @@ def run_simulation(matches, cycles, original_settings, custom_settings, changed_
     results = []
     total = len(matches)
     done = 0
+    skipped = 0
     t_start = time.time()
 
     for league, league_matches in leagues.items():
@@ -911,6 +912,7 @@ def run_simulation(matches, cycles, original_settings, custom_settings, changed_
                 league_cache = bulk_manager_c.load_league_cache(all_teams, league)
         except Exception as e:
             print(f"  ⚠️ Skip lega {league}: {e}")
+            skipped += len(league_matches)
             done += len(league_matches)
             continue
 
@@ -927,8 +929,10 @@ def run_simulation(matches, cycles, original_settings, custom_settings, changed_
 
             # Progress ogni 10 partite
             if done % 10 == 0 or done == total:
+                elaborated = done - skipped
                 print(f"\r  Progresso: {done}/{total} ({done/total*100:.0f}%) "
-                      f"| {rate:.1f} partite/s | ETA: {eta:.0f}s   ", end='', flush=True)
+                      f"| {rate:.1f} partite/s | ETA: {eta:.0f}s "
+                      f"| OK: {elaborated} Skip: {skipped}   ", end='', flush=True)
 
             # Build cache + preload
             try:
@@ -936,24 +940,32 @@ def run_simulation(matches, cycles, original_settings, custom_settings, changed_
                     bulk_cache = bulk_manager_c.build_match_cache(league_cache, home, away)
                     preloaded = preload_match_data(home, away, league=league, bulk_cache=bulk_cache)
             except Exception:
+                skipped += 1
                 continue
 
             if not preloaded:
+                skipped += 1
                 continue
 
             # --- MC ORIGINALE ---
-            WEIGHTS_CACHE[6] = original_weights_6
-            dist_orig = run_mc_single(preloaded, home, away, cycles, original_settings)
+            try:
+                WEIGHTS_CACHE[6] = original_weights_6
+                dist_orig = run_mc_single(preloaded, home, away, cycles, original_settings)
 
-            # --- MC CUSTOM ---
-            if blocco_b_changed:
-                WEIGHTS_CACHE[6] = custom_weights_6
-            dist_custom = run_mc_single(preloaded, home, away, cycles, custom_settings)
+                # --- MC CUSTOM ---
+                if blocco_b_changed:
+                    WEIGHTS_CACHE[6] = custom_weights_6
+                dist_custom = run_mc_single(preloaded, home, away, cycles, custom_settings)
+            except Exception:
+                WEIGHTS_CACHE[6] = original_weights_6
+                skipped += 1
+                continue
 
             # Ripristina weights originali
             WEIGHTS_CACHE[6] = original_weights_6
 
             if not dist_orig or not dist_custom:
+                skipped += 1
                 continue
 
             results.append({
@@ -967,7 +979,8 @@ def run_simulation(matches, cycles, original_settings, custom_settings, changed_
                 'custom': dist_custom,
             })
 
-    print()  # newline dopo progress bar
+    elapsed_total = time.time() - t_start
+    print(f"\n  ✅ Completato in {elapsed_total:.0f}s — Elaborate: {len(results)} | Skip: {skipped} | Totale: {total}")
     return results
 
 
