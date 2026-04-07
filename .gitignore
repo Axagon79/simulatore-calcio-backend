@@ -26,6 +26,9 @@ temp_*.png
 _output*.txt
 _clear_premium_cache.py
 _match_missing_aliases.py
+ai_engine/pesi_test*.json
+ai_engine/test_*.py
+ai_engine/read_prediction_errors.py
 
 # Cache data
 cache/
