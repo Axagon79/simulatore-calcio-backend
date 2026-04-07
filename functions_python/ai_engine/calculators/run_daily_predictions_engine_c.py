@@ -955,6 +955,18 @@ def apply_kelly(pronostici, dist, odds=None):
         stake_max = max(1, min(10, stake_max))
         stake = max(1, min(10, round(raw_stake)))
 
+        # Fattore quota a fasce — bilancia stake con probabilità implicita del mercato
+        def _fq(s, q):
+            if q < 1.50: return max(1, min(10, round(s * 2.00 / q)))
+            elif q < 2.00: return s
+            elif q < 2.50: return max(1, min(10, round(s * 2.20 / q)))
+            elif q < 3.50: return max(1, min(10, round(s * 2.00 / q)))
+            elif q < 5.00: return max(1, min(10, round(s * 3.50 / q)))
+            else: return s
+        stake = _fq(stake, quota)
+        stake_min = _fq(stake_min, quota)
+        stake_max = _fq(stake_max, quota)
+
         p['probabilita_stimata'] = round(prob * 100, 1)
         p['prob_mercato'] = round(p_market * 100, 1)
         p['prob_modello'] = round(prob * 100, 1)

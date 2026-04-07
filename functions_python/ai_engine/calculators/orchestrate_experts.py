@@ -56,6 +56,28 @@ MATCH_FIELDS = [
 ROUTING_VERSION = '1.0'
 
 
+def _apply_fattore_quota(stake, quota):
+    """Fattore quota a fasce — bilancia stake con probabilità implicita del mercato.
+    <1.50: 2.00/q | 1.50-1.99: nessuno | 2.00-2.49: 2.20/q
+    2.50-3.49: 2.00/q | 3.50-4.99: 3.50/q | 5.00+: nessuno
+    """
+    if not quota or quota <= 0:
+        return stake
+    if quota < 1.50:
+        fattore = 2.00 / quota
+    elif quota < 2.00:
+        return stake
+    elif quota < 2.50:
+        fattore = 2.20 / quota
+    elif quota < 3.50:
+        fattore = 2.00 / quota
+    elif quota < 5.00:
+        fattore = 3.50 / quota
+    else:
+        return stake
+    return max(1, min(10, round(stake * fattore)))
+
+
 # =====================================================
 # MULTI-GOAL — Poisson + Lambda zones
 # =====================================================
@@ -139,7 +161,7 @@ def _apply_goal_quota_conversion(unified, odds):
                 edge = prob_mod - prob_mkt
                 if edge > 0:
                     kelly = 0.75 * (edge * u25_q - (1 - edge)) / (u25_q - 1)
-                    p['stake'] = max(1, min(10, round(kelly * 10)))
+                    p['stake'] = _apply_fattore_quota(max(1, min(10, round(kelly * 10))), u25_q)
                     p['edge'] = round(edge * 100, 1)
                 else:
                     p['stake'] = 1
@@ -166,7 +188,7 @@ def _apply_goal_quota_conversion(unified, odds):
                 edge = prob_mod - prob_mkt
                 if edge > 0:
                     kelly = 0.75 * (edge * o15_q - (1 - edge)) / (o15_q - 1)
-                    p['stake'] = max(1, min(10, round(kelly * 10)))
+                    p['stake'] = _apply_fattore_quota(max(1, min(10, round(kelly * 10))), o15_q)
                     p['edge'] = round(edge * 100, 1)
                 else:
                     p['stake'] = 1
@@ -246,7 +268,7 @@ def _apply_gol_low_stake_to_nogoal(unified, odds):
                 edge = prob_mod - prob_mkt
                 if edge > 0:
                     kelly = 0.75 * (edge * ng_q - (1 - edge)) / (ng_q - 1)
-                    p['stake'] = max(1, min(10, round(kelly * 10)))
+                    p['stake'] = _apply_fattore_quota(max(1, min(10, round(kelly * 10))), ng_q)
                     p['edge'] = round(edge * 100, 1)
                 else:
                     p['stake'] = 1
@@ -416,7 +438,7 @@ def _apply_dc_stake1_to_under25(unified, odds):
             edge = prob_mod - prob_mkt
             if edge > 0:
                 kelly = 0.75 * (edge * u25_q - (1 - edge)) / (u25_q - 1)
-                p['stake'] = max(1, min(10, round(kelly * 10)))
+                p['stake'] = _apply_fattore_quota(max(1, min(10, round(kelly * 10))), u25_q)
                 p['edge'] = round(edge * 100, 1)
             else:
                 p['stake'] = 1
@@ -461,7 +483,7 @@ def _apply_mg23_stake4_to_under25(unified, odds):
                 edge = prob_mod - prob_mkt
                 if edge > 0:
                     kelly = 0.75 * (edge * u25_q - (1 - edge)) / (u25_q - 1)
-                    p['stake'] = max(1, min(10, round(kelly * 10)))
+                    p['stake'] = _apply_fattore_quota(max(1, min(10, round(kelly * 10))), u25_q)
                     p['edge'] = round(edge * 100, 1)
                 else:
                     p['stake'] = 1
@@ -531,7 +553,7 @@ def _apply_over15_stake5_low_to_under25(unified, odds):
                 edge = prob_mod - prob_mkt
                 if edge > 0:
                     kelly = 0.75 * (edge * u25_q - (1 - edge)) / (u25_q - 1)
-                    p['stake'] = max(1, min(10, round(kelly * 10)))
+                    p['stake'] = _apply_fattore_quota(max(1, min(10, round(kelly * 10))), u25_q)
                     p['edge'] = round(edge * 100, 1)
                 else:
                     p['stake'] = 1
@@ -617,7 +639,7 @@ def _apply_gol_stake5_q160_to_nogoal(unified, odds):
                 edge = prob_mod - prob_mkt
                 if edge > 0:
                     kelly = 0.75 * (edge * ng_q - (1 - edge)) / (ng_q - 1)
-                    p['stake'] = max(1, min(10, round(kelly * 10)))
+                    p['stake'] = _apply_fattore_quota(max(1, min(10, round(kelly * 10))), ng_q)
                     p['edge'] = round(edge * 100, 1)
                 else:
                     p['stake'] = 1
@@ -664,7 +686,7 @@ def _apply_dc_stake4_to_nogoal(unified, odds):
             edge = prob_mod - prob_mkt
             if edge > 0:
                 kelly = 0.75 * (edge * ng_q - (1 - edge)) / (ng_q - 1)
-                p['stake'] = max(1, min(10, round(kelly * 10)))
+                p['stake'] = _apply_fattore_quota(max(1, min(10, round(kelly * 10))), ng_q)
                 p['edge'] = round(edge * 100, 1)
             else:
                 p['stake'] = 1
@@ -709,7 +731,7 @@ def _apply_o25_stake6_to_goal(unified, odds):
                 edge = prob_mod - prob_mkt
                 if edge > 0:
                     kelly = 0.75 * (edge * gg_q - (1 - edge)) / (gg_q - 1)
-                    p['stake'] = max(1, min(10, round(kelly * 10)))
+                    p['stake'] = _apply_fattore_quota(max(1, min(10, round(kelly * 10))), gg_q)
                     p['edge'] = round(edge * 100, 1)
                 else:
                     p['stake'] = 1
@@ -766,7 +788,7 @@ def _apply_segno_stake9_conversions(unified, odds):
                 edge = prob_mod - prob_mkt
                 if edge > 0:
                     kelly = 0.75 * (edge * gg_q - (1 - edge)) / (gg_q - 1)
-                    p['stake'] = max(1, min(10, round(kelly * 10)))
+                    p['stake'] = _apply_fattore_quota(max(1, min(10, round(kelly * 10))), gg_q)
                     p['edge'] = round(edge * 100, 1)
                 else:
                     p['stake'] = 1
@@ -796,7 +818,7 @@ def _apply_segno_stake9_conversions(unified, odds):
                 edge = prob_mod - prob_mkt
                 if edge > 0:
                     kelly = 0.75 * (edge * ng_q - (1 - edge)) / (ng_q - 1)
-                    p['stake'] = max(1, min(10, round(kelly * 10)))
+                    p['stake'] = _apply_fattore_quota(max(1, min(10, round(kelly * 10))), ng_q)
                     p['edge'] = round(edge * 100, 1)
                 else:
                     p['stake'] = 1
@@ -923,7 +945,7 @@ def _apply_segno_stake6_conversion(unified, odds):
                 edge = prob_mod - prob_mkt
                 if edge > 0:
                     kelly = 0.75 * (edge * o25_q - (1 - edge)) / (o25_q - 1)
-                    p['stake'] = max(1, min(10, round(kelly * 10)))
+                    p['stake'] = _apply_fattore_quota(max(1, min(10, round(kelly * 10))), o25_q)
                     p['edge'] = round(edge * 100, 1)
                 else:
                     p['stake'] = 1
@@ -954,7 +976,7 @@ def _apply_segno_stake6_conversion(unified, odds):
                 edge = prob_mod - prob_mkt
                 if edge > 0:
                     kelly = 0.75 * (edge * gg_q - (1 - edge)) / (gg_q - 1)
-                    p['stake'] = max(1, min(10, round(kelly * 10)))
+                    p['stake'] = _apply_fattore_quota(max(1, min(10, round(kelly * 10))), gg_q)
                     p['edge'] = round(edge * 100, 1)
                 else:
                     p['stake'] = 1
@@ -1050,7 +1072,7 @@ def _apply_multigol(unified, odds):
                 if edge > 0:
                     kelly_fraction = 0.75
                     kelly = kelly_fraction * (edge * mg_quota - (1 - edge)) / (mg_quota - 1)
-                    mg['stake'] = max(1, min(10, round(kelly * 10)))
+                    mg['stake'] = _apply_fattore_quota(max(1, min(10, round(kelly * 10))), mg_quota)
                     mg['edge'] = round(edge * 100, 1)
                     mg['prob_mercato'] = round(100.0 / mg_quota, 1)
                     mg['prob_modello'] = round(mg_prob * 100, 1)
@@ -1134,7 +1156,7 @@ def _apply_combo96_dc_flip(unified, odds, simulation_data):
             edge = prob_mod - prob_mkt
             if edge > 0:
                 kelly = 0.75 * (edge * dc_quota) / (dc_quota - 1)
-                dc_pred['stake'] = max(1, min(10, round(kelly * 10)))
+                dc_pred['stake'] = _apply_fattore_quota(max(1, min(10, round(kelly * 10))), dc_quota)
                 dc_pred['edge'] = round(edge * 100, 1)
                 dc_pred['prob_mercato'] = round(prob_mkt * 100, 1)
                 dc_pred['prob_modello'] = round(prob_mod * 100, 1)
@@ -1231,7 +1253,7 @@ def _apply_x_draw_combos(unified, odds, simulation_data):
             edge = prob_mod - prob_mkt
             if edge > 0:
                 kelly = 0.75 * (edge * q_x) / (q_x - 1)
-                x_pred['stake'] = max(1, min(10, round(kelly * 10)))
+                x_pred['stake'] = _apply_fattore_quota(max(1, min(10, round(kelly * 10))), q_x)
                 x_pred['edge'] = round(edge * 100, 1)
                 x_pred['prob_mercato'] = round(prob_mkt * 100, 1)
                 x_pred['prob_modello'] = round(prob_mod * 100, 1)
@@ -1262,7 +1284,7 @@ def _apply_x_draw_combos(unified, odds, simulation_data):
         edge = 0.70 - prob_mkt
         if edge > 0:
             kelly = 0.75 * (edge * q_x) / (q_x - 1)
-            x_pred['stake'] = max(1, min(10, round(kelly * 10)))
+            x_pred['stake'] = _apply_fattore_quota(max(1, min(10, round(kelly * 10))), q_x)
             x_pred['edge'] = round(edge * 100, 1)
             x_pred['prob_mercato'] = round(prob_mkt * 100, 1)
             x_pred['prob_modello'] = 70.0
@@ -1348,7 +1370,7 @@ def _apply_home_win_combos(unified, odds, simulation_data):
             edge = prob_mod - prob_mkt
             if edge > 0:
                 kelly = 0.75 * (edge * q_1) / (q_1 - 1)
-                h_pred['stake'] = max(1, min(10, round(kelly * 10)))
+                h_pred['stake'] = _apply_fattore_quota(max(1, min(10, round(kelly * 10))), q_1)
                 h_pred['edge'] = round(edge * 100, 1)
                 h_pred['prob_mercato'] = round(prob_mkt * 100, 1)
                 h_pred['prob_modello'] = round(prob_mod * 100, 1)
@@ -1379,7 +1401,7 @@ def _apply_home_win_combos(unified, odds, simulation_data):
         edge = 0.75 - prob_mkt
         if edge > 0:
             kelly = 0.75 * (edge * q_1) / (q_1 - 1)
-            h_pred['stake'] = max(1, min(10, round(kelly * 10)))
+            h_pred['stake'] = _apply_fattore_quota(max(1, min(10, round(kelly * 10))), q_1)
             h_pred['edge'] = round(edge * 100, 1)
             h_pred['prob_mercato'] = round(prob_mkt * 100, 1)
             h_pred['prob_modello'] = 75.0
@@ -1437,7 +1459,7 @@ def _apply_gg_conf_dc_downgrade(unified, c_doc, match_odds=None):
                     kelly_stake = max(1, min(10, round(kelly * 10)))
                 else:
                     kelly_stake = 1
-                new_stake = max(1, round((kelly_stake + orig_stake) / 2))
+                new_stake = _apply_fattore_quota(max(1, round((kelly_stake + orig_stake) / 2)), quota)
                 p['stake'] = new_stake
                 p['routing_rule'] = 'gg_conf_dc_downgrade'
                 print(f"    🎯 GG-DC: SEGNO {pron} @{quota:.2f} stake {orig_stake}→{new_stake} (gg_pct={gg_pct}%)")
@@ -1463,7 +1485,7 @@ def _apply_gg_conf_dc_downgrade(unified, c_doc, match_odds=None):
                     }
                     if edge_ng > 0:
                         kelly_ng = 0.75 * (edge_ng * ng_q - (1 - edge_ng)) / (ng_q - 1)
-                        ng_pred['stake'] = max(1, min(10, round(kelly_ng * 10)))
+                        ng_pred['stake'] = _apply_fattore_quota(max(1, min(10, round(kelly_ng * 10))), ng_q)
                         ng_pred['edge'] = round(edge_ng * 100, 1)
                     else:
                         ng_pred['stake'] = 1
@@ -1535,7 +1557,7 @@ def _apply_segno_scrematura(unified, odds, base_doc, c_doc=None):
             edge = (prob / 100.0) - prob_mkt
             if edge > 0:
                 kelly = 0.75 * (edge * nuova_quota - (1 - edge)) / (nuova_quota - 1)
-                p['stake'] = max(1, min(10, round(kelly * 10)))
+                p['stake'] = _apply_fattore_quota(max(1, min(10, round(kelly * 10))), nuova_quota)
             else:
                 p['stake'] = 1
             p['edge'] = round(edge * 100, 1)
@@ -1558,7 +1580,7 @@ def _apply_segno_scrematura(unified, odds, base_doc, c_doc=None):
             edge = (prob / 100.0) - prob_mkt
             if edge > 0:
                 kelly = 0.75 * (edge * q_x - (1 - edge)) / (q_x - 1)
-                p['stake'] = max(1, min(10, round(kelly * 10)))
+                p['stake'] = _apply_fattore_quota(max(1, min(10, round(kelly * 10))), q_x)
             else:
                 p['stake'] = 1
             p['edge'] = round(edge * 100, 1)
@@ -1785,7 +1807,7 @@ def _apply_segno_scrematura(unified, odds, base_doc, c_doc=None):
                         edge = prob_mod - prob_mkt
                         if edge > 0:
                             kelly = 0.75 * (edge * o15_q) / (o15_q - 1)
-                            o15_pred['stake'] = max(1, min(10, round(kelly * 10)))
+                            o15_pred['stake'] = _apply_fattore_quota(max(1, min(10, round(kelly * 10))), o15_q)
                             o15_pred['edge'] = round(edge * 100, 1)
                         else:
                             o15_pred['stake'] = 1
@@ -1826,7 +1848,7 @@ def _apply_segno_scrematura(unified, odds, base_doc, c_doc=None):
                         edge = prob_mod - prob_mkt
                         if edge > 0:
                             kelly = 0.75 * (edge * u25_q) / (u25_q - 1)
-                            u25_pred['stake'] = max(1, min(10, round(kelly * 10)))
+                            u25_pred['stake'] = _apply_fattore_quota(max(1, min(10, round(kelly * 10))), u25_q)
                             u25_pred['edge'] = round(edge * 100, 1)
                         else:
                             u25_pred['stake'] = 1
@@ -1899,7 +1921,7 @@ def _apply_weak_o25_recovery(unified, c_doc):
             edge = prob_mod - prob_mkt
             if edge > 0:
                 kelly = 0.75 * (edge * quota) / (quota - 1)
-                pred['stake'] = max(1, min(10, round(kelly * 10)))
+                pred['stake'] = _apply_fattore_quota(max(1, min(10, round(kelly * 10))), quota)
                 pred['edge'] = round(edge * 100, 1)
             else:
                 pred['stake'] = 1
@@ -2315,7 +2337,7 @@ def _apply_segno_mc_filter(unified, simulation_data, odds):
                 edge = (prob / 100.0) - prob_mkt
                 if edge > 0:
                     kelly = 0.75 * (edge * over15_q - (1 - edge)) / (over15_q - 1)
-                    sost['stake'] = max(1, min(10, round(kelly * 10)))
+                    sost['stake'] = _apply_fattore_quota(max(1, min(10, round(kelly * 10))), over15_q)
                 else:
                     sost['stake'] = 1
                 sost['edge'] = round(edge * 100, 1)
@@ -2730,7 +2752,7 @@ def route_predictions(preds_by_sys, markets_by_sys):
                     if edge > 0:
                         kelly_fraction = 0.75  # 3/4 Kelly
                         kelly = kelly_fraction * (edge * ng_quota - (1 - edge)) / (ng_quota - 1)
-                        stake = max(1, min(10, round(kelly * 10)))
+                        stake = _apply_fattore_quota(max(1, min(10, round(kelly * 10))), ng_quota)
                         p['stake'] = stake
                         p['edge'] = round(edge * 100, 1)
                         p['prob_mercato'] = round(100.0 / ng_quota, 1)
@@ -2775,7 +2797,7 @@ def route_predictions(preds_by_sys, markets_by_sys):
             if edge > 0:
                 kelly_fraction = 0.75
                 kelly = kelly_fraction * (edge * ng_quota - (1 - edge)) / (ng_quota - 1)
-                stake = max(1, min(10, round(kelly * 10)))
+                stake = _apply_fattore_quota(max(1, min(10, round(kelly * 10))), ng_quota)
                 p['stake'] = stake
                 p['edge'] = round(edge * 100, 1)
                 p['prob_mercato'] = round(100.0 / ng_quota, 1)
@@ -2996,7 +3018,7 @@ def orchestrate_date(date_str, dry_run=False, match_time_filter=None, preserve_a
                                         edge = prob_mod - prob_mkt
                                         if edge > 0:
                                             kelly = 0.75 * (edge * sq) / (sq - 1)
-                                            segno_extra['stake'] = max(1, min(10, round(kelly * 10)))
+                                            segno_extra['stake'] = _apply_fattore_quota(max(1, min(10, round(kelly * 10))), sq)
                                             segno_extra['edge'] = round(edge * 100, 1)
                                         else:
                                             segno_extra['stake'] = 1
@@ -3046,7 +3068,7 @@ def orchestrate_date(date_str, dry_run=False, match_time_filter=None, preserve_a
                         edge = (prob / 100.0) - prob_mkt
                         if edge > 0:
                             kelly = 0.75 * (edge * over25_q - (1 - edge)) / (over25_q - 1)
-                            unified_pronostici[i]['stake'] = max(1, min(10, round(kelly * 10)))
+                            unified_pronostici[i]['stake'] = _apply_fattore_quota(max(1, min(10, round(kelly * 10))), over25_q)
                             unified_pronostici[i]['edge'] = round(edge * 100, 1)
                         unified_pronostici[i]['prob_mercato'] = round(prob_mkt * 100, 1)
                 else:
@@ -3106,13 +3128,25 @@ def orchestrate_date(date_str, dry_run=False, match_time_filter=None, preserve_a
 
         # --- DEDUP CROSS-SISTEMA: stesso pronostico, fonti diverse → tieni fonte migliore ---
         SOURCE_PRIORITY = {
-            'A+S': 1, 'A+S_mg': 1,
+            'A+S': 1, 'A+S_mg': 1, 'AS': 1,
             'C_screm': 2, 'S8F': 2,
             'A': 3, 'S': 3,
             'C': 4, 'C_dg35': 4,
             'A_flip': 5, 'A_flip_mg': 5,
             'MC_xdraw': 6,
         }
+
+        def _get_source_priority(src):
+            """Priorità source con fallback a prefisso (es. A+S_dc_s6_conv → A+S = 1)."""
+            if not src:
+                return 99
+            if src in SOURCE_PRIORITY:
+                return SOURCE_PRIORITY[src]
+            # Match per prefisso: ordina per lunghezza decrescente per matchare il più specifico
+            for key in sorted(SOURCE_PRIORITY, key=len, reverse=True):
+                if src.startswith(key):
+                    return SOURCE_PRIORITY[key]
+            return 99
         seen_pron = {}
         dedup_remove = set()
         for i, p in enumerate(unified_pronostici):
@@ -3121,16 +3155,26 @@ def orchestrate_date(date_str, dry_run=False, match_time_filter=None, preserve_a
                 if pron in seen_pron:
                     j = seen_pron[pron]
                     old = unified_pronostici[j]
-                    old_prio = SOURCE_PRIORITY.get(old.get('source', ''), 99)
-                    new_prio = SOURCE_PRIORITY.get(p.get('source', ''), 99)
-                    if new_prio < old_prio:
+                    old_elite = old.get('elite', False)
+                    new_elite = p.get('elite', False)
+                    # Elite vince sempre su non-elite
+                    if new_elite and not old_elite:
+                        new_wins = True
+                    elif old_elite and not new_elite:
+                        new_wins = False
+                    else:
+                        # Stessa categoria elite → usa source priority
+                        old_prio = _get_source_priority(old.get('source', ''))
+                        new_prio = _get_source_priority(p.get('source', ''))
+                        new_wins = new_prio < old_prio
+                    if new_wins:
                         dedup_remove.add(j)
                         seen_pron[pron] = i
                     else:
                         dedup_remove.add(i)
                     winner = unified_pronostici[seen_pron[pron]]
-                    loser_src = p.get('source') if new_prio >= old_prio else old.get('source')
-                    print(f"    🔀 DEDUP: {pron} — tenuto {winner.get('source')}, rimosso {loser_src}")
+                    loser_src = p.get('source') if not new_wins else old.get('source')
+                    print(f"    🔀 DEDUP: {pron} — tenuto {winner.get('source')}{'👑' if winner.get('elite') else ''}, rimosso {loser_src}")
                 else:
                     seen_pron[pron] = i
         if dedup_remove:
@@ -3278,6 +3322,38 @@ def orchestrate_date(date_str, dry_run=False, match_time_filter=None, preserve_a
         unified_pronostici = _apply_se2_stake8_filter(unified_pronostici)
         unified_pronostici = _apply_segno_stake7_cap(unified_pronostici)
         unified_pronostici = _apply_gol_stake8_cap(unified_pronostici)
+
+        # --- DEDUP post-conversioni: le conversioni possono creare duplicati su qualsiasi mercato ---
+        seen_pron2 = {}
+        dedup_remove2 = set()
+        for i, p in enumerate(unified_pronostici):
+            pron = p.get('pronostico', '')
+            if pron and pron != 'NO BET':
+                if pron in seen_pron2:
+                    j = seen_pron2[pron]
+                    old = unified_pronostici[j]
+                    old_elite = old.get('elite', False)
+                    new_elite = p.get('elite', False)
+                    if new_elite and not old_elite:
+                        new_wins = True
+                    elif old_elite and not new_elite:
+                        new_wins = False
+                    else:
+                        old_prio = _get_source_priority(old.get('source', ''))
+                        new_prio = _get_source_priority(p.get('source', ''))
+                        new_wins = new_prio < old_prio
+                    if new_wins:
+                        dedup_remove2.add(j)
+                        seen_pron2[pron] = i
+                    else:
+                        dedup_remove2.add(i)
+                    winner = unified_pronostici[seen_pron2[pron]]
+                    loser_src = p.get('source') if not new_wins else old.get('source')
+                    print(f"    🔀 DEDUP POST-CONV: {pron} — tenuto {winner.get('source')}{'👑' if winner.get('elite') else ''}, rimosso {loser_src}")
+                else:
+                    seen_pron2[pron] = i
+        if dedup_remove2:
+            unified_pronostici = [p for i, p in enumerate(unified_pronostici) if i not in dedup_remove2]
 
         # Costruisci documento unified
         unified_doc = {}

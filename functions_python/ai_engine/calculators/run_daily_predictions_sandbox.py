@@ -2773,6 +2773,20 @@ def calcola_stake_kelly(quota, probabilita_stimata, tipo='GOL'):
         stake = min(stake, 3)       # Overconfidence protection
     if quota > 5.0:
         stake = min(stake, 2)       # Value trap protection
+
+    # Fattore quota a fasce — bilancia stake con probabilità implicita del mercato
+    if quota < 1.50:
+        stake = max(1, min(10, round(stake * 2.00 / quota)))
+    elif quota < 2.00:
+        pass  # stake originale — Kelly già ben calibrato in questa fascia
+    elif quota < 2.50:
+        stake = max(1, min(10, round(stake * 2.20 / quota)))
+    elif quota < 3.50:
+        stake = max(1, min(10, round(stake * 2.00 / quota)))
+    elif quota < 5.00:
+        stake = max(1, min(10, round(stake * 3.50 / quota)))
+    # 5.00+: stake originale
+
     return stake, round(edge, 2)
 
 

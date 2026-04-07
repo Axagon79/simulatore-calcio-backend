@@ -174,8 +174,6 @@ router.get('/predictions', async (req, res) => {
       let matched = 0, total = 0;
       for (const doc of docs) {
         if (!doc.home || !doc.away || !doc.pronostici) continue;
-        const hasSegno = doc.pronostici.some(p => p.tipo === 'SEGNO' || p.tipo === 'DOPPIA_CHANCE');
-        if (!hasSegno) continue;
         total++;
 
         const teamKey = `${resolve(doc.home)}|||${resolve(doc.away)}`;
@@ -202,9 +200,10 @@ router.get('/predictions', async (req, res) => {
         matched++;
 
         for (const p of doc.pronostici) {
-          if (p.tipo !== 'SEGNO' && p.tipo !== 'DOPPIA_CHANCE') continue;
-          if (!results[mk]) results[mk] = [];
           const isBestPick = name === 'daily_predictions_unified';
+          // Dai sistemi A/S/C solo SEGNO e DC; dalle Best Picks (MoE) passa tutto
+          if (!isBestPick && p.tipo !== 'SEGNO' && p.tipo !== 'DOPPIA_CHANCE') continue;
+          if (!results[mk]) results[mk] = [];
           results[mk].push({
             source: p.source || source,
             bestPick: isBestPick,
