@@ -591,7 +591,7 @@ def decidi_over_under(dist, odds, re_dir, fav_pct):
 
         # Under 1.5: ELIMINATO SEMPRE (33% HR)
         if line == '1.5':
-            continue
+            continue  
 
         if mc_pct < UNDER_ELIMINA:
             continue  # < 45% → eliminato

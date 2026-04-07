@@ -72,31 +72,31 @@ uel_teams_collection = db['teams_europa_league']
 # ==================== COSTANTI (DEFAULT — sovrascritte da MongoDB se disponibili) ====================
 
 # Soglie decisione
-THRESHOLD_INCLUDE = 60
+THRESHOLD_INCLUDE = 48.9    # Ottimizzato backtest range A-S 07/04/2026
 THRESHOLD_HIGH = 70
 
 # Pesi FASE SEGNO (totale 100%)
 PESI_SEGNO = {
-    'bvs':           0.23,
-    'quote':         0.16,
-    'lucifero':      0.16,
-    'affidabilita':  0.13,
-    'dna':           0.07,
-    'motivazioni':   0.07,
-    'h2h':           0.04,
-    'campo':         0.04,
-    'strisce':       0.10,
+    'bvs':           0.2216,
+    'quote':         0.0201,
+    'lucifero':      0.0047,
+    'affidabilita':  0.3239,
+    'dna':           0.0684,
+    'motivazioni':   0.0124,
+    'h2h':           0.0230,
+    'campo':         0.3186,
+    'strisce':       0.0073,
 }
 
-# Pesi FASE GOL (totale 100%)
+# Pesi FASE GOL (totale 100%) — #1 Optuna range Attuale-Manuale, soglia 65.7
 PESI_GOL = {
-    'media_gol':     0.23,
-    'att_vs_def':    0.20,
-    'xg':            0.18,
-    'h2h_gol':       0.13,
-    'media_lega':    0.09,
-    'dna_off_def':   0.07,
-    'strisce':       0.10,
+    'media_gol':     0.1024,
+    'att_vs_def':    0.0396,
+    'xg':            0.1980,
+    'h2h_gol':       0.1498,
+    'media_lega':    0.1751,
+    'dna_off_def':   0.1613,
+    'strisce':       0.1737,
 }
 
 # Pesi FASE BOMBA (totale 100%)
@@ -109,6 +109,7 @@ PESI_BOMBA = {
 }
 
 THRESHOLD_BOMBA = 65
+THRESHOLD_GOL = 65.7  # Soglia specifica per Over/Under (separata da THRESHOLD_INCLUDE) — #1 Optuna backtest
 THRESHOLD_GGNG = 65  # Soglia specifica per Goal/NoGoal (separata da THRESHOLD_INCLUDE)
 
 # ==================== COSTANTI COPPE (UCL/UEL) ====================
@@ -301,7 +302,7 @@ def load_tuning_config():
     Carica pesi e soglie da MongoDB (prediction_tuning_settings).
     Se non trova nulla, usa i default hardcoded sopra.
     """
-    global PESI_SEGNO, PESI_GOL, PESI_BOMBA, THRESHOLD_INCLUDE, THRESHOLD_HIGH, THRESHOLD_BOMBA, THRESHOLD_GGNG
+    global PESI_SEGNO, PESI_GOL, PESI_BOMBA, THRESHOLD_INCLUDE, THRESHOLD_HIGH, THRESHOLD_BOMBA, THRESHOLD_GOL, THRESHOLD_GGNG
 
     try:
         tuning_collection = db['prediction_tuning_settings']
@@ -1612,20 +1613,19 @@ def score_bvs(match_data):
     bvs_index = h2h.get('bvs_match_index', 0)
     is_linear = h2h.get('is_linear', False)
 
-    # Base per classificazione
+    # Base per classificazione (ottimizzato backtest 07/04/2026)
     if classification == 'PURO':
-        base = 65
+        base = 36.04
     elif classification == 'SEMI':
-        base = 40
+        base = 36.84
     else:  # NON_BVS
-        base = 10
+        base = 2.77
 
     # Bonus/malus per bvs_match_index (-6 a +7)
-    # Normalizzo su scala -35 a +35
-    index_bonus = normalize(bvs_index, -6, 7) * 0.35
+    index_bonus = normalize(bvs_index, -6, 7) * 1.343
 
     # Bonus linearità
-    linear_bonus = 10 if is_linear else 0
+    linear_bonus = 2.37 if is_linear else 0
 
     score = base + index_bonus + linear_bonus
     return max(0, min(100, score))
@@ -1654,10 +1654,10 @@ def score_quote(match_data):
     # 1.35-1.55 = valore basso, rischio/rendimento scarso
     elif 1.35 <= q_fav < 1.55:
         score = 30 + (q_fav - 1.35) * 100  # 30-50
-    # 1.55-2.20 = range ideale, picco a 1.75
+    # 1.55-2.20 = range ideale, picco a 1.639 (ottimizzato backtest 07/04/2026)
     elif 1.55 <= q_fav <= 2.20:
-        distance_from_ideal = abs(q_fav - 1.75)
-        score = 100 - (distance_from_ideal * 45)  # 100 a 1.75, scende ai bordi
+        distance_from_ideal = abs(q_fav - 1.639)
+        score = 100 - (distance_from_ideal * 98.53)
     # Sopra 2.20 = penalizzata, troppo rischiosa
     elif 2.20 < q_fav <= 2.80:
         score = 45 - (q_fav - 2.20) * 40  # 45-21
@@ -1684,34 +1684,30 @@ def score_lucifero(match_data):
     max_luc = max(luc_home, luc_away)
     min_luc = min(luc_home, luc_away)
 
-    # Punteggio basato sul divario
-    # Divario 0 = 20 (nessuna differenza)
-    # Divario 10 = 60
-    # Divario 15+ = 80+
-    score = 20 + (divario / 25) * 70
+    # Punteggio basato sul divario (ottimizzato backtest 07/04/2026)
+    score = 39.94 + (divario / 25) * 45.25
 
     # Bonus se la squadra migliore è molto in forma
     if max_luc >= 20:
-        score += 10
+        score += 8.45
     elif max_luc >= 15:
-        score += 5
+        score += 12.10
 
     # Malus se entrambe in cattiva forma
     if max_luc < 8:
-        score -= 15
+        score -= 16.39
 
     # Bonus dal trend (ultime 5)
     trend_home = h2h.get('lucifero_trend_home', [])
     trend_away = h2h.get('lucifero_trend_away', [])
 
     if trend_home and trend_away:
-        # La favorita sta migliorando?
         if luc_home > luc_away and len(trend_home) >= 2:
-            if trend_home[0] > trend_home[-1]:  # trend[0] = più recente
-                score += 5  # In miglioramento
+            if trend_home[0] > trend_home[-1]:
+                score += 27.79
         elif luc_away > luc_home and len(trend_away) >= 2:
             if trend_away[0] > trend_away[-1]:
-                score += 5
+                score += 27.79
 
     return max(0, min(100, score))
 
@@ -1747,17 +1743,16 @@ def score_affidabilita(match_data):
         trust_sfidante = trust_home
 
     # Punteggio base dall'affidabilità numerica della favorita (0-10 → 0-70)
-    score = (aff_favorita / 10) * 70
+    # Ottimizzato backtest 07/04/2026
+    score = (aff_favorita / 10) * 27.63
 
-    # Bonus/Malus dalla trust letter della favorita
-    trust_bonus = {'A': 20, 'B': 10, 'C': 0, 'D': -15}
+    trust_bonus = {'A': 64.92, 'B': 30.75, 'C': 0, 'D': -43.39}
     score += trust_bonus.get(trust_favorita, 0)
 
-    # Bonus se anche la sfidante è affidabile (partita prevedibile)
     if aff_sfidante >= 7:
-        score += 10
+        score += 14.36
     elif aff_sfidante <= 3:
-        score -= 5  # Sfidante imprevedibile
+        score -= 47.12
 
     return max(0, min(100, score))
 
@@ -1774,19 +1769,19 @@ def score_dna(match_data):
     if not dna_home or not dna_away:
         return 50  # Neutro
 
-    # Calcola "potenza" complessiva DNA per squadra
+    # Calcola "potenza" complessiva DNA (ottimizzato backtest 07/04/2026)
     home_power = (
-        dna_home.get('att', 50) * 0.35 +
-        dna_home.get('def', 50) * 0.25 +
-        dna_home.get('tec', 50) * 0.25 +
-        dna_home.get('val', 50) * 0.15
+        dna_home.get('att', 50) * 0.2334 +
+        dna_home.get('def', 50) * 0.3463 +
+        dna_home.get('tec', 50) * 0.1994 +
+        dna_home.get('val', 50) * 0.2210
     )
 
     away_power = (
-        dna_away.get('att', 50) * 0.35 +
-        dna_away.get('def', 50) * 0.25 +
-        dna_away.get('tec', 50) * 0.25 +
-        dna_away.get('val', 50) * 0.15
+        dna_away.get('att', 50) * 0.2334 +
+        dna_away.get('def', 50) * 0.3463 +
+        dna_away.get('tec', 50) * 0.1994 +
+        dna_away.get('val', 50) * 0.2210
     )
 
     # Divario (0-100 possibile)
@@ -1827,12 +1822,12 @@ def score_motivazioni(match_data, home_team_doc, away_team_doc):
         mot_favorita = mot_away
         mot_sfidante = mot_home
 
-    # Favorita motivata (5-15 → 0-100)
-    score = normalize(mot_favorita, 5, 15) * 0.7
+    # Favorita motivata (ottimizzato backtest 07/04/2026)
+    score = normalize(mot_favorita, 5, 15) * 0.5375
 
     # Bonus se divario motivazionale
     divario_mot = abs(mot_home - mot_away)
-    score += (divario_mot / 10) * 30
+    score += (divario_mot / 10) * 101.29
 
     return max(0, min(100, score))
 
@@ -1854,16 +1849,16 @@ def score_h2h(match_data):
     # Divario H2H (0-10 possibile)
     divario = abs(home_score - away_score)
 
-    # Normalizza
-    score = 30 + (divario / 10) * 50
+    # Normalizza (ottimizzato backtest 07/04/2026)
+    score = 46.36 + (divario / 10) * 132.19
 
-    # Bonus per tanti scontri diretti (più dati = più affidabile)
+    # Bonus per tanti scontri diretti
     if total_matches >= 15:
-        score += 15
+        score += 29.72
     elif total_matches >= 8:
-        score += 10
+        score += 19.57
     elif total_matches >= 3:
-        score += 5
+        score += 22.21
 
     return max(0, min(100, score))
 
@@ -1886,14 +1881,14 @@ def score_campo(match_data):
     # Divario campo (0-100)
     divario = abs(field_home - field_away)
 
-    # Casa forte = conferma pronostico
-    score = 30 + (divario / 100) * 50
+    # Casa forte = conferma pronostico (ottimizzato backtest 07/04/2026)
+    score = 6.12 + (divario / 100) * 65.52
 
     # Bonus se casa molto forte
     if field_home >= 70:
-        score += 15
+        score += 30.48
     elif field_home >= 55:
-        score += 8
+        score += 23.85
 
     return max(0, min(100, score))
 
@@ -2807,7 +2802,7 @@ def make_decision(segno_result, gol_result, is_cup=False):
     threshold_segno = CUP_THRESHOLD_SEGNO if is_cup else THRESHOLD_INCLUDE
 
     # Sotto soglia su entrambi = SCARTA
-    if s_score < threshold_segno and g_score < THRESHOLD_INCLUDE:
+    if s_score < threshold_segno and g_score < THRESHOLD_GOL:
         return {
             'decision': 'SCARTA',
             'pronostici': [],
@@ -2915,7 +2910,7 @@ def make_decision(segno_result, gol_result, is_cup=False):
         # else: SEGNO skippato — X Factor processerà questa partita
 
     # Gol — Over/Under (usa g_score)
-    if g_score >= THRESHOLD_INCLUDE and gol_result['tipo_gol']:
+    if g_score >= THRESHOLD_GOL and gol_result['tipo_gol']:
         pronostici.append({
             'tipo': 'GOL',
             'pronostico': gol_result['tipo_gol'],
@@ -3194,7 +3189,7 @@ def generate_comment(match_data, segno_result, gol_result, decision_result):
             comments['doppia_chance'] = 'Copertura consigliata'
 
     # Commento per GOL
-    if decision_result['confidence_gol'] >= THRESHOLD_INCLUDE:
+    if decision_result['confidence_gol'] >= THRESHOLD_GOL:
         tipo_gol = gol_result.get('tipo_gol', '')
         if 'Over' in str(tipo_gol):
             pool_key = 'OVER'
@@ -3293,7 +3288,7 @@ def run_daily_predictions(target_date=None, match_time_filter=None):
     print(f"   PESI_SEGNO: {PESI_SEGNO}")
     print(f"   PESI_GOL: {PESI_GOL}")
     print(f"   PESI_BOMBA: {PESI_BOMBA}")
-    print(f"   SOGLIE: INCLUDE={THRESHOLD_INCLUDE}, HIGH={THRESHOLD_HIGH}, BOMBA={THRESHOLD_BOMBA}, GG/NG={THRESHOLD_GGNG}")
+    print(f"   SOGLIE: INCLUDE={THRESHOLD_INCLUDE}, HIGH={THRESHOLD_HIGH}, BOMBA={THRESHOLD_BOMBA}, GOL={THRESHOLD_GOL}, GG/NG={THRESHOLD_GGNG}")
 
     # 1. Recupera partite del giorno
     matches = get_today_matches(target_date)

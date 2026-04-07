@@ -2557,10 +2557,29 @@ def _dedup_gol_correlati(unified):
                 loser = _GOL_DEDUP_RULES.get((name_b, name_a))
 
             if loser is not None:
-                if loser == name_a:
-                    to_remove.add(i_a)
-                elif loser == name_b:
+                p_a = unified[i_a]
+                p_b = unified[i_b]
+                # Priorità 1: preferire chi viene dal mercato GOL originale (non convertito da SEGNO)
+                orig_a = p_a.get('original_pronostico', '')
+                orig_b = p_b.get('original_pronostico', '')
+                a_from_gol = orig_a in ('Goal', 'Over 1.5', 'Over 2.5', 'Over 3.5', 'Under 2.5', 'Under 3.5', 'No Goal', 'NoGoal', '') or not orig_a
+                b_from_gol = orig_b in ('Goal', 'Over 1.5', 'Over 2.5', 'Over 3.5', 'Under 2.5', 'Under 3.5', 'No Goal', 'NoGoal', '') or not orig_b
+
+                if a_from_gol and not b_from_gol:
+                    # A viene da GOL, B è convertito da altro mercato → rimuovi B
                     to_remove.add(i_b)
+                    print(f"    🔀 DEDUP GOL ORIGINE: tenuto {name_a} (mercato GOL), rimosso {name_b} (convertito da {orig_b})")
+                elif b_from_gol and not a_from_gol:
+                    to_remove.add(i_a)
+                    print(f"    🔀 DEDUP GOL ORIGINE: tenuto {name_b} (mercato GOL), rimosso {name_a} (convertito da {orig_a})")
+                else:
+                    # Priorità 2: entrambi stesso mercato → probabilità stimata più alta vince
+                    prob_a = p_a.get('probabilita_stimata', 0) or 0
+                    prob_b = p_b.get('probabilita_stimata', 0) or 0
+                    if prob_a >= prob_b:
+                        to_remove.add(i_b)
+                    else:
+                        to_remove.add(i_a)
 
     if to_remove:
         removed = [f"{unified[i].get('pronostico', '')}@{unified[i].get('quota', 0):.2f}({unified[i].get('source', '')})"
@@ -3322,6 +3341,9 @@ def orchestrate_date(date_str, dry_run=False, match_time_filter=None, preserve_a
         unified_pronostici = _apply_se2_stake8_filter(unified_pronostici)
         unified_pronostici = _apply_segno_stake7_cap(unified_pronostici)
         unified_pronostici = _apply_gol_stake8_cap(unified_pronostici)
+
+        # --- DEDUP GOL CORRELATI post-conversioni: le conversioni possono creare Over 1.5 + Over 2.5 ---
+        unified_pronostici = _dedup_gol_correlati(unified_pronostici)
 
         # --- DEDUP post-conversioni: le conversioni possono creare duplicati su qualsiasi mercato ---
         seen_pron2 = {}
