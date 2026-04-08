@@ -1,0 +1,20 @@
+{
+  "timestamp": "2026-04-08T00:00:00",
+  "type": "storico",
+  "name": "Pesi Lorenzo v1 (in produzione 08/04/2026 mattina, poche ore)",
+  "note": "Preset di Lorenzo applicato la notte del 08/04/2026, sostituito lo stesso giorno da Claude v3 dopo sfida con 1000 cicli MC. Score -35.0 vs baseline vecchia.",
+  "parameters": {
+    "DIVISORE_MEDIA_GOL": 1.75,
+    "IMPATTO_DIFESA_TATTICA": 17.0,
+    "POTENZA_FAVORITA_WINSHIFT": 0.4,
+    "TETTO_MAX_GOL_ATTESI": 4.0,
+    "PESO_RATING_ROSA": 1.6,
+    "PESO_FORMA_RECENTE": 1.8,
+    "PESO_BVS_QUOTE": 1.1,
+    "PESO_FATTORE_CAMPO": 1.4,
+    "PESO_MOTIVAZIONE": 1.2,
+    "PESO_STORIA_H2H": -0.5,
+    "PESO_STREAK": 1.5
+  },
+  "changes": {}
+}

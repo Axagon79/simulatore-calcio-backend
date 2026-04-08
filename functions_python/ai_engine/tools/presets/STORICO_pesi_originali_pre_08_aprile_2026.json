@@ -1,8 +1,8 @@
 {
   "timestamp": "2026-03-01T20:30:00",
-  "type": "default",
-  "name": "Originale ALGO_C — Parametri Produzione",
-  "note": "Parametri originali ALGO_C letti da MongoDB (algo_c_config). Nessuna modifica. Serve come baseline per confronto.",
+  "type": "storico",
+  "name": "Pesi VECCHI (in produzione fino al 07/04/2026)",
+  "note": "Questi erano i pesi in produzione dal 18/02/2026 (calibrazione iniziale) fino al 07/04/2026 (sfida vinta da Lorenzo). Usare questo file come baseline per confrontare nuovi preset contro i vecchi pesi.",
   "parameters": {
     "DIVISORE_MEDIA_GOL": 1.75,
     "IMPATTO_DIFESA_TATTICA": 17.0,

@@ -372,12 +372,13 @@ def score_giudizio(score):
 #     return None
 
 
-def update_classifica(results_dir, new_report_file=None):
-    """Aggiorna la classifica dei preset. Max 5 posti, ordinati per score.
+def update_classifica(results_dir, new_report_file=None, baseline_name=''):
+    """Aggiorna la classifica dei preset per una specifica baseline.
+    Max 5 posti, ordinati per score. Classifica separata per ogni baseline.
     Ritorna True se new_report_file è entrato in classifica, False altrimenti."""
     import glob as glob_mod
 
-    # Leggi tutti i report JSON
+    # Leggi tutti i report JSON, filtrando per baseline
     entries = []
     for fpath in glob_mod.glob(os.path.join(results_dir, 'report_*.json')):
         try:
@@ -387,6 +388,11 @@ def update_classifica(results_dir, new_report_file=None):
             if 'mercati_derivati' not in rpt:
                 continue
 
+            # Filtra per baseline: solo report della stessa baseline
+            rpt_baseline = rpt.get('baseline', '')
+            if baseline_name and rpt_baseline != baseline_name:
+                continue
+
             fname = os.path.basename(fpath)
             nome = rpt.get('nome', fname.replace('.json', '').replace('report_', ''))
             ts = rpt.get('timestamp', '')[:16].replace('T', ' ')
@@ -394,13 +400,11 @@ def update_classifica(results_dir, new_report_file=None):
             params = rpt['parametri']['custom']
             mercati = rpt['mercati_derivati']
 
-            # Ricalcola SEMPRE con pesi attuali (non usare punteggio salvato)
+            # Usa lo score salvato nel report (stesso che l'utente ha visto)
             hr_n = stats['bilancio_netto']
-            sc, det = calculate_preset_score(
-                hr_n, mercati,
-                stats['media_gol_custom'], stats['media_gol_reale']
-            )
-            punt = {'score': sc, 'giudizio': score_giudizio(sc)}
+            punt_salvato = rpt.get('punteggio', {})
+            sc = punt_salvato.get('score', 0)
+            punt = {'score': sc, 'giudizio': punt_salvato.get('giudizio', score_giudizio(sc))}
 
             # Identifica modifiche chiave
             mods = rpt['parametri'].get('modificati', {})
@@ -433,7 +437,10 @@ def update_classifica(results_dir, new_report_file=None):
                 'cicli': rpt.get('cicli_mc', '?'),
                 'periodo': f"{rpt['periodo']['inizio']} -> {rpt['periodo']['fine']}",
                 'hr_netto': hr_n,
-                'hr_custom': stats.get('hr_custom', 0),
+                'hr_orig': stats.get('hr_orig', '?'),
+                'hr_orig_pct': stats.get('hr_orig_pct', 0),
+                'hr_custom': stats.get('hr_custom', '?'),
+                'hr_custom_pct': stats.get('hr_custom_pct', 0),
                 'media_custom': stats['media_gol_custom'],
                 'media_reale': stats['media_gol_reale'],
                 'gap': round(abs(stats['media_gol_custom'] - stats['media_gol_reale']), 2),
@@ -459,23 +466,28 @@ def update_classifica(results_dir, new_report_file=None):
         new_fname = os.path.basename(new_report_file)
         new_in_classifica = any(e['file'] == new_fname for e in top5)
 
-    # Scrivi il file
-    classifica_path = os.path.join(results_dir, 'classifica_preset.txt')
+    # Scrivi il file — nome basato sulla baseline
+    if baseline_name:
+        suffix = baseline_name.replace(' ', '_').replace('/', '-').replace('\\', '-').replace('(', '').replace(')', '')
+        classifica_path = os.path.join(results_dir, f'classifica_{suffix}.txt')
+    else:
+        classifica_path = os.path.join(results_dir, 'classifica_preset.txt')
+
     with open(classifica_path, 'w', encoding='utf-8') as f:
         W = 106
         f.write("+" + "=" * (W - 2) + "+\n")
-        f.write("|" + "CLASSIFICA PRESET MC — TOP 5".center(W - 2) + "|\n")
+        titolo = f"CLASSIFICA vs {baseline_name}" if baseline_name else "CLASSIFICA PRESET MC"
+        f.write("|" + f"{titolo} — TOP 5".center(W - 2) + "|\n")
         f.write("|" + f"Aggiornata: {datetime.now().strftime('%d/%m/%Y %H:%M')}".center(W - 2) + "|\n")
         f.write("+" + "=" * (W - 2) + "+\n\n")
 
         # Tabella classifica
-        f.write(f"  {'#':<4}{'Score':>8}  {'HR':>5}  {'Gap':>6}  {'Nome':<36}  {'Giudizio':<10}  {'Cicli':>5}  {'Data'}\n")
-        f.write("  " + "-" * 100 + "\n")
+        f.write(f"  {'#':<4}{'Score':>8}  {'HR':>5}  {'Gap':>6}  {'Nome':<36}  {'Periodo':<25}  {'Part.':>5}  {'Cicli':>5}  {'Giudizio'}\n")
+        f.write("  " + "-" * 118 + "\n")
         for i, e in enumerate(top5, 1):
             medal = {1: '>>>', 2: ' >>', 3: '  >'}.get(i, '   ')
             nome_trunc = e['nome'][:34]
-            ts_short = e['ts'][5:] if len(e['ts']) >= 16 else e['ts']  # MM-DD HH:MM
-            f.write(f"  {medal}{i}  {e['score']:>+7.1f}  {e['hr_netto']:>+4d}  {e['gap']:>5.2f}  {nome_trunc:<36}  {e['giudizio']:<10}  {e['cicli']:>5}  {ts_short}\n")
+            f.write(f"  {medal}{i}  {e['score']:>+7.1f}  {e['hr_netto']:>+4d}  {e['gap']:>5.2f}  {nome_trunc:<36}  {e['periodo']:<25}  {e['partite']:>5}  {e['cicli']:>5}  {e['giudizio']}\n")
         f.write("  " + "-" * 100 + "\n")
         f.write(f"  ({len(entries)} report totali, mostrati i migliori 5)\n")
 
@@ -493,36 +505,29 @@ def update_classifica(results_dir, new_report_file=None):
             f.write(f"  Periodo: {e['periodo']}  |  Media gol: {e['media_custom']:.2f} (reale {e['media_reale']:.2f}, gap {e['gap']:.2f})\n")
             f.write(f"  Modifiche: {mods_str}\n")
 
-            # Tabella mercati compatta (incluso HR esatto)
-            f.write(f"\n  {'Mercato':<16}{'Netto':>7}  {'HR Custom':>14}  |  {'Mercato':<16}{'Netto':>7}  {'HR Custom':>14}\n")
-            f.write(f"  {'-'*40}  |  {'-'*40}\n")
+            # Tabella mercati
+            base_label = baseline_name if baseline_name else 'Pesi Vecchi'
+            f.write(f"\n  Pesi Vecchi:  {base_label}\n")
+            f.write(f"  Pesi Testati: {e['nome']}\n\n")
+            f.write(f"  {'Mercato':<16}  {'Pesi Vecchi':>12}  {'Pesi Testati':>12}  {'Netto':>7}\n")
+            f.write(f"  {'-'*54}\n")
 
-            # Aggiungi HR esatto come primo mercato
-            hr_entry = ('hr_esatto', {'nome': 'HR esatto', 'netto': e['hr_netto'], 'hr_custom': e['hr_custom']})
-            mk_list = [hr_entry] + list(e['mercati'].items())
-            # Dividi in 2 colonne
-            half = (len(mk_list) + 1) // 2
-            for row in range(half):
-                left = mk_list[row] if row < len(mk_list) else None
-                right = mk_list[row + half] if (row + half) < len(mk_list) else None
+            # HR esatto come prima riga
+            hr_orig_pct = e.get('hr_orig_pct', 0)
+            hr_custom_pct = e.get('hr_custom_pct', 0)
+            hr_orig_s = f"{hr_orig_pct:.1f}%" if hr_orig_pct else "?"
+            hr_custom_s = f"{hr_custom_pct:.1f}%" if hr_custom_pct else "?"
+            f.write(f"  {'HR esatto':<16}  {hr_orig_s:>12}  {hr_custom_s:>12}  {e['hr_netto']:>+7d}\n")
 
-                if left:
-                    lm = left[1]
-                    ln = lm['netto']
-                    ln_s = f"{ln:+d}"
-                    left_str = f"  {lm['nome']:<16}{ln_s:>7}  {lm['hr_custom']:>14}"
-                else:
-                    left_str = f"  {'':40}"
-
-                if right:
-                    rm = right[1]
-                    rn = rm['netto']
-                    rn_s = f"{rn:+d}"
-                    right_str = f"  {rm['nome']:<16}{rn_s:>7}  {rm['hr_custom']:>14}"
-                else:
-                    right_str = ""
-
-                f.write(f"{left_str}  |{right_str}\n")
+            # Tutti i mercati
+            for mk, mv in e['mercati'].items():
+                orig_pct = mv.get('hr_orig_pct', 0)
+                cust_pct = mv.get('hr_custom_pct', 0)
+                orig_s = f"{orig_pct:.1f}%" if orig_pct else "?"
+                cust_s = f"{cust_pct:.1f}%" if cust_pct else "?"
+                netto = mv['netto']
+                f.write(f"  {mv['nome']:<16}  {orig_s:>12}  {cust_s:>12}  {netto:>+7d}\n")
+            f.write(f"  {'-'*54}\n")
 
             # Punti forti/deboli (una riga ciascuno)
             if e['forti']:
@@ -536,40 +541,6 @@ def update_classifica(results_dir, new_report_file=None):
         w = SCORE_WEIGHTS
         f.write(f"  Pesi: HR esatto {w['hr_esatto']} | 1X2 {w['segno']} | O/U 2.5 {w['ou_2_5']} | DC {w['dc']} | GG/NG {w['gg_ng']} | O/U 1.5 {w['ou_1_5']} | O/U 3.5 {w['ou_3_5']} | MG {w['multigol']}\n")
         f.write(f"  {'═' * 82}\n")
-
-    # ── Pulizia preset: tieni solo quelli in top 5 + default ──
-    presets_dir = os.path.join(os.path.dirname(results_dir), 'presets') if os.path.isdir(os.path.join(os.path.dirname(results_dir), 'presets')) else None
-    if not presets_dir:
-        presets_dir = os.path.join(results_dir, '..', 'presets')
-    if os.path.isdir(presets_dir):
-        # Raccogli parametri custom di tutti i top 5
-        top5_params = []
-        for e in top5:
-            top5_params.append(e['params'])
-
-        removed = []
-        for pfile in glob_mod.glob(os.path.join(presets_dir, '*.json')):
-            pname = os.path.basename(pfile)
-            # Preserva sempre il default
-            if pname.startswith('default_') or pname.startswith('backup_'):
-                continue
-            try:
-                with open(pfile, 'r', encoding='utf-8') as pf:
-                    preset = json.load(pf)
-                preset_params = preset.get('parameters', {})
-                # Confronta con ogni entry in top 5
-                match = False
-                for tp in top5_params:
-                    if all(abs(preset_params.get(k, -999) - tp.get(k, -998)) < 0.001 for k in preset_params):
-                        match = True
-                        break
-                if not match:
-                    os.remove(pfile)
-                    removed.append(pname)
-            except Exception:
-                continue
-        if removed:
-            print(f"  🧹 Preset rimossi (fuori top 5): {', '.join(removed)}")
 
     return new_in_classifica
 
@@ -685,7 +656,63 @@ def load_original_settings():
     return settings
 
 
-def ask_parameters(original_settings):
+def ask_baseline():
+    """Chiede all'utente contro quale baseline confrontare.
+    Ritorna (settings_dict, nome_baseline)."""
+
+    # Cerca file preset con type "default" o "storico"
+    baseline_files = []
+    if os.path.exists(PRESETS_DIR):
+        for fname in sorted(os.listdir(PRESETS_DIR)):
+            if not fname.endswith('.json') or fname.startswith('backup_'):
+                continue
+            try:
+                with open(os.path.join(PRESETS_DIR, fname), 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                ftype = data.get('type', '')
+                if ftype in ('default', 'storico'):
+                    name = data.get('name', fname)
+                    baseline_files.append((fname, name, data))
+            except Exception:
+                continue
+
+    if not baseline_files:
+        print("\n  Nessun file baseline trovato, uso MongoDB...")
+        settings = load_original_settings()
+        return settings, "MongoDB"
+
+    print("\n" + "=" * 60)
+    print("  CONTRO CHI VUOI CONFRONTARE?")
+    print("=" * 60)
+
+    for i, (fname, name, _) in enumerate(baseline_files):
+        letter = chr(65 + i)  # A, B, C...
+        print(f"  [{letter}] {name}")
+
+    print()
+    default_letter = 'A'
+    choice = input(f"  Scelta [{default_letter}]: ").strip().upper()
+    if not choice:
+        choice = default_letter
+
+    idx = ord(choice) - 65
+    if 0 <= idx < len(baseline_files):
+        fname, name, data = baseline_files[idx]
+        settings = load_original_settings()
+        for k, v in data.get('parameters', {}).items():
+            settings[k] = v
+        print(f"\n  ✅ Baseline: {name}")
+        return settings, name
+
+    # Fallback: primo file
+    fname, name, data = baseline_files[0]
+    settings = load_original_settings()
+    for k, v in data.get('parameters', {}).items():
+        settings[k] = v
+    return settings, name
+
+
+def ask_parameters(original_settings, baseline_name=''):
     """Chiede all'utente i parametri custom, mostrando descrizioni.
     Ritorna (custom_settings, changed_params, preset_name)."""
     custom = dict(original_settings)
@@ -696,7 +723,7 @@ def ask_parameters(original_settings):
     presets = load_presets_list()
     if presets:
         print("\n" + "=" * 60)
-        print("  PRESET SALVATI")
+        print(f"  QUALE PRESET VUOI USARE CONTRO: {baseline_name}")
         print("=" * 60)
         for i, preset_item in enumerate(presets):
             fname, summary = preset_item[0], preset_item[1]
@@ -839,7 +866,7 @@ def ask_parameters(original_settings):
 
 
 def load_presets_list():
-    """Carica lista dei preset salvati."""
+    """Carica lista dei preset sfidanti (esclude baseline default/storico)."""
     presets = []
     if not os.path.exists(PRESETS_DIR):
         return presets
@@ -848,13 +875,17 @@ def load_presets_list():
             try:
                 with open(os.path.join(PRESETS_DIR, fname), 'r', encoding='utf-8') as f:
                     data = json.load(f)
+                # Salta i file baseline (quelli vanno solo in ask_baseline)
+                ftype = data.get('type', '')
+                if ftype in ('default', 'storico'):
+                    continue
                 # Genera summary dalle modifiche
                 name = data.get('name', fname.replace('.json', ''))
                 diffs = data.get('changes', {})
                 if diffs:
                     summary = ', '.join(f"{k}: {v[0]}→{v[1]}" for k, v in list(diffs.items())[:3])
                 else:
-                    summary = "Parametri originali (baseline)"
+                    summary = "Nessuna modifica"
                 presets.append((fname, summary, name))
             except Exception:
                 continue
@@ -1199,7 +1230,7 @@ def print_report(results, changed_params, original_settings, custom_settings, st
     print(f"\n  (Totale partite: {n} — dettaglio completo nel file JSON)")
 
 
-def save_full_report(results, changed_params, original_settings, custom_settings, start_date, end_date, cycles, nome=None):
+def save_full_report(results, changed_params, original_settings, custom_settings, start_date, end_date, cycles, nome=None, baseline_name=''):
     """Salva il report completo con TUTTE le partite in un file JSON."""
 
     RESULTS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'results')
@@ -1286,6 +1317,7 @@ def save_full_report(results, changed_params, original_settings, custom_settings
 
     report = {
         'nome': nome or 'Senza nome',
+        'baseline': baseline_name,
         'timestamp': datetime.now().isoformat(),
         'periodo': {
             'inizio': start_date.strftime('%Y-%m-%d'),
@@ -1539,13 +1571,15 @@ def save_full_report(results, changed_params, original_settings, custom_settings
     print(f"    TXT:  tools/results/{fname_txt}")
     print(f"    ({n} partite con dettaglio completo)")
 
-    # Aggiorna classifica automaticamente
-    in_classifica = update_classifica(RESULTS_DIR, fpath_json)
+    # Aggiorna classifica automaticamente (separata per baseline)
+    in_classifica = update_classifica(RESULTS_DIR, fpath_json, baseline_name)
+    classifica_suffix = baseline_name.replace(' ', '_').replace('/', '-').replace('\\', '-').replace('(', '').replace(')', '')
+    classifica_file = f"classifica_{classifica_suffix}.txt" if baseline_name else "classifica_preset.txt"
     if in_classifica:
         print(f"\n  ★ ENTRATO IN CLASSIFICA! (top 5)")
     else:
         print(f"\n  ✗ Score troppo basso — non entra in classifica")
-    print(f"    Classifica: tools/results/classifica_preset.txt")
+    print(f"    Classifica: tools/results/{classifica_file}")
 
     return fpath_json
 
@@ -1633,7 +1667,7 @@ def apply_to_mongodb(custom_settings, original_settings, changed_params):
 
 
 def save_preset_local(custom_settings, changed_params):
-    """Salva preset in file JSON locale. Se esiste già un preset identico, avvisa."""
+    """Salva preset in file JSON locale. Chiede il nome e lo usa per file e campo name."""
     new_params = {p['key']: custom_settings.get(p['key']) for p in PARAM_DEFS}
 
     # Controlla se esiste già un preset con gli stessi parametri
@@ -1653,12 +1687,20 @@ def save_preset_local(custom_settings, changed_params):
             except Exception:
                 continue
 
-    fname = f"tuning_{datetime.now().strftime('%Y-%m-%d_%H-%M')}.json"
+    # Chiedi il nome — diventa sia il nome del file che il campo "name" nel JSON
+    nome = input("\n  Nome per questo preset (es. 'Lorenzo v2', 'Claude test 08-04'): ").strip()
+    if not nome:
+        nome = f"Preset {datetime.now().strftime('%d/%m/%Y %H:%M')}"
+
+    # Nome file: sostituisci spazi e caratteri speciali
+    nome_file = nome.replace(' ', '_').replace('/', '-').replace('\\', '-')
+    fname = f"tuning_{datetime.now().strftime('%Y-%m-%d')}_{nome_file}.json"
     fpath = os.path.join(PRESETS_DIR, fname)
 
     data = {
         'timestamp': datetime.now().isoformat(),
         'type': 'custom_preset',
+        'name': nome,
         'parameters': new_params,
         'changes': {k: [v[0], v[1]] for k, v in changed_params.items()},
     }
@@ -1667,6 +1709,7 @@ def save_preset_local(custom_settings, changed_params):
         json.dump(data, f, indent=2)
 
     print(f"\n  ✅ Preset salvato: {fname}")
+    print(f"     Nome: {nome}")
 
 
 def restore_original_mongodb(original_settings):
@@ -1721,10 +1764,9 @@ def main():
     # Fase 1: Input
     start_date, end_date, cycles = ask_date_range()
 
-    print(f"\n  Caricamento parametri originali ALGO_C da MongoDB...")
-    original_settings = load_original_settings()
+    original_settings, baseline_name = ask_baseline()
 
-    custom_settings, changed_params, preset_name = ask_parameters(original_settings)
+    custom_settings, changed_params, preset_name = ask_parameters(original_settings, baseline_name)
 
     if not changed_params:
         print("\n  ⚠️ Nessun parametro modificato. Eseguo comunque per verifica.")
@@ -1740,7 +1782,7 @@ def main():
         print("  ❌ Nessuna partita trovata. Controlla le date.")
         return
 
-    # Fase 3: Simulazione (sempre vs Default ALGO_C da MongoDB)
+    # Fase 3: Simulazione (preset custom vs baseline scelta)
     print(f"\n  Avvio simulazione MC ({cycles} cicli × {len(matches)} partite)...")
     print(f"  Stima tempo: ~{len(matches) * 2}s")
     print()
@@ -1760,12 +1802,38 @@ def main():
             report_name = default_name
         if not report_name:
             report_name = f"Test {datetime.now().strftime('%H:%M')}"
-        save_full_report(results, changed_params, original_settings, custom_settings, start_date, end_date, cycles, nome=report_name)
+        save_full_report(results, changed_params, original_settings, custom_settings, start_date, end_date, cycles, nome=report_name, baseline_name=baseline_name)
+
+        # Se il nome è diverso dal preset, rinomina anche il file preset
+        if preset_name and report_name != preset_name:
+            # Cerca il file preset caricato e aggiorna il campo name + rinomina
+            for fname in os.listdir(PRESETS_DIR):
+                if not fname.endswith('.json') or fname.startswith('backup_'):
+                    continue
+                try:
+                    fpath = os.path.join(PRESETS_DIR, fname)
+                    with open(fpath, 'r', encoding='utf-8') as f:
+                        pdata = json.load(f)
+                    if pdata.get('name') == preset_name:
+                        # Aggiorna il campo name
+                        pdata['name'] = report_name
+                        with open(fpath, 'w', encoding='utf-8') as f:
+                            json.dump(pdata, f, indent=2, ensure_ascii=False)
+                        # Rinomina il file
+                        nome_file = report_name.replace(' ', '_').replace('/', '-').replace('\\', '-')
+                        new_fname = f"tuning_{datetime.now().strftime('%Y-%m-%d')}_{nome_file}.json"
+                        new_fpath = os.path.join(PRESETS_DIR, new_fname)
+                        os.rename(fpath, new_fpath)
+                        print(f"\n  ✅ Preset rinominato: {fname} → {new_fname}")
+                        break
+                except Exception:
+                    continue
 
     # Fase 5: Post-simulazione
     post_simulation(custom_settings, original_settings, changed_params)
 
-    print("\n  Done.\n")
+    print("\n  Done.")
+    input("\n  Premi INVIO per uscire...")
 
 
 if __name__ == '__main__':

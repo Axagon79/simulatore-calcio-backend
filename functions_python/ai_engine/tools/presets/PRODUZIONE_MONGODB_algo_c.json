@@ -1,0 +1,20 @@
+{
+  "timestamp": "2026-04-08T12:10:00",
+  "type": "default",
+  "name": "Pesi IN PRODUZIONE adesso (dal 08/04/2026)",
+  "note": "Preset Claude v3 applicato il 08/04/2026 dopo sfida con 1000 cicli MC. Score +66.7 ECCELLENTE vs baseline vecchia. AGGIORNARE QUESTO FILE ogni volta che si cambiano i pesi in produzione.",
+  "parameters": {
+    "DIVISORE_MEDIA_GOL": 1.70,
+    "IMPATTO_DIFESA_TATTICA": 17.0,
+    "POTENZA_FAVORITA_WINSHIFT": 0.35,
+    "TETTO_MAX_GOL_ATTESI": 4.2,
+    "PESO_RATING_ROSA": 1.5,
+    "PESO_FORMA_RECENTE": 1.7,
+    "PESO_BVS_QUOTE": 1.0,
+    "PESO_FATTORE_CAMPO": 1.5,
+    "PESO_MOTIVAZIONE": 1.3,
+    "PESO_STORIA_H2H": -0.5,
+    "PESO_STREAK": 1.3
+  },
+  "changes": {}
+}

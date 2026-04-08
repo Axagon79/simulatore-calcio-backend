@@ -1,0 +1,30 @@
+{
+  "timestamp": "2026-04-08T00:10:00",
+  "type": "custom_preset",
+  "name": "Claude v3 — Fix O/U 2.5, BVS/Streak aggressivo, GOL leggero",
+  "note": "Basato su Utente v1 (+106.5). BVS e Streak ancora piu giu. Rating leggermente ridotto. Forma ancora piu giu. Campo e Motivazione alzati. DIVISORE 1.70 e WINSHIFT 0.35 per recuperare O/U 2.5 (-14). TETTO 4.2 per piu spazio gol.",
+  "parameters": {
+    "DIVISORE_MEDIA_GOL": 1.70,
+    "IMPATTO_DIFESA_TATTICA": 17.0,
+    "POTENZA_FAVORITA_WINSHIFT": 0.35,
+    "TETTO_MAX_GOL_ATTESI": 4.2,
+    "PESO_RATING_ROSA": 1.5,
+    "PESO_FORMA_RECENTE": 1.7,
+    "PESO_BVS_QUOTE": 1.0,
+    "PESO_FATTORE_CAMPO": 1.5,
+    "PESO_MOTIVAZIONE": 1.3,
+    "PESO_STORIA_H2H": -0.5,
+    "PESO_STREAK": 1.3
+  },
+  "changes": {
+    "DIVISORE_MEDIA_GOL": [1.75, 1.70],
+    "POTENZA_FAVORITA_WINSHIFT": [0.4, 0.35],
+    "TETTO_MAX_GOL_ATTESI": [4.0, 4.2],
+    "PESO_RATING_ROSA": [1.3, 1.5],
+    "PESO_FORMA_RECENTE": [2.0, 1.7],
+    "PESO_BVS_QUOTE": [1.5, 1.0],
+    "PESO_FATTORE_CAMPO": [1.4, 1.5],
+    "PESO_MOTIVAZIONE": [1.2, 1.3],
+    "PESO_STREAK": [2.0, 1.3]
+  }
+}

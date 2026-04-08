@@ -1,7 +1,7 @@
 {
   "timestamp": "2026-04-07T23:30:00",
   "type": "custom_preset",
-  "name": "Utente v1 — Rating su, BVS/Streak giu, Forma giu leggero",
+  "name": "lorenzo_07/04/2026",
   "note": "Direzioni basate su analisi errori Mistral + intuito utente. Rating Rosa alzato per dare piu peso alla forza sulla carta. BVS e Streak ridotti (causavano 65% errori). Forma leggera riduzione. Parametri GOL invariati.",
   "parameters": {
     "DIVISORE_MEDIA_GOL": 1.75,
@@ -17,9 +17,21 @@
     "PESO_STREAK": 1.5
   },
   "changes": {
-    "PESO_RATING_ROSA": [1.3, 1.6],
-    "PESO_FORMA_RECENTE": [2.0, 1.8],
-    "PESO_BVS_QUOTE": [1.5, 1.1],
-    "PESO_STREAK": [2.0, 1.5]
+    "PESO_RATING_ROSA": [
+      1.3,
+      1.6
+    ],
+    "PESO_FORMA_RECENTE": [
+      2.0,
+      1.8
+    ],
+    "PESO_BVS_QUOTE": [
+      1.5,
+      1.1
+    ],
+    "PESO_STREAK": [
+      2.0,
+      1.5
+    ]
   }
 }
