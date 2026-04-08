@@ -1,0 +1,31 @@
+{
+  "timestamp": "2026-04-08T14:10:00",
+  "type": "custom_preset",
+  "name": "Claude v4 — GOL aggressivo, difesa bassa, campo forte",
+  "note": "Risposta a lorenzo_ultimo (+174.2). DIVISORE 1.60 molto aggressivo, TETTO 4.5 per catturare partite da 4+ gol. DIFESA 15.0 per meno blocco gol. WINSHIFT 0.30 per meno dominio favorita. CAMPO 1.7 forte. BVS 0.8 quasi azzerato. FORMA 1.5 molto giu.",
+  "parameters": {
+    "DIVISORE_MEDIA_GOL": 1.60,
+    "IMPATTO_DIFESA_TATTICA": 15.0,
+    "POTENZA_FAVORITA_WINSHIFT": 0.30,
+    "TETTO_MAX_GOL_ATTESI": 4.5,
+    "PESO_RATING_ROSA": 1.5,
+    "PESO_FORMA_RECENTE": 1.5,
+    "PESO_BVS_QUOTE": 0.8,
+    "PESO_FATTORE_CAMPO": 1.7,
+    "PESO_MOTIVAZIONE": 1.4,
+    "PESO_STORIA_H2H": -0.5,
+    "PESO_STREAK": 1.1
+  },
+  "changes": {
+    "DIVISORE_MEDIA_GOL": [1.75, 1.60],
+    "IMPATTO_DIFESA_TATTICA": [17.0, 15.0],
+    "POTENZA_FAVORITA_WINSHIFT": [0.4, 0.30],
+    "TETTO_MAX_GOL_ATTESI": [4.0, 4.5],
+    "PESO_RATING_ROSA": [1.3, 1.5],
+    "PESO_FORMA_RECENTE": [2.0, 1.5],
+    "PESO_BVS_QUOTE": [1.5, 0.8],
+    "PESO_FATTORE_CAMPO": [1.4, 1.7],
+    "PESO_MOTIVAZIONE": [1.2, 1.4],
+    "PESO_STREAK": [2.0, 1.1]
+  }
+}
