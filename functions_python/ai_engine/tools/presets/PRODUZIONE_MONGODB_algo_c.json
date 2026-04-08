@@ -1,20 +1,20 @@
 {
-  "timestamp": "2026-04-08T14:45:00",
+  "timestamp": "2026-04-08T18:10:00",
   "type": "default",
   "name": "Pesi IN PRODUZIONE adesso (dal 08/04/2026)",
-  "note": "Preset lorenzo_ultimo applicato il 08/04/2026. Score +174.2 ECCELLENTE vs baseline vecchia (1000 cicli). Sostituisce Claude v3 (+104.1).",
+  "note": "Preset lorenzo_ultimo_v2 applicato il 08/04/2026. Score +210.1 ECCELLENTE vs baseline vecchia (1000 cicli). Sostituisce Claude v6 (+179.1).",
   "parameters": {
-    "DIVISORE_MEDIA_GOL": 1.68,
-    "IMPATTO_DIFESA_TATTICA": 16.5,
-    "POTENZA_FAVORITA_WINSHIFT": 0.52,
+    "DIVISORE_MEDIA_GOL": 1.64,
+    "IMPATTO_DIFESA_TATTICA": 15.8,
+    "POTENZA_FAVORITA_WINSHIFT": 0.60,
     "TETTO_MAX_GOL_ATTESI": 4.3,
-    "PESO_RATING_ROSA": 1.65,
-    "PESO_FORMA_RECENTE": 1.5,
+    "PESO_RATING_ROSA": 1.85,
+    "PESO_FORMA_RECENTE": 1.55,
     "PESO_BVS_QUOTE": 1.1,
-    "PESO_FATTORE_CAMPO": 1.7,
-    "PESO_MOTIVAZIONE": 1.25,
+    "PESO_FATTORE_CAMPO": 1.75,
+    "PESO_MOTIVAZIONE": 1.2,
     "PESO_STORIA_H2H": -0.5,
-    "PESO_STREAK": 1.1
+    "PESO_STREAK": 1.0
   },
   "changes": {}
 }

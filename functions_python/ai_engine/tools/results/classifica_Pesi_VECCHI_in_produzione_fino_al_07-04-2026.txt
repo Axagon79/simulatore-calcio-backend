@@ -1,20 +1,70 @@
 +========================================================================================================+
 |                  CLASSIFICA vs Pesi VECCHI (in produzione fino al 07/04/2026) — TOP 5                  |
-|                                      Aggiornata: 08/04/2026 14:39                                      |
+|                                      Aggiornata: 08/04/2026 19:03                                      |
 +========================================================================================================+
 
   #      Score     HR     Gap  Nome                                  Periodo                    Part.  Cicli  Giudizio
   ----------------------------------------------------------------------------------------------------------------------
-  >>>1   +174.2    -4   0.01  lorenzo_ultimo                        2026-02-18 -> 2026-04-07    2159   1000  ECCELLENTE
-   >>2   +147.5    -2   0.12  Claude v4 — GOL aggressivo, difesa    2026-02-18 -> 2026-04-07    2159   1000  ECCELLENTE
-    >3   +104.1   +11   0.04  Claude v3 — Fix O/U 2.5, BVS/Strea    2026-02-18 -> 2026-04-07    2159   1000  ECCELLENTE
-     4    +66.7    -1   0.04  Claude v3 — Fix O/U 2.5, BVS/Strea    2026-02-18 -> 2026-04-07    2159   1000  ECCELLENTE
-     5    -35.0    -5   0.11  lorenzo_07/04/2026                    2026-02-18 -> 2026-04-07    2159   1000  SCARSO
+  >>>1   +210.1    -3   0.08  lorenzo_ultimo_v2                     2026-02-18 -> 2026-04-07    2159   1000  ECCELLENTE
+   >>2   +179.1   +12   0.06  Claude v6 — Push RATING+WINSHIFT,     2026-02-18 -> 2026-04-07    2159   1000  ECCELLENTE
+    >3   +174.2    -4   0.01  lorenzo_ultimo                        2026-02-18 -> 2026-04-07    2159   1000  ECCELLENTE
+     4   +147.5    -2   0.12  Claude v4 — GOL aggressivo, difesa    2026-02-18 -> 2026-04-07    2159   1000  ECCELLENTE
+     5   +104.1   +11   0.04  Claude v3 — Fix O/U 2.5, BVS/Strea    2026-02-18 -> 2026-04-07    2159   1000  ECCELLENTE
   ----------------------------------------------------------------------------------------------------
-  (5 report totali, mostrati i migliori 5)
+  (9 report totali, mostrati i migliori 5)
 
   ──────────────────────────────────────────────────────────────────────────────────
-  #1  lorenzo_ultimo  |  SCORE: +174.2
+  #1  lorenzo_ultimo_v2  |  SCORE: +210.1
+  File: report_2026-04-08_18-00.json
+  ──────────────────────────────────────────────────────────────────────────────────
+  Periodo: 2026-02-18 -> 2026-04-07  |  Media gol: 2.75 (reale 2.67, gap 0.08)
+  Modifiche: MEDIA_GOL=1.64, DIFESA_TATTI=15.8, FAVORITA_WIN=0.6, MAX_GOL_ATTE=4.3, RATING_ROSA=1.85, FORMA_RECENT=1.55 (+3)
+
+  Pesi Vecchi:  Pesi VECCHI (in produzione fino al 07/04/2026)
+  Pesi Testati: lorenzo_ultimo_v2
+
+  Mercato            Pesi Vecchi  Pesi Testati    Netto
+  ------------------------------------------------------
+  HR esatto                46.7%         46.6%       -3
+  1X2                      53.4%         53.9%      +11
+  Doppia Chance            80.9%         81.9%      +21
+  O/U 1.5                  64.3%         67.3%      +65
+  O/U 2.5                  56.8%         57.9%      +23
+  O/U 3.5                  72.2%         72.1%       -2
+  GG/NG                    55.3%         56.6%      +28
+  Multigol                 39.8%         41.5%      +36
+  ------------------------------------------------------
+
+  Forti: 1X2 +11, Doppia Chance +21, O/U 1.5 +65, O/U 2.5 +23, GG/NG +28, Multigol +36
+  Deboli: HR esatto -3
+
+  ──────────────────────────────────────────────────────────────────────────────────
+  #2  Claude v6 — Push RATING+WINSHIFT, aggressivo GOL  |  SCORE: +179.1
+  File: report_2026-04-08_16-26.json
+  ──────────────────────────────────────────────────────────────────────────────────
+  Periodo: 2026-02-18 -> 2026-04-07  |  Media gol: 2.73 (reale 2.67, gap 0.06)
+  Modifiche: MEDIA_GOL=1.65, DIFESA_TATTI=16.0, FAVORITA_WIN=0.5, MAX_GOL_ATTE=4.4, RATING_ROSA=1.8, FORMA_RECENT=1.6 (+4)
+
+  Pesi Vecchi:  Pesi VECCHI (in produzione fino al 07/04/2026)
+  Pesi Testati: Claude v6 — Push RATING+WINSHIFT, aggressivo GOL
+
+  Mercato            Pesi Vecchi  Pesi Testati    Netto
+  ------------------------------------------------------
+  HR esatto                46.8%         47.3%      +12
+  1X2                      53.1%         54.1%      +21
+  Doppia Chance            81.6%         81.4%       -4
+  O/U 1.5                  64.7%         66.9%      +49
+  O/U 2.5                  56.6%         57.5%      +19
+  O/U 3.5                  72.3%         71.8%      -11
+  GG/NG                    56.0%         56.9%      +20
+  Multigol                 40.2%         41.4%      +26
+  ------------------------------------------------------
+
+  Forti: HR esatto +12, 1X2 +21, O/U 1.5 +49, O/U 2.5 +19, GG/NG +20, Multigol +26
+  Deboli: Doppia Chance -4, O/U 3.5 -11
+
+  ──────────────────────────────────────────────────────────────────────────────────
+  #3  lorenzo_ultimo  |  SCORE: +174.2
   File: report_2026-04-08_13-52.json
   ──────────────────────────────────────────────────────────────────────────────────
   Periodo: 2026-02-18 -> 2026-04-07  |  Media gol: 2.68 (reale 2.67, gap 0.01)
@@ -39,7 +89,7 @@
   Deboli: HR esatto -4, O/U 3.5 -11
 
   ──────────────────────────────────────────────────────────────────────────────────
-  #2  Claude v4 — GOL aggressivo, difesa bassa, campo forte  |  SCORE: +147.5
+  #4  Claude v4 — GOL aggressivo, difesa bassa, campo forte  |  SCORE: +147.5
   File: report_2026-04-08_14-39.json
   ──────────────────────────────────────────────────────────────────────────────────
   Periodo: 2026-02-18 -> 2026-04-07  |  Media gol: 2.79 (reale 2.67, gap 0.12)
@@ -64,7 +114,7 @@
   Deboli: HR esatto -2, 1X2 -5, Doppia Chance -8, O/U 3.5 -12
 
   ──────────────────────────────────────────────────────────────────────────────────
-  #3  Claude v3 — Fix O/U 2.5, BVS/Streak aggressivo, GOL leggero  |  SCORE: +104.1
+  #5  Claude v3 — Fix O/U 2.5, BVS/Streak aggressivo, GOL leggero  |  SCORE: +104.1
   File: report_2026-04-08_13-06.json
   ──────────────────────────────────────────────────────────────────────────────────
   Periodo: 2026-02-18 -> 2026-04-07  |  Media gol: 2.63 (reale 2.67, gap 0.04)
@@ -86,55 +136,6 @@
   ------------------------------------------------------
 
   Forti: HR esatto +11, Doppia Chance +11, O/U 1.5 +34, GG/NG +25, Multigol +9
-
-  ──────────────────────────────────────────────────────────────────────────────────
-  #4  Claude v3 — Fix O/U 2.5, BVS/Streak aggressivo, GOL leggero  |  SCORE: +66.7
-  File: report_2026-04-08_12-05.json
-  ──────────────────────────────────────────────────────────────────────────────────
-  Periodo: 2026-02-18 -> 2026-04-07  |  Media gol: 2.63 (reale 2.67, gap 0.04)
-  Modifiche: MEDIA_GOL=1.7, FAVORITA_WIN=0.35, MAX_GOL_ATTE=4.2, RATING_ROSA=1.5, FORMA_RECENT=1.7, BVS_QUOTE=1.0 (+3)
-
-  Pesi Vecchi:  Pesi VECCHI (in produzione fino al 07/04/2026)
-  Pesi Testati: Claude v3 — Fix O/U 2.5, BVS/Streak aggressivo, GOL leggero
-
-  Mercato            Pesi Vecchi  Pesi Testati    Netto
-  ------------------------------------------------------
-  HR esatto                47.1%         47.0%       -1
-  1X2                      53.5%         53.9%       +8
-  Doppia Chance            81.6%         81.6%       +0
-  O/U 1.5                  64.7%         64.7%       +0
-  O/U 2.5                  56.3%         57.2%      +20
-  O/U 3.5                  72.2%         72.1%       -1
-  GG/NG                    56.2%         56.2%       +0
-  Multigol                 39.9%         40.5%      +13
-  ------------------------------------------------------
-
-  Forti: 1X2 +8, O/U 2.5 +20, Multigol +13
-
-  ──────────────────────────────────────────────────────────────────────────────────
-  #5  lorenzo_07/04/2026  |  SCORE: -35.0
-  File: report_2026-04-08_11-24.json
-  ──────────────────────────────────────────────────────────────────────────────────
-  Periodo: 2026-02-18 -> 2026-04-07  |  Media gol: 2.56 (reale 2.67, gap 0.11)
-  Modifiche: RATING_ROSA=1.6, FORMA_RECENT=1.8, BVS_QUOTE=1.1, STREAK=1.5
-
-  Pesi Vecchi:  Pesi VECCHI (in produzione fino al 07/04/2026)
-  Pesi Testati: lorenzo_07/04/2026
-
-  Mercato            Pesi Vecchi  Pesi Testati    Netto
-  ------------------------------------------------------
-  HR esatto                47.2%         46.9%       -5
-  1X2                      53.7%         53.9%       +3
-  Doppia Chance            81.4%         81.7%       +6
-  O/U 1.5                  64.5%         65.0%      +11
-  O/U 2.5                  57.5%         56.6%      -19
-  O/U 3.5                  72.1%         71.7%      -10
-  GG/NG                    55.8%         55.5%       -6
-  Multigol                 40.0%         39.6%      -10
-  ------------------------------------------------------
-
-  Forti: Doppia Chance +6, O/U 1.5 +11
-  Deboli: HR esatto -5, O/U 2.5 -19, O/U 3.5 -10, GG/NG -6, Multigol -10
 
   ══════════════════════════════════════════════════════════════════════════════════
   Formula: sum(netto x peso) + bonus media gol (max 10pt)

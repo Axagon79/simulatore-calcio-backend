@@ -1,0 +1,28 @@
+{
+  "timestamp": "2026-04-08T16:00:00",
+  "type": "custom_preset",
+  "name": "Claude v6 — Push RATING+WINSHIFT, aggressivo GOL",
+  "note": "Sfida a lorenzo_ultimo (+174.2). v5 fallito (+36.9) perche troppo conservativo. Ora spingo: DIVISORE 1.65 (piu aggressivo del campione), WINSHIFT 0.50 (leggermente sotto campione per non esagerare), RATING 1.80 (massimo), FORMA 1.6 (leggermente sopra campione per HR). DIFESA 16.0 meno blocco gol. TETTO 4.4 alto.",
+  "parameters": {
+    "DIVISORE_MEDIA_GOL": 1.65,
+    "IMPATTO_DIFESA_TATTICA": 16.0,
+    "POTENZA_FAVORITA_WINSHIFT": 0.50,
+    "TETTO_MAX_GOL_ATTESI": 4.4,
+    "PESO_RATING_ROSA": 1.80,
+    "PESO_FORMA_RECENTE": 1.6,
+    "PESO_BVS_QUOTE": 1.0,
+    "PESO_FATTORE_CAMPO": 1.7,
+    "PESO_MOTIVAZIONE": 1.25,
+    "PESO_STORIA_H2H": -0.5,
+    "PESO_STREAK": 1.1
+  },
+  "changes": {
+    "DIVISORE_MEDIA_GOL": [1.68, 1.65],
+    "IMPATTO_DIFESA_TATTICA": [16.5, 16.0],
+    "POTENZA_FAVORITA_WINSHIFT": [0.52, 0.50],
+    "TETTO_MAX_GOL_ATTESI": [4.3, 4.4],
+    "PESO_RATING_ROSA": [1.65, 1.80],
+    "PESO_FORMA_RECENTE": [1.5, 1.6],
+    "PESO_BVS_QUOTE": [1.1, 1.0]
+  }
+}

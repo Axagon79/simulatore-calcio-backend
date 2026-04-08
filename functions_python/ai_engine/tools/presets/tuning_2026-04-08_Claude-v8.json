@@ -1,0 +1,27 @@
+{
+  "timestamp": "2026-04-08T21:00:00",
+  "type": "custom_preset",
+  "name": "Claude v8 — RATING spinto, FORMA/STREAK/MOTIV ridotti, dati parlano",
+  "note": "Sfida a lorenzo_ultimo_v2 (+210.1). Analisi dati: RATING è il parametro più correlato allo score (1.85→1.90). FORMA, STREAK e MOTIVAZIONE i più bassi vincono. BVS e CAMPO leggero boost.",
+  "parameters": {
+    "DIVISORE_MEDIA_GOL": 1.64,
+    "IMPATTO_DIFESA_TATTICA": 15.8,
+    "POTENZA_FAVORITA_WINSHIFT": 0.60,
+    "TETTO_MAX_GOL_ATTESI": 4.3,
+    "PESO_RATING_ROSA": 1.90,
+    "PESO_FORMA_RECENTE": 1.50,
+    "PESO_BVS_QUOTE": 1.15,
+    "PESO_FATTORE_CAMPO": 1.80,
+    "PESO_MOTIVAZIONE": 1.15,
+    "PESO_STORIA_H2H": -0.5,
+    "PESO_STREAK": 0.90
+  },
+  "changes": {
+    "PESO_RATING_ROSA": [1.85, 1.90],
+    "PESO_FORMA_RECENTE": [1.55, 1.50],
+    "PESO_BVS_QUOTE": [1.1, 1.15],
+    "PESO_FATTORE_CAMPO": [1.75, 1.80],
+    "PESO_MOTIVAZIONE": [1.2, 1.15],
+    "PESO_STREAK": [1.0, 0.90]
+  }
+}
