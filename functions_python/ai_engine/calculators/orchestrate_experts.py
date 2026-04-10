@@ -17,6 +17,7 @@ import sys
 import os
 import re
 import math
+import json
 import argparse
 from datetime import datetime, timedelta, timezone
 from copy import deepcopy
@@ -3345,6 +3346,18 @@ def orchestrate_date(date_str, dry_run=False, match_time_filter=None, preserve_a
         # --- DEDUP GOL CORRELATI post-conversioni: le conversioni possono creare Over 1.5 + Over 2.5 ---
         unified_pronostici = _dedup_gol_correlati(unified_pronostici)
 
+        # --- CONFLITTO Over 2.5 (C) vs Under 2.5 (A): Over 2.5 C vince (73.3% HR vs 65.9%) ---
+        o25_c_idx = None
+        u25_a_idx = None
+        for i, p in enumerate(unified_pronostici):
+            if p.get('pronostico') == 'Over 2.5' and 'C' in (p.get('source') or ''):
+                o25_c_idx = i
+            elif p.get('pronostico') == 'Under 2.5' and (p.get('source') or '') == 'A':
+                u25_a_idx = i
+        if o25_c_idx is not None and u25_a_idx is not None:
+            print(f"    ⚔️ CONFLITTO O25(C) vs U25(A): Over 2.5 vince (73.3% vs 65.9%) → rimosso Under 2.5")
+            unified_pronostici = [p for i, p in enumerate(unified_pronostici) if i != u25_a_idx]
+
         # --- DEDUP post-conversioni: le conversioni possono creare duplicati su qualsiasi mercato ---
         seen_pron2 = {}
         dedup_remove2 = set()
@@ -3376,6 +3389,16 @@ def orchestrate_date(date_str, dry_run=False, match_time_filter=None, preserve_a
                     seen_pron2[pron] = i
         if dedup_remove2:
             unified_pronostici = [p for i, p in enumerate(unified_pronostici) if i not in dedup_remove2]
+
+        # --- FATTORE QUOTA FINALE: aggiusta lo stake in base alla fascia di quota ---
+        for p in unified_pronostici:
+            if p.get('pronostico') == 'NO BET' or p.get('tipo') == 'RISULTATO_ESATTO':
+                continue
+            quota = p.get('quota') or 0
+            old_stake = p.get('stake', 1)
+            new_stake = _apply_fattore_quota(old_stake, quota)
+            if new_stake != old_stake:
+                p['stake'] = new_stake
 
         # Costruisci documento unified
         unified_doc = {}
@@ -3533,14 +3556,35 @@ def main():
         print()
 
         total = 0
+        all_dry_docs = []  # Per salvare i docs in dry-run
         for dt in dates:
             result = orchestrate_date(dt, dry_run=args.dry_run)
             count = len(result) if isinstance(result, list) else result
             total += count
             status = '[DRY]' if args.dry_run else '[OK]'
             print(f"  {dt}: {count} partite {status}")
+            if args.dry_run and isinstance(result, list):
+                all_dry_docs.extend(result)
 
         print(f"\n  Totale: {total} partite su {len(dates)} giorni")
+
+        # Salva i pronostici dry-run su file JSON per confronto P/L
+        if args.dry_run and all_dry_docs:
+            out_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'log')
+            os.makedirs(out_dir, exist_ok=True)
+            out_path = os.path.join(out_dir, 'backfill_dry_run.json')
+            # Serializza — converte datetime/ObjectId in stringa
+            def _serialize(obj):
+                if isinstance(obj, datetime):
+                    return obj.isoformat()
+                if hasattr(obj, '__str__') and type(obj).__name__ == 'ObjectId':
+                    return str(obj)
+                raise TypeError(f"Non serializzabile: {type(obj)}")
+            with open(out_path, 'w', encoding='utf-8') as f:
+                json.dump(all_dry_docs, f, default=_serialize, ensure_ascii=False, indent=1)
+            print(f"\n  💾 Pronostici dry-run salvati in: {out_path}")
+            print(f"     ({len(all_dry_docs)} documenti)")
+            print(f"     Per confronto P/L: python backfill_pl_compare.py")
 
     else:
         if args.date:
