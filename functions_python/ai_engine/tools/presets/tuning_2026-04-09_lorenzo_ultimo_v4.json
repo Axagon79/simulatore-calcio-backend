@@ -1,0 +1,60 @@
+{
+  "timestamp": "2026-04-09T00:18:20.775281",
+  "type": "custom_preset",
+  "name": "lorenzo_ultimo_v4",
+  "parameters": {
+    "DIVISORE_MEDIA_GOL": 1.68,
+    "IMPATTO_DIFESA_TATTICA": 15.2,
+    "POTENZA_FAVORITA_WINSHIFT": 0.65,
+    "TETTO_MAX_GOL_ATTESI": 4.1,
+    "PESO_RATING_ROSA": 1.92,
+    "PESO_FORMA_RECENTE": 1.48,
+    "PESO_BVS_QUOTE": 1.12,
+    "PESO_FATTORE_CAMPO": 1.85,
+    "PESO_MOTIVAZIONE": 1.12,
+    "PESO_STORIA_H2H": -0.5,
+    "PESO_STREAK": 1.0
+  },
+  "changes": {
+    "DIVISORE_MEDIA_GOL": [
+      1.75,
+      1.68
+    ],
+    "IMPATTO_DIFESA_TATTICA": [
+      17.0,
+      15.2
+    ],
+    "POTENZA_FAVORITA_WINSHIFT": [
+      0.4,
+      0.65
+    ],
+    "TETTO_MAX_GOL_ATTESI": [
+      4.0,
+      4.1
+    ],
+    "PESO_RATING_ROSA": [
+      1.3,
+      1.92
+    ],
+    "PESO_FORMA_RECENTE": [
+      2.0,
+      1.48
+    ],
+    "PESO_BVS_QUOTE": [
+      1.5,
+      1.12
+    ],
+    "PESO_FATTORE_CAMPO": [
+      1.4,
+      1.85
+    ],
+    "PESO_MOTIVAZIONE": [
+      1.2,
+      1.12
+    ],
+    "PESO_STREAK": [
+      2.0,
+      1.0
+    ]
+  }
+}
