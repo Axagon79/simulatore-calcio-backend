@@ -131,7 +131,7 @@ def find_target_rounds(league_docs, league_name=None):
     end_idx = min(len(sorted_docs), anchor_index + 2)
     return sorted_docs[start_idx:end_idx]
 
-def run_injection(interactive=True):
+def run_injection(interactive=True, preloaded_rounds=None):
     teams_col = db["teams"]
     h2h_col = db["h2h_by_round"]
     ucl_col = db["matches_champions_league"]
@@ -139,7 +139,12 @@ def run_injection(interactive=True):
 
 # --- 1. GESTIONE MENU / AUTOMATICO ---
     targeted_rounds = None
-    if interactive:
+    if preloaded_rounds is not None:
+        # Round già scaricati dall'orchestratore
+        targeted_rounds = preloaded_rounds
+        query_filter = {}
+        print(f"\n🤖 MODALITÀ AUTOMATICA (round pre-caricati: {len(targeted_rounds)})")
+    elif interactive:
         query_filter = select_leagues_interactive(h2h_col)
     else:
         print("\n🤖 MODALITÀ AUTOMATICA MIRATA: Prec/Attuale/Succ per ogni campionato")

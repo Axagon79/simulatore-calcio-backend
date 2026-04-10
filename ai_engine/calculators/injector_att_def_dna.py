@@ -98,11 +98,15 @@ def find_target_rounds(league_docs, league_name=None):
     end_idx = min(len(sorted_docs), anchor_index + 2)
     return sorted_docs[start_idx:end_idx]
 
-def run_injection_att_def(interactive=True):
+def run_injection_att_def(interactive=True, preloaded_rounds=None):
     teams_col = db["teams"]
     h2h_col = db["h2h_by_round"]
 
-    if interactive:
+    if preloaded_rounds is not None:
+        # Round già scaricati dall'orchestratore
+        rounds = preloaded_rounds
+        print(f"\n🤖 MODALITÀ AUTOMATICA (round pre-caricati: {len(rounds)})")
+    elif interactive:
         query_filter = select_leagues_interactive(h2h_col)
         rounds = list(h2h_col.find(query_filter))
     else:
@@ -127,13 +131,21 @@ def run_injection_att_def(interactive=True):
     total_rounds = len(rounds)
     updated_rounds_count = 0
     matches_processed = 0
+
+    # Bulk cache teams per tm_id (una sola query)
+    all_teams = list(teams_col.find({}, {"transfermarkt_id": 1, "scores": 1}))
     team_cache = {}
+    for t in all_teams:
+        tm_id = t.get("transfermarkt_id")
+        if tm_id:
+            team_cache[tm_id] = t
+    print(f"   📦 Cache teams: {len(team_cache)} squadre caricate")
 
     for i, round_doc in enumerate(rounds):
         round_id = round_doc["_id"]
         matches_list = round_doc.get("matches", [])
         has_changes = False
-        
+
         for match in matches_list:
             home_id = match.get("home_tm_id")
             away_id = match.get("away_tm_id")
@@ -141,16 +153,9 @@ def run_injection_att_def(interactive=True):
             if not home_id or not away_id:
                 continue
 
-            # --- LOOKUP SQUADRE ---
-            if home_id in team_cache: home_team = team_cache[home_id]
-            else:
-                home_team = teams_col.find_one({"transfermarkt_id": home_id})
-                team_cache[home_id] = home_team
-
-            if away_id in team_cache: away_team = team_cache[away_id]
-            else:
-                away_team = teams_col.find_one({"transfermarkt_id": away_id})
-                team_cache[away_id] = away_team
+            # --- LOOKUP SQUADRE (da cache) ---
+            home_team = team_cache.get(home_id)
+            away_team = team_cache.get(away_id)
 
             # --- INIZIALIZZAZIONE STRUTTURA DNA ---
             if "h2h_data" not in match or match["h2h_data"] is None:

@@ -11,8 +11,9 @@ current_rounds_col = db['league_current_rounds']
 
 # ==========================================
 # 🛠️ CONFIGURAZIONE DEBUG / TEST
-TEST_HOME = ""    
-TEST_AWAY = ""  
+TEST_HOME = ""
+TEST_AWAY = ""
+DRY_RUN = False     # Se True, non scrive nel DB
 # ==========================================
 
 # --- 1. CARICAMENTO CALCOLATORE ---
@@ -33,6 +34,26 @@ except Exception as e:
     sys.exit(1)
 
 h2h_collection = db['h2h_by_round']
+teams_collection = db['teams']
+
+# Projection: solo i campi necessari per BVS
+BVS_PROJECTION = {
+    "_id": 1,
+    "league": 1,
+    "round_name": 1,
+    "matches.home": 1,
+    "matches.away": 1,
+    "matches.odds": 1,
+    "matches.h2h_data.odds": 1,
+    "matches.h2h_data.qt_1": 1,
+    "matches.h2h_data.qt_X": 1,
+    "matches.h2h_data.qt_2": 1,
+    "matches.h2h_data.bvs_index": 1,
+    "matches.h2h_data.bvs_away": 1,
+    "matches.date_obj": 1,
+    "matches.date": 1,
+    "matches.status": 1,
+}
 
 # --- 2. FUNZIONI DI NARRAZIONE (PURE ANALYTICS - NO BETTING JARGON) ---
 
@@ -183,23 +204,29 @@ def get_trust_letter(score):
 
 # --- 3. LOOP PRINCIPALE ---
 def update_bvs_system():
-    print(f"[{datetime.now().strftime('%H:%M:%S')}] 🏁 AVVIO BVS (Analisi Tecnica Pura)")
+    _start_time = datetime.now()
+    print(f"[{_start_time.strftime('%H:%M:%S')}] 🏁 AVVIO BVS (Analisi Tecnica Pura)")
     t_home = TEST_HOME.strip()
     t_away = TEST_AWAY.strip()
     TEST_MODE = bool(t_home and t_away)
-    
+
     if TEST_MODE:
         print(f"⚠️  MODALITÀ TEST: {t_home} vs {t_away}")
     else:
         print("ℹ️  MODALITÀ AUTOMATICA: Prec / Attuale / Succ")
 
+    # Cache teams in memoria (una sola query)
+    all_teams = list(teams_collection.find({}))
+    bulk_cache = {"TEAMS": all_teams}
+    print(f"   📦 Cache teams: {len(all_teams)} squadre caricate")
+
     leagues = h2h_collection.distinct("league")
     total_updated = 0
     test_match_found = False
-    
+
     for league in leagues:
         if not TEST_MODE: print(f"\n🏆 {league}...", end="")
-        league_docs = list(h2h_collection.find({"league": league}))
+        league_docs = list(h2h_collection.find({"league": league}, BVS_PROJECTION))
         
         target_docs = league_docs if TEST_MODE else find_target_rounds(league_docs, league_name=league)
         if not target_docs: continue
@@ -229,8 +256,8 @@ def update_bvs_system():
                     if TEST_MODE: print(f"   ❌ No Dati Esterni.")
                     continue
                 
-                stats_h = get_stats_from_ranking(home)
-                stats_a = get_stats_from_ranking(away)
+                stats_h = get_stats_from_ranking(home, bulk_cache=bulk_cache)
+                stats_a = get_stats_from_ranking(away, bulk_cache=bulk_cache)
                 if not stats_h or not stats_a: continue
 
                 try:
@@ -316,9 +343,8 @@ def update_bvs_system():
                         print(f"   📊 Cons: {tip_m}")
                         print(f"   🗣️  NARRAZIONE: {advice_text}")
 
-                    h2h_data.update({
+                    new_vals = {
                         "qt_1": round(qt_1, 2), "qt_X": round(qt_X, 2), "qt_2": round(qt_2, 2),
-                        "bvs_advice": advice_text,
                         "bvs_index": round(score_h, 2), "bvs_away": round(score_a, 2),
                         "bvs_match_index": match_idx,
                         "classification": fase, "is_linear": is_lin,
@@ -326,20 +352,31 @@ def update_bvs_system():
                         "tip_sign": tip_s, "tip_market": tip_m,
                         "trust_home_letter": get_trust_letter(score_h),
                         "trust_away_letter": get_trust_letter(score_a),
-                        "last_bvs_update": datetime.now()
-                    })
-                    modificato = True
+                    }
+
+                    if DRY_RUN:
+                        # Confronta con valori esistenti nel DB
+                        for k, v in new_vals.items():
+                            old_v = h2h_data.get(k)
+                            if old_v is not None and old_v != v:
+                                print(f"   ⚠️ {home} vs {away}: {k} {old_v}→{v}")
+                    else:
+                        new_vals["bvs_advice"] = advice_text
+                        new_vals["last_bvs_update"] = datetime.now()
+                        h2h_data.update(new_vals)
+                        modificato = True
                     total_updated += 1
                     
                 except Exception as e:
                     if TEST_MODE: print(f"   ❌ ECCEZIONE: {e}")
                     continue
             
-            if modificato:
+            if modificato and not DRY_RUN:
                 h2h_collection.update_one({'_id': doc['_id']}, {'$set': {'matches': matches}})
                 if TEST_MODE: return 
 
-    print(f"\n{'='*50}\n✅ AGGIORNAMENTO COMPLETATO. Partite calcolate: {total_updated}\n{'='*50}")
+    elapsed = (datetime.now() - _start_time).total_seconds()
+    print(f"\n{'='*50}\n✅ AGGIORNAMENTO COMPLETATO. Partite calcolate: {total_updated}\n⏱️ Tempo: {elapsed:.1f}s\n{'='*50}")
 
 if __name__ == "__main__":
     update_bvs_system()

@@ -120,7 +120,7 @@ def find_target_rounds(league_docs, league_name=None):
     end_idx = min(len(sorted_docs), anchor_index + 2)
     return sorted_docs[start_idx:end_idx]
 
-def run_injection_val(interactive=True):
+def run_injection_val(interactive=True, preloaded_rounds=None):
     """
     Estrae 'strengthScore09' da Teams e lo inietta come percentuale (0-100)
     nella struttura nidificata DNA di h2h_by_round sotto la chiave 'val'.
@@ -145,7 +145,11 @@ def run_injection_val(interactive=True):
     print(f"   ✅ Mappate {len(team_val_map)} squadre.")
 
     # 2. RECUPERO GIORNATE
-    if interactive:
+    if preloaded_rounds is not None:
+        # Round già scaricati dall'orchestratore
+        all_rounds = preloaded_rounds
+        print(f"🤖 MODALITÀ AUTOMATICA (round pre-caricati: {len(all_rounds)})")
+    elif interactive:
         query_filter = select_leagues_interactive(h2h_col)
         all_rounds = list(h2h_col.find(query_filter))
     else:

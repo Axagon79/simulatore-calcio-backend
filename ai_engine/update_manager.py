@@ -135,8 +135,9 @@ SCRAPER_SEQUENCE = [
       # ⭐ GENERAZIONE PRONOSTICI GIORNALIERI (DEVE girare DOPO tutti gli aggiornamenti dati + quote)
       ("run_daily_predictions.py", "🔮 [25/29] Pronostici Giornalieri", "Pronostici non generati o con quote mancanti", FP_CALCULATORS_DIR),
 
-      # ⭐ SYNC QUOTE SNAI → SANDBOX (recupera quote mancanti da h2h_by_round + produzione)
-      ("sync_snai_odds_to_sandbox.py", "🧪 [26/31] Sync Quote SNAI → Sandbox", "Sandbox potrebbe avere quote SNAI mancanti", CURRENT_DIR),
+      # ❌ DISATTIVATO 2026-04-10 — ridondante: scrape_snai_odds.py (step 23) scrive le quote in h2h_by_round,
+      #    e run_daily_predictions_sandbox.py (step 27) le legge da lì quando genera i doc. Il daemon le aggiorna in sandbox durante il giorno.
+      # ("sync_snai_odds_to_sandbox.py", "🧪 [26/31] Sync Quote SNAI → Sandbox", "Sandbox potrebbe avere quote SNAI mancanti", CURRENT_DIR),
 
       # ⭐ SISTEMA S — PRONOSTICI SANDBOX (stessi algoritmi di A, con tuning separato)
       ("run_daily_predictions_sandbox.py", "🧪 [27/31] Pronostici Sandbox", "Pronostici sandbox non generati", FP_CALCULATORS_DIR),

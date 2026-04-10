@@ -215,6 +215,8 @@ def run_updater():
     global _teams_by_id, _teams_by_name, _teams_by_league, _league_avg_cache
     print("🚀 Avvio Update Fattore Campo (MIRATO: Prec/Attuale/Succ)...")
 
+    DRY_RUN = False  # Se True, non scrive nel DB
+
     if h2h_collection is None:
         print("❌ Errore: Impossibile connettersi alla collezione h2h_by_round")
         return
@@ -256,16 +258,36 @@ def run_updater():
 
     print(f"   {len(all_teams_list)} teams → {len(_teams_by_name)} nomi indicizzati, {len(_teams_by_league)} leghe")
 
+    # Projection: solo i campi necessari
+    FC_PROJECTION = {
+        "_id": 1,
+        "league": 1,
+        "round_name": 1,
+        "matches.home": 1,
+        "matches.away": 1,
+        "matches.home_team_id": 1,
+        "matches.away_team_id": 1,
+        "matches.home_id": 1,
+        "matches.away_id": 1,
+        "matches.id_home": 1,
+        "matches.id_away": 1,
+        "matches.h2h_data.fattore_campo": 1,
+        "matches.date_obj": 1,
+        "matches.date": 1,
+        "matches.status": 1,
+    }
+
     # 1. Trova tutti i campionati distinti
     all_leagues = h2h_collection.distinct("league")
     print(f"📋 Campionati trovati: {len(all_leagues)}")
 
+    _start_time = datetime.now()
     total_updated = 0
     total_rounds = 0
 
     for league in tqdm(all_leagues, desc="Campionati"):
-        # 2. Prendi i round di questo campionato
-        league_docs = list(h2h_collection.find({"league": league}))
+        # 2. Prendi i round di questo campionato (con projection)
+        league_docs = list(h2h_collection.find({"league": league}, FC_PROJECTION))
 
         # 3. Trova le 3 giornate mirate
         target_rounds = find_target_rounds(league_docs, league_name=league)
@@ -311,22 +333,30 @@ def run_updater():
                 if not isinstance(existing_h2h, dict): existing_h2h = {}
 
                 existing_fattore_campo = existing_h2h.get("fattore_campo", {})
-                existing_fattore_campo.update(nuovo_dato)
 
-                existing_h2h["fattore_campo"] = existing_fattore_campo
+                if DRY_RUN:
+                    old_h = existing_fattore_campo.get("field_home")
+                    old_a = existing_fattore_campo.get("field_away")
+                    if old_h is not None and (old_h != pct_h or old_a != pct_a):
+                        print(f"   ⚠️ {h_name} vs {a_name}: home {old_h}→{pct_h} | away {old_a}→{pct_a}")
+                else:
+                    existing_fattore_campo.update(nuovo_dato)
+                    existing_h2h["fattore_campo"] = existing_fattore_campo
+                    m["h2h_data"] = existing_h2h
+                    modified = True
 
-                m["h2h_data"] = existing_h2h
-                modified = True
                 total_updated += 1
 
             # 6. Salva su DB se la giornata è stata modificata
-            if modified:
+            if modified and not DRY_RUN:
                 h2h_collection.update_one(
                     {"_id": r["_id"]},
                     {"$set": {"matches": matches}}
                 )
 
+    elapsed = (datetime.now() - _start_time).total_seconds()
     print(f"\n✅ Completato! Processati {total_rounds} round, aggiornate {total_updated} partite.")
+    print(f"⏱️ Tempo: {elapsed:.1f}s")
     
 # --- FUNZIONE DI TEST MANUALE ---
 def test_manuale(squadra_casa, squadra_ospite):

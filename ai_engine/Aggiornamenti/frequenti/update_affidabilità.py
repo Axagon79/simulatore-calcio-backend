@@ -30,22 +30,43 @@ def get_round_num(r):
     nums = re.findall(r'\d+', str(r.get('_id', '')))
     return int(nums[0]) if nums else 999
 
+DRY_RUN = False  # Se True, non scrive nel DB
+
+# Projection: solo i campi necessari
+AFF_PROJECTION = {
+    "_id": 1,
+    "league": 1,
+    "round_name": 1,
+    "matches.home": 1,
+    "matches.away": 1,
+    "matches.home_team": 1,
+    "matches.homeTeam": 1,
+    "matches.away_team": 1,
+    "matches.awayTeam": 1,
+    "matches.status": 1,
+    "matches.h2h_data.affidabilità": 1,
+    "matches.date_obj": 1,
+    "matches.date": 1,
+}
+
 def run_update_affidabilità():
     h2h_collection = db['h2h_by_round']
-    
+
     leghe = h2h_collection.distinct("league")
+    _start_time = datetime.now()
     print(f"\n{'='*60}")
-    print(f"🚀 AVVIO AGGIORNAMENTO TOTALE SU {len(leghe)} CAMPIONATI")
+    print(f"🚀 AVVIO AGGIORNAMENTO TOTALE SU {len(leghe)} CAMPIONATI {'(DRY RUN)' if DRY_RUN else ''}")
     print(f"{'='*60}")
 
     # Carica cache in memoria (teams + matches_history) per eliminare query ripetute
     build_caches()
 
     count_total = 0
+    diff_count = 0
     oggi = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
 
     for lega in leghe:
-        rounds_lega = list(h2h_collection.find({"league": lega}))
+        rounds_lega = list(h2h_collection.find({"league": lega}, AFF_PROJECTION))
         rounds_lega.sort(key=get_round_num)
         
         if not rounds_lega: continue
@@ -99,28 +120,36 @@ def run_update_affidabilità():
 
                     if 'h2h_data' not in match or match['h2h_data'] is None:
                         match['h2h_data'] = {}
-                    
-                    match['h2h_data']['affidabilità'] = {
-                        "affidabilità_casa": voto_h,
-                        "affidabilità_trasferta": voto_a,
-                        "last_update": datetime.now().strftime("%Y-%m-%d %H:%M")
-                    }
-                    
-                    modificato = True
-                    count_total += 1
-                    
-                    # STAMPA RIGA PARTITA ALLINEATA
-                    match_str = f"{home_team} vs {away_team}"
-                    print(f"   ⚡ [{status:<10}] | {match_str:<40} | ✅ OK")
 
-            if modificato:
+                    if DRY_RUN:
+                        old_aff = match['h2h_data'].get('affidabilità', {})
+                        old_h = old_aff.get('affidabilità_casa')
+                        old_a = old_aff.get('affidabilità_trasferta')
+                        if old_h is not None and (old_h != voto_h or old_a != voto_a):
+                            print(f"   ⚠️ {home_team} vs {away_team}: casa {old_h}→{voto_h} | trasf {old_a}→{voto_a}")
+                            diff_count += 1
+                    else:
+                        match['h2h_data']['affidabilità'] = {
+                            "affidabilità_casa": voto_h,
+                            "affidabilità_trasferta": voto_a,
+                            "last_update": datetime.now().strftime("%Y-%m-%d %H:%M")
+                        }
+                        modificato = True
+
+                    count_total += 1
+
+            if modificato and not DRY_RUN:
                 h2h_collection.update_one(
                     {"_id": doc['_id']},
                     {"$set": {"matches": matches_array}}
                 )
 
+    elapsed = (datetime.now() - _start_time).total_seconds()
     print(f"\n{'='*60}")
     print(f"✨ FINE OPERAZIONE! Totale partite processate: {count_total}")
+    if DRY_RUN:
+        print(f"   Differenze trovate: {diff_count}")
+    print(f"⏱️ Tempo: {elapsed:.1f}s")
     print(f"{'='*60}\n")
 
 if __name__ == "__main__":

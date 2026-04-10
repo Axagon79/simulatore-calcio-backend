@@ -27,6 +27,27 @@ init(autoreset=True)
 
 SOURCE_COLLECTION = "raw_h2h_data_v2"
 TARGET_COLLECTION = "h2h_by_round"
+DRY_RUN = False  # Se True, non scrive nel DB
+
+# Projection per h2h_by_round: solo campi necessari per il calcolo
+H2H_PROJECTION = {
+    "_id": 1,
+    "league": 1,
+    "round_name": 1,
+    "matches.home": 1,
+    "matches.away": 1,
+    "matches.home_tm_id": 1,
+    "matches.away_tm_id": 1,
+    "matches.h2h_data": 1,
+    "matches.home_score": 1,
+    "matches.away_score": 1,
+    "matches.avg_goals_home": 1,
+    "matches.avg_goals_away": 1,
+    "matches.history_summary": 1,
+    "matches.date_obj": 1,
+    "matches.date": 1,
+    "matches.status": 1,
+}
 
 def get_round_number_from_text(text):
     match = re.search(r'(\d+)', str(text))
@@ -243,9 +264,12 @@ def run_calculator(target_league=None):
             h2h_cache[(id_b, id_a)] = doc
     print(f"   ✅ Cache: {len(all_h2h)} coppie H2H caricate ({len(h2h_cache)} lookup)")
 
+    _start_time = datetime.now()
+    diff_count = 0
+
     # --- MODALITÀ MIRATA (pipeline) o COMPLETA (menu) ---
     if is_pipeline:
-        print("🤖 MODALITÀ AUTOMATICA MIRATA: Prec/Attuale/Succ per ogni campionato")
+        print(f"🤖 MODALITÀ AUTOMATICA MIRATA: Prec/Attuale/Succ {'(DRY RUN)' if DRY_RUN else ''}")
         print("   📥 Fase 1: selezione round (query leggera)...")
         light_docs = list(db[TARGET_COLLECTION].find({}, {"_id": 1, "league": 1, "matches.date": 1, "matches.date_obj": 1}))
         by_league = {}
@@ -258,7 +282,7 @@ def run_calculator(target_league=None):
             target = find_target_rounds(lg_docs, league_name=lg_name)
             target_ids.extend([d["_id"] for d in target])
         print(f"   📥 Fase 2: caricamento {len(target_ids)} round completi...")
-        all_rounds = list(db[TARGET_COLLECTION].find({"_id": {"$in": target_ids}}))
+        all_rounds = list(db[TARGET_COLLECTION].find({"_id": {"$in": target_ids}}, H2H_PROJECTION))
         print(f"   📋 {len(by_league)} campionati, {len(light_docs)} docs → {len(all_rounds)} giornate mirate")
 
         matches_total = 0
@@ -266,21 +290,39 @@ def run_calculator(target_league=None):
             matches_updated = []
             for m in r.get("matches", []):
                 res = get_h2h_score_v2(m, h2h_cache)
-                h2h_obj = m.get("h2h_data", {})
-                if not isinstance(h2h_obj, dict): h2h_obj = {}
-                h2h_obj.update(res)
-                m["h2h_data"] = h2h_obj
-                if res.get("status") == "Calculated":
-                    m["home_score"] = res["home_score"]
-                    m["away_score"] = res["away_score"]
-                    m["avg_goals_home"] = res["avg_goals_home"]
-                    m["avg_goals_away"] = res["avg_goals_away"]
-                    m["history_summary"] = res["history_summary"]
-                matches_updated.append(m)
-            db[TARGET_COLLECTION].update_one({"_id": r["_id"]}, {"$set": {"matches": matches_updated}})
-            matches_total += len(matches_updated)
+
+                if DRY_RUN:
+                    # Confronta con valori esistenti
+                    old_h2h = m.get("h2h_data", {})
+                    for k in ["home_score", "away_score", "avg_goals_home", "avg_goals_away"]:
+                        old_v = old_h2h.get(k)
+                        new_v = res.get(k)
+                        if old_v is not None and new_v is not None and old_v != new_v:
+                            print(f"   ⚠️ {m.get('home','?')} vs {m.get('away','?')}: {k} {old_v}→{new_v}")
+                            diff_count += 1
+                else:
+                    h2h_obj = m.get("h2h_data", {})
+                    if not isinstance(h2h_obj, dict): h2h_obj = {}
+                    h2h_obj.update(res)
+                    m["h2h_data"] = h2h_obj
+                    if res.get("status") == "Calculated":
+                        m["home_score"] = res["home_score"]
+                        m["away_score"] = res["away_score"]
+                        m["avg_goals_home"] = res["avg_goals_home"]
+                        m["avg_goals_away"] = res["avg_goals_away"]
+                        m["history_summary"] = res["history_summary"]
+                    matches_updated.append(m)
+
+            if not DRY_RUN and matches_updated:
+                db[TARGET_COLLECTION].update_one({"_id": r["_id"]}, {"$set": {"matches": matches_updated}})
+            matches_total += len(r.get("matches", []))
             print(f"\r⏳ Elaborazione: {i+1}/{len(all_rounds)} giornate...", end="", flush=True)
+
+        elapsed = (datetime.now() - _start_time).total_seconds()
         print(f"\n✅ FINE. Giornate: {len(all_rounds)}, Match: {matches_total}")
+        if DRY_RUN:
+            print(f"   Differenze trovate: {diff_count}")
+        print(f"⏱️ Tempo: {elapsed:.1f}s")
     else:
         # Modalità interattiva/singola lega (carica tutti i round della lega)
         for league_name in selected_leagues:

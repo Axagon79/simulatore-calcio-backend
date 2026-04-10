@@ -14,6 +14,39 @@ sys.path.append(CURRENT_DIR)
 sys.path.append(PROJECT_ROOT)
 sys.path.append(CALCULATORS_PATH)
 
+from config import db
+
+DRY_RUN = False  # Se True, solo download + calcolo, nessuna scrittura DB
+
+
+def load_targeted_rounds():
+    """
+    Scarica i round target (prec/attuale/succ) UNA SOLA VOLTA.
+    Restituisce la lista di documenti h2h_by_round completi.
+    """
+    from injector_dna_tec_e_formazioni import find_target_rounds
+
+    h2h_col = db["h2h_by_round"]
+
+    print("   📥 Fase 1: selezione round (query leggera)...")
+    light_docs = list(h2h_col.find({}, {"_id": 1, "league": 1, "matches.date": 1, "matches.date_obj": 1}))
+    by_league = {}
+    for doc in light_docs:
+        lg = doc.get("league")
+        if lg:
+            by_league.setdefault(lg, []).append(doc)
+
+    target_ids = []
+    for lg_name, lg_docs in by_league.items():
+        target = find_target_rounds(lg_docs, league_name=lg_name)
+        target_ids.extend([d["_id"] for d in target])
+
+    print(f"   📥 Fase 2: caricamento {len(target_ids)} round completi...")
+    rounds = list(h2h_col.find({"_id": {"$in": target_ids}}))
+    print(f"   📋 {len(by_league)} campionati → {len(rounds)} giornate mirate")
+    return rounds
+
+
 def run_all():
     start_time = time.time()
     print(f"\n{'='*70}")
@@ -22,38 +55,35 @@ def run_all():
     print(f"{'='*70}")
 
     try:
+        # --- DOWNLOAD ROUND UNA SOLA VOLTA ---
+        print("\n📦 Caricamento round condiviso (1 download per tutti gli injectors)...")
+        shared_rounds = load_targeted_rounds()
+
         # --- FASE 1: ATTACCO E DIFESA ---
-        # File: injector_att_def_dna.py
         print("\n🔹 [1/4] Caricamento 'injector_att_def_dna'...")
         try:
             inj_att_def = importlib.import_module("injector_att_def_dna")
-            
-            # Chiama la funzione con modalità silenziosa (interactive=False)
+
             if hasattr(inj_att_def, 'run_injection_att_def'):
-                inj_att_def.run_injection_att_def(interactive=False)
+                inj_att_def.run_injection_att_def(interactive=False, preloaded_rounds=shared_rounds)
             else:
-                # Fallback per sicurezza
-                print("⚠️  Attenzione: Funzione principale non trovata, provo legacy...")
                 if hasattr(inj_att_def, 'run_injection_v3'):
                     inj_att_def.run_injection_v3()
-                
+
             print("✅ Fase 1 (ATT/DEF) completata.")
         except Exception as e:
             print(f"❌ ERRORE CRITICO FASE 1: {e}")
 
         # --- FASE 2: TECNICA E FORMAZIONI ---
-        # File: injector_dna_tec_e_formazioni.py
         print("\n🔹 [2/4] Caricamento 'injector_dna_tec_e_formazioni'...")
         try:
-            # Carichiamo ESATTAMENTE il nome del file che mi hai dato
             inj_tec = importlib.import_module("injector_dna_tec_e_formazioni")
-            
-            # Chiama la funzione con modalità silenziosa (interactive=False)
+
             if hasattr(inj_tec, 'run_injection'):
-                inj_tec.run_injection(interactive=False)
+                inj_tec.run_injection(interactive=False, preloaded_rounds=shared_rounds)
             else:
                 print("❌ Errore: Funzione 'run_injection' non trovata in injector_dna_tec_e_formazioni.")
-                
+
             print("✅ Fase 2 (TEC/FORM) completata.")
         except ImportError:
             print(f"❌ ERRORE IMPORT FASE 2: Non trovo il file 'injector_dna_tec_e_formazioni.py'.")
@@ -61,15 +91,12 @@ def run_all():
             print(f"❌ ERRORE CRITICO FASE 2: {e}")
 
         # --- FASE 3: VALORE ROSA ---
-        # File: injector_dna_val.py
         print("\n🔹 [3/4] Caricamento 'injector_dna_val'...")
         try:
             inj_val = importlib.import_module("injector_dna_val")
-            
-            # MODIFICA FONDAMENTALE: interactive=False
-            # Così non mostra il menu e fa tutti i campionati in automatico
+
             if hasattr(inj_val, 'run_injection_val'):
-                inj_val.run_injection_val(interactive=False)
+                inj_val.run_injection_val(interactive=False, preloaded_rounds=shared_rounds)
                 print("✅ Fase 3 (VAL) completata.")
             else:
                 print("⚠️ Funzione 'run_injection_val' non trovata.")
