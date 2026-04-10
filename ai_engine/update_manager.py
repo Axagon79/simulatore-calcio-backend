@@ -97,11 +97,13 @@ SCRAPER_SEQUENCE = [
 
 
 
-      # ⭐ NUOVO SCRIPT AGGIUNTO QUI ALLA FINE NELLA CARTELLA FREQUENTI
-      ("nowgoal_scraper.py", "🚀 [14/22] Quote H2H Arricchite (NowGoal)", "Mancano le quote precise nel CSV", FREQUENT_DIR),
+      # ⭐ 2026-04-10 — Sostituto di nowgoal_scraper.py + nowgoal_scraper_single.py
+      # Usa BetExplorer con requests+BeautifulSoup (NO Selenium) → ~10 min vs 72 min dei due NowGoal
+      ("scraper_quote_betexplorer.py", "🚀 [14/22] Quote 1X2 (BetExplorer)", "Quote 1X2 per h2h_by_round", FREQUENT_DIR),
 
-      # ⭐ NUOVO SCRIPT DI DEBUG PER FIX MATCHING QUOTE NOWGOAL
-      ("nowgoal_scraper_single.py", "🚀 [15/22] Fix Quote H2H Debug (NowGoal)", "Mancano le quote precise nel CSV", FREQUENT_DIR),
+      # ❌ DISATTIVATI 2026-04-10 — sostituiti da scraper_quote_betexplorer.py (BetExplorer, NO Selenium, ~10 min vs 72 min)
+      # ("nowgoal_scraper.py", "🚀 [14/22] Quote H2H Arricchite (NowGoal)", "Mancano le quote precise nel CSV", FREQUENT_DIR),
+      # ("nowgoal_scraper_single.py", "🚀 [15/22] Fix Quote H2H Debug (NowGoal)", "Mancano le quote precise nel CSV", FREQUENT_DIR),
 
       # NUOVO SCRIPT DI DEBUG PER AGGIORNARE SOLO IL LUCIFERO
       ("cron_update_lucifero.py", "🔥 [16/22] Aggiorna Solo Lucifero (Debug)", "Aggiorna solo il punteggio Lucifero", FREQUENT_DIR),
