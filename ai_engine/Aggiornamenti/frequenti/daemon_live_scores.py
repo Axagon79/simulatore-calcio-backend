@@ -250,13 +250,15 @@ def strip_ranking(name: str) -> str:
 # --- FUNZIONI CORE ---
 
 def get_today_matches_from_db():
-    """Carica le partite di oggi da h2h_by_round con aggregation pipeline."""
+    """Carica le partite di oggi (+ ieri sera) da h2h_by_round con aggregation pipeline.
+    Include partite da ieri ore 21:00 per coprire match serali che superano mezzanotte."""
     today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+    start = today - timedelta(hours=3)  # ieri alle 21:00
     tomorrow = today + timedelta(days=1)
 
     pipeline = [
         {"$unwind": "$matches"},
-        {"$match": {"matches.date_obj": {"$gte": today, "$lt": tomorrow}}},
+        {"$match": {"matches.date_obj": {"$gte": start, "$lt": tomorrow}}},
         {"$project": {
             "league": 1,
             "round_id": "$_id",
