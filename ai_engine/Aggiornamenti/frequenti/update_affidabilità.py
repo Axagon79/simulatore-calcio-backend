@@ -33,21 +33,8 @@ def get_round_num(r):
 DRY_RUN = False  # Se True, non scrive nel DB
 
 # Projection: solo i campi necessari
-AFF_PROJECTION = {
-    "_id": 1,
-    "league": 1,
-    "round_name": 1,
-    "matches.home": 1,
-    "matches.away": 1,
-    "matches.home_team": 1,
-    "matches.homeTeam": 1,
-    "matches.away_team": 1,
-    "matches.awayTeam": 1,
-    "matches.status": 1,
-    "matches.h2h_data.affidabilità": 1,
-    "matches.date_obj": 1,
-    "matches.date": 1,
-}
+# NOTA: NON usare projection selettiva — lo script riscrive l'intero array
+# matches con $set, campi esclusi verrebbero cancellati (odds, mongo_id, ecc.)
 
 def run_update_affidabilità():
     h2h_collection = db['h2h_by_round']
@@ -66,7 +53,7 @@ def run_update_affidabilità():
     oggi = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
 
     for lega in leghe:
-        rounds_lega = list(h2h_collection.find({"league": lega}, AFF_PROJECTION))
+        rounds_lega = list(h2h_collection.find({"league": lega}))
         rounds_lega.sort(key=get_round_num)
         
         if not rounds_lega: continue

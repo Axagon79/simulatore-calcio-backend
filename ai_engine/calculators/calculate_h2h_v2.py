@@ -29,25 +29,8 @@ SOURCE_COLLECTION = "raw_h2h_data_v2"
 TARGET_COLLECTION = "h2h_by_round"
 DRY_RUN = False  # Se True, non scrive nel DB
 
-# Projection per h2h_by_round: solo campi necessari per il calcolo
-H2H_PROJECTION = {
-    "_id": 1,
-    "league": 1,
-    "round_name": 1,
-    "matches.home": 1,
-    "matches.away": 1,
-    "matches.home_tm_id": 1,
-    "matches.away_tm_id": 1,
-    "matches.h2h_data": 1,
-    "matches.home_score": 1,
-    "matches.away_score": 1,
-    "matches.avg_goals_home": 1,
-    "matches.avg_goals_away": 1,
-    "matches.history_summary": 1,
-    "matches.date_obj": 1,
-    "matches.date": 1,
-    "matches.status": 1,
-}
+# NOTA: NON usare projection selettiva — lo script riscrive l'intero array
+# matches con $set, campi esclusi verrebbero cancellati (odds, mongo_id, ecc.)
 
 def get_round_number_from_text(text):
     match = re.search(r'(\d+)', str(text))
@@ -282,7 +265,7 @@ def run_calculator(target_league=None):
             target = find_target_rounds(lg_docs, league_name=lg_name)
             target_ids.extend([d["_id"] for d in target])
         print(f"   📥 Fase 2: caricamento {len(target_ids)} round completi...")
-        all_rounds = list(db[TARGET_COLLECTION].find({"_id": {"$in": target_ids}}, H2H_PROJECTION))
+        all_rounds = list(db[TARGET_COLLECTION].find({"_id": {"$in": target_ids}}))
         print(f"   📋 {len(by_league)} campionati, {len(light_docs)} docs → {len(all_rounds)} giornate mirate")
 
         matches_total = 0

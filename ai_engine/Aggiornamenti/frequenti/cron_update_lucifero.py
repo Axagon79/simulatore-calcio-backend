@@ -36,21 +36,9 @@ if TEST_HOME and TEST_AWAY:
     print(f"🔎 MODALITÀ TEST ATTIVA: Cerco match {TEST_HOME} vs {TEST_AWAY}...")
 
 # --- PROJECTION: solo i campi necessari ---
-MATCH_PROJECTION = {
-    "_id": 1,
-    "league": 1,
-    "round_name": 1,
-    "matches.home": 1,
-    "matches.away": 1,
-    "matches.real_score": 1,
-    "matches.status": 1,
-    "matches.date_obj": 1,
-    "matches.date": 1,
-    "matches.h2h_data.lucifero_home": 1,
-    "matches.h2h_data.lucifero_away": 1,
-    "matches.h2h_data.lucifero_trend_home": 1,
-    "matches.h2h_data.lucifero_trend_away": 1,
-}
+# NOTA: NON usare projection selettiva qui — lo script riscrive l'intero array
+# matches con $set, quindi campi esclusi dalla projection verrebbero cancellati
+# (es. odds, home_mongo_id, match_time, ecc.)
 
 
 def get_date_object(match):
@@ -198,10 +186,9 @@ def esegui_aggiornamento():
         current_round_doc = db['league_current_rounds'].find_one({"league": lega})
         current_round = current_round_doc.get('current_round') if current_round_doc else None
 
-        # Scarica solo le ultime NUM_GIORNATE giornate di questa lega (con projection)
+        # Scarica le ultime NUM_GIORNATE giornate di questa lega
         all_league_docs = list(db.h2h_by_round.find(
-            {"league": lega},
-            MATCH_PROJECTION
+            {"league": lega}
         ))
 
         if not all_league_docs:

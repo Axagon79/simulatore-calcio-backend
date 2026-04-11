@@ -259,23 +259,8 @@ def run_updater():
     print(f"   {len(all_teams_list)} teams → {len(_teams_by_name)} nomi indicizzati, {len(_teams_by_league)} leghe")
 
     # Projection: solo i campi necessari
-    FC_PROJECTION = {
-        "_id": 1,
-        "league": 1,
-        "round_name": 1,
-        "matches.home": 1,
-        "matches.away": 1,
-        "matches.home_team_id": 1,
-        "matches.away_team_id": 1,
-        "matches.home_id": 1,
-        "matches.away_id": 1,
-        "matches.id_home": 1,
-        "matches.id_away": 1,
-        "matches.h2h_data.fattore_campo": 1,
-        "matches.date_obj": 1,
-        "matches.date": 1,
-        "matches.status": 1,
-    }
+    # NOTA: NON usare projection selettiva — lo script riscrive l'intero array
+    # matches con $set, campi esclusi verrebbero cancellati (odds, mongo_id, ecc.)
 
     # 1. Trova tutti i campionati distinti
     all_leagues = h2h_collection.distinct("league")
@@ -286,8 +271,8 @@ def run_updater():
     total_rounds = 0
 
     for league in tqdm(all_leagues, desc="Campionati"):
-        # 2. Prendi i round di questo campionato (con projection)
-        league_docs = list(h2h_collection.find({"league": league}, FC_PROJECTION))
+        # 2. Prendi i round di questo campionato
+        league_docs = list(h2h_collection.find({"league": league}))
 
         # 3. Trova le 3 giornate mirate
         target_rounds = find_target_rounds(league_docs, league_name=league)
