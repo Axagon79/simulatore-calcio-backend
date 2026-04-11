@@ -1,0 +1,121 @@
+======================================================================
+  REPORT ESPLORAZIONE PATTERN BIZZARRI
+  Data report: 2026-04-11 20:53
+  Periodo: dal 2026-03-21
+  Pronostici analizzati: 536
+======================================================================
+
+
+==========================================================================================
+  PATTERN BIZZARRI — HR >= 75%, N >= 8
+  * = gia in produzione
+==========================================================================================
+  Pattern                                                      HR     N   Profit       
+  -------------------------------------------------------------------------------------
+  GOL + q1.40-1.49 + SRC=C                                 90.9%    11     +3.5  
+  GOL + q1.60-1.79 + SRC=A+S                               87.5%     8     +3.4  
+  PRON=Under 3.5 + q1.30-1.49                              87.5%     8     +1.6  
+  EXTREME: CONF>=60 + STARS>=3 + q1.30-1.49 + DOPPIA_CHANCE  84.6%    13     +2.6  * E7
+  DOPPIA_CHANCE + q1.40-1.49 + CONF>=60                    83.3%    12     +2.3  
+  PRON=Goal + q1.30-1.49                                   81.8%    22     +3.8  
+  GOL + q1.30-1.39 + CONF>=70                              81.8%    11     +1.3  * E4
+  ROUTING=o25_s6_to_goal + GOL                             80.0%    15     +3.8  
+  ROUTING=o25_s6_to_goal + GOL + CONF>=70                  80.0%    15     +3.8  
+  ROUTING=o25_s6_to_goal + GOL + STARS>=3                  80.0%    15     +3.8  
+  LEAGUE=Eredivisie + GOL                                  80.0%    10     +2.0  
+  GOL + q1.50-1.59 + SRC=C_screm                           77.8%     9     +1.7  * E14
+  PRON=Under 3.5                                           77.8%     9     +0.6  
+  GOL + q1.30-1.39 + STARS>=3                              77.3%    22     +1.1  
+  SRC=A+S_o25_s6_conv + STARS>=3.0                         76.9%    13     +2.4  
+  SRC=A+S_o25_s6_conv + CONF>=70                           76.9%    13     +2.4  
+  SEGNO + q1.60-1.79 + CONF>=60                            75.0%    20     +5.1  
+  DOPPIA_CHANCE + q1.50-1.59 + STARS>=3                    75.0%    16     +2.4  
+  SEGNO + q1.60-1.79 + CONF>=70                            75.0%    12     +3.1  
+  DOPPIA_CHANCE + q1.50-1.59 + CONF>=60                    75.0%     8     +1.2  
+
+==========================================================================================
+  PATTERN BIZZARRI — HR >= 80%, N >= 5 (sample piccolo)
+  * = gia in produzione
+==========================================================================================
+  Pattern                                                      HR     N   Profit       
+  -------------------------------------------------------------------------------------
+  GOL + q1.40-1.49 + SRC=C                                 90.9%    11     +3.5  
+  GOL + q1.60-1.79 + SRC=A+S                               87.5%     8     +3.4  
+  PRON=Under 3.5 + q1.30-1.49                              87.5%     8     +1.6  
+  LEAGUE=Bundesliga + GOL                                  85.7%     7     +2.3  
+  PRON=Over 1.5 + CONF>=70                                 85.7%     7     +1.5  
+  EXTREME: CONF>=60 + STARS>=3 + q1.30-1.49 + DOPPIA_CHANCE  84.6%    13     +2.6  * E7
+  DOPPIA_CHANCE + q1.40-1.49 + CONF>=60                    83.3%    12     +2.3  
+  ROUTING=consensus_both + DOPPIA_CHANCE + STARS>=3        83.3%     6     +1.0  
+  PRON=Under 3.5 + STARS>=3                                83.3%     6     +0.8  
+  PRON=Goal + q1.30-1.49                                   81.8%    22     +3.8  
+  GOL + q1.30-1.39 + CONF>=70                              81.8%    11     +1.3  * E4
+  ROUTING=o25_s6_to_goal + GOL                             80.0%    15     +3.8  
+  ROUTING=o25_s6_to_goal + GOL + CONF>=70                  80.0%    15     +3.8  
+  ROUTING=o25_s6_to_goal + GOL + STARS>=3                  80.0%    15     +3.8  
+  LEAGUE=Eredivisie + GOL                                  80.0%    10     +2.0  
+  EXTREME: CONF>=70 + STARS>=3.5 + q<1.60 + DOPPIA_CHANCE  80.0%     5     +0.8  
+  LEAGUE=Scottish Championship + SEGNO                     80.0%     5     +4.5  
+  ROUTING=consensus_both + DOPPIA_CHANCE + CONF>=70        80.0%     5     +0.6  
+  GOL + q1.40-1.49 + SRC=A+S_o25_s6_conv                   80.0%     5     +0.8  
+  GOL + q1.50-1.59 + SRC=A+S_o25_s6_conv                   80.0%     5     +1.1  
+
+==========================================================================================
+  PATTERN BIZZARRI — HR >= 70%, N >= 15 (campione ampio)
+  * = gia in produzione
+==========================================================================================
+  Pattern                                                      HR     N   Profit       
+  -------------------------------------------------------------------------------------
+  PRON=Goal + q1.30-1.49                                   81.8%    22     +3.8  
+  ROUTING=o25_s6_to_goal + GOL                             80.0%    15     +3.8  
+  ROUTING=o25_s6_to_goal + GOL + CONF>=70                  80.0%    15     +3.8  
+  ROUTING=o25_s6_to_goal + GOL + STARS>=3                  80.0%    15     +3.8  
+  GOL + q1.30-1.39 + STARS>=3                              77.3%    22     +1.1  
+  SEGNO + q1.60-1.79 + CONF>=60                            75.0%    20     +5.1  
+  DOPPIA_CHANCE + q1.50-1.59 + STARS>=3                    75.0%    16     +2.4  
+  GOL + q1.30-1.39                                         74.1%    27     +0.2  
+  SEGNO + q1.60-1.79 + STARS>=3                            74.1%    27     +6.4  
+  DOPPIA_CHANCE + q1.40-1.49 + STARS>=3                    73.3%    15     +0.8  
+  ROUTING=scrematura_segno + DOPPIA_CHANCE + STARS>=3      72.0%    25     +5.4  
+  PRON=1 + CONF>=70                                        71.4%    21     +4.4  
+  GOL + q1.30-1.39 + CONF>=60                              70.8%    24     -0.9  
+  EXTREME: CONF>=70 + STARS>=3.5 + q<1.60 + GOL            70.6%    34     +0.9  
+
+==========================================================================================
+  TOP 30 — Score = HR * sqrt(N) — bilancia hit rate e volume
+  * = gia in produzione
+==========================================================================================
+    # Pattern                                                      HR     N   Profit  Score       
+  -----------------------------------------------------------------------------------------------
+    1. EXTREME: CONF>=70 + STARS>=3.5 + q<1.60 + GOL            70.6%    34     +0.9    412  
+    2. GOL + q1.30-1.39                                         74.1%    27     +0.2    385  
+    3. SEGNO + q1.60-1.79 + STARS>=3                            74.1%    27     +6.4    385  
+    4. PRON=Goal + q1.30-1.49                                   81.8%    22     +3.8    384  
+    5. GOL + q1.30-1.39 + STARS>=3                              77.3%    22     +1.1    363  
+    6. ROUTING=scrematura_segno + DOPPIA_CHANCE + STARS>=3      72.0%    25     +5.4    360  
+    7. GOL + q1.30-1.39 + CONF>=60                              70.8%    24     -0.9    347  
+    8. SEGNO + q1.60-1.79 + CONF>=60                            75.0%    20     +5.1    335  
+    9. PRON=1 + CONF>=70                                        71.4%    21     +4.4    327  
+   10. ROUTING=o25_s6_to_goal + GOL                             80.0%    15     +3.8    310  
+   11. ROUTING=o25_s6_to_goal + GOL + CONF>=70                  80.0%    15     +3.8    310  
+   12. ROUTING=o25_s6_to_goal + GOL + STARS>=3                  80.0%    15     +3.8    310  
+   13. EXTREME: CONF>=60 + STARS>=3 + q1.30-1.49 + DOPPIA_CHANCE  84.6%    13     +2.6    305  * E7
+   14. GOL + q1.40-1.49 + SRC=C                                 90.9%    11     +3.5    301  
+   15. DOPPIA_CHANCE + q1.50-1.59 + STARS>=3                    75.0%    16     +2.4    300  
+   16. DOPPIA_CHANCE + q1.40-1.49 + CONF>=60                    83.3%    12     +2.3    289  
+   17. DOPPIA_CHANCE + q1.40-1.49 + STARS>=3                    73.3%    15     +0.8    284  
+   18. SRC=A+S_o25_s6_conv + STARS>=3.0                         76.9%    13     +2.4    277  
+   19. SRC=A+S_o25_s6_conv + CONF>=70                           76.9%    13     +2.4    277  
+   20. GOL + q1.30-1.39 + CONF>=70                              81.8%    11     +1.3    271  * E4
+   21. SEGNO + q1.60-1.79 + CONF>=70                            75.0%    12     +3.1    260  
+   22. LEAGUE=Eredivisie + GOL                                  80.0%    10     +2.0    253  
+   23. GOL + q1.60-1.79 + SRC=A+S                               87.5%     8     +3.4    247  
+   24. PRON=Under 3.5 + q1.30-1.49                              87.5%     8     +1.6    247  
+   25. LEAGUE=LaLiga 2 + SEGNO                                  72.7%    11     +4.4    241  
+   26. LEAGUE=League Two + GOL                                  72.7%    11     +2.7    241  
+   27. GOL + q1.50-1.59 + SRC=C_screm                           77.8%     9     +1.7    233  * E14
+   28. PRON=Under 3.5                                           77.8%     9     +0.6    233  
+   29. LEAGUE=Bundesliga + GOL                                  85.7%     7     +2.3    227  
+   30. PRON=Over 1.5 + CONF>=70                                 85.7%     7     +1.5    227  
+
+Totale pattern HR>=65%: 78 (4 gia attivi *, 74 nuovi)

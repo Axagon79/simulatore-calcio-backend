@@ -1,0 +1,150 @@
+====================================================================================================
+  REPORT HYBRID PATTERN MIXER v2
+  Data report: 2026-04-11 21:26
+  Periodo: storico completo
+  Pronostici analizzati: 1532
+  Hit rate globale: 911/1532 = 59.5%
+  Condizioni estratte dai report: 48
+  Combinazioni testate: 8642
+  Sorgente: top 30 elite + top 30 bizarre + hr75_n8 bizarre
+====================================================================================================
+
+
+====================================================================================================
+  PATTERN IBRIDI v2 — HR >= 75%, N >= 8
+  * = gia in produzione
+====================================================================================================
+  Pattern                                                                HR     N   Profit       
+  -----------------------------------------------------------------------------------------------
+  q1.4-1.49 + routing=consensus_both + stelle3.5-4.0                100.0%     9     +3.9  
+  conf70-79 + pron=Over 1.5 + routing=consensus_both                100.0%     8     +3.0  
+  conf60-69 + pron=X2 + q1.4-1.49 + stelle3.0-3.5                   100.0%     8     +3.5  
+  conf60-69 + q1.6-1.79 + routing=single + stelle3.0-3.5            100.0%     8     +5.1  
+  conf>=60 + pron=X2 + q1.4-1.49 + stelle>=3.0                       94.4%    18     +6.5  
+  conf>=60 + pron=X2 + q1.4-1.49                                     93.1%    29     +9.7  
+  conf80-100 + pron=Under 2.5                                        92.9%    14     +4.8  
+  conf>=70 + pron=Goal + q1.3-1.49 + stelle>=3.5                     92.9%    14     +4.6  
+  conf80-100 + stelle3.5-4.0                                         92.3%    13     +4.5  
+  conf>=70 + q1.3-1.49 + src=C                                       92.3%    13     +4.3  
+  pron=Over 1.5 + routing=consensus_both + stelle3.0-3.5             92.3%    13     +3.4  
+  conf60-69 + pron=X2 + q1.4-1.49 + stelle>=3.0                      92.3%    13     +4.3  
+  conf60-69 + q1.4-1.49 + routing=consensus_both + tipo=DOPPIA_CHANCE  92.3%    13     +4.1  
+  conf60-69 + pron=X2 + q1.4-1.49                                    91.7%    24     +7.5  
+  conf70-79 + pron=Over 1.5 + q1.3-1.49                              91.7%    12     +3.2  
+  conf70-79 + q1.3-1.49 + src=C                                      91.7%    12     +3.8  
+  conf>=70 + pron=Under 2.5 + q1.3-1.39                              91.7%    12     +3.0  
+  conf>=70 + q1.4-1.49 + src=C                                       91.7%    12     +3.9  
+  pron=X2 + q1.4-1.49 + routing=consensus_both                       91.7%    12     +3.7  
+  q1.3-1.49 + routing=consensus_both + stelle3.5-4.0                 91.7%    12     +3.6  
+  pron=MG 2-4 + stelle>=3.0                                          90.9%    11     +3.3  * E10
+  conf60-69 + pron=1 + stelle3.0-3.5                                 90.9%    11     +7.7  
+  conf70-79 + q1.4-1.49 + src=C                                      90.9%    11     +3.5  
+  pron=Over 1.5 + q1.4-1.49 + routing=consensus_both                 90.9%    11     +3.2  
+  q1.4-1.49 + stelle3.5-4.0 + tipo=DOPPIA_CHANCE                     90.9%    11     +3.4  
+  conf60-69 + q1.4-1.49 + stelle3.0-3.5 + tipo=DOPPIA_CHANCE         90.9%    11     +3.3  
+  conf70-79 + pron=Goal + q1.3-1.49 + stelle3.5-4.0                  90.9%    11     +3.4  
+  conf>=60 + pron=X2 + q1.4-1.49 + src=C_screm                       90.9%    11     +3.5  
+  q1.3-1.49 + routing=consensus_both + stelle3.5-4.0 + tipo=GOL      90.9%    11     +3.3  
+  pron=MG 2-4 + stelle3.0-3.5                                        90.0%    10     +2.9  * E10
+
+====================================================================================================
+  PATTERN IBRIDI v2 — HR >= 70%, N >= 15 (campione ampio)
+  * = gia in produzione
+====================================================================================================
+  Pattern                                                                HR     N   Profit       
+  -----------------------------------------------------------------------------------------------
+  conf>=60 + pron=X2 + q1.4-1.49 + stelle>=3.0                       94.4%    18     +6.5  
+  conf>=60 + pron=X2 + q1.4-1.49                                     93.1%    29     +9.7  
+  conf60-69 + pron=X2 + q1.4-1.49                                    91.7%    24     +7.5  
+  conf60-69 + q1.4-1.49 + tipo=DOPPIA_CHANCE                         89.3%    28     +7.8  
+  conf>=60 + q1.4-1.49 + tipo=DOPPIA_CHANCE                          89.2%    37    +10.2  
+  pron=X2 + q1.4-1.49 + src=C_screm + stelle>=3.0                    88.9%    18     +5.2  
+  conf>=60 + q1.4-1.49 + stelle>=3.0 + tipo=DOPPIA_CHANCE            88.5%    26     +7.0  
+  conf>=70 + q1.4-1.49 + stelle3.5-4.0                               88.4%    43    +11.6  
+  conf>=60 + pron=MG 2-4                                             88.2%    17     +4.4  * E10
+  conf60-69 + q1.4-1.49 + stelle>=3.0 + tipo=DOPPIA_CHANCE           88.2%    17     +4.6  
+  conf>=60 + q1.4-1.49 + routing=consensus_both + tipo=DOPPIA_CHANCE  88.2%    17     +4.3  
+  q1.3-1.39 + routing=consensus_both + stelle3.0-3.5 + tipo=GOL      88.2%    17     +3.4  
+  conf70-79 + q1.3-1.39 + stelle3.0-3.5 + tipo=GOL                   87.5%    16     +3.0  
+  conf70-79 + q1.3-1.39 + tipo=GOL                                   87.0%    23     +4.2  
+  conf>=70 + q1.4-1.49 + stelle3.5-4.0 + tipo=GOL                    86.8%    38     +9.4  
+  q1.3-1.39 + src=A                                                  86.7%    15     +2.7  
+  src=A+S_mg + stelle3.0-3.5                                         86.7%    15     +5.0  
+  conf80-100 + routing=single + tipo=GOL                             86.7%    15     +3.8  
+  conf60-69 + pron=X2 + q1.3-1.49 + stelle>=3.0                      86.7%    15     +3.7  
+  conf>=60 + q1.4-1.49 + stelle3.0-3.5 + tipo=DOPPIA_CHANCE          86.7%    15     +3.6  
+  conf>=70 + q1.3-1.49 + stelle3.5-4.0                               86.4%    59    +13.3  
+  q1.6-1.79 + src=C + stelle3.0-3.5 + tipo=SEGNO                     86.4%    22     +8.9  
+  conf>=70 + q1.3-1.49 + stelle3.5-4.0 + tipo=GOL                    85.7%    49    +10.6  
+  conf60-69 + pron=X2 + q1.3-1.49                                    85.7%    28     +6.3  
+  q1.6-1.79 + routing=single + src=C + stelle3.0-3.5                 85.7%    21     +8.3  
+  pron=Over 1.5 + routing=consensus_both                             85.3%    34     +5.9  
+  pron=Goal + q1.3-1.49 + stelle>=3.5                                85.0%    20     +4.4  
+  conf>=70 + q1.3-1.39 + tipo=GOL                                    84.8%    33     +5.1  
+  pron=X2 + q1.4-1.49 + stelle>=3.0                                  84.8%    33     +7.3  
+  conf>=60 + pron=1 + q1.6-1.79 + routing=single                     84.6%    26    +10.7  
+
+====================================================================================================
+  TOP 30 — Score = HR * sqrt(N)
+  * = gia in produzione
+====================================================================================================
+    # Pattern                                                                HR     N   Profit  Score       
+  ---------------------------------------------------------------------------------------------------------
+    1. conf>=60 + q1.3-1.49                                               75.5%   273    +17.4   1247  
+    2. q1.3-1.49 + stelle>=3.0                                            73.7%   274    +11.2   1220  
+    3. q1.3-1.49 + tipo=GOL                                               73.7%   266     +9.5   1202  
+    4. conf>=60 + q1.3-1.49 + stelle>=3.0                                 75.6%   217    +14.5   1114  
+    5. conf>=60 + routing=single + stelle>=3.0                            68.8%   253    +42.1   1094  
+    6. conf>=60 + q1.3-1.49 + tipo=GOL                                    74.4%   215    +10.4   1091  
+    7. q1.3-1.49 + stelle>=3.0 + tipo=GOL                                 74.0%   204     +8.8   1057  
+    8. conf>=60 + q1.4-1.49                                               76.1%   180    +16.5   1021  
+    9. q1.4-1.49 + stelle>=3.0                                            74.7%   182    +13.3   1008  
+   10. conf>=60 + q1.3-1.49 + stelle>=3.0 + tipo=GOL                      74.7%   178     +9.6    997  
+   11. q1.4-1.49 + tipo=GOL                                               72.6%   168     +7.0    941  
+   12. q1.3-1.49 + stelle3.0-3.5                                          71.6%   169     +1.4    931  
+   13. conf>=60 + q1.4-1.49 + stelle>=3.0                                 75.9%   145    +13.0    914  
+   14. routing=single + stelle>=3.5                                       70.7%   164    +36.4    905  
+   15. conf>=70 + q1.3-1.49                                               76.5%   136    +10.7    892  
+   16. conf>=70 + routing=single                                          68.5%   168    +21.9    888  
+   17. conf>=60 + q1.4-1.49 + tipo=GOL                                    72.7%   143     +6.3    869  
+   18. q1.4-1.49 + stelle>=3.0 + tipo=GOL                                 72.8%   136     +6.1    849  
+   19. conf60-69 + q1.3-1.49                                              73.3%   131     +4.4    839  
+   20. routing=consensus_both + stelle>=3.0                               68.0%   150     +2.1    833  
+   21. conf>=70 + q1.3-1.49 + tipo=GOL                                    76.3%   118     +9.1    829  
+   22. pron=Over 1.5 + tipo=GOL                                           70.4%   135     -1.1    818  
+   23. q1.3-1.49 + tipo=DOPPIA_CHANCE                                     71.1%   128     +1.0    804  
+   24. conf>=60 + q1.4-1.49 + stelle>=3.0 + tipo=GOL                      73.1%   119     +6.0    797  
+   25. conf>=70 + routing=single + stelle>=3.5                            70.6%   126    +24.4    792  
+   26. pron=1 + routing=single + stelle>=3.0                              71.9%   121    +31.0    791  
+   27. q1.3-1.49 + stelle>=3.5                                            77.1%   105     +9.8    790  
+   28. routing=single + stelle>=3.0 + tipo=GOL                            71.7%   120    +12.1    785  
+   29. conf>=60 + q1.3-1.49 + stelle3.0-3.5                               74.1%   112     +4.7    784  
+   30. q1.3-1.49 + stelle3.0-3.5 + tipo=GOL                               72.4%   116     +1.8    780  
+
+====================================================================================================
+  TOP 20 NUOVI — Pattern non ancora in produzione, HR >= 70%, N >= 8
+====================================================================================================
+  Pattern                                                                HR     N   Profit
+  ------------------------------------------------------------------------------------------
+  q1.4-1.49 + routing=consensus_both + stelle3.5-4.0                100.0%     9     +3.9
+  conf70-79 + pron=Over 1.5 + routing=consensus_both                100.0%     8     +3.0
+  conf60-69 + pron=X2 + q1.4-1.49 + stelle3.0-3.5                   100.0%     8     +3.5
+  conf60-69 + q1.6-1.79 + routing=single + stelle3.0-3.5            100.0%     8     +5.1
+  conf>=60 + pron=X2 + q1.4-1.49 + stelle>=3.0                       94.4%    18     +6.5
+  conf>=60 + pron=X2 + q1.4-1.49                                     93.1%    29     +9.7
+  conf80-100 + pron=Under 2.5                                        92.9%    14     +4.8
+  conf>=70 + pron=Goal + q1.3-1.49 + stelle>=3.5                     92.9%    14     +4.6
+  conf80-100 + stelle3.5-4.0                                         92.3%    13     +4.5
+  conf>=70 + q1.3-1.49 + src=C                                       92.3%    13     +4.3
+  pron=Over 1.5 + routing=consensus_both + stelle3.0-3.5             92.3%    13     +3.4
+  conf60-69 + pron=X2 + q1.4-1.49 + stelle>=3.0                      92.3%    13     +4.3
+  conf60-69 + q1.4-1.49 + routing=consensus_both + tipo=DOPPIA_CHANCE  92.3%    13     +4.1
+  conf60-69 + pron=X2 + q1.4-1.49                                    91.7%    24     +7.5
+  conf70-79 + pron=Over 1.5 + q1.3-1.49                              91.7%    12     +3.2
+  conf70-79 + q1.3-1.49 + src=C                                      91.7%    12     +3.8
+  conf>=70 + pron=Under 2.5 + q1.3-1.39                              91.7%    12     +3.0
+  conf>=70 + q1.4-1.49 + src=C                                       91.7%    12     +3.9
+  pron=X2 + q1.4-1.49 + routing=consensus_both                       91.7%    12     +3.7
+  q1.3-1.49 + routing=consensus_both + stelle3.5-4.0                 91.7%    12     +3.6
+
+Totale pattern HR>=65%: 1082 (11 gia attivi, 1071 nuovi)

@@ -1,0 +1,713 @@
+{
+  "report_date": "2026-04-11",
+  "from_date": null,
+  "total_predictions": 1532,
+  "total_hits": 911,
+  "hit_rate_global": 59.5,
+  "elite_candidates": [
+    {
+      "dimension": "tipo+quota+conf",
+      "pattern": "SEGNO | 1.80-1.99 | 80-100",
+      "hit_rate": 90.0,
+      "sample_size": 10,
+      "profit": 6.45,
+      "active": "E15"
+    },
+    {
+      "dimension": "src+quota",
+      "pattern": "C | 1.30-1.49",
+      "hit_rate": 84.2,
+      "sample_size": 19,
+      "profit": 4.01,
+      "active": null
+    },
+    {
+      "dimension": "src+tipo+quota",
+      "pattern": "C | GOL | 1.30-1.49",
+      "hit_rate": 84.2,
+      "sample_size": 19,
+      "profit": 4.01,
+      "active": "E4~"
+    },
+    {
+      "dimension": "tipo+quota+stars",
+      "pattern": "DOPPIA_CHANCE | 1.30-1.49 | 3.5-4",
+      "hit_rate": 82.4,
+      "sample_size": 17,
+      "profit": 2.86,
+      "active": null
+    },
+    {
+      "dimension": "src+quota",
+      "pattern": "A+S_mg | 1.30-1.49",
+      "hit_rate": 81.8,
+      "sample_size": 11,
+      "profit": 1.87,
+      "active": null
+    },
+    {
+      "dimension": "src+tipo+quota",
+      "pattern": "A+S_mg | GOL | 1.30-1.49",
+      "hit_rate": 81.8,
+      "sample_size": 11,
+      "profit": 1.87,
+      "active": null
+    },
+    {
+      "dimension": "src+quota",
+      "pattern": "C_screm | 2.00-2.49",
+      "hit_rate": 81.2,
+      "sample_size": 16,
+      "profit": 11.9,
+      "active": "E3+"
+    },
+    {
+      "dimension": "src+tipo+quota",
+      "pattern": "C_screm | DOPPIA_CHANCE | 2.00-2.49",
+      "hit_rate": 81.2,
+      "sample_size": 16,
+      "profit": 11.9,
+      "active": "E3"
+    },
+    {
+      "dimension": "src+quota",
+      "pattern": "C_combo96 | 1.30-1.49",
+      "hit_rate": 81.0,
+      "sample_size": 21,
+      "profit": 3.13,
+      "active": null
+    },
+    {
+      "dimension": "src+tipo+quota",
+      "pattern": "C_combo96 | DOPPIA_CHANCE | 1.30-1.49",
+      "hit_rate": 81.0,
+      "sample_size": 21,
+      "profit": 3.13,
+      "active": "E7~"
+    },
+    {
+      "dimension": "tipo+quota+conf",
+      "pattern": "DOPPIA_CHANCE | 1.30-1.49 | 60-69",
+      "hit_rate": 80.0,
+      "sample_size": 40,
+      "profit": 5.44,
+      "active": "E7"
+    },
+    {
+      "dimension": "tipo+routing",
+      "pattern": "GOL | o25_s6_to_goal",
+      "hit_rate": 80.0,
+      "sample_size": 15,
+      "profit": 3.81,
+      "active": "E~"
+    },
+    {
+      "dimension": "routing+tipo",
+      "pattern": "o25_s6_to_goal | GOL",
+      "hit_rate": 80.0,
+      "sample_size": 15,
+      "profit": 3.81,
+      "active": "E~"
+    },
+    {
+      "dimension": "tipo+quota+conf",
+      "pattern": "SEGNO | 1.50-1.79 | 60-69",
+      "hit_rate": 79.2,
+      "sample_size": 24,
+      "profit": 6.86,
+      "active": null
+    },
+    {
+      "dimension": "tipo+quota+stars",
+      "pattern": "SEGNO | 1.50-1.79 | 3-3.5",
+      "hit_rate": 78.4,
+      "sample_size": 37,
+      "profit": 9.31,
+      "active": "E1"
+    },
+    {
+      "dimension": "tipo+quota+conf",
+      "pattern": "DOPPIA_CHANCE | 1.30-1.49 | 70-79",
+      "hit_rate": 77.8,
+      "sample_size": 18,
+      "profit": 1.58,
+      "active": "E16"
+    },
+    {
+      "dimension": "tipo+quota+stars",
+      "pattern": "GOL | 1.30-1.49 | 3.5-4",
+      "hit_rate": 77.5,
+      "sample_size": 71,
+      "profit": 7.04,
+      "active": null
+    },
+    {
+      "dimension": "tipo+conf",
+      "pattern": "SEGNO | 80-100",
+      "hit_rate": 77.1,
+      "sample_size": 35,
+      "profit": 10.89,
+      "active": "E6"
+    },
+    {
+      "dimension": "tipo+source",
+      "pattern": "GOL | A+S_o25_s6_conv",
+      "hit_rate": 76.9,
+      "sample_size": 13,
+      "profit": 2.36,
+      "active": null
+    },
+    {
+      "dimension": "tipo+quota+conf",
+      "pattern": "GOL | 1.30-1.49 | 70-79",
+      "hit_rate": 76.3,
+      "sample_size": 97,
+      "profit": 7.72,
+      "active": "E4"
+    },
+    {
+      "dimension": "tipo+quota+conf",
+      "pattern": "GOL | 1.30-1.49 | 80-100",
+      "hit_rate": 76.2,
+      "sample_size": 21,
+      "profit": 1.43,
+      "active": null
+    },
+    {
+      "dimension": "src+quota",
+      "pattern": "A | 1.30-1.49",
+      "hit_rate": 75.9,
+      "sample_size": 58,
+      "profit": 4.15,
+      "active": null
+    },
+    {
+      "dimension": "src+tipo+quota",
+      "pattern": "A | GOL | 1.30-1.49",
+      "hit_rate": 75.9,
+      "sample_size": 58,
+      "profit": 4.15,
+      "active": null
+    },
+    {
+      "dimension": "src+tipo+quota",
+      "pattern": "A+S | GOL | 1.30-1.49",
+      "hit_rate": 75.0,
+      "sample_size": 72,
+      "profit": 3.31,
+      "active": "E8"
+    },
+    {
+      "dimension": "src+quota",
+      "pattern": "A+S | 1.30-1.49",
+      "hit_rate": 73.8,
+      "sample_size": 107,
+      "profit": 3.31,
+      "active": null
+    },
+    {
+      "dimension": "tipo+quota",
+      "pattern": "GOL | 1.30-1.49",
+      "hit_rate": 73.7,
+      "sample_size": 266,
+      "profit": 9.53,
+      "active": "E4+"
+    },
+    {
+      "dimension": "tipo+quota+conf",
+      "pattern": "SEGNO | 1.50-1.79 | 50-59",
+      "hit_rate": 73.7,
+      "sample_size": 38,
+      "profit": 6.51,
+      "active": "E2"
+    },
+    {
+      "dimension": "tipo+edge",
+      "pattern": "SEGNO | 5-9",
+      "hit_rate": 73.3,
+      "sample_size": 15,
+      "profit": 3.5,
+      "active": null
+    },
+    {
+      "dimension": "tipo+quota+conf",
+      "pattern": "GOL | 1.50-1.79 | 80-100",
+      "hit_rate": 73.3,
+      "sample_size": 15,
+      "profit": 2.25,
+      "active": null
+    },
+    {
+      "dimension": "src+tipo+quota",
+      "pattern": "C_screm | GOL | 1.50-1.79",
+      "hit_rate": 73.2,
+      "sample_size": 41,
+      "profit": 5.98,
+      "active": "E14"
+    },
+    {
+      "dimension": "tipo+source",
+      "pattern": "DOPPIA_CHANCE | C_combo96",
+      "hit_rate": 72.9,
+      "sample_size": 48,
+      "profit": 6.74,
+      "active": null
+    },
+    {
+      "dimension": "tipo+routing",
+      "pattern": "DOPPIA_CHANCE | combo_96_dc_flip",
+      "hit_rate": 72.9,
+      "sample_size": 48,
+      "profit": 6.74,
+      "active": "E~"
+    },
+    {
+      "dimension": "routing+tipo",
+      "pattern": "combo_96_dc_flip | DOPPIA_CHANCE",
+      "hit_rate": 72.9,
+      "sample_size": 48,
+      "profit": 6.74,
+      "active": "E~"
+    },
+    {
+      "dimension": "tipo+quota",
+      "pattern": "DOPPIA_CHANCE | 2.00-2.49",
+      "hit_rate": 72.7,
+      "sample_size": 22,
+      "profit": 12.13,
+      "active": "E5"
+    },
+    {
+      "dimension": "tipo+quota+conf",
+      "pattern": "SEGNO | 1.50-1.79 | 80-100",
+      "hit_rate": 72.7,
+      "sample_size": 22,
+      "profit": 3.44,
+      "active": null
+    },
+    {
+      "dimension": "tipo+quota+conf",
+      "pattern": "SEGNO | 2.00-2.49 | 70-79",
+      "hit_rate": 72.7,
+      "sample_size": 11,
+      "profit": 5.55,
+      "active": null
+    },
+    {
+      "dimension": "tipo+quota+stars",
+      "pattern": "SEGNO | 1.80-1.99 | 4-4.5",
+      "hit_rate": 72.7,
+      "sample_size": 11,
+      "profit": 3.53,
+      "active": null
+    },
+    {
+      "dimension": "tipo+quota+stars",
+      "pattern": "GOL | 1.30-1.49 | <3",
+      "hit_rate": 72.6,
+      "sample_size": 62,
+      "profit": 0.75,
+      "active": null
+    },
+    {
+      "dimension": "tipo+quota+stars",
+      "pattern": "GOL | 1.30-1.49 | 3-3.5",
+      "hit_rate": 72.4,
+      "sample_size": 116,
+      "profit": 1.83,
+      "active": null
+    },
+    {
+      "dimension": "tipo+quota+conf",
+      "pattern": "GOL | 1.30-1.49 | 60-69",
+      "hit_rate": 72.2,
+      "sample_size": 97,
+      "profit": 1.26,
+      "active": null
+    },
+    {
+      "dimension": "tipo+source",
+      "pattern": "DOPPIA_CHANCE | A+S",
+      "hit_rate": 71.4,
+      "sample_size": 35,
+      "profit": -0.0,
+      "active": null
+    },
+    {
+      "dimension": "tipo+routing",
+      "pattern": "DOPPIA_CHANCE | consensus_both",
+      "hit_rate": 71.4,
+      "sample_size": 35,
+      "profit": -0.0,
+      "active": null
+    },
+    {
+      "dimension": "src+tipo+quota",
+      "pattern": "A+S | DOPPIA_CHANCE | 1.30-1.49",
+      "hit_rate": 71.4,
+      "sample_size": 35,
+      "profit": -0.0,
+      "active": null
+    },
+    {
+      "dimension": "routing+tipo",
+      "pattern": "consensus_both | DOPPIA_CHANCE",
+      "hit_rate": 71.4,
+      "sample_size": 35,
+      "profit": -0.0,
+      "active": null
+    },
+    {
+      "dimension": "tipo+quota+conf",
+      "pattern": "GOL | 1.30-1.49 | <50",
+      "hit_rate": 71.4,
+      "sample_size": 21,
+      "profit": -0.24,
+      "active": null
+    },
+    {
+      "dimension": "tipo+quota+stars",
+      "pattern": "DOPPIA_CHANCE | 2.00-2.49 | <3",
+      "hit_rate": 71.4,
+      "sample_size": 14,
+      "profit": 6.87,
+      "active": null
+    },
+    {
+      "dimension": "tipo+routing",
+      "pattern": "GOL | mc_filter_convert",
+      "hit_rate": 71.4,
+      "sample_size": 14,
+      "profit": 0.01,
+      "active": null
+    },
+    {
+      "dimension": "routing+tipo",
+      "pattern": "mc_filter_convert | GOL",
+      "hit_rate": 71.4,
+      "sample_size": 14,
+      "profit": 0.01,
+      "active": null
+    },
+    {
+      "dimension": "tipo+quota",
+      "pattern": "DOPPIA_CHANCE | 1.30-1.49",
+      "hit_rate": 71.1,
+      "sample_size": 128,
+      "profit": 0.98,
+      "active": "E7+"
+    },
+    {
+      "dimension": "src+tipo+quota",
+      "pattern": "C_screm | DOPPIA_CHANCE | 1.30-1.49",
+      "hit_rate": 70.8,
+      "sample_size": 65,
+      "profit": 0.55,
+      "active": null
+    },
+    {
+      "dimension": "tipo+conf",
+      "pattern": "GOL | 80-100",
+      "hit_rate": 70.7,
+      "sample_size": 41,
+      "profit": 2.6,
+      "active": null
+    },
+    {
+      "dimension": "tipo+quota+conf",
+      "pattern": "GOL | 1.30-1.49 | 50-59",
+      "hit_rate": 70.0,
+      "sample_size": 30,
+      "profit": -0.64,
+      "active": null
+    },
+    {
+      "dimension": "tipo+quota+stars",
+      "pattern": "SEGNO | 2.00-2.49 | 3.5-4",
+      "hit_rate": 70.0,
+      "sample_size": 10,
+      "profit": 4.55,
+      "active": null
+    },
+    {
+      "dimension": "tipo+quota+stars",
+      "pattern": "GOL | 2.00-2.49 | 3.5-4",
+      "hit_rate": 70.0,
+      "sample_size": 10,
+      "profit": 4.7,
+      "active": null
+    },
+    {
+      "dimension": "tipo+quota+stars",
+      "pattern": "DOPPIA_CHANCE | 1.30-1.49 | 3-3.5",
+      "hit_rate": 69.8,
+      "sample_size": 53,
+      "profit": -0.45,
+      "active": null
+    },
+    {
+      "dimension": "tipo+stars",
+      "pattern": "SEGNO | 4-4.5",
+      "hit_rate": 69.6,
+      "sample_size": 46,
+      "profit": 12.78,
+      "active": null
+    },
+    {
+      "dimension": "src+tipo+quota",
+      "pattern": "C | SEGNO | 1.50-1.79",
+      "hit_rate": 69.5,
+      "sample_size": 118,
+      "profit": 14.17,
+      "active": null
+    },
+    {
+      "dimension": "tipo+quota+stars",
+      "pattern": "DOPPIA_CHANCE | 1.30-1.49 | <3",
+      "hit_rate": 69.0,
+      "sample_size": 58,
+      "profit": -1.43,
+      "active": null
+    },
+    {
+      "dimension": "tipo+conf",
+      "pattern": "DOPPIA_CHANCE | 70-79",
+      "hit_rate": 69.0,
+      "sample_size": 29,
+      "profit": 0.79,
+      "active": null
+    },
+    {
+      "dimension": "tipo+quota+stars",
+      "pattern": "GOL | 1.30-1.49 | 4-4.5",
+      "hit_rate": 68.8,
+      "sample_size": 16,
+      "profit": -0.54,
+      "active": null
+    },
+    {
+      "dimension": "tipo+source",
+      "pattern": "GOL | A+S_mg",
+      "hit_rate": 68.0,
+      "sample_size": 25,
+      "profit": 0.75,
+      "active": null
+    },
+    {
+      "dimension": "tipo+quota+stars",
+      "pattern": "SEGNO | 1.50-1.79 | 4-4.5",
+      "hit_rate": 68.0,
+      "sample_size": 25,
+      "profit": 2.2,
+      "active": null
+    },
+    {
+      "dimension": "tipo+source",
+      "pattern": "GOL | C_screm",
+      "hit_rate": 67.6,
+      "sample_size": 108,
+      "profit": -0.56,
+      "active": null
+    },
+    {
+      "dimension": "tipo+routing",
+      "pattern": "GOL | scrematura_segno",
+      "hit_rate": 67.6,
+      "sample_size": 108,
+      "profit": -0.56,
+      "active": null
+    },
+    {
+      "dimension": "routing+tipo",
+      "pattern": "scrematura_segno | GOL",
+      "hit_rate": 67.6,
+      "sample_size": 108,
+      "profit": -0.56,
+      "active": null
+    },
+    {
+      "dimension": "src+quota",
+      "pattern": "C_screm | 1.30-1.49",
+      "hit_rate": 67.2,
+      "sample_size": 131,
+      "profit": -6.82,
+      "active": null
+    },
+    {
+      "dimension": "tipo+stars",
+      "pattern": "GOL | 3.5-4",
+      "hit_rate": 67.1,
+      "sample_size": 222,
+      "profit": 13.23,
+      "active": null
+    },
+    {
+      "dimension": "tipo+source",
+      "pattern": "GOL | A",
+      "hit_rate": 66.7,
+      "sample_size": 144,
+      "profit": 1.6,
+      "active": null
+    },
+    {
+      "dimension": "tipo+quota",
+      "pattern": "SEGNO | 1.50-1.79",
+      "hit_rate": 66.7,
+      "sample_size": 132,
+      "profit": 9.73,
+      "active": "E1+"
+    },
+    {
+      "dimension": "tipo+stars",
+      "pattern": "DOPPIA_CHANCE | 3.5-4",
+      "hit_rate": 66.7,
+      "sample_size": 36,
+      "profit": 0.74,
+      "active": null
+    },
+    {
+      "dimension": "tipo+quota+conf",
+      "pattern": "SEGNO | 1.80-1.99 | <50",
+      "hit_rate": 66.7,
+      "sample_size": 21,
+      "profit": 5.23,
+      "active": null
+    },
+    {
+      "dimension": "tipo+quota+conf",
+      "pattern": "GOL | 1.50-1.79 | 50-59",
+      "hit_rate": 66.7,
+      "sample_size": 15,
+      "profit": 1.15,
+      "active": null
+    },
+    {
+      "dimension": "tipo+routing",
+      "pattern": "GOL | union",
+      "hit_rate": 66.7,
+      "sample_size": 12,
+      "profit": -2.07,
+      "active": null
+    },
+    {
+      "dimension": "routing+tipo",
+      "pattern": "union | GOL",
+      "hit_rate": 66.7,
+      "sample_size": 12,
+      "profit": -2.07,
+      "active": null
+    },
+    {
+      "dimension": "tipo+quota+conf",
+      "pattern": "DOPPIA_CHANCE | 2.00-2.49 | <50",
+      "hit_rate": 66.7,
+      "sample_size": 12,
+      "profit": 4.77,
+      "active": null
+    },
+    {
+      "dimension": "tipo+quota+stars",
+      "pattern": "DOPPIA_CHANCE | 1.80-1.99 | 3-3.5",
+      "hit_rate": 66.7,
+      "sample_size": 12,
+      "profit": 3.08,
+      "active": null
+    },
+    {
+      "dimension": "tipo+routing",
+      "pattern": "GOL | single",
+      "hit_rate": 66.4,
+      "sample_size": 143,
+      "profit": 4.36,
+      "active": null
+    },
+    {
+      "dimension": "routing+tipo",
+      "pattern": "single | GOL",
+      "hit_rate": 66.4,
+      "sample_size": 143,
+      "profit": 4.36,
+      "active": null
+    },
+    {
+      "dimension": "tipo+edge",
+      "pattern": "GOL | <5",
+      "hit_rate": 66.3,
+      "sample_size": 514,
+      "profit": -3.73,
+      "active": null
+    },
+    {
+      "dimension": "src+tipo+quota",
+      "pattern": "C | SEGNO | 2.00-2.49",
+      "hit_rate": 66.0,
+      "sample_size": 50,
+      "profit": 16.72,
+      "active": null
+    },
+    {
+      "dimension": "tipo+conf",
+      "pattern": "DOPPIA_CHANCE | 50-59",
+      "hit_rate": 65.9,
+      "sample_size": 91,
+      "profit": 6.35,
+      "active": null
+    },
+    {
+      "dimension": "tipo+quota+stars",
+      "pattern": "SEGNO | 1.50-1.79 | 3.5-4",
+      "hit_rate": 65.7,
+      "sample_size": 35,
+      "profit": 2.91,
+      "active": null
+    },
+    {
+      "dimension": "src+quota",
+      "pattern": "C | 1.50-1.79",
+      "hit_rate": 65.6,
+      "sample_size": 195,
+      "profit": 12.64,
+      "active": null
+    },
+    {
+      "dimension": "tipo+quota+conf",
+      "pattern": "DOPPIA_CHANCE | 1.30-1.49 | <50",
+      "hit_rate": 65.6,
+      "sample_size": 32,
+      "profit": -2.12,
+      "active": null
+    },
+    {
+      "dimension": "tipo+conf",
+      "pattern": "GOL | 70-79",
+      "hit_rate": 65.5,
+      "sample_size": 287,
+      "profit": 3.73,
+      "active": null
+    },
+    {
+      "dimension": "tipo+edge",
+      "pattern": "DOPPIA_CHANCE | <5",
+      "hit_rate": 65.4,
+      "sample_size": 254,
+      "profit": 4.12,
+      "active": null
+    },
+    {
+      "dimension": "src+quota",
+      "pattern": "C_mg | 1.50-1.79",
+      "hit_rate": 65.0,
+      "sample_size": 20,
+      "profit": 0.79,
+      "active": null
+    },
+    {
+      "dimension": "src+tipo+quota",
+      "pattern": "C_mg | GOL | 1.50-1.79",
+      "hit_rate": 65.0,
+      "sample_size": 20,
+      "profit": 0.79,
+      "active": null
+    }
+  ]
+}

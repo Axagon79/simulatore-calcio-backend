@@ -1,0 +1,1604 @@
+{
+  "report_date": "2026-04-11",
+  "from_date": "2026-03-21",
+  "total_predictions": 536,
+  "total_hits": 291,
+  "hit_rate_global": 54.3,
+  "conditions_extracted": 32,
+  "combos_tested": 1966,
+  "source_patterns": 48,
+  "top_patterns": [
+    {
+      "pattern": "conf70-79 + pron=Over 1.5",
+      "hit_rate": 100.0,
+      "sample_size": 6,
+      "profit": 2.5,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "conf70-79 + pron=Over 1.5 + q1.3-1.49",
+      "hit_rate": 100.0,
+      "sample_size": 5,
+      "profit": 2.0,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "pron=Over 1.5 + q1.4-1.49 + src=A+S",
+      "hit_rate": 100.0,
+      "sample_size": 5,
+      "profit": 2.1,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "pron=Over 1.5 + src=A+S + stelle>=3.0",
+      "hit_rate": 100.0,
+      "sample_size": 5,
+      "profit": 1.9,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "pron=Under 3.5 + q1.3-1.49 + stelle>=3.0",
+      "hit_rate": 100.0,
+      "sample_size": 5,
+      "profit": 1.8,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf>=70 + q1.3-1.39 + stelle>=3.5 + tipo=GOL",
+      "hit_rate": 100.0,
+      "sample_size": 5,
+      "profit": 1.8,
+      "active": null,
+      "depth": 4
+    },
+    {
+      "pattern": "q1.5-1.59 + src=C_screm + stelle>=3.5 + tipo=GOL",
+      "hit_rate": 100.0,
+      "sample_size": 5,
+      "profit": 2.7,
+      "active": null,
+      "depth": 4
+    },
+    {
+      "pattern": "pron=Goal + q1.3-1.49 + stelle>=3.5",
+      "hit_rate": 92.9,
+      "sample_size": 14,
+      "profit": 4.6,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "q1.3-1.49 + src=C",
+      "hit_rate": 92.3,
+      "sample_size": 13,
+      "profit": 4.2,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "q1.4-1.49 + src=C",
+      "hit_rate": 90.9,
+      "sample_size": 11,
+      "profit": 3.5,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "pron=Goal + q1.3-1.49 + stelle3.5-4.0",
+      "hit_rate": 90.9,
+      "sample_size": 11,
+      "profit": 3.3,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf>=70 + pron=Goal + q1.3-1.49 + stelle>=3.5",
+      "hit_rate": 90.0,
+      "sample_size": 10,
+      "profit": 2.8,
+      "active": null,
+      "depth": 4
+    },
+    {
+      "pattern": "conf>=70 + q1.3-1.49 + src=C",
+      "hit_rate": 88.9,
+      "sample_size": 9,
+      "profit": 2.5,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "pron=Goal + q1.4-1.49 + stelle3.5-4.0",
+      "hit_rate": 88.9,
+      "sample_size": 9,
+      "profit": 2.6,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf70-79 + q1.3-1.49 + stelle>=3.5 + tipo=GOL",
+      "hit_rate": 87.5,
+      "sample_size": 16,
+      "profit": 3.9,
+      "active": null,
+      "depth": 4
+    },
+    {
+      "pattern": "pron=Under 3.5 + q1.3-1.49",
+      "hit_rate": 87.5,
+      "sample_size": 8,
+      "profit": 1.6,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "q1.6-1.79 + src=A+S",
+      "hit_rate": 87.5,
+      "sample_size": 8,
+      "profit": 3.4,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "conf70-79 + q1.3-1.49 + src=C",
+      "hit_rate": 87.5,
+      "sample_size": 8,
+      "profit": 2.0,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf>=70 + q1.4-1.49 + src=C",
+      "hit_rate": 87.5,
+      "sample_size": 8,
+      "profit": 2.1,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "q1.3-1.39 + stelle>=3.5 + tipo=GOL",
+      "hit_rate": 87.5,
+      "sample_size": 8,
+      "profit": 1.5,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf70-79 + q1.4-1.49 + stelle>=3.5",
+      "hit_rate": 85.7,
+      "sample_size": 14,
+      "profit": 3.2,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf70-79 + q1.3-1.49 + stelle3.5-4.0 + tipo=GOL",
+      "hit_rate": 85.7,
+      "sample_size": 14,
+      "profit": 3.0,
+      "active": null,
+      "depth": 4
+    },
+    {
+      "pattern": "conf>=70 + pron=Over 1.5",
+      "hit_rate": 85.7,
+      "sample_size": 7,
+      "profit": 1.5,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "conf70-79 + q1.4-1.49 + src=C",
+      "hit_rate": 85.7,
+      "sample_size": 7,
+      "profit": 1.7,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf>=70 + q1.3-1.39 + stelle>=3.5",
+      "hit_rate": 85.7,
+      "sample_size": 7,
+      "profit": 1.2,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "q1.3-1.39 + src=A+S + stelle>=3.0",
+      "hit_rate": 85.7,
+      "sample_size": 7,
+      "profit": 1.1,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf70-79 + pron=Goal + q1.3-1.49 + stelle3.5-4.0",
+      "hit_rate": 85.7,
+      "sample_size": 7,
+      "profit": 1.6,
+      "active": null,
+      "depth": 4
+    },
+    {
+      "pattern": "conf70-79 + q1.6-1.79 + routing=single + src=C",
+      "hit_rate": 85.7,
+      "sample_size": 7,
+      "profit": 3.1,
+      "active": null,
+      "depth": 4
+    },
+    {
+      "pattern": "conf70-79 + q1.4-1.49 + stelle>=3.5 + tipo=GOL",
+      "hit_rate": 84.6,
+      "sample_size": 13,
+      "profit": 2.8,
+      "active": null,
+      "depth": 4
+    },
+    {
+      "pattern": "conf70-79 + q1.3-1.49 + stelle>=3.5",
+      "hit_rate": 84.2,
+      "sample_size": 19,
+      "profit": 3.7,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "pron=Goal + q1.4-1.49",
+      "hit_rate": 83.3,
+      "sample_size": 18,
+      "profit": 3.8,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "conf70-79 + q1.4-1.49 + stelle3.5-4.0",
+      "hit_rate": 83.3,
+      "sample_size": 12,
+      "profit": 2.3,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf70-79 + src=C_screm",
+      "hit_rate": 83.3,
+      "sample_size": 6,
+      "profit": 1.6,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "pron=Under 3.5 + stelle>=3.0",
+      "hit_rate": 83.3,
+      "sample_size": 6,
+      "profit": 0.8,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "q1.5-1.59 + routing=o25_s6_to_goal",
+      "hit_rate": 83.3,
+      "sample_size": 6,
+      "profit": 1.7,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "src=A + stelle>=3.5",
+      "hit_rate": 83.3,
+      "sample_size": 6,
+      "profit": 1.0,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "conf70-79 + q1.3-1.39 + src=A+S",
+      "hit_rate": 83.3,
+      "sample_size": 6,
+      "profit": 0.8,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf>=70 + pron=Over 1.5 + q1.3-1.49",
+      "hit_rate": 83.3,
+      "sample_size": 6,
+      "profit": 1.0,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "q1.3-1.39 + stelle3.5-4.0 + tipo=GOL",
+      "hit_rate": 83.3,
+      "sample_size": 6,
+      "profit": 0.8,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf70-79 + pron=Goal + q1.4-1.49 + stelle3.5-4.0",
+      "hit_rate": 83.3,
+      "sample_size": 6,
+      "profit": 1.2,
+      "active": null,
+      "depth": 4
+    },
+    {
+      "pattern": "conf>=60 + q1.5-1.59 + src=C_screm + tipo=GOL",
+      "hit_rate": 83.3,
+      "sample_size": 6,
+      "profit": 1.7,
+      "active": null,
+      "depth": 4
+    },
+    {
+      "pattern": "conf70-79 + q1.3-1.49 + stelle3.5-4.0",
+      "hit_rate": 82.4,
+      "sample_size": 17,
+      "profit": 2.8,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "pron=Goal + q1.4-1.49 + stelle>=3.0",
+      "hit_rate": 82.4,
+      "sample_size": 17,
+      "profit": 3.3,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf>=60 + q1.6-1.79 + routing=single + src=C",
+      "hit_rate": 82.4,
+      "sample_size": 17,
+      "profit": 6.5,
+      "active": null,
+      "depth": 4
+    },
+    {
+      "pattern": "pron=Goal + q1.3-1.49",
+      "hit_rate": 81.8,
+      "sample_size": 22,
+      "profit": 3.8,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "pron=Over 1.5 + src=A+S",
+      "hit_rate": 81.8,
+      "sample_size": 11,
+      "profit": 1.5,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "conf>=70 + q1.3-1.39 + tipo=GOL",
+      "hit_rate": 81.8,
+      "sample_size": 11,
+      "profit": 1.3,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "q1.6-1.79 + routing=single + stelle3.5-4.0",
+      "hit_rate": 81.8,
+      "sample_size": 11,
+      "profit": 4.2,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf70-79 + q1.4-1.49 + stelle3.5-4.0 + tipo=GOL",
+      "hit_rate": 81.8,
+      "sample_size": 11,
+      "profit": 1.9,
+      "active": null,
+      "depth": 4
+    },
+    {
+      "pattern": "q1.6-1.79 + routing=single + stelle>=3.5",
+      "hit_rate": 81.2,
+      "sample_size": 16,
+      "profit": 5.9,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "pron=Goal + q1.3-1.49 + stelle>=3.0",
+      "hit_rate": 81.0,
+      "sample_size": 21,
+      "profit": 3.4,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf>=70 + q1.3-1.49 + stelle>=3.5 + tipo=GOL",
+      "hit_rate": 81.0,
+      "sample_size": 21,
+      "profit": 3.1,
+      "active": null,
+      "depth": 4
+    },
+    {
+      "pattern": "q1.4-1.49 + stelle3.5-4.0",
+      "hit_rate": 80.0,
+      "sample_size": 20,
+      "profit": 3.1,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "conf70-79 + routing=o25_s6_to_goal",
+      "hit_rate": 80.0,
+      "sample_size": 15,
+      "profit": 3.8,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "q1.3-1.39 + stelle>=3.5",
+      "hit_rate": 80.0,
+      "sample_size": 10,
+      "profit": 0.9,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "q1.5-1.59 + src=C_screm + stelle>=3.5",
+      "hit_rate": 80.0,
+      "sample_size": 10,
+      "profit": 2.3,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf>=70 + q1.6-1.79 + routing=single + src=C",
+      "hit_rate": 80.0,
+      "sample_size": 10,
+      "profit": 3.5,
+      "active": null,
+      "depth": 4
+    },
+    {
+      "pattern": "q1.4-1.49 + routing=o25_s6_to_goal",
+      "hit_rate": 80.0,
+      "sample_size": 5,
+      "profit": 0.8,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "q1.5-1.59 + src=A+S_o25_s6_conv",
+      "hit_rate": 80.0,
+      "sample_size": 5,
+      "profit": 1.1,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "src=A + stelle3.5-4.0",
+      "hit_rate": 80.0,
+      "sample_size": 5,
+      "profit": 0.6,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "conf70-79 + q1.3-1.39 + stelle3.5-4.0",
+      "hit_rate": 80.0,
+      "sample_size": 5,
+      "profit": 0.5,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf70-79 + src=C_screm + tipo=GOL",
+      "hit_rate": 80.0,
+      "sample_size": 5,
+      "profit": 1.2,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf80-100 + q1.5-1.59 + routing=single",
+      "hit_rate": 80.0,
+      "sample_size": 5,
+      "profit": 1.1,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "pron=Under 3.5 + q1.3-1.49 + src=A",
+      "hit_rate": 80.0,
+      "sample_size": 5,
+      "profit": 0.5,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf70-79 + q1.6-1.79 + routing=single + stelle3.5-4.0",
+      "hit_rate": 80.0,
+      "sample_size": 5,
+      "profit": 1.8,
+      "active": null,
+      "depth": 4
+    },
+    {
+      "pattern": "q1.3-1.39 + src=A+S + stelle>=3.0 + tipo=GOL",
+      "hit_rate": 80.0,
+      "sample_size": 5,
+      "profit": 0.4,
+      "active": null,
+      "depth": 4
+    },
+    {
+      "pattern": "conf>=70 + q1.3-1.49 + stelle>=3.5",
+      "hit_rate": 79.2,
+      "sample_size": 24,
+      "profit": 2.8,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "q1.3-1.49 + stelle3.5-4.0",
+      "hit_rate": 78.6,
+      "sample_size": 28,
+      "profit": 3.2,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "conf>=70 + q1.3-1.39",
+      "hit_rate": 78.6,
+      "sample_size": 14,
+      "profit": 1.0,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "conf>=70 + pron=Goal + q1.4-1.49",
+      "hit_rate": 78.6,
+      "sample_size": 14,
+      "profit": 1.9,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf>=60 + q1.6-1.79 + routing=single",
+      "hit_rate": 78.3,
+      "sample_size": 23,
+      "profit": 7.3,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "q1.3-1.49 + stelle3.5-4.0 + tipo=GOL",
+      "hit_rate": 78.3,
+      "sample_size": 23,
+      "profit": 2.5,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "q1.6-1.79 + routing=single + src=C + stelle>=3.0",
+      "hit_rate": 78.3,
+      "sample_size": 23,
+      "profit": 7.2,
+      "active": null,
+      "depth": 4
+    },
+    {
+      "pattern": "conf>=60 + pron=Under 3.5",
+      "hit_rate": 77.8,
+      "sample_size": 9,
+      "profit": 0.6,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "conf70-79 + q1.3-1.39 + tipo=GOL",
+      "hit_rate": 77.8,
+      "sample_size": 9,
+      "profit": 0.5,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "q1.5-1.59 + src=C_screm + tipo=GOL",
+      "hit_rate": 77.8,
+      "sample_size": 9,
+      "profit": 1.7,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "routing=single + stelle>=3.5 + tipo=GOL",
+      "hit_rate": 77.8,
+      "sample_size": 9,
+      "profit": 1.6,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "q1.3-1.39 + stelle>=3.0 + tipo=GOL",
+      "hit_rate": 77.3,
+      "sample_size": 22,
+      "profit": 1.1,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "q1.3-1.49 + stelle>=3.5",
+      "hit_rate": 77.1,
+      "sample_size": 35,
+      "profit": 3.3,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "conf70-79 + src=A+S_o25_s6_conv",
+      "hit_rate": 76.9,
+      "sample_size": 13,
+      "profit": 2.4,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "conf70-79 + pron=Goal + q1.4-1.49",
+      "hit_rate": 76.9,
+      "sample_size": 13,
+      "profit": 1.5,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "q1.3-1.49 + stelle>=3.5 + tipo=GOL",
+      "hit_rate": 76.7,
+      "sample_size": 30,
+      "profit": 2.6,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf>=70 + pron=Goal + q1.3-1.49",
+      "hit_rate": 76.5,
+      "sample_size": 17,
+      "profit": 1.6,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf>=70 + q1.4-1.49 + stelle>=3.5",
+      "hit_rate": 76.5,
+      "sample_size": 17,
+      "profit": 1.7,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "q1.4-1.49 + stelle3.5-4.0 + tipo=GOL",
+      "hit_rate": 76.5,
+      "sample_size": 17,
+      "profit": 1.7,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "q1.5-1.59 + src=C_screm + stelle>=3.0",
+      "hit_rate": 76.2,
+      "sample_size": 21,
+      "profit": 3.6,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf>=60 + q1.3-1.39 + stelle>=3.0 + tipo=GOL",
+      "hit_rate": 76.2,
+      "sample_size": 21,
+      "profit": 0.7,
+      "active": null,
+      "depth": 4
+    },
+    {
+      "pattern": "q1.4-1.49 + stelle>=3.5",
+      "hit_rate": 76.0,
+      "sample_size": 25,
+      "profit": 2.4,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "conf>=60 + q1.3-1.39 + stelle>=3.0",
+      "hit_rate": 76.0,
+      "sample_size": 25,
+      "profit": 0.8,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "q1.6-1.79 + routing=single + stelle>=3.0",
+      "hit_rate": 75.9,
+      "sample_size": 29,
+      "profit": 7.9,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "q1.3-1.39 + stelle>=3.0",
+      "hit_rate": 75.0,
+      "sample_size": 28,
+      "profit": 0.6,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "conf>=70 + q1.4-1.49 + stelle>=3.5 + tipo=GOL",
+      "hit_rate": 75.0,
+      "sample_size": 16,
+      "profit": 1.2,
+      "active": null,
+      "depth": 4
+    },
+    {
+      "pattern": "conf70-79 + q1.3-1.39",
+      "hit_rate": 75.0,
+      "sample_size": 12,
+      "profit": 0.2,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "q1.3-1.49 + src=A + stelle>=3.0",
+      "hit_rate": 75.0,
+      "sample_size": 12,
+      "profit": 0.5,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "q1.3-1.39 + stelle3.5-4.0",
+      "hit_rate": 75.0,
+      "sample_size": 8,
+      "profit": 0.2,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "pron=Under 2.5 + q1.6-1.79 + stelle>=3.0",
+      "hit_rate": 75.0,
+      "sample_size": 8,
+      "profit": 2.2,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "routing=single + stelle3.5-4.0 + tipo=GOL",
+      "hit_rate": 75.0,
+      "sample_size": 8,
+      "profit": 1.2,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "q1.3-1.39 + tipo=GOL",
+      "hit_rate": 74.1,
+      "sample_size": 27,
+      "profit": 0.2,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "q1.3-1.49 + src=A",
+      "hit_rate": 73.3,
+      "sample_size": 15,
+      "profit": 0.3,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "conf70-79 + pron=Goal + q1.3-1.49",
+      "hit_rate": 73.3,
+      "sample_size": 15,
+      "profit": 0.8,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "q1.4-1.49 + stelle>=3.5 + tipo=GOL",
+      "hit_rate": 72.7,
+      "sample_size": 22,
+      "profit": 1.1,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf70-79 + q1.6-1.79 + routing=single",
+      "hit_rate": 72.7,
+      "sample_size": 11,
+      "profit": 2.5,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf>=60 + pron=Over 1.5 + q1.4-1.49",
+      "hit_rate": 72.7,
+      "sample_size": 11,
+      "profit": 0.5,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf>=60 + q1.5-1.59 + src=C_screm",
+      "hit_rate": 72.7,
+      "sample_size": 11,
+      "profit": 1.3,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "routing=single + stelle3.5-4.0",
+      "hit_rate": 72.4,
+      "sample_size": 29,
+      "profit": 9.5,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "conf>=60 + q1.3-1.49 + stelle>=3.0",
+      "hit_rate": 71.8,
+      "sample_size": 78,
+      "profit": 1.2,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf>=60 + q1.4-1.49",
+      "hit_rate": 71.4,
+      "sample_size": 63,
+      "profit": 1.7,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "conf>=70 + q1.6-1.79 + routing=single",
+      "hit_rate": 71.4,
+      "sample_size": 14,
+      "profit": 2.8,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "pron=Over 1.5 + q1.4-1.49 + stelle>=3.0",
+      "hit_rate": 71.4,
+      "sample_size": 14,
+      "profit": 0.3,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf80-100 + q1.5-1.59",
+      "hit_rate": 71.4,
+      "sample_size": 7,
+      "profit": 0.6,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "pron=Under 2.5 + stelle>=3.5",
+      "hit_rate": 71.4,
+      "sample_size": 7,
+      "profit": -0.0,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "q1.6-1.79 + src=A",
+      "hit_rate": 71.4,
+      "sample_size": 7,
+      "profit": 1.5,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "q1.5-1.59 + src=C_screm + stelle3.5-4.0",
+      "hit_rate": 71.4,
+      "sample_size": 7,
+      "profit": 0.8,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf>=70 + routing=single + stelle>=3.5 + tipo=GOL",
+      "hit_rate": 71.4,
+      "sample_size": 7,
+      "profit": -0.0,
+      "active": null,
+      "depth": 4
+    },
+    {
+      "pattern": "conf>=60 + q1.3-1.49",
+      "hit_rate": 71.0,
+      "sample_size": 93,
+      "profit": 0.2,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "q1.3-1.49 + stelle>=3.0",
+      "hit_rate": 71.0,
+      "sample_size": 93,
+      "profit": 0.3,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "q1.3-1.49 + stelle>=3.0 + tipo=GOL",
+      "hit_rate": 70.8,
+      "sample_size": 72,
+      "profit": 0.0,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf>=60 + q1.3-1.39 + tipo=GOL",
+      "hit_rate": 70.8,
+      "sample_size": 24,
+      "profit": -0.9,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "routing=single + src=C + stelle3.5-4.0",
+      "hit_rate": 70.8,
+      "sample_size": 24,
+      "profit": 8.9,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "pron=Goal + q1.5-1.59",
+      "hit_rate": 70.6,
+      "sample_size": 17,
+      "profit": 1.6,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "routing=single + stelle>=3.5",
+      "hit_rate": 70.5,
+      "sample_size": 44,
+      "profit": 10.4,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "q1.3-1.49 + tipo=GOL",
+      "hit_rate": 70.1,
+      "sample_size": 87,
+      "profit": -0.9,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "q1.6-1.79 + src=C + stelle>=3.5",
+      "hit_rate": 70.0,
+      "sample_size": 40,
+      "profit": 7.2,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf>=60 + q1.3-1.39",
+      "hit_rate": 70.0,
+      "sample_size": 30,
+      "profit": -1.4,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "pron=Over 1.5 + q1.4-1.49",
+      "hit_rate": 70.0,
+      "sample_size": 20,
+      "profit": 0.0,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "pron=Under 2.5 + q1.3-1.49",
+      "hit_rate": 70.0,
+      "sample_size": 10,
+      "profit": -0.2,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "conf70-79 + pron=Goal + q1.5-1.59",
+      "hit_rate": 70.0,
+      "sample_size": 10,
+      "profit": 0.8,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "pron=Goal + q1.5-1.59 + stelle3.5-4.0",
+      "hit_rate": 70.0,
+      "sample_size": 10,
+      "profit": 0.9,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf>=60 + q1.4-1.49 + stelle>=3.0",
+      "hit_rate": 69.8,
+      "sample_size": 53,
+      "profit": 0.3,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "q1.6-1.79 + src=C + stelle3.5-4.0",
+      "hit_rate": 69.7,
+      "sample_size": 33,
+      "profit": 5.8,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf>=60 + q1.3-1.49 + tipo=GOL",
+      "hit_rate": 69.3,
+      "sample_size": 75,
+      "profit": -1.6,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "q1.4-1.49 + stelle>=3.0",
+      "hit_rate": 69.2,
+      "sample_size": 65,
+      "profit": -0.3,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "conf>=60 + q1.3-1.49 + stelle>=3.0 + tipo=GOL",
+      "hit_rate": 69.2,
+      "sample_size": 65,
+      "profit": -1.5,
+      "active": null,
+      "depth": 4
+    },
+    {
+      "pattern": "src=C + stelle3.5-4.0",
+      "hit_rate": 68.8,
+      "sample_size": 77,
+      "profit": 15.1,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "conf70-79 + q1.3-1.49",
+      "hit_rate": 68.8,
+      "sample_size": 48,
+      "profit": -1.3,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "pron=Goal + q1.5-1.59 + stelle>=3.0",
+      "hit_rate": 68.8,
+      "sample_size": 16,
+      "profit": 1.0,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "q1.3-1.49 + src=C_screm + stelle>=3.0",
+      "hit_rate": 68.8,
+      "sample_size": 16,
+      "profit": -0.2,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf>=60 + q1.4-1.49 + tipo=GOL",
+      "hit_rate": 68.6,
+      "sample_size": 51,
+      "profit": -0.7,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "q1.6-1.79 + src=C + stelle>=3.0",
+      "hit_rate": 68.6,
+      "sample_size": 51,
+      "profit": 7.9,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "routing=single + src=C + stelle>=3.5",
+      "hit_rate": 68.4,
+      "sample_size": 38,
+      "profit": 9.5,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf>=70 + q1.6-1.79 + src=C",
+      "hit_rate": 68.4,
+      "sample_size": 19,
+      "profit": 2.7,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "q1.4-1.49 + tipo=GOL",
+      "hit_rate": 68.3,
+      "sample_size": 60,
+      "profit": -1.1,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "conf70-79 + q1.3-1.49 + tipo=GOL",
+      "hit_rate": 68.3,
+      "sample_size": 41,
+      "profit": -1.3,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf>=60 + q1.6-1.79 + src=C",
+      "hit_rate": 68.2,
+      "sample_size": 44,
+      "profit": 6.6,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "q1.3-1.49 + src=A+S + stelle>=3.0",
+      "hit_rate": 68.2,
+      "sample_size": 22,
+      "profit": -1.1,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "src=C_screm + stelle>=3.0",
+      "hit_rate": 68.1,
+      "sample_size": 47,
+      "profit": 4.3,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "q1.4-1.49 + stelle>=3.0 + tipo=GOL",
+      "hit_rate": 68.0,
+      "sample_size": 50,
+      "profit": -1.1,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "src=C + stelle3.5-4.0 + tipo=GOL",
+      "hit_rate": 67.9,
+      "sample_size": 56,
+      "profit": 6.8,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf>=70 + q1.3-1.49",
+      "hit_rate": 67.9,
+      "sample_size": 53,
+      "profit": -2.1,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "pron=Goal + src=C + stelle3.5-4.0",
+      "hit_rate": 67.9,
+      "sample_size": 53,
+      "profit": 6.2,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "pron=Over 1.5 + stelle>=3.0",
+      "hit_rate": 67.9,
+      "sample_size": 28,
+      "profit": -1.3,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "src=C + stelle>=3.5",
+      "hit_rate": 67.7,
+      "sample_size": 99,
+      "profit": 15.9,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "pron=Over 1.5 + tipo=GOL",
+      "hit_rate": 67.5,
+      "sample_size": 40,
+      "profit": -1.7,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "conf>=70 + q1.3-1.49 + tipo=GOL",
+      "hit_rate": 67.4,
+      "sample_size": 46,
+      "profit": -2.1,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf70-79 + pron=Goal",
+      "hit_rate": 67.4,
+      "sample_size": 43,
+      "profit": 3.3,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "src=C + stelle>=3.5 + tipo=GOL",
+      "hit_rate": 67.2,
+      "sample_size": 64,
+      "profit": 7.1,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "pron=Goal + src=C + stelle>=3.5",
+      "hit_rate": 67.2,
+      "sample_size": 61,
+      "profit": 6.5,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf>=70 + pron=Goal",
+      "hit_rate": 66.7,
+      "sample_size": 48,
+      "profit": 2.8,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "q1.6-1.79 + routing=single",
+      "hit_rate": 66.7,
+      "sample_size": 39,
+      "profit": 4.5,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "conf70-79 + q1.4-1.49",
+      "hit_rate": 66.7,
+      "sample_size": 36,
+      "profit": -1.6,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "q1.6-1.79 + routing=single + src=C",
+      "hit_rate": 66.7,
+      "sample_size": 33,
+      "profit": 3.7,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf>=70 + routing=single + stelle>=3.5",
+      "hit_rate": 66.7,
+      "sample_size": 30,
+      "profit": 2.2,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "pron=Over 1.5 + q1.3-1.49 + stelle>=3.0",
+      "hit_rate": 66.7,
+      "sample_size": 21,
+      "profit": -1.3,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf70-79 + pron=Goal + src=C + stelle3.5-4.0",
+      "hit_rate": 66.7,
+      "sample_size": 21,
+      "profit": 1.3,
+      "active": null,
+      "depth": 4
+    },
+    {
+      "pattern": "conf70-79 + routing=single + stelle>=3.5",
+      "hit_rate": 66.7,
+      "sample_size": 18,
+      "profit": 1.7,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf70-79 + q1.6-1.79 + src=C",
+      "hit_rate": 66.7,
+      "sample_size": 15,
+      "profit": 1.7,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf70-79 + routing=single + stelle3.5-4.0",
+      "hit_rate": 66.7,
+      "sample_size": 15,
+      "profit": 1.3,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf>=60 + q1.5-1.59 + src=C",
+      "hit_rate": 66.7,
+      "sample_size": 15,
+      "profit": 0.4,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "q1.4-1.49 + src=C_screm + stelle>=3.0",
+      "hit_rate": 66.7,
+      "sample_size": 15,
+      "profit": -0.6,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf80-100 + routing=single",
+      "hit_rate": 66.7,
+      "sample_size": 12,
+      "profit": 0.6,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "pron=Under 2.5 + q1.6-1.79",
+      "hit_rate": 66.7,
+      "sample_size": 12,
+      "profit": 1.5,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "src=C_screm + stelle3.5-4.0",
+      "hit_rate": 66.7,
+      "sample_size": 12,
+      "profit": 0.8,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "conf>=60 + q1.3-1.39 + src=A+S",
+      "hit_rate": 66.7,
+      "sample_size": 12,
+      "profit": -1.1,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf70-79 + q1.6-1.79 + src=C + stelle3.5-4.0",
+      "hit_rate": 66.7,
+      "sample_size": 12,
+      "profit": 1.4,
+      "active": null,
+      "depth": 4
+    },
+    {
+      "pattern": "conf70-79 + pron=Under 2.5 + q1.3-1.49",
+      "hit_rate": 66.7,
+      "sample_size": 9,
+      "profit": -0.6,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf>=60 + pron=Under 2.5 + q1.6-1.79",
+      "hit_rate": 66.7,
+      "sample_size": 9,
+      "profit": 1.2,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "q1.5-1.59 + src=C + stelle3.5-4.0",
+      "hit_rate": 66.7,
+      "sample_size": 9,
+      "profit": 0.3,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "pron=Under 2.5 + stelle3.5-4.0",
+      "hit_rate": 66.7,
+      "sample_size": 6,
+      "profit": -0.4,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "pron=Under 3.5 + src=A",
+      "hit_rate": 66.7,
+      "sample_size": 6,
+      "profit": -0.5,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "q1.3-1.49 + routing=o25_s6_to_goal",
+      "hit_rate": 66.7,
+      "sample_size": 6,
+      "profit": -0.2,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "conf80-100 + q1.5-1.59 + src=C",
+      "hit_rate": 66.7,
+      "sample_size": 6,
+      "profit": 0.1,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "pron=Over 1.5 + q1.3-1.39 + src=A+S",
+      "hit_rate": 66.7,
+      "sample_size": 6,
+      "profit": -0.6,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "pron=Under 2.5 + q1.6-1.79 + routing=single",
+      "hit_rate": 66.7,
+      "sample_size": 6,
+      "profit": 0.8,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf70-79 + routing=single + stelle3.5-4.0 + tipo=GOL",
+      "hit_rate": 66.7,
+      "sample_size": 6,
+      "profit": -0.4,
+      "active": null,
+      "depth": 4
+    },
+    {
+      "pattern": "pron=Goal + stelle3.5-4.0",
+      "hit_rate": 66.1,
+      "sample_size": 56,
+      "profit": 4.8,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "conf>=60 + routing=single + src=C",
+      "hit_rate": 66.0,
+      "sample_size": 47,
+      "profit": 12.3,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf>=60 + q1.4-1.49 + stelle>=3.0 + tipo=GOL",
+      "hit_rate": 65.9,
+      "sample_size": 44,
+      "profit": -2.2,
+      "active": null,
+      "depth": 4
+    },
+    {
+      "pattern": "conf70-79 + q1.6-1.79",
+      "hit_rate": 65.7,
+      "sample_size": 35,
+      "profit": 2.9,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "q1.5-1.59 + stelle>=3.5",
+      "hit_rate": 65.7,
+      "sample_size": 35,
+      "profit": 0.5,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "pron=Over 1.5 + q1.3-1.49",
+      "hit_rate": 65.6,
+      "sample_size": 32,
+      "profit": -2.5,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "conf70-79 + q1.4-1.49 + tipo=GOL",
+      "hit_rate": 65.6,
+      "sample_size": 32,
+      "profit": -1.8,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf>=70 + pron=Goal + src=C",
+      "hit_rate": 65.5,
+      "sample_size": 29,
+      "profit": 1.6,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf>=60 + pron=Over 1.5",
+      "hit_rate": 65.4,
+      "sample_size": 26,
+      "profit": -2.3,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "conf70-79 + pron=Goal + src=C",
+      "hit_rate": 65.4,
+      "sample_size": 26,
+      "profit": 1.4,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf70-79 + stelle>=3.5 + tipo=GOL",
+      "hit_rate": 65.3,
+      "sample_size": 49,
+      "profit": 1.9,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "pron=Goal + stelle>=3.5",
+      "hit_rate": 65.2,
+      "sample_size": 66,
+      "profit": 4.4,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "conf70-79 + pron=Goal + stelle3.5-4.0",
+      "hit_rate": 65.2,
+      "sample_size": 23,
+      "profit": 0.9,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf70-79 + q1.3-1.49 + src=A+S",
+      "hit_rate": 65.0,
+      "sample_size": 20,
+      "profit": -1.8,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf>=60 + pron=Over 1.5 + stelle>=3.0",
+      "hit_rate": 65.0,
+      "sample_size": 20,
+      "profit": -1.9,
+      "active": null,
+      "depth": 3
+    }
+  ]
+}

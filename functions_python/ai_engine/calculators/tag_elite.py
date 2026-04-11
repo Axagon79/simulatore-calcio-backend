@@ -1,7 +1,7 @@
 """
 Step Elite — Tagga i pronostici unified del giorno che matchano i pattern storicamente vincenti.
 Gira subito dopo orchestrate_experts.py (step 31).
-Aggiunge elite: true ai pronostici che soddisfano almeno uno dei 16 pattern.
+Aggiunge elite: true ai pronostici che soddisfano almeno uno dei 18 pattern.
 """
 
 import os
@@ -104,6 +104,22 @@ def matches_elite(p):
 
     # Pattern 16: DOPPIA_CHANCE + quota 1.30-1.49 + confidence 70-79 (81.8%, N=11)
     if tipo == 'DOPPIA_CHANCE' and 1.30 <= quota < 1.50 and 70 <= confidence < 80:
+        return True
+
+    # === PATTERN HYBRID v2 (17-18) — Aggiunti 11/04/2026 ===
+    # Scoperti da hybrid_pattern_mixer_v2.py (incrocio top 30 elite + bizarre)
+    # Se danno problemi, commentare/rimuovere da qui fino a "return False"
+
+    routing = p.get('routing_rule', '')
+
+    # Pattern 17: SEGNO pron=1 + quota 1.60-1.79 + routing single + stelle >= 3.0
+    # Storico: 82.9%, N=41, +15.2u — Post-mod: 88.2%, N=17, +8.1u
+    if pronostico == '1' and 1.60 <= quota < 1.80 and routing == 'single' and stars >= 3.0:
+        return True
+
+    # Pattern 18: SEGNO + quota 1.60-1.79 + source C + stelle >= 3.0
+    # Storico: 79.3%, N=58, +18.1u — Post-mod: 82.6%, N=23, +8.8u
+    if tipo == 'SEGNO' and 1.60 <= quota < 1.80 and source == 'C' and stars >= 3.0:
         return True
 
     return False

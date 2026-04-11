@@ -479,7 +479,7 @@ def run_scraper(dry_run=False):
                         if match_teams(be['home'], be['away'], m['home'], m['away'], teams_cache, debug=False):
                             be_used.add(bi)
 
-                            # Partita posticipata su BE → niente quote, aggiorna status DB
+                            # Partita posticipata su BE → niente quote, aggiorna status DB + unified
                             if be.get('postponed'):
                                 found = True
                                 league_no_odds += 1
@@ -489,6 +489,10 @@ def run_scraper(dry_run=False):
                                     db.h2h_by_round.update_one(
                                         {"_id": round_doc["_id"], "matches.home": m['home'], "matches.away": m['away']},
                                         {"$set": {"matches.$.match_status_detail": "Postp."}}
+                                    )
+                                    db.daily_predictions_unified.update_many(
+                                        {"home": m['home'], "away": m['away'], "league": lname},
+                                        {"$set": {"match_status_detail": "Postp."}}
                                     )
                                 all_odds_lines.append(f"   ⏳ {m['home']} vs {m['away']} — POSTICIPATA")
                                 if is_debug:

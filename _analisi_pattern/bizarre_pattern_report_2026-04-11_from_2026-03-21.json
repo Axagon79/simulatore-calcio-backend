@@ -1,0 +1,559 @@
+{
+  "report_date": "2026-04-11",
+  "from_date": "2026-03-21",
+  "total_predictions": 536,
+  "patterns_hr75_n8": [
+    {
+      "pattern": "GOL + q1.40-1.49 + SRC=C",
+      "hr": 90.9,
+      "n": 11,
+      "active": null
+    },
+    {
+      "pattern": "GOL + q1.60-1.79 + SRC=A+S",
+      "hr": 87.5,
+      "n": 8,
+      "active": null
+    },
+    {
+      "pattern": "PRON=Under 3.5 + q1.30-1.49",
+      "hr": 87.5,
+      "n": 8,
+      "active": null
+    },
+    {
+      "pattern": "EXTREME: CONF>=60 + STARS>=3 + q1.30-1.49 + DOPPIA_CHANCE",
+      "hr": 84.6,
+      "n": 13,
+      "active": "E7"
+    },
+    {
+      "pattern": "DOPPIA_CHANCE + q1.40-1.49 + CONF>=60",
+      "hr": 83.3,
+      "n": 12,
+      "active": null
+    },
+    {
+      "pattern": "PRON=Goal + q1.30-1.49",
+      "hr": 81.8,
+      "n": 22,
+      "active": null
+    },
+    {
+      "pattern": "GOL + q1.30-1.39 + CONF>=70",
+      "hr": 81.8,
+      "n": 11,
+      "active": "E4"
+    },
+    {
+      "pattern": "ROUTING=o25_s6_to_goal + GOL",
+      "hr": 80.0,
+      "n": 15,
+      "active": null
+    },
+    {
+      "pattern": "ROUTING=o25_s6_to_goal + GOL + CONF>=70",
+      "hr": 80.0,
+      "n": 15,
+      "active": null
+    },
+    {
+      "pattern": "ROUTING=o25_s6_to_goal + GOL + STARS>=3",
+      "hr": 80.0,
+      "n": 15,
+      "active": null
+    },
+    {
+      "pattern": "LEAGUE=Eredivisie + GOL",
+      "hr": 80.0,
+      "n": 10,
+      "active": null
+    },
+    {
+      "pattern": "GOL + q1.50-1.59 + SRC=C_screm",
+      "hr": 77.8,
+      "n": 9,
+      "active": "E14"
+    },
+    {
+      "pattern": "PRON=Under 3.5",
+      "hr": 77.8,
+      "n": 9,
+      "active": null
+    },
+    {
+      "pattern": "GOL + q1.30-1.39 + STARS>=3",
+      "hr": 77.3,
+      "n": 22,
+      "active": null
+    },
+    {
+      "pattern": "SRC=A+S_o25_s6_conv + STARS>=3.0",
+      "hr": 76.9,
+      "n": 13,
+      "active": null
+    },
+    {
+      "pattern": "SRC=A+S_o25_s6_conv + CONF>=70",
+      "hr": 76.9,
+      "n": 13,
+      "active": null
+    },
+    {
+      "pattern": "SEGNO + q1.60-1.79 + CONF>=60",
+      "hr": 75.0,
+      "n": 20,
+      "active": null
+    },
+    {
+      "pattern": "DOPPIA_CHANCE + q1.50-1.59 + STARS>=3",
+      "hr": 75.0,
+      "n": 16,
+      "active": null
+    },
+    {
+      "pattern": "SEGNO + q1.60-1.79 + CONF>=70",
+      "hr": 75.0,
+      "n": 12,
+      "active": null
+    },
+    {
+      "pattern": "DOPPIA_CHANCE + q1.50-1.59 + CONF>=60",
+      "hr": 75.0,
+      "n": 8,
+      "active": null
+    },
+    {
+      "pattern": "LEAGUE=Serie C - Girone C + GOL",
+      "hr": 75.0,
+      "n": 8,
+      "active": null
+    },
+    {
+      "pattern": "GOL + q1.80-1.99 + CONF>=70",
+      "hr": 75.0,
+      "n": 8,
+      "active": null
+    }
+  ],
+  "patterns_hr80_n5": [
+    {
+      "pattern": "GOL + q1.40-1.49 + SRC=C",
+      "hr": 90.9,
+      "n": 11,
+      "active": null
+    },
+    {
+      "pattern": "GOL + q1.60-1.79 + SRC=A+S",
+      "hr": 87.5,
+      "n": 8,
+      "active": null
+    },
+    {
+      "pattern": "PRON=Under 3.5 + q1.30-1.49",
+      "hr": 87.5,
+      "n": 8,
+      "active": null
+    },
+    {
+      "pattern": "LEAGUE=Bundesliga + GOL",
+      "hr": 85.7,
+      "n": 7,
+      "active": null
+    },
+    {
+      "pattern": "PRON=Over 1.5 + CONF>=70",
+      "hr": 85.7,
+      "n": 7,
+      "active": null
+    },
+    {
+      "pattern": "EXTREME: CONF>=60 + STARS>=3 + q1.30-1.49 + DOPPIA_CHANCE",
+      "hr": 84.6,
+      "n": 13,
+      "active": "E7"
+    },
+    {
+      "pattern": "DOPPIA_CHANCE + q1.40-1.49 + CONF>=60",
+      "hr": 83.3,
+      "n": 12,
+      "active": null
+    },
+    {
+      "pattern": "ROUTING=consensus_both + DOPPIA_CHANCE + STARS>=3",
+      "hr": 83.3,
+      "n": 6,
+      "active": null
+    },
+    {
+      "pattern": "PRON=Under 3.5 + STARS>=3",
+      "hr": 83.3,
+      "n": 6,
+      "active": null
+    },
+    {
+      "pattern": "PRON=Goal + q1.30-1.49",
+      "hr": 81.8,
+      "n": 22,
+      "active": null
+    },
+    {
+      "pattern": "GOL + q1.30-1.39 + CONF>=70",
+      "hr": 81.8,
+      "n": 11,
+      "active": "E4"
+    },
+    {
+      "pattern": "ROUTING=o25_s6_to_goal + GOL",
+      "hr": 80.0,
+      "n": 15,
+      "active": null
+    },
+    {
+      "pattern": "ROUTING=o25_s6_to_goal + GOL + CONF>=70",
+      "hr": 80.0,
+      "n": 15,
+      "active": null
+    },
+    {
+      "pattern": "ROUTING=o25_s6_to_goal + GOL + STARS>=3",
+      "hr": 80.0,
+      "n": 15,
+      "active": null
+    },
+    {
+      "pattern": "LEAGUE=Eredivisie + GOL",
+      "hr": 80.0,
+      "n": 10,
+      "active": null
+    },
+    {
+      "pattern": "EXTREME: CONF>=70 + STARS>=3.5 + q<1.60 + DOPPIA_CHANCE",
+      "hr": 80.0,
+      "n": 5,
+      "active": null
+    },
+    {
+      "pattern": "LEAGUE=Scottish Championship + SEGNO",
+      "hr": 80.0,
+      "n": 5,
+      "active": null
+    },
+    {
+      "pattern": "ROUTING=consensus_both + DOPPIA_CHANCE + CONF>=70",
+      "hr": 80.0,
+      "n": 5,
+      "active": null
+    },
+    {
+      "pattern": "GOL + q1.40-1.49 + SRC=A+S_o25_s6_conv",
+      "hr": 80.0,
+      "n": 5,
+      "active": null
+    },
+    {
+      "pattern": "GOL + q1.50-1.59 + SRC=A+S_o25_s6_conv",
+      "hr": 80.0,
+      "n": 5,
+      "active": null
+    }
+  ],
+  "patterns_hr70_n15": [
+    {
+      "pattern": "PRON=Goal + q1.30-1.49",
+      "hr": 81.8,
+      "n": 22,
+      "active": null
+    },
+    {
+      "pattern": "ROUTING=o25_s6_to_goal + GOL",
+      "hr": 80.0,
+      "n": 15,
+      "active": null
+    },
+    {
+      "pattern": "ROUTING=o25_s6_to_goal + GOL + CONF>=70",
+      "hr": 80.0,
+      "n": 15,
+      "active": null
+    },
+    {
+      "pattern": "ROUTING=o25_s6_to_goal + GOL + STARS>=3",
+      "hr": 80.0,
+      "n": 15,
+      "active": null
+    },
+    {
+      "pattern": "GOL + q1.30-1.39 + STARS>=3",
+      "hr": 77.3,
+      "n": 22,
+      "active": null
+    },
+    {
+      "pattern": "SEGNO + q1.60-1.79 + CONF>=60",
+      "hr": 75.0,
+      "n": 20,
+      "active": null
+    },
+    {
+      "pattern": "DOPPIA_CHANCE + q1.50-1.59 + STARS>=3",
+      "hr": 75.0,
+      "n": 16,
+      "active": null
+    },
+    {
+      "pattern": "GOL + q1.30-1.39",
+      "hr": 74.1,
+      "n": 27,
+      "active": null
+    },
+    {
+      "pattern": "SEGNO + q1.60-1.79 + STARS>=3",
+      "hr": 74.1,
+      "n": 27,
+      "active": null
+    },
+    {
+      "pattern": "DOPPIA_CHANCE + q1.40-1.49 + STARS>=3",
+      "hr": 73.3,
+      "n": 15,
+      "active": null
+    },
+    {
+      "pattern": "ROUTING=scrematura_segno + DOPPIA_CHANCE + STARS>=3",
+      "hr": 72.0,
+      "n": 25,
+      "active": null
+    },
+    {
+      "pattern": "PRON=1 + CONF>=70",
+      "hr": 71.4,
+      "n": 21,
+      "active": null
+    },
+    {
+      "pattern": "GOL + q1.30-1.39 + CONF>=60",
+      "hr": 70.8,
+      "n": 24,
+      "active": null
+    },
+    {
+      "pattern": "EXTREME: CONF>=70 + STARS>=3.5 + q<1.60 + GOL",
+      "hr": 70.6,
+      "n": 34,
+      "active": null
+    }
+  ],
+  "top30_scored": [
+    {
+      "pattern": "EXTREME: CONF>=70 + STARS>=3.5 + q<1.60 + GOL",
+      "hr": 70.6,
+      "n": 34,
+      "score": 411.7,
+      "active": null
+    },
+    {
+      "pattern": "GOL + q1.30-1.39",
+      "hr": 74.1,
+      "n": 27,
+      "score": 385.0,
+      "active": null
+    },
+    {
+      "pattern": "SEGNO + q1.60-1.79 + STARS>=3",
+      "hr": 74.1,
+      "n": 27,
+      "score": 385.0,
+      "active": null
+    },
+    {
+      "pattern": "PRON=Goal + q1.30-1.49",
+      "hr": 81.8,
+      "n": 22,
+      "score": 383.7,
+      "active": null
+    },
+    {
+      "pattern": "GOL + q1.30-1.39 + STARS>=3",
+      "hr": 77.3,
+      "n": 22,
+      "score": 362.6,
+      "active": null
+    },
+    {
+      "pattern": "ROUTING=scrematura_segno + DOPPIA_CHANCE + STARS>=3",
+      "hr": 72.0,
+      "n": 25,
+      "score": 360.0,
+      "active": null
+    },
+    {
+      "pattern": "GOL + q1.30-1.39 + CONF>=60",
+      "hr": 70.8,
+      "n": 24,
+      "score": 346.8,
+      "active": null
+    },
+    {
+      "pattern": "SEGNO + q1.60-1.79 + CONF>=60",
+      "hr": 75.0,
+      "n": 20,
+      "score": 335.4,
+      "active": null
+    },
+    {
+      "pattern": "PRON=1 + CONF>=70",
+      "hr": 71.4,
+      "n": 21,
+      "score": 327.2,
+      "active": null
+    },
+    {
+      "pattern": "ROUTING=o25_s6_to_goal + GOL",
+      "hr": 80.0,
+      "n": 15,
+      "score": 309.8,
+      "active": null
+    },
+    {
+      "pattern": "ROUTING=o25_s6_to_goal + GOL + CONF>=70",
+      "hr": 80.0,
+      "n": 15,
+      "score": 309.8,
+      "active": null
+    },
+    {
+      "pattern": "ROUTING=o25_s6_to_goal + GOL + STARS>=3",
+      "hr": 80.0,
+      "n": 15,
+      "score": 309.8,
+      "active": null
+    },
+    {
+      "pattern": "EXTREME: CONF>=60 + STARS>=3 + q1.30-1.49 + DOPPIA_CHANCE",
+      "hr": 84.6,
+      "n": 13,
+      "score": 305.0,
+      "active": "E7"
+    },
+    {
+      "pattern": "GOL + q1.40-1.49 + SRC=C",
+      "hr": 90.9,
+      "n": 11,
+      "score": 301.5,
+      "active": null
+    },
+    {
+      "pattern": "DOPPIA_CHANCE + q1.50-1.59 + STARS>=3",
+      "hr": 75.0,
+      "n": 16,
+      "score": 300.0,
+      "active": null
+    },
+    {
+      "pattern": "DOPPIA_CHANCE + q1.40-1.49 + CONF>=60",
+      "hr": 83.3,
+      "n": 12,
+      "score": 288.6,
+      "active": null
+    },
+    {
+      "pattern": "DOPPIA_CHANCE + q1.40-1.49 + STARS>=3",
+      "hr": 73.3,
+      "n": 15,
+      "score": 283.9,
+      "active": null
+    },
+    {
+      "pattern": "SRC=A+S_o25_s6_conv + STARS>=3.0",
+      "hr": 76.9,
+      "n": 13,
+      "score": 277.3,
+      "active": null
+    },
+    {
+      "pattern": "SRC=A+S_o25_s6_conv + CONF>=70",
+      "hr": 76.9,
+      "n": 13,
+      "score": 277.3,
+      "active": null
+    },
+    {
+      "pattern": "GOL + q1.30-1.39 + CONF>=70",
+      "hr": 81.8,
+      "n": 11,
+      "score": 271.3,
+      "active": "E4"
+    },
+    {
+      "pattern": "SEGNO + q1.60-1.79 + CONF>=70",
+      "hr": 75.0,
+      "n": 12,
+      "score": 259.8,
+      "active": null
+    },
+    {
+      "pattern": "LEAGUE=Eredivisie + GOL",
+      "hr": 80.0,
+      "n": 10,
+      "score": 253.0,
+      "active": null
+    },
+    {
+      "pattern": "GOL + q1.60-1.79 + SRC=A+S",
+      "hr": 87.5,
+      "n": 8,
+      "score": 247.5,
+      "active": null
+    },
+    {
+      "pattern": "PRON=Under 3.5 + q1.30-1.49",
+      "hr": 87.5,
+      "n": 8,
+      "score": 247.5,
+      "active": null
+    },
+    {
+      "pattern": "LEAGUE=LaLiga 2 + SEGNO",
+      "hr": 72.7,
+      "n": 11,
+      "score": 241.1,
+      "active": null
+    },
+    {
+      "pattern": "LEAGUE=League Two + GOL",
+      "hr": 72.7,
+      "n": 11,
+      "score": 241.1,
+      "active": null
+    },
+    {
+      "pattern": "GOL + q1.50-1.59 + SRC=C_screm",
+      "hr": 77.8,
+      "n": 9,
+      "score": 233.4,
+      "active": "E14"
+    },
+    {
+      "pattern": "PRON=Under 3.5",
+      "hr": 77.8,
+      "n": 9,
+      "score": 233.4,
+      "active": null
+    },
+    {
+      "pattern": "LEAGUE=Bundesliga + GOL",
+      "hr": 85.7,
+      "n": 7,
+      "score": 226.7,
+      "active": null
+    },
+    {
+      "pattern": "PRON=Over 1.5 + CONF>=70",
+      "hr": 85.7,
+      "n": 7,
+      "score": 226.7,
+      "active": null
+    }
+  ]
+}
