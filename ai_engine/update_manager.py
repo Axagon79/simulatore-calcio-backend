@@ -395,14 +395,14 @@ def main():
     print("\n\n" + "="*100)
     print(f"📊 REPORT AGGIORNAMENTO - DURATA TOTALE: {total_duration_str}")
     print("="*100)
-    print(f"{'STATO':<6} | {'DURATA':<10} | {'FILE (Script)':<35} | {'IMPATTO (Se fallisce)'}")
-    print("-" * 100)
+    print(f"{'#':<4} | {'STATO':<6} | {'DURATA':<10} | {'FILE (Script)':<35} | {'IMPATTO (Se fallisce)'}")
+    print("-" * 104)
 
     failures = []
-    for item in report:
+    for idx, item in enumerate(report, 1):
         dur_min = item['duration'] / 60
         dur_str = f"{dur_min:.1f}min"
-        print(f"{item['status']:<6} | {dur_str:<10} | {item['file']:<35} | {item['impact']}")
+        print(f"{idx:<4} | {item['status']:<6} | {dur_str:<10} | {item['file']:<35} | {item['impact']}")
         if item['status'] == "❌ KO":
             failures.append(item)
 

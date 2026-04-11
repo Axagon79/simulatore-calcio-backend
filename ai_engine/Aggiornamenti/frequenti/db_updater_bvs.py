@@ -37,23 +37,8 @@ h2h_collection = db['h2h_by_round']
 teams_collection = db['teams']
 
 # Projection: solo i campi necessari per BVS
-BVS_PROJECTION = {
-    "_id": 1,
-    "league": 1,
-    "round_name": 1,
-    "matches.home": 1,
-    "matches.away": 1,
-    "matches.odds": 1,
-    "matches.h2h_data.odds": 1,
-    "matches.h2h_data.qt_1": 1,
-    "matches.h2h_data.qt_X": 1,
-    "matches.h2h_data.qt_2": 1,
-    "matches.h2h_data.bvs_index": 1,
-    "matches.h2h_data.bvs_away": 1,
-    "matches.date_obj": 1,
-    "matches.date": 1,
-    "matches.status": 1,
-}
+# NOTA: NON usare projection selettiva — lo script riscrive l'intero array
+# matches con $set, campi esclusi verrebbero cancellati (odds, mongo_id, ecc.)
 
 # --- 2. FUNZIONI DI NARRAZIONE (PURE ANALYTICS - NO BETTING JARGON) ---
 
@@ -226,7 +211,7 @@ def update_bvs_system():
 
     for league in leagues:
         if not TEST_MODE: print(f"\n🏆 {league}...", end="")
-        league_docs = list(h2h_collection.find({"league": league}, BVS_PROJECTION))
+        league_docs = list(h2h_collection.find({"league": league}))
         
         target_docs = league_docs if TEST_MODE else find_target_rounds(league_docs, league_name=league)
         if not target_docs: continue
