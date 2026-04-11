@@ -2899,9 +2899,10 @@ def orchestrate_date(date_str, dry_run=False, match_time_filter=None, preserve_a
     if not all_match_keys:
         return 0
 
-    # 2b. Costruisci mappa giornata da h2h_by_round per questa data
+    # 2b. Costruisci mappa giornata e data reale da h2h_by_round per questa data
     # Cerca tutti i round che contengono partite in questa data
     _round_map = {}  # (league, home, away) → round_number (int)
+    _real_date_map = {}  # (home, away) → data reale YYYY-MM-DD da h2h_by_round
     try:
         from datetime import timezone as _tz
         _date_obj = datetime.strptime(date_str, "%Y-%m-%d")
@@ -2922,6 +2923,7 @@ def orchestrate_date(date_str, dry_run=False, match_time_filter=None, preserve_a
                 _md = _m.get('date_obj')
                 if _md and _date_start <= _md <= _date_end:
                     _round_map[(_league, _m.get('home', ''), _m.get('away', ''))] = _rnum
+                    _real_date_map[(_m.get('home', ''), _m.get('away', ''))] = _md.strftime('%Y-%m-%d')
     except Exception as e:
         print(f"    ⚠️ Errore lookup giornata: {e}")
 
@@ -3503,6 +3505,60 @@ def orchestrate_date(date_str, dry_run=False, match_time_filter=None, preserve_a
                         nobet_count += 1
                 if nobet_count:
                     print(f"    ⚠️ {nobet_count} partite non rigenerate → NO BET")
+
+                # Controlla se qualche partita ha cambiato data in h2h_by_round
+                # Se la data reale è diversa, sposta il documento alla data giusta
+                moved_count = 0
+                for edoc in existing_docs:
+                    _home = edoc.get('home', '')
+                    _away = edoc.get('away', '')
+
+                    # 1. Controlla nella mappa già costruita
+                    _real = _real_date_map.get((_home, _away))
+
+                    # 2. Se non trovata, cerca direttamente in h2h_by_round
+                    if not _real:
+                        try:
+                            _h2h_match = db['h2h_by_round'].find_one(
+                                {'matches': {'$elemMatch': {'home': _home, 'away': _away}}},
+                                {'matches.$': 1}
+                            )
+                            if _h2h_match and _h2h_match.get('matches'):
+                                _h2h_date = _h2h_match['matches'][0].get('date_obj')
+                                if _h2h_date:
+                                    _real = _h2h_date.strftime('%Y-%m-%d')
+                        except Exception:
+                            pass
+
+                    # 3. Se la data reale è diversa, aggiorna il campo date
+                    if _real and _real != date_str:
+                        # Verifica che non esista già un doc per la stessa partita nella data nuova
+                        _existing_new = coll.find_one({'date': _real, 'home': _home, 'away': _away})
+                        if not _existing_new:
+                            coll.update_one(
+                                {'_id': edoc['_id']},
+                                {'$set': {'date': _real}}
+                            )
+                            moved_count += 1
+                            print(f"    📅 {_home} - {_away}: data corretta {date_str} → {_real}")
+                        else:
+                            # Esiste già nella data nuova, elimina il duplicato vecchio
+                            coll.delete_one({'_id': edoc['_id']})
+                            moved_count += 1
+                            print(f"    📅 {_home} - {_away}: rimosso duplicato da {date_str} (esiste già in {_real})")
+
+                        # Aggiorna anche prediction_versions per la stessa partita
+                        _old_mk = f"{date_str}_{_home.strip().lower().replace(' ', '_')}_{_away.strip().lower().replace(' ', '_')}"
+                        _new_mk = f"{_real}_{_home.strip().lower().replace(' ', '_')}_{_away.strip().lower().replace(' ', '_')}"
+                        _pv_result = db['prediction_versions'].update_many(
+                            {'date': date_str, 'home': _home, 'away': _away},
+                            {'$set': {'date': _real, 'match_key': _new_mk}}
+                        )
+                        if _pv_result.modified_count > 0:
+                            print(f"    📅 {_home} - {_away}: aggiornate {_pv_result.modified_count} versioni in prediction_versions")
+
+                if moved_count:
+                    print(f"    📅 {moved_count} partite con data corretta")
 
         # Salva richieste quote RE per lo scraper SNAI
         re_requests = []
