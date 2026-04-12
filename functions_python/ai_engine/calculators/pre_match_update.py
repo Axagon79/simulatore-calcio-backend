@@ -39,7 +39,7 @@ from run_daily_predictions_sandbox import run_daily_predictions as run_system_s
 from run_daily_predictions_engine_c import run_engine_c as run_system_c
 from orchestrate_experts import orchestrate_date as run_orchestrator
 from snapshot_nightly import normalize_match_key, get_all_matches
-from tag_elite import matches_elite
+from tag_elite import get_matched_patterns
 
 # Collections
 h2h_collection = db['h2h_by_round']
@@ -509,7 +509,7 @@ def run_full_cycle(date_str, target_date, block_times, run_label):
         pronostici = doc.get('pronostici', [])
         changed_elite = False
         for p in pronostici:
-            is_elite = matches_elite(p)
+            is_elite = len(get_matched_patterns(p)) > 0
             if p.get('elite') != is_elite:
                 p['elite'] = is_elite
                 changed_elite = True
