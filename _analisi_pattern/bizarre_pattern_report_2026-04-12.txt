@@ -1,0 +1,267 @@
+======================================================================
+  REPORT ESPLORAZIONE PATTERN BIZZARRI
+  Data report: 2026-04-12 20:17
+  Periodo: storico completo
+  Pronostici analizzati: 1612
+======================================================================
+
+
+==========================================================================================
+  PATTERN BIZZARRI — HR >= 75%, N >= 8
+  * = gia in produzione
+==========================================================================================
+  Pattern                                                      HR     N   Profit       
+  -------------------------------------------------------------------------------------
+  PRON=MG 2-4 + STARS>=3                                   90.9%    11     +3.3  * E10
+  PRON=Under 3.5 + q1.30-1.49                              90.0%    10     +2.5  
+  PRON=MG 2-4                                              88.2%    17     +4.4  * E10
+  PRON=MG 2-4 + q1.30-1.49                                 88.2%    17     +4.4  * E10
+  PRON=Under 3.5 + STARS>=3                                87.5%     8     +1.7  
+  DOPPIA_CHANCE + q1.40-1.49 + CONF>=60                    87.2%    39     +9.7  
+  EXTREME: CONF>=70 + STARS>=3.5 + q<1.60 + DOPPIA_CHANCE  86.7%    15     +3.7  
+  GOL + q1.30-1.39 + SRC=A                                 86.7%    15     +2.7  
+  LEAGUE=Serie C - Girone B + SEGNO                        86.7%    15    +10.1  
+  GOL + q1.30-1.39 + CONF>=70                              84.8%    33     +5.1  * E4
+  GOL + q1.40-1.49 + SRC=C                                 82.4%    17     +3.3  
+  GOL + q1.40-1.49 + SRC=A+S_mg                            81.8%    11     +1.9  
+  CONF>=85 + GOL                                           81.8%    11     +3.4  
+  GOL + q1.30-1.39 + SRC=A+S                               81.2%    32     +3.3  * E8
+  SRC=A+S_mg + STARS>=3.0                                  81.2%    16     +4.0  
+  DOPPIA_CHANCE + q2.00-2.49 + SRC=C_screm                 81.2%    16    +11.9  * E3
+  LEAGUE=LaLiga 2 + SEGNO                                  81.2%    16     +9.9  
+  ROUTING=consensus_both + DOPPIA_CHANCE + STARS>=3        81.0%    21     +2.5  
+  EXTREME: CONF>=60 + STARS>=3 + q1.30-1.49 + DOPPIA_CHANCE  80.4%    46     +6.1  * E7
+  GOL + q1.50-1.59 + SRC=C_screm                           80.0%    25     +5.6  * E14
+
+==========================================================================================
+  PATTERN BIZZARRI — HR >= 80%, N >= 5 (sample piccolo)
+  * = gia in produzione
+==========================================================================================
+  Pattern                                                      HR     N   Profit       
+  -------------------------------------------------------------------------------------
+  LEAGUE=Scottish Premiership + DOPPIA_CHANCE             100.0%     5     +5.0  
+  LEAGUE=Allsvenskan + GOL                                100.0%     5     +3.1  
+  PRON=MG 2-4 + STARS>=3                                   90.9%    11     +3.3  * E10
+  PRON=Under 3.5 + q1.30-1.49                              90.0%    10     +2.5  
+  PRON=MG 2-4                                              88.2%    17     +4.4  * E10
+  PRON=MG 2-4 + q1.30-1.49                                 88.2%    17     +4.4  * E10
+  PRON=Under 3.5 + STARS>=3                                87.5%     8     +1.7  
+  DOPPIA_CHANCE + q1.40-1.49 + CONF>=60                    87.2%    39     +9.7  
+  EXTREME: CONF>=70 + STARS>=3.5 + q<1.60 + DOPPIA_CHANCE  86.7%    15     +3.7  
+  GOL + q1.30-1.39 + SRC=A                                 86.7%    15     +2.7  
+  LEAGUE=Serie C - Girone B + SEGNO                        86.7%    15    +10.1  
+  PRON=1X + CONF>=70                                       85.7%     7     +1.3  
+  PRON=MG 3-5 + STARS>=3                                   85.7%     7     +3.4  
+  EDGE>=30 + GOL                                           85.7%     7     +5.8  
+  GOL + q1.30-1.39 + CONF>=70                              84.8%    33     +5.1  * E4
+  PRON=MG 3-5 + q1.50-1.79                                 83.3%     6     +2.3  
+  LEAGUE=League of Ireland Premier Division + DOPPIA_CHANCE  83.3%     6     +1.9  
+  GOL + q1.50-1.59 + SRC=A+S_o25_s6_conv                   83.3%     6     +1.6  
+  ROUTING=union + GOL + STARS>=3                           83.3%     6     +1.0  
+  SRC=C_combo96 + CONF>=70                                 83.3%     6     +1.3  
+
+==========================================================================================
+  PATTERN BIZZARRI — HR >= 70%, N >= 15 (campione ampio)
+  * = gia in produzione
+==========================================================================================
+  Pattern                                                      HR     N   Profit       
+  -------------------------------------------------------------------------------------
+  PRON=MG 2-4                                              88.2%    17     +4.4  * E10
+  PRON=MG 2-4 + q1.30-1.49                                 88.2%    17     +4.4  * E10
+  DOPPIA_CHANCE + q1.40-1.49 + CONF>=60                    87.2%    39     +9.7  
+  EXTREME: CONF>=70 + STARS>=3.5 + q<1.60 + DOPPIA_CHANCE  86.7%    15     +3.7  
+  GOL + q1.30-1.39 + SRC=A                                 86.7%    15     +2.7  
+  LEAGUE=Serie C - Girone B + SEGNO                        86.7%    15    +10.1  
+  GOL + q1.30-1.39 + CONF>=70                              84.8%    33     +5.1  * E4
+  GOL + q1.40-1.49 + SRC=C                                 82.4%    17     +3.3  
+  GOL + q1.30-1.39 + SRC=A+S                               81.2%    32     +3.3  * E8
+  SRC=A+S_mg + STARS>=3.0                                  81.2%    16     +4.0  
+  DOPPIA_CHANCE + q2.00-2.49 + SRC=C_screm                 81.2%    16    +11.9  * E3
+  LEAGUE=LaLiga 2 + SEGNO                                  81.2%    16     +9.9  
+  ROUTING=consensus_both + DOPPIA_CHANCE + STARS>=3        81.0%    21     +2.5  
+  EXTREME: CONF>=60 + STARS>=3 + q1.30-1.49 + DOPPIA_CHANCE  80.4%    46     +6.1  * E7
+  GOL + q1.50-1.59 + SRC=C_screm                           80.0%    25     +5.6  * E14
+  DOPPIA_CHANCE + q1.40-1.49 + SRC=A+S                     80.0%    20     +2.8  
+  DOPPIA_CHANCE + q1.40-1.49 + SRC=C_combo96               80.0%    15     +2.2  
+  LEAGUE=LaLiga 2 + DOPPIA_CHANCE                          78.9%    19     +5.8  
+  DOPPIA_CHANCE + q1.40-1.49 + STARS>=3                    78.7%    47     +6.2  
+  GOL + q1.30-1.39 + CONF>=60                              78.1%    73     +4.4  
+
+==========================================================================================
+  TOP 30 — Score = HR * sqrt(N) — bilancia hit rate e volume
+  * = gia in produzione
+==========================================================================================
+    # Pattern                                                      HR     N   Profit  Score       
+  -----------------------------------------------------------------------------------------------
+    1. EXTREME: CONF>=60 + STARS>=3 + q1.30-1.49 + GOL          73.0%   189     +5.6   1004  
+    2. GOL + q1.40-1.49                                         70.4%   179     +1.7    942  
+    3. GOL + q1.40-1.49 + CONF>=60                              70.6%   153     +2.0    873  
+    4. GOL + q1.40-1.49 + STARS>=3                              70.1%   147     +0.8    850  
+    5. PRON=Over 1.5                                            70.5%   139     -1.3    831  
+    6. ROUTING=single + GOL + STARS>=3                          71.9%   121    +13.0    791  
+    7. EXTREME: CONF>=70 + STARS>=3.5 + q<1.60 + GOL            72.6%   117     +6.9    785  
+    8. SRC=A + STARS>=3.0                                       73.0%   115    +12.4    783  
+    9. GOL + q1.30-1.39                                         75.8%    99     +2.8    754  
+   10. PRON=X2 + q1.30-1.49                                     74.2%    97     +5.2    731  
+   11. LEAGUE=Primera División + GOL                            71.3%   101     +3.7    717  
+   12. DOPPIA_CHANCE + q1.40-1.49                               75.3%    89     +7.3    710  
+   13. GOL + q1.40-1.49 + CONF>=70                              70.3%    91     +0.9    671  
+   14. GOL + q1.30-1.39 + CONF>=60                              78.1%    73     +4.4    667  
+   15. SRC=A + CONF>=70                                         70.6%    85     +5.2    651  
+   16. PRON=Under 2.5 + CONF>=70                                70.2%    84     +4.5    643  
+   17. GOL + q1.30-1.39 + STARS>=3                              76.8%    69     +3.0    638  
+   18. SEGNO + q1.60-1.79 + SRC=C                               70.5%    78    +13.0    623  
+   19. SEGNO + q1.60-1.79 + STARS>=3                            73.1%    67    +14.1    598  
+   20. EXTREME: CONF>=60 + STARS>=3 + q1.30-1.49 + DOPPIA_CHANCE  80.4%    46     +6.1    545  * E7
+   21. DOPPIA_CHANCE + q1.40-1.49 + CONF>=60                    87.2%    39     +9.7    545  
+   22. PRON=Under 2.5 + q1.30-1.49                              74.1%    54     +2.6    545  
+   23. STARS>=4.0 + SEGNO                                       71.9%    57    +16.8    543  
+   24. DOPPIA_CHANCE + q1.40-1.49 + STARS>=3                    78.7%    47     +6.2    540  
+   25. LEAGUE=Eredivisie + GOL                                  71.7%    53     +5.2    522  
+   26. DOPPIA_CHANCE + q1.40-1.49 + SRC=C_screm                 75.0%    48     +4.0    520  
+   27. PRON=1 + CONF>=70                                        70.4%    54    +12.4    517  
+   28. EDGE>=20 + CONF>=70 + SEGNO                              72.0%    50    +19.7    509  
+   29. ROUTING=combo_96_dc_flip + DOPPIA_CHANCE                 71.4%    49     +5.7    500  
+   30. ROUTING=consensus_both + DOPPIA_CHANCE                   75.0%    44     +2.0    497  
+
+
+******************************************************************************************
+ TUTTI I PATTERN HR >= 65%, N >= 10
+ * = pattern gia in produzione
+******************************************************************************************
+
+Pattern                                                           HR     N   Profit
+-------------------------------------------------------------------------------------
+PRON=MG 2-4 + STARS>=3                                        90.9%    11     +3.3  * E10
+PRON=Under 3.5 + q1.30-1.49                                   90.0%    10     +2.5
+PRON=MG 2-4                                                   88.2%    17     +4.4  * E10
+PRON=MG 2-4 + q1.30-1.49                                      88.2%    17     +4.4  * E10
+DOPPIA_CHANCE + q1.40-1.49 + CONF>=60                         87.2%    39     +9.7
+EXTREME: CONF>=70 + STARS>=3.5 + q<1.60 + DOPPIA_CHANCE       86.7%    15     +3.7
+GOL + q1.30-1.39 + SRC=A                                      86.7%    15     +2.7
+LEAGUE=Serie C - Girone B + SEGNO                             86.7%    15    +10.1
+GOL + q1.30-1.39 + CONF>=70                                   84.8%    33     +5.1  * E4
+GOL + q1.40-1.49 + SRC=C                                      82.4%    17     +3.3
+GOL + q1.40-1.49 + SRC=A+S_mg                                 81.8%    11     +1.9
+CONF>=85 + GOL                                                81.8%    11     +3.4
+GOL + q1.30-1.39 + SRC=A+S                                    81.2%    32     +3.3  * E8
+SRC=A+S_mg + STARS>=3.0                                       81.2%    16     +4.0
+DOPPIA_CHANCE + q2.00-2.49 + SRC=C_screm                      81.2%    16    +11.9  * E3
+LEAGUE=LaLiga 2 + SEGNO                                       81.2%    16     +9.9
+ROUTING=consensus_both + DOPPIA_CHANCE + STARS>=3             81.0%    21     +2.5
+EXTREME: CONF>=60 + STARS>=3 + q1.30-1.49 + DOPPIA_CHANCE     80.4%    46     +6.1  * E7
+GOL + q1.50-1.59 + SRC=C_screm                                80.0%    25     +5.6  * E14
+DOPPIA_CHANCE + q1.40-1.49 + SRC=A+S                          80.0%    20     +2.8
+DOPPIA_CHANCE + q1.40-1.49 + SRC=C_combo96                    80.0%    15     +2.2
+GOL + q1.60-1.79 + SRC=C_mg                                   80.0%    10     +3.2
+LEAGUE=LaLiga 2 + DOPPIA_CHANCE                               78.9%    19     +5.8
+DOPPIA_CHANCE + q1.40-1.49 + STARS>=3                         78.7%    47     +6.2
+CONF>=85 + SEGNO                                              78.6%    14     +4.5  * E6
+GOL + q1.30-1.39 + CONF>=60                                   78.1%    73     +4.4
+EXTREME: CONF>=80 + STARS>=3 + SEGNO                          76.9%    39    +11.8  * E6
+DOPPIA_CHANCE + q1.30-1.39 + CONF>=70                         76.9%    13     +0.6  * E16
+GOL + q1.30-1.39 + STARS>=3                                   76.8%    69     +3.0
+SRC=C_combo96 + STARS>=3.0                                    76.5%    34     +6.1
+ROUTING=combo_96_dc_flip + DOPPIA_CHANCE + STARS>=3           76.5%    34     +6.1
+PRON=Under 3.5                                                76.5%    17     -0.0
+LEAGUE=Ligue 2 + DOPPIA_CHANCE                                76.5%    17     +2.4
+GOL + q1.30-1.39                                              75.8%    99     +2.8
+PRON=Goal + q1.30-1.49                                        75.8%    33     +2.8
+DOPPIA_CHANCE + q1.40-1.49                                    75.3%    89     +7.3
+DOPPIA_CHANCE + q1.40-1.49 + SRC=C_screm                      75.0%    48     +4.0
+ROUTING=consensus_both + DOPPIA_CHANCE                        75.0%    44     +2.0
+PRON=Over 1.5 + CONF>=70                                      75.0%    20     +0.9
+LEAGUE=2. Bundesliga + DOPPIA_CHANCE                          75.0%    12     +2.0
+PRON=X2 + q1.30-1.49                                          74.2%    97     +5.2
+PRON=Under 2.5 + q1.30-1.49                                   74.1%    54     +2.6
+DOPPIA_CHANCE + q2.00-2.49                                    73.9%    23    +13.2  * E5
+GOL + q1.40-1.49 + SRC=A                                      73.3%    45     +2.3
+ROUTING=union + GOL                                           73.3%    15     -0.7
+SEGNO + q1.60-1.79 + STARS>=3                                 73.1%    67    +14.1
+LEAGUE=La Liga + GOL                                          73.1%    26     +3.8
+EXTREME: CONF>=60 + STARS>=3 + q1.30-1.49 + GOL               73.0%   189     +5.6
+SRC=A + STARS>=3.0                                            73.0%   115    +12.4
+LEAGUE=Bundesliga + GOL                                       72.7%    33     +3.5
+LEAGUE=2. Bundesliga + SEGNO                                  72.7%    11     +6.9
+EXTREME: CONF>=70 + STARS>=3.5 + q<1.60 + GOL                 72.6%   117     +6.9
+EXTREME: CONF>=80 + STARS>=3 + GOL                            72.1%    43     +4.4
+EDGE>=20 + CONF>=70 + SEGNO                                   72.0%    50    +19.7
+SEGNO + q1.80-1.99 + CONF>=70                                 72.0%    25     +8.5
+ROUTING=single + GOL + STARS>=3                               71.9%   121    +13.0
+STARS>=4.0 + SEGNO                                            71.9%    57    +16.8
+DOPPIA_CHANCE + q1.50-1.59 + STARS>=3                         71.8%    39     +4.1
+LEAGUE=Eredivisie + GOL                                       71.7%    53     +5.2
+ROUTING=combo_96_dc_flip + DOPPIA_CHANCE                      71.4%    49     +5.7
+DOPPIA_CHANCE + q1.30-1.39 + CONF>=60                         71.4%    28     -0.7  * E7
+DOPPIA_CHANCE + q1.50-1.59 + CONF>=60                         71.4%    21     +2.0
+ROUTING=mc_filter_convert + GOL                               71.4%    14     +0.0
+SEGNO + q2.00-2.49 + CONF>=70                                 71.4%    14     +6.5
+LEAGUE=Scottish Premiership + SEGNO                           71.4%    14    +19.1
+LEAGUE=Primera División + GOL                                 71.3%   101     +3.7
+SEGNO + q1.60-1.79 + CONF>=60                                 70.8%    48     +8.7
+DOPPIA_CHANCE + q1.30-1.39 + SRC=A+S                          70.8%    24     -0.8
+GOL + q1.40-1.49 + CONF>=60                                   70.6%   153     +2.0
+SRC=A + CONF>=70                                              70.6%    85     +5.2
+LEAGUE=Brasileirão Serie A + GOL                              70.6%    17     +1.8
+PRON=Over 1.5                                                 70.5%   139     -1.3
+SEGNO + q1.60-1.79 + SRC=C                                    70.5%    78    +13.0
+GOL + q1.40-1.49                                              70.4%   179     +1.7
+PRON=1 + CONF>=70                                             70.4%    54    +12.4
+GOL + q1.40-1.49 + CONF>=70                                   70.3%    91     +0.9
+PRON=Under 2.5 + CONF>=70                                     70.2%    84     +4.5
+GOL + q1.40-1.49 + STARS>=3                                   70.1%   147     +0.8
+LEAGUE=LaLiga 2 + GOL                                         70.0%    30     +2.4
+SEGNO + q1.60-1.79 + CONF>=70                                 70.0%    30     +5.1
+LEAGUE=Jupiler Pro League + GOL                               70.0%    20     +2.0
+GOL + q1.60-1.79 + SRC=C_screm                                70.0%    20     +2.8
+LEAGUE=Süper Lig + SEGNO                                      70.0%    10     +2.3
+PRON=Over 1.5 + q1.30-1.49                                    69.8%   116     -3.8
+PRON=Under 2.5 + STARS>=3                                     69.7%   119     +7.6
+ROUTING=mc_filter_convert + GOL + STARS>=3                    69.2%    13     -0.3
+ROUTING=consensus_both + DOPPIA_CHANCE + CONF>=70             69.2%    13     -0.6
+SEGNO + q1.50-1.59 + CONF>=60                                 69.0%    29     +1.8
+PRON=1 + q1.50-1.79                                           68.9%   106    +11.3
+ROUTING=single + GOL + CONF>=70                               68.9%    90     +3.6
+ROUTING=single + SEGNO + CONF>=70                             68.6%    86    +20.9
+PRON=1X + q1.30-1.49                                          68.3%    41     -1.7
+SEGNO + q1.50-1.59 + STARS>=3                                 68.3%    41     +2.1  * E1
+ROUTING=scrematura_segno + GOL + STARS>=3                     68.2%    85     +1.8
+LEAGUE=Serie C - Girone A + DOPPIA_CHANCE                     68.2%    22     +1.8
+ROUTING=scrematura_segno + GOL                                68.1%   113     +0.9
+SEGNO + q1.50-1.59 + SRC=C                                    68.1%    47     +2.2
+MULTIGOL + SRC=A+S_mg                                         68.0%    25     +0.7
+SRC=A+S + STARS>=3.0                                          67.9%   162     +1.4
+PRON=Over 1.5 + STARS>=3                                      67.8%    90     -4.1
+GOL + q1.30-1.39 + SRC=C_screm                                67.7%    31     -2.5
+SEGNO + q1.60-1.79                                            67.4%    86     +9.8
+GOL + q1.40-1.49 + SRC=A+S                                    67.4%    43     -1.6
+ROUTING=consensus_both + GOL + CONF>=70                       67.3%   113     +1.3
+DOPPIA_CHANCE + q1.30-1.39                                    67.3%    49     -3.8
+SRC=A+S + CONF>=70                                            67.2%   128     +0.4
+STAKE>=4 + DOPPIA_CHANCE                                      66.7%   243    +13.8
+ROUTING=single + GOL                                          66.7%   144     +5.3
+DOPPIA_CHANCE + q1.30-1.39 + STARS>=3                         66.7%    30     -2.6
+LEAGUE=Serie B + GOL                                          66.7%    27     +0.7
+EDGE>=20 + CONF>=70 + GOL                                     66.7%    21     +4.6
+PRON=Over 1.5 + q1.50-1.79                                    66.7%    18     +0.7
+LEAGUE=Eerste Divisie + GOL                                   66.7%    18     +0.0
+LEAGUE=Eredivisie + DOPPIA_CHANCE                             66.7%    12     +3.1
+SRC=C_screm + STARS>=3.0                                      66.5%   185     +7.6
+SRC=C + CONF>=70                                              66.5%   158    +24.8
+PRON=X2 + STARS>=3                                            66.4%   140     +8.7
+ROUTING=consensus_both + GOL + STARS>=3                       66.2%   139     -0.8
+SEGNO + q1.50-1.59                                            66.0%    53     +0.9
+STARS>=3.5 + SEGNO                                            65.9%   132    +28.0
+STAKE>=4 + GOL                                                65.8%   509     +8.8
+PRON=Over 2.5 + STARS>=3                                      65.5%   165     +1.4
+LEAGUE=Serie C - Girone C + GOL                               65.5%    29     +0.5
+STARS>=3.5 + GOL                                              65.4%   301    +10.9
+STAKE>=3 + DOPPIA_CHANCE                                      65.4%   269    +14.9
+PRON=1 + STARS>=3                                             65.4%   159    +28.8
+DOPPIA_CHANCE + q1.50-1.59                                    65.2%    69     +0.3
+ROUTING=scrematura_segno + DOPPIA_CHANCE + STARS>=3           65.0%   100     +5.8
+ROUTING=o25_s6_to_goal + GOL                                  65.0%    20     +0.3
+ROUTING=o25_s6_to_goal + GOL + CONF>=70                       65.0%    20     +0.3
+ROUTING=o25_s6_to_goal + GOL + STARS>=3                       65.0%    20     +0.3
+
+Totale pattern HR>=65%: 131 con N>=10 (16 gia attivi *, 153 nuovi su totale 169)

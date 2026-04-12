@@ -6,7 +6,7 @@ Legge pronostici unified per 3 giorni, recupera selezioni valide da
 bollette saltate, e produce max 10 bollette al giorno.
 """
 
-import os, sys, re, json, time
+import os, sys, re, json, time, glob
 from datetime import datetime, timedelta, timezone
 
 # --- FIX PERCORSI ---
@@ -19,6 +19,177 @@ while not os.path.exists(os.path.join(current_path, 'config.py')):
 sys.path.append(current_path)
 
 from config import db
+
+# ==================== PATTERN MATCHING BOLLETTE ====================
+# 33 pattern (B1-B33) da report elite+bizarre + 150 pattern hybrid
+# Un pronostico entra nel pool non-elite se matcha almeno uno di questi
+
+def _match_pattern_b(sel):
+    """Controlla se una selezione matcha uno dei 33 pattern B1-B33 (elite+bizarre)."""
+    t = sel.get("mercato", "")
+    q = sel.get("quota", 0) or 0
+    c = sel.get("confidence", 0) or 0
+    s = sel.get("stars", 0) or 0
+    src = sel.get("source", "")
+    rt = sel.get("routing_rule", "")
+    e = sel.get("edge", 0) or 0
+    pr = sel.get("pronostico", "")
+
+    # B1: SEGNO | quota 1.50-1.79 | confidence 60-69
+    if t == "SEGNO" and 1.50 <= q < 1.80 and 60 <= c <= 69: return True
+    # B2: SEGNO | quota 1.50-1.79 | confidence 80-100
+    if t == "SEGNO" and 1.50 <= q < 1.80 and 80 <= c <= 100: return True
+    # B3: SEGNO | quota 2.00-2.49 | confidence 70-79
+    if t == "SEGNO" and 2.00 <= q < 2.50 and 70 <= c <= 79: return True
+    # B4: SEGNO | quota 1.80-1.99 | stelle 4-4.5
+    if t == "SEGNO" and 1.80 <= q < 2.00 and 4.0 <= s <= 4.5: return True
+    # B5: GOL | quota 1.50-1.79 | confidence 80-100
+    if t == "GOL" and 1.50 <= q < 1.80 and 80 <= c <= 100: return True
+    # B6: SEGNO | edge 5-9
+    if t == "SEGNO" and 5 <= e <= 9: return True
+    # B7: GOL | source A+S_o25_s6_conv
+    if t == "GOL" and src == "A+S_o25_s6_conv": return True
+    # B8: DOPPIA_CHANCE | quota 1.40-1.49 | confidence >=60
+    if t == "DOPPIA_CHANCE" and 1.40 <= q < 1.50 and c >= 60: return True
+    # B9: EXTREME conf>=70 stelle>=3.5 quota<1.60 DOPPIA_CHANCE
+    if t == "DOPPIA_CHANCE" and c >= 70 and s >= 3.5 and q < 1.60: return True
+    # B10: confidence>=85 GOL
+    if t == "GOL" and c >= 85: return True
+    # B11: source A+S_mg stelle>=3.0
+    if src == "A+S_mg" and s >= 3.0: return True
+    # B12: routing consensus_both DOPPIA_CHANCE stelle>=3
+    if t == "DOPPIA_CHANCE" and rt == "consensus_both" and s >= 3: return True
+    # B13: DOPPIA_CHANCE quota 1.40-1.49 source A+S
+    if t == "DOPPIA_CHANCE" and 1.40 <= q < 1.50 and src == "A+S": return True
+    # B14: DOPPIA_CHANCE quota 1.40-1.49 source C_combo96
+    if t == "DOPPIA_CHANCE" and 1.40 <= q < 1.50 and src == "C_combo96": return True
+    # B15: GOL quota 1.60-1.79 source C_mg
+    if t == "GOL" and 1.60 <= q < 1.80 and src == "C_mg": return True
+    # B16: DOPPIA_CHANCE quota 1.40-1.49 stelle>=3
+    if t == "DOPPIA_CHANCE" and 1.40 <= q < 1.50 and s >= 3: return True
+    # B17: source C_combo96 stelle>=3.0
+    if src == "C_combo96" and s >= 3.0: return True
+    # B18: GOL quota 1.30-1.39 confidence>=60
+    if t == "GOL" and 1.30 <= q < 1.40 and c >= 60: return True
+    # B19: routing combo_96_dc_flip DOPPIA_CHANCE stelle>=3
+    if t == "DOPPIA_CHANCE" and rt == "combo_96_dc_flip" and s >= 3: return True
+    # B20: DOPPIA_CHANCE quota 1.40-1.49
+    if t == "DOPPIA_CHANCE" and 1.40 <= q < 1.50: return True
+    # B21: DOPPIA_CHANCE quota 1.40-1.49 source C_screm
+    if t == "DOPPIA_CHANCE" and 1.40 <= q < 1.50 and src == "C_screm": return True
+    # B22: SEGNO quota 1.60-1.79 stelle>=3
+    if t == "SEGNO" and 1.60 <= q < 1.80 and s >= 3: return True
+    # B23: source A stelle>=3.0
+    if src == "A" and s >= 3.0: return True
+    # B24: EXTREME conf>=70 stelle>=3.5 quota<1.60 GOL
+    if t == "GOL" and c >= 70 and s >= 3.5 and q < 1.60: return True
+    # B25: EXTREME conf>=80 stelle>=3 GOL
+    if t == "GOL" and c >= 80 and s >= 3: return True
+    # B26: edge>=20 conf>=70 SEGNO
+    if t == "SEGNO" and e >= 20 and c >= 70: return True
+    # B27: SEGNO quota 1.80-1.99 conf>=70
+    if t == "SEGNO" and 1.80 <= q < 2.00 and c >= 70: return True
+    # B28: routing single GOL stelle>=3
+    if t == "GOL" and rt == "single" and s >= 3: return True
+    # B29: stelle>=4.0 SEGNO
+    if t == "SEGNO" and s >= 4.0: return True
+    # B30: SEGNO quota 1.60-1.79 source C
+    if t == "SEGNO" and 1.60 <= q < 1.80 and src == "C": return True
+    # B31: pronostico 1 conf>=70
+    if pr == "1" and c >= 70: return True
+    # B32: SEGNO quota 2.00-2.49 conf>=70
+    if t == "SEGNO" and 2.00 <= q < 2.50 and c >= 70: return True
+    # B33: SEGNO quota 1.60-1.79 conf>=60
+    if t == "SEGNO" and 1.60 <= q < 1.80 and c >= 60: return True
+    return False
+
+
+def _check_hybrid_condition(cond_str, sel):
+    """Verifica una singola condizione hybrid su una selezione."""
+    t = sel.get("mercato", "")
+    q = sel.get("quota", 0) or 0
+    c = sel.get("confidence", 0) or 0
+    s = sel.get("stars", 0) or 0
+    src = sel.get("source", "")
+    rt = sel.get("routing_rule", "")
+    st = sel.get("stake", 0) or 0
+    pr = sel.get("pronostico", "")
+    cs = cond_str.strip()
+
+    m = re.match(r"conf(\d+)-(\d+)", cs)
+    if m: return int(m.group(1)) <= c <= int(m.group(2))
+    m = re.match(r"conf>=(\d+)", cs)
+    if m: return c >= int(m.group(1))
+    m = re.match(r"stelle([\d.]+)-([\d.]+)", cs)
+    if m: return float(m.group(1)) <= s < float(m.group(2))
+    m = re.match(r"stelle>=([\d.]+)", cs)
+    if m: return s >= float(m.group(1))
+    m = re.match(r"q([\d.]+)-([\d.]+)", cs)
+    if m: return float(m.group(1)) <= q <= float(m.group(2)) + 0.001
+    m = re.match(r"tipo=(.+)", cs)
+    if m: return t == m.group(1)
+    m = re.match(r"src=(.+)", cs)
+    if m: return src == m.group(1)
+    m = re.match(r"routing=(.+)", cs)
+    if m: return rt == m.group(1)
+    m = re.match(r"pron=(.+)", cs)
+    if m: return pr == m.group(1)
+    m = re.match(r"stake>=(\d+)", cs)
+    if m: return st >= int(m.group(1))
+    return False
+
+
+def _load_hybrid_patterns():
+    """Carica i 150 pattern hybrid dal file txt più recente."""
+    # Cerca nella cartella _analisi_pattern
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    pattern_dir = os.path.join(base_dir, "..", "..", "..", "_analisi_pattern")
+    pattern_file = os.path.join(pattern_dir, "hybrid_75_by_profit.txt")
+
+    if not os.path.exists(pattern_file):
+        print("⚠️ File hybrid_75_by_profit.txt non trovato, skip pattern hybrid")
+        return []
+
+    patterns = []
+    with open(pattern_file, "r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line or line[0] not in "0123456789":
+                continue
+            parts = line.split()
+            # Estrai pattern: dal secondo token fino al profit (+N.N o -N.N)
+            pat_parts = []
+            for p in parts[1:]:
+                if p.startswith("+") or p.startswith("-"):
+                    try:
+                        float(p)
+                        break
+                    except ValueError:
+                        pass
+                pat_parts.append(p)
+            pattern = " ".join(pat_parts)
+            conditions = [c.strip() for c in pattern.split("+")]
+            patterns.append(conditions)
+
+    return patterns
+
+
+# Carica pattern hybrid all'avvio
+_HYBRID_PATTERNS = _load_hybrid_patterns()
+
+
+def matches_bollette_pattern(sel):
+    """Controlla se una selezione matcha almeno uno dei 183 pattern (B1-B33 + hybrid).
+    Usato per filtrare il pool prima di passarlo a Mistral nelle sezioni non-elite."""
+    # Check B1-B33
+    if _match_pattern_b(sel):
+        return True
+    # Check 150 hybrid
+    for conds in _HYBRID_PATTERNS:
+        if all(_check_hybrid_condition(c, sel) for c in conds):
+            return True
+    return False
+
 
 try:
     import requests
@@ -52,8 +223,8 @@ MAX_BOLLETTE = 18
 # Fasce quota totale
 FASCE = {
     "oggi":       (1.0, 999.0),   # Nessun vincolo quota — solo partite di oggi
-    "selettiva":  (1.5, 5.0),
-    "bilanciata": (5.0, 8.0),
+    "selettiva":  (1.5, 4.5),
+    "bilanciata": (5.0, 7.5),
     "ambiziosa":  (8.0, 999.0),
     "elite":      (1.5, 8.0),     # Almeno 70% selezioni elite
 }
@@ -68,32 +239,33 @@ CATEGORY_CONSTRAINTS = {
     },
     "selettiva": {
         "min_sel": 2, "max_sel": 5,
-        "min_quota": None, "max_quota": 5.00,
-        "max_bollette": 5,
+        "min_quota": None, "max_quota": 4.50,
+        "max_bollette": 3,
         "quota_singola": {2: 2.20, 3: 1.70, 4: 1.50, 5: 1.38},
     },
     "bilanciata": {
-        "min_sel": 2, "max_sel": 7,
-        "min_quota": 5.00, "max_quota": 8.00,
-        "max_bollette": 5,
+        "min_sel": 3, "max_sel": 7,
+        "min_quota": 5.00, "max_quota": 7.50,
+        "max_bollette": 3,
         "quota_singola": {2: 2.80, 3: 2.00, 4: 1.68, 5: 1.52, 6: 1.41, 7: 1.35},
     },
     "ambiziosa": {
         "min_sel": 4, "max_sel": 8,
         "min_quota": 8.00, "max_quota": None,
-        "max_bollette": 5,
+        "max_bollette": 3,
         "quota_singola": {4: 3.00, 5: 2.50, 6: 2.20, 7: 2.00, 8: 1.80},
     },
     "elite": {
-        "min_sel": 3, "max_sel": 5,
+        "min_sel": 2, "max_sel": 5,
         "min_quota": None, "max_quota": 8.00,
-        "max_bollette": 99,  # libero
-        "quota_singola": {3: 2.00, 4: 1.68, 5: 1.52},
+        "max_bollette": 3,
+        "quota_singola": {2: 2.85, 3: 2.00, 4: 1.68, 5: 1.52},
     },
 }
 
 # Tolleranze per validazione
-QUOTA_TOTALE_TOLERANCE = 0.05   # 5% — quota max 5.00 accetta fino a 5.25
+QUOTA_TOTALE_TOLERANCE_UP = 0.15    # 15% sopra il max
+QUOTA_TOTALE_TOLERANCE_DOWN = 0.0   # 0% sotto il min (nessuna tolleranza)
 QUOTA_SINGOLA_TOLERANCE = 0.10  # 10% — quota max 1.50 accetta fino a 1.65
 MAX_RETRY_FEEDBACK = 1          # Numero di retry con feedback
 
@@ -120,10 +292,11 @@ REGOLE COMPOSIZIONE
    - Se una selezione ha data diversa da {today_date}, NON può stare in una bolletta "oggi"
    - Quote libere, qualsiasi fascia
    - Minimo 2, massimo 4 selezioni per bolletta. Diversifica: una da 2, una da 3, una da 4
-   - ESATTAMENTE 3 bollette oggi
+   - Fino a 3 bollette oggi
 
    📌 SELETTIVA — Campo "tipo": "selettiva"
-   - Quota totale MASSIMO 5.00
+   - Fino a 3 bollette selettive
+   - Quota totale MASSIMO 4.50
    - Minimo 2, massimo 5 selezioni per bolletta
    - Quota max per SINGOLA selezione (varia in base al numero di selezioni):
      • 2 selezioni → ogni quota max 2.20
@@ -132,8 +305,8 @@ REGOLE COMPOSIZIONE
      • 5 selezioni → ogni quota max 1.38
 
    📌 BILANCIATA — Campo "tipo": "bilanciata"
-   - Fino a 5 bollette bilanciate
-   - Quota totale tra 5.00 e 8.00
+   - Fino a 3 bollette bilanciate
+   - Quota totale tra 5.00 e 7.50
    - Minimo 2, massimo 7 selezioni per bolletta
    - Quota max per SINGOLA selezione (varia in base al numero di selezioni):
      • 2 selezioni → ogni quota max 2.80
@@ -144,7 +317,7 @@ REGOLE COMPOSIZIONE
      • 7 selezioni → ogni quota max 1.35
 
    📌 AMBIZIOSA — Campo "tipo": "ambiziosa"
-   - Fino a 5 bollette ambiziose!
+   - Fino a 3 bollette ambiziose!
    - Quota totale superiore a 8.0
    - Minimo 4, massimo 8 selezioni per bolletta
    - Quota max per SINGOLA selezione (varia in base al numero di selezioni):
@@ -155,25 +328,21 @@ REGOLE COMPOSIZIONE
      • 8 selezioni → ogni quota max 1.80
 
    📌 ELITE — Campo "tipo": "elite"
-   - ALMENO il 70% delle selezioni DEVE essere ★ELITE dal POOL ELITE
-   - Il restante 30% DEVE provenire dal POOL COMPLETO (selezioni NON elite)
-   - ⚠️ REGOLA CRITICA: SFRUTTA SEMPRE il 30% non-elite per completare le bollette!
-     Anche se ci sono poche selezioni elite (es. solo 2-3), componi comunque bollette da 3-5 selezioni aggiungendo 1-2 selezioni dal pool completo
-   - Minimo elite richieste: 2 su 3 selezioni, 3 su 4, 4 su 5
-   - Esempio con 3 selezioni: 2 elite + 1 non-elite con quota più alta (es. @2.0)
-   - Esempio con 4 selezioni: 3 elite + 1 non-elite
-   - NON fare bollette elite da sole 2 selezioni — il minimo è 3
+   - Fino a 3 bollette elite
+   - TUTTE le selezioni DEVONO essere ★ELITE dal POOL ELITE (100%, nessuna eccezione)
+   - NON inserire MAI selezioni non-elite in bollette di tipo elite
    - Le bollette elite NON hanno vincolo sulle date: possono avere partite di oggi, domani o dopodomani liberamente
    - Quota totale MASSIMO 8.00
-   - Minimo 3, massimo 5 selezioni per bolletta
+   - Minimo 2, massimo 5 selezioni per bolletta
    - Quota max per SINGOLA selezione (varia in base al numero di selezioni):
+     • 2 selezioni → ogni quota max 2.85
      • 3 selezioni → ogni quota max 2.00
      • 4 selezioni → ogni quota max 1.68
      • 5 selezioni → ogni quota max 1.52
    - Se non ci sono abbastanza selezioni elite nel pool, genera meno bollette elite (anche 0 se necessario)
 
    Le bollette "oggi" sono SEPARATE e DIVERSE dalle altre — non devono essere le stesse bollette delle altre fasce
-   Distribuzione: ESATTAMENTE 3 oggi, fino a 5 selettive, fino a 5 bilanciate, fino a 5 ambiziose, elite libero (quante riesci)
+   Distribuzione: fino a 3 oggi, fino a 3 selettive, fino a 3 bilanciate, fino a 3 ambiziose, fino a 3 elite
 5. Si consiglia di dare la preferenza a selezioni con confidence e stelle alte, ma fai affidamento alla tua esperienza: se una selezione con stelle più basse ti convince per il contesto della bolletta, usala
 5b. ⭐ SELEZIONI ELITE ⭐ — Le selezioni marcate con ★ELITE nel pool sono pronostici che matchano pattern storicamente vincenti (hit rate > 80%). Dai loro PRIORITÀ ASSOLUTA: ogni bolletta dovrebbe contenere almeno 1 selezione elite se disponibile. Non forzare combinazioni innaturali, ma a parità di scelta preferisci SEMPRE una selezione elite
 6. ⚠️⚠️⚠️ REGOLA OBBLIGATORIA — ALMENO 1 PARTITA DI OGGI ⚠️⚠️⚠️
@@ -229,17 +398,66 @@ IMPORTANTE:
 
 def _sanitize_and_parse_json(content):
     """Sanitizza la risposta Mistral e parsa il JSON.
-    Rimuove markdown wrapping e caratteri di controllo invalidi."""
+    5 livelli di fallback per gestire risposte corrotte/troncate."""
     content = content.strip()
+
+    # Step 1: Rimuovi markdown wrapping
     if content.startswith("```"):
         content = re.sub(r'^```(?:json)?\s*', '', content)
         content = re.sub(r'\s*```$', '', content)
-    # Rimuovi caratteri di controllo dentro le stringhe JSON (tab, newline, etc.)
+
+    # Rimuovi caratteri di controllo
     content = re.sub(r'[\x00-\x1f\x7f](?!["\\/bfnrtu])', ' ', content)
-    return json.loads(content)
+
+    # Step 2: Tentativo diretto
+    try:
+        return json.loads(content)
+    except json.JSONDecodeError:
+        pass
+
+    # Step 3: Estrai array tra primo [ e ultimo ]
+    first_bracket = content.find('[')
+    last_bracket = content.rfind(']')
+    if first_bracket != -1 and last_bracket > first_bracket:
+        extracted = content[first_bracket:last_bracket + 1]
+        try:
+            return json.loads(extracted)
+        except json.JSONDecodeError:
+            pass
+
+    # Step 4: JSON troncato — trova l'ultimo } completo e chiudi l'array
+    if first_bracket != -1:
+        extracted = content[first_bracket:]
+        # Rimuovi trailing comma prima di chiusure
+        extracted = re.sub(r',\s*([}\]])', r'\1', extracted)
+        # Trova l'ultimo oggetto completo (ultimo })
+        last_brace = extracted.rfind('}')
+        if last_brace != -1:
+            truncated = extracted[:last_brace + 1] + ']'
+            try:
+                return json.loads(truncated)
+            except json.JSONDecodeError:
+                pass
+
+    # Step 5: Regex — estrai singoli oggetti JSON
+    objects = re.findall(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}', content)
+    if objects:
+        results = []
+        for obj_str in objects:
+            try:
+                obj = json.loads(obj_str)
+                if 'selezioni' in obj or 'tipo' in obj:
+                    results.append(obj)
+            except json.JSONDecodeError:
+                continue
+        if results:
+            print(f"   ⚠️ JSON riparato via regex: {len(results)} bollette estratte")
+            return results
+
+    raise json.JSONDecodeError("Impossibile parsare JSON dopo 5 tentativi", content, 0)
 
 
-def build_pool(today_str):
+def build_pool(today_str, skip_time_filter=False):
     """Costruisce il pool di selezioni dai pronostici unified per 3 giorni."""
     today = datetime.strptime(today_str, "%Y-%m-%d")
     dates = [(today + timedelta(days=i)).strftime("%Y-%m-%d") for i in range(3)]
@@ -259,13 +477,14 @@ def build_pool(today_str):
         match_date = doc.get("date", "")
         match_time = doc.get("match_time", "00:00")
 
-        # Escludi partite già iniziate
-        try:
-            kick_off = datetime.strptime(f"{match_date} {match_time}", "%Y-%m-%d %H:%M")
-            if kick_off <= now:
-                continue
-        except ValueError:
-            pass
+        # Escludi partite già iniziate (skip per date retroattive)
+        if not skip_time_filter:
+            try:
+                kick_off = datetime.strptime(f"{match_date} {match_time}", "%Y-%m-%d %H:%M")
+                if kick_off <= now:
+                    continue
+            except ValueError:
+                pass
 
         match_key = f"{home} vs {away}|{match_date}"
 
@@ -291,6 +510,10 @@ def build_pool(today_str):
                 "confidence": p.get("confidence", 0),
                 "stars": p.get("stars", 0),
                 "elite": p.get("elite", False),
+                "source": p.get("source", ""),
+                "routing_rule": p.get("routing_rule", ""),
+                "edge": p.get("edge", 0) or 0,
+                "stake": p.get("stake", 0) or 0,
             })
 
     print(f"📦 Pool base: {len(pool)} selezioni da {len(docs)} partite ({', '.join(dates)})")
@@ -416,6 +639,7 @@ def call_mistral(pool_text, today_str):
         ],
         "temperature": 0.4,
         "max_tokens": 8000,
+        "response_format": {"type": "json_object"},
     }
 
     max_retries = 2
@@ -443,10 +667,9 @@ def _classify_tipo(raw_tipo, selezioni, quota_totale, pool_index, today_str):
             (f"{s['home']} vs {s['away']}|{s['match_date']}", s['mercato'], s['pronostico']),
             {}
         ).get("elite", False))
-        min_elite = {3: 2, 4: 3, 5: 4}.get(n_sel, max(2, int(n_sel * 0.7)))
-        if elite_count >= min_elite:
+        if elite_count == n_sel:
             return "elite"
-        print(f"  ⚠️ Bolletta elite con solo {elite_count}/{n_sel} elite — riclassificata")
+        print(f"  ⚠️ Bolletta elite con solo {elite_count}/{n_sel} elite (servono 100%) — riclassificata")
 
     if raw_tipo == "oggi" and solo_oggi:
         return "oggi"
@@ -576,12 +799,11 @@ def validate_with_errors(raw_bollette, pool, today_str, existing_counters=None, 
                 (f"{s['home']} vs {s['away']}|{s['match_date']}", s['mercato'], s['pronostico']),
                 {}
             ).get("elite", False))
-            min_elite = {3: 2, 4: 3, 5: 4}.get(n_sel, max(2, int(n_sel * 0.7)))
             errors.append({
                 "code": "ELITE_INSUFFICIENTE",
                 "bolletta_idx": i, "tipo": "elite",
                 "feedback": f"Bolletta #{i+1} (elite): solo {elite_count}/{n_sel} selezioni elite, "
-                           f"servono almeno {min_elite}. Usa piu' selezioni dal POOL ELITE"
+                           f"servono {n_sel}/{n_sel} (100%). Usa SOLO selezioni dal POOL ELITE"
             })
 
         # --- #9: manca partita di oggi (escluse elite) ---
@@ -617,9 +839,9 @@ def validate_with_errors(raw_bollette, pool, today_str, existing_counters=None, 
             })
             continue
 
-        # --- #4: quota totale troppo alta (tolleranza 5%) ---
+        # --- #4: quota totale troppo alta (tolleranza 15%) ---
         max_q = c.get("max_quota")
-        if max_q is not None and quota_totale > max_q * (1 + QUOTA_TOTALE_TOLERANCE):
+        if max_q is not None and quota_totale > max_q * (1 + QUOTA_TOTALE_TOLERANCE_UP):
             errors.append({
                 "code": "QUOTA_TOTALE_ALTA",
                 "bolletta_idx": i, "tipo": tipo,
@@ -629,9 +851,9 @@ def validate_with_errors(raw_bollette, pool, today_str, existing_counters=None, 
             })
             continue
 
-        # --- #5: quota totale troppo bassa (tolleranza 5%) ---
+        # --- #5: quota totale troppo bassa (tolleranza 0%) ---
         min_q = c.get("min_quota")
-        if min_q is not None and quota_totale < min_q * (1 - QUOTA_TOTALE_TOLERANCE):
+        if min_q is not None and quota_totale < min_q * (1 - QUOTA_TOTALE_TOLERANCE_DOWN):
             errors.append({
                 "code": "QUOTA_TOTALE_BASSA",
                 "bolletta_idx": i, "tipo": tipo,
@@ -758,7 +980,7 @@ def validate_and_build(raw_bollette, pool, today_str, existing_counters=None):
     return valid_docs
 
 
-def build_extra_pool(today_str, existing_match_keys):
+def build_extra_pool(today_str, existing_match_keys, skip_time_filter=False):
     """Costruisce pool esteso da h2h_by_round per partite NON già nel pool AI."""
     today = datetime.strptime(today_str, "%Y-%m-%d")
     dates = [(today + timedelta(days=i)).strftime("%Y-%m-%d") for i in range(3)]
@@ -793,13 +1015,14 @@ def build_extra_pool(today_str, existing_match_keys):
             if match_key in existing_match_keys:
                 continue
 
-            # Salta partite già iniziate
-            try:
-                kick_off = datetime.strptime(f"{match_date} {match_time}", "%Y-%m-%d %H:%M")
-                if kick_off <= now:
-                    continue
-            except ValueError:
-                pass
+            # Salta partite già iniziate (skip per date retroattive)
+            if not skip_time_filter:
+                try:
+                    kick_off = datetime.strptime(f"{match_date} {match_time}", "%Y-%m-%d %H:%M")
+                    if kick_off <= now:
+                        continue
+                except ValueError:
+                    pass
 
             # Prendi quote se disponibili
             odds = m.get("odds", {})
@@ -954,7 +1177,8 @@ match_key, mercato e pronostico devono corrispondere ESATTAMENTE al pool."""
             {"role": "user", "content": f"Pool disponibile:\n{pool_text}\n\nComponi {count_needed} bollette {fascia}."},
         ],
         "temperature": 0.4,
-        "max_tokens": 4000,
+        "max_tokens": 8000,
+        "response_format": {"type": "json_object"},
     }
 
     for attempt in range(3):
@@ -968,7 +1192,18 @@ match_key, mercato e pronostico devono corrispondere ESATTAMENTE al pool."""
         break
 
     content = resp.json()["choices"][0]["message"]["content"]
-    return _sanitize_and_parse_json(content)
+
+    try:
+        return _sanitize_and_parse_json(content)
+    except (json.JSONDecodeError, Exception) as e:
+        print(f"   ⚠️ Parse JSON fallito ({e}), retry con istruzione esplicita...")
+        # Retry: aggiungi istruzione esplicita sul formato
+        payload["messages"].append({"role": "assistant", "content": content})
+        payload["messages"].append({"role": "user", "content": "ERRORE: la risposta non è un JSON valido. Rispondi con SOLO un array JSON valido, senza testo prima o dopo. Formato: [{...}, {...}]"})
+        resp2 = requests.post(MISTRAL_URL, headers=headers, json=payload, timeout=120)
+        resp2.raise_for_status()
+        content2 = resp2.json()["choices"][0]["message"]["content"]
+        return _sanitize_and_parse_json(content2)
 
 
 def build_feedback_prompt(errors, valid_docs, counters, today_str):
@@ -1033,6 +1268,7 @@ def call_mistral_retry(pool_text, today_str, original_response, feedback):
         "messages": messages,
         "temperature": 0.3,  # Piu' bassa per correzione precisa
         "max_tokens": 8000,
+        "response_format": {"type": "json_object"},
     }
 
     resp = requests.post(MISTRAL_URL, headers=headers, json=payload, timeout=120)
@@ -1054,6 +1290,8 @@ def _check_feasibility(fascia, pool, today_str):
     # Filtra pool per la sezione
     if fascia == "oggi":
         section_pool = [s for s in pool if s.get("match_date") == today_str]
+    elif fascia == "elite":
+        section_pool = [s for s in pool if s.get("elite")]
     else:
         section_pool = pool
 
@@ -1063,7 +1301,7 @@ def _check_feasibility(fascia, pool, today_str):
     if len(unique_matches) < min_sel:
         return False, f"solo {len(unique_matches)} partite uniche, servono almeno {min_sel}", section_pool
 
-    # Check 2: elite — servono selezioni elite
+    # Check 2: elite — servono almeno 2 selezioni elite (100% richiesto)
     if fascia == "elite":
         elite_count = sum(1 for s in section_pool if s.get("elite"))
         if elite_count < 2:
@@ -1084,7 +1322,7 @@ def _check_feasibility(fascia, pool, today_str):
             max_achievable = 1.0
             for q in top_quotes[:min_sel]:
                 max_achievable *= q
-            if max_achievable < min_quota * 0.9:  # 10% tolleranza
+            if max_achievable < min_quota * (1 - QUOTA_TOTALE_TOLERANCE_DOWN):  # 0% tolleranza sotto
                 return False, f"quota max raggiungibile ~{max_achievable:.1f}, minimo {min_quota}", section_pool
 
     # Check 4: quota massima rispettabile?
@@ -1101,7 +1339,7 @@ def _check_feasibility(fascia, pool, today_str):
             min_achievable = 1.0
             for q in low_quotes:
                 min_achievable *= q
-            if min_achievable > max_quota * 1.1:  # 10% tolleranza
+            if min_achievable > max_quota * (1 + QUOTA_TOTALE_TOLERANCE_UP):  # 15% tolleranza sopra
                 return False, f"quota min raggiungibile ~{min_achievable:.1f}, massimo {max_quota}", section_pool
 
     return True, "OK", section_pool
@@ -1109,15 +1347,26 @@ def _check_feasibility(fascia, pool, today_str):
 
 def _generate_for_section(fascia, needed, pool, today_str, bollette_docs, counters):
     """Genera bollette per una singola sezione con retry.
-    Returns: lista di bollette valide per questa sezione.
+    Returns: (lista bollette valide, lista selezioni scartate per ricomposizione).
     """
     # Check fattibilita'
     feasible, reason, section_pool = _check_feasibility(fascia, pool, today_str)
     if not feasible:
         print(f"   ⛔ Impossibile: {reason}")
-        return []
+        return [], []
 
     print(f"   📋 Pool per {fascia}: {len(section_pool)} selezioni")
+
+    # Per elite: limita richiesta in base al pool disponibile
+    if fascia == "elite":
+        unique_elite_matches = len(set(s.get("match_key", "") for s in section_pool))
+        max_elite = max(2, unique_elite_matches // 2)  # ~metà delle partite uniche
+        needed = min(needed, max_elite)
+        print(f"   📋 Elite: {unique_elite_matches} partite uniche → max {needed} bollette")
+
+    # Raccolta selezioni scartate per ricomposizione
+    all_raw = []
+    discarded_sels = []
 
     # Chiamata Mistral (retry 429 gestito dentro call_mistral_integration)
     raw = None
@@ -1125,11 +1374,13 @@ def _generate_for_section(fascia, needed, pool, today_str, bollette_docs, counte
         raw = call_mistral_integration(section_pool, fascia, needed, today_str)
     except Exception as e:
         print(f"   ❌ Errore Mistral per {fascia}: {e}")
-        return []
+        return [], []
 
     if not isinstance(raw, list):
         print(f"   ❌ Risposta non valida per {fascia}")
-        return []
+        return [], []
+
+    all_raw.extend(raw)
 
     # Valida
     valid, errors, new_counters = validate_with_errors(
@@ -1180,6 +1431,7 @@ def _generate_for_section(fascia, needed, pool, today_str, bollette_docs, counte
         try:
             retry_raw = call_mistral_integration(section_pool, fascia, still_needed, today_str, extra_context=feedback_text)
             if isinstance(retry_raw, list):
+                all_raw.extend(retry_raw)
                 retry_valid, errors, new_counters = validate_with_errors(
                     retry_raw, section_pool, today_str,
                     existing_counters=new_counters,
@@ -1210,7 +1462,215 @@ def _generate_for_section(fascia, needed, pool, today_str, bollette_docs, counte
     # Aggiorna counters
     counters.update(new_counters)
 
-    return valid
+    # Raccogli selezioni dalle bollette scartate (raw che non sono in valid)
+    valid_fingerprints = set()
+    for doc in valid:
+        fp = frozenset(
+            f"{s['home']}|{s['away']}|{s['match_date']}|{s['mercato']}|{s['pronostico']}"
+            for s in doc["selezioni"]
+        )
+        valid_fingerprints.add(fp)
+
+    pool_index = {}
+    for s in section_pool:
+        key = (s["match_key"], s["mercato"], s["pronostico"])
+        pool_index[key] = s
+
+    for raw_b in all_raw:
+        # Controlla se questa raw bolletta e' stata accettata
+        selezioni_raw = raw_b.get("selezioni", [])
+        if not isinstance(selezioni_raw, list):
+            continue
+        raw_fp = frozenset(
+            f"{s.get('match_key', '')}|{s.get('mercato', '')}|{s.get('pronostico', '')}"
+            for s in selezioni_raw
+        )
+        # Se non e' in valid, le sue selezioni sono scartate
+        is_accepted = False
+        for vfp in valid_fingerprints:
+            # Confronto approssimativo (i formati possono differire)
+            if len(raw_fp & vfp) >= len(selezioni_raw) * 0.8:
+                is_accepted = True
+                break
+        if not is_accepted:
+            for sel in selezioni_raw:
+                key = (sel.get("match_key", ""), sel.get("mercato", ""), sel.get("pronostico", ""))
+                pool_entry = pool_index.get(key)
+                if pool_entry:
+                    discarded_sels.append(pool_entry)
+
+    return valid, discarded_sels
+
+
+def _recompose_from_discards(discarded_selezioni, pool, today_str, bollette_docs, counters):
+    """Ricompone bollette dalle selezioni delle bollette scartate (logica urna).
+    Pesca selezioni random, verifica vincoli, classifica per quota totale.
+    Returns: lista di nuove bollette valide.
+    """
+    import random
+
+    if not discarded_selezioni:
+        return []
+
+    # Deduplica selezioni nell'urna (stessa partita + mercato + pronostico = 1 volta)
+    seen = set()
+    urna = []
+    for sel in discarded_selezioni:
+        key = (sel.get("match_key", f"{sel['home']} vs {sel['away']}|{sel['match_date']}"),
+               sel["mercato"], sel["pronostico"])
+        if key not in seen:
+            seen.add(key)
+            urna.append(sel)
+
+    if len(urna) < 2:
+        return []
+
+    # Fasce con range di quota per classificazione
+    FASCE_RECOMPOSE = [
+        ("selettiva", 1.5, 4.50),
+        ("bilanciata", 5.0, 7.50),
+        ("ambiziosa", 8.0, 999.0),
+    ]
+
+    # Check se ci sono partite di oggi nell'urna
+    has_today_in_urna = any(s.get("match_date") == today_str for s in urna)
+
+    new_bollette = []
+    consecutive_fails = 0
+    max_fails = 50
+
+    # Calcola quante bollette servono ancora per fascia
+    targets = {"selettiva": 3, "bilanciata": 3, "ambiziosa": 3}
+    for fascia in targets:
+        targets[fascia] -= counters.get(fascia, 0)
+
+    all_done = all(t <= 0 for t in targets.values())
+
+    while not all_done and consecutive_fails < max_fails:
+        # Estrai selezioni random dall'urna
+        n_sel = random.randint(2, 8)  # max ambiziosa
+        if len(urna) < 2:
+            break
+        candidate_sels = random.sample(urna, min(n_sel, len(urna)))
+
+        # Check: no stessa partita due volte
+        match_keys = [f"{s['home']}|{s['away']}|{s['match_date']}" for s in candidate_sels]
+        if len(match_keys) != len(set(match_keys)):
+            consecutive_fails += 1
+            continue
+
+        # Check: no SEGNO X
+        if any(s.get("mercato") == "SEGNO" and s.get("pronostico") == "X" for s in candidate_sels):
+            consecutive_fails += 1
+            continue
+
+        # Check: almeno 1 partita di oggi (skip se urna non ne ha)
+        has_today = any(s.get("match_date") == today_str for s in candidate_sels)
+        if has_today_in_urna and not has_today:
+            consecutive_fails += 1
+            continue
+
+        # Calcola quota totale
+        quota_totale = 1.0
+        for s in candidate_sels:
+            quota_totale *= s["quota"]
+        quota_totale = round(quota_totale, 2)
+
+        # Classifica per range di quota — prima fascia con posto
+        assigned_fascia = None
+        for fascia, lo, hi in FASCE_RECOMPOSE:
+            if targets.get(fascia, 0) <= 0:
+                continue
+            # Tolleranza: 15% sopra, 0% sotto
+            if lo <= quota_totale <= hi * (1 + QUOTA_TOTALE_TOLERANCE_UP):
+                # Check numero selezioni nel range della fascia
+                c = CATEGORY_CONSTRAINTS[fascia]
+                if c["min_sel"] <= len(candidate_sels) <= c["max_sel"]:
+                    # Check quota singola
+                    limits = c.get("quota_singola", {})
+                    if limits:
+                        max_qs = limits.get(len(candidate_sels))
+                        if max_qs is not None:
+                            max_qs_tol = max_qs * (1 + QUOTA_SINGOLA_TOLERANCE)
+                            if any(s["quota"] > max_qs_tol for s in candidate_sels):
+                                continue
+                    assigned_fascia = fascia
+                    break
+
+        if not assigned_fascia:
+            consecutive_fails += 1
+            continue
+
+        # Check duplicati con bollette esistenti + nuove
+        bolletta_fingerprint = frozenset(
+            f"{s['home']}|{s['away']}|{s['match_date']}|{s['mercato']}|{s['pronostico']}"
+            for s in candidate_sels
+        )
+        is_duplicate = False
+        for existing_doc in bollette_docs + new_bollette:
+            existing_fp = frozenset(
+                f"{s['home']}|{s['away']}|{s['match_date']}|{s['mercato']}|{s['pronostico']}"
+                for s in existing_doc["selezioni"]
+            )
+            if bolletta_fingerprint == existing_fp:
+                is_duplicate = True
+                break
+            overlap = len(bolletta_fingerprint & existing_fp)
+            # Se urna ha solo 1 partita di oggi, due bollette possono condividerla
+            # purché abbiano almeno 1 altra selezione diversa
+            threshold = max(2, len(bolletta_fingerprint) * 0.8)
+            if overlap >= threshold:
+                is_duplicate = True
+                break
+        if is_duplicate:
+            consecutive_fails += 1
+            continue
+
+        # Bolletta valida — costruisci documento
+        solo_oggi = all(s.get("match_date") == today_str for s in candidate_sels)
+        counters[assigned_fascia] = counters.get(assigned_fascia, 0) + 1
+        existing_count = counters[assigned_fascia]
+
+        selezioni_doc = []
+        for s in candidate_sels:
+            selezioni_doc.append({
+                "home": s["home"],
+                "away": s["away"],
+                "league": s["league"],
+                "match_time": s["match_time"],
+                "match_date": s["match_date"],
+                "home_mongo_id": s["home_mongo_id"],
+                "away_mongo_id": s["away_mongo_id"],
+                "mercato": s["mercato"],
+                "pronostico": s["pronostico"],
+                "quota": s["quota"],
+                "confidence": s["confidence"],
+                "stars": s["stars"],
+                "esito": None,
+            })
+
+        doc = {
+            "date": today_str,
+            "tipo": assigned_fascia,
+            "solo_oggi": solo_oggi,
+            "quota_totale": quota_totale,
+            "label": f"{assigned_fascia.capitalize()} #{existing_count}",
+            "selezioni": selezioni_doc,
+            "esito_globale": None,
+            "saved_by": [],
+            "reasoning": "Ricomposta automaticamente dal mini-pool",
+            "generated_at": datetime.now(timezone.utc),
+            "pool_size": len(pool),
+            "version": 1,
+        }
+
+        new_bollette.append(doc)
+        targets[assigned_fascia] -= 1
+        consecutive_fails = 0  # Reset dopo successo
+
+        all_done = all(t <= 0 for t in targets.values())
+
+    return new_bollette
 
 
 def main():
@@ -1218,28 +1678,33 @@ def main():
     print("🎫 GENERAZIONE BOLLETTE — Step 35 (Sequenziale)")
     print("=" * 60)
 
-    today_str = datetime.now().strftime("%Y-%m-%d")
+    # Supporta --date YYYY-MM-DD per generare bollette retroattive
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--date', type=str, default=None, help='Data YYYY-MM-DD')
+    args, _ = parser.parse_known_args()
+    today_str = args.date if args.date else datetime.now().strftime("%Y-%m-%d")
+    is_retroactive = args.date is not None
 
     # 1. Costruisci pool base (pronostici AI)
-    pool = build_pool(today_str)
+    pool = build_pool(today_str, skip_time_filter=is_retroactive)
     recovered = recover_from_yesterday(today_str)
     if recovered:
         pool.extend(recovered)
     pool = deduplicate_pool(pool)
     print(f"📊 Pool AI: {len(pool)} selezioni uniche")
 
-    # 2. Pool esteso (h2h_by_round con quote)
-    existing_match_keys = set(s["match_key"] for s in pool)
-    extra = build_extra_pool(today_str, existing_match_keys)
-    extended_pool = pool + extra
-    extended_pool = deduplicate_pool(extended_pool)
-    print(f"📊 Pool esteso: {len(extended_pool)} selezioni ({len(extra)} extra da h2h)")
+    # 1b. Filtra pool con pattern bollette (183 pattern + elite)
+    pool_before = len(pool)
+    pool = [s for s in pool if s.get("elite") or matches_bollette_pattern(s)]
+    print(f"🎯 Filtro pattern: {pool_before} → {len(pool)} selezioni "
+          f"({pool_before - len(pool)} escluse, {len(_HYBRID_PATTERNS)} pattern hybrid caricati)")
 
-    if len(extended_pool) < 2:
+    if len(pool) < 2:
         print("⚠️ Pool troppo piccolo (< 2 selezioni). Nessuna bolletta generata.")
         return
 
-    # 3. Generazione sequenziale per sezione
+    # 2. Generazione sequenziale per sezione
     bollette_docs = []
     counters = {"oggi": 0, "elite": 0, "selettiva": 0, "bilanciata": 0, "ambiziosa": 0}
 
@@ -1247,12 +1712,13 @@ def main():
     SECTION_TARGETS = {
         "oggi":       3,
         "elite":      3,
-        "selettiva":  5,
-        "bilanciata": 5,
-        "ambiziosa":  5,
+        "selettiva":  3,
+        "bilanciata": 3,
+        "ambiziosa":  3,
     }
 
     SECTION_ORDER = ["oggi", "elite", "selettiva", "bilanciata", "ambiziosa"]
+    all_discarded_sels = []
 
     for fascia in SECTION_ORDER:
         target = SECTION_TARGETS[fascia]
@@ -1260,8 +1726,8 @@ def main():
         print(f"📌 SEZIONE {fascia.upper()} — target: {target} bollette")
         print(f"{'─'*50}")
 
-        new_bollette = _generate_for_section(
-            fascia, target, extended_pool, today_str, bollette_docs, counters
+        new_bollette, discarded = _generate_for_section(
+            fascia, target, pool, today_str, bollette_docs, counters
         )
 
         if new_bollette:
@@ -1270,8 +1736,36 @@ def main():
         else:
             print(f"   ⚠️ {fascia.upper()}: nessuna bolletta valida")
 
+        if discarded:
+            all_discarded_sels.extend(discarded)
+
         # Pausa tra sezioni per evitare rate limit Mistral
         time.sleep(5)
+
+    # 3. Ricomposizione automatica dalle bollette scartate
+    missing = {f: 3 - counters.get(f, 0) for f in ["selettiva", "bilanciata", "ambiziosa"]}
+    any_missing = any(v > 0 for v in missing.values())
+
+    if any_missing and all_discarded_sels:
+        print(f"\n{'─'*50}")
+        print(f"🔄 RICOMPOSIZIONE — urna: {len(all_discarded_sels)} selezioni scartate")
+        print(f"   Mancano: " + ", ".join(f"{f}={v}" for f, v in missing.items() if v > 0))
+        print(f"{'─'*50}")
+
+        recomposed = _recompose_from_discards(
+            all_discarded_sels, pool, today_str, bollette_docs, counters
+        )
+
+        if recomposed:
+            bollette_docs.extend(recomposed)
+            by_tipo_r = {}
+            for b in recomposed:
+                by_tipo_r.setdefault(b["tipo"], []).append(b)
+            for tipo, bs in by_tipo_r.items():
+                quotes = [b["quota_totale"] for b in bs]
+                print(f"   ✅ Ricomposte {len(bs)} {tipo}: quote {quotes}")
+        else:
+            print(f"   ⚠️ Nessuna bolletta ricomposta")
 
     if not bollette_docs:
         print("\n⚠️ Nessuna bolletta generata.")

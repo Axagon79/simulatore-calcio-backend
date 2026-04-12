@@ -1,0 +1,1044 @@
+====================================================================================================
+  REPORT HYBRID PATTERN MIXER v2
+  Data report: 2026-04-12 20:32
+  Periodo: storico completo
+  Pronostici analizzati: 1612
+  Hit rate globale: 957/1612 = 59.4%
+  Condizioni estratte dai report: 48
+  Combinazioni testate: 8842
+  Sorgente: top 30 elite + top 30 bizarre + hr75_n8 bizarre
+====================================================================================================
+
+
+====================================================================================================
+  PATTERN IBRIDI v2 — HR >= 75%, N >= 8
+  * = gia in produzione
+====================================================================================================
+  Pattern                                                                HR     N   Profit       
+  -----------------------------------------------------------------------------------------------
+  conf70-79 + pron=Over 1.5 + routing=consensus_both                100.0%     8     +3.0  
+  conf60-69 + pron=X2 + q1.4-1.49 + stelle3.0-3.5                   100.0%     8     +3.5  
+  conf60-69 + q1.6-1.79 + routing=single + stelle3.0-3.5            100.0%     8     +5.1  
+  conf80-100 + pron=Under 2.5                                        92.9%    14     +4.8  
+  conf80-100 + stelle3.5-4.0                                         92.9%    14     +5.2  
+  conf60-69 + q1.4-1.49 + routing=consensus_both + tipo=DOPPIA_CHANCE  92.9%    14     +4.5  
+  conf>=70 + pron=Goal + q1.3-1.49 + stelle>=3.5                     92.9%    14     +4.6  
+  conf>=70 + q1.3-1.49 + src=C                                       92.3%    13     +4.3  
+  pron=Over 1.5 + routing=consensus_both + stelle3.0-3.5             92.3%    13     +3.4  
+  conf60-69 + pron=X2 + q1.4-1.49 + stelle>=3.0                      92.3%    13     +4.3  
+  conf60-69 + pron=X2 + q1.4-1.49                                    91.7%    24     +7.5  
+  conf70-79 + pron=Over 1.5 + q1.3-1.49                              91.7%    12     +3.2  
+  conf70-79 + q1.3-1.49 + src=C                                      91.7%    12     +3.8  
+  conf>=70 + pron=Under 2.5 + q1.3-1.39                              91.7%    12     +3.0  
+  conf>=70 + q1.4-1.49 + src=C                                       91.7%    12     +3.9  
+  conf60-69 + pron=X2 + q1.4-1.49 + routing=consensus_both           91.7%    12     +3.7  
+  pron=MG 2-4 + stelle>=3.0                                          90.9%    11     +3.3  * E10
+  conf70-79 + q1.4-1.49 + src=C                                      90.9%    11     +3.5  
+  pron=Over 1.5 + q1.4-1.49 + routing=consensus_both                 90.9%    11     +3.2  
+  q1.4-1.49 + stelle3.5-4.0 + tipo=DOPPIA_CHANCE                     90.9%    11     +3.4  
+  conf60-69 + pron=X2 + q1.3-1.49 + stelle3.0-3.5                    90.9%    11     +3.2  
+  conf60-69 + q1.4-1.49 + stelle3.0-3.5 + tipo=DOPPIA_CHANCE         90.9%    11     +3.3  
+  conf70-79 + pron=Goal + q1.3-1.49 + stelle3.5-4.0                  90.9%    11     +3.4  
+  conf>=60 + pron=X2 + q1.4-1.49 + src=C_screm                       90.9%    11     +3.5  
+  conf>=60 + pron=X2 + q1.4-1.49                                     90.0%    30     +8.7  
+  pron=MG 2-4 + stelle3.0-3.5                                        90.0%    10     +2.9  * E10
+  pron=Under 3.5 + q1.3-1.49                                         90.0%    10     +2.5  
+  conf80-100 + pron=Under 2.5 + q1.3-1.49                            90.0%    10     +2.7  
+  conf80-100 + pron=Under 2.5 + stelle3.5-4.0                        90.0%    10     +3.2  
+  pron=X2 + q1.4-1.49 + stelle3.5-4.0                                90.0%    10     +3.0  
+
+====================================================================================================
+  PATTERN IBRIDI v2 — HR >= 70%, N >= 15 (campione ampio)
+  * = gia in produzione
+====================================================================================================
+  Pattern                                                                HR     N   Profit       
+  -----------------------------------------------------------------------------------------------
+  conf60-69 + pron=X2 + q1.4-1.49                                    91.7%    24     +7.5  
+  conf>=60 + pron=X2 + q1.4-1.49                                     90.0%    30     +8.7  
+  conf60-69 + q1.4-1.49 + tipo=DOPPIA_CHANCE                         89.7%    29     +8.2  
+  conf>=60 + pron=X2 + q1.4-1.49 + stelle>=3.0                       89.5%    19     +5.5  
+  pron=X2 + q1.4-1.49 + src=C_screm + stelle>=3.0                    88.9%    18     +5.2  
+  conf>=60 + pron=MG 2-4                                             88.2%    17     +4.4  * E10
+  conf60-69 + q1.4-1.49 + stelle>=3.0 + tipo=DOPPIA_CHANCE           88.2%    17     +4.6  
+  q1.3-1.39 + routing=consensus_both + stelle3.0-3.5 + tipo=GOL      88.2%    17     +3.4  
+  conf60-69 + pron=X2 + routing=consensus_both                       87.5%    16     +3.7  
+  q1.6-1.79 + routing=single + stelle>=4.0                           87.5%    16     +7.2  
+  conf60-69 + pron=X2 + q1.3-1.49 + stelle>=3.0                      87.5%    16     +4.0  
+  conf60-69 + q1.3-1.49 + stelle3.0-3.5 + tipo=DOPPIA_CHANCE         87.5%    16     +3.8  
+  conf70-79 + q1.3-1.39 + stelle3.0-3.5 + tipo=GOL                   87.5%    16     +3.0  
+  conf>=60 + q1.4-1.49 + tipo=DOPPIA_CHANCE                          87.2%    39     +9.7  
+  conf70-79 + q1.3-1.39 + tipo=GOL                                   87.0%    23     +4.2  
+  conf>=70 + q1.4-1.49 + stelle3.5-4.0                               86.7%    45    +11.0  
+  conf60-69 + pron=X2 + q1.3-1.49                                    86.7%    30     +7.0  
+  q1.3-1.39 + src=A                                                  86.7%    15     +2.7  
+  src=A+S_mg + stelle3.0-3.5                                         86.7%    15     +5.0  
+  conf80-100 + routing=single + tipo=GOL                             86.7%    15     +3.8  
+  q1.6-1.79 + routing=single + stelle>=4.0 + tipo=SEGNO              86.7%    15     +6.6  
+  q1.3-1.39 + routing=consensus_both + stelle3.0-3.5                 85.7%    28     +4.7  
+  pron=Over 1.5 + routing=consensus_both                             85.3%    34     +5.9  
+  conf>=70 + q1.3-1.49 + stelle3.5-4.0                               85.2%    61    +12.7  
+  conf>=60 + q1.4-1.49 + stelle>=3.0 + tipo=DOPPIA_CHANCE            85.2%    27     +6.0  
+  conf>=70 + q1.4-1.49 + stelle3.5-4.0 + tipo=GOL                    85.0%    40     +8.8  
+  pron=Goal + q1.3-1.49 + stelle>=3.5                                85.0%    20     +4.4  
+  conf>=70 + q1.3-1.39 + tipo=GOL                                    84.8%    33     +5.1  
+  conf60-69 + routing=consensus_both + tipo=DOPPIA_CHANCE            84.6%    26     +4.8  
+  pron=1 + routing=single + stelle>=4.0                              84.6%    26    +11.6  
+
+====================================================================================================
+  TOP 30 — Score = HR * sqrt(N)
+  * = gia in produzione
+====================================================================================================
+    # Pattern                                                                HR     N   Profit  Score       
+  ---------------------------------------------------------------------------------------------------------
+    1. conf>=60 + q1.3-1.49                                               74.7%   293    +15.4   1279  
+    2. q1.3-1.49 + stelle>=3.0                                            72.7%   293     +7.4   1244  
+    3. q1.3-1.49 + tipo=GOL                                               72.3%   278     +4.6   1205  
+    4. conf>=60 + q1.3-1.49 + stelle>=3.0                                 74.5%   235    +11.7   1142  
+    5. conf>=60 + routing=single + stelle>=3.0                            68.4%   266    +44.4   1116  
+    6. conf>=60 + q1.3-1.49 + tipo=GOL                                    73.0%   226     +6.5   1097  
+    7. q1.3-1.49 + stelle>=3.0 + tipo=GOL                                 72.2%   216     +3.8   1061  
+    8. conf>=60 + q1.4-1.49                                               74.0%   192    +11.7   1025  
+    9. q1.4-1.49 + stelle>=3.0                                            72.2%   194     +7.0   1006  
+   10. conf>=60 + q1.3-1.49 + stelle>=3.0 + tipo=GOL                      73.0%   189     +5.6   1004  
+   11. q1.3-1.49 + stelle3.0-3.5                                          70.7%   184     -1.1    959  
+   12. q1.4-1.49 + tipo=GOL                                               70.4%   179     +1.7    942  
+   13. routing=single + stelle>=3.5                                       70.1%   177    +38.8    933  
+   14. conf>=60 + q1.4-1.49 + stelle>=3.0                                 73.1%   156     +7.8    913  
+   15. conf>=70 + routing=single                                          68.8%   176    +24.6    913  
+   16. conf>=70 + q1.3-1.49                                               74.7%   146     +7.7    903  
+   17. conf60-69 + q1.3-1.49                                              73.8%   141     +5.4    876  
+   18. conf>=60 + q1.4-1.49 + tipo=GOL                                    70.6%   153     +2.0    873  
+   19. routing=consensus_both + stelle>=3.0                               68.1%   160     +1.8    861  
+   20. q1.3-1.49 + tipo=DOPPIA_CHANCE                                     72.5%   138     +3.4    852  
+   21. q1.4-1.49 + stelle>=3.0 + tipo=GOL                                 70.1%   147     +0.8    850  
+   22. pron=Over 1.5 + tipo=GOL                                           70.5%   139     -1.3    831  
+   23. conf>=70 + q1.3-1.49 + tipo=GOL                                    74.2%   124     +6.0    826  
+   24. pron=1 + routing=single + stelle>=3.0                              72.7%   128    +35.9    823  
+   25. conf>=70 + routing=single + stelle>=3.5                            70.9%   134    +27.1    821  
+   26. conf>=60 + q1.3-1.49 + stelle3.0-3.5                               73.0%   126     +3.2    819  
+   27. conf>=60 + q1.3-1.49 + routing=consensus_both                      75.7%   115     +6.4    812  
+   28. q1.3-1.49 + routing=consensus_both                                 73.9%   119     +3.7    806  
+   29. conf>=60 + q1.4-1.49 + stelle>=3.0 + tipo=GOL                      70.5%   129     +1.8    801  
+   30. q1.3-1.49 + stelle>=3.5                                            76.1%   109     +8.5    795  
+
+====================================================================================================
+  TOP 20 NUOVI — Pattern non ancora in produzione, HR >= 70%, N >= 8
+====================================================================================================
+  Pattern                                                                HR     N   Profit
+  ------------------------------------------------------------------------------------------
+  conf70-79 + pron=Over 1.5 + routing=consensus_both                100.0%     8     +3.0
+  conf60-69 + pron=X2 + q1.4-1.49 + stelle3.0-3.5                   100.0%     8     +3.5
+  conf60-69 + q1.6-1.79 + routing=single + stelle3.0-3.5            100.0%     8     +5.1
+  conf80-100 + pron=Under 2.5                                        92.9%    14     +4.8
+  conf80-100 + stelle3.5-4.0                                         92.9%    14     +5.2
+  conf60-69 + q1.4-1.49 + routing=consensus_both + tipo=DOPPIA_CHANCE  92.9%    14     +4.5
+  conf>=70 + pron=Goal + q1.3-1.49 + stelle>=3.5                     92.9%    14     +4.6
+  conf>=70 + q1.3-1.49 + src=C                                       92.3%    13     +4.3
+  pron=Over 1.5 + routing=consensus_both + stelle3.0-3.5             92.3%    13     +3.4
+  conf60-69 + pron=X2 + q1.4-1.49 + stelle>=3.0                      92.3%    13     +4.3
+  conf60-69 + pron=X2 + q1.4-1.49                                    91.7%    24     +7.5
+  conf70-79 + pron=Over 1.5 + q1.3-1.49                              91.7%    12     +3.2
+  conf70-79 + q1.3-1.49 + src=C                                      91.7%    12     +3.8
+  conf>=70 + pron=Under 2.5 + q1.3-1.39                              91.7%    12     +3.0
+  conf>=70 + q1.4-1.49 + src=C                                       91.7%    12     +3.9
+  conf60-69 + pron=X2 + q1.4-1.49 + routing=consensus_both           91.7%    12     +3.7
+  conf70-79 + q1.4-1.49 + src=C                                      90.9%    11     +3.5
+  pron=Over 1.5 + q1.4-1.49 + routing=consensus_both                 90.9%    11     +3.2
+  q1.4-1.49 + stelle3.5-4.0 + tipo=DOPPIA_CHANCE                     90.9%    11     +3.4
+  conf60-69 + pron=X2 + q1.3-1.49 + stelle3.0-3.5                    90.9%    11     +3.2
+
+
+****************************************************************************************************
+  TUTTI I PATTERN HR >= 65%, N >= 10
+  * = pattern gia in produzione
+****************************************************************************************************
+  Pattern                                                                HR     N   Profit
+  ------------------------------------------------------------------------------------------
+  conf80-100 + pron=Under 2.5                                        92.9%    14     +4.8
+  conf80-100 + stelle3.5-4.0                                         92.9%    14     +5.2
+  conf60-69 + q1.4-1.49 + routing=consensus_both + tipo=DOPPIA_CHANCE  92.9%    14     +4.5
+  conf>=70 + pron=Goal + q1.3-1.49 + stelle>=3.5                     92.9%    14     +4.6
+  conf>=70 + q1.3-1.49 + src=C                                       92.3%    13     +4.3
+  pron=Over 1.5 + routing=consensus_both + stelle3.0-3.5             92.3%    13     +3.4
+  conf60-69 + pron=X2 + q1.4-1.49 + stelle>=3.0                      92.3%    13     +4.3
+  conf60-69 + pron=X2 + q1.4-1.49                                    91.7%    24     +7.5
+  conf70-79 + pron=Over 1.5 + q1.3-1.49                              91.7%    12     +3.2
+  conf70-79 + q1.3-1.49 + src=C                                      91.7%    12     +3.8
+  conf>=70 + pron=Under 2.5 + q1.3-1.39                              91.7%    12     +3.0
+  conf>=70 + q1.4-1.49 + src=C                                       91.7%    12     +3.9
+  conf60-69 + pron=X2 + q1.4-1.49 + routing=consensus_both           91.7%    12     +3.7
+  pron=MG 2-4 + stelle>=3.0                                          90.9%    11     +3.3  * E10
+  conf70-79 + q1.4-1.49 + src=C                                      90.9%    11     +3.5
+  pron=Over 1.5 + q1.4-1.49 + routing=consensus_both                 90.9%    11     +3.2
+  q1.4-1.49 + stelle3.5-4.0 + tipo=DOPPIA_CHANCE                     90.9%    11     +3.4
+  conf60-69 + pron=X2 + q1.3-1.49 + stelle3.0-3.5                    90.9%    11     +3.2
+  conf60-69 + q1.4-1.49 + stelle3.0-3.5 + tipo=DOPPIA_CHANCE         90.9%    11     +3.3
+  conf70-79 + pron=Goal + q1.3-1.49 + stelle3.5-4.0                  90.9%    11     +3.4
+  conf>=60 + pron=X2 + q1.4-1.49 + src=C_screm                       90.9%    11     +3.5
+  conf>=60 + pron=X2 + q1.4-1.49                                     90.0%    30     +8.7
+  pron=MG 2-4 + stelle3.0-3.5                                        90.0%    10     +2.9  * E10
+  pron=Under 3.5 + q1.3-1.49                                         90.0%    10     +2.5
+  conf80-100 + pron=Under 2.5 + q1.3-1.49                            90.0%    10     +2.7
+  conf80-100 + pron=Under 2.5 + stelle3.5-4.0                        90.0%    10     +3.2
+  pron=X2 + q1.4-1.49 + stelle3.5-4.0                                90.0%    10     +3.0
+  q1.4-1.49 + routing=consensus_both + stelle3.5-4.0                 90.0%    10     +2.9
+  conf70-79 + pron=Goal + q1.4-1.49 + stelle3.5-4.0                  90.0%    10     +3.0
+  conf70-79 + q1.3-1.49 + stelle3.5-4.0 + tipo=DOPPIA_CHANCE         90.0%    10     +2.6
+  pron=Over 1.5 + q1.3-1.39 + routing=consensus_both + stelle3.0-3.5  90.0%    10     +2.2
+  pron=X2 + q1.4-1.49 + src=C_screm + stelle3.0-3.5                  90.0%    10     +3.0
+  conf70-79 + q1.3-1.39 + routing=consensus_both + stelle3.0-3.5 + tipo=GOL  90.0%    10     +2.3
+  conf60-69 + q1.4-1.49 + tipo=DOPPIA_CHANCE                         89.7%    29     +8.2
+  conf>=60 + pron=X2 + q1.4-1.49 + stelle>=3.0                       89.5%    19     +5.5
+  pron=X2 + q1.4-1.49 + src=C_screm + stelle>=3.0                    88.9%    18     +5.2
+  conf>=60 + pron=MG 2-4                                             88.2%    17     +4.4  * E10
+  conf60-69 + q1.4-1.49 + stelle>=3.0 + tipo=DOPPIA_CHANCE           88.2%    17     +4.6
+  q1.3-1.39 + routing=consensus_both + stelle3.0-3.5 + tipo=GOL      88.2%    17     +3.4
+  conf60-69 + pron=X2 + routing=consensus_both                       87.5%    16     +3.7
+  q1.6-1.79 + routing=single + stelle>=4.0                           87.5%    16     +7.2
+  conf60-69 + pron=X2 + q1.3-1.49 + stelle>=3.0                      87.5%    16     +4.0
+  conf60-69 + q1.3-1.49 + stelle3.0-3.5 + tipo=DOPPIA_CHANCE         87.5%    16     +3.8
+  conf70-79 + q1.3-1.39 + stelle3.0-3.5 + tipo=GOL                   87.5%    16     +3.0
+  conf>=60 + q1.4-1.49 + tipo=DOPPIA_CHANCE                          87.2%    39     +9.7
+  conf70-79 + q1.3-1.39 + tipo=GOL                                   87.0%    23     +4.2
+  conf>=70 + q1.4-1.49 + stelle3.5-4.0                               86.7%    45    +11.0
+  conf60-69 + pron=X2 + q1.3-1.49                                    86.7%    30     +7.0
+  q1.3-1.39 + src=A                                                  86.7%    15     +2.7
+  src=A+S_mg + stelle3.0-3.5                                         86.7%    15     +5.0
+  conf80-100 + routing=single + tipo=GOL                             86.7%    15     +3.8
+  q1.6-1.79 + routing=single + stelle>=4.0 + tipo=SEGNO              86.7%    15     +6.6
+  q1.3-1.39 + routing=consensus_both + stelle3.0-3.5                 85.7%    28     +4.7
+  conf70-79 + pron=Over 1.5                                          85.7%    14     +2.7
+  pron=Under 2.5 + q1.3-1.39                                         85.7%    14     +2.4
+  pron=X2 + q1.3-1.49 + stelle3.5-4.0                                85.7%    14     +3.1
+  conf>=60 + q1.4-1.49 + src=C_screm + tipo=DOPPIA_CHANCE            85.7%    14     +3.3
+  conf>=70 + pron=1 + q1.6-1.79 + routing=single                     85.7%    14     +6.1
+  q1.5-1.59 + src=C_screm + stelle>=3.5 + tipo=GOL                   85.7%    14     +4.4
+  pron=Over 1.5 + routing=consensus_both                             85.3%    34     +5.9
+  conf>=70 + q1.3-1.49 + stelle3.5-4.0                               85.2%    61    +12.7
+  conf>=60 + q1.4-1.49 + stelle>=3.0 + tipo=DOPPIA_CHANCE            85.2%    27     +6.0
+  conf>=70 + q1.4-1.49 + stelle3.5-4.0 + tipo=GOL                    85.0%    40     +8.8
+  pron=Goal + q1.3-1.49 + stelle>=3.5                                85.0%    20     +4.4
+  conf>=70 + q1.3-1.39 + tipo=GOL                                    84.8%    33     +5.1
+  conf60-69 + routing=consensus_both + tipo=DOPPIA_CHANCE            84.6%    26     +4.8
+  pron=1 + routing=single + stelle>=4.0                              84.6%    26    +11.6
+  conf>=60 + pron=1 + q1.6-1.79 + routing=single                     84.6%    26    +10.7
+  conf60-69 + pron=MG 2-4                                            84.6%    13     +2.7  * E10
+  conf>=60 + routing=combo_96_dc_flip                                84.6%    13     +3.2
+  conf80-100 + q1.6-1.79 + routing=single                            84.6%    13     +5.2
+  pron=X2 + q1.4-1.49 + routing=consensus_both                       84.6%    13     +2.7
+  q1.3-1.49 + routing=consensus_both + stelle3.5-4.0                 84.6%    13     +2.6
+  conf60-69 + q1.3-1.49 + routing=consensus_both + stelle3.0-3.5     84.6%    13     +2.3
+  conf>=70 + q1.3-1.49 + stelle3.5-4.0 + tipo=GOL                    84.3%    51    +10.0
+  conf80-100 + pron=1                                                84.2%    19     +7.9
+  q1.3-1.49 + src=C                                                  84.2%    19     +4.0
+  conf>=60 + q1.4-1.49 + routing=consensus_both + tipo=DOPPIA_CHANCE  84.2%    19     +3.8
+  q1.3-1.39 + routing=consensus_both + stelle>=3.0 + tipo=GOL        84.2%    19     +2.8
+  q1.4-1.49 + src=C_screm + stelle>=3.0 + tipo=DOPPIA_CHANCE         84.0%    25     +5.4
+  q1.3-1.39 + routing=consensus_both + stelle>=3.0                   83.9%    31     +4.4
+  conf70-79 + q1.3-1.39                                              83.3%    36     +4.8
+  conf60-69 + src=A + stelle3.0-3.5                                  83.3%    24     +7.0
+  conf70-79 + q1.3-1.39 + stelle3.0-3.5                              83.3%    24     +3.2
+  conf70-79 + q1.3-1.39 + routing=consensus_both + stelle3.0-3.5     83.3%    18     +2.4
+  pron=1 + q1.6-1.79 + routing=single + stelle3.0-3.5                83.3%    18     +6.4
+  q2.0-2.49 + stelle>=4.0                                            83.3%    12     +8.9
+  conf50-59 + q1.6-1.79 + tipo=GOL                                   83.3%    12     +4.5
+  conf60-69 + pron=1 + stelle3.0-3.5                                 83.3%    12     +6.7
+  conf70-79 + q1.3-1.39 + stelle3.5-4.0                              83.3%    12     +1.6
+  conf80-100 + q1.6-1.79 + tipo=SEGNO                                83.3%    12     +4.6
+  conf50-59 + pron=1 + q1.5-1.59 + routing=single                    83.3%    12     +3.4
+  conf50-59 + q1.4-1.49 + src=C_screm + tipo=DOPPIA_CHANCE           83.3%    12     +2.5
+  conf60-69 + pron=1 + q1.6-1.79 + routing=single                    83.3%    12     +4.5
+  conf60-69 + q1.3-1.49 + src=A + stelle3.0-3.5                      83.3%    12     +2.2
+  conf>=60 + pron=X2 + q1.3-1.49 + src=C_screm                       83.3%    12     +2.5
+  conf>=70 + q1.3-1.39 + routing=consensus_both + tipo=GOL           83.3%    12     +1.6
+  q1.3-1.39 + routing=consensus_both + stelle>=3.0 + tipo=DOPPIA_CHANCE  83.3%    12     +1.6
+  q1.3-1.49 + routing=consensus_both + stelle3.5-4.0 + tipo=GOL      83.3%    12     +2.3
+  pron=1 + q1.6-1.79 + routing=single + stelle>=3.0                  82.9%    41    +15.2
+  pron=Under 2.5 + q1.3-1.49 + stelle>=3.5                           82.8%    29     +4.9
+  conf>=70 + q1.3-1.39                                               82.6%    46     +5.7
+  conf70-79 + q1.3-1.49 + stelle3.5-4.0                              82.6%    46     +8.0
+  pron=Over 1.5 + q1.3-1.39 + routing=consensus_both                 82.6%    23     +2.7
+  conf60-69 + q1.3-1.49 + stelle>=3.0 + tipo=DOPPIA_CHANCE           82.6%    23     +4.0
+  pron=1 + q1.6-1.79 + routing=single + stelle>=3.5                  82.6%    23     +8.8
+  q1.6-1.79 + src=C + stelle3.0-3.5 + tipo=SEGNO                     82.6%    23     +7.9
+  conf70-79 + q1.4-1.49 + stelle3.5-4.0                              82.4%    34     +6.3
+  pron=X2 + q1.4-1.49 + stelle>=3.0                                  82.4%    34     +6.3
+  conf>=60 + q1.3-1.39 + stelle3.0-3.5 + tipo=GOL                    82.4%    34     +4.1
+  q1.4-1.49 + src=C                                                  82.4%    17     +3.3
+  pron=Goal + q1.3-1.49 + stelle3.5-4.0                              82.4%    17     +3.1
+  q1.3-1.49 + stelle3.5-4.0 + tipo=DOPPIA_CHANCE                     82.4%    17     +2.9
+  conf>=70 + q1.3-1.39 + stelle>=3.5 + tipo=GOL                      82.4%    17     +2.1
+  conf>=60 + pron=X2 + q1.3-1.49                                     82.2%    45     +7.4
+  conf>=70 + q1.3-1.49 + stelle>=3.5                                 82.1%    78    +12.6
+  conf>=70 + q1.4-1.49 + stelle>=3.5                                 82.1%    56    +10.1
+  conf70-79 + q1.3-1.49 + stelle>=3.5                                82.0%    50     +8.2
+  conf60-69 + q1.3-1.49 + tipo=DOPPIA_CHANCE                         81.8%    44     +6.9
+  conf>=70 + q1.3-1.39 + stelle>=3.5                                 81.8%    22     +2.5
+  q1.6-1.79 + routing=single + src=C + stelle3.0-3.5                 81.8%    22     +7.3
+  conf>=85 + tipo=GOL                                                81.8%    11     +3.4
+  pron=MG 2-4 + src=A+S_mg                                           81.8%    11     +1.9  * E10
+  conf70-79 + q2.0-2.49 + src=C                                      81.8%    11     +7.3
+  q1.3-1.49 + routing=combo_96_dc_flip + stelle3.0-3.5               81.8%    11     +1.7
+  conf70-79 + q1.3-1.39 + routing=consensus_both + tipo=GOL          81.8%    11     +1.3
+  conf>=70 + q1.3-1.39 + stelle3.5-4.0 + tipo=GOL                    81.8%    11     +1.2
+  q1.3-1.39 + routing=consensus_both + stelle3.0-3.5 + tipo=DOPPIA_CHANCE  81.8%    11     +1.3
+  q1.3-1.49 + src=C_screm + stelle3.5-4.0 + tipo=DOPPIA_CHANCE       81.8%    11     +1.9
+  conf50-59 + q1.4-1.49 + src=C_screm + stelle3.0-3.5 + tipo=DOPPIA_CHANCE  81.8%    11     +2.1
+  conf70-79 + q1.4-1.49 + stelle>=3.5                                81.6%    38     +6.6
+  conf60-69 + q1.4-1.49 + stelle3.0-3.5                              81.2%    32     +5.3
+  q1.3-1.39 + routing=consensus_both + tipo=GOL                      81.2%    32     +3.3
+  conf60-69 + pron=Under 3.5                                         81.2%    16     +1.0
+  conf>=85 + routing=single                                          81.2%    16     +5.4
+  q2.0-2.49 + src=C_screm                                            81.2%    16    +11.9
+  src=A+S_mg + stelle>=3.0                                           81.2%    16     +4.0
+  conf>=70 + q1.3-1.39 + stelle3.5-4.0                               81.2%    16     +1.7
+  conf>=70 + q2.0-2.49 + src=C                                       81.2%    16    +10.5
+  q1.3-1.49 + routing=combo_96_dc_flip + stelle>=3.0                 81.2%    16     +2.3
+  q1.6-1.79 + stelle>=4.0 + tipo=SEGNO                               81.2%    16     +5.6
+  conf60-69 + src=C_screm + stelle3.5-4.0 + tipo=GOL                 81.2%    16     +3.4
+  conf>=60 + q1.4-1.49 + stelle3.0-3.5 + tipo=DOPPIA_CHANCE          81.2%    16     +2.6
+  conf>=60 + q1.5-1.59 + src=C_screm + tipo=GOL                      81.2%    16     +3.9
+  q1.4-1.49 + src=C_screm + stelle3.0-3.5 + tipo=DOPPIA_CHANCE       81.2%    16     +2.9
+  q1.3-1.49 + routing=combo_96_dc_flip                               81.0%    21     +3.1
+  conf>=70 + q1.3-1.39 + routing=consensus_both                      81.0%    21     +2.2
+  pron=Under 2.5 + q1.4-1.49 + stelle>=3.5                           81.0%    21     +3.4
+  routing=consensus_both + stelle>=3.0 + tipo=DOPPIA_CHANCE          81.0%    21     +2.5
+  conf>=70 + q1.3-1.49 + stelle>=3.5 + tipo=GOL                      80.9%    68    +10.0
+  conf>=60 + q1.3-1.39 + stelle3.0-3.5                               80.9%    47     +4.7
+  conf60-69 + src=C_screm + tipo=GOL                                 80.8%    26     +5.4
+  conf60-69 + routing=single + stelle>=3.0 + tipo=GOL                80.8%    26     +8.1
+  conf>=60 + q1.3-1.49 + tipo=DOPPIA_CHANCE                          80.6%    67     +9.0
+  conf70-79 + q1.3-1.49 + stelle3.5-4.0 + tipo=GOL                   80.6%    36     +5.3
+  conf>=60 + pron=X2 + q1.3-1.49 + stelle>=3.0                       80.6%    31     +4.4
+  conf>=70 + q1.4-1.49 + stelle>=3.5 + tipo=GOL                      80.4%    51     +7.9
+  conf>=60 + q1.3-1.49 + stelle>=3.0 + tipo=DOPPIA_CHANCE            80.4%    46     +6.1
+  q1.4-1.49 + stelle3.5-4.0                                          80.3%    66    +10.2
+  conf>=60 + routing=consensus_both + tipo=DOPPIA_CHANCE             80.0%    40     +4.6
+  conf70-79 + q1.3-1.49 + stelle>=3.5 + tipo=GOL                     80.0%    40     +5.6
+  pron=Under 2.5 + q1.3-1.49 + stelle3.5-4.0                         80.0%    25     +3.2
+  q1.5-1.59 + src=C_screm + tipo=GOL                                 80.0%    25     +5.6
+  conf70-79 + q1.3-1.39 + routing=consensus_both                     80.0%    20     +1.8
+  q1.4-1.49 + routing=consensus_both + tipo=DOPPIA_CHANCE            80.0%    20     +2.8
+  routing=consensus_both + stelle3.0-3.5 + tipo=DOPPIA_CHANCE        80.0%    20     +2.2
+  conf60-69 + pron=Under 2.5 + routing=single + stelle3.0-3.5        80.0%    20     +5.3
+  conf>=60 + pron=Over 1.5 + q1.3-1.49 + stelle3.0-3.5               80.0%    20     +1.9
+  q1.4-1.49 + routing=combo_96_dc_flip                               80.0%    15     +2.2
+  conf80-100 + q1.6-1.79 + src=C                                     80.0%    15     +5.0
+  pron=Goal + q1.4-1.49 + stelle3.5-4.0                              80.0%    15     +2.4
+  pron=X2 + q2.0-2.49 + src=C_screm                                  80.0%    15    +10.8
+  q1.4-1.49 + src=C_screm + stelle3.5-4.0                            80.0%    15     +2.3
+  conf>=60 + pron=Over 1.5 + q1.3-1.39 + stelle3.0-3.5               80.0%    15     +1.2
+  conf50-59 + pron=1 + q1.6-1.79 + routing=single + stelle3.0-3.5    80.0%    15     +4.5
+  conf80-100 + q1.3-1.39                                             80.0%    10     +0.9
+  q1.6-1.79 + src=C_mg                                               80.0%    10     +3.2
+  conf50-59 + q1.3-1.49 + routing=combo_96_dc_flip                   80.0%    10     +1.4
+  conf70-79 + q2.0-2.49 + routing=single                             80.0%    10     +6.4
+  q1.4-1.49 + routing=combo_96_dc_flip + stelle>=3.0                 80.0%    10     +1.4
+  conf60-69 + q1.4-1.49 + src=C_screm + tipo=DOPPIA_CHANCE           80.0%    10     +1.5
+  conf60-69 + src=C_screm + stelle3.0-3.5 + tipo=GOL                 80.0%    10     +2.1
+  conf70-79 + pron=1 + q1.6-1.79 + routing=single                    80.0%    10     +3.6
+  pron=1 + q1.5-1.59 + routing=single + stelle3.0-3.5                80.0%    10     +2.3
+  conf80-100 + routing=single                                        79.6%    54    +15.6
+  pron=1 + stelle>=4.0                                               79.3%    29    +10.2
+  conf70-79 + q1.4-1.49 + stelle3.5-4.0 + tipo=GOL                   79.3%    29     +4.1
+  conf>=60 + q1.3-1.49 + stelle3.0-3.5 + tipo=DOPPIA_CHANCE          79.3%    29     +3.2
+  conf>=60 + q1.3-1.39 + routing=consensus_both                      79.2%    53     +4.1
+  conf60-69 + pron=Over 1.5 + routing=consensus_both                 79.2%    24     +2.2
+  pron=X2 + q1.4-1.49 + stelle3.0-3.5                                79.2%    24     +3.3
+  q1.6-1.79 + stelle3.0-3.5 + tipo=SEGNO                             79.2%    24     +6.9
+  pron=X2 + q1.3-1.49 + src=C_screm + stelle>=3.0                    79.2%    24     +3.3
+  q1.3-1.39 + stelle3.0-3.5 + tipo=GOL                               79.1%    43     +3.2
+  pron=1 + q1.6-1.79 + stelle3.0-3.5                                 78.9%    19     +5.4
+  pron=Under 2.5 + q1.4-1.49 + stelle3.5-4.0                         78.9%    19     +2.5
+  conf50-59 + q1.6-1.79 + src=C + stelle3.0-3.5                      78.9%    19     +5.4
+  conf60-69 + q1.3-1.49 + stelle3.0-3.5                              78.8%    52     +5.8
+  conf70-79 + q1.4-1.49 + stelle>=3.5 + tipo=GOL                     78.8%    33     +4.4
+  q1.4-1.49 + stelle>=3.0 + tipo=DOPPIA_CHANCE                       78.7%    47     +6.2
+  src=A + stelle>=3.5                                                78.6%    42     +7.0
+  conf>=85 + tipo=SEGNO                                              78.6%    14     +4.5
+  conf60-69 + q1.4-1.49 + src=A                                      78.6%    14     +1.7
+  conf60-69 + q1.5-1.59 + routing=single + stelle>=3.0               78.6%    14     +2.9
+  conf>=60 + q1.3-1.39 + stelle>=3.0 + tipo=GOL                      78.3%    60     +3.9
+  conf>=60 + pron=Over 1.5 + stelle3.0-3.5                           78.3%    23     +1.8
+  conf>=60 + pron=X2 + routing=consensus_both                        78.3%    23     +2.2
+  q1.3-1.49 + src=A + stelle>=3.0                                    78.2%    55     +5.7
+  q1.4-1.49 + stelle3.5-4.0 + tipo=GOL                               78.2%    55     +6.8
+  conf>=60 + q1.3-1.39 + tipo=GOL                                    78.1%    73     +4.4
+  q1.4-1.49 + stelle>=3.5                                            77.9%    77     +9.3
+  conf60-69 + q1.4-1.49 + routing=consensus_both                     77.8%    27     +2.9
+  conf>=85 + src=C                                                   77.8%    18     +6.1
+  conf>=60 + pron=X2 + q1.5-1.59                                     77.8%    18     +3.4
+  conf>=70 + pron=Over 1.5 + q1.3-1.49                               77.8%    18     +1.4
+  conf50-59 + q1.6-1.79 + routing=single + stelle3.0-3.5             77.8%    18     +4.8
+  q1.5-1.59 + src=C_screm + stelle3.0-3.5 + tipo=DOPPIA_CHANCE       77.8%    18     +3.6
+  q1.6-1.79 + src=C + stelle>=3.0 + tipo=SEGNO                       77.4%    62    +17.5
+  pron=X2 + q1.4-1.49                                                77.3%    66     +7.3
+  conf80-100 + routing=single + stelle>=4.0                          77.3%    44    +12.4
+  conf80-100 + q1.5-1.59                                             77.3%    22     +3.9
+  conf70-79 + q1.3-1.49 + tipo=DOPPIA_CHANCE                         77.3%    22     +1.7
+  conf>=70 + q2.0-2.49 + stelle>=3.5                                 77.3%    22    +13.9
+  conf60-69 + q1.6-1.79 + routing=single + stelle>=3.0               77.3%    22     +6.2
+  q1.5-1.59 + src=C_screm + stelle>=3.0 + tipo=GOL                   77.3%    22     +4.0
+  q1.3-1.49 + stelle3.5-4.0                                          77.2%    92     +8.6
+  conf>=60 + q1.3-1.39 + stelle>=3.0                                 77.2%    79     +4.0
+  q1.6-1.79 + routing=single + stelle>=3.0 + tipo=SEGNO              77.0%    61    +16.9
+  conf80-100 + tipo=SEGNO                                            76.9%    39    +11.8
+  conf>=85 + stelle>=3.0                                             76.9%    26     +6.9
+  q1.5-1.59 + stelle3.0-3.5 + tipo=DOPPIA_CHANCE                     76.9%    26     +4.8
+  conf>=70 + q1.6-1.79 + routing=single + tipo=SEGNO                 76.9%    26     +7.5
+  conf50-59 + pron=1 + q1.5-1.59                                     76.9%    13     +2.4
+  conf60-69 + pron=1 + q1.6-1.79                                     76.9%    13     +3.5
+  conf60-69 + pron=Under 3.5 + src=A                                 76.9%    13     -0.1
+  conf60-69 + pron=X2 + q1.5-1.59                                    76.9%    13     +2.4
+  conf60-69 + pron=X2 + stelle3.5-4.0                                76.9%    13     +3.3
+  conf70-79 + q1.3-1.39 + tipo=DOPPIA_CHANCE                         76.9%    13     +0.6
+  conf>=60 + pron=1 + stelle3.0-3.5                                  76.9%    13     +5.7
+  conf>=70 + q2.0-2.49 + routing=single                              76.9%    13     +7.4
+  q1.5-1.59 + src=C + stelle3.0-3.5                                  76.9%    13     +2.4
+  conf50-59 + pron=X2 + q1.3-1.49 + src=C_screm                      76.9%    13     +1.2
+  conf>=60 + q1.3-1.39 + stelle3.0-3.5 + tipo=DOPPIA_CHANCE          76.9%    13     +0.7
+  q1.3-1.39 + stelle>=3.0 + tipo=GOL                                 76.8%    69     +3.0
+  q1.3-1.39 + routing=consensus_both                                 76.8%    56     +2.5
+  conf60-69 + q1.3-1.49 + routing=consensus_both                     76.8%    56     +3.8
+  q1.3-1.49 + src=A                                                  76.7%    60     +5.0
+  conf>=70 + pron=Under 2.5 + q1.3-1.49                              76.7%    43     +3.5
+  conf>=60 + q1.6-1.79 + routing=single + tipo=SEGNO                 76.7%    43    +12.1
+  conf>=60 + pron=1 + q1.6-1.79 + stelle>=3.0                        76.7%    30     +8.3
+  q1.6-1.79 + routing=single + src=C + stelle>=3.0                   76.6%    64    +17.2
+  q1.3-1.49 + routing=single + stelle>=3.0                           76.5%    51     +4.1
+  routing=combo_96_dc_flip + stelle>=3.0                             76.5%    34     +6.1
+  conf>=60 + pron=Under 3.5                                          76.5%    17     -0.0
+  conf50-59 + pron=X2 + q1.4-1.49                                    76.5%    17     +1.7
+  conf60-69 + q1.3-1.49 + src=A                                      76.5%    17     +1.5
+  conf70-79 + q2.0-2.49 + stelle>=3.5                                76.5%    17    +10.8
+  conf70-79 + stelle3.5-4.0 + tipo=DOPPIA_CHANCE                     76.5%    17     +2.1
+  conf50-59 + pron=1 + q1.6-1.79 + routing=single                    76.5%    17     +4.2
+  conf60-69 + q1.3-1.39 + routing=consensus_both + tipo=GOL          76.5%    17     +0.7
+  conf60-69 + q1.6-1.79 + routing=single + src=C                     76.5%    17     +4.6
+  conf>=60 + pron=X2 + q1.3-1.49 + stelle3.0-3.5                     76.5%    17     +1.3
+  conf>=60 + pron=X2 + q1.5-1.59 + stelle>=3.0                       76.5%    17     +2.9
+  conf>=60 + q1.3-1.49 + src=C_screm + tipo=DOPPIA_CHANCE            76.5%    17     +1.7
+  pron=1 + q1.6-1.79 + routing=single + stelle3.5-4.0                76.5%    17     +4.9
+  q1.6-1.79 + src=C_screm + stelle>=3.0 + tipo=GOL                   76.5%    17     +4.1
+  conf60-69 + q1.4-1.49                                              76.4%    89     +8.5
+  q1.3-1.49 + routing=consensus_both + stelle>=3.0                   76.4%    72     +4.8
+  src=A + stelle3.5-4.0                                              76.3%    38     +5.3
+  conf>=60 + q1.3-1.39                                               76.2%   101     +3.7
+  conf80-100 + q1.3-1.49                                             76.2%    21     +1.4
+  conf50-59 + q1.6-1.79 + src=C                                      76.2%    21     +5.0
+  q1.3-1.49 + src=C_screm + stelle3.5-4.0                            76.2%    21     +1.7
+  conf60-69 + q1.4-1.49 + stelle3.0-3.5 + tipo=GOL                   76.2%    21     +2.0
+  conf>=60 + q1.3-1.39 + routing=consensus_both + tipo=DOPPIA_CHANCE  76.2%    21     +0.8
+  q1.3-1.49 + stelle>=3.5                                            76.1%   109     +8.5
+  pron=1 + q1.6-1.79 + stelle>=3.0                                   76.1%    46    +11.8
+  routing=single + stelle3.5-4.0 + tipo=GOL                          76.1%    46     +7.8
+  conf>=60 + q1.6-1.79 + routing=single + src=C                      76.1%    46    +12.4
+  q1.3-1.49 + stelle3.5-4.0 + tipo=GOL                               76.0%    75     +5.8
+  pron=X2 + routing=consensus_both                                   76.0%    25     +1.6
+  pron=X2 + q1.3-1.49 + stelle>=3.0                                  75.9%    54     +4.1
+  routing=single + stelle>=3.5 + tipo=GOL                            75.9%    54     +8.9
+  pron=X2 + stelle3.5-4.0                                            75.9%    29     +5.0
+  conf60-69 + q1.3-1.39 + routing=consensus_both                     75.9%    29     +0.9
+  conf>=70 + q1.6-1.79 + routing=single + src=C                      75.9%    29     +7.8
+  q1.3-1.39 + tipo=GOL                                               75.8%    99     +2.8
+  q1.4-1.49 + stelle>=3.5 + tipo=GOL                                 75.8%    66     +5.9
+  pron=Goal + q1.3-1.49                                              75.8%    33     +2.8
+  pron=X2 + q1.4-1.49 + src=C_screm                                  75.8%    33     +3.2
+  conf>=60 + q1.3-1.49 + routing=consensus_both                      75.7%   115     +6.4
+  conf>=70 + pron=1 + routing=single                                 75.6%    45    +14.2
+  q1.3-1.49 + routing=single                                         75.5%    53     +3.6
+  conf60-69 + q1.4-1.49 + stelle>=3.0                                75.5%    53     +4.5
+  q1.4-1.49 + tipo=DOPPIA_CHANCE                                     75.3%    89     +7.3
+  q1.3-1.49 + stelle>=3.5 + tipo=GOL                                 75.0%    92     +5.7
+  pron=Under 2.5 + q1.3-1.49 + stelle>=3.0                           75.0%    52     +3.1
+  q1.4-1.49 + src=C_screm + tipo=DOPPIA_CHANCE                       75.0%    48     +4.0
+  conf>=70 + routing=single + stelle>=3.5 + tipo=GOL                 75.0%    48     +6.1
+  routing=consensus_both + tipo=DOPPIA_CHANCE                        75.0%    44     +2.0
+  conf80-100 + routing=single + src=C                                75.0%    40    +10.8
+  q1.4-1.49 + src=A + stelle>=3.0                                    75.0%    40     +3.0
+  conf>=70 + routing=single + stelle3.5-4.0 + tipo=GOL               75.0%    40     +5.0
+  q1.4-1.49 + stelle3.0-3.5 + tipo=DOPPIA_CHANCE                     75.0%    36     +2.8
+  conf60-69 + q1.3-1.49 + stelle3.0-3.5 + tipo=GOL                   75.0%    36     +2.0
+  conf>=60 + pron=Goal + q1.3-1.49                                   75.0%    32     +2.4
+  pron=Goal + q1.4-1.49                                              75.0%    28     +2.4
+  q1.6-1.79 + src=C + stelle3.0-3.5                                  75.0%    28     +6.4
+  conf60-69 + pron=Under 2.5 + stelle3.0-3.5                         75.0%    24     +4.7
+  conf>=70 + pron=Goal + q1.3-1.49                                   75.0%    24     +1.8
+  conf>=70 + pron=Over 1.5                                           75.0%    20     +0.9
+  conf50-59 + q1.6-1.79 + routing=single                             75.0%    20     +4.4
+  conf60-69 + q1.3-1.39 + stelle3.0-3.5                              75.0%    20     +0.5
+  conf>=70 + pron=Goal + q1.4-1.49                                   75.0%    20     +1.7
+  conf50-59 + q1.6-1.79 + stelle3.0-3.5 + tipo=SEGNO                 75.0%    20     +4.4
+  conf50-59 + q1.5-1.59 + routing=single                             75.0%    16     +2.5
+  conf70-79 + pron=X2 + stelle3.5-4.0                                75.0%    16     +1.7
+  conf80-100 + q1.5-1.59 + routing=single                            75.0%    16     +2.3
+  q1.5-1.59 + routing=single + stelle3.5-4.0                         75.0%    16     +2.5
+  conf50-59 + pron=1 + q1.6-1.79 + stelle3.0-3.5                     75.0%    16     +3.5
+  conf60-69 + pron=Over 1.5 + q1.3-1.39 + routing=consensus_both     75.0%    16     +0.3
+  pron=X2 + q1.3-1.49 + src=C_screm + stelle3.0-3.5                  75.0%    16     +1.1
+  conf>=70 + q1.5-1.59 + src=C_screm                                 75.0%    12     +1.7
+  pron=Over 1.5 + q1.5-1.59 + src=C_screm                            75.0%    12     +1.8
+  conf50-59 + pron=1 + q2.0-2.49 + routing=single                    75.0%    12     +6.3
+  conf60-69 + pron=Over 1.5 + src=C_screm + stelle3.5-4.0            75.0%    12     +1.1
+  conf60-69 + pron=X2 + q1.5-1.59 + stelle>=3.0                      75.0%    12     +1.9
+  conf60-69 + pron=X2 + src=C_screm + stelle3.5-4.0                  75.0%    12     +2.8
+  conf60-69 + q1.3-1.39 + routing=consensus_both + tipo=DOPPIA_CHANCE  75.0%    12     +0.3
+  conf>=70 + q2.0-2.49 + routing=single + src=C                      75.0%    12     +6.1
+  pron=1 + q2.0-2.49 + routing=single + stelle3.0-3.5                75.0%    12     +6.3
+  conf50-59 + pron=X2 + q1.3-1.49 + src=C_screm + stelle3.0-3.5      75.0%    12     +0.8
+  conf>=60 + q1.3-1.49                                               74.7%   293    +15.4
+  conf>=70 + q1.3-1.49                                               74.7%   146     +7.7
+  q1.3-1.39 + stelle3.0-3.5                                          74.6%    67     +1.1
+  q1.3-1.49 + routing=consensus_both + stelle3.0-3.5                 74.6%    59     +2.2
+  conf>=60 + q1.3-1.49 + stelle>=3.0                                 74.5%   235    +11.7
+  pron=1 + q1.6-1.79 + routing=single                                74.5%    55    +12.7
+  q1.3-1.49 + routing=consensus_both + stelle>=3.0 + tipo=GOL        74.5%    51     +2.3
+  conf>=60 + pron=1 + routing=single                                 74.4%    78    +23.6
+  q1.6-1.79 + routing=single + stelle3.0-3.5                         74.4%    39     +8.6
+  q1.6-1.79 + routing=single + stelle>=3.5 + tipo=SEGNO              74.4%    39     +9.6
+  conf>=70 + q1.3-1.49 + tipo=GOL                                    74.2%   124     +6.0
+  pron=X2 + q1.3-1.49                                                74.2%    97     +5.2
+  routing=single + stelle>=4.0                                       74.2%    62    +19.4
+  conf>=60 + pron=1 + q1.6-1.79                                      74.2%    31     +7.3
+  pron=Under 2.5 + q1.3-1.49                                         74.1%    54     +2.6
+  routing=single + stelle>=4.0 + tipo=SEGNO                          74.1%    54    +18.2
+  routing=combo_96_dc_flip + stelle3.0-3.5                           74.1%    27     +4.3
+  conf>=60 + pron=Goal + q1.4-1.49                                   74.1%    27     +2.0
+  pron=1 + q1.6-1.79 + stelle>=3.5                                   74.1%    27     +6.4
+  conf>=60 + q1.4-1.49                                               74.0%   192    +11.7
+  q1.3-1.49 + stelle>=3.0 + tipo=DOPPIA_CHANCE                       74.0%    77     +3.6
+  q1.3-1.49 + routing=consensus_both                                 73.9%   119     +3.7
+  pron=Under 2.5 + stelle>=3.5                                       73.9%    46     +4.6
+  conf>=70 + q2.0-2.49                                               73.9%    23    +12.9
+  q2.0-2.49 + tipo=DOPPIA_CHANCE                                     73.9%    23    +13.2
+  pron=Over 1.5 + q1.3-1.39 + stelle3.0-3.5                          73.9%    23     +0.0
+  pron=X2 + q1.5-1.59 + stelle3.0-3.5                                73.9%    23     +3.2
+  conf60-69 + q1.3-1.49                                              73.8%   141     +5.4
+  conf80-100 + stelle>=3.0                                           73.8%    84    +15.7
+  conf>=70 + q1.3-1.49 + routing=consensus_both + tipo=GOL           73.8%    42     +1.7
+  q1.6-1.79 + routing=single + src=C + stelle>=3.5                   73.8%    42     +9.8
+  q1.3-1.39 + stelle>=3.0                                            73.7%    99     +0.4
+  routing=single + src=C + stelle>=4.0                               73.7%    57    +18.8
+  conf60-69 + q1.4-1.49 + src=C_screm                                73.7%    19     +1.2
+  conf70-79 + pron=Goal + q1.4-1.49                                  73.7%    19     +1.2
+  conf50-59 + q1.5-1.59 + stelle3.0-3.5 + tipo=DOPPIA_CHANCE         73.7%    19     +2.6
+  conf70-79 + q1.6-1.79 + routing=consensus_both + stelle3.0-3.5     73.7%    19     +3.8
+  conf>=60 + q1.3-1.39 + stelle>=3.0 + tipo=DOPPIA_CHANCE            73.7%    19     +0.1
+  pron=X2 + q1.5-1.59 + stelle>=3.0                                  73.5%    34     +4.4
+  q1.3-1.49 + routing=consensus_both + tipo=GOL                      73.3%    75     +1.8
+  q1.4-1.49 + src=A                                                  73.3%    45     +2.3
+  pron=X2 + q1.3-1.49 + src=C_screm                                  73.3%    45     +2.2
+  conf>=60 + q1.5-1.59 + src=C_screm                                 73.3%    30     +3.7
+  pron=Goal + q1.3-1.49 + stelle>=3.0                                73.3%    30     +1.5
+  conf50-59 + q2.0-2.49 + routing=single                             73.3%    15     +7.4
+  conf70-79 + pron=X2 + q1.3-1.49                                    73.3%    15     +0.4
+  conf50-59 + pron=X2 + q1.4-1.49 + stelle3.0-3.5                    73.3%    15     +0.8
+  conf60-69 + q1.3-1.39 + stelle3.0-3.5 + tipo=GOL                   73.3%    15     -0.0
+  conf70-79 + pron=Under 2.5 + q1.3-1.49 + stelle3.5-4.0             73.3%    15     +0.6
+  pron=X2 + q1.5-1.59 + src=C_screm + stelle3.0-3.5                  73.3%    15     +2.0
+  conf50-59 + q1.5-1.59 + src=C_screm + stelle3.0-3.5 + tipo=DOPPIA_CHANCE  73.3%    15     +2.0
+  conf>=60 + q1.4-1.49 + stelle>=3.0                                 73.1%   156     +7.8
+  conf>=60 + pron=Over 1.5                                           73.1%    78     +1.1
+  q1.6-1.79 + stelle>=3.0 + tipo=SEGNO                               73.1%    67    +14.1
+  q1.3-1.39 + stelle>=3.5 + tipo=GOL                                 73.1%    26     -0.2
+  q1.3-1.49 + src=A + stelle3.0-3.5                                  73.1%    26     +0.8
+  q1.5-1.59 + src=C_screm + stelle3.0-3.5                            73.1%    26     +3.3
+  conf>=60 + q1.3-1.49 + tipo=GOL                                    73.0%   226     +6.5
+  conf>=60 + q1.3-1.49 + stelle>=3.0 + tipo=GOL                      73.0%   189     +5.6
+  conf>=60 + q1.3-1.49 + stelle3.0-3.5                               73.0%   126     +3.2
+  src=A + stelle>=3.0                                                73.0%   115    +12.4
+  q1.4-1.49 + routing=single + stelle>=3.0                           73.0%    37     +1.8
+  conf70-79 + q1.3-1.49                                              72.9%   118     +3.3
+  pron=1 + routing=single + stelle3.0-3.5                            72.9%    59    +17.4
+  q1.3-1.49 + stelle>=3.0                                            72.7%   293     +7.4
+  pron=1 + routing=single + stelle>=3.0                              72.7%   128    +35.9
+  conf>=70 + q1.3-1.49 + routing=consensus_both                      72.7%    55     +1.1
+  conf60-69 + pron=1 + routing=single                                72.7%    33     +9.4
+  conf>=70 + q1.6-1.79 + routing=single + stelle>=3.5                72.7%    33     +7.0
+  conf50-59 + routing=combo_96_dc_flip                               72.7%    22     +3.3
+  pron=X2 + q2.0-2.49                                                72.7%    22    +12.2
+  conf50-59 + q1.5-1.59 + tipo=DOPPIA_CHANCE                         72.7%    22     +2.7
+  conf50-59 + q1.6-1.79 + tipo=SEGNO                                 72.7%    22     +4.0
+  conf70-79 + pron=Goal + q1.3-1.49                                  72.7%    22     +0.9
+  conf80-100 + q1.4-1.49                                             72.7%    11     +0.6
+  src=C_mg + stelle3.5-4.0                                           72.7%    11     +2.1
+  conf70-79 + q2.0-2.49 + tipo=SEGNO                                 72.7%    11     +5.5
+  pron=1 + q1.5-1.59 + stelle3.0-3.5                                 72.7%    11     +1.3
+  pron=X2 + q1.5-1.59 + stelle>=3.5                                  72.7%    11     +1.2
+  pron=X2 + routing=consensus_both + stelle>=3.0                     72.7%    11     +0.1
+  conf50-59 + q1.5-1.59 + routing=single + stelle3.0-3.5             72.7%    11     +1.3
+  conf60-69 + q1.3-1.49 + src=C_screm + stelle3.0-3.5                72.7%    11     +0.5
+  conf60-69 + q1.4-1.49 + src=C_screm + stelle3.5-4.0                72.7%    11     +0.5
+  conf>=60 + pron=X2 + q1.5-1.59 + src=C_screm                       72.7%    11     +1.3
+  conf>=60 + q1.4-1.49 + routing=consensus_both                      72.6%    62     +2.2
+  q1.3-1.49 + tipo=DOPPIA_CHANCE                                     72.5%   138     +3.4
+  pron=Under 2.5 + routing=single + stelle>=3.0                      72.5%   109    +11.0
+  pron=1 + routing=single + stelle>=3.5                              72.5%    69    +18.5
+  q1.5-1.59 + src=C_screm + stelle>=3.0                              72.5%    51     +5.9
+  conf>=60 + pron=Over 1.5 + q1.3-1.39                               72.5%    40     -0.7
+  pron=X2 + q1.3-1.49 + stelle3.0-3.5                                72.5%    40     +1.0
+  pron=1 + q1.5-1.59 + routing=single + stelle>=3.0                  72.4%    29     +3.4
+  q1.3-1.49 + tipo=GOL                                               72.3%   278     +4.6
+  conf60-69 + q1.3-1.49 + stelle>=3.0                                72.3%    83     +1.7
+  conf>=60 + q1.6-1.79 + stelle>=3.0 + tipo=SEGNO                    72.3%    47     +9.7
+  q1.3-1.49 + stelle>=3.0 + tipo=GOL                                 72.2%   216     +3.8
+  q1.4-1.49 + stelle>=3.0                                            72.2%   194     +7.0
+  q2.0-2.49 + stelle>=3.5                                            72.2%    36    +18.4
+  conf60-69 + pron=1 + stelle>=3.0                                   72.2%    36    +11.1
+  q1.3-1.49 + src=C_screm + stelle>=3.0 + tipo=DOPPIA_CHANCE         72.2%    36     +1.2
+  conf70-79 + q2.0-2.49                                              72.2%    18     +9.8
+  conf50-59 + pron=1 + q1.6-1.79                                     72.2%    18     +3.2
+  conf60-69 + pron=Over 1.5 + src=C_screm                            72.2%    18     +1.0
+  conf60-69 + q1.5-1.59 + src=C_screm                                72.2%    18     +2.0
+  conf60-69 + q1.6-1.79 + tipo=SEGNO                                 72.2%    18     +3.6
+  conf80-100 + q1.5-1.59 + stelle>=4.0                               72.2%    18     +1.8
+  conf>=70 + pron=1 + q1.6-1.79                                      72.2%    18     +3.8
+  q2.0-2.49 + routing=single + stelle>=3.5                           72.2%    18     +8.4
+  conf50-59 + q1.5-1.59 + src=C_screm + tipo=DOPPIA_CHANCE           72.2%    18     +2.1
+  q1.6-1.79 + routing=single + stelle>=3.0                           72.1%    86    +16.7
+  conf80-100 + tipo=GOL                                              72.1%    43     +4.4
+  conf80-100 + src=C                                                 72.0%    50    +11.6
+  conf50-59 + q1.5-1.59 + src=C_screm                                72.0%    25     +2.8
+  conf60-69 + routing=consensus_both + stelle3.0-3.5                 72.0%    25     +1.4
+  conf60-69 + src=C_screm + stelle3.0-3.5                            72.0%    25     +2.9
+  pron=Goal + q1.4-1.49 + stelle>=3.0                                72.0%    25     +1.1
+  q1.5-1.59 + src=C_screm + stelle>=3.5                              72.0%    25     +2.6
+  q1.6-1.79 + src=C + stelle>=4.0                                    72.0%    25     +4.8
+  routing=single + stelle>=3.0 + tipo=GOL                            71.9%   121    +13.0
+  conf70-79 + q1.3-1.49 + tipo=GOL                                   71.9%    96     +1.7
+  stelle>=4.0 + tipo=SEGNO                                           71.9%    57    +16.8
+  q1.3-1.39 + stelle>=3.5                                            71.9%    32     -0.8
+  conf60-69 + q1.5-1.59 + stelle3.0-3.5                              71.9%    32     +3.3
+  q1.4-1.49 + routing=single                                         71.8%    39     +1.2
+  q1.5-1.59 + stelle>=3.0 + tipo=DOPPIA_CHANCE                       71.8%    39     +4.1
+  q1.3-1.49 + routing=consensus_both + stelle3.0-3.5 + tipo=GOL      71.8%    39     -0.0
+  q1.3-1.49 + stelle3.0-3.5 + tipo=DOPPIA_CHANCE                     71.7%    60     +0.7
+  pron=Over 1.5 + q1.3-1.49 + stelle3.0-3.5                          71.7%    46     -0.2
+  q1.4-1.49 + routing=consensus_both                                 71.4%    63     +1.2
+  conf50-59 + pron=1 + routing=single                                71.4%    63    +20.4
+  conf60-69 + pron=Over 1.5                                          71.4%    56     -0.5
+  pron=X2 + routing=combo_96_dc_flip                                 71.4%    49     +5.7
+  pron=Under 2.5 + stelle3.5-4.0                                     71.4%    42     +2.9
+  pron=X2 + stelle>=3.5                                              71.4%    35     +4.3
+  conf>=60 + q1.3-1.39 + tipo=DOPPIA_CHANCE                          71.4%    28     -0.7
+  conf80-100 + q1.6-1.79                                             71.4%    21     +3.9
+  conf50-59 + routing=combo_96_dc_flip + stelle3.0-3.5               71.4%    21     +2.9
+  conf70-79 + stelle>=3.5 + tipo=DOPPIA_CHANCE                       71.4%    21     +1.8
+  conf>=60 + q1.5-1.59 + tipo=DOPPIA_CHANCE                          71.4%    21     +2.0
+  pron=X2 + src=C_screm + stelle3.5-4.0                              71.4%    21     +2.8
+  conf50-59 + q1.3-1.49 + src=C_screm + tipo=DOPPIA_CHANCE           71.4%    21     +0.3
+  conf50-59 + q1.5-1.59 + src=C_screm + stelle3.0-3.5                71.4%    21     +2.2
+  conf>=60 + q1.6-1.79 + routing=single + stelle3.0-3.5              71.4%    21     +3.8
+  pron=Under 3.5 + src=A                                             71.4%    14     -1.1
+  conf>=70 + q2.0-2.49 + tipo=SEGNO                                  71.4%    14     +6.5
+  pron=Over 1.5 + src=C_screm + stelle3.5-4.0                        71.4%    14     +0.5
+  q1.5-1.59 + stelle3.0-3.5 + tipo=SEGNO                             71.4%    14     +1.4
+  q2.0-2.49 + stelle>=3.5 + tipo=GOL                                 71.4%    14     +7.2
+  conf60-69 + q1.3-1.49 + src=C_screm + tipo=GOL                     71.4%    14     +0.1
+  conf70-79 + q1.6-1.79 + routing=single + tipo=SEGNO                71.4%    14     +2.9
+  conf>=60 + pron=Over 1.5 + q1.3-1.49                               71.2%    66     -1.1
+  q1.3-1.49 + src=C_screm + tipo=DOPPIA_CHANCE                       71.2%    66     +1.0
+  conf>=60 + q1.3-1.49 + stelle3.0-3.5 + tipo=GOL                    71.1%    97     -0.0
+  pron=Under 2.5 + q1.4-1.49 + stelle>=3.0                           71.1%    38     +0.8
+  conf>=70 + q1.4-1.49                                               71.0%   100     +2.0
+  conf60-69 + q1.6-1.79 + routing=single                             71.0%    31     +5.8
+  conf>=70 + pron=Under 2.5 + q1.4-1.49                              71.0%    31     +0.6
+  conf>=70 + routing=single + stelle>=3.5                            70.9%   134    +27.1
+  pron=Over 1.5 + q1.3-1.39                                          70.8%    65     -2.7
+  conf50-59 + pron=X2 + src=C_screm                                  70.8%    48     +8.9
+  conf>=60 + q1.6-1.79 + tipo=SEGNO                                  70.8%    48     +8.7
+  conf60-69 + pron=X2 + src=C_screm                                  70.8%    24     +3.7
+  conf70-79 + q1.6-1.79 + routing=consensus_both                     70.8%    24     +3.7
+  q1.3-1.39 + routing=consensus_both + tipo=DOPPIA_CHANCE            70.8%    24     -0.8
+  pron=X2 + q1.5-1.59 + src=C_screm + stelle>=3.0                    70.8%    24     +2.2
+  q1.3-1.49 + stelle3.0-3.5                                          70.7%   184     -1.1
+  conf60-69 + src=C_screm                                            70.7%    58     +5.4
+  q1.4-1.49 + routing=consensus_both + stelle>=3.0                   70.7%    41     +0.4
+  conf>=60 + q1.4-1.49 + tipo=GOL                                    70.6%   153     +2.0
+  conf>=70 + src=A                                                   70.6%    85     +5.2
+  conf>=60 + q1.6-1.79 + routing=single + stelle>=3.0                70.6%    68    +11.9
+  routing=consensus_both + stelle3.5-4.0                             70.6%    34     +1.8
+  conf60-69 + q1.6-1.79 + stelle3.5-4.0 + tipo=GOL                   70.6%    34     +6.2
+  q1.3-1.49 + stelle>=4.0                                            70.6%    17     -0.1
+  conf50-59 + q1.5-1.59 + tipo=SEGNO                                 70.6%    17     +1.5  * E2
+  conf60-69 + pron=Over 1.5 + q1.4-1.49                              70.6%    17     +0.1
+  conf50-59 + pron=X2 + q1.5-1.59 + stelle3.0-3.5                    70.6%    17     +1.5
+  conf70-79 + q1.6-1.79 + routing=single + src=C                     70.6%    17     +3.1
+  conf70-79 + routing=single + src=C + stelle>=4.0                   70.6%    17     +8.0
+  q1.3-1.39 + src=C_screm + stelle>=3.0 + tipo=GOL                   70.6%    17     -0.7
+  q2.0-2.49 + routing=single + src=C + stelle>=3.5                   70.6%    17     +7.1
+  pron=Over 1.5 + tipo=GOL                                           70.5%   139     -1.3
+  conf>=60 + q1.4-1.49 + stelle>=3.0 + tipo=GOL                      70.5%   129     +1.8
+  q1.6-1.79 + src=C + tipo=SEGNO                                     70.5%    78    +13.0
+  q1.4-1.49 + tipo=GOL                                               70.4%   179     +1.7
+  conf>=70 + pron=1                                                  70.4%    54    +12.4
+  conf50-59 + pron=X2 + q1.3-1.49                                    70.4%    27     -0.0
+  q2.0-2.49 + src=C + stelle>=3.5                                    70.4%    27    +11.7
+  conf>=60 + pron=Over 1.5 + q1.3-1.39 + stelle>=3.0                 70.4%    27     -1.3
+  conf>=60 + pron=1 + stelle>=3.0                                    70.3%    91    +22.5
+  conf>=70 + q1.4-1.49 + tipo=GOL                                    70.3%    91     +0.9
+  conf60-69 + q1.3-1.39 + tipo=GOL                                   70.3%    37     -1.7
+  conf60-69 + q1.6-1.79 + stelle3.0-3.5                              70.3%    37     +5.9
+  pron=1 + q1.5-1.59 + routing=single                                70.3%    37     +3.0
+  conf70-79 + q1.3-1.49 + routing=consensus_both + tipo=GOL          70.3%    37     -0.4
+  q1.5-1.59 + routing=single + src=C + stelle>=3.0                   70.3%    37     +3.0
+  q1.3-1.49 + stelle3.0-3.5 + tipo=GOL                               70.2%   124     -1.8
+  conf>=70 + pron=Under 2.5                                          70.2%    84     +4.5
+  conf>=60 + pron=Over 1.5 + stelle>=3.0                             70.2%    57     -1.4
+  conf50-59 + q1.5-1.59                                              70.2%    47     +3.9
+  q1.6-1.79 + routing=single + stelle>=3.5                           70.2%    47     +8.1
+  routing=single + stelle>=3.5                                       70.1%   177    +38.8
+  q1.4-1.49 + stelle>=3.0 + tipo=GOL                                 70.1%   147     +0.8
+  conf60-69 + q1.3-1.49 + tipo=GOL                                   70.1%    97     -1.5
+  q1.6-1.79 + routing=single + tipo=SEGNO                            70.1%    77    +12.4
+  conf60-69 + pron=X2                                                70.1%    67     +9.3
+  q1.6-1.79 + routing=single + src=C                                 70.0%    80    +12.6
+  conf80-100 + stelle>=4.0                                           70.0%    70    +10.5
+  conf50-59 + src=C_screm + tipo=DOPPIA_CHANCE                       70.0%    60     +9.1
+  conf60-69 + q1.4-1.49 + tipo=GOL                                   70.0%    60     +0.2
+  conf70-79 + q1.3-1.49 + routing=consensus_both                     70.0%    50     -1.0
+  conf50-59 + pron=1 + routing=single + stelle3.0-3.5                70.0%    50    +12.3
+  pron=Under 2.5 + q1.4-1.49                                         70.0%    40     +0.2
+  conf>=70 + q1.6-1.79 + tipo=SEGNO                                  70.0%    30     +5.1
+  conf60-69 + q1.3-1.49 + routing=consensus_both + tipo=GOL          70.0%    30     -1.0
+  conf>=70 + q1.4-1.49 + routing=consensus_both + tipo=GOL           70.0%    30     +0.1
+  conf70-79 + q1.3-1.49 + routing=consensus_both + stelle3.0-3.5 + tipo=GOL  70.0%    30     -0.6
+  conf50-59 + pron=X2 + q1.5-1.59                                    70.0%    20     +1.6
+  conf70-79 + pron=Goal + q1.5-1.59                                  70.0%    20     +1.4
+  conf70-79 + pron=X2 + stelle>=3.5                                  70.0%    20     +1.5
+  pron=1 + q1.6-1.79 + stelle3.5-4.0                                 70.0%    20     +3.5
+  pron=Under 2.5 + q1.6-1.79 + stelle3.0-3.5                         70.0%    20     +3.3
+  q1.3-1.39 + stelle3.5-4.0 + tipo=GOL                               70.0%    20     -1.0
+  q1.6-1.79 + src=C_screm + stelle3.0-3.5                            70.0%    20     +3.1
+  q1.6-1.79 + src=C_screm + tipo=GOL                                 70.0%    20     +2.8
+  conf50-59 + q1.4-1.49 + stelle3.0-3.5 + tipo=DOPPIA_CHANCE         70.0%    20     +0.2
+  conf>=60 + pron=1 + q1.5-1.59 + routing=single                     70.0%    20     +1.6
+  conf>=60 + q1.5-1.59 + stelle>=3.0 + tipo=DOPPIA_CHANCE            70.0%    20     +1.5
+  pron=1 + q2.0-2.49 + routing=single + stelle>=3.0                  70.0%    20     +8.4
+  conf60-69 + q1.3-1.49 + routing=single                             70.0%    10     +0.0
+  conf70-79 + pron=1 + stelle>=4.0                                   70.0%    10     +2.3
+  conf70-79 + q2.0-2.49 + stelle3.5-4.0                              70.0%    10     +5.0
+  pron=1 + q1.5-1.59 + stelle3.5-4.0                                 70.0%    10     +0.9
+  pron=Goal + q2.0-2.49 + stelle>=3.5                                70.0%    10     +4.5
+  pron=X2 + routing=consensus_both + stelle3.0-3.5                   70.0%    10     -0.3
+  conf50-59 + pron=1 + q1.5-1.59 + stelle3.0-3.5                     70.0%    10     +0.8
+  conf70-79 + src=C_screm + stelle3.5-4.0 + tipo=DOPPIA_CHANCE       70.0%    10     +0.4
+  conf>=60 + pron=1 + q2.0-2.49 + routing=single                     70.0%    10     +4.1
+  conf>=60 + pron=X2 + q1.3-1.39 + routing=consensus_both            70.0%    10     -0.5
+  pron=Over 1.5 + q1.5-1.59 + src=C_screm + stelle>=3.0              70.0%    10     +0.7
+  q1.3-1.39 + src=C_screm + stelle3.0-3.5 + tipo=GOL                 70.0%    10     -0.5
+  q1.3-1.49 + src=C_screm + stelle3.5-4.0 + tipo=GOL                 70.0%    10     -0.2
+  conf50-59 + pron=1 + q2.0-2.49 + routing=single + stelle3.0-3.5    70.0%    10     +4.3
+  src=A + stelle3.0-3.5                                              69.9%    73     +5.4
+  pron=Over 1.5 + q1.3-1.49                                          69.8%   116     -3.8
+  pron=1 + q1.6-1.79                                                 69.8%    63     +9.5
+  conf60-69 + q1.6-1.79 + stelle>=3.0 + tipo=GOL                     69.8%    63    +10.2
+  conf>=60 + src=C_screm + tipo=GOL                                  69.8%    53     +2.6
+  q1.6-1.79 + stelle>=3.5 + tipo=SEGNO                               69.8%    43     +7.2
+  conf50-59 + pron=X2 + src=C_screm + stelle3.0-3.5                  69.8%    43     +7.7
+  pron=Under 2.5 + stelle>=3.0                                       69.7%   119     +7.6
+  conf70-79 + tipo=DOPPIA_CHANCE                                     69.7%    33     +0.9
+  conf60-69 + src=C_screm + stelle3.5-4.0                            69.7%    33     +2.6
+  pron=1 + q1.5-1.59 + stelle>=3.0                                   69.7%    33     +2.5
+  routing=consensus_both + stelle3.5-4.0 + tipo=GOL                  69.7%    33     +1.5
+  pron=Over 1.5 + stelle3.0-3.5                                      69.6%    56     -0.9
+  conf50-59 + q1.4-1.49 + tipo=DOPPIA_CHANCE                         69.6%    23     +0.1
+  conf70-79 + pron=Under 2.5 + stelle3.5-4.0                         69.6%    23     +1.5
+  conf>=60 + pron=1 + q1.5-1.59                                      69.6%    23     +1.7
+  conf>=70 + stelle>=3.5 + tipo=DOPPIA_CHANCE                        69.6%    23     +1.4
+  pron=Over 1.5 + q1.4-1.49 + stelle3.0-3.5                          69.6%    23     -0.2
+  conf50-59 + pron=X2 + q1.3-1.49 + stelle3.0-3.5                    69.6%    23     -0.3
+  conf>=60 + pron=Under 2.5 + stelle>=3.0                            69.5%   118     +7.0
+  conf50-59 + src=C_screm                                            69.4%    98     +9.7
+  conf60-69 + q1.6-1.79 + stelle>=3.0                                69.4%    85    +13.2
+  src=A+S + stelle3.5-4.0                                            69.4%    36     +1.5
+  conf60-69 + q1.4-1.49 + stelle>=3.0 + tipo=GOL                     69.4%    36     -0.0
+  pron=1 + stelle>=3.5                                               69.2%    78    +16.7
+  conf60-69 + q1.3-1.39                                              69.2%    52     -3.0
+  conf60-69 + pron=1                                                 69.2%    39     +9.9
+  q1.3-1.39 + stelle3.5-4.0                                          69.2%    26     -1.6
+  conf50-59 + q1.4-1.49 + src=C_screm                                69.2%    26     -0.1
+  conf60-69 + q1.3-1.49 + src=C_screm                                69.2%    26     -0.3
+  conf70-79 + pron=1 + routing=single                                69.2%    26     +6.3
+  conf>=60 + pron=Over 1.5 + q1.4-1.49                               69.2%    26     -0.4
+  conf>=70 + q1.6-1.79 + src=A+S                                     69.2%    26     +3.3
+  conf>=60 + q1.5-1.59 + routing=single + src=C                      69.2%    26     +1.7
+  pron=Over 1.5 + q1.5-1.59                                          69.2%    13     +0.8
+  conf60-69 + q1.6-1.79 + src=A                                      69.2%    13     +2.2
+  conf70-79 + routing=consensus_both + tipo=DOPPIA_CHANCE            69.2%    13     -0.6
+  conf80-100 + q1.3-1.49 + stelle>=4.0                               69.2%    13     -0.4
+  conf80-100 + q1.5-1.59 + tipo=SEGNO                                69.2%    13     +0.7
+  q1.5-1.59 + stelle>=4.0 + tipo=GOL                                 69.2%    13     +0.7
+  conf50-59 + q2.0-2.49 + routing=single + stelle3.0-3.5             69.2%    13     +5.4
+  conf60-69 + q1.5-1.59 + src=C_screm + stelle3.5-4.0                69.2%    13     +0.9
+  conf60-69 + q1.6-1.79 + stelle3.5-4.0 + tipo=SEGNO                 69.2%    13     +2.1
+  conf>=60 + q1.6-1.79 + src=C_screm + tipo=GOL                      69.2%    13     +1.6
+  conf50-59 + pron=X2 + q1.5-1.59 + src=C_screm + stelle3.0-3.5      69.2%    13     +1.0
+  conf>=60 + pron=1                                                  69.1%    94    +21.3
+  pron=X2 + src=C_screm + stelle3.0-3.5                              69.1%    55     +8.6
+  conf50-59 + q1.4-1.49                                              69.0%    42     -0.4
+  src=C_screm + stelle3.0-3.5 + tipo=GOL                             69.0%    42     +1.3
+  conf70-79 + pron=Goal + src=C + stelle3.5-4.0                      69.0%    42     +5.0
+  conf70-79 + q1.3-1.49 + routing=consensus_both + stelle3.0-3.5     69.0%    42     -1.6
+  conf70-79 + pron=Under 2.5 + q1.3-1.49                             69.0%    29     -0.8
+  conf>=60 + q1.4-1.49 + src=C_screm                                 69.0%    29     -0.1
+  conf>=60 + q1.5-1.59 + tipo=SEGNO                                  69.0%    29     +1.8
+  conf60-69 + q1.6-1.79 + stelle3.0-3.5 + tipo=GOL                   69.0%    29     +4.0
+  q1.5-1.59 + src=C_screm + stelle>=3.0 + tipo=DOPPIA_CHANCE         69.0%    29     +1.8
+  conf>=70 + routing=single + tipo=GOL                               68.9%    90     +3.6
+  conf>=70 + routing=single                                          68.8%   176    +24.6
+  q1.5-1.59 + src=C_screm                                            68.8%    80     +4.7
+  conf>=60 + q1.6-1.79 + routing=single                              68.8%    77    +11.5
+  conf60-69 + q1.6-1.79 + stelle3.5-4.0                              68.8%    48     +7.3
+  q1.5-1.59 + stelle>=4.0                                            68.8%    32     +1.6
+  q1.4-1.49 + src=C_screm + stelle3.0-3.5                            68.8%    32     -0.2
+  q1.4-1.49 + routing=consensus_both + stelle>=3.0 + tipo=GOL        68.8%    32     -0.5
+  conf50-59 + q1.6-1.79 + src=C_screm                                68.8%    16     +2.3
+  conf60-69 + pron=Under 2.5 + q1.6-1.79                             68.8%    16     +2.6
+  conf60-69 + q1.5-1.59 + tipo=DOPPIA_CHANCE                         68.8%    16     +0.9
+  conf50-59 + pron=X2 + q1.5-1.59 + src=C_screm                      68.8%    16     +1.0
+  pron=Over 1.5 + q1.3-1.39 + src=C_screm + stelle>=3.0              68.8%    16     -1.1
+  pron=Under 2.5 + routing=single + stelle3.0-3.5                    68.7%    67     +4.1
+  conf>=70 + routing=single + tipo=SEGNO                             68.6%    86    +20.9
+  pron=Over 1.5 + q1.4-1.49                                          68.6%    51     -1.1
+  conf>=70 + tipo=DOPPIA_CHANCE                                      68.6%    35     +0.4
+  routing=consensus_both + stelle>=3.5                               68.6%    35     +0.8
+  pron=Over 1.5 + q1.3-1.39 + stelle>=3.0                            68.6%    35     -2.5
+  src=A+S + stelle3.5-4.0 + tipo=GOL                                 68.6%    35     +1.2
+  conf>=60 + routing=single + stelle>=3.0                            68.4%   266    +44.4
+  q1.4-1.49 + stelle3.0-3.5                                          68.4%   117     -2.3
+  conf>=60 + q1.4-1.49 + stelle3.0-3.5                               68.4%    79     -1.5
+  conf50-59 + pron=X2                                                68.4%    76     +9.1
+  conf50-59 + q1.4-1.49 + stelle3.0-3.5                              68.4%    38     -0.7
+  conf50-59 + q1.5-1.59 + stelle3.0-3.5                              68.4%    38     +2.1
+  conf50-59 + src=C_screm + tipo=GOL                                 68.4%    38     +0.5
+  conf50-59 + q1.4-1.49 + tipo=GOL                                   68.4%    19     -0.5
+  conf60-69 + q1.5-1.59 + src=C                                      68.4%    19     +1.0
+  conf80-100 + q1.6-1.79 + stelle>=4.0                               68.4%    19     +2.6
+  q1.4-1.49 + src=A + stelle3.0-3.5                                  68.4%    19     -0.3
+  q2.0-2.49 + stelle>=3.5 + tipo=SEGNO                               68.4%    19     +7.6
+  conf>=60 + pron=Under 2.5 + q1.6-1.79 + stelle3.0-3.5              68.4%    19     +2.7
+  pron=1 + q1.5-1.59 + routing=single + stelle>=3.5                  68.4%    19     +1.0
+  conf50-59 + q1.3-1.49 + src=C_screm + stelle3.0-3.5 + tipo=DOPPIA_CHANCE  68.4%    19     -0.4
+  q1.6-1.79 + src=C + stelle>=3.0                                    68.3%   120    +16.7
+  conf70-79 + q1.4-1.49                                              68.3%    82     -1.5
+  src=C + stelle>=4.0                                                68.3%    82    +17.5
+  conf60-69 + q1.3-1.49 + stelle>=3.0 + tipo=GOL                     68.3%    60     -2.3
+  conf60-69 + pron=X2 + stelle>=3.0                                  68.3%    41     +2.6
+  conf>=60 + q1.3-1.49 + src=C_screm                                 68.3%    41     -1.3
+  q1.5-1.59 + stelle>=3.0 + tipo=SEGNO                               68.3%    41     +2.1
+  conf60-69 + routing=single + src=C + stelle3.5-4.0                 68.3%    41    +12.1
+  routing=single + src=C + stelle>=3.5                               68.2%   132    +33.2
+  src=C_screm + stelle3.0-3.5                                        68.2%   110     +8.7
+  src=C_screm + stelle>=3.0 + tipo=GOL                               68.2%    85     +1.8
+  conf70-79 + pron=Goal + stelle3.5-4.0                              68.2%    44     +4.5
+  conf70-79 + src=C + stelle3.5-4.0 + tipo=GOL                       68.2%    44     +4.6
+  conf60-69 + pron=Over 1.5 + stelle3.5-4.0                          68.2%    22     -1.1
+  conf>=70 + pron=Goal + q1.5-1.59                                   68.2%    22     +0.9
+  conf>=70 + pron=X2 + stelle>=3.5                                   68.2%    22     +1.0
+  pron=1 + q1.5-1.59 + stelle>=3.5                                   68.2%    22     +1.2
+  q1.3-1.49 + routing=single + stelle3.0-3.5                         68.2%    22     -0.8
+  src=C_screm + stelle3.5-4.0 + tipo=GOL                             68.2%    22     +0.3
+  routing=consensus_both + stelle>=3.0                               68.1%   160     +1.8
+  src=C_screm + tipo=GOL                                             68.1%   113     +0.9
+  conf>=70 + routing=single + src=C                                  68.1%    91    +21.1
+  conf>=70 + routing=single + stelle3.5-4.0                          68.1%    72     +7.7
+  conf60-69 + q1.5-1.59 + stelle>=3.0                                68.1%    69     +3.3
+  q1.5-1.59 + routing=single + src=C                                 68.1%    47     +2.2
+  routing=consensus_both + stelle3.0-3.5                             68.0%   125     +0.9
+  conf>=60 + src=A+S_mg                                              68.0%    25     +0.7
+  conf>=70 + q1.6-1.79 + routing=consensus_both                      68.0%    25     +2.7
+  conf70-79 + routing=single + stelle3.5-4.0 + tipo=GOL              68.0%    25     +1.1
+  q1.3-1.49 + src=C_screm + stelle3.0-3.5 + tipo=DOPPIA_CHANCE       68.0%    25     -0.7
+  src=A+S + stelle>=3.0                                              67.9%   162     +1.4
+  q1.4-1.49 + src=C_screm                                            67.9%    84     -1.9
+  pron=X2 + src=C_screm + stelle>=3.0                                67.9%    81    +10.2
+  q1.4-1.49 + src=C_screm + stelle>=3.0                              67.9%    53     -1.1
+  conf50-59 + src=C_screm + stelle3.0-3.5 + tipo=DOPPIA_CHANCE       67.9%    53     +6.6
+  conf60-69 + pron=Under 2.5 + stelle>=3.0                           67.9%    28     +2.3
+  conf70-79 + routing=single + stelle>=3.5 + tipo=GOL                67.9%    28     +1.7
+  routing=single + stelle3.5-4.0                                     67.8%   115    +19.4
+  pron=Over 1.5 + stelle>=3.0                                        67.8%    90     -4.1
+  pron=1 + routing=single                                            67.7%   195    +53.6
+  conf>=70 + stelle3.5-4.0 + tipo=GOL                                67.7%   130     +5.3
+  pron=X2 + q1.3-1.39                                                67.7%    31     -2.2
+  conf50-59 + q1.3-1.49 + tipo=GOL                                   67.7%    31     -1.6
+  q1.3-1.39 + src=C_screm + tipo=GOL                                 67.7%    31     -2.5
+  conf50-59 + pron=X2 + stelle3.0-3.5                                67.6%    68     +8.1
+  src=C_screm + stelle3.0-3.5 + tipo=DOPPIA_CHANCE                   67.6%    68     +7.4
+  src=A+S + stelle>=3.5                                              67.6%    37     +0.5
+  conf60-69 + stelle3.0-3.5 + tipo=DOPPIA_CHANCE                     67.6%    34     +0.5
+  conf>=70 + q1.4-1.49 + routing=consensus_both                      67.6%    34     -1.1
+  pron=1 + q2.0-2.49 + routing=single                                67.6%    34    +12.6
+  routing=consensus_both + stelle>=3.5 + tipo=GOL                    67.6%    34     +0.5
+  conf>=70 + routing=consensus_both                                  67.5%   126     +0.7
+  routing=single + stelle>=3.5 + tipo=SEGNO                          67.5%   123    +29.8
+  conf60-69 + tipo=DOPPIA_CHANCE                                     67.4%    86     +5.8
+  q1.6-1.79 + tipo=SEGNO                                             67.4%    86     +9.8
+  conf60-69 + pron=Over 1.5 + q1.3-1.49                              67.4%    46     -3.1
+  pron=1 + q1.5-1.59                                                 67.4%    43     +1.7
+  conf60-69 + routing=single + stelle3.5-4.0                         67.4%    43    +11.7
+  q1.4-1.49 + routing=consensus_both + tipo=GOL                      67.4%    43     -1.6
+  src=C_screm + stelle>=3.5 + tipo=GOL                               67.4%    43     +0.5
+  conf>=60 + src=A                                                   67.3%   147     +3.0
+  conf>=70 + routing=consensus_both + tipo=GOL                       67.3%   113     +1.3
+  conf>=60 + pron=X2                                                 67.3%    98     +7.3
+  conf50-59 + q1.6-1.79                                              67.3%    52     +5.7
+  q1.3-1.39 + tipo=DOPPIA_CHANCE                                     67.3%    49     -3.8
+  conf>=70 + src=A+S                                                 67.2%   128     +0.4
+  conf>=60 + tipo=DOPPIA_CHANCE                                      67.2%   125     +5.4
+  conf>=60 + stelle>=4.0                                             67.2%   122    +18.4
+  conf>=60 + routing=consensus_both                                  67.1%   234     -2.8
+  conf50-59 + src=C_screm + stelle3.0-3.5                            67.1%    85     +5.8
+  conf60-69 + routing=single + stelle>=3.0                           67.1%    85    +18.6
+  conf70-79 + routing=consensus_both + stelle3.0-3.5 + tipo=GOL      67.1%    79     +0.9
+  pron=Under 2.5 + stelle3.0-3.5                                     67.1%    73     +3.1
+  conf70-79 + q1.4-1.49 + tipo=GOL                                   67.1%    73     -2.5
+  routing=single + stelle>=3.0                                       67.0%   342    +63.8
+  conf>=70 + src=A+S + tipo=GOL                                      67.0%   115     +1.0
+  conf70-79 + routing=consensus_both + stelle3.0-3.5                 67.0%    91     -0.1
+  conf>=60 + src=A+S                                                 66.9%   236     -3.1
+  q1.3-1.49 + src=C_screm                                            66.9%   133     -7.3
+  conf>=70 + stelle>=3.5                                             66.8%   307    +28.1
+  conf>=70 + stelle>=3.5 + tipo=GOL                                  66.7%   189     +7.6
+  routing=single + tipo=GOL                                          66.7%   144     +5.3
+  pron=Under 2.5 + routing=single                                    66.7%   132     +3.3
+  q1.5-1.59 + stelle3.0-3.5                                          66.7%   126     +2.9
+  q1.6-1.79 + routing=single                                         66.7%   111    +11.8
+  conf60-69 + routing=consensus_both                                 66.7%    99     -3.1
+  conf>=60 + pron=Under 2.5 + stelle3.0-3.5                          66.7%    72     +2.5
+  q1.5-1.59 + routing=single + stelle>=3.0                           66.7%    66     +1.3
+  conf>=70 + q1.6-1.79 + src=C                                       66.7%    54     +6.0
+  conf>=70 + q1.6-1.79 + routing=single                              66.7%    45     +5.0
+  conf>=60 + pron=Over 1.5 + q1.3-1.49 + stelle>=3.0                 66.7%    45     -3.6
+  conf60-69 + routing=single + stelle3.0-3.5                         66.7%    42     +6.9
+  stelle3.5-4.0 + tipo=DOPPIA_CHANCE                                 66.7%    36     +0.7
+  src=A+S + stelle>=3.5 + tipo=GOL                                   66.7%    36     +0.2
+  q1.5-1.59 + routing=single + stelle3.0-3.5                         66.7%    33     +0.6
+  q1.5-1.59 + routing=single + stelle>=3.5                           66.7%    33     +0.8
+  conf60-69 + q1.3-1.39 + stelle>=3.0                                66.7%    30     -2.8
+  conf70-79 + stelle>=4.0 + tipo=GOL                                 66.7%    30     +3.1
+  pron=Over 1.5 + q1.3-1.39 + src=C_screm                            66.7%    30     -2.9
+  q1.3-1.39 + stelle>=3.0 + tipo=DOPPIA_CHANCE                       66.7%    30     -2.6
+  q1.3-1.49 + src=C_screm + stelle>=3.5                              66.7%    30     -1.7
+  q1.5-1.59 + stelle>=3.5 + tipo=SEGNO                               66.7%    27     +0.7
+  conf50-59 + q1.3-1.49 + stelle3.0-3.5 + tipo=GOL                   66.7%    27     -1.8
+  pron=Over 1.5 + stelle3.5-4.0                                      66.7%    24     -1.7
+  q2.0-2.49 + stelle3.5-4.0                                          66.7%    24     +9.5
+  conf60-69 + pron=1 + stelle3.5-4.0                                 66.7%    24     +4.3
+  pron=Under 2.5 + q1.6-1.79 + stelle>=3.0                           66.7%    24     +2.6
+  q1.3-1.39 + stelle3.0-3.5 + tipo=DOPPIA_CHANCE                     66.7%    24     -2.1
+  conf50-59 + q1.4-1.49 + src=C_screm + stelle3.0-3.5                66.7%    24     -1.0
+  conf60-69 + q1.3-1.39 + stelle>=3.0 + tipo=GOL                     66.7%    24     -2.3
+  q1.5-1.59 + routing=single + src=C + stelle>=3.5                   66.7%    24     +0.6
+  q1.6-1.79 + routing=single + stelle3.5-4.0 + tipo=SEGNO            66.7%    24     +3.0
+  conf60-69 + q1.4-1.49 + stelle3.5-4.0                              66.7%    21     -0.8
+  q1.4-1.49 + src=C_screm + stelle>=3.5                              66.7%    21     -0.9
+  src=C_screm + stelle>=4.0 + tipo=GOL                               66.7%    21     +0.3
+  conf50-59 + pron=Over 1.5 + q1.4-1.49                              66.7%    18     -0.9
+  conf70-79 + routing=single + stelle>=4.0                           66.7%    18     +7.0
+  q1.6-1.79 + src=A + stelle3.0-3.5                                  66.7%    18     +2.1
+  conf60-69 + q1.3-1.39 + tipo=DOPPIA_CHANCE                         66.7%    15     -1.3
+  conf>=60 + pron=X2 + q1.3-1.39                                     66.7%    15     -1.3
+  conf>=70 + q1.3-1.49 + src=C_screm                                 66.7%    15     -0.9
+  conf60-69 + q1.3-1.49 + src=C_screm + stelle3.5-4.0                66.7%    15     -0.8
+  conf60-69 + q1.5-1.59 + stelle>=3.0 + tipo=DOPPIA_CHANCE           66.7%    15     +0.4
+  conf60-69 + src=C_screm + stelle3.0-3.5 + tipo=DOPPIA_CHANCE       66.7%    15     +0.8
+  conf70-79 + routing=single + stelle>=4.0 + tipo=SEGNO              66.7%    15     +6.4
+  conf50-59 + q1.3-1.39 + tipo=GOL                                   66.7%    12     -1.1
+  conf70-79 + src=C_screm + stelle>=4.0                              66.7%    12     +1.2
+  conf70-79 + stelle3.0-3.5 + tipo=DOPPIA_CHANCE                     66.7%    12     -1.0
+  conf>=60 + q1.3-1.39 + src=C_screm                                 66.7%    12     -1.1
+  pron=1 + q1.5-1.59 + stelle>=4.0                                   66.7%    12     +0.3
+  pron=X2 + q1.3-1.39 + routing=consensus_both                       66.7%    12     -1.1
+  pron=X2 + q1.3-1.39 + src=C_screm                                  66.7%    12     -1.0
+  conf50-59 + q1.5-1.59 + stelle3.0-3.5 + tipo=SEGNO                 66.7%    12     +0.3  * E2
+  conf60-69 + pron=Over 1.5 + q1.3-1.49 + src=C_screm                66.7%    12     -0.8
+  conf60-69 + pron=X2 + src=C_screm + stelle3.0-3.5                  66.7%    12     +0.9
+  conf60-69 + q1.3-1.49 + src=C_screm + tipo=DOPPIA_CHANCE           66.7%    12     -0.5
+  conf70-79 + pron=Under 2.5 + q1.4-1.49 + stelle3.5-4.0             66.7%    12     -0.5
+  conf>=60 + pron=X2 + q1.3-1.39 + stelle>=3.0                       66.7%    12     -1.1
+  conf>=70 + stelle3.5-4.0                                           66.5%   185     +9.8
+  src=C_screm + stelle>=3.0                                          66.5%   185     +7.6
+  conf>=70 + src=C                                                   66.5%   158    +24.8
+  routing=consensus_both + src=A+S                                   66.4%   238     -5.4
+  pron=X2 + stelle>=3.0                                              66.4%   140     +8.7
+  conf70-79 + routing=consensus_both                                 66.4%   116     -1.0
+  conf>=60 + q1.6-1.79 + src=C                                       66.3%   101    +11.3
+  conf>=70 + tipo=SEGNO                                              66.3%    95    +19.1
+  q1.6-1.79 + src=C + stelle>=3.5                                    66.3%    92    +10.3
+  conf>=60 + routing=single + src=C                                  66.2%   154    +34.8
+  routing=consensus_both + stelle>=3.0 + tipo=GOL                    66.2%   139     -0.8
+  pron=Over 1.5 + q1.3-1.49 + stelle>=3.0                            66.2%    71     -5.8
+  conf70-79 + q1.3-1.49 + stelle3.0-3.5                              66.2%    68     -4.9
+  conf>=60 + routing=single                                          66.1%   289    +36.7
+  conf70-79 + q1.3-1.49 + stelle3.0-3.5 + tipo=GOL                   66.1%    56     -3.9
+  src=A+S + stelle>=3.0 + tipo=GOL                                   66.0%   141     -1.1
+  conf70-79 + routing=consensus_both + tipo=GOL                      66.0%   103     -0.3
+  conf>=60 + src=C_screm                                             66.0%   100     +1.8
+  q1.5-1.59 + tipo=SEGNO                                             66.0%    53     +0.9
+  conf>=60 + stelle3.0-3.5 + tipo=DOPPIA_CHANCE                      66.0%    50     -1.2
+  conf60-69 + q1.6-1.79 + src=C                                      66.0%    47     +5.2
+  stelle>=3.5 + tipo=SEGNO                                           65.9%   132    +28.0
+  stelle3.0-3.5 + tipo=DOPPIA_CHANCE                                 65.9%   129     +4.7
+  conf50-59 + tipo=DOPPIA_CHANCE                                     65.9%    91     +6.4
+  conf>=60 + q1.5-1.59 + stelle3.0-3.5                               65.9%    88     +0.8
+  conf70-79 + src=A+S                                                65.8%   117     -2.0
+  conf50-59 + stelle3.0-3.5 + tipo=DOPPIA_CHANCE                     65.8%    79     +5.9
+  conf>=60 + pron=X2 + src=C_screm                                   65.8%    38     +2.5
+  q2.0-2.49 + routing=single + stelle>=3.0                           65.8%    38    +12.8
+  conf60-69 + q1.6-1.79 + src=C + stelle3.5-4.0                      65.8%    38     +4.2
+  conf>=70 + stelle>=3.0                                             65.7%   475    +22.4
+  stelle3.5-4.0 + tipo=GOL                                           65.7%   242     +8.6
+  routing=consensus_both + stelle3.0-3.5 + tipo=GOL                  65.7%   105     -1.3
+  conf60-69 + pron=Over 1.5 + stelle>=3.0                            65.7%    35     -3.0
+  conf70-79 + src=C + tipo=GOL                                       65.6%    61     +4.0
+  conf50-59 + src=C_screm + stelle3.0-3.5 + tipo=GOL                 65.6%    32     -0.8
+  conf>=60 + stelle>=3.5                                             65.5%   475    +38.9
+  stelle>=3.0 + tipo=DOPPIA_CHANCE                                   65.5%   171     +4.7
+  conf>=60 + routing=single + tipo=SEGNO                             65.5%   145    +31.4
+  conf50-59 + q1.3-1.49 + stelle3.0-3.5                              65.5%    58     -4.3
+  conf>=60 + q1.5-1.59 + routing=single + stelle>=3.0                65.5%    55     +0.0
+  conf50-59 + pron=Over 1.5 + q1.3-1.49                              65.5%    29     -2.5
+  conf60-69 + pron=Over 1.5 + q1.3-1.39                              65.5%    29     -3.3
+  conf>=60 + pron=Over 1.5 + src=C_screm                             65.5%    29     -1.6
+  stelle>=3.5 + tipo=GOL                                             65.4%   301    +10.9
+  pron=1 + stelle>=3.0                                               65.4%   159    +28.8
+  q1.6-1.79 + src=C                                                  65.4%   136    +12.2
+  conf70-79 + src=A+S + tipo=GOL                                     65.4%   104     -1.3
+  q1.3-1.49 + src=C_screm + stelle>=3.0                              65.4%    81     -6.0
+  q1.4-1.49 + stelle3.0-3.5 + tipo=GOL                               65.4%    81     -5.1
+  conf70-79 + pron=X2                                                65.4%    26     -0.4
+  pron=X2 + src=C_screm + stelle>=3.5                                65.4%    26     +1.6
+  conf50-59 + pron=Over 1.5 + q1.3-1.49 + stelle3.0-3.5              65.4%    26     -2.2
+  conf60-69 + pron=Goal + q1.6-1.79 + stelle3.5-4.0                  65.4%    26     +2.8
+  conf70-79 + q1.4-1.49 + routing=consensus_both + tipo=GOL          65.4%    26     -1.6
+  q1.6-1.79 + routing=single + src=C + stelle3.5-4.0                 65.4%    26     +2.6
+  conf>=60 + pron=X2 + stelle>=3.0                                   65.3%    72     +0.6
+  q1.3-1.39 + src=C_screm                                            65.3%    49     -5.4
+  src=C_screm + stelle3.5-4.0                                        65.3%    49     -0.2
+  conf>=70 + tipo=GOL                                                65.2%   345     +2.9
+  conf>=60 + stelle>=3.0 + tipo=DOPPIA_CHANCE                        65.2%    92     -1.2
+  conf>=60 + routing=single + stelle3.0-3.5                          65.2%    89     +5.7
+  conf50-59 + q1.3-1.49                                              65.2%    69     -5.6
+  q1.5-1.59 + tipo=DOPPIA_CHANCE                                     65.2%    69     +0.3
+  conf70-79 + src=A                                                  65.2%    66     -0.3
+  conf50-59 + q1.3-1.49 + src=C_screm                                65.2%    46     -3.8
+  conf50-59 + q1.6-1.79 + stelle3.0-3.5                              65.2%    46     +3.4
+  conf60-69 + q1.5-1.59 + stelle>=3.0 + tipo=GOL                     65.2%    46     +0.1
+  pron=Over 1.5 + src=C_screm + stelle>=3.5                          65.2%    23     -1.4
+  pron=Under 2.5 + q1.3-1.49 + stelle3.0-3.5                         65.2%    23     -1.8
+  conf60-69 + q1.5-1.59 + stelle3.0-3.5 + tipo=GOL                   65.2%    23     -0.0
+  conf60-69 + q1.5-1.59 + stelle3.5-4.0 + tipo=GOL                   65.2%    23     +0.1
+  conf>=60 + pron=Under 2.5 + q1.6-1.79 + stelle>=3.0                65.2%    23     +2.0
+  conf>=60 + q2.0-2.49 + stelle>=3.0 + tipo=GOL                      65.2%    23     +8.5
+  q1.5-1.59 + stelle>=3.0                                            65.1%   238     -0.1
+  conf>=60 + q1.4-1.49 + stelle3.0-3.5 + tipo=GOL                    65.1%    63     -4.1
+  pron=1 + routing=single + stelle3.5-4.0                            65.1%    43     +6.9
+  src=C_screm + stelle>=3.0 + tipo=DOPPIA_CHANCE                     65.0%   100     +5.8
+  conf70-79 + routing=o25_s6_to_goal                                 65.0%    20     +0.3
+  conf60-69 + q1.5-1.59 + routing=consensus_both                     65.0%    20     -0.1
+  pron=X2 + q1.3-1.39 + stelle>=3.0                                  65.0%    20     -2.2
+  conf70-79 + q1.6-1.79 + routing=single + stelle>=3.5               65.0%    20     +1.8
+
+Totale pattern HR>=65%: 1106 (11 gia attivi, 1095 nuovi)

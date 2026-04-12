@@ -606,6 +606,20 @@ for r in new_only[:20]:
 
 active_count = sum(1 for r in hybrid_results if r['active'] and r['hr'] >= 65 and r['n'] >= 5)
 new_count = sum(1 for r in hybrid_results if not r['active'] and r['hr'] >= 65 and r['n'] >= 5)
+
+# CLASSIFICA COMPLETA HR >= 65%, N >= 10
+all_65 = [r for r in hybrid_results if r['n'] >= 10 and r['hr'] >= 65]
+all_65.sort(key=lambda x: (-x['hr'], -x['n']))
+print(f"\n{'*'*100}")
+print(f"  TUTTI I PATTERN HR >= 65%, N >= 10")
+print(f"  * = pattern gia in produzione")
+print(f"{'*'*100}")
+print(f"  {'Pattern':<65} {'HR':>7} {'N':>5} {'Profit':>8}")
+print(f"  {'-'*90}")
+for r in all_65:
+    tag = f"  * {r['active']}" if r['active'] else ""
+    print(f"  {r['pattern']:<65} {r['hr']:>5.1f}%  {r['n']:>4}  {r['profit']:>+7.1f}{tag}")
+
 print(f"\nTotale pattern HR>=65%: {active_count + new_count} ({active_count} gia attivi, {new_count} nuovi)")
 
 client.close()
@@ -673,6 +687,17 @@ lines.append(f"  {'Pattern':<65} {'HR':>7} {'N':>5} {'Profit':>8}")
 lines.append(f"  {'-'*90}")
 for r in new_only[:20]:
     lines.append(f"  {r['pattern']:<65} {r['hr']:>5.1f}%  {r['n']:>4}  {r['profit']:>+7.1f}")
+
+# CLASSIFICA COMPLETA HR >= 65%, N >= 10
+lines.append(f"\n\n{'*'*100}")
+lines.append(f"  TUTTI I PATTERN HR >= 65%, N >= 10")
+lines.append(f"  * = pattern gia in produzione")
+lines.append(f"{'*'*100}")
+lines.append(f"  {'Pattern':<65} {'HR':>7} {'N':>5} {'Profit':>8}")
+lines.append(f"  {'-'*90}")
+for r in all_65:
+    tag = f"  * {r['active']}" if r['active'] else ""
+    lines.append(f"  {r['pattern']:<65} {r['hr']:>5.1f}%  {r['n']:>4}  {r['profit']:>+7.1f}{tag}")
 
 lines.append(f"\nTotale pattern HR>=65%: {active_count + new_count} ({active_count} gia attivi, {new_count} nuovi)")
 

@@ -410,9 +410,24 @@ for i, (name, hr, n, score) in enumerate(scored_list[:30], 1):
     profit = results_profit.get(name, 0)
     lines.append(f"  {i:>3}. {name:<55} {hr:>5.1f}%  {n:>4}  {profit:>+7.1f}  {score:>5.0f}  {tag}")
 
+# CLASSIFICA COMPLETA HR >= 65%, N >= 10
+lines.append(f"\n\n{'*'*90}")
+lines.append(f" TUTTI I PATTERN HR >= 65%, N >= 10")
+lines.append(f" * = pattern gia in produzione")
+lines.append(f"{'*'*90}\n")
+all_65 = [(r['pattern'], r['hr'], r['n']) for r in all_results if r['n'] >= 10 and r['hr'] >= 65]
+all_65.sort(key=lambda x: (-x[1], -x[2]))
+lines.append(f"{'Pattern':<60} {'HR':>7} {'N':>5} {'Profit':>8}")
+lines.append(f"{'-'*85}")
+for name, hr, n in all_65:
+    active = is_active_bizarre(name)
+    tag = f"  * {active}" if active else ""
+    profit = results_profit.get(name, 0)
+    lines.append(f"{name:<60} {hr:>5.1f}%  {n:>4}  {profit:>+7.1f}{tag}")
+
 active_count = sum(1 for r in all_results if is_active_bizarre(r['pattern']))
 new_count = len(all_results) - active_count
-lines.append(f"\nTotale pattern HR>=65%: {len(all_results)} ({active_count} gia attivi *, {new_count} nuovi)")
+lines.append(f"\nTotale pattern HR>=65%: {len(all_65)} con N>=10 ({active_count} gia attivi *, {new_count} nuovi su totale {len(all_results)})")
 
 txt_path = os.path.join(log_dir, f"{base_name}.txt")
 with open(txt_path, 'w', encoding='utf-8') as f:
