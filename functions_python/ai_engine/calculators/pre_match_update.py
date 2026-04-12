@@ -471,9 +471,9 @@ def run_full_cycle(date_str, target_date, block_times, run_label):
     if skipped_started > 0:
         print(f"   ⏩ {skipped_started} partite già iniziate — skip, aggiorno le restanti {len(effective_times)}")
 
-    # Per il run -1h, filtra solo partite con pronostici attivi
+    # Per il run -1h, filtra solo partite con pronostici attivi (tra quelle non ancora iniziate)
     if run_label == 'update_1h':
-        effective_times = get_active_match_times(date_str, block_times)
+        effective_times = get_active_match_times(date_str, effective_times)
         if not effective_times:
             print(f"   ⏭️  Nessuna partita con pronostici attivi nel blocco — skip")
             # Salva comunque snapshot vuoto per completezza
