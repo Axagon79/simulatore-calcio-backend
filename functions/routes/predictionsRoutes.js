@@ -1051,32 +1051,35 @@ router.get('/daily-predictions-unified', async (req, res) => {
       .find({ date }, { projection: { _id: 0 } })
       .toArray();
 
-    // Controlla se qualche prediction manca di real_score (fallback per sicurezza)
+    // Assicura real_sign per chi ha già real_score
+    for (const pred of predictions) {
+      if (pred.real_score) {
+        if (!pred.real_sign) {
+          const parsed = parseScore(pred.real_score);
+          pred.real_sign = parsed ? parsed.sign : null;
+        }
+      } else {
+        pred.real_sign = null;
+        pred.hit = null;
+      }
+    }
+
+    // [COMMENTATO 12/04/2026] Fallback h2h_by_round disabilitato per test performance.
+    // I risultati dovrebbero arrivare già scritti dal daemon/pipeline.
+    // Se mancano risultati, decommentare e fare deploy.
+    /*
     const needsCrossMatch = predictions.some(p => !p.real_score && !p.real_sign);
     let resultsMap = {};
     if (needsCrossMatch) {
       resultsMap = await getFinishedResults(req.db, date);
     }
-
     for (const pred of predictions) {
-      // Se real_score è già nel documento (dal trigger/backfill), usalo
-      if (pred.real_score) {
-        // hit già calcolato dal trigger/backfill, assicura coerenza
-        if (!pred.real_sign) {
-          const parsed = parseScore(pred.real_score);
-          pred.real_sign = parsed ? parsed.sign : null;
-        }
-        continue;
-      }
-
-      // Fallback: cross-match con h2h_by_round (solo se necessario)
+      if (pred.real_score) continue;
       const realScore = resultsMap[`${pred.home}|||${pred.away}|||${pred.date}`] || null;
       pred.real_score = realScore;
-
       if (realScore) {
         const parsed = parseScore(realScore);
         pred.real_sign = parsed ? parsed.sign : null;
-
         if (pred.pronostici && pred.pronostici.length > 0) {
           for (const p of pred.pronostici) {
             p.hit = checkPronostico(p.pronostico, p.tipo, parsed);
@@ -1085,11 +1088,9 @@ router.get('/daily-predictions-unified', async (req, res) => {
         } else {
           pred.hit = null;
         }
-      } else {
-        pred.real_sign = null;
-        pred.hit = null;
       }
     }
+    */
 
     predictions.sort((a, b) => (a.match_time || '').localeCompare(b.match_time || ''));
 

@@ -1,7 +1,7 @@
 """
 Step Elite — Tagga i pronostici unified del giorno che matchano i pattern storicamente vincenti.
 Gira subito dopo orchestrate_experts.py (step 31).
-Aggiunge elite: true ai pronostici che soddisfano almeno uno dei 18 pattern.
+Aggiunge: elite (bool), elite_patterns (produzione), elite_patterns_trial (in prova).
 """
 
 import os
@@ -25,104 +25,125 @@ today = datetime.now()
 dates = [(today + timedelta(days=i)).strftime('%Y-%m-%d') for i in range(7)]
 
 
-def matches_elite(p):
-    """Controlla se un pronostico matcha uno dei 16 pattern elite."""
+def get_matched_patterns(p):
+    """Restituisce la lista di pattern ID che il pronostico matcha."""
     tipo = p.get('tipo', '')
     quota = p.get('quota', 0) or 0
     confidence = p.get('confidence', 0) or 0
     stars = p.get('stars', 0) or 0
     source = p.get('source', '')
     pronostico = p.get('pronostico', '')
+    routing = p.get('routing_rule', '')
 
     # NO BET esclusi
     if pronostico == 'NO BET':
-        return False
+        return []
 
-    # === PATTERN ORIGINALI (1-8) ===
+    matched = []
 
-    # Pattern 1: SEGNO + quota 1.50-1.79 + stelle 3.0-3.5
+    # === PATTERN IN PRODUZIONE (P1-P16) ===
+
     if tipo == 'SEGNO' and 1.50 <= quota < 1.80 and 3.0 <= stars < 3.5:
-        return True
-
-    # Pattern 2: SEGNO + quota 1.50-1.79 + confidence 50-59
+        matched.append('P1')
     if tipo == 'SEGNO' and 1.50 <= quota < 1.80 and 50 <= confidence < 60:
-        return True
-
-    # Pattern 3: DOPPIA_CHANCE + source C_screm + quota 2.00-2.49
+        matched.append('P2')
     if tipo == 'DOPPIA_CHANCE' and source == 'C_screm' and 2.00 <= quota < 2.50:
-        return True
-
-    # Pattern 4: GOL + quota 1.30-1.49 + confidence 70-79
+        matched.append('P3')
     if tipo == 'GOL' and 1.30 <= quota < 1.50 and 70 <= confidence < 80:
-        return True
-
-    # Pattern 5: DOPPIA_CHANCE + quota 2.00-2.49
+        matched.append('P4')
     if tipo == 'DOPPIA_CHANCE' and 2.00 <= quota < 2.50:
-        return True
-
-    # Pattern 6: SEGNO + confidence >= 80
+        matched.append('P5')
     if tipo == 'SEGNO' and confidence >= 80:
-        return True
-
-    # Pattern 7: DOPPIA_CHANCE + quota 1.30-1.49 + confidence 60-69 (80.6%, N=31)
+        matched.append('P6')
     if tipo == 'DOPPIA_CHANCE' and 1.30 <= quota < 1.50 and 60 <= confidence < 70:
-        return True
-
-    # Pattern 8: GOL + source A+S + quota 1.30-1.49
+        matched.append('P7')
     if tipo == 'GOL' and source == 'A+S' and 1.30 <= quota < 1.50:
-        return True
-
-    # === NUOVI PATTERN (9-16) — Scoperti 22/03/2026 ===
-
-    # Pattern 9: DOPPIA_CHANCE + quota 1.40-1.49 + confidence >= 60 (92.6%, N=27)
+        matched.append('P8')
     if tipo == 'DOPPIA_CHANCE' and 1.40 <= quota < 1.50 and confidence >= 60:
-        return True
-
-    # Pattern 10: Multigol 2-4 (88.2%, N=17)
+        matched.append('P9')
     if 'MG 2-4' in pronostico or 'Multigol 2-4' in pronostico:
-        return True
-
-    # Pattern 11: GOL + quota 1.30-1.39 + confidence >= 70 (86.4%, N=22)
+        matched.append('P10')
     if tipo == 'GOL' and 1.30 <= quota < 1.40 and confidence >= 70:
-        return True
-
-    # Pattern 12: DOPPIA_CHANCE + quota 1.40-1.49 + stelle >= 3.0 (85.3%, N=34)
+        matched.append('P11')
     if tipo == 'DOPPIA_CHANCE' and 1.40 <= quota < 1.50 and stars >= 3.0:
-        return True
-
-    # Pattern 13: GOL + quota 1.30-1.39 + source A+S (85.2%, N=27)
+        matched.append('P12')
     if tipo == 'GOL' and 1.30 <= quota < 1.40 and source == 'A+S':
-        return True
-
-    # Pattern 14: GOL + quota 1.50-1.59 + source C_screm (84.2%, N=19)
+        matched.append('P13')
     if tipo == 'GOL' and 1.50 <= quota < 1.60 and source == 'C_screm':
-        return True
-
-    # Pattern 15: SEGNO + quota 1.80-1.99 + confidence >= 80 (100%, N=8)
+        matched.append('P14')
     if tipo == 'SEGNO' and 1.80 <= quota < 2.00 and confidence >= 80:
-        return True
-
-    # Pattern 16: DOPPIA_CHANCE + quota 1.30-1.49 + confidence 70-79 (81.8%, N=11)
+        matched.append('P15')
     if tipo == 'DOPPIA_CHANCE' and 1.30 <= quota < 1.50 and 70 <= confidence < 80:
-        return True
+        matched.append('P16')
 
-    # === PATTERN HYBRID v2 (17-18) — Aggiunti 11/04/2026 ===
-    # Scoperti da hybrid_pattern_mixer_v2.py (incrocio top 30 elite + bizarre)
-    # Se danno problemi, commentare/rimuovere da qui fino a "return False"
+    # === PATTERN IN PROVA (P17-P18) — Aggiunti 11/04/2026 ===
 
-    routing = p.get('routing_rule', '')
-
-    # Pattern 17: SEGNO pron=1 + quota 1.60-1.79 + routing single + stelle >= 3.0
-    # Storico: 82.9%, N=41, +15.2u — Post-mod: 88.2%, N=17, +8.1u
-    if pronostico == '1' and 1.60 <= quota < 1.80 and routing == 'single' and stars >= 3.0:
-        return True
-
-    # Pattern 18: SEGNO + quota 1.60-1.79 + source C + stelle >= 3.0
-    # Storico: 79.3%, N=58, +18.1u — Post-mod: 82.6%, N=23, +8.8u
+    if pronostico == '1' and 1.60 <= quota < 1.80 and routing == 'single' and stars >= 3.0 and source != 'C':
+        matched.append('P17')
     if tipo == 'SEGNO' and 1.60 <= quota < 1.80 and source == 'C' and stars >= 3.0:
-        return True
+        matched.append('P18')
 
-    return False
+    # Rimuovi pattern meno specifici quando uno più specifico li copre
+    return _remove_subsets(matched)
+
+
+# Numero di condizioni per pattern (per risolvere sovrapposizioni)
+PATTERN_CONDITIONS = {
+    'P1': 3,   # tipo + quota + stelle
+    'P2': 3,   # tipo + quota + confidence
+    'P3': 3,   # tipo + source + quota
+    'P4': 3,   # tipo + quota + confidence
+    'P5': 2,   # tipo + quota
+    'P6': 2,   # tipo + confidence
+    'P7': 3,   # tipo + quota + confidence
+    'P8': 3,   # tipo + source + quota
+    'P9': 3,   # tipo + quota + confidence
+    'P10': 1,  # pronostico
+    'P11': 3,  # tipo + quota + confidence
+    'P12': 3,  # tipo + quota + stelle
+    'P13': 3,  # tipo + quota + source
+    'P14': 3,  # tipo + quota + source
+    'P15': 3,  # tipo + quota + confidence
+    'P16': 3,  # tipo + quota + confidence
+    'P17': 4,  # pronostico + quota + routing + stelle (+ source != C)
+    'P18': 4,  # tipo + quota + source + stelle
+}
+
+# Quali pattern sono "contenuti" in altri (il meno specifico è coperto dal più specifico)
+# Chiave = pattern generico, Valore = lista di pattern più specifici che lo coprono
+SUBSET_MAP = {
+    'P5': ['P3', 'P7', 'P9', 'P12', 'P16'],   # DC + quota → coperto da DC + quota + altro
+    'P6': ['P1', 'P2', 'P15', 'P17', 'P18'],   # SEGNO + conf → coperto da SEGNO + conf + altro
+    'P4': ['P8', 'P11', 'P13'],                  # GOL + quota + conf → coperto da chi ha source o quota stretta
+    'P11': ['P13'],                               # GOL + quota stretta + conf → coperto da chi ha source
+    'P2': ['P1'],                                 # SEGNO + quota + conf → coperto da SEGNO + quota + stelle
+    'P1': ['P18'],                                # SEGNO 3 cond → coperto da SEGNO 4 cond con source
+    'P8': ['P13'],                                # GOL + A+S + quota larga → coperto da quota stretta
+    'P9': ['P16'],                                # DC + quota stretta + conf generica → coperto da conf più stretta
+    'P7': ['P9'],                                 # DC + quota + conf 60-69 → coperto da DC + quota stretta + conf ≥60
+    'P12': ['P9'],                                # DC + quota + stelle → coperto da DC + quota + conf (stessa fascia)
+}
+
+
+def _remove_subsets(matched):
+    """Rimuove pattern meno specifici quando uno più specifico è presente."""
+    if len(matched) <= 1:
+        return matched
+    matched_set = set(matched)
+    to_remove = set()
+    for generic, specifics in SUBSET_MAP.items():
+        if generic in matched_set:
+            for specific in specifics:
+                if specific in matched_set:
+                    to_remove.add(generic)
+                    break
+    return [p for p in matched if p not in to_remove]
+
+
+# Pattern in produzione vs in prova
+PATTERNS_PRODUZIONE = {'P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7', 'P8',
+                       'P9', 'P10', 'P11', 'P12', 'P13', 'P14', 'P15', 'P16'}
+PATTERNS_PROVA = {'P17', 'P18'}
 
 
 def main():
@@ -142,10 +163,19 @@ def main():
             changed = False
 
             for p in pronostici:
-                is_elite = matches_elite(p)
+                matched = get_matched_patterns(p)
+                is_elite = len(matched) > 0
                 old_elite = p.get('elite', False)
+                old_prod = p.get('elite_patterns', [])
+                old_trial = p.get('elite_patterns_trial', [])
+
                 p['elite'] = is_elite
-                if is_elite != old_elite:
+                prod = sorted([m for m in matched if m in PATTERNS_PRODUZIONE])
+                trial = sorted([m for m in matched if m in PATTERNS_PROVA])
+                p['elite_patterns'] = prod
+                p['elite_patterns_trial'] = trial
+
+                if is_elite != old_elite or prod != old_prod or trial != old_trial:
                     changed = True
                 if is_elite:
                     total_tagged += 1
@@ -160,7 +190,7 @@ def main():
         date_elite = sum(
             1 for d in docs
             for p in d.get('pronostici', [])
-            if matches_elite(p)
+            if len(get_matched_patterns(p)) > 0
         )
         print(f"  {date}: {len(docs)} partite, {date_elite} pronostici elite")
 
