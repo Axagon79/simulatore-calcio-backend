@@ -26,6 +26,7 @@ app.use(cors({
 }));
 
 app.use(express.json());
+app.disable('etag');
 
 // --- Rate limiting: 500 req / 15 min per IP (skip per admin/localhost) ---
 const limiter = rateLimit({
@@ -58,7 +59,13 @@ let db;
 async function getDatabase() {
   if (db) return db;
   if (!client) {
-    client = new MongoClient(MONGO_URI);
+    client = new MongoClient(MONGO_URI, {
+      maxPoolSize: 10,
+      minPoolSize: 2,
+      maxIdleTimeMS: 120000,
+      serverSelectionTimeoutMS: 5000,
+      connectTimeoutMS: 5000,
+    });
     await client.connect();
   }
   const db_name = MONGO_URI.split('/').pop()?.split('?')[0] || 'football_simulator_db';
@@ -119,8 +126,32 @@ app.use('/quote-anomale', quoteAnomaleRoutes);
 // GET /prediction-versions — Storico versioni pronostici per match
 app.get('/prediction-versions', async (req, res) => {
   try {
-    const { date, match_key } = req.query;
+    const { date, match_key, keys_only } = req.query;
     if (!date) return res.status(400).json({ error: 'Parametro date obbligatorio' });
+
+    // Modalità leggera: ultima versione per ogni partita (per rilevare partite ritirate)
+    if (keys_only === 'true') {
+      const pipeline = [
+        { $match: { date } },
+        { $sort: { version_order: 1 } },
+        { $group: {
+          _id: '$match_key',
+          home: { $last: '$home' },
+          away: { $last: '$away' },
+          league: { $last: '$league' },
+          match_time: { $last: '$match_time' },
+          home_mongo_id: { $last: '$home_mongo_id' },
+          away_mongo_id: { $last: '$away_mongo_id' },
+          odds: { $last: '$odds' },
+          pronostici_tipi: { $addToSet: '$pronostici.tipo' },
+          ever_had_picks: { $max: { $cond: [{ $gt: [{ $size: { $ifNull: ['$pronostici', []] } }, 0] }, true, false] } }
+        }},
+        { $match: { ever_had_picks: true } },
+        { $project: { _id: 0, match_key: '$_id', home: 1, away: 1, league: 1, match_time: 1, home_mongo_id: 1, away_mongo_id: 1, odds: 1, pronostici_tipi: 1 } }
+      ];
+      const versions = await req.db.collection('prediction_versions').aggregate(pipeline).toArray();
+      return res.json({ versions });
+    }
 
     const filter = { date };
     if (match_key) {
@@ -1159,7 +1190,9 @@ app.get('/', (req, res) => {
 // NON ri-dichiarare onRequest qui! È già dichiarata alla riga 1.
 exports.api = onRequest({
   region: "us-central1",
-  memory: "256MiB",
+  memory: "512MiB",
+  cpu: 1,
+  concurrency: 80,
   timeoutSeconds: 60,
   cors: true,
   invoker: 'public',

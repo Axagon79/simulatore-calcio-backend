@@ -1048,7 +1048,7 @@ router.get('/daily-predictions-unified', async (req, res) => {
 
   try {
     const predictions = await req.db.collection('daily_predictions_unified')
-      .find({ date }, { projection: { _id: 0 } })
+      .find({ date }, { projection: { _id: 0, simulation_data: 0, segno_dettaglio: 0, segno_dettaglio_raw: 0, gol_dettaglio: 0, analysis_free: 0, streak_home: 0, streak_away: 0, streak_home_context: 0, streak_away_context: 0 } })
       .toArray();
 
     // Assicura real_sign per chi ha già real_score
@@ -1150,6 +1150,23 @@ router.get('/daily-predictions-unified', async (req, res) => {
   } catch (error) {
     console.error('❌ [UNIFIED] Errore:', error);
     return res.status(500).json({ error: 'Errore nel recupero pronostici unified', details: error.message });
+  }
+});
+
+// GET /predictions/prediction-detail — Dettagli pesanti di una singola partita (on-demand)
+router.get('/prediction-detail', async (req, res) => {
+  const { date, home, away } = req.query;
+  if (!date || !home || !away) return res.status(400).json({ error: 'Parametri date, home, away obbligatori' });
+
+  try {
+    const doc = await req.db.collection('daily_predictions_unified')
+      .findOne({ date, home, away }, { projection: { _id: 0, simulation_data: 1, segno_dettaglio: 1, segno_dettaglio_raw: 1, gol_dettaglio: 1, analysis_free: 1, streak_home: 1, streak_away: 1, streak_home_context: 1, streak_away_context: 1 } });
+
+    if (!doc) return res.json({ success: false });
+    return res.json({ success: true, detail: doc });
+  } catch (error) {
+    console.error('❌ [DETAIL] Errore:', error);
+    return res.status(500).json({ error: 'Errore nel recupero dettagli', details: error.message });
   }
 });
 
