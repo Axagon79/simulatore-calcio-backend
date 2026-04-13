@@ -1784,13 +1784,27 @@ def main():
     for b in bollette_docs:
         by_tipo.setdefault(b["tipo"], []).append(b)
 
+    # Conta bollette Mistral vs urna
+    n_recomposed = sum(1 for b in bollette_docs if b.get("reasoning", "").startswith("Ricomposta"))
+    n_mistral = len(bollette_docs) - n_recomposed
+
+    print(f"\n{'='*50}")
+    print(f"🏆 RIEPILOGO FINALE:")
+    print(f"   Mistral: {n_mistral}/15 bollette")
+    if n_recomposed > 0:
+        print(f"   Urna:    +{n_recomposed} ricomposte")
+    print(f"   TOTALE:  {len(bollette_docs)}/15 {'✅' if len(bollette_docs) >= 15 else '⚠️'}")
+    print(f"{'='*50}")
+
     print(f"\n✅ Salvate {len(bollette_docs)} bollette:")
     for tipo in SECTION_ORDER:
         if tipo in by_tipo:
             quotes = [b["quota_totale"] for b in by_tipo[tipo]]
             n_sel_list = [len(b["selezioni"]) for b in by_tipo[tipo]]
+            r_count = sum(1 for b in by_tipo[tipo] if b.get("reasoning", "").startswith("Ricomposta"))
+            urna_tag = f" (🔄 {r_count} da urna)" if r_count > 0 else ""
             print(f"   {tipo.upper()}: {len(by_tipo[tipo])} "
-                  f"— quote: {quotes} — selezioni: {n_sel_list}")
+                  f"— quote: {quotes} — selezioni: {n_sel_list}{urna_tag}")
 
 
 if __name__ == "__main__":
