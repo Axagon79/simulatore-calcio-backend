@@ -158,25 +158,28 @@ SCRAPER_SEQUENCE = [
       ("orchestrate_experts.py", "🎼 [31/37] Orchestrazione MoE", "Pronostici unified non generati", FP_CALCULATORS_DIR),
 
       # ⭐ TAG ELITE — Tagga pronostici che matchano pattern storicamente vincenti
-      ("tag_elite.py", "🏆 [32/37] Tag Elite", "Pronostici elite non taggati", FP_CALCULATORS_DIR),
+      ("tag_elite.py", "🏆 [32/38] Tag Elite", "Pronostici elite non taggati", FP_CALCULATORS_DIR),
+
+      # 🧪 TAG MIXER — Tagga pronostici che matchano i 74 pattern mixer
+      ("tag_mixer.py", "🧪 [33/38] Tag Mixer", "Pronostici mixer non taggati", FP_CALCULATORS_DIR),
 
       # ⭐ SNAPSHOT NIGHTLY — Salva versione nightly di tutti i match in prediction_versions
-      ("snapshot_nightly.py", "📸 [33/37] Snapshot Nightly (Versioning)", "Storico versioni pronostici non salvato", FP_CALCULATORS_DIR),
+      ("snapshot_nightly.py", "📸 [34/39] Snapshot Nightly (Versioning)", "Storico versioni pronostici non salvato", FP_CALCULATORS_DIR),
 
       # ⭐ SCRAPER RE — Quote Risultato Esatto da SNAI (solo partite con RE prediction)
-      ("scrape_snai_exact_score.py", "💎 [34/37] Quote RE (SNAI)", "Quote risultato esatto mancanti", FREQUENT_DIR),
+      ("scrape_snai_exact_score.py", "💎 [35/39] Quote RE (SNAI)", "Quote risultato esatto mancanti", FREQUENT_DIR),
 
       # ⭐ ANALISI MATCH — Genera analisi free per ogni pronostico unified (22 checker contraddizioni)
-      ("generate_match_analysis.py", "🔍 [35/37] Analisi Match (contraddizioni)", "Analisi match non generate", FP_CALCULATORS_DIR),
+      ("generate_match_analysis.py", "🔍 [36/39] Analisi Match (contraddizioni)", "Analisi match non generate", FP_CALCULATORS_DIR),
 
       # ⭐ UPDATE TICKET ESITI — Aggiorna esiti bollette con risultati reali (PRIMA di generare, così recover_from_yesterday funziona)
-      ("update_ticket_esiti.py", "🎯 [36/37] Aggiornamento Esiti Ticket", "Esiti ticket non aggiornati", FP_CALCULATORS_DIR),
+      ("update_ticket_esiti.py", "🎯 [37/39] Aggiornamento Esiti Ticket", "Esiti ticket non aggiornati", FP_CALCULATORS_DIR),
 
       # ⭐ GENERAZIONE BOLLETTE — Compone bollette scommessa tramite Mistral AI
-      ("generate_bollette_2.py", "🎫 [37/38] Generazione Bollette", "Bollette non generate", FP_CALCULATORS_DIR),
+      ("generate_bollette_2.py", "🎫 [38/39] Generazione Bollette", "Bollette non generate", FP_CALCULATORS_DIR),
 
       # ⭐ QUOTE ANOMALE — Scrapa quote apertura da LuckSport (pre-match -2h aggiornerà le live)
-      ("scraper_quote_anomale_lucksport.py", "📈 [38/38] Quote Anomale (LuckSport)", "Quote anomale apertura non scrapeate", FREQUENT_DIR),
+      ("scraper_quote_anomale_lucksport.py", "📈 [39/39] Quote Anomale (LuckSport)", "Quote anomale apertura non scrapeate", FREQUENT_DIR),
 ]
 
 
