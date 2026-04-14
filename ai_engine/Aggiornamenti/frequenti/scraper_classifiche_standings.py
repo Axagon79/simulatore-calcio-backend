@@ -28,30 +28,37 @@ rankings_collection = db['classifiche']
 teams_collection = db['teams']
 
 # --- CACHE TEAMS IN MEMORIA (evita ~520 query regex individuali) ---
-_teams_cache = {}  # nome_lower → transfermarkt_id
+_teams_cache = {}  # nome_lower → transfermarkt_id (globale)
+_teams_cache_by_league = {}  # league → {nome_lower → transfermarkt_id}
 _tmid_to_name = {}  # transfermarkt_id → nome ufficiale dal DB
 
 def _build_teams_cache():
-    """Carica tutte le teams e costruisce un dizionario nome/alias → tm_id."""
-    all_teams = list(teams_collection.find({}, {"name": 1, "aliases": 1, "aliases_transfermarkt": 1, "transfermarkt_id": 1}))
+    """Carica tutte le teams e costruisce dizionari nome/alias → tm_id (globale + per lega)."""
+    all_teams = list(teams_collection.find({}, {"name": 1, "league": 1, "aliases": 1, "aliases_transfermarkt": 1, "transfermarkt_id": 1}))
     for t in all_teams:
         tm_id = t.get("transfermarkt_id")
         if not tm_id:
             continue
+        league = t.get("league", "")
+        if league not in _teams_cache_by_league:
+            _teams_cache_by_league[league] = {}
         # Nome principale
         name = t.get("name", "")
         if name:
             _teams_cache[name.strip().lower()] = tm_id
+            _teams_cache_by_league[league][name.strip().lower()] = tm_id
             _tmid_to_name[str(tm_id)] = name.strip()
         # Aliases standard
         for alias in (t.get("aliases") or []):
             if alias:
                 _teams_cache[alias.strip().lower()] = tm_id
+                _teams_cache_by_league[league][alias.strip().lower()] = tm_id
         # Aliases Transfermarkt
         for alias in (t.get("aliases_transfermarkt") or []):
             if alias:
                 _teams_cache[alias.strip().lower()] = tm_id
-    print(f"   ✅ Cache teams: {len(all_teams)} squadre → {len(_teams_cache)} nomi indicizzati")
+                _teams_cache_by_league[league][alias.strip().lower()] = tm_id
+    print(f"   ✅ Cache teams: {len(all_teams)} squadre → {len(_teams_cache)} nomi globali, {len(_teams_cache_by_league)} leghe indicizzate")
 
 _build_teams_cache()
 
@@ -61,8 +68,8 @@ COMPETITIONS = [
     {"name": "Serie A", "country": "Italy", "standings_url": "https://football.nowgoal26.com/subleastanding/2025-2026/34/2948", "dual_tables": False},
     {"name": "Serie B", "country": "Italy", "standings_url": "https://football.nowgoal26.com/subleastanding/2025-2026/40/261", "dual_tables": False},
     {"name": "Serie C - Girone A", "country": "Italy", "standings_url": "https://football.nowgoal26.com/subleastanding/2025-2026/142/1525", "dual_tables": False},
-    {"name": "Serie C - Girone B", "country": "Italy", "standings_url": "https://football.nowgoal26.com/subleastanding/2025-2026/142/1526", "dual_tables": False},
-    {"name": "Serie C - Girone C", "country": "Italy", "standings_url": "https://football.nowgoal26.com/subleastanding/2025-2026/142/1527", "dual_tables": False},
+    {"name": "Serie C - Girone B", "country": "Italy", "standings_url": "https://football.nowgoal26.com/subleastanding/2025-2026/142/1526", "dual_tables": False, "stage": "1526"},
+    {"name": "Serie C - Girone C", "country": "Italy", "standings_url": "https://football.nowgoal26.com/subleastanding/2025-2026/142/1527", "dual_tables": False, "stage": "1527"},
     {"name": "Premier League", "country": "England", "standings_url": "https://football.nowgoal26.com/leastanding/36", "dual_tables": False},
     {"name": "La Liga", "country": "Spain", "standings_url": "https://football.nowgoal26.com/leastanding/31", "dual_tables": False},
     {"name": "Bundesliga", "country": "Germany", "standings_url": "https://football.nowgoal26.com/leastanding/8", "dual_tables": False},
@@ -112,11 +119,19 @@ def to_int_signed(val):
     except:
         return 0
 
-def find_db_data(scraped_name):
-    """Cerca il nome nella cache in-memory. Restituisce (transfermarkt_id, None)."""
+def find_db_data(scraped_name, league=None):
+    """Cerca il nome nella cache in-memory. Prima per lega, poi fallback globale.
+    Restituisce (transfermarkt_id, None)."""
     if not scraped_name:
         return None, None
-    tm_id = _teams_cache.get(scraped_name.strip().lower())
+    key = scraped_name.strip().lower()
+    # Prima cerca nella lega corrente (evita match cross-lega)
+    if league and league in _teams_cache_by_league:
+        tm_id = _teams_cache_by_league[league].get(key)
+        if tm_id:
+            return tm_id, None
+    # Fallback: cache globale
+    tm_id = _teams_cache.get(key)
     if tm_id:
         return tm_id, None
     return None, None
@@ -190,7 +205,7 @@ def _quit_driver():
 atexit.register(_quit_driver)
 
 
-def _parse_standings_table(driver):
+def _parse_standings_table(driver, league_name=None):
     """
     Parsa la tabella standings attualmente visibile nella pagina (nuovo layout NowGoal).
     Restituisce lista di dict con campi: rank, team, transfermarkt_id, points, played,
@@ -237,10 +252,10 @@ def _parse_standings_table(driver):
                 goal_diff = to_int_signed(spans[6].get_text(strip=True))
                 points = to_int(spans[7].get_text(strip=True))
 
-                # Cerca transfermarkt_id nel DB
-                tm_id, _ = find_db_data(team_name)
+                # Cerca transfermarkt_id nel DB (prima nella lega corrente, poi globale)
+                tm_id, _ = find_db_data(team_name, league=league_name)
                 if not tm_id:
-                    tm_id, _ = find_db_data(team_name_raw)
+                    tm_id, _ = find_db_data(team_name_raw, league=league_name)
                 if tm_id:
                     foundids += 1
                     db_name = _tmid_to_name.get(str(tm_id))
@@ -340,15 +355,31 @@ def scrape_nowgoal():
                 print(f"   ❌ Redirect a pagina esterna: {current_url}")
                 continue
 
+            # Click sul girone se necessario (Serie C: Group B/C)
+            stage = comp.get('stage')
+            if stage:
+                try:
+                    # Apri dropdown gironi
+                    dropdown = driver.find_element(By.CSS_SELECTOR, "#subStandingBox")
+                    driver.execute_script("arguments[0].click()", dropdown)
+                    time.sleep(0.5)
+                    # Clicca sul girone corretto
+                    girone_btn = driver.find_element(By.CSS_SELECTOR, f"#subStandingBox li[data-s-sub='{stage}']")
+                    driver.execute_script("arguments[0].click()", girone_btn)
+                    time.sleep(2)
+                    print(f"   📌 Cliccato girone (data-s-sub={stage})")
+                except:
+                    print(f"   ⚠️ Dropdown girone non trovato (stage={stage})")
+
             # 3. Parsa tab "Total" (default)
             print(f"   📋 Tab Total...")
-            table_total = _parse_standings_table(driver)
+            table_total = _parse_standings_table(driver, league_name)
 
             # 4. Parsa tab "Home"
             print(f"   🏠 Tab Home...")
             table_home = []
             if _click_tab(driver, "Home"):
-                table_home = _parse_standings_table(driver)
+                table_home = _parse_standings_table(driver, league_name)
             else:
                 print(f"      ⚠️ Tab Home non trovato")
 
@@ -356,7 +387,7 @@ def scrape_nowgoal():
             print(f"   ✈️ Tab Away...")
             table_away = []
             if _click_tab(driver, "Away"):
-                table_away = _parse_standings_table(driver)
+                table_away = _parse_standings_table(driver, league_name)
             else:
                 print(f"      ⚠️ Tab Away non trovato")
 
