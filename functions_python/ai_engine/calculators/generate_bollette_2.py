@@ -770,6 +770,11 @@ def validate_with_errors(raw_bollette, pool, today_str, existing_counters=None, 
                 "quota": pool_entry["quota"],
                 "confidence": pool_entry["confidence"],
                 "stars": pool_entry["stars"],
+                "source": pool_entry.get("source", ""),
+                "routing_rule": pool_entry.get("routing_rule", ""),
+                "edge": pool_entry.get("edge", 0),
+                "stake": pool_entry.get("stake", 0),
+                "elite": pool_entry.get("elite", False),
                 "esito": None,
             })
 
