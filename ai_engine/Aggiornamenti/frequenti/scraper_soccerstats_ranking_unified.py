@@ -181,15 +181,19 @@ def scrape_unified_ranking():
                     res = teams_collection.update_one(filter_q, update_doc)
                     if res.matched_count > 0:
                         updated += 1
-                        # Recupera nome ufficiale dal DB per la classifica
-                        matched_team = teams_collection.find_one(filter_q, {"name": 1})
+                        # Recupera nome ufficiale e transfermarkt_id dal DB
+                        matched_team = teams_collection.find_one(filter_q, {"name": 1, "transfermarkt_id": 1})
                         db_name = matched_team["name"] if matched_team else team_name
-                        gf_total = gf_h + gf_a
-                        ga_total = ga_h + ga_a
+                        tm_id = matched_team.get("transfermarkt_id") if matched_team else None
                         classifica_teams.append({
                             "team": db_name,
-                            "goals_for": gf_total,
-                            "goals_against": ga_total,
+                            "transfermarkt_id": tm_id,
+                            "goals_for": gf_h + gf_a,
+                            "goals_against": ga_h + ga_a,
+                            "goals_for_home": gf_h,
+                            "goals_against_home": ga_h,
+                            "goals_for_away": gf_a,
+                            "goals_against_away": ga_a,
                         })
 
                 except Exception as e:
@@ -198,16 +202,29 @@ def scrape_unified_ranking():
             print(f"   ✅ Aggiornate {updated} squadre.")
 
             # Salva goals_for/goals_against nella collection classifiche
+            # table → totali, table_home → solo casa, table_away → solo trasferta
             if classifica_teams:
                 existing_cls = classifiche_collection.find_one({"league": league['name']})
                 if existing_cls:
-                    for tbl_key in ["table", "table_home", "table_away"]:
+                    # Mappa: per ogni tabella, quale campo GF/GS usare
+                    tbl_gf_keys = {
+                        "table":      ("goals_for", "goals_against"),
+                        "table_home": ("goals_for_home", "goals_against_home"),
+                        "table_away": ("goals_for_away", "goals_against_away"),
+                    }
+                    for tbl_key, (gf_field, ga_field) in tbl_gf_keys.items():
                         old_tbl = existing_cls.get(tbl_key, [])
                         for entry in old_tbl:
-                            match_gf = next((c for c in classifica_teams if c["team"] == entry.get("team")), None)
+                            # Matching per transfermarkt_id (priorità), fallback nome
+                            entry_tm = entry.get("transfermarkt_id")
+                            match_gf = None
+                            if entry_tm:
+                                match_gf = next((c for c in classifica_teams if c.get("transfermarkt_id") and str(c["transfermarkt_id"]) == str(entry_tm)), None)
+                            if not match_gf:
+                                match_gf = next((c for c in classifica_teams if c["team"] == entry.get("team")), None)
                             if match_gf:
-                                entry["goals_for"] = match_gf["goals_for"]
-                                entry["goals_against"] = match_gf["goals_against"]
+                                entry["goals_for"] = match_gf[gf_field]
+                                entry["goals_against"] = match_gf[ga_field]
                         classifiche_collection.update_one(
                             {"league": league['name']},
                             {"$set": {tbl_key: old_tbl}}
