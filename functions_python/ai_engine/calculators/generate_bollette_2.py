@@ -21,174 +21,22 @@ sys.path.append(current_path)
 from config import db
 
 # ==================== PATTERN MATCHING BOLLETTE ====================
-# 33 pattern (B1-B33) da report elite+bizarre + 150 pattern hybrid
+# Usa gli stessi 85 pattern del Mixer (tag_mixer.py)
 # Un pronostico entra nel pool non-elite se matcha almeno uno di questi
 
-def _match_pattern_b(sel):
-    """Controlla se una selezione matcha uno dei 33 pattern B1-B33 (elite+bizarre)."""
-    t = sel.get("mercato", "")
-    q = sel.get("quota", 0) or 0
-    c = sel.get("confidence", 0) or 0
-    s = sel.get("stars", 0) or 0
-    src = sel.get("source", "")
-    rt = sel.get("routing_rule", "")
-    e = sel.get("edge", 0) or 0
-    pr = sel.get("pronostico", "")
-
-    # B1: SEGNO | quota 1.50-1.79 | confidence 60-69
-    if t == "SEGNO" and 1.50 <= q < 1.80 and 60 <= c <= 69: return True
-    # B2: SEGNO | quota 1.50-1.79 | confidence 80-100
-    if t == "SEGNO" and 1.50 <= q < 1.80 and 80 <= c <= 100: return True
-    # B3: SEGNO | quota 2.00-2.49 | confidence 70-79
-    if t == "SEGNO" and 2.00 <= q < 2.50 and 70 <= c <= 79: return True
-    # B4: SEGNO | quota 1.80-1.99 | stelle 4-4.5
-    if t == "SEGNO" and 1.80 <= q < 2.00 and 4.0 <= s <= 4.5: return True
-    # B5: GOL | quota 1.50-1.79 | confidence 80-100
-    if t == "GOL" and 1.50 <= q < 1.80 and 80 <= c <= 100: return True
-    # B6: SEGNO | edge 5-9
-    if t == "SEGNO" and 5 <= e <= 9: return True
-    # B7: GOL | source A+S_o25_s6_conv
-    if t == "GOL" and src == "A+S_o25_s6_conv": return True
-    # B8: DOPPIA_CHANCE | quota 1.40-1.49 | confidence >=60
-    if t == "DOPPIA_CHANCE" and 1.40 <= q < 1.50 and c >= 60: return True
-    # B9: EXTREME conf>=70 stelle>=3.5 quota<1.60 DOPPIA_CHANCE
-    if t == "DOPPIA_CHANCE" and c >= 70 and s >= 3.5 and q < 1.60: return True
-    # B10: confidence>=85 GOL
-    if t == "GOL" and c >= 85: return True
-    # B11: source A+S_mg stelle>=3.0
-    if src == "A+S_mg" and s >= 3.0: return True
-    # B12: routing consensus_both DOPPIA_CHANCE stelle>=3
-    if t == "DOPPIA_CHANCE" and rt == "consensus_both" and s >= 3: return True
-    # B13: DOPPIA_CHANCE quota 1.40-1.49 source A+S
-    if t == "DOPPIA_CHANCE" and 1.40 <= q < 1.50 and src == "A+S": return True
-    # B14: DOPPIA_CHANCE quota 1.40-1.49 source C_combo96
-    if t == "DOPPIA_CHANCE" and 1.40 <= q < 1.50 and src == "C_combo96": return True
-    # B15: GOL quota 1.60-1.79 source C_mg
-    if t == "GOL" and 1.60 <= q < 1.80 and src == "C_mg": return True
-    # B16: DOPPIA_CHANCE quota 1.40-1.49 stelle>=3
-    if t == "DOPPIA_CHANCE" and 1.40 <= q < 1.50 and s >= 3: return True
-    # B17: source C_combo96 stelle>=3.0
-    if src == "C_combo96" and s >= 3.0: return True
-    # B18: GOL quota 1.30-1.39 confidence>=60
-    if t == "GOL" and 1.30 <= q < 1.40 and c >= 60: return True
-    # B19: routing combo_96_dc_flip DOPPIA_CHANCE stelle>=3
-    if t == "DOPPIA_CHANCE" and rt == "combo_96_dc_flip" and s >= 3: return True
-    # B20: DOPPIA_CHANCE quota 1.40-1.49
-    if t == "DOPPIA_CHANCE" and 1.40 <= q < 1.50: return True
-    # B21: DOPPIA_CHANCE quota 1.40-1.49 source C_screm
-    if t == "DOPPIA_CHANCE" and 1.40 <= q < 1.50 and src == "C_screm": return True
-    # B22: SEGNO quota 1.60-1.79 stelle>=3
-    if t == "SEGNO" and 1.60 <= q < 1.80 and s >= 3: return True
-    # B23: source A stelle>=3.0
-    if src == "A" and s >= 3.0: return True
-    # B24: EXTREME conf>=70 stelle>=3.5 quota<1.60 GOL
-    if t == "GOL" and c >= 70 and s >= 3.5 and q < 1.60: return True
-    # B25: EXTREME conf>=80 stelle>=3 GOL
-    if t == "GOL" and c >= 80 and s >= 3: return True
-    # B26: edge>=20 conf>=70 SEGNO
-    if t == "SEGNO" and e >= 20 and c >= 70: return True
-    # B27: SEGNO quota 1.80-1.99 conf>=70
-    if t == "SEGNO" and 1.80 <= q < 2.00 and c >= 70: return True
-    # B28: routing single GOL stelle>=3
-    if t == "GOL" and rt == "single" and s >= 3: return True
-    # B29: stelle>=4.0 SEGNO
-    if t == "SEGNO" and s >= 4.0: return True
-    # B30: SEGNO quota 1.60-1.79 source C
-    if t == "SEGNO" and 1.60 <= q < 1.80 and src == "C": return True
-    # B31: pronostico 1 conf>=70
-    if pr == "1" and c >= 70: return True
-    # B32: SEGNO quota 2.00-2.49 conf>=70
-    if t == "SEGNO" and 2.00 <= q < 2.50 and c >= 70: return True
-    # B33: SEGNO quota 1.60-1.79 conf>=60
-    if t == "SEGNO" and 1.60 <= q < 1.80 and c >= 60: return True
-    return False
-
-
-def _check_hybrid_condition(cond_str, sel):
-    """Verifica una singola condizione hybrid su una selezione."""
-    t = sel.get("mercato", "")
-    q = sel.get("quota", 0) or 0
-    c = sel.get("confidence", 0) or 0
-    s = sel.get("stars", 0) or 0
-    src = sel.get("source", "")
-    rt = sel.get("routing_rule", "")
-    st = sel.get("stake", 0) or 0
-    pr = sel.get("pronostico", "")
-    cs = cond_str.strip()
-
-    m = re.match(r"conf(\d+)-(\d+)", cs)
-    if m: return int(m.group(1)) <= c <= int(m.group(2))
-    m = re.match(r"conf>=(\d+)", cs)
-    if m: return c >= int(m.group(1))
-    m = re.match(r"stelle([\d.]+)-([\d.]+)", cs)
-    if m: return float(m.group(1)) <= s < float(m.group(2))
-    m = re.match(r"stelle>=([\d.]+)", cs)
-    if m: return s >= float(m.group(1))
-    m = re.match(r"q([\d.]+)-([\d.]+)", cs)
-    if m: return float(m.group(1)) <= q <= float(m.group(2)) + 0.001
-    m = re.match(r"tipo=(.+)", cs)
-    if m: return t == m.group(1)
-    m = re.match(r"src=(.+)", cs)
-    if m: return src == m.group(1)
-    m = re.match(r"routing=(.+)", cs)
-    if m: return rt == m.group(1)
-    m = re.match(r"pron=(.+)", cs)
-    if m: return pr == m.group(1)
-    m = re.match(r"stake>=(\d+)", cs)
-    if m: return st >= int(m.group(1))
-    return False
-
-
-def _load_hybrid_patterns():
-    """Carica i 150 pattern hybrid dal file txt più recente."""
-    # Cerca nella cartella _analisi_pattern
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    pattern_dir = os.path.join(base_dir, "..", "..", "..", "_analisi_pattern")
-    pattern_file = os.path.join(pattern_dir, "hybrid_75_by_profit.txt")
-
-    if not os.path.exists(pattern_file):
-        print("⚠️ File hybrid_75_by_profit.txt non trovato, skip pattern hybrid")
-        return []
-
-    patterns = []
-    with open(pattern_file, "r", encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if not line or line[0] not in "0123456789":
-                continue
-            parts = line.split()
-            # Estrai pattern: dal secondo token fino al profit (+N.N o -N.N)
-            pat_parts = []
-            for p in parts[1:]:
-                if p.startswith("+") or p.startswith("-"):
-                    try:
-                        float(p)
-                        break
-                    except ValueError:
-                        pass
-                pat_parts.append(p)
-            pattern = " ".join(pat_parts)
-            conditions = [c.strip() for c in pattern.split("+")]
-            patterns.append(conditions)
-
-    return patterns
-
-
-# Carica pattern hybrid all'avvio
-_HYBRID_PATTERNS = _load_hybrid_patterns()
-
+from tag_mixer import _check, PATTERNS
 
 def matches_bollette_pattern(sel):
-    """Controlla se una selezione matcha almeno uno dei 183 pattern (B1-B33 + hybrid).
+    """Controlla se una selezione matcha almeno uno degli 85 pattern Mixer.
     Usato per filtrare il pool prima di passarlo a Mistral nelle sezioni non-elite."""
-    # Check B1-B33
-    if _match_pattern_b(sel):
-        return True
-    # Check 150 hybrid
-    for conds in _HYBRID_PATTERNS:
-        if all(_check_hybrid_condition(c, sel) for c in conds):
-            return True
-    return False
+    if sel.get("pronostico") == "NO BET":
+        return False
+    # Mappa campo 'mercato' -> 'tipo' per compatibilità (bollette usa 'mercato', mixer usa 'tipo')
+    p = dict(sel)
+    if 'mercato' in p and 'tipo' not in p:
+        p['tipo'] = p['mercato']
+    flags = _check(p)
+    return any(all(flags.get(c, False) for c in conds) for conds in PATTERNS.values())
 
 
 try:

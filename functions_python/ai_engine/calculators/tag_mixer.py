@@ -1,26 +1,12 @@
 """
 Tag Mixer — Tagga i pronostici unified che matchano i 74 pattern (14 genitori + 60 ibridi).
+Esporta anche PATTERNS (85 = 74 + 11 salvati) usato da generate_bollette_2.py per il pool bollette.
 Gira dopo tag_elite.py nella pipeline. Aggiunge: mixer (bool), mixer_patterns (lista ID).
 """
 
 import os
 import sys
 from datetime import datetime, timedelta
-from dotenv import load_dotenv
-from pymongo import MongoClient
-
-load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env'))
-MONGO_URI = os.getenv('MONGO_URI')
-if not MONGO_URI:
-    print("ERRORE: MONGO_URI non trovata")
-    sys.exit(1)
-
-client = MongoClient(MONGO_URI)
-db = client['football_simulator_db']
-coll = db['daily_predictions_unified']
-
-today = datetime.now()
-dates = [(today + timedelta(days=i)).strftime('%Y-%m-%d') for i in range(7)]
 
 
 # ============================================================
@@ -41,18 +27,31 @@ def _check(p):
         'conf50-59': 50 <= confidence <= 59,
         'conf60-69': 60 <= confidence <= 69,
         'conf70-79': 70 <= confidence <= 79,
+        'conf60+': confidence >= 60,
+        'conf70+': confidence >= 70,
+        'conf80+': confidence >= 80,
+        'conf85+': confidence >= 85,
+        'q1.30-1.39': 1.30 <= quota <= 1.39,
         'q1.30-1.49': 1.30 <= quota <= 1.49,
         'q1.50-1.79': 1.50 <= quota <= 1.79,
+        'q_lt1.60': quota < 1.60,
         'q3.00-3.99': 3.00 <= quota <= 3.99,
+        'src_A': source == 'A',
         'src_C_screm': source == 'C_screm',
         'src_C': source == 'C',
         'route_scrematura': routing == 'scrematura_segno',
         'route_union': routing == 'union',
         'route_single': routing == 'single',
+        'route_consensus_both': routing == 'consensus_both',
         'tipo_GOL': tipo == 'GOL',
         'tipo_SEGNO': tipo == 'SEGNO',
+        'tipo_DC': tipo == 'DOPPIA_CHANCE',
         'pron_Goal': pronostico == 'Goal',
         'pron_1': pronostico == '1',
+        'pron_Over1.5': pronostico == 'Over 1.5',
+        'st3.0+': stars >= 3.0,
+        'st3.0-3.5': 3.0 <= stars < 3.5,
+        'st3.5+': stars >= 3.5,
         'st3.6-3.9': 3.6 <= stars <= 3.9,
         'edge20-50': 20 < edge <= 50,
         'edge50+': edge > 50,
@@ -60,10 +59,10 @@ def _check(p):
 
 
 # ============================================================
-# 74 pattern: ogni pattern e un set di condizioni che devono essere TUTTE vere
-# G = genitore (14), H = ibrido (60)
+# MIXER_PATTERNS: 74 pattern per la pagina Mixer (G+H)
+# PATTERNS: 85 pattern per il pool bollette (G+H+S)
 # ============================================================
-PATTERNS = {
+MIXER_PATTERNS = {
     # --- 14 GENITORI ---
     'G01': {'conf50-59', 'src_C_screm'},
     'G02': {'conf50-59', 'q1.50-1.79'},
@@ -143,24 +142,59 @@ PATTERNS = {
     'H60': {'edge20-50', 'pron_1', 'q1.50-1.79', 'tipo_SEGNO'},
 }
 
+# --- 11 SALVATI DA BOLLETTE (S01-S11) — solo per pool bollette, NON per pagina Mixer ---
+_BOLLETTE_EXTRA = {
+    'S01': {'conf70+', 'q1.30-1.39'},                                # HYB_080: 86.7% HR, +20.22u
+    'S02': {'conf60+', 'q1.30-1.39', 'st3.0-3.5'},                   # HYB_102: 84.6% HR, +16.29u
+    'S03': {'q1.30-1.39', 'route_consensus_both', 'st3.0-3.5'},      # HYB_101: 83.3% HR, +15.94u
+    'S04': {'conf70-79', 'pron_Over1.5'},                             # HYB_145: 100% HR, +14.03u
+    'S05': {'pron_Over1.5', 'route_consensus_both'},                  # HYB_079: 100% HR, +8.18u
+    'S06': {'q1.30-1.49', 'st3.5+'},                                 # HYB_038: 100% HR, +11.68u
+    'S07': {'tipo_GOL', 'conf70+', 'st3.5+', 'q_lt1.60'},            # B24: 100% HR, +9.33u
+    'S08': {'tipo_GOL', 'q1.30-1.39', 'conf60+'},                    # B18: 88.9% HR, +2.79u
+    'S09': {'tipo_DC', 'route_consensus_both', 'st3.0+'},             # B12: 72.7% HR, +5.84u
+    'S10': {'src_A', 'st3.5+'},                                      # HYB_060: 100% HR, +3.13u
+    'S11': {'q1.30-1.39', 'src_A'},                                  # HYB_144: 100% HR, +1.48u
+}
+
+# PATTERNS = tutti (85) — usato da generate_bollette_2.py
+PATTERNS = {**MIXER_PATTERNS, **_BOLLETTE_EXTRA}
+
 
 def get_matched_mixer_patterns(p):
-    """Restituisce la lista di pattern ID che il pronostico matcha."""
+    """Restituisce la lista di pattern ID (solo G+H, 74) che il pronostico matcha.
+    Usato per taggare mixer nella pagina Mixer."""
     if p.get('pronostico') == 'NO BET':
         return []
 
     flags = _check(p)
     matched = []
-    for pat_id, conditions in PATTERNS.items():
+    for pat_id, conditions in MIXER_PATTERNS.items():
         if all(flags.get(c, False) for c in conditions):
             matched.append(pat_id)
     return matched
 
 
 def main():
+    from dotenv import load_dotenv
+    from pymongo import MongoClient
+
+    load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env'))
+    MONGO_URI = os.getenv('MONGO_URI')
+    if not MONGO_URI:
+        print("ERRORE: MONGO_URI non trovata")
+        sys.exit(1)
+
+    client = MongoClient(MONGO_URI)
+    db = client['football_simulator_db']
+    coll = db['daily_predictions_unified']
+
+    today = datetime.now()
+    dates = [(today + timedelta(days=i)).strftime('%Y-%m-%d') for i in range(7)]
+
     print(f"=== TAG MIXER — {today.strftime('%Y-%m-%d %H:%M')} ===")
     print(f"Date da processare: {dates}")
-    print(f"Pattern totali: {len(PATTERNS)} (14 genitori + 60 ibridi)")
+    print(f"Pattern mixer: {len(MIXER_PATTERNS)} (14 genitori + 60 ibridi) | Bollette: {len(PATTERNS)} (+{len(_BOLLETTE_EXTRA)} salvati)")
 
     total_tagged = 0
     total_matches = 0
