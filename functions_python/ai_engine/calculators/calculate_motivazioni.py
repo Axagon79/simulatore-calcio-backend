@@ -118,20 +118,36 @@ def compute_pressure_ahead(
     return pressure
 
 
+def _match_team_to_classifica(team_doc, cls_by_name, cls_by_tm_id):
+    """Matching squadra con classifica: transfermarkt_id > nome > aliases."""
+    tm_id = team_doc.get("transfermarkt_id")
+    if tm_id and tm_id in cls_by_tm_id:
+        return cls_by_tm_id[tm_id]
+    name = team_doc.get("name", "")
+    if name in cls_by_name:
+        return cls_by_name[name]
+    for alias in team_doc.get("aliases", []):
+        if isinstance(alias, str) and alias in cls_by_name:
+            return cls_by_name[alias]
+        elif isinstance(alias, dict):
+            for v in alias.values():
+                if isinstance(v, str) and v in cls_by_name:
+                    return cls_by_name[v]
+    return None
+
+
 def main():
     print("🔥 Calcolo MOTIVAZIONE squadre (0-10) per tutti i campionati...")
 
-    cursor = teams.find(
-        {
-            "stats.ranking_c.position": {"$exists": True},
-            "stats.ranking_c.points": {"$exists": True},
-            "stats.ranking_c.played": {"$exists": True},
-            "league": {"$exists": True},
-        }
-    )
+    classifiche = db["classifiche"]
+
+    all_teams = list(teams.find(
+        {"league": {"$exists": True}},
+        {"name": 1, "league": 1, "aliases": 1, "transfermarkt_id": 1, "stats": 1}
+    ))
 
     leagues = {}
-    for team in cursor:
+    for team in all_teams:
         league = team.get("league")
         if not league:
             continue
@@ -153,16 +169,32 @@ def main():
         print(f"\n🏆 {league}")
         print(f"   Giornate totali previste: {total_matches}")
 
+        cls_doc = classifiche.find_one({"league": league})
+        if not cls_doc or not cls_doc.get("table"):
+            print("   ⚠️ Nessuna classifica trovata, salto.")
+            continue
+
+        cls_by_name = {}
+        cls_by_tm_id = {}
+        for row in cls_doc["table"]:
+            cls_by_name[row.get("team", "")] = row
+            tm_id = row.get("transfermarkt_id")
+            if tm_id:
+                cls_by_tm_id[tm_id] = row
+
         # mappa posizione -> (punti, played, team)
         pos_map = {}
         for t in league_teams:
-            rc = t.get("stats", {}).get("ranking_c", {})
-            pos = rc.get("position")
-            pts = rc.get("points")
-            played = rc.get("played")
+            cls_row = _match_team_to_classifica(t, cls_by_name, cls_by_tm_id)
+            if not cls_row:
+                continue
+            pos = cls_row.get("rank")
+            pts = cls_row.get("points")
+            played = cls_row.get("played")
             if isinstance(pos, int) and isinstance(pts, (int, float)) and isinstance(
                 played, int
             ):
+                t["_cls"] = {"position": pos, "points": pts, "played": played}
                 pos_map[pos] = (pts, played, t)
 
         if not pos_map:
@@ -235,11 +267,12 @@ def main():
 
         # ---------------- calcolo per squadra ----------------
         for t in league_teams:
-            stats = t.get("stats", {})
-            rc = stats.get("ranking_c", {})
-            pos = rc.get("position")
-            pts = rc.get("points")
-            played = rc.get("played")
+            cls = t.get("_cls")
+            if not cls:
+                continue
+            pos = cls["position"]
+            pts = cls["points"]
+            played = cls["played"]
 
             name = t.get("name", "???")
 
@@ -426,9 +459,9 @@ def calculate_single_motivation(team_data, pos_map, league_conf, league_name):
     """
     total_matches = league_conf.get("total_matches")
     zones = league_conf.get("zones", {})
-    
-    rc = team_data.get("stats", {}).get("ranking_c", {})
-    pos, pts, played = rc.get("position"), rc.get("points"), rc.get("played")
+
+    cls = team_data.get("_cls", {})
+    pos, pts, played = cls.get("position"), cls.get("points"), cls.get("played")
     
     if not all(isinstance(x, (int, float)) for x in [pos, pts, played]):
         return NEUTRAL_MOTIVATION
@@ -480,7 +513,24 @@ def get_motivation_live_bulk(team_name, league_name, bulk_cache):
         return NEUTRAL_MOTIVATION
 
     league_teams = [t for t in bulk_cache["TEAMS"] if t.get("league") == league_name]
-    pos_map = {t.get("stats", {}).get("ranking_c", {}).get("position"): (t.get("stats", {}).get("ranking_c", {}).get("points"), t.get("stats", {}).get("ranking_c", {}).get("played"), t) for t in league_teams if t.get("stats", {}).get("ranking_c", {}).get("position")}
+    # Carica classifica dalla collection classifiche
+    cls_doc = db["classifiche"].find_one({"league": league_name})
+    cls_by_name = {}
+    cls_by_tm_id = {}
+    if cls_doc and cls_doc.get("table"):
+        for row in cls_doc["table"]:
+            cls_by_name[row.get("team", "")] = row
+            tm_id = row.get("transfermarkt_id")
+            if tm_id:
+                cls_by_tm_id[tm_id] = row
+
+    # Arricchisci le squadre con dati classifica
+    for t in league_teams:
+        cls_row = _match_team_to_classifica(t, cls_by_name, cls_by_tm_id)
+        if cls_row:
+            t["_cls"] = {"position": cls_row.get("rank"), "points": cls_row.get("points"), "played": cls_row.get("played")}
+
+    pos_map = {t["_cls"]["position"]: (t["_cls"]["points"], t["_cls"]["played"], t) for t in league_teams if t.get("_cls", {}).get("position")}
     
     # RICERCA TARGET TEAM (FIX ALIAS BLINDATO)
     target_team = None

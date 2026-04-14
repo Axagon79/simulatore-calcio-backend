@@ -205,7 +205,7 @@ REGOLE COMPOSIZIONE
    CONTROLLA ogni bolletta prima di inviarla: c'è almeno 1 selezione con data {today_date}? Se no, aggiungila.
 8. Non creare bollette con una sola selezione — almeno 2 selezioni per bolletta (selettiva: 2-5, bilanciata: 2-7, ambiziosa: 4-8)
 9. Rispetta SEMPRE i limiti di quota per singola selezione indicati sopra. Se una selezione ha quota troppo alta per quella categoria, NON usarla in quella bolletta
-10. Per ogni bolletta, scrivi una motivazione di 2 righe nel campo "reasoning" che spiega PERCHÉ hai scelto quelle selezioni. Cita i dati statistici: forma, classifica, trend, strisce, affidabilità, motivazione. Esempio: "Fiorentina in casa è 5° in classifica casa con forma al 65% e trend in salita, Benevento ha 4 vittorie consecutive e affidabilità 8.2/10". NO frasi generiche tipo "combinazione sicura" o "favorite nette"
+10. Per ogni bolletta, scrivi una motivazione di 2 righe nel campo "reasoning" che spiega PERCHÉ hai scelto quelle selezioni. Cita Q, D e i dati statistici chiave (forma, classifica, trend). Esempio: "Fiorentina Q=68 D=72 — 5° in casa, forma 65%, trend in salita. Benevento Q=62 D=64 — 4 vittorie consecutive, affidabilità 8.2/10". NO frasi generiche tipo "combinazione sicura" o "favorite nette"
 11. Cerca di variare il numero di selezioni tra le bollette della stessa categoria, non mettere sempre lo stesso numero
 12. ⚠️ DIVERSIFICAZIONE OBBLIGATORIA DEL NUMERO DI SELEZIONI ⚠️
    NON fare bollette con lo stesso numero di selezioni nella stessa categoria. Segui questi schemi:
@@ -220,7 +220,22 @@ REGOLE COMPOSIZIONE
 DATI STATISTICI — COME LEGGERLI E USARLI
 ═══════════════════════════════════════
 
-Ogni partita nel pool ha dati statistici sotto le selezioni. Usali per fare scelte INFORMATE, non alla cieca:
+Ogni selezione ha due indicatori sintetici calcolati dal sistema:
+
+📐 **Q (Qualità)** (0-100): misura quanto sono SOLIDI e ABBONDANTI i dati statistici disponibili per questa partita. Q alto = tanti dati affidabili su cui basarsi. Q basso = pochi dati o dati incoerenti → selezione rischiosa perché non hai informazioni su cui fare affidamento.
+
+🧭 **D (Direzione)** (0-100): misura quanto i dati statistici SUPPORTANO lo specifico pronostico. D alto = tutti i segnali puntano nella stessa direzione del pronostico. D basso = i dati contraddicono il pronostico o sono neutrali.
+
+COME USARE Q e D:
+- Q≥60 e D≥60 = selezione FORTE — dati solidi che confermano il pronostico. Ideale per bollette selettive
+- Q≥60 e D<50 = ATTENZIONE — dati solidi ma NON supportano il pronostico. Evita nelle selettive
+- Q<45 e D≥60 = RISCHIO — la direzione è giusta ma i dati sono pochi/deboli. Accettabile nelle ambiziose
+- Q<45 e D<45 = selezione DEBOLE — pochi dati e pure contrastanti. Evita o usa solo come riempitivo
+- Nelle bollette SELETTIVE: preferisci Q≥55 e D≥55
+- Nelle bollette AMBIZIOSE: puoi accettare Q più basso ma D dovrebbe essere ≥50
+- NON mettere troppe selezioni con Q<50 nella stessa bolletta
+
+Ogni partita nel pool ha anche dati statistici dettagliati sotto le selezioni. Usali per fare scelte INFORMATE, non alla cieca:
 
 📊 **Classifica**: posizione in campionato, punti, vittorie-pareggi-sconfitte, gol fatti/subiti, posizione casa e trasferta separata. Una squadra 3° in casa ma 12° fuori casa è molto diversa. Controlla SEMPRE la classifica casa per la squadra di casa e la classifica trasferta per la squadra in trasferta.
 
@@ -891,12 +906,14 @@ def _analisi_gf_gs(squadra_data, tutte_squadre, contesto="totale"):
 
 
 def _trend_score(trend_values):
-    """Calcola un punteggio di trend (-100 a +100).
-    Positivo = miglioramento, negativo = peggioramento."""
+    """Calcola il gap tra media trend e forma attuale.
+    Negativo = sottoperforma (potenziale riscatto), positivo = sovraperforma.
+    NOTA: trend_values[0] = più recente (forma attuale), media = trend medio."""
     if not trend_values or len(trend_values) < 2:
         return 0
-    diff = trend_values[-1] - trend_values[0]
-    return max(-100, min(100, round(diff * (100 / 15))))
+    media = sum(trend_values) / len(trend_values)
+    forma_attuale = trend_values[0]
+    return round(media - forma_attuale, 1)
 
 
 def _curve_lookup(streak_type, n):
@@ -946,15 +963,30 @@ def _get_mercato_type(mercato, pronostico):
     return "SEGNO"  # default
 
 
+def _dir_verso_pronostico(valore, soglia_pro, soglia_contro, invertito=False):
+    """Calcola direzione 0-100: quanto un valore punta verso il pronostico.
+    - valore: il dato grezzo della squadra
+    - soglia_pro: valore sopra cui supporta il pronostico (100)
+    - soglia_contro: valore sotto cui va contro il pronostico (0)
+    - invertito: se True, la logica si inverte (basso = pro)
+    Ritorna 0-100 dove 50 = neutro, 100 = totalmente a favore, 0 = totalmente contro."""
+    if soglia_pro == soglia_contro:
+        return 50
+    if invertito:
+        valore = soglia_pro + soglia_contro - valore
+    ratio = (valore - soglia_contro) / (soglia_pro - soglia_contro)
+    return max(0, min(100, round(ratio * 100, 1)))
+
+
 def calculate_solidity_coefficient(pool, classifiche_cache=None):
     """Calcola il Coefficiente di Solidità (0-100) per ogni selezione del pool.
 
-    11 componenti indipendenti, ognuno emette score (0-100) + direzione.
-    I pesi cambiano in base al mercato (SEGNO vs GOL).
-    Le strisce usano la curva a campana (stessi valori di run_daily_predictions.py).
-    Il contesto (confronto direzioni vs pronostico) è il moltiplicatore finale.
+    11 componenti, ognuno produce per OGNI SQUADRA:
+      - score (0-100): qualità/forza del dato
+      - dir (0-100): quanto quel dato punta verso il pronostico specifico
 
-    Il coefficiente viene salvato in s['coeff_solidita'] per ogni selezione.
+    I pesi cambiano in base al mercato (SEGNO vs GOL).
+    Il contesto (media pesata delle direzioni) è il moltiplicatore finale (0.7-1.3).
     """
     if classifiche_cache is None:
         classifiche_cache = {}
@@ -966,15 +998,50 @@ def calculate_solidity_coefficient(pool, classifiche_cache=None):
         pronostico = s.get("pronostico", "")
 
         if not ch or not ca:
-            s["coeff_solidita"] = None
+            s["coeff_qualita"] = None
+            s["coeff_direzione"] = None
             continue
 
-        scores = {}      # {componente: punteggio 0-100}
-        direzioni = {}   # {componente: [lista direzioni]}
+        # Struttura per squadra: {componente: {home: {score, dir}, away: {score, dir}}}
+        componenti = {}
 
-        # Determina pesi in base al mercato
         mercato_type = _get_mercato_type(mercato, pronostico)
         PESI = PESI_SEGNO if mercato_type == "SEGNO" else PESI_GOL
+
+        # Determina il "verso" del pronostico per calcolare le direzioni
+        pron_up = (pronostico or "").upper()
+        mercato_up = (mercato or "").upper()
+        # pron_favor: "1" = casa favorita, "2" = ospite favorita, "X" = pareggio,
+        #             "OVER"/"GOAL" = tanti gol, "UNDER"/"NOGOL" = pochi gol
+        if mercato_up == "SEGNO":
+            pron_favor = pron_up  # "1", "2", "X"
+        elif mercato_up in ("DOPPIA_CHANCE", "DC"):
+            if "1" in pron_up:
+                pron_favor = "1X"
+            elif "2" in pron_up:
+                pron_favor = "X2"
+            else:
+                pron_favor = "X"
+        elif mercato_up == "GOL":
+            if pron_up in ("GOAL", "GG"):
+                pron_favor = "GOAL"
+            elif pron_up in ("NO GOAL", "NOGOL", "NG"):
+                pron_favor = "NOGOL"
+            elif "OVER" in pron_up:
+                pron_favor = "OVER"
+            elif "UNDER" in pron_up:
+                pron_favor = "UNDER"
+            else:
+                pron_favor = "GOAL"
+        else:
+            pron_favor = pron_up
+
+        is_segno = mercato_type == "SEGNO"
+        favor_home = pron_favor in ("1", "1X")
+        favor_away = pron_favor in ("2", "X2")
+        favor_draw = pron_favor in ("X", "1X", "X2")
+        favor_over = pron_favor in ("OVER", "GOAL")
+        favor_under = pron_favor in ("UNDER", "NOGOL")
 
         # === 1. LINEARITÀ V-N-P ===
         lin_home_tot = _linearita_vnp(ch.get("v"), ch.get("n"), ch.get("p"))
@@ -983,29 +1050,37 @@ def calculate_solidity_coefficient(pool, classifiche_cache=None):
         lin_away_ctx = _linearita_vnp(ca.get("v_trasf"), ca.get("n_trasf"), ca.get("p_trasf"))
 
         if lin_home_tot is not None and lin_home_ctx is not None:
-            lin_home = lin_home_tot * 0.4 + lin_home_ctx * 0.6
+            score_h = lin_home_tot * 0.4 + lin_home_ctx * 0.6
         else:
-            lin_home = lin_home_tot or lin_home_ctx or 50
+            score_h = lin_home_tot or lin_home_ctx or 50
         if lin_away_tot is not None and lin_away_ctx is not None:
-            lin_away = lin_away_tot * 0.4 + lin_away_ctx * 0.6
+            score_a = lin_away_tot * 0.4 + lin_away_ctx * 0.6
         else:
-            lin_away = lin_away_tot or lin_away_ctx or 50
+            score_a = lin_away_tot or lin_away_ctx or 50
 
         pt_home = ch.get("pt", 0)
         pt_away = ca.get("pt", 0)
-        distacco_pt = abs(pt_home - pt_away)
-        bonus_distacco = min(15, distacco_pt * 0.8)
+        # Direzione: casa alta in classifica → supporta 1, away alta → supporta 2
+        if is_segno:
+            if favor_home:
+                dir_h = min(100, score_h + min(15, max(0, pt_home - pt_away) * 0.8))
+                dir_a = min(100, max(0, 100 - score_a - min(15, max(0, pt_away - pt_home) * 0.8)))
+            elif favor_away:
+                dir_h = max(0, 100 - score_h - min(15, max(0, pt_home - pt_away) * 0.8))
+                dir_a = min(100, score_a + min(15, max(0, pt_away - pt_home) * 0.8))
+            else:  # pareggio
+                # Squadre vicine in classifica → supporta X
+                dir_h = max(0, min(100, 100 - abs(pt_home - pt_away) * 3))
+                dir_a = dir_h
+        else:
+            # Per GOL la linearità è meno rilevante per la direzione
+            dir_h = 50
+            dir_a = 50
 
-        scores["linearita"] = min(100, (lin_home + lin_away) / 2 + bonus_distacco)
-
-        dir_lin = []
-        if pt_home > pt_away + 5:
-            dir_lin.append("SEGNO_1")
-        elif pt_away > pt_home + 5:
-            dir_lin.append("SEGNO_2")
-        elif distacco_pt <= 5:
-            dir_lin.append("SEGNO_X")
-        direzioni["linearita"] = dir_lin
+        componenti["linearita"] = {
+            "home": {"score": round(score_h, 1), "dir": round(dir_h, 1)},
+            "away": {"score": round(score_a, 1), "dir": round(dir_a, 1)},
+        }
 
         # === 2. GF-GS ===
         league = s.get("league", "")
@@ -1019,10 +1094,56 @@ def calculate_solidity_coefficient(pool, classifiche_cache=None):
         att_a_pm = gfgs_away_ctx["gf_pm"]
         def_a_pm = gfgs_away_ctx["gs_pm"]
 
-        # Soglie campionato
         media_camp_gf = sum(r.get("gf", 0) / max(r.get("g", 1), 1) for r in tutte_squadre.values()) / max(len(tutte_squadre), 1) if tutte_squadre else 1.3
         media_camp_gs = sum(r.get("gs", 0) / max(r.get("g", 1), 1) for r in tutte_squadre.values()) / max(len(tutte_squadre), 1) if tutte_squadre else 1.3
 
+        # Score GF-GS: chiarezza dei dati (quanto i numeri sono estremi vs media)
+        clarity_h = min(100, (abs(gfgs_home_ctx.get("att_vs_camp", 0)) + abs(gfgs_home_ctx.get("def_vs_camp", 0))) * 0.8)
+        clarity_a = min(100, (abs(gfgs_away_ctx.get("att_vs_camp", 0)) + abs(gfgs_away_ctx.get("def_vs_camp", 0))) * 0.8)
+
+        # Direzione GF-GS
+        # Rapporto vs media: 1.0 = nella media, >1 = sopra, <1 = sotto
+        ratio_att_h = att_h_pm / max(media_camp_gf, 0.3)  # quanto casa segna vs media
+        ratio_def_h = def_h_pm / max(media_camp_gs, 0.3)  # quanto casa subisce vs media
+        ratio_att_a = att_a_pm / max(media_camp_gf, 0.3)
+        ratio_def_a = def_a_pm / max(media_camp_gs, 0.3)
+        if is_segno:
+            if favor_home:
+                # Dir H per "1": casa segna tanto (ratio_att_h alto) → pro
+                dir_h_gfgs = min(100, max(0, ratio_att_h * 50))
+                # Dir A per "1": ospite debole = segna poco (ratio basso) + subisce tanto (ratio alto) → pro
+                dir_a_gfgs = min(100, max(0, (2 - ratio_att_a + ratio_def_a) / 3 * 100))
+            elif favor_away:
+                dir_h_gfgs = min(100, max(0, (2 - ratio_att_h + ratio_def_h) / 3 * 100))
+                dir_a_gfgs = min(100, max(0, ratio_att_a * 50))
+            else:
+                dir_h_gfgs = 50
+                dir_a_gfgs = 50
+        else:
+            # GOL: tanti gol attesi → OVER/GOAL, pochi → UNDER/NOGOL
+            if favor_over:
+                # Segna tanto + subisce tanto → Over
+                dir_h_gfgs = min(100, max(0, (ratio_att_h + ratio_def_h) / 2 * 50))
+                dir_a_gfgs = min(100, max(0, (ratio_att_a + ratio_def_a) / 2 * 50))
+            elif favor_under:
+                # Segna poco + subisce poco → Under
+                dir_h_gfgs = min(100, max(0, (2 - ratio_att_h + (2 - ratio_def_h)) / 4 * 100))
+                dir_a_gfgs = min(100, max(0, (2 - ratio_att_a + (2 - ratio_def_a)) / 4 * 100))
+            else:
+                # Goal/NoGoal generico
+                gol_attesi = att_h_pm + att_a_pm
+                dir_h_gfgs = min(100, max(0, gol_attesi / (media_camp_gf * 2) * 50))
+                dir_a_gfgs = dir_h_gfgs
+
+        componenti["gf_gs"] = {
+            "home": {"score": round(clarity_h, 1), "dir": round(dir_h_gfgs, 1)},
+            "away": {"score": round(clarity_a, 1), "dir": round(dir_a_gfgs, 1)},
+        }
+
+        # Salva analisi GF-GS per _format_match_stats
+        s["gfgs_home"] = gfgs_home_ctx
+        s["gfgs_away"] = gfgs_away_ctx
+        # Tipo partita (per Mistral)
         att_h_forte = att_h_pm > media_camp_gf * 1.1
         att_h_debole = att_h_pm < media_camp_gf * 0.85
         def_a_debole = def_a_pm > media_camp_gs * 1.1
@@ -1031,371 +1152,330 @@ def calculate_solidity_coefficient(pool, classifiche_cache=None):
         att_a_debole = att_a_pm < media_camp_gf * 0.85
         def_h_debole = def_h_pm > media_camp_gs * 1.1
         def_h_forte = def_h_pm < media_camp_gs * 0.85
-
-        # Incrocio + tipo partita
         tipo_parts = []
-        incrocio_score = 50
-        dir_gfgs = []
-
         if att_h_forte and def_a_debole:
             tipo_parts.append("casa segna bene + ospite subisce tanto → gol casa prevedibili")
-            incrocio_score += 25
-            dir_gfgs.extend(["SEGNO_1", "OVER", "GOAL"])
-        elif att_h_debole and def_a_forte:
-            tipo_parts.append("casa segna poco + ospite subisce poco → pochi gol casa prevedibili")
-            incrocio_score += 20
-            dir_gfgs.extend(["UNDER", "NOGOL"])
         elif att_h_forte and def_a_forte:
             tipo_parts.append("casa segna bene MA ospite difende bene → scontro aperto lato casa")
-            incrocio_score -= 10
         elif att_h_debole and def_a_debole:
             tipo_parts.append("casa segna poco MA ospite subisce tanto → imprevedibile lato casa")
-            incrocio_score -= 10
-
         if att_a_forte and def_h_debole:
             tipo_parts.append("ospite segna bene + casa subisce tanto → gol ospite prevedibili")
-            incrocio_score += 25
-            dir_gfgs.extend(["SEGNO_2", "OVER", "GOAL"])
-        elif att_a_debole and def_h_forte:
-            tipo_parts.append("ospite segna poco + casa subisce poco → pochi gol ospite prevedibili")
-            incrocio_score += 20
-            dir_gfgs.extend(["UNDER", "NOGOL"])
         elif att_a_forte and def_h_forte:
             tipo_parts.append("ospite segna bene MA casa difende bene → scontro aperto lato ospite")
-            incrocio_score -= 10
         elif att_a_debole and def_h_debole:
             tipo_parts.append("ospite segna poco MA casa subisce tanto → imprevedibile lato ospite")
-            incrocio_score -= 10
-
         if gfgs_home_ctx.get("outlier") or gfgs_away_ctx.get("outlier"):
             tipo_parts.append("almeno una squadra outlier (campionato a parte)")
-            incrocio_score += 20
-
-        incrocio_score = max(0, min(100, incrocio_score))
-        tipo_partita = " | ".join(tipo_parts) if tipo_parts else "nessun incrocio chiaro"
-
-        gol_attesi = att_h_pm + att_a_pm
-        if gol_attesi > 2.8:
-            dir_gfgs.append("OVER")
-        elif gol_attesi < 2.2:
-            dir_gfgs.append("UNDER")
-
-        fascia_clarity_h = abs(gfgs_home_ctx.get("att_vs_fascia", 0)) + abs(gfgs_home_ctx.get("def_vs_fascia", 0))
-        fascia_clarity_a = abs(gfgs_away_ctx.get("att_vs_fascia", 0)) + abs(gfgs_away_ctx.get("def_vs_fascia", 0))
-        camp_clarity_h = abs(gfgs_home_ctx.get("att_vs_camp", 0)) + abs(gfgs_home_ctx.get("def_vs_camp", 0))
-        camp_clarity_a = abs(gfgs_away_ctx.get("att_vs_camp", 0)) + abs(gfgs_away_ctx.get("def_vs_camp", 0))
-        fascia_score = min(100, (fascia_clarity_h + fascia_clarity_a) * 0.8)
-        camp_score = min(100, (camp_clarity_h + camp_clarity_a) * 0.5)
-        scores["gf_gs"] = round(fascia_score * 0.4 + camp_score * 0.3 + incrocio_score * 0.3, 1)
-        direzioni["gf_gs"] = dir_gfgs
-
-        s["gfgs_home"] = gfgs_home_ctx
-        s["gfgs_away"] = gfgs_away_ctx
-        s["tipo_partita"] = tipo_partita
+        s["tipo_partita"] = " | ".join(tipo_parts) if tipo_parts else "nessun incrocio chiaro"
 
         # === 3. FORMA ===
         lh = s.get("lucifero_home_pct")
         la = s.get("lucifero_away_pct")
-        if lh is not None and la is not None:
-            diff_forma = abs(lh - la)
-            avg_forma = (lh + la) / 2
-            scores["forma"] = min(100, diff_forma * 1.5 + max(0, abs(avg_forma - 50) * 0.5))
-            dir_forma = []
-            if lh > la + 15:
-                dir_forma.append("SEGNO_1")
-            elif la > lh + 15:
-                dir_forma.append("SEGNO_2")
-            elif abs(lh - la) < 10:
-                dir_forma.append("SEGNO_X")
-            direzioni["forma"] = dir_forma
+        score_forma_h = lh if lh is not None else 50
+        score_forma_a = la if la is not None else 50
+        if is_segno:
+            if favor_home:
+                dir_forma_h = score_forma_h  # casa in forma → supporta 1
+                dir_forma_a = max(0, 100 - score_forma_a)  # away in forma → CONTRO 1
+            elif favor_away:
+                dir_forma_h = max(0, 100 - score_forma_h)
+                dir_forma_a = score_forma_a
+            else:
+                dir_forma_h = max(0, min(100, 100 - abs(score_forma_h - 50) * 2))
+                dir_forma_a = max(0, min(100, 100 - abs(score_forma_a - 50) * 2))
         else:
-            scores["forma"] = 50
-            direzioni["forma"] = []
+            dir_forma_h = 50
+            dir_forma_a = 50
+
+        componenti["forma"] = {
+            "home": {"score": round(score_forma_h, 1), "dir": round(dir_forma_h, 1)},
+            "away": {"score": round(score_forma_a, 1), "dir": round(dir_forma_a, 1)},
+        }
 
         # === 4. TREND ===
         th = s.get("trend_home", [])
         ta = s.get("trend_away", [])
-        trend_h = _trend_score(th)
+        trend_h = _trend_score(th)  # gap media-attuale: negativo=sottoperforma, positivo=sovraperforma
         trend_a = _trend_score(ta)
-        if trend_h != 0 or trend_a != 0:
-            if (trend_h > 0 and trend_a < 0) or (trend_h < 0 and trend_a > 0):
-                scores["trend"] = min(100, abs(trend_h - trend_a) * 0.7)
+        # Score: 0-100 dove 50=in linea col suo trend, >50=sovraperforma, <50=sottoperforma
+        # Gap max realistico ~30 punti → mappa su scala 0-100
+        score_trend_h = min(100, max(0, 50 + trend_h * (50 / 30)))
+        score_trend_a = min(100, max(0, 50 + trend_a * (50 / 30)))
+        # Direzione: gap positivo = sottoperforma = potenziale riscatto
+        # Casa sottoperforma (gap+) → riscatto → pro 1
+        # Away sottoperforma (gap+) → riscatto → contro 1
+        if is_segno:
+            if favor_home:
+                dir_trend_h = min(100, max(0, 50 + trend_h * (50 / 30)))  # casa sottoperforma → pro 1
+                dir_trend_a = min(100, max(0, 50 - trend_a * (50 / 30)))  # away sottoperforma → contro 1
+            elif favor_away:
+                dir_trend_h = min(100, max(0, 50 - trend_h * (50 / 30)))
+                dir_trend_a = min(100, max(0, 50 + trend_a * (50 / 30)))
             else:
-                scores["trend"] = min(100, max(abs(trend_h), abs(trend_a)) * 0.5)
+                dir_trend_h = max(0, min(100, 100 - abs(trend_h) * (50 / 30)))
+                dir_trend_a = max(0, min(100, 100 - abs(trend_a) * (50 / 30)))
         else:
-            scores["trend"] = 40
-        dir_trend = []
-        if trend_h > 20 and trend_a < -10:
-            dir_trend.append("SEGNO_1")
-        elif trend_a > 20 and trend_h < -10:
-            dir_trend.append("SEGNO_2")
-        direzioni["trend"] = dir_trend
+            dir_trend_h = 50
+            dir_trend_a = 50
+
+        componenti["trend"] = {
+            "home": {"score": round(score_trend_h, 1), "dir": round(dir_trend_h, 1)},
+            "away": {"score": round(score_trend_a, 1), "dir": round(dir_trend_a, 1)},
+        }
 
         # === 5. COERENZA FORMA-TREND ===
-        # Forma attuale vs trend: se sono allineati → attendibile, se divergono → sotto/iper-performance
-        if lh is not None and la is not None and th and ta:
-            # Ultimo valore del trend normalizzato su scala 0-100 (come lucifero_pct)
-            trend_h_pct = (th[-1] / 25.0) * 100 if th else lh
-            trend_a_pct = (ta[-1] / 25.0) * 100 if ta else la
-            # Gap tra forma attuale e trend
-            gap_h = abs(lh - trend_h_pct)
-            gap_a = abs(la - trend_a_pct)
-            gap_medio = (gap_h + gap_a) / 2
-            # Score: gap piccolo = coerente = attendibile (score alto)
-            # gap grande = incoerente = meno prevedibile (score basso)
-            scores["coerenza"] = max(0, min(100, round(100 - gap_medio * 2, 1)))
-            # Direzione: sottoperformance = probabile risalita, iperperformance = probabile calo
-            dir_coerenza = []
-            # Home sottoperforma (forma bassa, trend alto) → probabile risalita → SEGNO_1
-            if lh < trend_h_pct - 15:
-                dir_coerenza.append("SEGNO_1")
-            # Home iperperforma (forma alta, trend basso) → probabile calo → SEGNO_2
-            elif lh > trend_h_pct + 15:
-                dir_coerenza.append("SEGNO_2")
-            # Away sottoperforma → probabile risalita → SEGNO_2
-            if la < trend_a_pct - 15:
-                dir_coerenza.append("SEGNO_2")
-            # Away iperperforma → probabile calo → SEGNO_1
-            elif la > trend_a_pct + 15:
-                dir_coerenza.append("SEGNO_1")
-            direzioni["coerenza"] = dir_coerenza
+        # Coerenza = forma attuale - gap. Più è basso, più è coerente.
+        if lh is not None and th and len(th) >= 2:
+            gap_h = abs(trend_h)  # trend_h = media - forma, già calcolato sopra
+            score_coer_h = max(0, round(lh - gap_h, 1))
         else:
-            scores["coerenza"] = 50
-            direzioni["coerenza"] = []
+            score_coer_h = 50
+        if la is not None and ta and len(ta) >= 2:
+            gap_a = abs(trend_a)
+            score_coer_a = max(0, round(la - gap_a, 1))
+        else:
+            score_coer_a = 50
+
+        # Direzione: valore basso = più coerente = più prevedibile
+        # Squadra favorita coerente (basso) → pro pronostico
+        # Squadra avversaria coerente (basso) → contro pronostico
+        if is_segno:
+            if favor_home:
+                dir_coer_h = max(0, 100 - score_coer_h)  # casa coerente (basso) → dir alta → pro 1
+                dir_coer_a = score_coer_a                 # away coerente (basso) → dir bassa → contro 1
+            elif favor_away:
+                dir_coer_h = score_coer_h
+                dir_coer_a = max(0, 100 - score_coer_a)
+            else:
+                dir_coer_h = score_coer_h
+                dir_coer_a = score_coer_a
+        else:
+            dir_coer_h = 50
+            dir_coer_a = 50
+
+        componenti["coerenza"] = {
+            "home": {"score": round(score_coer_h, 1), "dir": round(dir_coer_h, 1)},
+            "away": {"score": round(score_coer_a, 1), "dir": round(dir_coer_a, 1)},
+        }
 
         # === 6. MOTIVAZIONE ===
         mh = s.get("motivazione_home")
         ma = s.get("motivazione_away")
-        if mh and ma:
-            mot_h = mh.get("score", 10)
-            mot_a = ma.get("score", 10)
-            diff_mot = abs(mot_h - mot_a)
-            avg_mot = (mot_h + mot_a) / 2
-            scores["motivazione"] = min(100, diff_mot * 8 + max(0, abs(avg_mot - 10) * 3))
-            dir_mot = []
-            if mot_h > mot_a + 3:
-                dir_mot.append("SEGNO_1")
-            elif mot_a > mot_h + 3:
-                dir_mot.append("SEGNO_2")
-            direzioni["motivazione"] = dir_mot
+        mot_h = mh.get("score", 5) if mh else 5
+        mot_a = ma.get("score", 5) if ma else 5
+        # Score: motivazione alta = dato forte (0-10 → 0-100)
+        score_mot_h = min(100, mot_h * 10)
+        score_mot_a = min(100, mot_a * 10)
+        if is_segno:
+            if favor_home:
+                dir_mot_h = score_mot_h  # casa motivata → pro
+                dir_mot_a = max(0, 100 - score_mot_a)  # away motivata → contro
+            elif favor_away:
+                dir_mot_h = max(0, 100 - score_mot_h)
+                dir_mot_a = score_mot_a
+            else:
+                # Pareggio: motivazioni simili → pro
+                dir_mot_h = max(0, min(100, 100 - abs(mot_h - mot_a) * 10))
+                dir_mot_a = dir_mot_h
         else:
-            scores["motivazione"] = 50
-            direzioni["motivazione"] = []
+            dir_mot_h = 50
+            dir_mot_a = 50
+
+        componenti["motivazione"] = {
+            "home": {"score": round(score_mot_h, 1), "dir": round(dir_mot_h, 1)},
+            "away": {"score": round(score_mot_a, 1), "dir": round(dir_mot_a, 1)},
+        }
 
         # === 7. STRISCE (curva a campana) ===
         sh = s.get("streak_home", {})
         sa = s.get("streak_away", {})
 
-        # Calcola score e direzioni separati per SEGNO e GOL
         streak_segno_h = _streak_normalized(sh, "SEGNO")
         streak_segno_a = _streak_normalized(sa, "SEGNO")
         streak_gol_h = _streak_normalized(sh, "GOL")
         streak_gol_a = _streak_normalized(sa, "GOL")
 
-        # Score strisce: quanto è forte il segnale complessivo (indipendente dalla direzione)
-        # Usiamo il mercato corretto per dare lo score
+        # Score: forza del segnale (0-100)
         if mercato_type == "SEGNO":
-            raw_streak = (abs(streak_segno_h) + abs(streak_segno_a)) / 2
+            score_str_h = round(abs(streak_segno_h) * 100, 1)
+            score_str_a = round(abs(streak_segno_a) * 100, 1)
         else:
-            raw_streak = (abs(streak_gol_h) + abs(streak_gol_a)) / 2
-        # 0-1 → 0-100 (0 = nessun segnale, 1 = segnale massimo)
-        scores["strisce"] = round(raw_streak * 100, 1)
+            score_str_h = round(abs(streak_gol_h) * 100, 1)
+            score_str_a = round(abs(streak_gol_a) * 100, 1)
 
         # Direzione strisce
-        dir_strisce = []
-        if streak_segno_h > 0.3:
-            dir_strisce.append("SEGNO_1")
-        if streak_segno_a > 0.3:
-            dir_strisce.append("SEGNO_2")
-        if streak_segno_h < -0.3:
-            dir_strisce.append("SEGNO_2")  # home in crisi → vantaggio ospite
-        if streak_segno_a < -0.3:
-            dir_strisce.append("SEGNO_1")  # away in crisi → vantaggio casa
-        if streak_gol_h > 0.3 or streak_gol_a > 0.3:
-            # Strisce gol positive = over/goal attivi
-            if sh.get("over25", 0) >= 3 or sa.get("over25", 0) >= 3:
-                dir_strisce.append("OVER")
-            if sh.get("gg", 0) >= 3 or sa.get("gg", 0) >= 3:
-                dir_strisce.append("GOAL")
-            if sh.get("under25", 0) >= 3 or sa.get("under25", 0) >= 3:
-                dir_strisce.append("UNDER")
-            if sh.get("clean_sheet", 0) >= 2 or sa.get("clean_sheet", 0) >= 2:
-                dir_strisce.append("NOGOL")
-            if sh.get("senza_segnare", 0) >= 2 or sa.get("senza_segnare", 0) >= 2:
-                dir_strisce.append("NOGOL")
-        direzioni["strisce"] = dir_strisce
+        if is_segno:
+            if favor_home:
+                # Striscia positiva casa → pro, striscia positiva away → contro
+                dir_str_h = min(100, max(0, 50 + streak_segno_h * 50))
+                dir_str_a = min(100, max(0, 50 - streak_segno_a * 50))
+            elif favor_away:
+                dir_str_h = min(100, max(0, 50 - streak_segno_h * 50))
+                dir_str_a = min(100, max(0, 50 + streak_segno_a * 50))
+            else:
+                dir_str_h = max(0, min(100, 50 - abs(streak_segno_h) * 30))
+                dir_str_a = max(0, min(100, 50 - abs(streak_segno_a) * 30))
+        else:
+            if favor_over:
+                over_h = sh.get("over25", 0)
+                gg_h = sh.get("gg", 0)
+                over_a = sa.get("over25", 0)
+                gg_a = sa.get("gg", 0)
+                dir_str_h = min(100, max(0, (over_h + gg_h) * 15))
+                dir_str_a = min(100, max(0, (over_a + gg_a) * 15))
+            elif favor_under:
+                under_h = sh.get("under25", 0)
+                cs_h = sh.get("clean_sheet", 0)
+                under_a = sa.get("under25", 0)
+                cs_a = sa.get("clean_sheet", 0)
+                dir_str_h = min(100, max(0, (under_h + cs_h) * 15))
+                dir_str_a = min(100, max(0, (under_a + cs_a) * 15))
+            else:
+                dir_str_h = min(100, max(0, streak_gol_h * 50 + 50))
+                dir_str_a = min(100, max(0, streak_gol_a * 50 + 50))
+
+        componenti["strisce"] = {
+            "home": {"score": round(score_str_h, 1), "dir": round(dir_str_h, 1)},
+            "away": {"score": round(score_str_a, 1), "dir": round(dir_str_a, 1)},
+        }
 
         # === 8. AFFIDABILITÀ ===
         ac = s.get("affidabilita_casa")
         at = s.get("affidabilita_trasf")
-        if ac is not None and at is not None:
-            scores["affidabilita"] = min(100, ((ac + at) / 2) * 10)
-        else:
-            scores["affidabilita"] = 50
-        direzioni["affidabilita"] = []  # l'affidabilità rafforza, non dà direzione
+        score_aff_h = min(100, ac * 10) if ac is not None else 50
+        score_aff_a = min(100, at * 10) if at is not None else 50
+        # Affidabilità non ha una direzione forte, ma squadra affidabile → risultato prevedibile
+        dir_aff_h = score_aff_h  # alta affidabilità = fidarsi del dato
+        dir_aff_a = score_aff_a
 
-        # === 9. ATTACCO (separato) ===
+        componenti["affidabilita"] = {
+            "home": {"score": round(score_aff_h, 1), "dir": round(dir_aff_h, 1)},
+            "away": {"score": round(score_aff_a, 1), "dir": round(dir_aff_a, 1)},
+        }
+
+        # === 9. ATTACCO ===
         dh = s.get("dna_home")
         da = s.get("dna_away")
-        if dh and da:
-            att_h = dh.get("att", 50)
-            att_a = da.get("att", 50)
-            diff_att = abs(att_h - att_a)
-            scores["attacco"] = min(100, diff_att * 2.5)
-            dir_att = []
-            if att_h > att_a + 15:
-                dir_att.extend(["SEGNO_1", "OVER"])
-            elif att_a > att_h + 15:
-                dir_att.extend(["SEGNO_2", "OVER"])
-            if att_h > 70 and att_a > 70:
-                dir_att.append("OVER")
-            elif att_h < 35 and att_a < 35:
-                dir_att.append("UNDER")
-            direzioni["attacco"] = dir_att
-        else:
-            scores["attacco"] = 50
-            direzioni["attacco"] = []
+        att_dna_h = dh.get("att", 50) if dh else 50
+        att_dna_a = da.get("att", 50) if da else 50
 
-        # === 10. DIFESA (separato) ===
-        if dh and da:
-            def_h = dh.get("def", 50)
-            def_a = da.get("def", 50)
-            diff_def = abs(def_h - def_a)
-            scores["difesa"] = min(100, diff_def * 2.5)
-            dir_def = []
-            # Difesa forte = meno gol subiti = vantaggio nel segno
-            if def_h > def_a + 15:
-                dir_def.append("SEGNO_1")
-            elif def_a > def_h + 15:
-                dir_def.append("SEGNO_2")
-            if def_h > 70 and def_a > 70:
-                dir_def.extend(["UNDER", "NOGOL"])
-            elif def_h < 35 and def_a < 35:
-                dir_def.extend(["OVER", "GOAL"])
-            direzioni["difesa"] = dir_def
-        else:
-            scores["difesa"] = 50
-            direzioni["difesa"] = []
-
-        # === 11. VALORE ROSA (separato, senza tecnica) ===
-        if dh and da:
-            val_h = dh.get("val", 50)
-            val_a = da.get("val", 50)
-            diff_val = abs(val_h - val_a)
-            scores["valore_rosa"] = min(100, diff_val * 2)
-            dir_val = []
-            if val_h > val_a + 20:
-                dir_val.append("SEGNO_1")
-            elif val_a > val_h + 20:
-                dir_val.append("SEGNO_2")
-            direzioni["valore_rosa"] = dir_val
-        else:
-            scores["valore_rosa"] = 50
-            direzioni["valore_rosa"] = []
-
-        # === CONTESTO — Moltiplicatore finale ===
-        # Conta quanti componenti supportano il pronostico vs quanti vanno contro
-        mercato_up = mercato.upper() if mercato else ""
-        pron_up = pronostico.upper() if pronostico else ""
-
-        dir_supporto = set()
-        if mercato_up == "SEGNO":
-            if pron_up in ("1", "SEGNO_1"):
-                dir_supporto = {"SEGNO_1"}
-            elif pron_up in ("2", "SEGNO_2"):
-                dir_supporto = {"SEGNO_2"}
-            elif pron_up in ("X", "SEGNO_X"):
-                dir_supporto = {"SEGNO_X"}
-        elif mercato_up in ("DOPPIA_CHANCE", "DC"):
-            if "1" in pron_up and "X" in pron_up:
-                dir_supporto = {"SEGNO_1", "SEGNO_X"}
-            elif "X" in pron_up and "2" in pron_up:
-                dir_supporto = {"SEGNO_2", "SEGNO_X"}
-            elif "1" in pron_up:
-                dir_supporto = {"SEGNO_1", "SEGNO_X"}
-            elif "2" in pron_up:
-                dir_supporto = {"SEGNO_2", "SEGNO_X"}
-        elif mercato_up == "GOL":
-            if pron_up in ("GOAL", "GG"):
-                dir_supporto = {"GOAL", "OVER"}
-            elif pron_up in ("NO GOAL", "NOGOL", "NG"):
-                dir_supporto = {"NOGOL", "UNDER"}
-            elif "OVER" in pron_up:
-                dir_supporto = {"OVER", "GOAL"}
-            elif "UNDER" in pron_up:
-                dir_supporto = {"UNDER", "NOGOL"}
-
-        dir_contrarie = {
-            "SEGNO_1": {"SEGNO_2"},
-            "SEGNO_2": {"SEGNO_1"},
-            "SEGNO_X": {"SEGNO_1", "SEGNO_2"},
-            "OVER": {"UNDER"},
-            "UNDER": {"OVER"},
-            "GOAL": {"NOGOL"},
-            "NOGOL": {"GOAL"},
-        }
-        dir_contro = set()
-        for d in dir_supporto:
-            dir_contro.update(dir_contrarie.get(d, set()))
-
-        # Conta pesata: ogni componente vota con il suo peso
-        peso_pro = 0
-        peso_contro = 0
-        peso_totale_dir = sum(PESI.get(k, 0) for k in direzioni if k != "strisce")
-        # Le strisce hanno peso implicito dalla curva, aggiungiamo un peso fisso per il voto
-        peso_strisce_dir = 5  # peso fisso per il voto direzione delle strisce
-        peso_totale_dir += peso_strisce_dir
-
-        for comp, dir_list in direzioni.items():
-            if comp == "strisce":
-                peso = peso_strisce_dir
-            elif comp in PESI:
-                peso = PESI[comp]
+        if is_segno:
+            if favor_home:
+                dir_att_h = att_dna_h  # attacco casa forte → pro
+                dir_att_a = max(0, 100 - att_dna_a)  # attacco away forte → contro
+            elif favor_away:
+                dir_att_h = max(0, 100 - att_dna_h)
+                dir_att_a = att_dna_a
             else:
-                continue
-            for d in dir_list:
-                if d in dir_supporto:
-                    peso_pro += peso
-                elif d in dir_contro:
-                    peso_contro += peso
-
-        # Bilancio: da -1 (tutto contro) a +1 (tutto a favore)
-        if peso_totale_dir > 0:
-            bilancio = (peso_pro - peso_contro) / peso_totale_dir
+                dir_att_h = max(0, min(100, 100 - abs(att_dna_h - att_dna_a) * 2))
+                dir_att_a = dir_att_h
         else:
-            bilancio = 0
+            if favor_over:
+                dir_att_h = att_dna_h  # attacco forte → gol → pro over
+                dir_att_a = att_dna_a
+            elif favor_under:
+                dir_att_h = max(0, 100 - att_dna_h)
+                dir_att_a = max(0, 100 - att_dna_a)
+            else:
+                dir_att_h = att_dna_h
+                dir_att_a = att_dna_a
 
-        # === CALCOLO FINALE ===
-        # 1. Somma pesata dei componenti (senza strisce — quelle hanno la curva)
-        somma_pesata = sum(scores.get(k, 50) * PESI[k] for k in PESI)
-        somma_pesi_max = sum(100 * PESI[k] for k in PESI)
+        componenti["attacco"] = {
+            "home": {"score": round(att_dna_h, 1), "dir": round(dir_att_h, 1)},
+            "away": {"score": round(att_dna_a, 1), "dir": round(dir_att_a, 1)},
+        }
 
-        # 2. Contributo strisce (aggiunto alla somma)
-        # Le strisce non hanno peso nella tabella, contribuiscono direttamente col loro score
-        streak_contributo = scores.get("strisce", 50)
-        somma_pesata += streak_contributo * peso_strisce_dir
-        somma_pesi_max += 100 * peso_strisce_dir
+        # === 10. DIFESA ===
+        def_dna_h = dh.get("def", 50) if dh else 50
+        def_dna_a = da.get("def", 50) if da else 50
 
-        # 3. Normalizza su 0-100
-        coeff_base = (somma_pesata / somma_pesi_max) * 100 if somma_pesi_max > 0 else 50
+        if is_segno:
+            if favor_home:
+                dir_def_h = def_dna_h  # difesa casa forte → pro (non subisce)
+                dir_def_a = max(0, 100 - def_dna_a)  # difesa away forte → contro
+            elif favor_away:
+                dir_def_h = max(0, 100 - def_dna_h)
+                dir_def_a = def_dna_a
+            else:
+                dir_def_h = max(0, min(100, 100 - abs(def_dna_h - def_dna_a) * 2))
+                dir_def_a = dir_def_h
+        else:
+            if favor_over:
+                dir_def_h = max(0, 100 - def_dna_h)  # difesa debole → gol → pro over
+                dir_def_a = max(0, 100 - def_dna_a)
+            elif favor_under:
+                dir_def_h = def_dna_h  # difesa forte → pochi gol → pro under
+                dir_def_a = def_dna_a
+            else:
+                dir_def_h = 50
+                dir_def_a = 50
 
-        # 4. Moltiplicatore contesto: bilancio -1/+1 → moltiplicatore 0.7-1.3
-        moltiplicatore = 1.0 + bilancio * 0.3
-        coeff_finale = coeff_base * moltiplicatore
+        componenti["difesa"] = {
+            "home": {"score": round(def_dna_h, 1), "dir": round(dir_def_h, 1)},
+            "away": {"score": round(def_dna_a, 1), "dir": round(dir_def_a, 1)},
+        }
 
-        # Clamp 0-100
-        coeff_finale = max(0, min(100, coeff_finale))
+        # === 11. VALORE ROSA ===
+        val_dna_h = dh.get("val", 50) if dh else 50
+        val_dna_a = da.get("val", 50) if da else 50
 
-        s["coeff_solidita"] = round(coeff_finale, 1)
-        s["coeff_base"] = round(coeff_base, 1)
-        s["coeff_moltiplicatore"] = round(moltiplicatore, 2)
-        s["coeff_dettaglio"] = {k: round(scores.get(k, 50), 1) for k in list(PESI.keys()) + ["strisce"]}
-        s["coeff_direzioni"] = {k: v for k, v in direzioni.items() if v}
+        if is_segno:
+            if favor_home:
+                dir_val_h = val_dna_h
+                dir_val_a = max(0, 100 - val_dna_a)
+            elif favor_away:
+                dir_val_h = max(0, 100 - val_dna_h)
+                dir_val_a = val_dna_a
+            else:
+                dir_val_h = max(0, min(100, 100 - abs(val_dna_h - val_dna_a) * 2))
+                dir_val_a = dir_val_h
+        else:
+            dir_val_h = 50
+            dir_val_a = 50
+
+        componenti["valore_rosa"] = {
+            "home": {"score": round(val_dna_h, 1), "dir": round(dir_val_h, 1)},
+            "away": {"score": round(val_dna_a, 1), "dir": round(dir_val_a, 1)},
+        }
+
+        # === CALCOLO FINALE: DUE COEFFICIENTI SEPARATI ===
+        peso_strisce_val = 5
+
+        # 1. COEFFICIENTE QUALITÀ: media pesata degli score
+        somma_score = 0
+        somma_pesi_max = 0
+        for comp_name in PESI:
+            peso = PESI[comp_name]
+            c = componenti.get(comp_name, {"home": {"score": 50}, "away": {"score": 50}})
+            avg_score = (c["home"]["score"] + c["away"]["score"]) / 2
+            somma_score += avg_score * peso
+            somma_pesi_max += 100 * peso
+        c_str = componenti.get("strisce", {"home": {"score": 50}, "away": {"score": 50}})
+        somma_score += ((c_str["home"]["score"] + c_str["away"]["score"]) / 2) * peso_strisce_val
+        somma_pesi_max += 100 * peso_strisce_val
+        coeff_qualita = (somma_score / somma_pesi_max) * 100 if somma_pesi_max > 0 else 50
+
+        # 2. COEFFICIENTE DIREZIONE: media pesata delle direzioni
+        somma_dir = 0
+        dir_pesi_tot = 0
+        for comp_name in PESI:
+            peso = PESI[comp_name]
+            c = componenti.get(comp_name, {"home": {"dir": 50}, "away": {"dir": 50}})
+            avg_dir = (c["home"]["dir"] + c["away"]["dir"]) / 2
+            somma_dir += avg_dir * peso
+            dir_pesi_tot += peso
+        c_str = componenti.get("strisce", {"home": {"dir": 50}, "away": {"dir": 50}})
+        somma_dir += ((c_str["home"]["dir"] + c_str["away"]["dir"]) / 2) * peso_strisce_val
+        dir_pesi_tot += peso_strisce_val
+        coeff_direzione = (somma_dir / dir_pesi_tot) if dir_pesi_tot > 0 else 50
+
+        s["coeff_qualita"] = round(coeff_qualita, 1)
+        s["coeff_direzione"] = round(coeff_direzione, 1)
+        s["coeff_componenti"] = componenti
         s["coeff_contesto"] = {
-            "bilancio": round(bilancio, 2),
-            "pro": round(peso_pro, 1),
-            "contro": round(peso_contro, 1),
             "mercato_type": mercato_type,
+            "pronostico": pron_favor,
         }
         calculated += 1
 
@@ -1406,18 +1486,18 @@ def _format_match_stats(s):
     """Formatta i dati statistici di una selezione per il prompt Mistral."""
     parts = []
 
-    # Coefficiente di Solidità (con dettaglio e contesto)
-    coeff = s.get("coeff_solidita")
-    if coeff is not None:
-        det = s.get("coeff_dettaglio", {})
-        det_str = " | ".join(f"{k}:{v}" for k, v in det.items())
+    # Coefficiente Qualità + Direzione (con dettaglio per squadra)
+    cq = s.get("coeff_qualita")
+    cd = s.get("coeff_direzione")
+    if cq is not None:
+        comp = s.get("coeff_componenti", {})
         ctx = s.get("coeff_contesto", {})
-        molt = s.get("coeff_moltiplicatore", 1.0)
-        base = s.get("coeff_base", coeff)
+        comp_str = " | ".join(
+            f"{k}:H{c['home']['score']:.0f}/{c['home']['dir']:.0f} A{c['away']['score']:.0f}/{c['away']['dir']:.0f}"
+            for k, c in comp.items()
+        )
         parts.append(
-            f"    SOLIDITA: {coeff}/100 (base:{base} x{molt}) "
-            f"[{det_str}] "
-            f"contesto: {ctx.get('pro',0)} pro / {ctx.get('contro',0)} contro ({ctx.get('mercato_type','?')})"
+            f"    QUALITA: {cq}/100 | DIREZIONE: {cd}/100 [{comp_str}]"
         )
 
     # Classifica totale
@@ -1562,9 +1642,12 @@ def serialize_pool_for_prompt(pool):
                 # Selezioni della partita
                 for s in sels:
                     elite_tag = " ★ELITE" if show_elite_tag and s.get("elite") else ""
+                    cq = s.get("coeff_qualita")
+                    cd = s.get("coeff_direzione")
+                    coeff_tag = f" | Q={cq} D={cd}" if cq is not None else ""
                     lines.append(
                         f"  {s['match_key']} | {s['mercato']}: {s['pronostico']} "
-                        f"@ {s['quota']} | conf={s['confidence']} ★{s['stars']}{elite_tag}"
+                        f"@ {s['quota']} | conf={s['confidence']} ★{s['stars']}{elite_tag}{coeff_tag}"
                     )
                 # Stats della partita (una volta sola)
                 stats_text = _format_match_stats(sels[0])
