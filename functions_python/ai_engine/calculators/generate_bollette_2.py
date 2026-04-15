@@ -6,8 +6,16 @@ Legge pronostici unified per 3 giorni, recupera selezioni valide da
 bollette saltate, e produce max 10 bollette al giorno.
 """
 
-import os, sys, re, json, time, glob
+import os, sys, re, json, time, glob, logging, threading
 from datetime import datetime, timedelta, timezone
+
+# --- LOGGING ---
+logger = logging.getLogger("bollette")
+logger.setLevel(logging.DEBUG)
+if not logger.handlers:
+    _handler = logging.StreamHandler()
+    _handler.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s] %(message)s", datefmt="%H:%M:%S"))
+    logger.addHandler(_handler)
 
 # --- FIX PERCORSI ---
 current_path = os.path.dirname(os.path.abspath(__file__))
@@ -42,80 +50,56 @@ def matches_bollette_pattern(sel):
 try:
     import requests
 except ImportError:
-    print("❌ Modulo 'requests' non trovato. Installa con: pip install requests")
+    logger.error("Modulo 'requests' non trovato. Installa con: pip install requests")
     sys.exit(1)
 
-# --- CONFIGURAZIONE ---
-MISTRAL_URL = "https://api.mistral.ai/v1/chat/completions"
-MISTRAL_MODEL = "mistral-medium-2508"
+from bollette_config import (
+    OPENROUTER_URL, OPENROUTER_MODEL, MISTRAL_URL, MISTRAL_MODEL,
+    MAX_BOLLETTE, FASCE, CATEGORY_CONSTRAINTS, SECTION_ORDER, SECTION_TARGETS,
+    QUOTA_TOTALE_TOLERANCE_UP, QUOTA_TOTALE_TOLERANCE_DOWN,
+    QUOTA_SINGOLA_TOLERANCE, MAX_RETRY_FEEDBACK,
+    MIN_SCORE_PER_CATEGORY, MIN_SCORE_RECOMPOSE,
+    SCRIPT_TIMEOUT_MINUTES,
+)
+
+DEBUG_MODE = False  # Attivato con --debug, salva prompt LLM su file
+
+# --- CONFIGURAZIONE LLM (DeepSeek R1 via OpenRouter + fallback Mistral) ---
+OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY")
 MISTRAL_API_KEY = os.environ.get("MISTRAL_API_KEY")
-if not MISTRAL_API_KEY:
+
+# Carica da .env se non in ambiente
+if not OPENROUTER_API_KEY or not MISTRAL_API_KEY:
     try:
         from dotenv import load_dotenv
-        # Prova .env nella cartella config
         load_dotenv(os.path.join(current_path, '.env'))
-        MISTRAL_API_KEY = os.environ.get("MISTRAL_API_KEY")
-        # Fallback: .env nella root del progetto
-        if not MISTRAL_API_KEY:
+        OPENROUTER_API_KEY = OPENROUTER_API_KEY or os.environ.get("OPENROUTER_API_KEY")
+        MISTRAL_API_KEY = MISTRAL_API_KEY or os.environ.get("MISTRAL_API_KEY")
+        if not OPENROUTER_API_KEY or not MISTRAL_API_KEY:
             root_env = os.path.join(current_path, '..', '..', '.env')
             load_dotenv(os.path.abspath(root_env))
-            MISTRAL_API_KEY = os.environ.get("MISTRAL_API_KEY")
+            OPENROUTER_API_KEY = OPENROUTER_API_KEY or os.environ.get("OPENROUTER_API_KEY")
+            MISTRAL_API_KEY = MISTRAL_API_KEY or os.environ.get("MISTRAL_API_KEY")
     except ImportError:
         pass
-if not MISTRAL_API_KEY:
-    print("❌ MISTRAL_API_KEY non trovata!")
+
+# Almeno un provider deve essere disponibile
+if not OPENROUTER_API_KEY and not MISTRAL_API_KEY:
+    logger.error("Nessuna API key trovata (OPENROUTER_API_KEY o MISTRAL_API_KEY)!")
     sys.exit(1)
 
-MAX_BOLLETTE = 18
-
-# Fasce quota totale
-FASCE = {
-    "oggi":       (1.0, 999.0),   # Nessun vincolo quota — solo partite di oggi
-    "selettiva":  (1.5, 4.5),
-    "bilanciata": (5.0, 7.5),
-    "ambiziosa":  (8.0, 999.0),
-    "elite":      (1.5, 8.0),     # Almeno 70% selezioni elite
-}
-
-# Vincoli per categoria (validazione post-Mistral)
-CATEGORY_CONSTRAINTS = {
-    "oggi": {
-        "min_sel": 2, "max_sel": 4,
-        "min_quota": None, "max_quota": None,
-        "max_bollette": 3,
-        "quota_singola": {},  # nessun vincolo
-    },
-    "selettiva": {
-        "min_sel": 2, "max_sel": 5,
-        "min_quota": None, "max_quota": 4.50,
-        "max_bollette": 3,
-        "quota_singola": {2: 2.20, 3: 1.70, 4: 1.50, 5: 1.38},
-    },
-    "bilanciata": {
-        "min_sel": 3, "max_sel": 7,
-        "min_quota": 5.00, "max_quota": 7.50,
-        "max_bollette": 3,
-        "quota_singola": {2: 2.80, 3: 2.00, 4: 1.68, 5: 1.52, 6: 1.41, 7: 1.35},
-    },
-    "ambiziosa": {
-        "min_sel": 4, "max_sel": 8,
-        "min_quota": 8.00, "max_quota": None,
-        "max_bollette": 3,
-        "quota_singola": {4: 3.00, 5: 2.50, 6: 2.20, 7: 2.00, 8: 1.80},
-    },
-    "elite": {
-        "min_sel": 2, "max_sel": 5,
-        "min_quota": None, "max_quota": 8.00,
-        "max_bollette": 3,
-        "quota_singola": {2: 2.85, 3: 2.00, 4: 1.68, 5: 1.52},
-    },
-}
-
-# Tolleranze per validazione
-QUOTA_TOTALE_TOLERANCE_UP = 0.15    # 15% sopra il max
-QUOTA_TOTALE_TOLERANCE_DOWN = 0.0   # 0% sotto il min (nessuna tolleranza)
-QUOTA_SINGOLA_TOLERANCE = 0.10  # 10% — quota max 1.50 accetta fino a 1.65
-MAX_RETRY_FEEDBACK = 1          # Numero di retry con feedback
+# Provider attivo
+if OPENROUTER_API_KEY:
+    LLM_URL = OPENROUTER_URL
+    LLM_MODEL = OPENROUTER_MODEL
+    LLM_API_KEY = OPENROUTER_API_KEY
+    LLM_PROVIDER = "DeepSeek R1 (OpenRouter)"
+else:
+    LLM_URL = MISTRAL_URL
+    LLM_MODEL = MISTRAL_MODEL
+    LLM_API_KEY = MISTRAL_API_KEY
+    LLM_PROVIDER = "Mistral (fallback)"
+logger.info(f"LLM: {LLM_PROVIDER}")
 
 # --- PROMPT MISTRAL ---
 SYSTEM_PROMPT = """Sei un analista dati sportivo specializzato nella composizione di bollette scommesse. NON sei tu a fare i pronostici — quelli li ha già fatti un sistema AI. Il tuo compito è ANALIZZARE i dati statistici di ogni selezione e decidere QUALI COMBINARE insieme nei biglietti.
@@ -138,7 +122,7 @@ REGOLE COMPOSIZIONE
 1. Ogni partita può apparire UNA SOLA VOLTA per bolletta, con UN SOLO mercato
 2. REGOLA CRITICA: la stessa selezione (stessa partita + stesso pronostico) può apparire MASSIMO 1 VOLTA per categoria. Se generi 3 bollette "oggi", una selezione può stare in UNA sola di quelle 3. Stesso per elite, selettiva, bilanciata, ambiziosa. Se ripeti la stessa selezione in 2 bollette della stessa categoria e quella perde, perdi entrambe. DIVERSIFICA
 3. Hai a disposizione partite di oggi, domani e dopodomani. Sei libero di scegliere come combinarle: puoi fare bollette miste o concentrate su un giorno solo. Consiglio: cerca di non mettere TUTTE le partite dello stesso giorno in tutte le bollette, ma segui il tuo istinto da professionista
-4. Genera esattamente {max_bollette} bollette totali, divise in 4 categorie. OGNI CATEGORIA DEVE AVERE ALMENO 3 BOLLETTE:
+4. Obiettivo: fino a {max_bollette} bollette totali, divise in 5 categorie. Genera fino a 3 bollette per categoria, ma se la qualità del pool non è sufficiente puoi generarne meno (anche 0):
 
    📌 OGGI — Campo "tipo": "oggi"
    - SOLO ed ESCLUSIVAMENTE partite di oggi ({today_date}). OGNI selezione deve avere data {today_date}
@@ -204,66 +188,310 @@ REGOLE COMPOSIZIONE
    L'utente vuole SEMPRE avere qualcosa da seguire subito. Se non ci sono abbastanza partite oggi, metti quelle che ci sono e completa con domani/dopodomani.
    CONTROLLA ogni bolletta prima di inviarla: c'è almeno 1 selezione con data {today_date}? Se no, aggiungila.
 8. Non creare bollette con una sola selezione — almeno 2 selezioni per bolletta (selettiva: 2-5, bilanciata: 2-7, ambiziosa: 4-8)
-9. Rispetta SEMPRE i limiti di quota per singola selezione indicati sopra. Se una selezione ha quota troppo alta per quella categoria, NON usarla in quella bolletta
-10. Per ogni bolletta, scrivi una motivazione di 2 righe nel campo "reasoning" che spiega PERCHÉ hai scelto quelle selezioni. Cita RH, RA, C e i dati statistici chiave (forma, classifica, trend). Esempio: "Fiorentina RH=65 RA=58 C=72 — 5° in casa, forma 65%, trend in salita. Benevento RH=45 RA=52 C=68 — 4 vittorie consecutive, affidabilità 8.2/10". NO frasi generiche tipo "combinazione sicura" o "favorite nette"
-11. Cerca di variare il numero di selezioni tra le bollette della stessa categoria, non mettere sempre lo stesso numero
-12. ⚠️ DIVERSIFICAZIONE OBBLIGATORIA DEL NUMERO DI SELEZIONI ⚠️
+9. Per ogni bolletta, scrivi una motivazione di 2 righe nel campo "reasoning" che spiega PERCHÉ hai scelto quelle selezioni. Cita RH, RA, C e i dati statistici chiave (forma, classifica, trend). Esempio: "Fiorentina RH=65 RA=58 C=72 — 5° in casa, forma 65%, trend in salita. Benevento RH=45 RA=52 C=68 — 4 vittorie consecutive, affidabilità 8.2/10". NO frasi generiche tipo "combinazione sicura" o "favorite nette"
+10. Cerca di variare il numero di selezioni tra le bollette della stessa categoria, non mettere sempre lo stesso numero
+11. ⚠️ DIVERSIFICAZIONE OBBLIGATORIA DEL NUMERO DI SELEZIONI ⚠️
    NON fare bollette con lo stesso numero di selezioni nella stessa categoria. Segui questi schemi:
-   - OGGI (3 bollette): una da 2, una da 3, una da 4 selezioni
-   - SELETTIVA (5 bollette): una da 2, una da 3, una da 4, una da 5, una da 3 selezioni
-   - BILANCIATA (5 bollette): una da 3, una da 4, una da 5, una da 6, una da 4 selezioni
-   - AMBIZIOSA (5 bollette): una da 4, una da 6, una da 8, una da 5, una da 7 selezioni
-   - ELITE: una da 3, una da 4, una da 5 selezioni
+   - OGGI (fino a 3 bollette): una da 2, una da 3, una da 4 selezioni
+   - SELETTIVA (fino a 3 bollette): una da 2, una da 3, una da 4 selezioni
+   - BILANCIATA (fino a 3 bollette): una da 3, una da 5, una da 7 selezioni
+   - AMBIZIOSA (fino a 3 bollette): una da 4, una da 6, una da 8 selezioni
+   - ELITE (fino a 3 bollette): una da 2, una da 3, una da 4 selezioni
    Questa regola è OBBLIGATORIA. Bollette tutte con lo stesso numero di selezioni verranno scartate.
+12. Genera fino a 3 bollette per categoria. Se non ci sono abbastanza selezioni di qualità (punteggio ≥ soglia), generane di meno. È meglio una bolletta in meno che una bolletta perdente in partenza.
+
+═══════════════════════════════════════════════════════════════════════════════
+REGOLE DI COMPOSIZIONE (VINCOLI SOFT CON PRIORITÀ ALLA QUALITÀ)
+═══════════════════════════════════════════════════════════════════════════════
+
+1. NUMERO BOLLETTE: Obiettivo 3 per categoria, ma riduci se la qualità non è sufficiente.
+   Non sacrificare mai la qualità per raggiungere un numero.
+
+2. QUOTA TOTALE: Intervallo desiderabile (es. 1.5-4.5 per selettiva).
+   Puoi accettare uno sforamento fino al 15% se la bolletta ha un punteggio medio ≥8.
+
+3. QUOTA SINGOLA: Non superare i limiti indicati, A MENO CHE la selezione non abbia:
+   - Punteggio finale ≥9
+   - RH e RA in zone OTTIMALI/DEBOLI vincenti (es. RH 10-30, RA 50-70)
+   - Mercato GOL o DOPPIA_CHANCE (più affidabili di SEGNO)
+   In tal caso, puoi estendere la quota singola massima del 20%.
+
+4. PRIORITÀ ASSOLUTA: Massimizzare il Valore Atteso complessivo del portafoglio.
+   Se una bolletta viola un vincolo ma ha EV stimato molto alto, preferiscila a una che rispetta i vincoli ma ha EV basso.
+
+5. SELEZIONI EXTRA: le selezioni marcate "EXTRA" nel pool provengono da partite non elaborate dal sistema AI.
+   NON hanno punteggio finale né RH/RA/C. Usale SOLO se strettamente necessario e MAI in bollette ELITE o SELETTIVE.
+   Possono essere usate come riempitivo per bollette AMBIZIOSE o BILANCIATE.
+
+═══════════════════════════════════════════════════════════════════════════════
+GUIDA OPERATIVA A RH, RA, C — CALIBRATA SU 671 PARTITE REALI
+═══════════════════════════════════════════════════════════════════════════════
+
+Ogni selezione ha 3 indicatori già calcolati (range 0-100): RH, RA e C.
+Il sistema assegna automaticamente una ZONA a ciascun valore:
+
+| ZONA     | RANGE               | SIGNIFICATO                                          |
+|----------|---------------------|------------------------------------------------------|
+| OTTIMALE | 30-50               | Zona di riferimento. HR medio-alto.                  |
+| DEBOLE   | 10-30 oppure 50-70  | Comportamento DIVERSO per RH e RA (vedi anomalie).   |
+| ASSENTE  | <10 oppure >70      | SEGNALE ROSSO — EVITA SEMPRE. HR crolla.             |
+
+ANOMALIE CONFERMATE DAI DATI REALI (671 partite):
+- RH: la zona migliore è DEBOLE_BASSO 10-30 (HR 59.5%), seguita da OTTIMALE 30-50 (55.4%).
+  Le zone alte (50-70 e >70) sono le peggiori (43.1% e 43.8%).
+- RA: la zona migliore è DEBOLE_ALTO 50-70 (HR 57.5%), seguita da OTTIMALE 30-50 (56.2%).
+  Le zone basse (<10 e 10-30) sono le peggiori (33.3% e 51.3%).
+- C: DEBOLE_ALTO 50-70 (HR 54.9%) è leggermente superiore a OTTIMALE 30-50 (53.9%).
+  ASSENTE >70 crolla a 38.5%. C non scende MAI sotto 30.
+
+═══════════════════════════════════════════════════════════════════════════════
+PASSO 1 — PUNTEGGIO BASE (SOLO RH, RA, C)
+═══════════════════════════════════════════════════════════════════════════════
+
+Per ogni selezione, somma i punti. I valori sono calibrati sugli HR reali:
+
+| CONDIZIONE                                  | PUNTI |
+|---------------------------------------------|-------|
+| RH in zona DEBOLE_BASSO (10-30)             | +4    |
+| RH in zona OTTIMALE (30-50)                 | +3    |
+| RH in zona DEBOLE_ALTO (50-70)              | -1    |
+| RH in zona ASSENTE (<10 o >70)              | -4    |
+| RA in zona DEBOLE_ALTO (50-70)              | +4    |
+| RA in zona OTTIMALE (30-50)                 | +3    |
+| RA in zona DEBOLE_BASSO (10-30)             | +1    |
+| RA in zona ASSENTE (<10 o >70)              | -4    |
+| C in zona DEBOLE_ALTO (50-70)               | +2    |
+| C in zona OTTIMALE (30-50)                  | +1    |
+| C in zona ASSENTE (>70)                     | -3    |
+
+Il punteggio grezzo:
+  >= 7 = Fondamenta statistiche ECCELLENTI.
+  4-6  = Selezione BUONA/DISCRETA.
+  <= 3 = Selezione DEBOLE, da usare con cautela o scartare.
+
+═══════════════════════════════════════════════════════════════════════════════
+PASSO 2 — BONUS E MALUS DAGLI ALTRI DATI
+═══════════════════════════════════════════════════════════════════════════════
+
+BONUS (aggiungi al punteggio base):
+| Fattore                              | Bonus | Note                                        |
+|--------------------------------------|-------|---------------------------------------------|
+| Selezione ELITE                      | +3    | HR 67.3% vs 49.9% non-elite                |
+| Confidence 70-80                     | +2    | Picco HR a 63.2%                            |
+| Confidence 60-70                     | +1    | HR 58.4%                                    |
+| Stelle 4                             | +2    | HR 61.4% (miglior fascia)                   |
+| Stelle 3                             | +1    | HR 52.7%                                    |
+| Forma squadra favorita 40-60%        | +2    | HR 59.2% (fascia migliore, NON lineare)     |
+| Affidabilita squadra favorita > 7.0  | +1    | HR 58.6-62.5% sopra 7                       |
+| Mercato GOL                          | +1    | HR 59.0% vs 45.5% SEGNO                     |
+
+MALUS (sottrai dal punteggio base):
+| Fattore                              | Malus | Note                                        |
+|--------------------------------------|-------|---------------------------------------------|
+| Confidence < 50                      | -2    | HR 41.3%                                    |
+| Stelle 2                             | -2    | HR 22.2% (pessimo)                          |
+| Forma squadra favorita 20-40%        | -1    | HR 45.8%                                    |
+| Forma squadra favorita > 80%         | -1    | HR solo 50.0% (sopravvalutata)              |
+| Mercato SEGNO                        | -1    | HR 45.5% (il peggiore)                      |
+
+ELITE applica COMUNQUE bonus/malus: il tag ELITE e un vantaggio di partenza, ma non rende immune da difetti.
+
+═══════════════════════════════════════════════════════════════════════════════
+PASSO 3 — SOGLIE DECISIONALI PER LE BOLLETTE
+═══════════════════════════════════════════════════════════════════════════════
+
+Somma punteggio base (Passo 1) + bonus/malus (Passo 2) = PUNTEGGIO FINALE (tipico: -5 a +15).
+
+- Bollette SELETTIVE / ELITE: accetta solo punteggio finale >= 7
+- Bollette BILANCIATE: accetta punteggio finale >= 5
+- Bollette AMBIZIOSE: fino a 2 selezioni con punteggio 3-4, purche le altre siano >= 6
+- Bollette OGGI: qualsiasi punteggio >= 4, priorita a quelle >= 7
+
+REGOLE DI ESCLUSIONE ASSOLUTA (NON USARE MAI):
+- Qualsiasi selezione con RH o RA in zona ASSENTE
+- Selezione con C in zona ASSENTE (>70)
+- Selezione con Stelle 2 e Confidence < 60
+- Selezione con pronostico SEGNO X (pareggio) — vietato
+
+═══════════════════════════════════════════════════════════════════════════════
+COMBINAZIONI DI ZONE VINCENTI (da cercare prioritariamente)
+═══════════════════════════════════════════════════════════════════════════════
+
+Cerca selezioni con queste "firme" ad alto HR reale:
+- RH_DEBOLE (10-30) + RA_OTTIMALE (30-50) + C_OTTIMALE (30-50) = HR 73.3% (la migliore)
+- RH_DEBOLE (10-30) + RA_DEBOLE (50-70) + C_DEBOLE (50-70) = HR 61.5%
+- RH_OTTIMALE (30-50) + RA_OTTIMALE (30-50) + C_DEBOLE (50-70) = HR 56.0%
+
+Evita SEMPRE combinazioni che includono ASSENTE (es. RH_ASSENTE + RA_OTTIMALE = HR 40.0%).
+
+═══════════════════════════════════════════════════════════════════════════════
+ESEMPI DI RAGIONAMENTO (dati reali)
+═══════════════════════════════════════════════════════════════════════════════
+
+Esempio A — Selezione TOP (punteggio 15):
+  Luton vs Northampton - Over 2.5
+  RH=34 (OTTIMALE) +3 | RA=49 (OTTIMALE) +3 | C=56 (DEBOLE_ALTO) +2 = base 8
+  ELITE +3 | Confidence 79 (70-80) +2 | Stelle 4 +2 | Forma 84% -1 | Mercato GOL +1
+  PUNTEGGIO FINALE = 15. ECCELLENTE per qualsiasi bolletta.
+
+Esempio B — Selezione da EVITARE (punteggio -1):
+  Bolton vs Stevenage - SEGNO 1
+  RH=42 (OTTIMALE) +3 | RA=71 (ASSENTE) -4 | C=61 (DEBOLE_ALTO) +2 = base 1
+  Forma Bolton 32% -1 | Mercato SEGNO -1
+  PUNTEGGIO FINALE = -1. SCARTARE (RA ASSENTE).
+
+Esempio C — Selezione buona per bilanciata (punteggio 12):
+  Lanus vs Banfield - SEGNO 1
+  RH=37 (OTTIMALE) +3 | RA=36 (OTTIMALE) +3 | C=58 (DEBOLE_ALTO) +2 = base 8
+  ELITE +3 | Forma 52% (40-60%) +2 | Mercato SEGNO -1
+  PUNTEGGIO FINALE = 12. OTTIMA per selettiva/elite.
+
+Nel campo "reasoning" di ogni bolletta, cita sempre RH, RA, C, il punteggio e i dati chiave.
+Esempio: "Luton RH=34(OTT) RA=49(OTT) C=56(DEB) punt.15 — ELITE, conf 79, forma 84%, Over supportato da gol casa"
+
+═══════════════════════════════════════════════════════════════════════════════
+💰 MENTALITÀ DELLO SCOMMETTITORE — OGNI BOLLETTA VALE 1€
+═══════════════════════════════════════════════════════════════════════════════
+
+Immagina di dover investire **1 euro su ogni bolletta che crei** con i tuoi soldi veri.
+Il tuo obiettivo NON è indovinare il risultato, ma **far crescere il capitale nel lungo periodo**.
+
+Per farlo, devi rispettare tre principi fondamentali:
+
+1. **PROBABILITÀ > QUOTA**
+   Una bolletta con quota 2.00 e probabilità reale del 60% è un AFFARE.
+   Una bolletta con quota 10.00 e probabilità reale del 5% è una TRAPPOLA.
+   Il sistema ti fornisce il PUNTEGGIO FINALE: usalo come stima della probabilità di successo.
+   Più alto è il punteggio, più la selezione ha basi solide. Non lasciarti abbagliare dalle quote alte.
+
+2. **DIVERSIFICAZIONE DEL RISCHIO**
+   Non puntare tutto su un unico evento o su una sola tipologia di bolletta.
+   Le diverse categorie (oggi, selettiva, bilanciata, ambiziosa, elite) servono proprio a distribuire il rischio.
+   Anche la bolletta più sicura può perdere: se perdi 1€ su una selettiva, puoi rifarti con una ambiziosa che paga 8€.
+
+3. **VALORE ATTESO POSITIVO**
+   Il valore atteso (EV) di una bolletta si calcola approssimativamente così:
+   `(Probabilità di vincita stimata × Quota) - 1`
+   Se il risultato è positivo, la bolletta ha senso **economicamente**.
+   Se è negativo, stai regalando soldi al bookmaker.
+
+   Esempio pratico:
+   - Bolletta A: punteggio finale 10 (prob. stimata ~65%), quota totale 2.50
+     EV = (0.65 × 2.50) - 1 = 1.625 - 1 = **+0.625€** per ogni euro giocato. ✅
+   - Bolletta B: punteggio finale 3 (prob. stimata ~30%), quota totale 9.00
+     EV = (0.30 × 9.00) - 1 = 2.70 - 1 = **+1.70€** → sembra migliore, ma la probabilità è bassissima e la varianza altissima. ⚠️
+     Nel lungo periodo, bollette con bassa probabilità e alta quota sono **perdenti** perché la stima di probabilità reale è spesso sovrastimata.
+
+   **Regola pratica:**
+   - Per bollette con punteggio ≥ 7, puoi accettare quote anche medio-basse (1.50 - 3.00) perché la probabilità di successo è alta.
+   - Per bollette con punteggio tra 4 e 6, cerca quote che giustifichino il rischio (almeno 3.00 - 6.00).
+   - Evita bollette con punteggio < 4, a meno che la quota non sia **enorme** (>15.00) e tu abbia una forte convinzione basata su dati anomali (es. squadra B in crisi nera). Ma in generale, **non ne vale la pena**.
+
+═══════════════════════════════════════════════════════════════════════════════
+📊 STRATEGIA DI COSTRUZIONE DEL PORTAFOGLIO (3-5 BOLLETTE PER CATEGORIA)
+═══════════════════════════════════════════════════════════════════════════════
+
+Immagina di avere a disposizione 15-20€ totali da distribuire su tutte le bollette della giornata.
+Ogni categoria ha un ruolo specifico nel tuo portafoglio:
+
+| Categoria   | Obiettivo                          | Quota ideale | Quante bollette | Punteggio minimo |
+|-------------|------------------------------------|--------------|-----------------|------------------|
+| **OGGI**    | Coprire le spese quotidiane        | 2.00 - 4.00  | 3               | ≥ 5              |
+| **SELETTIVA** | Guadagno sicuro e costante        | 1.80 - 3.50  | 3-5             | ≥ 7              |
+| **BILANCIATA**| Bilanciare rischio/rendimento      | 5.00 - 7.50  | 3-5             | ≥ 5              |
+| **AMBIZIOSA** | Colpo grosso occasionale           | 8.00 - 15.00 | 3-5             | ≥ 4 (max 2 sotto 5)|
+| **ELITE**   | Massima affidabilità su pattern storici | 2.50 - 6.00 | 3-5             | ≥ 7 (e tutte ELITE)|
+
+**Regola d'oro del bankroll:**
+Se in una giornata hai generato 15 bollette, significa che stai investendo 15€.
+L'obiettivo minimo è che **almeno 3-4 bollette vadano a segno**, coprendo l'investimento totale e generando un profitto.
+
+Per massimizzare le probabilità di successo del portafoglio:
+- **NON concentrare tutte le bollette sullo stesso campionato o sulle stesse partite.**
+  Un imprevisto (es. rinvio, campo pesante, arbitro casalingo) può affondare tutte le bollette insieme.
+- **Includi almeno 1-2 bollette con quota totale < 3.00** (tipicamente selettive o oggi).
+  Queste fungono da "ancora" per il portafoglio: hanno alta probabilità di vincita e garantiscono un flusso di cassa minimo.
+- **Le bollette AMBIZIOSE devono essere la minoranza.**
+  Anche se una paga 12€, la probabilità di centrarla è bassa. Non affidare il tuo profitto giornaliero a una sola bolletta rischiosa.
+
+═══════════════════════════════════════════════════════════════════════════════
+🧠 COME SCEGLIERE LE SELEZIONI IN OTTICA DI VALORE ATTESO
+═══════════════════════════════════════════════════════════════════════════════
+
+Quando selezioni un pronostico da inserire in una bolletta, poniti queste tre domande:
+
+1. **Il punteggio finale è sufficiente per la categoria?** (vedi soglie al Passo 3)
+2. **La quota della singola selezione è proporzionata al suo punteggio?**
+   - Punteggio ≥ 8: quota anche bassa (1.30 - 1.70) va bene, perché è molto probabile.
+   - Punteggio 5-7: cerca quote almeno 1.70 - 2.50.
+   - Punteggio < 5: la quota deve essere > 2.50 per giustificare il rischio.
+3. **La selezione aggiunge diversificazione al portafoglio?**
+   - Evita di usare la stessa partita in più di 2 bollette.
+   - Evita di usare lo stesso mercato (es. Over 2.5) per partite dello stesso campionato, perché i risultati potrebbero essere correlati.
+
+**Esempio di scelta basata sul valore:**
+
+   Hai due selezioni candidate per una bolletta BILANCIATA (target quota 5.00-7.50):
+
+   - Selezione X: punteggio 9, quota 1.55
+   - Selezione Y: punteggio 6, quota 2.10
+
+   Quale scegli?
+   - X ha probabilità molto alta, ma quota bassa. Da sola non ti aiuta a raggiungere la quota target.
+   - Y ha probabilità discreta e quota più alta. È più adatta a una bilanciata.
+
+   Se invece stai costruendo una SELETTIVA (target quota < 4.50), X è perfetta perché aumenta la probabilità di successo della bolletta.
+
+═══════════════════════════════════════════════════════════════════════════════
+⚠️ ERRORI COMUNI DA EVITARE (CHE TI FANNO PERDERE SOLDI)
+═══════════════════════════════════════════════════════════════════════════════
+
+1. **Innamorarsi della quota alta.**
+   Una bolletta con quota 15.00 composta da 5 selezioni con punteggio < 4 ha probabilità di successo inferiore al 5%.
+   Significa che in media vinci 1 volta su 20. Se giochi 1€ a bolletta, dopo 20 tentativi avrai speso 20€ per vincerne 15. **Sei in perdita.**
+
+2. **Trascurare le correlazioni.**
+   Esempio: mettere "Over 2.5" su tre partite che si giocano sotto la pioggia battente.
+   Anche se ogni singola selezione ha un buon punteggio, il contesto esterno (meteo, infortuni dell'ultimo minuto) può affondare tutte e tre insieme.
+   **Diversifica sempre campionati e contesti.**
+
+3. **Usare troppe selezioni con punteggio borderline nelle bollette conservative.**
+   Una bolletta SELETTIVA con 3 selezioni di cui due con punteggio 5 e una con punteggio 8 ha una probabilità reale di successo molto più bassa di quanto sembri.
+   **Per le selettive, esigi almeno 2 selezioni su 3 con punteggio ≥ 7.**
+
+4. **Ignorare la motivazione e il contesto partita.**
+   Una squadra che lotta per la salvezza contro una che non ha nulla da chiedere può ribaltare ogni pronostico basato sui dati.
+   Se vedi "Motivazione: LOTTA SALVEZZA" vs "Motivazione: NEUTRALE", **rivedi il punteggio al ribasso** per la squadra favorita.
+   Il sistema potrebbe non aver ancora incorporato questo fattore nel punteggio.
+
+═══════════════════════════════════════════════════════════════════════════════
+💡 SINTESI OPERATIVA PER LA COMPOSIZIONE
+═══════════════════════════════════════════════════════════════════════════════
+
+Quando componi le bollette per la giornata, segui questa checklist mentale:
+
+✅ Ho generato almeno 3 bollette per ogni categoria richiesta?
+✅ Le bollette SELETTIVE hanno almeno il 70% di selezioni con punteggio ≥ 7?
+✅ Le bollette AMBIZIOSE hanno quote che giustificano il rischio (≥ 8.00)?
+✅ Ho evitato di usare la stessa partita in più di 2 bollette?
+✅ Ho diversificato i campionati e i mercati (GOL, SEGNO, DOPPIA_CHANCE)?
+✅ Almeno una bolletta ha quota totale < 3.00 per fare da "ancora"?
+✅ Ho controllato che nessuna bolletta abbia RH o RA in zona ASSENTE?
+✅ Le motivazioni delle squadre coinvolte sono coerenti con il pronostico?
+
+Se la risposta a tutte queste domande è SÌ, hai costruito un portafoglio solido che **nel lungo periodo ha un valore atteso positivo**.
 
 ═══════════════════════════════════════
-DATI STATISTICI — COME LEGGERLI E USARLI
+ALTRI DATI STATISTICI — COME LEGGERLI
 ═══════════════════════════════════════
 
-Ogni selezione ha TRE indicatori sintetici calcolati dal sistema:
-
-🏠 **RH (Rapporto Casa)** (0-100): quanto la direzione dei dati supporta la forza della squadra di CASA. RH alto = la squadra di casa è forte E i dati confermano quella forza nella direzione del pronostico. RH basso = la squadra è forte ma i dati non la supportano, oppure è debole.
-
-✈️ **RA (Rapporto Trasferta)** (0-100): quanto la direzione dei dati supporta la forza della squadra in TRASFERTA. Stessa logica di RH ma per la squadra ospite.
-
-🔗 **C (Coerenza)** (0-100): quanto i due rapporti sono d'accordo tra loro. C alto = entrambe le squadre confermano la stessa direzione. C basso = i dati delle due squadre si contraddicono o non supportano il pronostico.
-
-ZONE (5 livelli a CAMPANA — il centro è l'ottimale, gli estremi sono peggiori):
-- ASSENTE (>70 o <10): coerenza assente — estremo, segnale inaffidabile
-- DEBOLE (50-70 o 10-30): coerenza debole — sopra o sotto l'ottimale
-- OTTIMALE (30-50): coerenza ottimale — massima affidabilità (HR ~59% RH, ~54% RA, ~53% C)
-
-COME USARE RH, RA e C:
-- RH e RA entrambi OTTIMALI + C OTTIMALE = selezione TOP — massima affidabilità su tutti e tre i valori
-- I valori OTTIMALI (30-50) hanno il miglior tasso di successo storico. NON è vero che "più alto = meglio"
-- ASSENTE agli estremi (sia <10 che >70) = segnale inaffidabile, evitare
-- DEBOLE (10-30 o 50-70) = accettabile ma non ideale
-- Nelle bollette SELETTIVE: preferisci RH e RA in zona OTTIMALE
-- NON mettere troppe selezioni con zona ASSENTE nella stessa bolletta
-
-Ogni partita nel pool ha anche dati statistici dettagliati sotto le selezioni. Usali per fare scelte INFORMATE, non alla cieca:
-
-📊 **Classifica**: posizione in campionato, punti, vittorie-pareggi-sconfitte, gol fatti/subiti, posizione casa e trasferta separata. Una squadra 3° in casa ma 12° fuori casa è molto diversa. Controlla SEMPRE la classifica casa per la squadra di casa e la classifica trasferta per la squadra in trasferta.
-
-🔥 **Forma (Lucifero)**: percentuale 0-100% che misura le performance nelle ultime 6 partite con pesi decrescenti (le più recenti contano di più). Sopra 60% = buona forma. Sotto 30% = crisi.
-
-📈 **Trend**: 5 valori cronologici della forma (dal più vecchio al più recente). Se i numeri crescono (es. 30→45→60→72→80) la squadra sta migliorando. Se calano sta peggiorando. La freccia ↑ indica miglioramento, ↓ peggioramento. ATTENZIONE: una squadra in forte trend positivo potrebbe essere sottovalutata dalle quote.
-
-🎯 **Motivazione**: cosa si gioca la squadra. LOTTA TITOLO/EUROPA/SALVEZZA = massima motivazione. BASSA/NEUTRALE = niente da chiedere, rischio calo mentale. Due squadre con motivazioni opposte (una lotta salvezza, l'altra non ha nulla da perdere) sono imprevedibili.
-
-🔄 **Strisce**: serie consecutive attive (vittorie, sconfitte, Over 2.5, Under 2.5, GG, clean sheet, ecc.). IMPORTANTE: strisce molto lunghe (es. 7 vittorie consecutive) NON significano che continueranno — statisticamente la probabilità di interrompere la striscia AUMENTA. Usa le strisce per confermare un trend, non per scommettere ciecamente sulla continuazione.
-
-🎯 **Affidabilità**: quanto la squadra rispetta il pronostico dei bookmaker (0-10). Un'affidabilità alta (>7) significa che la squadra tende a vincere quando è favorita e perdere quando è sfavorita — i risultati sono prevedibili. Un'affidabilità bassa (<4) significa risultati imprevedibili, sorprese frequenti. Per bollette selettive (sicure) preferisci squadre affidabili. Per bollette ambiziose puoi rischiare con le meno affidabili.
-
-**Attacco** (0-100): potenza offensiva della squadra. Più è alto, più la squadra segna. Utile per pronostici Goal/Over.
-
-**Difesa** (0-100): solidità difensiva della squadra. Più è alto, meno la squadra subisce gol. Utile per pronostici Under/NoGoal.
-
-**Tecnica** (0-100): qualità tecnica complessiva della rosa.
-
-**Valore rosa** (0-100): valore economico e qualità complessiva della rosa. Indica il gap di qualità tra le due squadre.
-
-REGOLA D'ORO: non scegliere solo per quota e confidence. Una selezione a quota 1.40 con squadra in crisi di forma, motivazione bassa e trend in calo è MENO sicura di una a quota 1.55 con squadra in forma, motivata e affidabile.
+Classifica: posizione, punti, V-N-P, GF-GS, posizione casa/trasferta separata.
+Forma (Lucifero): 0-100%, ultime 6 partite con pesi decrescenti.
+Trend: 5 valori cronologici. Freccia su = miglioramento, giu = peggioramento.
+Motivazione: LOTTA TITOLO/EUROPA/SALVEZZA = forte. BASSA/NEUTRALE = rischio calo.
+Strisce: serie consecutive attive. Strisce molto lunghe NON significano continuazione.
+Affidabilita: 0-10, quanto la squadra rispetta i pronostici. >7 = prevedibile.
+Attacco/Difesa/Valore rosa: 0-100, utili per confermare pronostici GOL/Under.
 
 ═══════════════════════════════════════
 FORMATO OUTPUT — JSON ARRAY
@@ -353,9 +581,10 @@ def _sanitize_and_parse_json(content):
             except json.JSONDecodeError:
                 continue
         if results:
-            print(f"   ⚠️ JSON riparato via regex: {len(results)} bollette estratte")
+            logger.warning(f" JSON riparato via regex: {len(results)} bollette estratte")
             return results
 
+    logger.error(f"❌ JSON non parsabile dopo 5 tentativi. Risposta grezza ({len(content)} chars):\n{content[:2000]}")
     raise json.JSONDecodeError("Impossibile parsare JSON dopo 5 tentativi", content, 0)
 
 
@@ -369,7 +598,7 @@ def build_pool(today_str, skip_time_filter=False):
         {"date": {"$in": dates}},
         {"home": 1, "away": 1, "date": 1, "league": 1, "match_time": 1,
          "home_mongo_id": 1, "away_mongo_id": 1, "pronostici": 1, "odds": 1}
-    ))
+    ).max_time_ms(30000))
 
     now = datetime.now()
 
@@ -418,7 +647,7 @@ def build_pool(today_str, skip_time_filter=False):
                 "stake": p.get("stake", 0) or 0,
             })
 
-    print(f"📦 Pool base: {len(pool)} selezioni da {len(docs)} partite ({', '.join(dates)})")
+    logger.info(f"📦 Pool base: {len(pool)} selezioni da {len(docs)} partite ({', '.join(dates)})")
     return pool
 
 
@@ -427,7 +656,7 @@ def recover_from_yesterday(today_str):
     today = datetime.strptime(today_str, "%Y-%m-%d")
     yesterday_str = (today - timedelta(days=1)).strftime("%Y-%m-%d")
 
-    yesterday_bollette = list(db.bollette.find({"date": yesterday_str}))
+    yesterday_bollette = list(db.bollette.find({"date": yesterday_str}).max_time_ms(30000))
     recovered = []
 
     for b in yesterday_bollette:
@@ -462,7 +691,7 @@ def recover_from_yesterday(today_str):
                 })
 
     if recovered:
-        print(f"♻️ Recuperate {len(recovered)} selezioni da bollette saltate ieri")
+        logger.info(f"♻️ Recuperate {len(recovered)} selezioni da bollette saltate ieri")
     return recovered
 
 
@@ -539,7 +768,7 @@ def enrich_pool_with_stats(pool):
     leagues = set(m["league"] for m in matches.values())
     classifiche_cache = {}  # league -> {team_name: row}
     for league in leagues:
-        doc = db.classifiche.find_one({"league": league}, {"table": 1, "table_home": 1, "table_away": 1})
+        doc = db.classifiche.find_one({"league": league}, {"table": 1, "table_home": 1, "table_away": 1}, max_time_ms=30000)
         if not doc:
             continue
         league_map = {}
@@ -588,7 +817,7 @@ def enrich_pool_with_stats(pool):
         {"$or": [{"name": {"$in": teams_list}}, {"aliases": {"$in": teams_list}}]},
         {"name": 1, "aliases": 1, "stats.motivation": 1, "stats.motivation_pressure_euro": 1,
          "stats.motivation_pressure_releg": 1, "stats.motivation_pressure_title": 1}
-    ))
+    ).max_time_ms(30000))
     motivazioni_cache = {}  # team_name -> dict (chiave = nome DB + tutti gli aliases)
     for t in teams_docs:
         stats = t.get("stats", {})
@@ -622,7 +851,8 @@ def enrich_pool_with_stats(pool):
         doc = db.h2h_by_round.find_one(
             {"league": m["league"], "matches": {"$elemMatch": {"home": m["home"], "away": m["away"]}}},
             {"matches.$": 1},
-            sort=[("_id", -1)]
+            sort=[("_id", -1)],
+            max_time_ms=30000
         )
         if not doc or not doc.get("matches"):
             continue
@@ -667,7 +897,7 @@ def enrich_pool_with_stats(pool):
     unified_docs = list(db.daily_predictions_unified.find(
         {"date": {"$in": dates}},
         {"home": 1, "away": 1, "date": 1, "streak_home": 1, "streak_away": 1}
-    ))
+    ).max_time_ms(30000))
     for doc in unified_docs:
         mk = f"{doc['home']} vs {doc['away']}|{doc['date']}"
         sh = doc.get("streak_home", {})
@@ -709,7 +939,7 @@ def enrich_pool_with_stats(pool):
         if h2h or s.get("classifica_home") or sk:
             enriched_count += 1
 
-    print(f"📊 Arricchite {enriched_count}/{len(matches)} partite con dati statistici")
+    logger.info(f"📊 Arricchite {enriched_count}/{len(matches)} partite con dati statistici")
     return classifiche_cache
 
 
@@ -1095,6 +1325,8 @@ def calculate_solidity_coefficient(pool, classifiche_cache=None):
         # === 2. GF-GS ===
         league = s.get("league", "")
         tutte_squadre = classifiche_cache.get(league, {})
+        if not tutte_squadre:
+            logger.warning(f"⚠️ Classifica mancante per {league}, coefficiente solidità con fallback")
 
         gfgs_home_ctx = _analisi_gf_gs(ch, tutte_squadre, "casa")
         gfgs_away_ctx = _analisi_gf_gs(ca, tutte_squadre, "trasferta")
@@ -1514,14 +1746,140 @@ def calculate_solidity_coefficient(pool, classifiche_cache=None):
         }
         calculated += 1
 
-    print(f"🔢 Coefficiente Solidità calcolato per {calculated}/{len(pool)} selezioni")
+    logger.info(f"🔢 Coefficiente Solidità calcolato per {calculated}/{len(pool)} selezioni")
+
+
+def calculate_final_score(pool):
+    """Calcola il punteggio finale (Passo 1 + Passo 2) per ogni selezione.
+    Calibrato su 671 partite reali. Il punteggio viene salvato in sel['punteggio_finale']."""
+
+    def _zona_rh(v):
+        if v < 10 or v > 70: return "ASSENTE"
+        if v <= 30: return "DEBOLE_BASSO"
+        if v <= 50: return "OTTIMALE"
+        return "DEBOLE_ALTO"
+
+    def _zona_ra(v):
+        if v < 10 or v > 70: return "ASSENTE"
+        if v <= 30: return "DEBOLE_BASSO"
+        if v <= 50: return "OTTIMALE"
+        return "DEBOLE_ALTO"
+
+    def _zona_c(v):
+        if v > 70: return "ASSENTE"
+        if v <= 50: return "OTTIMALE"
+        return "DEBOLE_ALTO"
+
+    calculated = 0
+    for sel in pool:
+        rh = sel.get("rapporto_home")
+        ra = sel.get("rapporto_away")
+        c = sel.get("coerenza_rapporti")
+
+        if rh is None or ra is None or c is None:
+            sel["punteggio_finale"] = None
+            continue
+
+        # --- PASSO 1: punteggio base da zone RH, RA, C ---
+        score = 0
+        zrh = _zona_rh(rh)
+        if zrh == "DEBOLE_BASSO": score += 4
+        elif zrh == "OTTIMALE": score += 3
+        elif zrh == "DEBOLE_ALTO": score -= 1
+        elif zrh == "ASSENTE": score -= 4
+
+        zra = _zona_ra(ra)
+        if zra == "DEBOLE_ALTO": score += 4
+        elif zra == "OTTIMALE": score += 3
+        elif zra == "DEBOLE_BASSO": score += 1
+        elif zra == "ASSENTE": score -= 4
+
+        zc = _zona_c(c)
+        if zc == "DEBOLE_ALTO": score += 2
+        elif zc == "OTTIMALE": score += 1
+        elif zc == "ASSENTE": score -= 3
+
+        # --- PASSO 2: bonus/malus da altri dati ---
+        # Elite
+        if sel.get("elite"):
+            score += 3
+
+        # Confidence
+        conf = sel.get("confidence", 0) or 0
+        if 70 <= conf <= 80: score += 2
+        elif 60 <= conf < 70: score += 1
+        elif conf < 50: score -= 2
+
+        # Stelle
+        stars = sel.get("stars", 0) or 0
+        if stars == 4: score += 2
+        elif stars == 3: score += 1
+        elif stars == 2: score -= 2
+
+        # Forma e affidabilità squadra chiave (dipende da mercato/pronostico)
+        mercato = sel.get("mercato", "")
+        pronostico = sel.get("pronostico", "")
+        forma_home = sel.get("lucifero_home_pct") or 50
+        forma_away = sel.get("lucifero_away_pct") or 50
+        aff_home = sel.get("affidabilita_casa") or 5
+        aff_away = sel.get("affidabilita_trasf") or 5
+
+        if mercato == "GOL":
+            # Per mercati GOL: media delle due forme (entrambe contano)
+            forma = (forma_home + forma_away) / 2
+            aff = (aff_home + aff_away) / 2
+        elif mercato == "SEGNO":
+            if pronostico in ("1", "1X"):
+                forma, aff = forma_home, aff_home
+            elif pronostico in ("2", "X2"):
+                forma, aff = forma_away, aff_away
+            else:  # X
+                forma = (forma_home + forma_away) / 2
+                aff = (aff_home + aff_away) / 2
+        elif mercato == "DOPPIA_CHANCE":
+            if pronostico in ("1X", "1"):
+                forma, aff = forma_home, aff_home
+            elif pronostico in ("X2", "2"):
+                forma, aff = forma_away, aff_away
+            else:  # 12
+                forma = max(forma_home, forma_away)
+                aff = max(aff_home, aff_away)
+        else:
+            forma = (forma_home + forma_away) / 2
+            aff = (aff_home + aff_away) / 2
+
+        if 40 <= forma <= 60: score += 2
+        elif 20 <= forma < 40: score -= 1
+        elif forma > 80: score -= 1
+
+        # Affidabilità
+        if aff > 7: score += 1
+
+        # Mercato
+        if mercato == "GOL": score += 1
+        elif mercato == "SEGNO": score -= 1
+
+        # Esclusione assoluta: zona ASSENTE su RH, RA o C
+        if zrh == "ASSENTE" or zra == "ASSENTE" or zc == "ASSENTE":
+            score = -999
+
+        sel["punteggio_finale"] = score
+        calculated += 1
+
+    # Filtra selezioni tossiche dal pool (zona ASSENTE)
+    before = len(pool)
+    pool[:] = [s for s in pool if s.get("punteggio_finale") != -999]
+    if before - len(pool) > 0:
+        logger.info(f"🚫 Escluse {before - len(pool)} selezioni con zona ASSENTE")
+
+    logger.info(f"📊 Punteggio finale calcolato per {calculated}/{len(pool)} selezioni")
 
 
 def _format_match_stats(s):
     """Formatta i dati statistici di una selezione per il prompt Mistral."""
     parts = []
 
-    # Rapporti + Coerenza
+    # Rapporti + Coerenza + Punteggio finale
     rh = s.get("rapporto_home")
     ra = s.get("rapporto_away")
     coer = s.get("coerenza_rapporti")
@@ -1532,8 +1890,10 @@ def _format_match_stats(s):
             if v >= 30: return "OTTIMALE"
             if v >= 10: return "DEBOLE"
             return "ASSENTE"
+        punt = s.get("punteggio_finale")
+        punt_tag = f" | PUNTEGGIO={punt}" if punt is not None else ""
         parts.append(
-            f"    RH={rh:.0f}({_zona(rh)}) RA={ra:.0f}({_zona(ra)}) C={coer:.0f}({_zona(coer)}) | QH={s.get('coeff_qualita_home',0):.0f} QA={s.get('coeff_qualita_away',0):.0f} D={s.get('coeff_direzione',0):.0f}"
+            f"    RH={rh:.0f}({_zona(rh)}) RA={ra:.0f}({_zona(ra)}) C={coer:.0f}({_zona(coer)}) | QH={s.get('coeff_qualita_home',0):.0f} QA={s.get('coeff_qualita_away',0):.0f} D={s.get('coeff_direzione',0):.0f}{punt_tag}"
         )
 
     # Classifica totale
@@ -1682,9 +2042,14 @@ def serialize_pool_for_prompt(pool):
                     ra = s.get("rapporto_away")
                     coer = s.get("coerenza_rapporti")
                     coeff_tag = f" | RH={rh} RA={ra} C={coer}" if rh is not None else ""
+                    punt = s.get("punteggio_finale")
+                    if s.get("_extra_pool"):
+                        punt_tag = " | EXTRA (no score — fuori dal sistema AI)"
+                    else:
+                        punt_tag = f" | SCORE={punt}" if punt is not None else ""
                     lines.append(
                         f"  {s['match_key']} | {s['mercato']}: {s['pronostico']} "
-                        f"@ {s['quota']} | conf={s['confidence']} ★{s['stars']}{elite_tag}{coeff_tag}"
+                        f"@ {s['quota']} | conf={s['confidence']} ★{s['stars']}{elite_tag}{coeff_tag}{punt_tag}"
                     )
                 # Stats della partita (una volta sola)
                 stats_text = _format_match_stats(sels[0])
@@ -1712,37 +2077,89 @@ def serialize_pool_for_prompt(pool):
     return "\n".join(lines)
 
 
-def call_mistral(pool_text, today_str):
-    """Chiama Mistral per generare le bollette."""
-    prompt = SYSTEM_PROMPT.replace("{max_bollette}", str(MAX_BOLLETTE)).replace("{today_date}", today_str)
+def _call_llm(messages, provider_url=None, provider_model=None, provider_key=None):
+    """Chiamata LLM generica con fallback automatico DeepSeek → Mistral."""
+    url = provider_url or LLM_URL
+    model = provider_model or LLM_MODEL
+    api_key = provider_key or LLM_API_KEY
 
     headers = {
-        "Authorization": f"Bearer {MISTRAL_API_KEY}",
+        "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json",
     }
     payload = {
-        "model": MISTRAL_MODEL,
-        "messages": [
-            {"role": "system", "content": prompt},
-            {"role": "user", "content": f"Ecco il pool di selezioni disponibili:\n{pool_text}\n\nComponi le bollette."},
-        ],
+        "model": model,
+        "messages": messages,
         "temperature": 0.4,
-        "max_tokens": 8000,
+        "max_tokens": 16000,
         "response_format": {"type": "json_object"},
     }
 
     max_retries = 2
     for attempt in range(1, max_retries + 1):
-        resp = requests.post(MISTRAL_URL, headers=headers, json=payload, timeout=120)
-        if resp.status_code == 429 and attempt < max_retries:
-            wait = 10 * attempt
-            print(f"⏳ Rate limit 429, retry {attempt}/{max_retries} tra {wait}s...")
-            time.sleep(wait)
-            continue
-        resp.raise_for_status()
-        break
+        try:
+            resp = requests.post(url, headers=headers, json=payload, timeout=180)
+            if resp.status_code == 429 and attempt < max_retries:
+                wait = 15 * attempt
+                logger.info(f"⏳ Rate limit 429, retry {attempt}/{max_retries} tra {wait}s...")
+                time.sleep(wait)
+                continue
+            resp.raise_for_status()
+            content = resp.json()["choices"][0]["message"]["content"]
+            # DeepSeek R1 restituisce ragionamento in <think>...</think> — rimuovilo
+            if "<think>" in content:
+                import re
+                content = re.sub(r'<think>.*?</think>', '', content, flags=re.DOTALL).strip()
+            return content
+        except Exception as e:
+            if attempt < max_retries:
+                logger.warning(f" Errore LLM (attempt {attempt}): {e}")
+                time.sleep(10)
+                continue
+            raise
 
-    content = resp.json()["choices"][0]["message"]["content"]
+    raise Exception("LLM: tutti i tentativi falliti")
+
+
+def _save_debug_prompt(messages, label="llm_call"):
+    """Salva prompt e messaggi su file per debug."""
+    if not DEBUG_MODE:
+        return
+    debug_dir = os.path.join(os.path.dirname(__file__), "..", "..", "..", "log")
+    os.makedirs(debug_dir, exist_ok=True)
+    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+    debug_file = os.path.join(debug_dir, f"debug_bollette_{label}_{ts}.json")
+    try:
+        with open(debug_file, "w", encoding="utf-8") as f:
+            json.dump(messages, f, ensure_ascii=False, indent=2)
+        logger.debug(f"🐛 Prompt salvato: {debug_file}")
+    except Exception as e:
+        logger.warning(f"⚠️ Errore salvataggio debug: {e}")
+
+
+def _call_llm_with_fallback(messages):
+    """Chiama LLM primario, se fallisce usa fallback Mistral."""
+    _save_debug_prompt(messages, "primary")
+    try:
+        return _call_llm(messages)
+    except Exception as e:
+        # Fallback su Mistral solo se il primario è OpenRouter
+        if LLM_URL == OPENROUTER_URL and MISTRAL_API_KEY:
+            logger.warning(f" DeepSeek fallito ({e}), fallback su Mistral...")
+            return _call_llm(messages, MISTRAL_URL, MISTRAL_MODEL, MISTRAL_API_KEY)
+        raise
+
+
+def call_mistral(pool_text, today_str):
+    """Chiama LLM per generare le bollette."""
+    prompt = SYSTEM_PROMPT.replace("{max_bollette}", str(MAX_BOLLETTE)).replace("{today_date}", today_str)
+
+    messages = [
+        {"role": "system", "content": prompt},
+        {"role": "user", "content": f"Ecco il pool di selezioni disponibili:\n{pool_text}\n\nComponi le bollette."},
+    ]
+
+    content = _call_llm_with_fallback(messages)
     return _sanitize_and_parse_json(content)
 
 
@@ -1758,7 +2175,7 @@ def _classify_tipo(raw_tipo, selezioni, quota_totale, pool_index, today_str):
         ).get("elite", False))
         if elite_count == n_sel:
             return "elite"
-        print(f"  ⚠️ Bolletta elite con solo {elite_count}/{n_sel} elite (servono 100%) — riclassificata")
+        logger.warning(f" Bolletta elite con solo {elite_count}/{n_sel} elite (servono 100%) — riclassificata")
 
     if raw_tipo == "oggi" and solo_oggi:
         return "oggi"
@@ -1877,6 +2294,26 @@ def validate_with_errors(raw_bollette, pool, today_str, existing_counters=None, 
                 "code": "PARTITA_DUPLICATA",
                 "bolletta_idx": i, "tipo": raw_tipo,
                 "feedback": f"Bolletta #{i+1} ({raw_tipo}): stessa partita ripetuta nella bolletta"
+            })
+            continue
+
+        # --- #2b: punteggio minimo selezioni ---
+        min_score = MIN_SCORE_PER_CATEGORY.get(raw_tipo, 4)
+        low_score_sels = []
+        for sel in selezioni_raw:
+            key = (sel.get("match_key", ""), sel.get("mercato", ""), sel.get("pronostico", ""))
+            pe = pool_index.get(key, {})
+            if pe.get("_extra_pool"):
+                continue  # extra pool non ha punteggio
+            punt = pe.get("punteggio_finale") or 0
+            if punt < min_score:
+                low_score_sels.append(f"{key[0]} (score={punt})")
+        if low_score_sels:
+            errors.append({
+                "code": "PUNTEGGIO_BASSO",
+                "bolletta_idx": i, "tipo": raw_tipo,
+                "feedback": f"Bolletta #{i+1} ({raw_tipo}): {len(low_score_sels)} selezioni con punteggio "
+                           f"< {min_score}: {', '.join(low_score_sels[:3])}. Sostituisci con selezioni migliori"
             })
             continue
 
@@ -2060,7 +2497,7 @@ def validate_with_errors(raw_bollette, pool, today_str, existing_counters=None, 
             filtered_docs.append(doc)
             used_sels[tipo].update(doc_sels)
     if len(filtered_docs) < len(valid_docs):
-        print(f"   🔄 Deduplica: {len(valid_docs)} → {len(filtered_docs)} bollette (selezioni ripetute nella stessa sezione)")
+        logger.info(f"🔄 Deduplica: {len(valid_docs)} → {len(filtered_docs)} bollette (selezioni ripetute nella stessa sezione)")
     valid_docs = filtered_docs
 
     # --- Post-loop: #12 diversificazione assente ---
@@ -2099,7 +2536,7 @@ def build_extra_pool(today_str, existing_match_keys, skip_time_filter=False):
     rounds = list(db.h2h_by_round.find(
         {"matches.date_obj": {"$gte": date_start, "$lte": date_end}},
         {"league": 1, "matches": 1}
-    ))
+    ).max_time_ms(30000))
 
     for rnd in rounds:
         league = rnd.get("league", "")
@@ -2212,9 +2649,17 @@ def call_mistral_integration(pool, fascia, count_needed, today_str, extra_contex
     if quota_singola:
         max_quota_singola = max(quota_singola.values())
         filtered_pool = [s for s in pool if s["quota"] <= max_quota_singola]
-        print(f"   📋 Pool filtrato per {fascia}: {len(filtered_pool)}/{len(pool)} selezioni (quota max singola: {max_quota_singola})")
+        logger.info(f"📋 Pool filtrato per {fascia}: {len(filtered_pool)}/{len(pool)} selezioni (quota max singola: {max_quota_singola})")
     else:
         filtered_pool = pool
+
+    # Pre-filtra pool: rimuovi selezioni con punteggio sotto soglia per questa fascia
+    min_score = MIN_SCORE_PER_CATEGORY.get(fascia, 4)
+    before_score = len(filtered_pool)
+    filtered_pool = [s for s in filtered_pool
+                     if s.get("_extra_pool") or (s.get("punteggio_finale") or 0) >= min_score]
+    if before_score - len(filtered_pool) > 0:
+        logger.info(f"📋 Pool {fascia}: escluse {before_score - len(filtered_pool)} selezioni con punteggio < {min_score}")
 
     pool_text = serialize_pool_for_prompt(filtered_pool)
 
@@ -2273,116 +2718,21 @@ match_key, mercato e pronostico devono corrispondere ESATTAMENTE al pool."""
     if extra_context:
         prompt += f"\n\n⚠️ ATTENZIONE — ERRORI PRECEDENTI:\n{extra_context}"
 
-    headers = {
-        "Authorization": f"Bearer {MISTRAL_API_KEY}",
-        "Content-Type": "application/json",
-    }
-    payload = {
-        "model": MISTRAL_MODEL,
-        "messages": [
-            {"role": "system", "content": prompt},
-            {"role": "user", "content": f"Pool disponibile:\n{pool_text}\n\nComponi {count_needed} bollette {fascia}."},
-        ],
-        "temperature": 0.4,
-        "max_tokens": 8000,
-        "response_format": {"type": "json_object"},
-    }
+    messages = [
+        {"role": "system", "content": prompt},
+        {"role": "user", "content": f"Pool disponibile:\n{pool_text}\n\nComponi {count_needed} bollette {fascia}."},
+    ]
 
-    for attempt in range(3):
-        resp = requests.post(MISTRAL_URL, headers=headers, json=payload, timeout=120)
-        if resp.status_code == 429 and attempt < 2:
-            wait = 30 * (attempt + 1)
-            print(f"   ⏳ Rate limit 429, attendo {wait}s...")
-            time.sleep(wait)
-            continue
-        resp.raise_for_status()
-        break
-
-    content = resp.json()["choices"][0]["message"]["content"]
+    content = _call_llm_with_fallback(messages)
 
     try:
         return _sanitize_and_parse_json(content)
     except (json.JSONDecodeError, Exception) as e:
-        print(f"   ⚠️ Parse JSON fallito ({e}), retry con istruzione esplicita...")
-        # Retry: aggiungi istruzione esplicita sul formato
-        payload["messages"].append({"role": "assistant", "content": content})
-        payload["messages"].append({"role": "user", "content": "ERRORE: la risposta non è un JSON valido. Rispondi con SOLO un array JSON valido, senza testo prima o dopo. Formato: [{...}, {...}]"})
-        resp2 = requests.post(MISTRAL_URL, headers=headers, json=payload, timeout=120)
-        resp2.raise_for_status()
-        content2 = resp2.json()["choices"][0]["message"]["content"]
+        logger.warning(f" Parse JSON fallito ({e}), retry con istruzione esplicita...")
+        messages.append({"role": "assistant", "content": content})
+        messages.append({"role": "user", "content": "ERRORE: la risposta non è un JSON valido. Rispondi con SOLO un array JSON valido, senza testo prima o dopo. Formato: [{...}, {...}]"})
+        content2 = _call_llm_with_fallback(messages)
         return _sanitize_and_parse_json(content2)
-
-
-def build_feedback_prompt(errors, valid_docs, counters, today_str):
-    """Costruisce il prompt di feedback per il retry con errori specifici."""
-    lines = []
-
-    # Bollette accettate
-    if valid_docs:
-        lines.append(f"✅ {len(valid_docs)} bollette ACCETTATE (non rigenerarle):")
-        for doc in valid_docs:
-            lines.append(f"  - {doc['tipo'].capitalize()}: {len(doc['selezioni'])} selezioni, "
-                        f"quota {doc['quota_totale']}")
-        lines.append("")
-
-    # Errori specifici
-    lines.append(f"❌ {len(errors)} problemi trovati. Correggi generando SOLO bollette sostitutive:\n")
-    for err in errors:
-        lines.append(f"- {err['feedback']}")
-
-    # Stato distribuzione
-    lines.append("\n📊 Distribuzione attuale:")
-    for tipo in ["oggi", "selettiva", "bilanciata", "ambiziosa", "elite"]:
-        actual = counters.get(tipo, 0)
-        target = CATEGORY_CONSTRAINTS.get(tipo, {}).get("max_bollette", 5)
-        target_min = 3 if tipo != "elite" else 1
-        status = "✅" if actual >= target_min else "❌"
-        lines.append(f"  {status} {tipo}: {actual}/{target_min}+ (max {target})")
-
-    # Categorie mancanti
-    missing = []
-    for tipo in ["oggi", "selettiva", "bilanciata", "ambiziosa"]:
-        actual = counters.get(tipo, 0)
-        if actual < 3:
-            missing.append(f"{3 - actual} bollette {tipo}")
-    if missing:
-        lines.append(f"\n⚠️ SERVONO ANCORA: {', '.join(missing)}")
-
-    lines.append("\nGenera SOLO le bollette sostitutive/mancanti. Array JSON valido, niente testo.")
-
-    return "\n".join(lines)
-
-
-def call_mistral_retry(pool_text, today_str, original_response, feedback):
-    """Richiama Mistral con la conversazione precedente + feedback sugli errori."""
-    prompt = SYSTEM_PROMPT.replace("{max_bollette}", str(MAX_BOLLETTE)).replace("{today_date}", today_str)
-
-    headers = {
-        "Authorization": f"Bearer {MISTRAL_API_KEY}",
-        "Content-Type": "application/json",
-    }
-
-    # Conversazione multi-turn: system → user → assistant (risposta originale) → user (feedback)
-    messages = [
-        {"role": "system", "content": prompt},
-        {"role": "user", "content": f"Ecco il pool di selezioni disponibili:\n{pool_text}\n\nComponi le bollette."},
-        {"role": "assistant", "content": json.dumps(original_response, ensure_ascii=False)},
-        {"role": "user", "content": feedback},
-    ]
-
-    payload = {
-        "model": MISTRAL_MODEL,
-        "messages": messages,
-        "temperature": 0.3,  # Piu' bassa per correzione precisa
-        "max_tokens": 8000,
-        "response_format": {"type": "json_object"},
-    }
-
-    resp = requests.post(MISTRAL_URL, headers=headers, json=payload, timeout=120)
-    resp.raise_for_status()
-
-    content = resp.json()["choices"][0]["message"]["content"]
-    return _sanitize_and_parse_json(content)
 
 
 def _check_feasibility(fascia, pool, today_str):
@@ -2394,6 +2744,16 @@ def _check_feasibility(fascia, pool, today_str):
     min_quota = c.get("min_quota")
     max_quota = c.get("max_quota")
 
+    # Soglie punteggio minimo per categoria (calibrate su dati reali)
+    MIN_SCORE = {
+        "elite": 7,
+        "selettiva": 7,
+        "bilanciata": 5,
+        "ambiziosa": 4,
+        "oggi": 4,
+    }
+    min_score = MIN_SCORE.get(fascia, 4)
+
     # Filtra pool per la sezione
     if fascia == "oggi":
         section_pool = [s for s in pool if s.get("match_date") == today_str]
@@ -2401,6 +2761,13 @@ def _check_feasibility(fascia, pool, today_str):
         section_pool = [s for s in pool if s.get("elite")]
     else:
         section_pool = pool
+
+    # Check 0: abbastanza selezioni con punteggio sufficiente?
+    qualified = [s for s in section_pool if (s.get("punteggio_finale") or 0) >= min_score]
+    unique_qualified = set(s.get("match_key", "") for s in qualified)
+    if len(unique_qualified) < min_sel:
+        return False, f"solo {len(unique_qualified)} partite con punteggio ≥{min_score}, servono almeno {min_sel}", section_pool
+    logger.info(f"📊 {fascia}: {len(unique_qualified)} partite qualificate (punteggio ≥{min_score})")
 
     # Check 1: abbastanza selezioni?
     # Conta partite uniche (ogni partita puo' apparire 1 volta per bolletta)
@@ -2459,17 +2826,17 @@ def _generate_for_section(fascia, needed, pool, today_str, bollette_docs, counte
     # Check fattibilita'
     feasible, reason, section_pool = _check_feasibility(fascia, pool, today_str)
     if not feasible:
-        print(f"   ⛔ Impossibile: {reason}")
+        logger.error(f" Impossibile: {reason}")
         return [], []
 
-    print(f"   📋 Pool per {fascia}: {len(section_pool)} selezioni")
+    logger.info(f"📋 Pool per {fascia}: {len(section_pool)} selezioni")
 
     # Per elite: limita richiesta in base al pool disponibile
     if fascia == "elite":
         unique_elite_matches = len(set(s.get("match_key", "") for s in section_pool))
         max_elite = max(2, unique_elite_matches // 2)  # ~metà delle partite uniche
         needed = min(needed, max_elite)
-        print(f"   📋 Elite: {unique_elite_matches} partite uniche → max {needed} bollette")
+        logger.info(f"📋 Elite: {unique_elite_matches} partite uniche → max {needed} bollette")
 
     # Raccolta selezioni scartate per ricomposizione
     all_raw = []
@@ -2480,11 +2847,11 @@ def _generate_for_section(fascia, needed, pool, today_str, bollette_docs, counte
     try:
         raw = call_mistral_integration(section_pool, fascia, needed, today_str)
     except Exception as e:
-        print(f"   ❌ Errore Mistral per {fascia}: {e}")
+        logger.error(f" Errore Mistral per {fascia}: {e}")
         return [], []
 
     if not isinstance(raw, list):
-        print(f"   ❌ Risposta non valida per {fascia}")
+        logger.error(f" Risposta non valida per {fascia}")
         return [], []
 
     all_raw.extend(raw)
@@ -2507,16 +2874,16 @@ def _generate_for_section(fascia, needed, pool, today_str, bollette_docs, counte
     valid = valid[:needed]
 
     if errors:
-        print(f"   ⚠️ {len(errors)} errori per {fascia}")
+        logger.warning(f" {len(errors)} errori per {fascia}")
         for err in errors[:3]:
-            print(f"      [{err['code']}] {err['feedback'][:100]}")
+            logger.warning(f"[{err['code']}] {err['feedback'][:100]}")
 
     # Se non abbastanza, retry fino a 2 volte con feedback specifico
     for retry_attempt in range(2):
         still_needed = needed - len(valid)
         if still_needed <= 0 or not errors:
             break
-        print(f"   🔄 Retry {fascia} #{retry_attempt+1}: mancano {still_needed} bollette...")
+        logger.info(f"🔄 Retry {fascia} #{retry_attempt+1}: mancano {still_needed} bollette...")
 
         # Costruisci feedback specifico con errori e suggerimenti
         error_lines = [f"- {err['feedback']}" for err in errors[:5]]
@@ -2552,11 +2919,11 @@ def _generate_for_section(fascia, needed, pool, today_str, bollette_docs, counte
                 retry_valid = retry_valid[:still_needed]
                 valid.extend(retry_valid)
                 if retry_valid:
-                    print(f"   ✅ Retry: +{len(retry_valid)} bollette {fascia}")
+                    logger.info(f"✅ Retry: +{len(retry_valid)} bollette {fascia}")
                 if errors:
-                    print(f"   ⚠️ Retry: ancora {len(errors)} errori")
+                    logger.warning(f" Retry: ancora {len(errors)} errori")
         except Exception as e:
-            print(f"   ❌ Errore retry {fascia}: {e}")
+            logger.error(f" Errore retry {fascia}: {e}")
             break
 
     # Assegna tipo e label
@@ -2606,6 +2973,7 @@ def _generate_for_section(fascia, needed, pool, today_str, bollette_docs, counte
                 if pool_entry:
                     discarded_sels.append(pool_entry)
 
+    logger.info(f"📊 {fascia}: {len(valid)}/{needed} bollette generate")
     return valid, discarded_sels
 
 
@@ -2628,6 +2996,12 @@ def _recompose_from_discards(discarded_selezioni, pool, today_str, bollette_docs
         if key not in seen:
             seen.add(key)
             urna.append(sel)
+
+    # Filtra per punteggio minimo: solo selezioni con punteggio >= 4
+    pre_filter = len(urna)
+    urna = [s for s in urna if (s.get("punteggio_finale") or 0) >= 4]
+    if pre_filter != len(urna):
+        logger.info(f"📊 Urna filtrata per punteggio ≥4: {len(urna)}/{pre_filter} selezioni")
 
     if len(urna) < 2:
         return []
@@ -2804,18 +3178,39 @@ def _recompose_from_discards(discarded_selezioni, pool, today_str, bollette_docs
     return new_bollette
 
 
-def main():
-    print("\n" + "=" * 60)
-    print("🎫 GENERAZIONE BOLLETTE — Step 35 (Sequenziale)")
-    print("=" * 60)
+def _timeout_handler():
+    """Termina il processo se supera il timeout globale."""
+    logger.error(f"⏰ TIMEOUT: script superato {SCRIPT_TIMEOUT_MINUTES} minuti, terminazione forzata")
+    os._exit(1)
 
-    # Supporta --date YYYY-MM-DD per generare bollette retroattive
+
+def main():
+    # Timeout globale (Windows-compatible, signal.alarm non disponibile)
+    timer = threading.Timer(SCRIPT_TIMEOUT_MINUTES * 60, _timeout_handler)
+    timer.daemon = True
+    timer.start()
+
+    logger.info("=" * 60)
+    logger.info("🎫 GENERAZIONE BOLLETTE — Step 35 (Sequenziale)")
+    logger.info(f"⏰ Timeout globale: {SCRIPT_TIMEOUT_MINUTES} minuti")
+    logger.info("=" * 60)
+
+    # Supporta --date YYYY-MM-DD e --dry-run
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('--date', type=str, default=None, help='Data YYYY-MM-DD')
+    parser.add_argument('--dry-run', action='store_true', help='Non salvare su MongoDB')
+    parser.add_argument('--debug', action='store_true', help='Salva prompt LLM su file debug')
     args, _ = parser.parse_known_args()
     today_str = args.date if args.date else datetime.now().strftime("%Y-%m-%d")
     is_retroactive = args.date is not None
+    dry_run = args.dry_run
+    global DEBUG_MODE
+    DEBUG_MODE = args.debug
+    if dry_run:
+        logger.info("🔍 MODALITÀ DRY-RUN — nessun salvataggio su MongoDB")
+    if DEBUG_MODE:
+        logger.info("🐛 MODALITÀ DEBUG — prompt LLM salvati in log/")
 
     # 1. Costruisci pool base (pronostici AI)
     pool = build_pool(today_str, skip_time_filter=is_retroactive)
@@ -2823,12 +3218,12 @@ def main():
     if recovered:
         pool.extend(recovered)
     pool = deduplicate_pool(pool)
-    print(f"📊 Pool AI: {len(pool)} selezioni uniche")
+    logger.info(f"📊 Pool AI: {len(pool)} selezioni uniche")
 
     # 1b. Filtra pool con pattern bollette (85 pattern Mixer + elite)
     pool_before = len(pool)
     pool = [s for s in pool if s.get("elite") or matches_bollette_pattern(s)]
-    print(f"🎯 Filtro pattern: {pool_before} → {len(pool)} selezioni "
+    logger.info(f"🎯 Filtro pattern: {pool_before} → {len(pool)} selezioni "
           f"({pool_before - len(pool)} escluse, {len(PATTERNS)} pattern caricati)")
 
     # 1c. Arricchisci pool con dati statistici (classifica, forma, trend, motivazioni, strisce, affidabilità, DNA)
@@ -2837,31 +3232,23 @@ def main():
     # 1d. Calcola Coefficiente di Solidità (deterministico, Python)
     calculate_solidity_coefficient(pool, classifiche_cache)
 
+    # 1e. Calcola punteggio finale per ogni selezione (Passo 1 + Passo 2)
+    calculate_final_score(pool)
+
     if len(pool) < 2:
-        print("⚠️ Pool troppo piccolo (< 2 selezioni). Nessuna bolletta generata.")
+        logger.warning(" Pool troppo piccolo (< 2 selezioni). Nessuna bolletta generata.")
         return
 
     # 2. Generazione sequenziale per sezione
     bollette_docs = []
     counters = {"oggi": 0, "elite": 0, "selettiva": 0, "bilanciata": 0, "ambiziosa": 0}
-
-    # Target bollette per sezione
-    SECTION_TARGETS = {
-        "oggi":       3,
-        "elite":      3,
-        "selettiva":  3,
-        "bilanciata": 3,
-        "ambiziosa":  3,
-    }
-
-    SECTION_ORDER = ["oggi", "elite", "selettiva", "bilanciata", "ambiziosa"]
     all_discarded_sels = []
 
     for fascia in SECTION_ORDER:
         target = SECTION_TARGETS[fascia]
-        print(f"\n{'─'*50}")
-        print(f"📌 SEZIONE {fascia.upper()} — target: {target} bollette")
-        print(f"{'─'*50}")
+        logger.info(f"{'─'*50}")
+        logger.info(f"📌 SEZIONE {fascia.upper()} — target: {target} bollette")
+        logger.info(f"{'─'*50}")
 
         new_bollette, discarded = _generate_for_section(
             fascia, target, pool, today_str, bollette_docs, counters
@@ -2869,9 +3256,12 @@ def main():
 
         if new_bollette:
             bollette_docs.extend(new_bollette)
-            print(f"   ✅ {fascia.upper()}: {len(new_bollette)} bollette generate")
+            if len(new_bollette) < target:
+                logger.info(f"✅ {fascia.upper()}: {len(new_bollette)}/{target} bollette (qualità insufficiente per generarne di più)")
+            else:
+                logger.info(f"✅ {fascia.upper()}: {len(new_bollette)} bollette generate")
         else:
-            print(f"   ⚠️ {fascia.upper()}: nessuna bolletta valida")
+            logger.warning(f" {fascia.upper()}: nessuna bolletta valida")
 
         if discarded:
             all_discarded_sels.extend(discarded)
@@ -2884,10 +3274,10 @@ def main():
     any_missing = any(v > 0 for v in missing.values())
 
     if any_missing and all_discarded_sels:
-        print(f"\n{'─'*50}")
-        print(f"🔄 RICOMPOSIZIONE — urna: {len(all_discarded_sels)} selezioni scartate")
-        print(f"   Mancano: " + ", ".join(f"{f}={v}" for f, v in missing.items() if v > 0))
-        print(f"{'─'*50}")
+        logger.info(f"{'─'*50}")
+        logger.info(f"🔄 RICOMPOSIZIONE — urna: {len(all_discarded_sels)} selezioni scartate")
+        logger.info(f"Mancano: " + ", ".join(f"{f}={v}" for f, v in missing.items() if v > 0))
+        logger.info(f"{'─'*50}")
 
         recomposed = _recompose_from_discards(
             all_discarded_sels, pool, today_str, bollette_docs, counters
@@ -2900,21 +3290,23 @@ def main():
                 by_tipo_r.setdefault(b["tipo"], []).append(b)
             for tipo, bs in by_tipo_r.items():
                 quotes = [b["quota_totale"] for b in bs]
-                print(f"   ✅ Ricomposte {len(bs)} {tipo}: quote {quotes}")
+                logger.info(f"✅ Ricomposte {len(bs)} {tipo}: quote {quotes}")
         else:
-            print(f"   ⚠️ Nessuna bolletta ricomposta")
+            logger.warning(f" Nessuna bolletta ricomposta")
 
     if not bollette_docs:
-        print("\n⚠️ Nessuna bolletta generata.")
+        logger.warning("Nessuna bolletta generata.")
         return
 
     # 4. Salva su MongoDB
-    coll = db.bollette
-    deleted = coll.delete_many({"date": today_str, "custom": {"$ne": True}})
-    if deleted.deleted_count > 0:
-        print(f"\n🗑️ Rimosse {deleted.deleted_count} bollette precedenti per {today_str}")
-
-    coll.insert_many(bollette_docs)
+    if dry_run:
+        logger.info("🔍 DRY-RUN: skip salvataggio MongoDB")
+    else:
+        coll = db.bollette
+        deleted = coll.delete_many({"date": today_str, "custom": {"$ne": True}})
+        if deleted.deleted_count > 0:
+            logger.info(f"🗑️ Rimosse {deleted.deleted_count} bollette precedenti per {today_str}")
+        coll.insert_many(bollette_docs)
 
     # 5. Riepilogo finale
     by_tipo = {}
@@ -2925,23 +3317,26 @@ def main():
     n_recomposed = sum(1 for b in bollette_docs if b.get("reasoning", "").startswith("Ricomposta"))
     n_mistral = len(bollette_docs) - n_recomposed
 
-    print(f"\n{'='*50}")
-    print(f"🏆 RIEPILOGO FINALE:")
-    print(f"   Mistral: {n_mistral}/15 bollette")
+    logger.info(f"{'='*50}")
+    logger.info(f"🏆 RIEPILOGO FINALE:")
+    logger.info(f"LLM: {n_mistral}/15 bollette")
     if n_recomposed > 0:
-        print(f"   Urna:    +{n_recomposed} ricomposte")
-    print(f"   TOTALE:  {len(bollette_docs)}/15 {'✅' if len(bollette_docs) >= 15 else '⚠️'}")
-    print(f"{'='*50}")
+        logger.info(f"Urna:    +{n_recomposed} ricomposte")
+    logger.info(f"TOTALE:  {len(bollette_docs)} bollette {'✅' if len(bollette_docs) >= 10 else '⚠️ poche bollette di qualità'}")
+    logger.info(f"{'='*50}")
 
-    print(f"\n✅ Salvate {len(bollette_docs)} bollette:")
+    label = "🔍 DRY-RUN" if dry_run else "✅ Salvate"
+    logger.info(f"{label} {len(bollette_docs)} bollette:")
     for tipo in SECTION_ORDER:
         if tipo in by_tipo:
             quotes = [b["quota_totale"] for b in by_tipo[tipo]]
             n_sel_list = [len(b["selezioni"]) for b in by_tipo[tipo]]
             r_count = sum(1 for b in by_tipo[tipo] if b.get("reasoning", "").startswith("Ricomposta"))
             urna_tag = f" (🔄 {r_count} da urna)" if r_count > 0 else ""
-            print(f"   {tipo.upper()}: {len(by_tipo[tipo])} "
-                  f"— quote: {quotes} — selezioni: {n_sel_list}{urna_tag}")
+            logger.info(f"  {tipo.upper()}: {len(by_tipo[tipo])} "
+                        f"— quote: {quotes} — selezioni: {n_sel_list}{urna_tag}")
+
+    timer.cancel()
 
 
 if __name__ == "__main__":
