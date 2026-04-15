@@ -40,6 +40,7 @@ from run_daily_predictions_engine_c import run_engine_c as run_system_c
 from orchestrate_experts import orchestrate_date as run_orchestrator
 from snapshot_nightly import normalize_match_key, get_all_matches
 from tag_elite import get_matched_patterns
+from tag_mixer import get_matched_mixer_patterns
 
 # Collections
 h2h_collection = db['h2h_by_round']
@@ -518,6 +519,28 @@ def run_full_cycle(date_str, target_date, block_times, run_label):
         if changed_elite:
             unified_collection.update_one({'_id': doc['_id']}, {'$set': {'pronostici': pronostici}})
     print(f"   👑 Elite ri-taggati: {elite_count} pronostici")
+
+    # 1c. Ri-tagging Mixer dopo orchestratore
+    mixer_count = 0
+    mixer_docs = list(unified_collection.find(
+        {'date': date_str, 'match_time': {'$in': effective_times}},
+        {'_id': 1, 'pronostici': 1}
+    ))
+    for doc in mixer_docs:
+        pronostici = doc.get('pronostici', [])
+        changed_mixer = False
+        for p in pronostici:
+            matched = get_matched_mixer_patterns(p)
+            is_mixer = len(matched) > 0
+            if p.get('mixer') != is_mixer or sorted(matched) != sorted(p.get('mixer_patterns', [])):
+                p['mixer'] = is_mixer
+                p['mixer_patterns'] = sorted(matched)
+                changed_mixer = True
+            if is_mixer:
+                mixer_count += 1
+        if changed_mixer:
+            unified_collection.update_one({'_id': doc['_id']}, {'$set': {'pronostici': pronostici}})
+    print(f"   🎛️ Mixer ri-taggati: {mixer_count} pronostici")
 
     # 2. Snapshot + change detection
     all_changes = save_snapshot_and_detect_changes(date_str, block_times, run_label)
