@@ -82,5 +82,18 @@ MIN_SCORE_PER_CATEGORY = {
 
 MIN_SCORE_RECOMPOSE = 4  # Punteggio minimo per urna ricomposizione
 
+# --- MEDIA NORMALIZZATA ---
+MEDIA_NORMALIZZATA_CRITERI = [
+    "stars", "confidence", "punteggio_finale",
+    "coerenza_rapporti", "coeff_direzione",
+    "coeff_qualita_home", "coeff_qualita_away",
+]
+# Cascata: parte da 0.70, scende di 0.005 alla volta fino a 0.50
+# Esempio: 0.70 → 0.695 → 0.69 → 0.685 → ... → 0.50
+MEDIA_NORMALIZZATA_SOGLIA_MAX = 0.70
+MEDIA_NORMALIZZATA_SOGLIA_MIN = 0.50
+MEDIA_NORMALIZZATA_STEP = 0.005
+MEDIA_NORMALIZZATA_MIN_SELEZIONI = 10  # Selezioni minime per provare a comporre
+
 # --- TIMEOUT ---
 SCRIPT_TIMEOUT_MINUTES = 20  # Timeout globale script

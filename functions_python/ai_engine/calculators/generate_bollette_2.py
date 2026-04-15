@@ -60,6 +60,9 @@ from bollette_config import (
     QUOTA_SINGOLA_TOLERANCE, MAX_RETRY_FEEDBACK,
     MIN_SCORE_PER_CATEGORY, MIN_SCORE_RECOMPOSE,
     SCRIPT_TIMEOUT_MINUTES,
+    MEDIA_NORMALIZZATA_CRITERI,
+    MEDIA_NORMALIZZATA_SOGLIA_MAX, MEDIA_NORMALIZZATA_SOGLIA_MIN,
+    MEDIA_NORMALIZZATA_STEP, MEDIA_NORMALIZZATA_MIN_SELEZIONI,
 )
 
 DEBUG_MODE = False  # Attivato con --debug, salva prompt LLM su file
@@ -120,7 +123,17 @@ REGOLE COMPOSIZIONE
 ═══════════════════════════════════════
 
 1. Ogni partita può apparire UNA SOLA VOLTA per bolletta, con UN SOLO mercato
-2. REGOLA CRITICA: la stessa selezione (stessa partita + stesso pronostico) può apparire MASSIMO 1 VOLTA per categoria. Se generi 3 bollette "oggi", una selezione può stare in UNA sola di quelle 3. Stesso per elite, selettiva, bilanciata, ambiziosa. Se ripeti la stessa selezione in 2 bollette della stessa categoria e quella perde, perdi entrambe. DIVERSIFICA
+2. ⚠️⚠️⚠️ REGOLA CRITICA — NO RIPETIZIONI NELLA STESSA SEZIONE ⚠️⚠️⚠️
+   La stessa selezione (stessa partita + stesso pronostico) può apparire MASSIMO 1 VOLTA per categoria.
+   Se generi 3 bollette "oggi", una selezione può stare in UNA sola di quelle 3.
+   Stesso per elite, selettiva, bilanciata, ambiziosa.
+   ESEMPIO VIETATO: Benevento-Cavese (1) nella bolletta Bilanciata #1 E nella bolletta Bilanciata #2 → VIETATO!
+   ESEMPIO PERMESSO: Benevento-Cavese (1) nella Bilanciata #1 E nella Selettiva #2 → OK (sezioni diverse)
+   Se ripeti la stessa selezione in 2 bollette della stessa categoria e quella perde, perdi entrambe. DIVERSIFICA.
+   CONTROLLA ogni bolletta prima di inviarla: ci sono selezioni duplicate nella stessa categoria? Se sì, CAMBIA.
+2b. REGOLA RIPETIZIONI CROSS-SEZIONE: una selezione PUÒ apparire in sezioni diverse, ma se la ripeti tra sezioni
+   scegli SOLO tra quelle con MN (Media Normalizzata) più alta. Le selezioni con MN alta sono le più solide
+   su tutti i fronti — sono quelle che meritano di essere ripetute. NON ripetere mai selezioni con MN bassa
 3. Hai a disposizione partite di oggi, domani e dopodomani. Sei libero di scegliere come combinarle: puoi fare bollette miste o concentrate su un giorno solo. Consiglio: cerca di non mettere TUTTE le partite dello stesso giorno in tutte le bollette, ma segui il tuo istinto da professionista
 4. Obiettivo: fino a {max_bollette} bollette totali, divise in 5 categorie. Genera fino a 3 bollette per categoria, ma se la qualità del pool non è sufficiente puoi generarne meno (anche 0):
 
@@ -312,6 +325,15 @@ REGOLE DI ESCLUSIONE ASSOLUTA (NON USARE MAI):
 - Selezione con C in zona ASSENTE (>70)
 - Selezione con Stelle 2 e Confidence < 60
 - Selezione con pronostico SEGNO X (pareggio) — vietato
+
+MEDIA NORMALIZZATA (MN):
+Ogni selezione ha un valore MN (0.00-1.00) che è la media normalizzata di 7 criteri:
+stelle, confidence, punteggio finale, coerenza rapporti, direzione, qualità casa, qualità trasferta.
+Più alto è MN, più la selezione è solida su TUTTI i fronti (non solo su un criterio).
+- MN >= 0.70: eccellente, dare priorità assoluta
+- MN 0.60-0.70: buona, usare con fiducia
+- MN < 0.60: presente solo se il pool era scarso — usare con cautela
+A parità di altri fattori, preferisci SEMPRE la selezione con MN più alta.
 
 ═══════════════════════════════════════════════════════════════════════════════
 COMBINAZIONI DI ZONE VINCENTI (da cercare prioritariamente)
@@ -621,8 +643,8 @@ def build_pool(today_str, skip_time_filter=False):
 
         for p in doc.get("pronostici", []):
             quota = p.get("quota")
-            if not quota or quota <= 1.0:
-                continue  # Escludi senza quota valida
+            if not quota or quota < 1.30:
+                continue  # Escludi quote sotto 1.30 (floor minimo)
             if p.get("tipo") == "RISULTATO_ESATTO":
                 continue  # RE escluso dalle bollette
 
@@ -1875,6 +1897,61 @@ def calculate_final_score(pool):
     logger.info(f"📊 Punteggio finale calcolato per {calculated}/{len(pool)} selezioni")
 
 
+def calculate_media_normalizzata(pool):
+    """Calcola la media normalizzata (0-1) di 7 criteri per ogni selezione.
+    Min-max normalization per criterio, poi media.
+    Filtro a cascata: parte dalla soglia più alta e scende finché non ha
+    almeno MEDIA_NORMALIZZATA_MIN_POOL selezioni."""
+
+    # 1. Raccogli valori per ogni criterio (solo selezioni con tutti i campi)
+    valid_sels = []
+    for s in pool:
+        vals = {}
+        skip = False
+        for c in MEDIA_NORMALIZZATA_CRITERI:
+            v = s.get(c)
+            if v is None:
+                skip = True
+                break
+            vals[c] = float(v)
+        if not skip:
+            valid_sels.append((s, vals))
+
+    if not valid_sels:
+        logger.warning("⚠️ Nessuna selezione con tutti i criteri per media normalizzata")
+        return
+
+    # 2. Min-max per criterio
+    mins = {}
+    maxs = {}
+    for c in MEDIA_NORMALIZZATA_CRITERI:
+        all_vals = [vals[c] for _, vals in valid_sels]
+        mins[c] = min(all_vals)
+        maxs[c] = max(all_vals)
+
+    # 3. Normalizza e calcola media
+    for s, vals in valid_sels:
+        norm_sum = 0
+        for c in MEDIA_NORMALIZZATA_CRITERI:
+            rng = maxs[c] - mins[c]
+            if rng > 0:
+                norm_sum += (vals[c] - mins[c]) / rng
+            else:
+                norm_sum += 0.5  # tutti uguali → valore neutro
+        s["media_normalizzata"] = round(norm_sum / len(MEDIA_NORMALIZZATA_CRITERI), 4)
+
+    # 4. Log distribuzione (il filtro a cascata avviene nel main)
+    dist = {}
+    for soglia in [0.70, 0.65, 0.60, 0.55, 0.50]:
+        count = sum(1 for s in pool
+                    if s.get("media_normalizzata") is not None
+                    and s["media_normalizzata"] >= soglia)
+        dist[soglia] = count
+    dist_str = " | ".join(f"≥{s}:{c}" for s, c in dist.items())
+
+    logger.info(f"📈 Media normalizzata: {len(valid_sels)} calcolate | {dist_str}")
+
+
 def _format_match_stats(s):
     """Formatta i dati statistici di una selezione per il prompt Mistral."""
     parts = []
@@ -1892,8 +1969,10 @@ def _format_match_stats(s):
             return "ASSENTE"
         punt = s.get("punteggio_finale")
         punt_tag = f" | PUNTEGGIO={punt}" if punt is not None else ""
+        mn = s.get("media_normalizzata")
+        mn_tag = f" | MN={mn:.2f}" if mn is not None else ""
         parts.append(
-            f"    RH={rh:.0f}({_zona(rh)}) RA={ra:.0f}({_zona(ra)}) C={coer:.0f}({_zona(coer)}) | QH={s.get('coeff_qualita_home',0):.0f} QA={s.get('coeff_qualita_away',0):.0f} D={s.get('coeff_direzione',0):.0f}{punt_tag}"
+            f"    RH={rh:.0f}({_zona(rh)}) RA={ra:.0f}({_zona(ra)}) C={coer:.0f}({_zona(coer)}) | QH={s.get('coeff_qualita_home',0):.0f} QA={s.get('coeff_qualita_away',0):.0f} D={s.get('coeff_direzione',0):.0f}{punt_tag}{mn_tag}"
         )
 
     # Classifica totale
@@ -2148,19 +2227,6 @@ def _call_llm_with_fallback(messages):
             logger.warning(f" DeepSeek fallito ({e}), fallback su Mistral...")
             return _call_llm(messages, MISTRAL_URL, MISTRAL_MODEL, MISTRAL_API_KEY)
         raise
-
-
-def call_mistral(pool_text, today_str):
-    """Chiama LLM per generare le bollette."""
-    prompt = SYSTEM_PROMPT.replace("{max_bollette}", str(MAX_BOLLETTE)).replace("{today_date}", today_str)
-
-    messages = [
-        {"role": "system", "content": prompt},
-        {"role": "user", "content": f"Ecco il pool di selezioni disponibili:\n{pool_text}\n\nComponi le bollette."},
-    ]
-
-    content = _call_llm_with_fallback(messages)
-    return _sanitize_and_parse_json(content)
 
 
 def _classify_tipo(raw_tipo, selezioni, quota_totale, pool_index, today_str):
@@ -2474,7 +2540,14 @@ def validate_with_errors(raw_bollette, pool, today_str, existing_counters=None, 
     # --- Post-loop: #14 selezione max 1 volta per sezione ---
     # Scarta bollette che ripetono una selezione già presente in un'altra bolletta della stessa sezione
     filtered_docs = []
+    # Pre-popola con selezioni dalle bollette già accettate (sezioni precedenti + retry precedenti)
     used_sels = {}  # tipo -> set di selezioni già usate
+    for existing_doc in _all_accepted:
+        t = existing_doc.get("tipo", "")
+        if t not in used_sels:
+            used_sels[t] = set()
+        for s in existing_doc.get("selezioni", []):
+            used_sels[t].add(f"{s['home']} vs {s['away']}|{s['match_date']}|{s['mercato']}:{s['pronostico']}")
     for doc in valid_docs:
         tipo = doc.get("tipo", "")
         if tipo not in used_sels:
@@ -2690,37 +2763,40 @@ def call_mistral_integration(pool, fascia, count_needed, today_str, extra_contex
             val = min_s
     div_text = ", ".join(f"Bolletta {i+1}: {n} selezioni" for i, n in enumerate(div_seq))
 
-    prompt = f"""Sei un analista dati sportivo. I pronostici sono già decisi dall'AI. Analizza i dati statistici e componi esattamente {count_needed} bollette di tipo "{fascia}".
-{quota_rule}
+    # Usa il SYSTEM_PROMPT completo (con guida RH/RA/C, mentalità scommettitore, vincoli soft, ecc.)
+    system_prompt = SYSTEM_PROMPT.replace("{max_bollette}", str(MAX_BOLLETTE)).replace("{today_date}", today_str)
 
-REGOLE:
-1. Ogni partita UNA SOLA VOLTA per bolletta, con UN SOLO mercato
+    # Istruzioni specifiche per questa fascia nel messaggio user
+    fascia_instructions = f"""⚠️ ISTRUZIONI SPECIFICHE PER QUESTA CHIAMATA:
+Genera esattamente {count_needed} bollette di tipo "{fascia}".
+
+REGOLE FASCIA {fascia.upper()}:
+1. {quota_rule}
 2. {sel_rule}
 3. {quota_singola_rule}
-4. Le selezioni con _extra_pool=true sono partite fuori dal sistema AI — usale se servono
-5. ⚠️ OBBLIGATORIO: almeno 1 selezione con data {today_str} in ogni bolletta (escluso elite)
-6. Diversifica il numero di selezioni tra bollette: {div_text}
-7. ⚠️ CRITICO: NON ripetere la stessa selezione in più bollette! Ogni selezione può apparire in UNA SOLA bolletta. Se la ripeti e perde, perdi tutte le bollette
-8. Restituisci SOLO un array JSON valido. Nessun testo prima o dopo
+4. Diversifica il numero di selezioni: {div_text}
+5. ⚠️ CRITICO: NON ripetere la stessa selezione in più bollette!
+6. Restituisci SOLO un array JSON valido. Nessun testo prima o dopo
 
+Formato output:
 [
   {{
     "tipo": "{fascia}",
     "selezioni": [
       {{ "match_key": "Home vs Away|YYYY-MM-DD", "mercato": "SEGNO", "pronostico": "1" }}
     ],
-    "reasoning": "Cita i dati statistici che ti hanno convinto (forma, trend, affidabilità, classifica)"
+    "reasoning": "Cita RH, RA, C, forma, trend, affidabilità, classifica"
   }}
 ]
 
 match_key, mercato e pronostico devono corrispondere ESATTAMENTE al pool."""
 
     if extra_context:
-        prompt += f"\n\n⚠️ ATTENZIONE — ERRORI PRECEDENTI:\n{extra_context}"
+        fascia_instructions += f"\n\n⚠️ ATTENZIONE — ERRORI PRECEDENTI:\n{extra_context}"
 
     messages = [
-        {"role": "system", "content": prompt},
-        {"role": "user", "content": f"Pool disponibile:\n{pool_text}\n\nComponi {count_needed} bollette {fascia}."},
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": f"{fascia_instructions}\n\nPool disponibile:\n{pool_text}"},
     ]
 
     content = _call_llm_with_fallback(messages)
@@ -3235,11 +3311,37 @@ def main():
     # 1e. Calcola punteggio finale per ogni selezione (Passo 1 + Passo 2)
     calculate_final_score(pool)
 
+    # 1f. Calcola media normalizzata e filtra sotto soglia
+    calculate_media_normalizzata(pool)
+
     if len(pool) < 2:
         logger.warning(" Pool troppo piccolo (< 2 selezioni). Nessuna bolletta generata.")
         return
 
-    # 2. Generazione sequenziale per sezione
+    # 2. Cascata media normalizzata: Python sceglie la soglia, poi Mistral compone
+    #    Parte da 0.70, scende di 0.005 alla volta fino a 0.50
+    #    Si ferma alla prima soglia che ha almeno MIN_SELEZIONI nel pool
+    soglia = MEDIA_NORMALIZZATA_SOGLIA_MAX
+    chosen_soglia = MEDIA_NORMALIZZATA_SOGLIA_MIN  # fallback
+    while soglia >= MEDIA_NORMALIZZATA_SOGLIA_MIN - 0.001:  # epsilon per float
+        count = sum(1 for s in pool
+                    if s.get("media_normalizzata") is not None
+                    and s["media_normalizzata"] >= soglia)
+        if count >= MEDIA_NORMALIZZATA_MIN_SELEZIONI:
+            chosen_soglia = soglia
+            break
+        soglia = round(soglia - MEDIA_NORMALIZZATA_STEP, 3)
+
+    # Filtra pool alla soglia scelta (escluse anche quelle senza MN — dati insufficienti)
+    pool_before_mn = len(pool)
+    filtered_pool = [s for s in pool
+                     if s.get("media_normalizzata") is not None
+                     and s["media_normalizzata"] >= chosen_soglia]
+    mn_excluded = pool_before_mn - len(filtered_pool)
+    logger.info(f"🎯 Cascata MN: soglia scelta = {chosen_soglia:.3f} → "
+                f"{len(filtered_pool)} selezioni nel pool, {mn_excluded} escluse")
+
+    # Generazione sequenziale per sezione con pool filtrato
     bollette_docs = []
     counters = {"oggi": 0, "elite": 0, "selettiva": 0, "bilanciata": 0, "ambiziosa": 0}
     all_discarded_sels = []
@@ -3251,7 +3353,7 @@ def main():
         logger.info(f"{'─'*50}")
 
         new_bollette, discarded = _generate_for_section(
-            fascia, target, pool, today_str, bollette_docs, counters
+            fascia, target, filtered_pool, today_str, bollette_docs, counters
         )
 
         if new_bollette:
@@ -3280,7 +3382,7 @@ def main():
         logger.info(f"{'─'*50}")
 
         recomposed = _recompose_from_discards(
-            all_discarded_sels, pool, today_str, bollette_docs, counters
+            all_discarded_sels, filtered_pool, today_str, bollette_docs, counters
         )
 
         if recomposed:
