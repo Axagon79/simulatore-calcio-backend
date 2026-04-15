@@ -66,11 +66,15 @@ classifiche_cache = enrich_pool_with_stats(pool)
 calculate_solidity_coefficient(pool, classifiche_cache)
 
 # Filtra solo quelli calcolati
-calcolati = [s for s in pool if s.get("coeff_qualita") is not None]
-print(f"Calcolati: {calcolati_n}/{len(pool)}\n" if (calcolati_n := len(calcolati)) else "")
+calcolati = [s for s in pool if s.get("rapporto_home") is not None]
+print(f"Calcolati: {len(calcolati)}/{len(pool)}\n")
 
-qs = sorted([s["coeff_qualita"] for s in calcolati])
+qhs = sorted([s["coeff_qualita_home"] for s in calcolati])
+qas = sorted([s["coeff_qualita_away"] for s in calcolati])
 ds = sorted([s["coeff_direzione"] for s in calcolati])
+rhs = sorted([s["rapporto_home"] for s in calcolati])
+ras = sorted([s["rapporto_away"] for s in calcolati])
+coer = sorted([s["coerenza_rapporti"] for s in calcolati])
 
 def stats(vals, label):
     n = len(vals)
@@ -89,35 +93,23 @@ def stats(vals, label):
 
     # Distribuzione a fasce di 10
     print(f"\n  Distribuzione:")
-    for lo in range(0, 100, 10):
+    for lo in range(0, 200, 10):
         hi = lo + 10
         cnt = sum(1 for v in vals if lo <= v < hi)
-        bar = '#' * cnt
-        print(f"  {lo:3d}-{hi:3d}: {cnt:3d} {bar}")
+        if cnt > 0:
+            bar = '#' * min(cnt, 80)
+            print(f"  {lo:3d}-{hi:3d}: {cnt:3d} {bar}")
 
-stats(qs, "QUALITA (Q)")
+stats(qhs, "QUALITA HOME (Q_H)")
+stats(qas, "QUALITA AWAY (Q_A)")
 stats(ds, "DIREZIONE (D)")
+stats(rhs, "RAPPORTO HOME (D/Q_H)")
+stats(ras, "RAPPORTO AWAY (D/Q_A)")
+stats(coer, "COERENZA (100=vicini, 0=opposti)")
 
-# Matrice Q x D (fasce da 20)
-print(f"\n{'='*60}")
-print(f"  MATRICE Q x D (fasce da 20)")
-print(f"{'='*60}")
-fasce = [(0, 20), (20, 40), (40, 60), (60, 80), (80, 100)]
-labels = ["0-20", "20-40", "40-60", "60-80", "80-100"]
-print(f"  {'Q \\ D':>10s}", end="")
-for lb in labels:
-    print(f" {lb:>7s}", end="")
-print()
-for qi, (q_lo, q_hi) in enumerate(fasce):
-    print(f"  {labels[qi]:>10s}", end="")
-    for di, (d_lo, d_hi) in enumerate(fasce):
-        cnt = sum(1 for s in calcolati if q_lo <= s["coeff_qualita"] < q_hi and d_lo <= s["coeff_direzione"] < d_hi)
-        print(f" {cnt:7d}", end="")
-    print()
-
-# Lista completa ordinata per Q
-print(f"\n{'='*60}")
-print(f"  LISTA COMPLETA (ordinata per Q)")
-print(f"{'='*60}")
-for i, s in enumerate(sorted(calcolati, key=lambda x: x["coeff_qualita"], reverse=True)):
-    print(f"  {i+1:3d}. Q:{s['coeff_qualita']:5.1f} D:{s['coeff_direzione']:5.1f} | {s['home']:20s} vs {s['away']:20s} | {s['mercato']}: {s['pronostico']} @ {s['quota']}")
+# Lista top 40 ordinata per rapporto_home
+print(f"\n{'='*80}")
+print(f"  TOP 40 per RAPPORTO HOME")
+print(f"{'='*80}")
+for i, s in enumerate(sorted(calcolati, key=lambda x: x["rapporto_home"], reverse=True)[:40]):
+    print(f"  {i+1:3d}. RH:{s['rapporto_home']:5.1f} RA:{s['rapporto_away']:5.1f} C:{s['coerenza_rapporti']:5.1f} | QH:{s['coeff_qualita_home']:5.1f} QA:{s['coeff_qualita_away']:5.1f} D:{s['coeff_direzione']:5.1f} | {s['home']:18s} vs {s['away']:18s} | {s['mercato']}: {s['pronostico']} @ {s['quota']}")

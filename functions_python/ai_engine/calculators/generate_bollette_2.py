@@ -205,7 +205,7 @@ REGOLE COMPOSIZIONE
    CONTROLLA ogni bolletta prima di inviarla: c'è almeno 1 selezione con data {today_date}? Se no, aggiungila.
 8. Non creare bollette con una sola selezione — almeno 2 selezioni per bolletta (selettiva: 2-5, bilanciata: 2-7, ambiziosa: 4-8)
 9. Rispetta SEMPRE i limiti di quota per singola selezione indicati sopra. Se una selezione ha quota troppo alta per quella categoria, NON usarla in quella bolletta
-10. Per ogni bolletta, scrivi una motivazione di 2 righe nel campo "reasoning" che spiega PERCHÉ hai scelto quelle selezioni. Cita Q, D e i dati statistici chiave (forma, classifica, trend). Esempio: "Fiorentina Q=68 D=72 — 5° in casa, forma 65%, trend in salita. Benevento Q=62 D=64 — 4 vittorie consecutive, affidabilità 8.2/10". NO frasi generiche tipo "combinazione sicura" o "favorite nette"
+10. Per ogni bolletta, scrivi una motivazione di 2 righe nel campo "reasoning" che spiega PERCHÉ hai scelto quelle selezioni. Cita RH, RA, C e i dati statistici chiave (forma, classifica, trend). Esempio: "Fiorentina RH=65 RA=58 C=72 — 5° in casa, forma 65%, trend in salita. Benevento RH=45 RA=52 C=68 — 4 vittorie consecutive, affidabilità 8.2/10". NO frasi generiche tipo "combinazione sicura" o "favorite nette"
 11. Cerca di variare il numero di selezioni tra le bollette della stessa categoria, non mettere sempre lo stesso numero
 12. ⚠️ DIVERSIFICAZIONE OBBLIGATORIA DEL NUMERO DI SELEZIONI ⚠️
    NON fare bollette con lo stesso numero di selezioni nella stessa categoria. Segui questi schemi:
@@ -220,20 +220,30 @@ REGOLE COMPOSIZIONE
 DATI STATISTICI — COME LEGGERLI E USARLI
 ═══════════════════════════════════════
 
-Ogni selezione ha due indicatori sintetici calcolati dal sistema:
+Ogni selezione ha TRE indicatori sintetici calcolati dal sistema:
 
-📐 **Q (Qualità)** (0-100): misura quanto sono SOLIDI e ABBONDANTI i dati statistici disponibili per questa partita. Q alto = tanti dati affidabili su cui basarsi. Q basso = pochi dati o dati incoerenti → selezione rischiosa perché non hai informazioni su cui fare affidamento.
+🏠 **RH (Rapporto Casa)** (0-100): quanto la direzione dei dati supporta la forza della squadra di CASA. RH alto = la squadra di casa è forte E i dati confermano quella forza nella direzione del pronostico. RH basso = la squadra è forte ma i dati non la supportano, oppure è debole.
 
-🧭 **D (Direzione)** (0-100): misura quanto i dati statistici SUPPORTANO lo specifico pronostico. D alto = tutti i segnali puntano nella stessa direzione del pronostico. D basso = i dati contraddicono il pronostico o sono neutrali.
+✈️ **RA (Rapporto Trasferta)** (0-100): quanto la direzione dei dati supporta la forza della squadra in TRASFERTA. Stessa logica di RH ma per la squadra ospite.
 
-COME USARE Q e D:
-- Q≥60 e D≥60 = selezione FORTE — dati solidi che confermano il pronostico. Ideale per bollette selettive
-- Q≥60 e D<50 = ATTENZIONE — dati solidi ma NON supportano il pronostico. Evita nelle selettive
-- Q<45 e D≥60 = RISCHIO — la direzione è giusta ma i dati sono pochi/deboli. Accettabile nelle ambiziose
-- Q<45 e D<45 = selezione DEBOLE — pochi dati e pure contrastanti. Evita o usa solo come riempitivo
-- Nelle bollette SELETTIVE: preferisci Q≥55 e D≥55
-- Nelle bollette AMBIZIOSE: puoi accettare Q più basso ma D dovrebbe essere ≥50
-- NON mettere troppe selezioni con Q<50 nella stessa bolletta
+🔗 **C (Coerenza)** (0-100): quanto i due rapporti sono d'accordo tra loro. C alto = entrambe le squadre confermano la stessa direzione. C basso = i dati delle due squadre si contraddicono o non supportano il pronostico.
+
+ZONE (6 livelli, uguali per RH, RA e C):
+- VERDE SCURO (>70): segnale fortissimo
+- VERDE (55-70): segnale forte
+- GIALLA (40-55): nella media
+- ARANCIONE (25-40): sotto la media
+- ROSSA (10-25): segnale debole
+- NERA (<10): segnale assente o contrario
+
+COME USARE RH, RA e C:
+- RH e RA entrambi VERDI + C VERDE = selezione TOP — entrambe le squadre confermano il pronostico. Ideale per selettive
+- RH VERDE + RA ARANCIONE + C bassa = la casa supporta ma la trasferta no — selezione rischiosa
+- RH e RA entrambi ROSSI = evitare, i dati non supportano il pronostico per nessuna delle due squadre
+- C alta ma RH e RA bassi = le squadre sono d'accordo nel NON supportare il pronostico — PEGGIO, non meglio
+- Nelle bollette SELETTIVE: preferisci RH e RA ≥ GIALLA e C ≥ GIALLA
+- Nelle bollette AMBIZIOSE: puoi accettare RH o RA più bassi ma C dovrebbe essere ≥ ARANCIONE
+- NON mettere troppe selezioni con RH o RA ROSSI nella stessa bolletta
 
 Ogni partita nel pool ha anche dati statistici dettagliati sotto le selezioni. Usali per fare scelte INFORMATE, non alla cieca:
 
@@ -998,8 +1008,12 @@ def calculate_solidity_coefficient(pool, classifiche_cache=None):
         pronostico = s.get("pronostico", "")
 
         if not ch or not ca:
-            s["coeff_qualita"] = None
+            s["coeff_qualita_home"] = None
+            s["coeff_qualita_away"] = None
             s["coeff_direzione"] = None
+            s["rapporto_home"] = None
+            s["rapporto_away"] = None
+            s["coerenza_rapporti"] = None
             continue
 
         # Struttura per squadra: {componente: {home: {score, dir}, away: {score, dir}}}
@@ -1439,24 +1453,27 @@ def calculate_solidity_coefficient(pool, classifiche_cache=None):
             "away": {"score": round(val_dna_a, 1), "dir": round(dir_val_a, 1)},
         }
 
-        # === CALCOLO FINALE: DUE COEFFICIENTI SEPARATI ===
+        # === CALCOLO FINALE: Q separato per squadra + D unico + rapporti ===
         peso_strisce_val = 5
 
-        # 1. COEFFICIENTE QUALITÀ: media pesata degli score
-        somma_score = 0
+        # 1. QUALITÀ HOME: media pesata degli score home
+        somma_qh = 0
+        somma_qa = 0
         somma_pesi_max = 0
         for comp_name in PESI:
             peso = PESI[comp_name]
             c = componenti.get(comp_name, {"home": {"score": 50}, "away": {"score": 50}})
-            avg_score = (c["home"]["score"] + c["away"]["score"]) / 2
-            somma_score += avg_score * peso
+            somma_qh += c["home"]["score"] * peso
+            somma_qa += c["away"]["score"] * peso
             somma_pesi_max += 100 * peso
         c_str = componenti.get("strisce", {"home": {"score": 50}, "away": {"score": 50}})
-        somma_score += ((c_str["home"]["score"] + c_str["away"]["score"]) / 2) * peso_strisce_val
+        somma_qh += c_str["home"]["score"] * peso_strisce_val
+        somma_qa += c_str["away"]["score"] * peso_strisce_val
         somma_pesi_max += 100 * peso_strisce_val
-        coeff_qualita = (somma_score / somma_pesi_max) * 100 if somma_pesi_max > 0 else 50
+        q_home = (somma_qh / somma_pesi_max) * 100 if somma_pesi_max > 0 else 50
+        q_away = (somma_qa / somma_pesi_max) * 100 if somma_pesi_max > 0 else 50
 
-        # 2. COEFFICIENTE DIREZIONE: media pesata delle direzioni
+        # 2. DIREZIONE: media pesata delle direzioni (unico)
         somma_dir = 0
         dir_pesi_tot = 0
         for comp_name in PESI:
@@ -1470,8 +1487,30 @@ def calculate_solidity_coefficient(pool, classifiche_cache=None):
         dir_pesi_tot += peso_strisce_val
         coeff_direzione = (somma_dir / dir_pesi_tot) if dir_pesi_tot > 0 else 50
 
-        s["coeff_qualita"] = round(coeff_qualita, 1)
+        # 3. RAPPORTI: quanto la direzione supporta la forza di ogni squadra
+        # Normalizzati 0-100 (range reale ~60-200)
+        rh_raw = coeff_direzione / max(q_home, 1) * 100
+        ra_raw = coeff_direzione / max(q_away, 1) * 100
+        rapporto_home = round(min(100, max(0, (rh_raw - 60) / 140 * 100)), 1)
+        rapporto_away = round(min(100, max(0, (ra_raw - 60) / 140 * 100)), 1)
+
+        # 4. COERENZA: combinazione scostamento dal centro + distanza tra i due
+        # Scostamento dal centro (50): sotto 50 = negativo, sopra 50 = positivo
+        scost_h = rapporto_home - 50
+        scost_a = rapporto_away - 50
+        scost_totale = scost_h + scost_a  # positivo se entrambi sopra, negativo se entrambi sotto
+        distanza = abs(rapporto_home - rapporto_away)
+        # Sopra 50: scostamento si sottrae (migliora). Sotto 50: si somma (peggiora)
+        penalita = distanza - scost_totale
+        # Range: -100 (migliore) a +200 (peggiore). Normalizzo 0-100
+        coerenza = round(100 - (penalita + 100) / 300 * 100, 1)
+
+        s["coeff_qualita_home"] = round(q_home, 1)
+        s["coeff_qualita_away"] = round(q_away, 1)
         s["coeff_direzione"] = round(coeff_direzione, 1)
+        s["rapporto_home"] = rapporto_home
+        s["rapporto_away"] = rapporto_away
+        s["coerenza_rapporti"] = coerenza
         s["coeff_componenti"] = componenti
         s["coeff_contesto"] = {
             "mercato_type": mercato_type,
@@ -1486,18 +1525,20 @@ def _format_match_stats(s):
     """Formatta i dati statistici di una selezione per il prompt Mistral."""
     parts = []
 
-    # Coefficiente Qualità + Direzione (con dettaglio per squadra)
-    cq = s.get("coeff_qualita")
-    cd = s.get("coeff_direzione")
-    if cq is not None:
-        comp = s.get("coeff_componenti", {})
-        ctx = s.get("coeff_contesto", {})
-        comp_str = " | ".join(
-            f"{k}:H{c['home']['score']:.0f}/{c['home']['dir']:.0f} A{c['away']['score']:.0f}/{c['away']['dir']:.0f}"
-            for k, c in comp.items()
-        )
+    # Rapporti + Coerenza
+    rh = s.get("rapporto_home")
+    ra = s.get("rapporto_away")
+    coer = s.get("coerenza_rapporti")
+    if rh is not None:
+        def _zona(v):
+            if v > 70: return "VERDE_SCURO"
+            if v > 55: return "VERDE"
+            if v > 40: return "GIALLA"
+            if v > 25: return "ARANCIONE"
+            if v > 10: return "ROSSA"
+            return "NERA"
         parts.append(
-            f"    QUALITA: {cq}/100 | DIREZIONE: {cd}/100 [{comp_str}]"
+            f"    RH={rh:.0f}({_zona(rh)}) RA={ra:.0f}({_zona(ra)}) C={coer:.0f}({_zona(coer)}) | QH={s.get('coeff_qualita_home',0):.0f} QA={s.get('coeff_qualita_away',0):.0f} D={s.get('coeff_direzione',0):.0f}"
         )
 
     # Classifica totale
@@ -1642,9 +1683,10 @@ def serialize_pool_for_prompt(pool):
                 # Selezioni della partita
                 for s in sels:
                     elite_tag = " ★ELITE" if show_elite_tag and s.get("elite") else ""
-                    cq = s.get("coeff_qualita")
-                    cd = s.get("coeff_direzione")
-                    coeff_tag = f" | Q={cq} D={cd}" if cq is not None else ""
+                    rh = s.get("rapporto_home")
+                    ra = s.get("rapporto_away")
+                    coer = s.get("coerenza_rapporti")
+                    coeff_tag = f" | RH={rh} RA={ra} C={coer}" if rh is not None else ""
                     lines.append(
                         f"  {s['match_key']} | {s['mercato']}: {s['pronostico']} "
                         f"@ {s['quota']} | conf={s['confidence']} ★{s['stars']}{elite_tag}{coeff_tag}"
