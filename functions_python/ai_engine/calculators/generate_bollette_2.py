@@ -228,22 +228,18 @@ Ogni selezione ha TRE indicatori sintetici calcolati dal sistema:
 
 🔗 **C (Coerenza)** (0-100): quanto i due rapporti sono d'accordo tra loro. C alto = entrambe le squadre confermano la stessa direzione. C basso = i dati delle due squadre si contraddicono o non supportano il pronostico.
 
-ZONE (6 livelli, uguali per RH, RA e C):
-- VERDE SCURO (>70): segnale fortissimo
-- VERDE (55-70): segnale forte
-- GIALLA (40-55): nella media
-- ARANCIONE (25-40): sotto la media
-- ROSSA (10-25): segnale debole
-- NERA (<10): segnale assente o contrario
+ZONE (5 livelli a CAMPANA — il centro è l'ottimale, gli estremi sono peggiori):
+- ASSENTE (>70 o <10): coerenza assente — estremo, segnale inaffidabile
+- DEBOLE (50-70 o 10-30): coerenza debole — sopra o sotto l'ottimale
+- OTTIMALE (30-50): coerenza ottimale — massima affidabilità (HR ~59% RH, ~54% RA, ~53% C)
 
 COME USARE RH, RA e C:
-- RH e RA entrambi VERDI + C VERDE = selezione TOP — entrambe le squadre confermano il pronostico. Ideale per selettive
-- RH VERDE + RA ARANCIONE + C bassa = la casa supporta ma la trasferta no — selezione rischiosa
-- RH e RA entrambi ROSSI = evitare, i dati non supportano il pronostico per nessuna delle due squadre
-- C alta ma RH e RA bassi = le squadre sono d'accordo nel NON supportare il pronostico — PEGGIO, non meglio
-- Nelle bollette SELETTIVE: preferisci RH e RA ≥ GIALLA e C ≥ GIALLA
-- Nelle bollette AMBIZIOSE: puoi accettare RH o RA più bassi ma C dovrebbe essere ≥ ARANCIONE
-- NON mettere troppe selezioni con RH o RA ROSSI nella stessa bolletta
+- RH e RA entrambi OTTIMALI + C OTTIMALE = selezione TOP — massima affidabilità su tutti e tre i valori
+- I valori OTTIMALI (30-50) hanno il miglior tasso di successo storico. NON è vero che "più alto = meglio"
+- ASSENTE agli estremi (sia <10 che >70) = segnale inaffidabile, evitare
+- DEBOLE (10-30 o 50-70) = accettabile ma non ideale
+- Nelle bollette SELETTIVE: preferisci RH e RA in zona OTTIMALE
+- NON mettere troppe selezioni con zona ASSENTE nella stessa bolletta
 
 Ogni partita nel pool ha anche dati statistici dettagliati sotto le selezioni. Usali per fare scelte INFORMATE, non alla cieca:
 
@@ -1531,12 +1527,11 @@ def _format_match_stats(s):
     coer = s.get("coerenza_rapporti")
     if rh is not None:
         def _zona(v):
-            if v > 70: return "VERDE_SCURO"
-            if v > 55: return "VERDE"
-            if v > 40: return "GIALLA"
-            if v > 25: return "ARANCIONE"
-            if v > 10: return "ROSSA"
-            return "NERA"
+            if v >= 70: return "ASSENTE"
+            if v >= 50: return "DEBOLE"
+            if v >= 30: return "OTTIMALE"
+            if v >= 10: return "DEBOLE"
+            return "ASSENTE"
         parts.append(
             f"    RH={rh:.0f}({_zona(rh)}) RA={ra:.0f}({_zona(ra)}) C={coer:.0f}({_zona(coer)}) | QH={s.get('coeff_qualita_home',0):.0f} QA={s.get('coeff_qualita_away',0):.0f} D={s.get('coeff_direzione',0):.0f}"
         )
