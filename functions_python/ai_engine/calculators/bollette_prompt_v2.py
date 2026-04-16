@@ -447,3 +447,14 @@ Pool di 4 selezioni:
 ]
 
 """
+
+
+USER_PROMPT_V2 = """Ecco il pool di partite disponibili con tutti i dati sportivi. Analizzalo e genera i biglietti che ritieni vincenti.
+
+Varia il numero di selezioni tra i biglietti: alcuni da 2, alcuni da 3, alcuni da 4, alcuni da 5 o più. Non generare tutti i biglietti con lo stesso numero di selezioni.
+
+Cerca di sfruttare tutte le partite del pool: se ad esempio hai 20 partite a disposizione, non usare sempre le stesse. Distribuisci le partite tra i vari biglietti.
+
+Pool:
+{pool_text}
+"""
