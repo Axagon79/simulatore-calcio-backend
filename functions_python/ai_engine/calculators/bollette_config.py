@@ -4,9 +4,12 @@ Configurazione centralizzata per generate_bollette_2.py
 Tutti i parametri modificabili in un unico posto.
 """
 
+# --- PROMPT ---
+PROMPT_VERSION = "v2"  # "v1" = prompt originale, "v2" = prompt riscritto (Mistral-optimized)
+
 # --- LLM ---
-OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
-OPENROUTER_MODEL = "deepseek/deepseek-r1"
+DEEPSEEK_URL = "https://api.deepseek.com/chat/completions"
+DEEPSEEK_MODEL = "deepseek-chat"
 
 MISTRAL_URL = "https://api.mistral.ai/v1/chat/completions"
 MISTRAL_MODEL = "mistral-medium-2508"
@@ -93,7 +96,7 @@ MEDIA_NORMALIZZATA_CRITERI = [
 MEDIA_NORMALIZZATA_SOGLIA_MAX = 0.70
 MEDIA_NORMALIZZATA_SOGLIA_MIN = 0.50
 MEDIA_NORMALIZZATA_STEP = 0.005
-MEDIA_NORMALIZZATA_MIN_SELEZIONI = 10  # Selezioni minime per provare a comporre
+MEDIA_NORMALIZZATA_MIN_SELEZIONI = 30  # Selezioni minime per provare a comporre
 
 # --- TIMEOUT ---
 SCRIPT_TIMEOUT_MINUTES = 20  # Timeout globale script

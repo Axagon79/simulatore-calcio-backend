@@ -54,7 +54,8 @@ except ImportError:
     sys.exit(1)
 
 from bollette_config import (
-    OPENROUTER_URL, OPENROUTER_MODEL, MISTRAL_URL, MISTRAL_MODEL,
+    PROMPT_VERSION,
+    DEEPSEEK_URL, DEEPSEEK_MODEL, MISTRAL_URL, MISTRAL_MODEL,
     MAX_BOLLETTE, FASCE, CATEGORY_CONSTRAINTS, SECTION_ORDER, SECTION_TARGETS,
     QUOTA_TOTALE_TOLERANCE_UP, QUOTA_TOTALE_TOLERANCE_DOWN,
     QUOTA_SINGOLA_TOLERANCE, MAX_RETRY_FEEDBACK,
@@ -64,39 +65,40 @@ from bollette_config import (
     MEDIA_NORMALIZZATA_SOGLIA_MAX, MEDIA_NORMALIZZATA_SOGLIA_MIN,
     MEDIA_NORMALIZZATA_STEP, MEDIA_NORMALIZZATA_MIN_SELEZIONI,
 )
+from bollette_prompt_v2 import SYSTEM_PROMPT_V2, USER_PROMPT_V2
 
 DEBUG_MODE = False  # Attivato con --debug, salva prompt LLM su file
 
-# --- CONFIGURAZIONE LLM (DeepSeek R1 via OpenRouter + fallback Mistral) ---
-OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY")
+# --- CONFIGURAZIONE LLM (DeepSeek V3.2 diretto + fallback Mistral) ---
+DEEPSEEK_API_KEY = os.environ.get("DEEPSEEK_API_KEY")
 MISTRAL_API_KEY = os.environ.get("MISTRAL_API_KEY")
 
 # Carica da .env se non in ambiente
-if not OPENROUTER_API_KEY or not MISTRAL_API_KEY:
+if not DEEPSEEK_API_KEY or not MISTRAL_API_KEY:
     try:
         from dotenv import load_dotenv
         load_dotenv(os.path.join(current_path, '.env'))
-        OPENROUTER_API_KEY = OPENROUTER_API_KEY or os.environ.get("OPENROUTER_API_KEY")
+        DEEPSEEK_API_KEY = DEEPSEEK_API_KEY or os.environ.get("DEEPSEEK_API_KEY")
         MISTRAL_API_KEY = MISTRAL_API_KEY or os.environ.get("MISTRAL_API_KEY")
-        if not OPENROUTER_API_KEY or not MISTRAL_API_KEY:
+        if not DEEPSEEK_API_KEY or not MISTRAL_API_KEY:
             root_env = os.path.join(current_path, '..', '..', '.env')
             load_dotenv(os.path.abspath(root_env))
-            OPENROUTER_API_KEY = OPENROUTER_API_KEY or os.environ.get("OPENROUTER_API_KEY")
+            DEEPSEEK_API_KEY = DEEPSEEK_API_KEY or os.environ.get("DEEPSEEK_API_KEY")
             MISTRAL_API_KEY = MISTRAL_API_KEY or os.environ.get("MISTRAL_API_KEY")
     except ImportError:
         pass
 
 # Almeno un provider deve essere disponibile
-if not OPENROUTER_API_KEY and not MISTRAL_API_KEY:
-    logger.error("Nessuna API key trovata (OPENROUTER_API_KEY o MISTRAL_API_KEY)!")
+if not DEEPSEEK_API_KEY and not MISTRAL_API_KEY:
+    logger.error("Nessuna API key trovata (DEEPSEEK_API_KEY o MISTRAL_API_KEY)!")
     sys.exit(1)
 
-# Provider attivo
-if OPENROUTER_API_KEY:
-    LLM_URL = OPENROUTER_URL
-    LLM_MODEL = OPENROUTER_MODEL
-    LLM_API_KEY = OPENROUTER_API_KEY
-    LLM_PROVIDER = "DeepSeek R1 (OpenRouter)"
+# Provider attivo: DeepSeek R1 primario, Mistral fallback
+if DEEPSEEK_API_KEY:
+    LLM_URL = DEEPSEEK_URL
+    LLM_MODEL = DEEPSEEK_MODEL
+    LLM_API_KEY = DEEPSEEK_API_KEY
+    LLM_PROVIDER = "DeepSeek V3.2 (diretto)"
 else:
     LLM_URL = MISTRAL_URL
     LLM_MODEL = MISTRAL_MODEL
@@ -326,14 +328,22 @@ REGOLE DI ESCLUSIONE ASSOLUTA (NON USARE MAI):
 - Selezione con Stelle 2 e Confidence < 60
 - Selezione con pronostico SEGNO X (pareggio) — vietato
 
-MEDIA NORMALIZZATA (MN):
+MEDIA NORMALIZZATA (MN) E BLOCCHI DI QUALITÀ:
 Ogni selezione ha un valore MN (0.00-1.00) che è la media normalizzata di 7 criteri:
 stelle, confidence, punteggio finale, coerenza rapporti, direzione, qualità casa, qualità trasferta.
 Più alto è MN, più la selezione è solida su TUTTI i fronti (non solo su un criterio).
-- MN >= 0.70: eccellente, dare priorità assoluta
-- MN 0.60-0.70: buona, usare con fiducia
-- MN < 0.60: presente solo se il pool era scarso — usare con cautela
-A parità di altri fattori, preferisci SEMPRE la selezione con MN più alta.
+
+Il pool è diviso in 5 BLOCCHI ordinati per qualità:
+  🏆 BLOCCO 1 — Selezioni Premium (MN ≥ 0.70): le migliori in assoluto, USA PRIMA QUESTE
+  🥇 BLOCCO 2 — Selezioni di Qualità (MN ≥ 0.65): alta qualità, usa se il Blocco 1 non basta
+  🥈 BLOCCO 3 — Selezioni Solide (MN ≥ 0.60): buone e affidabili, usa se i Blocchi 1-2 non bastano
+  🥉 BLOCCO 4 — Selezioni di Completamento (MN ≥ 0.55): per completare i biglietti se servono altre selezioni
+  📋 BLOCCO 5 — Selezioni di Riserva (MN ≥ 0.50): solo se mancano selezioni dai blocchi superiori
+
+Le selezioni sono ordinate dalla migliore alla peggiore per MN e raggruppate in blocchi.
+Le selezioni nei blocchi più alti sono statisticamente più solide, ma sei LIBERO di scegliere
+quelle che ritieni migliori per ogni bolletta in base alla tua analisi complessiva dei dati.
+Non sei obbligato a seguire l'ordine — usa il tuo giudizio da professionista.
 
 ═══════════════════════════════════════════════════════════════════════════════
 COMBINAZIONI DI ZONE VINCENTI (da cercare prioritariamente)
@@ -1952,6 +1962,127 @@ def calculate_media_normalizzata(pool):
     logger.info(f"📈 Media normalizzata: {len(valid_sels)} calcolate | {dist_str}")
 
 
+def _format_match_stats_v2(s):
+    """Formatta i dati statistici per il prompt V2 — solo dati sportivi, no RH/RA/C/MN."""
+    parts = []
+
+    # Classifica totale
+    ch = s.get("classifica_home")
+    ca = s.get("classifica_away")
+    if ch and ca:
+        parts.append(
+            f"    Classifica: {s['home']} {ch['pos']}o ({ch['pt']}pt, {ch['v']}V-{ch['n']}N-{ch['p']}P, "
+            f"GF:{ch['gf']} GS:{ch['gs']}) "
+            f"vs {s['away']} {ca['pos']}o ({ca['pt']}pt, {ca['v']}V-{ca['n']}N-{ca['p']}P, "
+            f"GF:{ca['gf']} GS:{ca['gs']})"
+        )
+        casa_parts = []
+        if ch.get("v_casa") is not None:
+            casa_parts.append(
+                f"{s['home']}(casa {ch.get('pos_casa','?')}o): "
+                f"{ch['v_casa']}V-{ch['n_casa']}N-{ch['p_casa']}P GF:{ch['gf_casa']} GS:{ch['gs_casa']}"
+            )
+        if ca.get("v_trasf") is not None:
+            casa_parts.append(
+                f"{s['away']}(trasf {ca.get('pos_trasf','?')}o): "
+                f"{ca['v_trasf']}V-{ca['n_trasf']}N-{ca['p_trasf']}P GF:{ca['gf_trasf']} GS:{ca['gs_trasf']}"
+            )
+        if casa_parts:
+            parts.append(f"    Casa/Trasf: {' vs '.join(casa_parts)}")
+
+    # Analisi GF-GS
+    gh = s.get("gfgs_home")
+    ga = s.get("gfgs_away")
+    if gh and ga:
+        gh_gap_att = f"{gh['gap_att']:+d}" if 'gap_att' in gh else "?"
+        gh_gap_dif = f"{gh['gap_dif']:+d}" if 'gap_dif' in gh else "?"
+        ga_gap_att = f"{ga['gap_att']:+d}" if 'gap_att' in ga else "?"
+        ga_gap_dif = f"{ga['gap_dif']:+d}" if 'gap_dif' in ga else "?"
+        parts.append(
+            f"    GF-GS casa: {s['home']} {gh['gf_pm']}gf/g {gh['gs_pm']}gs/g "
+            f"(vs fascia: att {gh['att_vs_fascia']:+.0f}% dif {gh['def_vs_fascia']:+.0f}%, "
+            f"vs camp: att {gh['att_vs_camp']:+.0f}% dif {gh['def_vs_camp']:+.0f}%, "
+            f"pos att:{gh.get('pos_att','?')}o dif:{gh.get('pos_dif','?')}o gap att:{gh_gap_att} dif:{gh_gap_dif})"
+            f"{' [OUTLIER]' if gh.get('outlier') else ''}"
+        )
+        parts.append(
+            f"    GF-GS trasf: {s['away']} {ga['gf_pm']}gf/g {ga['gs_pm']}gs/g "
+            f"(vs fascia: att {ga['att_vs_fascia']:+.0f}% dif {ga['def_vs_fascia']:+.0f}%, "
+            f"vs camp: att {ga['att_vs_camp']:+.0f}% dif {ga['def_vs_camp']:+.0f}%, "
+            f"pos att:{ga.get('pos_att','?')}o dif:{ga.get('pos_dif','?')}o gap att:{ga_gap_att} dif:{ga_gap_dif})"
+            f"{' [OUTLIER]' if ga.get('outlier') else ''}"
+        )
+    tp = s.get("tipo_partita")
+    if tp:
+        parts.append(f"    Tipo partita: {tp}")
+
+    # Forma
+    lh = s.get("lucifero_home_pct")
+    la = s.get("lucifero_away_pct")
+    if lh is not None and la is not None:
+        parts.append(f"    Forma: {s['home']} {lh}% | {s['away']} {la}%")
+
+    # Trend
+    th = s.get("trend_home", [])
+    ta = s.get("trend_away", [])
+    if th and ta:
+        th_str = "->".join(f"{v:.0f}" for v in th)
+        ta_str = "->".join(f"{v:.0f}" for v in ta)
+        th_dir = "+" if len(th) >= 2 and th[-1] > th[0] else "-" if len(th) >= 2 and th[-1] < th[0] else "="
+        ta_dir = "+" if len(ta) >= 2 and ta[-1] > ta[0] else "-" if len(ta) >= 2 and ta[-1] < ta[0] else "="
+        parts.append(f"    Trend: {s['home']} [{th_str}]{th_dir} | {s['away']} [{ta_str}]{ta_dir}")
+
+    # Motivazione
+    mh = s.get("motivazione_home")
+    ma = s.get("motivazione_away")
+    if mh and ma:
+        parts.append(f"    Motivazione: {s['home']} {mh['label']} ({mh['score']}) | {s['away']} {ma['label']} ({ma['score']})")
+
+    # Strisce
+    sh = s.get("streak_home", {})
+    sa = s.get("streak_away", {})
+    if sh or sa:
+        streak_parts = []
+        for team, sk in [(s["home"], sh), (s["away"], sa)]:
+            notable = []
+            if sk.get("vittorie", 0) >= 2:
+                notable.append(f"{sk['vittorie']}V consecutive")
+            if sk.get("sconfitte", 0) >= 2:
+                notable.append(f"{sk['sconfitte']}S consecutive")
+            if sk.get("imbattibilita", 0) >= 3:
+                notable.append(f"{sk['imbattibilita']} imbattute")
+            if sk.get("over25", 0) >= 3:
+                notable.append(f"{sk['over25']}xOver2.5")
+            if sk.get("under25", 0) >= 3:
+                notable.append(f"{sk['under25']}xUnder2.5")
+            if sk.get("gg", 0) >= 3:
+                notable.append(f"{sk['gg']}xGG")
+            if sk.get("clean_sheet", 0) >= 2:
+                notable.append(f"{sk['clean_sheet']}xCS")
+            if sk.get("senza_segnare", 0) >= 2:
+                notable.append(f"{sk['senza_segnare']}x senza gol")
+            if notable:
+                streak_parts.append(f"{team}: {', '.join(notable)}")
+        if streak_parts:
+            parts.append(f"    Strisce: {' | '.join(streak_parts)}")
+
+    # Affidabilita
+    ac = s.get("affidabilita_casa")
+    at = s.get("affidabilita_trasf")
+    if ac is not None and at is not None:
+        parts.append(f"    Affidabilita: {s['home']}(casa) {ac}/10 | {s['away']}(trasf) {at}/10")
+
+    # Attacco, Difesa, Valore rosa
+    dh = s.get("dna_home")
+    da = s.get("dna_away")
+    if dh and da:
+        parts.append(f"    Attacco: {s['home']} {dh.get('att',0)}/100 | {s['away']} {da.get('att',0)}/100")
+        parts.append(f"    Difesa: {s['home']} {dh.get('def',0)}/100 | {s['away']} {da.get('def',0)}/100")
+        parts.append(f"    Valore rosa: {s['home']} {dh.get('val',0)}/100 | {s['away']} {da.get('val',0)}/100")
+
+    return "\n".join(parts)
+
+
 def _format_match_stats(s):
     """Formatta i dati statistici di una selezione per il prompt Mistral."""
     parts = []
@@ -2094,7 +2225,7 @@ def _format_match_stats(s):
 
 def serialize_pool_for_prompt(pool):
     """Serializza il pool in formato compatto per il prompt Mistral.
-    Pool elite separato dal pool completo per chiarezza.
+    Pool elite separato, poi pool completo diviso in 5 blocchi per MN.
     Include dati statistici per ogni partita (classifica, forma, trend, ecc.)."""
 
     elite_pool = [s for s in pool if s.get("elite")]
@@ -2146,12 +2277,74 @@ def serialize_pool_for_prompt(pool):
     else:
         lines.append("\n⚠️ Nessuna selezione elite disponibile — NON generare bollette elite")
 
-    # Pool completo
-    lines.append("\n╔══════════════════════════════════════╗")
-    lines.append("║  POOL COMPLETO — per bollette oggi,  ║")
-    lines.append("║  selettiva, bilanciata, ambiziosa     ║")
-    lines.append("╚══════════════════════════════════════╝")
-    _render_pool(pool, show_elite_tag=True)
+    # Pool completo diviso in 5 BLOCCHI per Media Normalizzata
+    # Blocco 1: MN >= 0.70, Blocco 2: MN >= 0.65, ..., Blocco 5: MN >= 0.50
+    mn_blocks = [
+        (1, 0.70, "🏆 BLOCCO 1 — Selezioni Premium (MN ≥ 0.70)", "le migliori in assoluto"),
+        (2, 0.65, "🥇 BLOCCO 2 — Selezioni di Qualità (MN ≥ 0.65)", "alta qualità"),
+        (3, 0.60, "🥈 BLOCCO 3 — Selezioni Solide (MN ≥ 0.60)", "buone e affidabili"),
+        (4, 0.55, "🥉 BLOCCO 4 — Selezioni di Completamento (MN ≥ 0.55)", "qualità discreta"),
+        (5, 0.50, "📋 BLOCCO 5 — Selezioni di Riserva (MN ≥ 0.50)", "qualità sufficiente"),
+    ]
+
+    lines.append("\n╔══════════════════════════════════════════════════════════════╗")
+    lines.append("║  POOL COMPLETO — ordinato per qualità (MN), dalla migliore  ║")
+    lines.append("║  alla peggiore. Sei libero di scegliere come combinarle.    ║")
+    lines.append("╚══════════════════════════════════════════════════════════════╝")
+
+    prev_threshold = 1.01  # sopra il massimo possibile
+    for block_num, threshold, title, hint in mn_blocks:
+        block_sels = [s for s in pool
+                      if s.get("media_normalizzata") is not None
+                      and s["media_normalizzata"] >= threshold
+                      and s["media_normalizzata"] < prev_threshold]
+        if block_sels:
+            lines.append(f"\n{'═'*60}")
+            lines.append(f"  {title}")
+            lines.append(f"  → {hint} — {len(block_sels)} selezioni")
+            lines.append(f"{'═'*60}")
+            # Ordina per MN decrescente dentro il blocco
+            block_sels.sort(key=lambda x: x.get("media_normalizzata", 0), reverse=True)
+            _render_pool(block_sels, show_elite_tag=True)
+        prev_threshold = threshold
+
+    # Selezioni senza MN (dati insufficienti per calcolarla) — in fondo
+    no_mn_sels = [s for s in pool if s.get("media_normalizzata") is None]
+    if no_mn_sels:
+        lines.append(f"\n{'═'*60}")
+        lines.append(f"  📌 SENZA CLASSIFICA MN — dati insufficienti per il calcolo")
+        lines.append(f"  → {len(no_mn_sels)} selezioni")
+        lines.append(f"{'═'*60}")
+        _render_pool(no_mn_sels, show_elite_tag=True)
+
+    return "\n".join(lines)
+
+
+def serialize_pool_for_prompt_v2(pool):
+    """Serializza il pool per il prompt V2 — formato semplice, solo dati sportivi."""
+    lines = []
+
+    by_date = {}
+    for s in pool:
+        by_date.setdefault(s["match_date"], []).append(s)
+
+    for date in sorted(by_date.keys()):
+        lines.append(f"\n=== {date} ===")
+        by_match = {}
+        for s in by_date[date]:
+            by_match.setdefault(s["match_key"], []).append(s)
+
+        for mk, sels in by_match.items():
+            for s in sels:
+                elite_tag = " | ★ELITE" if s.get("elite") else ""
+                lines.append(
+                    f"  {s['match_key']} | {s['mercato']}: {s['pronostico']} "
+                    f"@ {s['quota']} | confidence {s['confidence']}{elite_tag}"
+                )
+            # Stats una volta sola per partita
+            stats_text = _format_match_stats_v2(sels[0])
+            if stats_text:
+                lines.append(stats_text)
 
     return "\n".join(lines)
 
@@ -2169,20 +2362,22 @@ def _call_llm(messages, provider_url=None, provider_model=None, provider_key=Non
     payload = {
         "model": model,
         "messages": messages,
-        "temperature": 0.4,
-        "max_tokens": 16000,
+        "temperature": 1.0,
+        "max_tokens": 8192,
         "response_format": {"type": "json_object"},
     }
 
     max_retries = 2
     for attempt in range(1, max_retries + 1):
         try:
-            resp = requests.post(url, headers=headers, json=payload, timeout=180)
+            resp = requests.post(url, headers=headers, json=payload, timeout=600)
             if resp.status_code == 429 and attempt < max_retries:
                 wait = 15 * attempt
                 logger.info(f"⏳ Rate limit 429, retry {attempt}/{max_retries} tra {wait}s...")
                 time.sleep(wait)
                 continue
+            if resp.status_code >= 400:
+                logger.error(f" LLM risposta errore {resp.status_code}: {resp.text[:500]}")
             resp.raise_for_status()
             content = resp.json()["choices"][0]["message"]["content"]
             # DeepSeek R1 restituisce ragionamento in <think>...</think> — rimuovilo
@@ -2222,9 +2417,9 @@ def _call_llm_with_fallback(messages):
     try:
         return _call_llm(messages)
     except Exception as e:
-        # Fallback su Mistral solo se il primario è OpenRouter
-        if LLM_URL == OPENROUTER_URL and MISTRAL_API_KEY:
-            logger.warning(f" DeepSeek fallito ({e}), fallback su Mistral...")
+        # Fallback su Mistral solo se il primario è DeepSeek
+        if LLM_URL == DEEPSEEK_URL and MISTRAL_API_KEY:
+            logger.warning(f" DeepSeek V3.2 fallito ({e}), fallback su Mistral...")
             return _call_llm(messages, MISTRAL_URL, MISTRAL_MODEL, MISTRAL_API_KEY)
         raise
 
@@ -2918,12 +3113,12 @@ def _generate_for_section(fascia, needed, pool, today_str, bollette_docs, counte
     all_raw = []
     discarded_sels = []
 
-    # Chiamata Mistral (retry 429 gestito dentro call_mistral_integration)
+    # Chiamata LLM
     raw = None
     try:
         raw = call_mistral_integration(section_pool, fascia, needed, today_str)
     except Exception as e:
-        logger.error(f" Errore Mistral per {fascia}: {e}")
+        logger.error(f" Errore LLM per {fascia}: {e}")
         return [], []
 
     if not isinstance(raw, list):
@@ -2954,12 +3149,10 @@ def _generate_for_section(fascia, needed, pool, today_str, bollette_docs, counte
         for err in errors[:3]:
             logger.warning(f"[{err['code']}] {err['feedback'][:100]}")
 
-    # Se non abbastanza, retry fino a 2 volte con feedback specifico
-    for retry_attempt in range(2):
-        still_needed = needed - len(valid)
-        if still_needed <= 0 or not errors:
-            break
-        logger.info(f"🔄 Retry {fascia} #{retry_attempt+1}: mancano {still_needed} bollette...")
+    # Se non abbastanza, retry 1 volta con feedback specifico
+    still_needed = needed - len(valid)
+    if still_needed > 0 and errors:
+        logger.info(f"🔄 Retry {fascia}: mancano {still_needed} bollette...")
 
         # Costruisci feedback specifico con errori e suggerimenti
         error_lines = [f"- {err['feedback']}" for err in errors[:5]]
@@ -3000,7 +3193,118 @@ def _generate_for_section(fascia, needed, pool, today_str, bollette_docs, counte
                     logger.warning(f" Retry: ancora {len(errors)} errori")
         except Exception as e:
             logger.error(f" Errore retry {fascia}: {e}")
-            break
+
+    # --- SWAP BLOCCHI: Python corregge l'ordine dei blocchi ---
+    # Se Mistral ha usato selezioni di blocchi bassi ignorando blocchi alti, Python sostituisce
+    def _get_mn_from_pool(sel):
+        """Trova la MN di una selezione nel pool."""
+        mn = sel.get("media_normalizzata")
+        if mn is not None:
+            return mn
+        mk = sel.get("match_key", f"{sel['home']} vs {sel['away']}|{sel['match_date']}")
+        for ps in section_pool:
+            if (ps.get("match_key") == mk
+                and ps.get("mercato") == sel.get("mercato")
+                and ps.get("pronostico") == sel.get("pronostico")):
+                return ps.get("media_normalizzata")
+        return None
+
+    def _get_block(mn):
+        if mn is None: return 99
+        if mn >= 0.70: return 1
+        if mn >= 0.65: return 2
+        if mn >= 0.60: return 3
+        if mn >= 0.55: return 4
+        return 5
+
+    # Raccogli tutte le selezioni usate in tutte le bollette valide di questa sezione
+    used_keys = set()
+    for doc in valid:
+        for sel in doc.get("selezioni", []):
+            mk = sel.get("match_key", f"{sel['home']} vs {sel['away']}|{sel['match_date']}")
+            used_keys.add(f"{mk}|{sel['mercato']}:{sel['pronostico']}")
+
+    # Trova selezioni Premium/Qualità (blocco 1-2) nel pool NON usate
+    unused_top = []
+    for ps in section_pool:
+        mn = ps.get("media_normalizzata")
+        if mn is not None and _get_block(mn) <= 2:
+            mk = ps.get("match_key", f"{ps['home']} vs {ps['away']}|{ps['match_date']}")
+            key = f"{mk}|{ps['mercato']}:{ps['pronostico']}"
+            if key not in used_keys:
+                unused_top.append(ps)
+    # Ordina per MN decrescente
+    unused_top.sort(key=lambda x: x.get("media_normalizzata", 0), reverse=True)
+
+    if unused_top:
+        swap_count = 0
+        for doc in valid:
+            if not unused_top:
+                break
+            # Trova selezioni di blocco 4-5 in questa bolletta
+            sels = doc.get("selezioni", [])
+            for i, sel in enumerate(sels):
+                if not unused_top:
+                    break
+                sel_mn = _get_mn_from_pool(sel)
+                sel_block = _get_block(sel_mn)
+                if sel_block >= 4:
+                    # Prova a sostituire con la migliore unused_top
+                    candidate = unused_top[0]
+                    # Verifica che la partita non sia già nella bolletta
+                    candidate_mk = candidate.get("match_key", f"{candidate['home']} vs {candidate['away']}|{candidate['match_date']}")
+                    already_in = any(
+                        s.get("match_key", f"{s['home']} vs {s['away']}|{s['match_date']}") == candidate_mk
+                        for j, s in enumerate(sels) if j != i
+                    )
+                    if already_in:
+                        continue
+                    # Calcola nuova quota totale
+                    old_quota = sel.get("quota", 1.0)
+                    new_quota = candidate.get("quota", 1.0)
+                    current_total = doc.get("quota_totale", 1.0)
+                    new_total = (current_total / old_quota) * new_quota if old_quota > 0 else current_total
+
+                    # Verifica vincoli quota della fascia
+                    cc = CATEGORY_CONSTRAINTS.get(fascia, {})
+                    min_q = cc.get("min_quota")
+                    max_q = cc.get("max_quota")
+                    ok = True
+                    if min_q and new_total < min_q * (1 - QUOTA_TOTALE_TOLERANCE_DOWN):
+                        ok = False
+                    if max_q and new_total > max_q * (1 + QUOTA_TOTALE_TOLERANCE_UP):
+                        ok = False
+                    # Verifica quota singola
+                    n_sels = len(sels)
+                    qs_limit = cc.get("quota_singola", {}).get(n_sels)
+                    if qs_limit and new_quota > qs_limit * (1 + QUOTA_SINGOLA_TOLERANCE):
+                        ok = False
+
+                    if ok:
+                        old_name = f"{sel.get('home')} vs {sel.get('away')} {sel.get('pronostico')}"
+                        new_name = f"{candidate['home']} vs {candidate['away']} {candidate['pronostico']}"
+                        logger.info(f"🔄 Swap blocchi: {old_name} (Blocco {sel_block}, MN={sel_mn:.2f}) "
+                                    f"→ {new_name} (Blocco {_get_block(candidate.get('media_normalizzata'))}, MN={candidate['media_normalizzata']:.2f})")
+                        # Sostituisci
+                        sels[i] = {
+                            "home": candidate["home"],
+                            "away": candidate["away"],
+                            "match_date": candidate["match_date"],
+                            "match_key": candidate.get("match_key", f"{candidate['home']} vs {candidate['away']}|{candidate['match_date']}"),
+                            "mercato": candidate["mercato"],
+                            "pronostico": candidate["pronostico"],
+                            "quota": candidate["quota"],
+                            "confidence": candidate.get("confidence", 0),
+                            "stars": candidate.get("stars", 0),
+                            "elite": candidate.get("elite", False),
+                            "media_normalizzata": candidate.get("media_normalizzata"),
+                        }
+                        doc["quota_totale"] = round(new_total, 2)
+                        unused_top.pop(0)
+                        swap_count += 1
+
+        if swap_count:
+            logger.info(f"🔄 Swap blocchi {fascia}: {swap_count} sostituzioni (Blocco 4-5 → Blocco 1-2)")
 
     # Assegna tipo e label
     existing_count = sum(1 for b in bollette_docs if b.get("tipo") == fascia)
@@ -3050,6 +3354,30 @@ def _generate_for_section(fascia, needed, pool, today_str, bollette_docs, counte
                     discarded_sels.append(pool_entry)
 
     logger.info(f"📊 {fascia}: {len(valid)}/{needed} bollette generate")
+
+    # Log blocchi MN per ogni bolletta accettata
+    for doc in valid:
+        block_dist = {"Premium": 0, "Qualità": 0, "Solide": 0, "Completamento": 0, "Riserva": 0}
+        for sel in doc.get("selezioni", []):
+            mn = sel.get("media_normalizzata")
+            if mn is None:
+                # Cerca MN nel pool originale
+                mk = sel.get("match_key", f"{sel['home']} vs {sel['away']}|{sel['match_date']}")
+                for ps in section_pool:
+                    if (ps.get("match_key") == mk
+                        and ps.get("mercato") == sel.get("mercato")
+                        and ps.get("pronostico") == sel.get("pronostico")):
+                        mn = ps.get("media_normalizzata")
+                        break
+            if mn is not None:
+                if mn >= 0.70:   block_dist["Premium"] += 1
+                elif mn >= 0.65: block_dist["Qualità"] += 1
+                elif mn >= 0.60: block_dist["Solide"] += 1
+                elif mn >= 0.55: block_dist["Completamento"] += 1
+                else:            block_dist["Riserva"] += 1
+        parts = [f"{k}:{v}" for k, v in block_dist.items() if v > 0]
+        logger.info(f"    {doc['label']}: {len(doc['selezioni'])} sel → {' | '.join(parts) if parts else 'MN non disponibile'}")
+
     return valid, discarded_sels
 
 
@@ -3254,6 +3582,156 @@ def _recompose_from_discards(discarded_selezioni, pool, today_str, bollette_docs
     return new_bollette
 
 
+def _generate_all_v2(pool, today_str):
+    """Flusso V2: una singola chiamata LLM, poi Python smista nelle fasce."""
+    # Filtra via SEGNO X dal pool
+    pool = [s for s in pool if not (s.get("mercato") == "SEGNO" and s.get("pronostico") == "X")]
+
+    pool_text = serialize_pool_for_prompt_v2(pool)
+    user_prompt = USER_PROMPT_V2.format(pool_text=pool_text)
+
+    messages = [
+        {"role": "system", "content": SYSTEM_PROMPT_V2},
+        {"role": "user", "content": user_prompt},
+    ]
+
+    if DEBUG_MODE:
+        debug_dir = os.path.join(current_path, "log")
+        os.makedirs(debug_dir, exist_ok=True)
+        with open(os.path.join(debug_dir, f"prompt_v2_{today_str}.txt"), "w", encoding="utf-8") as f:
+            f.write(f"=== SYSTEM PROMPT ===\n{SYSTEM_PROMPT_V2}\n\n=== USER PROMPT ===\n{user_prompt}")
+
+    logger.info(f"🤖 Chiamata LLM V2 — pool: {len(pool)} selezioni")
+    content = _call_llm_with_fallback(messages)
+
+    try:
+        raw_bollette = _sanitize_and_parse_json(content)
+    except Exception as e:
+        logger.error(f" Parse JSON V2 fallito: {e}")
+        # Retry con istruzione esplicita
+        messages.append({"role": "assistant", "content": content})
+        messages.append({"role": "user", "content": "ERRORE: la risposta non è un JSON valido. Rispondi con SOLO un array JSON valido, senza testo prima o dopo. Formato: [{...}, {...}]"})
+        content2 = _call_llm_with_fallback(messages)
+        raw_bollette = _sanitize_and_parse_json(content2)
+
+    if not isinstance(raw_bollette, list):
+        logger.error(" LLM V2 non ha restituito un array")
+        return []
+
+    logger.info(f"📦 LLM V2 ha generato {len(raw_bollette)} biglietti")
+
+    # Smista nelle fasce in base alla quota totale
+    bollette_docs = []
+    counters = {"oggi": 0, "elite": 0, "selettiva": 0, "bilanciata": 0, "ambiziosa": 0}
+    pool_by_key = {}
+    for s in pool:
+        key = f"{s['match_key']}|{s['mercato']}:{s['pronostico']}"
+        pool_by_key[key] = s
+
+    for raw in raw_bollette:
+        selezioni_raw = raw.get("selezioni", [])
+        if len(selezioni_raw) < 2:
+            logger.warning(f" Biglietto con {len(selezioni_raw)} selezioni — scartato")
+            continue
+
+        # Valida e arricchisci le selezioni dal pool
+        selezioni_valid = []
+        valid = True
+        for sel in selezioni_raw:
+            mk = sel.get("match_key", "")
+            mercato = sel.get("mercato", "")
+            pronostico = sel.get("pronostico", "")
+            key = f"{mk}|{mercato}:{pronostico}"
+            pool_entry = pool_by_key.get(key)
+            if not pool_entry:
+                logger.warning(f" Selezione non trovata nel pool: {key}")
+                valid = False
+                break
+            selezioni_valid.append(pool_entry)
+
+        if not valid:
+            continue
+
+        # Verifica partite duplicate nello stesso biglietto
+        match_keys = [s["match_key"] for s in selezioni_valid]
+        if len(match_keys) != len(set(match_keys)):
+            logger.warning(f" Biglietto con partite duplicate — scartato")
+            continue
+
+        # Calcola quota totale
+        quota_totale = 1.0
+        for s in selezioni_valid:
+            quota_totale *= s["quota"]
+        quota_totale = round(quota_totale, 2)
+
+        # Verifica se tutte le selezioni sono elite
+        all_elite = all(s.get("elite") for s in selezioni_valid)
+
+        # Smista nella fascia corretta in base alla quota totale
+        if all_elite and quota_totale <= 8.0:
+            assigned_fascia = "elite"
+        elif quota_totale <= 4.50:
+            assigned_fascia = "selettiva"
+        elif quota_totale <= 7.50:
+            assigned_fascia = "bilanciata"
+        else:
+            assigned_fascia = "ambiziosa"
+
+        # Verifica se c'è una partita di oggi
+        has_today = any(s["match_date"] == today_str for s in selezioni_valid)
+        if has_today and assigned_fascia not in ("elite",) and counters.get("oggi", 0) < 3:
+            # Potrebbe essere anche una bolletta "oggi"
+            # La assegna a "oggi" se ci sono solo partite di oggi
+            all_today = all(s["match_date"] == today_str for s in selezioni_valid)
+            if all_today and counters.get("oggi", 0) < 3:
+                assigned_fascia = "oggi"
+
+        counters[assigned_fascia] = counters.get(assigned_fascia, 0) + 1
+
+        # Costruisci il documento bolletta
+        selezioni_doc = []
+        for s in selezioni_valid:
+            selezioni_doc.append({
+                "home": s["home"],
+                "away": s["away"],
+                "league": s["league"],
+                "match_time": s["match_time"],
+                "match_date": s["match_date"],
+                "match_key": s["match_key"],
+                "mercato": s["mercato"],
+                "pronostico": s["pronostico"],
+                "quota": s["quota"],
+                "confidence": s.get("confidence", 0),
+                "stars": s.get("stars", 0),
+                "elite": s.get("elite", False),
+            })
+
+        doc = {
+            "date": today_str,
+            "tipo": assigned_fascia,
+            "label": f"{assigned_fascia.capitalize()} #{counters[assigned_fascia]}",
+            "selezioni": selezioni_doc,
+            "quota_totale": quota_totale,
+            "n_selezioni": len(selezioni_doc),
+            "reasoning": raw.get("reasoning", ""),
+            "prompt_version": "v2",
+            "created_at": datetime.now(),
+        }
+        bollette_docs.append(doc)
+
+    # Log riepilogo
+    by_tipo = {}
+    for b in bollette_docs:
+        by_tipo.setdefault(b["tipo"], []).append(b)
+    for tipo in ["oggi", "elite", "selettiva", "bilanciata", "ambiziosa"]:
+        if tipo in by_tipo:
+            quotes = [b["quota_totale"] for b in by_tipo[tipo]]
+            n_sels = [b["n_selezioni"] for b in by_tipo[tipo]]
+            logger.info(f"  {tipo.upper()}: {len(by_tipo[tipo])} biglietti — quote: {quotes} — selezioni: {n_sels}")
+
+    return bollette_docs
+
+
 def _timeout_handler():
     """Termina il processo se supera il timeout globale."""
     logger.error(f"⏰ TIMEOUT: script superato {SCRIPT_TIMEOUT_MINUTES} minuti, terminazione forzata")
@@ -3277,16 +3755,20 @@ def main():
     parser.add_argument('--date', type=str, default=None, help='Data YYYY-MM-DD')
     parser.add_argument('--dry-run', action='store_true', help='Non salvare su MongoDB')
     parser.add_argument('--debug', action='store_true', help='Salva prompt LLM su file debug')
+    parser.add_argument('--prompt-v1', action='store_true', help='Usa il prompt v1 (originale) invece del v2')
     args, _ = parser.parse_known_args()
     today_str = args.date if args.date else datetime.now().strftime("%Y-%m-%d")
     is_retroactive = args.date is not None
     dry_run = args.dry_run
     global DEBUG_MODE
     DEBUG_MODE = args.debug
+    # Prompt version: default da config, sovrascrivibile da riga di comando
+    active_prompt = "v1" if args.prompt_v1 else PROMPT_VERSION
     if dry_run:
         logger.info("🔍 MODALITÀ DRY-RUN — nessun salvataggio su MongoDB")
     if DEBUG_MODE:
         logger.info("🐛 MODALITÀ DEBUG — prompt LLM salvati in log/")
+    logger.info(f"📝 Prompt versione: {active_prompt}")
 
     # 1. Costruisci pool base (pronostici AI)
     pool = build_pool(today_str, skip_time_filter=is_retroactive)
@@ -3318,30 +3800,69 @@ def main():
         logger.warning(" Pool troppo piccolo (< 2 selezioni). Nessuna bolletta generata.")
         return
 
-    # 2. Cascata media normalizzata: Python sceglie la soglia, poi Mistral compone
-    #    Parte da 0.70, scende di 0.005 alla volta fino a 0.50
-    #    Si ferma alla prima soglia che ha almeno MIN_SELEZIONI nel pool
-    soglia = MEDIA_NORMALIZZATA_SOGLIA_MAX
-    chosen_soglia = MEDIA_NORMALIZZATA_SOGLIA_MIN  # fallback
-    while soglia >= MEDIA_NORMALIZZATA_SOGLIA_MIN - 0.001:  # epsilon per float
-        count = sum(1 for s in pool
-                    if s.get("media_normalizzata") is not None
-                    and s["media_normalizzata"] >= soglia)
-        if count >= MEDIA_NORMALIZZATA_MIN_SELEZIONI:
-            chosen_soglia = soglia
-            break
-        soglia = round(soglia - MEDIA_NORMALIZZATA_STEP, 3)
+    # ========== BIFORCAZIONE V1 / V2 ==========
+    if active_prompt == "v2":
+        logger.info("🚀 Flusso V2 — singola chiamata LLM, Python smista nelle fasce")
+        bollette_docs = _generate_all_v2(pool, today_str)
 
-    # Filtra pool alla soglia scelta (escluse anche quelle senza MN — dati insufficienti)
-    pool_before_mn = len(pool)
-    filtered_pool = [s for s in pool
-                     if s.get("media_normalizzata") is not None
-                     and s["media_normalizzata"] >= chosen_soglia]
-    mn_excluded = pool_before_mn - len(filtered_pool)
-    logger.info(f"🎯 Cascata MN: soglia scelta = {chosen_soglia:.3f} → "
-                f"{len(filtered_pool)} selezioni nel pool, {mn_excluded} escluse")
+        if not bollette_docs:
+            logger.warning("Nessuna bolletta generata dal flusso V2.")
+            timer.cancel()
+            return
 
-    # Generazione sequenziale per sezione con pool filtrato
+        # Salva su MongoDB
+        if dry_run:
+            logger.info("🔍 DRY-RUN: skip salvataggio MongoDB")
+        else:
+            coll = db.bollette
+            deleted = coll.delete_many({"date": today_str, "custom": {"$ne": True}})
+            if deleted.deleted_count > 0:
+                logger.info(f"🗑️ Rimosse {deleted.deleted_count} bollette precedenti per {today_str}")
+            coll.insert_many(bollette_docs)
+
+        # Riepilogo finale V2
+        by_tipo = {}
+        for b in bollette_docs:
+            by_tipo.setdefault(b["tipo"], []).append(b)
+        logger.info(f"{'='*50}")
+        logger.info(f"🏆 RIEPILOGO FINALE (V2):")
+        logger.info(f"TOTALE: {len(bollette_docs)} bollette")
+        for tipo in ["oggi", "elite", "selettiva", "bilanciata", "ambiziosa"]:
+            if tipo in by_tipo:
+                quotes = [b["quota_totale"] for b in by_tipo[tipo]]
+                n_sels = [b["n_selezioni"] for b in by_tipo[tipo]]
+                logger.info(f"  {tipo.upper()}: {len(by_tipo[tipo])} — quote: {quotes} — selezioni: {n_sels}")
+        logger.info(f"{'='*50}")
+
+        label = "🔍 DRY-RUN" if dry_run else "✅ Salvate"
+        logger.info(f"{label} {len(bollette_docs)} bollette (prompt V2)")
+        timer.cancel()
+        return
+
+    # ========== FLUSSO V1 (originale) ==========
+    # 2. Ordina pool per media normalizzata (dalla migliore alla peggiore)
+    #    Nessun filtro — tutte le selezioni passano, i blocchi sono solo informativi nel prompt
+    filtered_pool = sorted(pool, key=lambda s: s.get("media_normalizzata") or 0, reverse=True)
+
+    # Log distribuzione per blocchi (informativo)
+    block_counts = []
+    prev_th = 1.01
+    for label, th in [("Premium ≥0.70", 0.70), ("Qualità ≥0.65", 0.65),
+                      ("Solide ≥0.60", 0.60), ("Completamento ≥0.55", 0.55),
+                      ("Riserva ≥0.50", 0.50)]:
+        cnt = sum(1 for s in filtered_pool
+                  if s.get("media_normalizzata") is not None
+                  and s["media_normalizzata"] >= th
+                  and s["media_normalizzata"] < prev_th)
+        if cnt > 0:
+            block_counts.append(f"{label}: {cnt}")
+        prev_th = th
+    no_mn = sum(1 for s in filtered_pool if s.get("media_normalizzata") is None)
+    if no_mn > 0:
+        block_counts.append(f"Senza MN: {no_mn}")
+    logger.info(f"📦 Pool: {len(filtered_pool)} selezioni | {' | '.join(block_counts) if block_counts else 'nessuno'}")
+
+    # Generazione sequenziale per sezione con pool completo
     bollette_docs = []
     counters = {"oggi": 0, "elite": 0, "selettiva": 0, "bilanciata": 0, "ambiziosa": 0}
     all_discarded_sels = []

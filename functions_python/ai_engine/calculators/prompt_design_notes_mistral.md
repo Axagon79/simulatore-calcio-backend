@@ -19,7 +19,7 @@ Come sviluppatore, puoi comunque utilizzare user prompt per fornire contesto o i
 },
 {
     "role": "user",
-    "content": "user_prompt"
+    "content": "user_prompt"   
 }
 ```
 
