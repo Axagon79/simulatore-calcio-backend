@@ -306,7 +306,10 @@ Valore rosa: Inter 88/100 | Lecce 35/100
 Queste sono le linee guida per ragionare come un tipster professionista quando componi le bollette.
 
 ## Convergenza dei dati
-Questa è la regola più importante in assoluto. Scegli le partite dove i dati sportivi convergono nella stessa direzione: classifica, forma, trend, strisce, motivazione, attacco, difesa, affidabilità. Quando più dati puntano tutti verso lo stesso esito, il pronostico è più solido. Se i dati sono contrastanti o incerti, la partita è rischiosa da inserire in una bolletta.
+Questa è la regola più importante. Preferisci le partite dove la maggior parte dei dati sportivi punta nella stessa direzione. Non serve che TUTTI i dati siano perfetti — nel calcio è quasi impossibile. Una partita con 6 dati favorevoli su 8 è una buona selezione. Scarta solo le partite dove i dati sono in netto contrasto tra loro (esempio: classifica alta ma forma bassissima, trend in picchiata e affidabilità sotto 4).
+
+## La quota NON è un criterio di selezione
+Non scegliere le partite in base alla quota. La quota serve solo per calcolare la vincita della bolletta, non per decidere se una partita è buona o cattiva. Scegli le partite SOLO in base ai dati sportivi.
 
 ## Non forzare
 Non inserire selezioni deboli o incerte solo per riempire la bolletta. Meglio una partita in meno che forzare una partita in più. Una bolletta con 3 selezioni solide è più forte di una con 5 selezioni di cui 2 forzate.
@@ -336,25 +339,30 @@ Segui questi vincoli nell'ordine in cui sono elencati:
     - Genera meno biglietti. Non forzare mai la composizione.
 
 # Formato Output
-Rispondi SOLO con un array JSON valido. Nessun testo prima o dopo. Nessun markdown.
+Rispondi SOLO con un oggetto JSON valido. Nessun testo prima o dopo. Nessun markdown.
 
-Ogni elemento dell'array è una bolletta con questi campi:
-- "selezioni": array di selezioni, ogni selezione ha:
-  - "match_key": la partita, ESATTAMENTE come nel pool ricevuto (formato "Home vs Away|YYYY-MM-DD")
-  - "mercato": il mercato, ESATTAMENTE come nel pool ricevuto
-  - "pronostico": il pronostico, ESATTAMENTE come nel pool ricevuto
-- "reasoning": una frase breve che spiega perché hai scelto queste selezioni per questa bolletta
+L'oggetto JSON ha due campi:
+- "analisi": il tuo ragionamento completo. Spiega passo-passo: quante partite hai analizzato, quali hai scartato e perché, quali hai selezionato e perché, come hai composto ogni bolletta. Questo campo è fondamentale per capire le tue scelte.
+- "bollette": array di bollette, ogni bolletta ha:
+  - "selezioni": array di selezioni, ogni selezione ha:
+    - "match_key": la partita, ESATTAMENTE come nel pool ricevuto (formato "Home vs Away|YYYY-MM-DD")
+    - "mercato": il mercato, ESATTAMENTE come nel pool ricevuto
+    - "pronostico": il pronostico, ESATTAMENTE come nel pool ricevuto
+  - "reasoning": una frase breve che spiega perché hai scelto queste selezioni per questa bolletta
 
 ### Esempio
-[
-  {
-    "selezioni": [
-      {"match_key": "Inter vs Milan|2026-03-16", "mercato": "SEGNO", "pronostico": "1"},
-      {"match_key": "Juventus vs Roma|2026-03-16", "mercato": "GOL", "pronostico": "Over 2.5"}
-    ],
-    "reasoning": "Inter forte in casa, forma 82%, Roma subisce in trasferta, convergenza dati su Over"
-  }
-]
+{
+  "analisi": "Ho analizzato 4 partite. Inter vs Lecce: tutti i dati convergono, Elite, inserire. Roma vs Empoli: trend positivo, tipo partita favorevole ai gol, inserire. Burnley vs Sheffield: dati contrastanti, scartare. Barcelona vs Atletico: Elite, 1X copre il pareggio, inserire. Ho composto 2 bollette diversificando.",
+  "bollette": [
+    {
+      "selezioni": [
+        {"match_key": "Inter vs Milan|2026-03-16", "mercato": "SEGNO", "pronostico": "1"},
+        {"match_key": "Juventus vs Roma|2026-03-16", "mercato": "GOL", "pronostico": "Over 2.5"}
+      ],
+      "reasoning": "Inter forte in casa, forma 82%, Roma subisce in trasferta, convergenza dati su Over"
+    }
+  ]
+}
 
 # Esempi
 Di seguito un esempio completo di come analizzare un pool e generare bollette.
@@ -429,31 +437,38 @@ Pool di 4 selezioni:
 - Selezione 4 (Barcelona 1X): Elite, confidence alta, Barcelona imbattuta in casa, affidabilità 9.0. Ma 6V consecutive → la curva strisce è in calo (-1). La doppia chance 1X copre anche il pareggio, quindi il rischio è basso. Inserire.
 
 ## Output
-[
-  {
-    "selezioni": [
-      {"match_key": "Inter vs Lecce|2026-03-16", "mercato": "SEGNO", "pronostico": "1"},
-      {"match_key": "Roma vs Empoli|2026-03-16", "mercato": "GOL", "pronostico": "Over 2.5"}
-    ],
-    "reasoning": "Inter convergenza totale dati + Elite, Roma trend positivo con 3xOver2.5 al picco"
-  },
-  {
-    "selezioni": [
-      {"match_key": "Inter vs Lecce|2026-03-16", "mercato": "SEGNO", "pronostico": "1"},
-      {"match_key": "Barcelona vs Atletico Madrid|2026-03-16", "mercato": "DOPPIA_CHANCE", "pronostico": "1X"}
-    ],
-    "reasoning": "Due Elite con convergenza dati forte, Barcelona 1X copre anche il pareggio"
-  }
-]
+{
+  "analisi": "Ho analizzato 4 partite. Inter vs Lecce: classifica nettamente a favore (2o vs 17o), forma 82% vs 35%, trend in salita vs in calo, 4V consecutive al picco della curva (+3), affidabilità Inter casa 8.1/10, Elite. Tutti i dati convergono, inserire. Roma vs Empoli: Roma in trend positivo, tipo partita favorevole ai gol casa, 3xOver2.5 al picco della curva (+2), attacco Roma 68 vs difesa Empoli 35. Inserire. Burnley vs Sheffield Utd: forma quasi identica (48% vs 51%), trend opposti ma vicini, nessun incrocio chiaro, affidabilità media. Dati contrastanti, scartare. Barcelona vs Atletico Madrid: Elite, confidence 85, Barcelona imbattuta in casa, affidabilità 9.0. Ma 6V consecutive → curva in calo (-1). La doppia chance 1X copre anche il pareggio, rischio basso. Inserire. Ho composto 2 bollette: una con Inter+Roma (convergenza + Over), una con Inter+Barcelona (due Elite solide).",
+  "bollette": [
+    {
+      "selezioni": [
+        {"match_key": "Inter vs Lecce|2026-03-16", "mercato": "SEGNO", "pronostico": "1"},
+        {"match_key": "Roma vs Empoli|2026-03-16", "mercato": "GOL", "pronostico": "Over 2.5"}
+      ],
+      "reasoning": "Inter convergenza totale dati + Elite, Roma trend positivo con 3xOver2.5 al picco"
+    },
+    {
+      "selezioni": [
+        {"match_key": "Inter vs Lecce|2026-03-16", "mercato": "SEGNO", "pronostico": "1"},
+        {"match_key": "Barcelona vs Atletico Madrid|2026-03-16", "mercato": "DOPPIA_CHANCE", "pronostico": "1X"}
+      ],
+      "reasoning": "Due Elite con convergenza dati forte, Barcelona 1X copre anche il pareggio"
+    }
+  ]
+}
 
 """
 
 
-USER_PROMPT_V2 = """Ecco il pool di partite disponibili con tutti i dati sportivi. Analizzalo e genera i biglietti che ritieni vincenti.
+USER_PROMPT_V2 = """Ecco il pool di {n_selezioni} partite disponibili su 3 giorni ({dates_range}) con tutti i dati sportivi. Analizzale TUTTE — non fermarti al primo giorno, usa partite di tutti i giorni disponibili.
 
-Varia il numero di selezioni tra i biglietti: alcuni da 2, alcuni da 3, alcuni da 4, alcuni da 5 o più. Non generare tutti i biglietti con lo stesso numero di selezioni.
+Oggi è {today_date}. Genera almeno 3 biglietti che contengano esclusivamente partite di oggi ({today_date}).
 
-Cerca di sfruttare tutte le partite del pool: se ad esempio hai 20 partite a disposizione, non usare sempre le stesse. Distribuisci le partite tra i vari biglietti.
+Genera almeno 10 biglietti in totale. Hai {n_selezioni} selezioni a disposizione — usane il più possibile. Non fermarti a 3 o 5 biglietti, continua a comporre finché hai selezioni valide.
+
+Varia il numero di selezioni tra i biglietti. I biglietti NON devono essere tutti da 2 o 3 selezioni — serve un mix reale: biglietti corti (2 selezioni), medi (3-4 selezioni) e lunghi (5+ selezioni). Se tutti i biglietti hanno lo stesso numero di selezioni, il risultato non è accettabile.
+
+Distribuisci le partite tra i vari biglietti: non usare sempre le stesse selezioni.
 
 Pool:
 {pool_text}

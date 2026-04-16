@@ -2395,6 +2395,58 @@ def _call_llm(messages, provider_url=None, provider_model=None, provider_key=Non
     raise Exception("LLM: tutti i tentativi falliti")
 
 
+def _call_llm_v2(messages, provider_url=None, provider_model=None, provider_key=None, n=3):
+    """Chiamata LLM per il flusso V2: temperatura 0.5, n completamenti, max_tokens 16384.
+    Restituisce una lista di contenuti (uno per completamento)."""
+    url = provider_url or MISTRAL_URL
+    model = provider_model or MISTRAL_MODEL
+    api_key = provider_key or MISTRAL_API_KEY
+
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+    }
+    payload = {
+        "model": model,
+        "messages": messages,
+        "temperature": 0.5,
+        "top_p": 0.7,
+        "max_tokens": 16384,
+        "response_format": {"type": "json_object"},
+        "n": n,
+    }
+
+    max_retries = 2
+    for attempt in range(1, max_retries + 1):
+        try:
+            resp = requests.post(url, headers=headers, json=payload, timeout=600)
+            if resp.status_code == 429 and attempt < max_retries:
+                wait = 15 * attempt
+                logger.info(f"⏳ Rate limit 429, retry {attempt}/{max_retries} tra {wait}s...")
+                time.sleep(wait)
+                continue
+            if resp.status_code >= 400:
+                logger.error(f" LLM V2 risposta errore {resp.status_code}: {resp.text[:500]}")
+            resp.raise_for_status()
+            choices = resp.json().get("choices", [])
+            contents = []
+            for choice in choices:
+                content = choice["message"]["content"]
+                if "<think>" in content:
+                    content = re.sub(r'<think>.*?</think>', '', content, flags=re.DOTALL).strip()
+                contents.append(content)
+            logger.info(f"📦 LLM V2: ricevute {len(contents)} risposte (n={n})")
+            return contents
+        except Exception as e:
+            if attempt < max_retries:
+                logger.warning(f" Errore LLM V2 (attempt {attempt}): {e}")
+                time.sleep(10)
+                continue
+            raise
+
+    raise Exception("LLM V2: tutti i tentativi falliti")
+
+
 def _save_debug_prompt(messages, label="llm_call"):
     """Salva prompt e messaggi su file per debug."""
     if not DEBUG_MODE:
@@ -3582,13 +3634,49 @@ def _recompose_from_discards(discarded_selezioni, pool, today_str, bollette_docs
     return new_bollette
 
 
-def _generate_all_v2(pool, today_str):
+def _build_bolletta_doc(fascia, numero, selezioni_valid, quota_totale, reasoning, today_str):
+    """Costruisce il documento bolletta per MongoDB."""
+    selezioni_doc = []
+    for s in selezioni_valid:
+        selezioni_doc.append({
+            "home": s["home"],
+            "away": s["away"],
+            "league": s["league"],
+            "match_time": s["match_time"],
+            "match_date": s["match_date"],
+            "match_key": s["match_key"],
+            "mercato": s["mercato"],
+            "pronostico": s["pronostico"],
+            "quota": s["quota"],
+            "confidence": s.get("confidence", 0),
+            "stars": s.get("stars", 0),
+            "elite": s.get("elite", False),
+        })
+    return {
+        "date": today_str,
+        "tipo": fascia,
+        "label": f"{fascia.capitalize()} #{numero}",
+        "selezioni": selezioni_doc,
+        "quota_totale": quota_totale,
+        "n_selezioni": len(selezioni_doc),
+        "reasoning": reasoning,
+        "prompt_version": "v2",
+        "created_at": datetime.now(),
+    }
+
+
+def _generate_all_v2(pool, today_str, use_deepseek=False):
     """Flusso V2: una singola chiamata LLM, poi Python smista nelle fasce."""
     # Filtra via SEGNO X dal pool
     pool = [s for s in pool if not (s.get("mercato") == "SEGNO" and s.get("pronostico") == "X")]
 
     pool_text = serialize_pool_for_prompt_v2(pool)
-    user_prompt = USER_PROMPT_V2.format(pool_text=pool_text)
+    dates_in_pool = sorted(set(s["match_date"] for s in pool))
+    dates_range = ", ".join(dates_in_pool)
+    user_prompt = USER_PROMPT_V2.format(
+        pool_text=pool_text, today_date=today_str,
+        n_selezioni=len(pool), dates_range=dates_range
+    )
 
     messages = [
         {"role": "system", "content": SYSTEM_PROMPT_V2},
@@ -3598,35 +3686,97 @@ def _generate_all_v2(pool, today_str):
     if DEBUG_MODE:
         debug_dir = os.path.join(current_path, "log")
         os.makedirs(debug_dir, exist_ok=True)
-        with open(os.path.join(debug_dir, f"prompt_v2_{today_str}.txt"), "w", encoding="utf-8") as f:
+        prompt_path = os.path.join(debug_dir, f"prompt_v2_{today_str}.txt")
+        with open(prompt_path, "w", encoding="utf-8") as f:
             f.write(f"=== SYSTEM PROMPT ===\n{SYSTEM_PROMPT_V2}\n\n=== USER PROMPT ===\n{user_prompt}")
+        logger.info(f"  🐛 Prompt salvato: {prompt_path}")
 
-    logger.info(f"🤖 Chiamata LLM V2 — pool: {len(pool)} selezioni")
-    content = _call_llm_with_fallback(messages)
-
-    try:
-        raw_bollette = _sanitize_and_parse_json(content)
-    except Exception as e:
-        logger.error(f" Parse JSON V2 fallito: {e}")
-        # Retry con istruzione esplicita
-        messages.append({"role": "assistant", "content": content})
-        messages.append({"role": "user", "content": "ERRORE: la risposta non è un JSON valido. Rispondi con SOLO un array JSON valido, senza testo prima o dopo. Formato: [{...}, {...}]"})
-        content2 = _call_llm_with_fallback(messages)
-        raw_bollette = _sanitize_and_parse_json(content2)
-
-    if not isinstance(raw_bollette, list):
-        logger.error(" LLM V2 non ha restituito un array")
+    def _extract_bollette_from_response(parsed, label=""):
+        """Estrae l'array di bollette dalla risposta LLM (supporta sia array diretto che oggetto con analisi)."""
+        if isinstance(parsed, list):
+            return parsed
+        if isinstance(parsed, dict):
+            # Nuovo formato: {"analisi": "...", "bollette": [...]}
+            analisi = parsed.get("analisi", "")
+            if analisi:
+                logger.info(f"  📝 Analisi{' ' + label if label else ''}: {analisi[:300]}{'...' if len(analisi) > 300 else ''}")
+            bollette = parsed.get("bollette", [])
+            if isinstance(bollette, list):
+                return bollette
         return []
 
-    logger.info(f"📦 LLM V2 ha generato {len(raw_bollette)} biglietti")
+    # V2: Mistral con n=3 di default, DeepSeek (singola risposta) solo con --deepseek
+    if use_deepseek:
+        logger.info(f"🤖 Chiamata DeepSeek V2 — pool: {len(pool)} selezioni")
+        content = _call_llm_with_fallback(messages)
+        try:
+            parsed = _sanitize_and_parse_json(content)
+            raw_bollette = _extract_bollette_from_response(parsed)
+        except Exception as e:
+            logger.error(f" Parse JSON V2 fallito: {e}")
+            messages.append({"role": "assistant", "content": content})
+            messages.append({"role": "user", "content": "ERRORE: la risposta non è un JSON valido. Rispondi con SOLO un oggetto JSON valido, senza testo prima o dopo."})
+            content2 = _call_llm_with_fallback(messages)
+            parsed2 = _sanitize_and_parse_json(content2)
+            raw_bollette = _extract_bollette_from_response(parsed2)
+    else:
+        logger.info(f"🤖 Chiamata Mistral V2 (n=3) — pool: {len(pool)} selezioni")
+        contents = _call_llm_v2(messages)
+        # Salva risposte raw in debug
+        if DEBUG_MODE:
+            debug_dir = os.path.join(current_path, "log")
+            os.makedirs(debug_dir, exist_ok=True)
+            for i, c in enumerate(contents):
+                fpath = os.path.join(debug_dir, f"response_v2_{today_str}_n{i+1}.json")
+                with open(fpath, "w", encoding="utf-8") as f:
+                    f.write(c)
+                logger.info(f"  🐛 Risposta {i+1} salvata: {fpath}")
+        # Unisci le bollette da tutte le N risposte
+        raw_bollette = []
+        for i, content in enumerate(contents):
+            try:
+                parsed = _sanitize_and_parse_json(content)
+                bollette = _extract_bollette_from_response(parsed, f"(risposta {i+1})")
+                logger.info(f"  Risposta {i+1}/{len(contents)}: {len(bollette)} biglietti")
+                raw_bollette.extend(bollette)
+            except Exception as e:
+                logger.warning(f"  Risposta {i+1}/{len(contents)}: parse fallito ({e})")
 
-    # Smista nelle fasce in base alla quota totale
-    bollette_docs = []
-    counters = {"oggi": 0, "elite": 0, "selettiva": 0, "bilanciata": 0, "ambiziosa": 0}
+    if not raw_bollette:
+        logger.error(" LLM V2 non ha generato bollette valide")
+        return []
+
+    logger.info(f"📦 LLM V2 ha generato {len(raw_bollette)} biglietti totali")
+
+    # Indice pool per lookup veloce (chiave esatta + fallback per match senza data)
     pool_by_key = {}
+    pool_by_match_mercato = {}  # fallback: "Home vs Away|mercato:pronostico" senza data
     for s in pool:
         key = f"{s['match_key']}|{s['mercato']}:{s['pronostico']}"
         pool_by_key[key] = s
+        # Fallback: nome partita (senza data) + mercato + pronostico
+        match_name = s['match_key'].split('|')[0] if '|' in s['match_key'] else s['match_key']
+        fallback_key = f"{match_name}|{s['mercato']}:{s['pronostico']}"
+        pool_by_match_mercato[fallback_key] = s
+
+    def _find_in_pool(mk, mercato, pronostico):
+        """Cerca selezione nel pool con matching flessibile."""
+        # 1. Match esatto
+        key = f"{mk}|{mercato}:{pronostico}"
+        entry = pool_by_key.get(key)
+        if entry:
+            return entry
+        # 2. Fallback: nome partita senza data
+        match_name = mk.split('|')[0] if '|' in mk else mk
+        fallback_key = f"{match_name}|{mercato}:{pronostico}"
+        entry = pool_by_match_mercato.get(fallback_key)
+        if entry:
+            logger.debug(f"  Match_key corretto: {mk} → {entry['match_key']}")
+            return entry
+        return None
+
+    # === FASE 1: Valida tutte le bollette e assegna fascia ===
+    validated = []  # lista di (assigned_fascia, selezioni_valid, quota_totale, reasoning)
 
     for raw in raw_bollette:
         selezioni_raw = raw.get("selezioni", [])
@@ -3641,10 +3791,9 @@ def _generate_all_v2(pool, today_str):
             mk = sel.get("match_key", "")
             mercato = sel.get("mercato", "")
             pronostico = sel.get("pronostico", "")
-            key = f"{mk}|{mercato}:{pronostico}"
-            pool_entry = pool_by_key.get(key)
+            pool_entry = _find_in_pool(mk, mercato, pronostico)
             if not pool_entry:
-                logger.warning(f" Selezione non trovata nel pool: {key}")
+                logger.warning(f" Selezione non trovata nel pool: {mk}|{mercato}:{pronostico}")
                 valid = False
                 break
             selezioni_valid.append(pool_entry)
@@ -3667,8 +3816,11 @@ def _generate_all_v2(pool, today_str):
         # Verifica se tutte le selezioni sono elite
         all_elite = all(s.get("elite") for s in selezioni_valid)
 
-        # Smista nella fascia corretta in base alla quota totale
-        if all_elite and quota_totale <= 8.0:
+        # Assegna fascia
+        all_today = all(s["match_date"] == today_str for s in selezioni_valid)
+        if all_today:
+            assigned_fascia = "oggi"
+        elif all_elite and quota_totale <= 8.0:
             assigned_fascia = "elite"
         elif quota_totale <= 4.50:
             assigned_fascia = "selettiva"
@@ -3677,47 +3829,179 @@ def _generate_all_v2(pool, today_str):
         else:
             assigned_fascia = "ambiziosa"
 
-        # Verifica se c'è una partita di oggi
-        has_today = any(s["match_date"] == today_str for s in selezioni_valid)
-        if has_today and assigned_fascia not in ("elite",) and counters.get("oggi", 0) < 3:
-            # Potrebbe essere anche una bolletta "oggi"
-            # La assegna a "oggi" se ci sono solo partite di oggi
-            all_today = all(s["match_date"] == today_str for s in selezioni_valid)
-            if all_today and counters.get("oggi", 0) < 3:
-                assigned_fascia = "oggi"
+        validated.append((assigned_fascia, selezioni_valid, quota_totale, raw.get("reasoning", "")))
 
-        counters[assigned_fascia] = counters.get(assigned_fascia, 0) + 1
+    # === FASE 2: Cap 3 per fascia, eccedenze → urna ===
+    MAX_PER_FASCIA = 3
+    bollette_docs = []
+    counters = {"oggi": 0, "elite": 0, "selettiva": 0, "bilanciata": 0, "ambiziosa": 0}
+    urna_selezioni = []  # selezioni smontate dalle bollette in eccesso
 
-        # Costruisci il documento bolletta
-        selezioni_doc = []
-        for s in selezioni_valid:
-            selezioni_doc.append({
-                "home": s["home"],
-                "away": s["away"],
-                "league": s["league"],
-                "match_time": s["match_time"],
-                "match_date": s["match_date"],
-                "match_key": s["match_key"],
-                "mercato": s["mercato"],
-                "pronostico": s["pronostico"],
-                "quota": s["quota"],
-                "confidence": s.get("confidence", 0),
-                "stars": s.get("stars", 0),
-                "elite": s.get("elite", False),
-            })
+    for fascia, selezioni_valid, quota_totale, reasoning in validated:
+        if counters[fascia] < MAX_PER_FASCIA:
+            counters[fascia] += 1
+            bollette_docs.append(_build_bolletta_doc(
+                fascia, counters[fascia], selezioni_valid, quota_totale, reasoning, today_str
+            ))
+        else:
+            # Eccedenza: smonta le selezioni nell'urna
+            for s in selezioni_valid:
+                sel_key = f"{s['match_key']}|{s['mercato']}:{s['pronostico']}"
+                if not any(f"{u['match_key']}|{u['mercato']}:{u['pronostico']}" == sel_key for u in urna_selezioni):
+                    urna_selezioni.append(s)
 
-        doc = {
-            "date": today_str,
-            "tipo": assigned_fascia,
-            "label": f"{assigned_fascia.capitalize()} #{counters[assigned_fascia]}",
-            "selezioni": selezioni_doc,
-            "quota_totale": quota_totale,
-            "n_selezioni": len(selezioni_doc),
-            "reasoning": raw.get("reasoning", ""),
-            "prompt_version": "v2",
-            "created_at": datetime.now(),
-        }
-        bollette_docs.append(doc)
+    logger.info(f"📋 Fase 2: {len(bollette_docs)} bollette accettate, {len(urna_selezioni)} selezioni in urna")
+
+    # === FASE 3: Ricomposizione dall'urna ===
+    # Ordina per confidence decrescente, compone bollette da max 8 selezioni,
+    # se avanza 1 sola la aggiunge all'ultima bolletta (fa 9 invece di 8).
+    # Ogni bolletta viene smistata nella fascia giusta per quota totale.
+    MAX_SEL_PER_BOLLETTA = 8
+
+    if urna_selezioni:
+        # Deduplica selezioni già presenti nelle bollette accettate
+        used_global = set()
+        for doc in bollette_docs:
+            for sel in doc["selezioni"]:
+                used_global.add(f"{sel['match_key']}|{sel['mercato']}:{sel['pronostico']}")
+
+        urna_clean = []
+        for s in urna_selezioni:
+            sel_key = f"{s['match_key']}|{s['mercato']}:{s['pronostico']}"
+            if sel_key not in used_global:
+                urna_clean.append(s)
+                used_global.add(sel_key)
+
+        # Ordina per confidence decrescente
+
+        logger.info(f"🔄 Ricomposizione urna: {len(urna_clean)} selezioni uniche disponibili")
+
+        if len(urna_clean) >= 2:
+            remaining = list(urna_clean)  # copia
+            gruppi_con_fascia = []  # (gruppo, fascia)
+
+            # --- STEP 1: Completa le fasce sotto il cap di 3 ---
+            # Ordine: selettiva (1.5-4.5), bilanciata (5.0-7.5), poi ambiziosa
+            fasce_da_completare = []
+            for fascia_name in ["selettiva", "bilanciata"]:
+                current = counters.get(fascia_name, 0)
+                if current < MAX_PER_FASCIA:
+                    needed = MAX_PER_FASCIA - current
+                    constraints = CATEGORY_CONSTRAINTS[fascia_name]
+                    fasce_da_completare.append((fascia_name, needed, constraints))
+
+            for fascia_name, needed, constraints in fasce_da_completare:
+                min_sel = constraints["min_sel"]
+                max_sel = constraints["max_sel"]
+                min_quota = constraints.get("min_quota") or 0
+                max_quota = constraints.get("max_quota") or 999
+
+                for _ in range(needed):
+                    if len(remaining) < min_sel:
+                        break
+
+                    # Strategia: prova con le prime N selezioni (ordine confidence)
+                    # Se la quota è troppo bassa, prova ordinando per quota decrescente
+                    best_gruppo = None
+                    best_indices = None
+
+                    # Tentativo 1: prime N selezioni in ordine di confidence
+                    for take in range(min_sel, min(max_sel, len(remaining)) + 1):
+                        gruppo = remaining[:take]
+                        qt = 1.0
+                        for s in gruppo:
+                            qt *= s["quota"]
+                        qt = round(qt, 2)
+                        if min_quota <= qt <= max_quota:
+                            best_gruppo = gruppo
+                            best_indices = list(range(take))
+                            break
+
+                    # Tentativo 2: se non trovato, prova con le selezioni a quota più alta
+                    if not best_gruppo:
+                        by_quota = sorted(range(len(remaining)), key=lambda i: remaining[i]["quota"], reverse=True)
+                        for take in range(min_sel, min(max_sel, len(remaining)) + 1):
+                            indices = by_quota[:take]
+                            gruppo = [remaining[i] for i in indices]
+                            qt = 1.0
+                            for s in gruppo:
+                                qt *= s["quota"]
+                            qt = round(qt, 2)
+                            if min_quota <= qt <= max_quota:
+                                best_gruppo = gruppo
+                                best_indices = sorted(indices)
+                                break
+
+                    if best_gruppo:
+                        # Rimuovi le selezioni usate (dall'ultimo indice al primo)
+                        for idx in reversed(best_indices):
+                            remaining.pop(idx)
+                        gruppi_con_fascia.append((best_gruppo, fascia_name))
+                        logger.info(f"  📦 Urna → {fascia_name.upper()}: {len(best_gruppo)} sel, quota {qt}")
+
+            # --- STEP 2: Ambiziose dall'urna ---
+            # Completa fino a 3 ambiziose totali (ragionevoli), poi 1 pazza extra
+            QUOTA_AMBIZIOSA_MIN = 8.0
+            ambiziose_esistenti = counters.get("ambiziosa", 0)
+            ambiziose_mancanti = max(0, MAX_PER_FASCIA - ambiziose_esistenti)
+            # Max dall'urna: quelle mancanti per arrivare a 3 + 1 pazza
+            MAX_AMBIZIOSE_URNA = ambiziose_mancanti + 1
+            ambiziose_urna = 0
+
+            while len(remaining) >= 2 and ambiziose_urna < MAX_AMBIZIOSE_URNA:
+                # L'ultima è la pazza (max 8 selezioni)
+                if ambiziose_urna == MAX_AMBIZIOSE_URNA - 1:
+                    take = min(MAX_SEL_PER_BOLLETTA, len(remaining))
+                else:
+                    # Prime 2: parti da 5, aggiungi fino a 8 se quota < 8.00
+                    take = min(5, len(remaining))
+
+                gruppo = remaining[:take]
+                qt = 1.0
+                for s in gruppo:
+                    qt *= s["quota"]
+
+                # Per le prime 2, aggiungi selezioni se la quota non arriva a 8.00
+                if ambiziose_urna < 2:
+                    while qt < QUOTA_AMBIZIOSA_MIN and take < min(MAX_SEL_PER_BOLLETTA, len(remaining)):
+                        take += 1
+                        gruppo = remaining[:take]
+                        qt = 1.0
+                        for s in gruppo:
+                            qt *= s["quota"]
+
+                remaining = remaining[take:]
+                if len(gruppo) >= 2:
+                    qt = round(qt, 2)
+                    # Lo Step 2 deve produrre ambiziose (quota >= 8.00)
+                    # Se la quota non ci arriva, metti nella fascia corretta SOLO se ha spazio
+                    if qt >= 8.0:
+                        fascia = "ambiziosa"
+                        ambiziose_urna += 1
+                        gruppi_con_fascia.append((gruppo, fascia))
+                    elif qt <= 4.50 and (counters.get("selettiva", 0) + sum(1 for _, f in gruppi_con_fascia if f == "selettiva")) < MAX_PER_FASCIA:
+                        gruppi_con_fascia.append((gruppo, "selettiva"))
+                    elif qt <= 7.50 and (counters.get("bilanciata", 0) + sum(1 for _, f in gruppi_con_fascia if f == "bilanciata")) < MAX_PER_FASCIA:
+                        gruppi_con_fascia.append((gruppo, "bilanciata"))
+                    else:
+                        logger.info(f"  🗑️ Urna: bolletta scartata (quota {qt}, nessuna fascia disponibile)")
+
+            # Selezioni rimanenti dopo le 3 ambiziose: scartate
+            if remaining:
+                logger.info(f"  🗑️ Urna: {len(remaining)} selezioni scartate (ambiziosa completa)")
+
+            for gruppo, fascia in gruppi_con_fascia:
+                qt = 1.0
+                for s in gruppo:
+                    qt *= s["quota"]
+                qt = round(qt, 2)
+
+                counters[fascia] = counters.get(fascia, 0) + 1
+                bollette_docs.append(_build_bolletta_doc(
+                    fascia, counters[fascia], gruppo, qt,
+                    f"Ricomposta da urna ({len(gruppo)} sel, quota {qt})", today_str
+                ))
+                logger.info(f"  ✅ {fascia.upper()} #{counters[fascia]}: {len(gruppo)} selezioni, quota {qt}")
 
     # Log riepilogo
     by_tipo = {}
@@ -3756,6 +4040,7 @@ def main():
     parser.add_argument('--dry-run', action='store_true', help='Non salvare su MongoDB')
     parser.add_argument('--debug', action='store_true', help='Salva prompt LLM su file debug')
     parser.add_argument('--prompt-v1', action='store_true', help='Usa il prompt v1 (originale) invece del v2')
+    parser.add_argument('--deepseek', action='store_true', help='Forza DeepSeek come provider LLM (default: Mistral)')
     args, _ = parser.parse_known_args()
     today_str = args.date if args.date else datetime.now().strftime("%Y-%m-%d")
     is_retroactive = args.date is not None
@@ -3803,7 +4088,7 @@ def main():
     # ========== BIFORCAZIONE V1 / V2 ==========
     if active_prompt == "v2":
         logger.info("🚀 Flusso V2 — singola chiamata LLM, Python smista nelle fasce")
-        bollette_docs = _generate_all_v2(pool, today_str)
+        bollette_docs = _generate_all_v2(pool, today_str, use_deepseek=args.deepseek)
 
         if not bollette_docs:
             logger.warning("Nessuna bolletta generata dal flusso V2.")
