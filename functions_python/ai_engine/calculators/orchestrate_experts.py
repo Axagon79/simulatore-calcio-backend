@@ -176,7 +176,7 @@ def _apply_goal_quota_conversion(unified, odds):
         # Fascia 1.70-1.79 → Over 1.5
         elif 1.70 <= q < 1.80:
             o15_q = float(odds.get('over_15') or 0)
-            if o15_q > 1.0:
+            if o15_q >= 1.35:
                 p['original_pronostico'] = 'Goal'
                 p['original_quota'] = q
                 p['pronostico'] = 'Over 1.5'
@@ -3248,8 +3248,8 @@ def orchestrate_date(date_str, dry_run=False, match_time_filter=None, preserve_a
             print(f"    ⚔️ DC CONTRASTANTI: tenuto {winner['pronostico']} @{winner.get('quota','?')}, "
                   f"rimosso {loser['pronostico']} @{loser.get('quota','?')} ({reason})")
 
-        # --- RISULTATO ESATTO MC (admin-only, bonus separato) ---
-        unified_pronostici = _add_exact_score_predictions(unified_pronostici, c_doc_for_combo, match_odds)
+        # --- RISULTATO ESATTO MC — DISABILITATO (17/04/2026) ---
+        # unified_pronostici = _add_exact_score_predictions(unified_pronostici, c_doc_for_combo, match_odds)
 
         # --- DIAMOND RECOVERY: recupera pronostici scartati con pattern ad alta HR ---
         unified_pronostici = _apply_diamond_recovery(unified_pronostici, docs_by_sys, match_key, match_odds)
