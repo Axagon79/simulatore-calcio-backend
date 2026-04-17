@@ -1193,7 +1193,7 @@ async function generateOddsMonitorAnalysis(matchJson) {
     { role: 'user', content: JSON.stringify(matchJson) },
   ];
 
-  const reply = await callMistral(messages, { temperature: 0.7, maxTokens: 600 });
+  const reply = await callMistral(messages, { temperature: 0.7, maxTokens: 1500 });
   return sanitizeMistralResponse(reply.content);
 }
 
