@@ -79,4 +79,17 @@ ai_engine/Aggiornamenti/date_orari/date_orari_pending.json
 # Documentazione locale
 docs/
 
+# Claude Code settings locali
+.claude/settings.local.json
+
+# Cache analisi temporanee
+_results_cache_*.pkl
+*.pkl
+
+# Script deploy locali
+deploy.ps1
+
+# Script analisi/dump/test temporanei nella cartella calculators (convenzione prefisso _)
+functions_python/ai_engine/calculators/_*.py
+
 node_modules
