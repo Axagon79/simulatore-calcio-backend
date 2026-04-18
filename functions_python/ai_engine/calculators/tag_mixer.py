@@ -34,6 +34,7 @@ def _check(p):
         'q1.30-1.39': 1.30 <= quota <= 1.39,
         'q1.30-1.49': 1.30 <= quota <= 1.49,
         'q1.50-1.79': 1.50 <= quota <= 1.79,
+        'q1.60-1.79': 1.60 <= quota <= 1.79,  # aggiunto 18/04/2026 per pattern V
         'q_lt1.60': quota < 1.60,
         'q3.00-3.99': 3.00 <= quota <= 3.99,
         'src_A': source == 'A',
@@ -53,6 +54,8 @@ def _check(p):
         'st3.0-3.5': 3.0 <= stars < 3.5,
         'st3.5+': stars >= 3.5,
         'st3.6-3.9': 3.6 <= stars <= 3.9,
+        'st4.0+': stars >= 4.0,  # aggiunto 18/04/2026 per pattern V
+        'conf80-100': 80 <= confidence <= 100,  # aggiunto 18/04/2026 per pattern V (alias di conf80+ ma esplicito)
         'edge20-50': 20 < edge <= 50,
         'edge50+': edge > 50,
     }
@@ -140,6 +143,24 @@ MIXER_PATTERNS = {
     'H58': {'pron_1', 'q1.50-1.79', 'route_single', 'st3.6-3.9'},
     'H59': {'edge20-50', 'pron_1', 'q1.50-1.79', 'route_single'},
     'H60': {'edge20-50', 'pron_1', 'q1.50-1.79', 'tipo_SEGNO'},
+
+    # --- 12 PATTERN V (aggiunti 18/04/2026) ---
+    # Estratti da hybrid_pattern_mixer_v2 sui SEGNO (storico 2026-02-18 -> 2026-04-18, 1490 SEGNO valutati)
+    # Tutti AFFIDABILI: HR>=70%, N>=20, quote >=1.50. Yield medio +24%.
+    # 0 sovrapposizione gerarchica con G/H esistenti (lavorano su st4.0+, q1.60-1.79, conf80-100, conf85+).
+    # Vedi memoria: disabilitazione-regole-segno.md
+    'V01': {'pron_1', 'src_C', 'st4.0+'},                       # HR 79%, N=28, +9.4u, Yield +33.6%
+    'V02': {'conf80-100', 'pron_1'},                            # HR 78%, N=23, +7.3u
+    'V03': {'conf70+', 'q1.60-1.79', 'src_C', 'tipo_SEGNO'},    # HR 77%, N=26, +7.5u
+    'V04': {'conf85+', 'src_C'},                                # HR 73%, N=22, +5.9u
+    'V05': {'pron_1', 'q1.60-1.79', 'src_C', 'st3.0+'},         # HR 76%, N=42, +10.9u
+    'V06': {'pron_1', 'st4.0+'},                                # HR 74%, N=31, +8.0u
+    'V07': {'q1.60-1.79', 'src_C', 'st3.0+', 'tipo_SEGNO'},     # HR 74%, N=61, +13.6u
+    'V08': {'conf85+', 'st3.0+'},                               # HR 71%, N=28, +5.8u
+    'V09': {'q1.60-1.79', 'src_C', 'st3.0-3.5', 'tipo_SEGNO'},  # HR 73%, N=22, +4.2u
+    'V10': {'pron_1', 'q1.60-1.79', 'src_C'},                   # HR 72%, N=54, +10.3u
+    'V11': {'q1.60-1.79', 'src_C', 'tipo_SEGNO'},               # HR 70%, N=74, +12.0u
+    'V12': {'conf50-59', 'q1.60-1.79', 'src_C'},                # HR 71%, N=21, +3.4u
 }
 
 # --- 11 SALVATI DA BOLLETTE (S01-S11) — solo per pool bollette, NON per pagina Mixer ---
@@ -162,17 +183,36 @@ PATTERNS = {**MIXER_PATTERNS, **_BOLLETTE_EXTRA}
 
 
 def get_matched_mixer_patterns(p):
-    """Restituisce la lista di pattern ID (solo G+H, 74) che il pronostico matcha.
-    Usato per taggare mixer nella pagina Mixer."""
+    """Restituisce la lista di pattern ID che il pronostico matcha.
+    Logica gerarchica (introdotta 18/04/2026): se due pattern matchano e uno è
+    sottoinsieme dell'altro, viene tenuto solo quello piu' specifico (con piu' condizioni).
+    """
     if p.get('pronostico') == 'NO BET':
         return []
 
     flags = _check(p)
-    matched = []
+    matched_ids = []
     for pat_id, conditions in MIXER_PATTERNS.items():
         if all(flags.get(c, False) for c in conditions):
-            matched.append(pat_id)
-    return matched
+            matched_ids.append(pat_id)
+
+    # Filtro gerarchico: rimuovi i pattern che sono sottoinsieme propri di un altro pattern matchato
+    filtered = []
+    for pid in matched_ids:
+        cond_pid = MIXER_PATTERNS[pid]
+        is_absorbed = False
+        for other_id in matched_ids:
+            if other_id == pid:
+                continue
+            cond_other = MIXER_PATTERNS[other_id]
+            # pid e' assorbito se le sue condizioni sono un sottoinsieme proprio di other
+            if cond_pid.issubset(cond_other) and cond_pid != cond_other:
+                is_absorbed = True
+                break
+        if not is_absorbed:
+            filtered.append(pid)
+
+    return filtered
 
 
 def main():
