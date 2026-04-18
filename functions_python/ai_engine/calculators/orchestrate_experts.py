@@ -608,6 +608,42 @@ def _apply_gol_stake7_filter(unified, odds):
     return result
 
 
+def _apply_f150_169_trap_filter(unified, odds):
+    """
+    Filtro 'trappola fascia 1.50-1.69' (aggiunto 18/04/2026):
+    Analisi 60 giorni ha evidenziato che in questa fascia quota:
+    - DOPPIA_CHANCE X2: 82 casi HR 52.4% (BE 62.5%), P/L -53u pesato -14.55u flat
+    - GOL Under 2.5: 47 casi HR 57.4% (BE 62.5%), P/L -22u pesato -4.76u flat
+    Entrambi strutturalmente sotto breakeven con campione grande.
+    Conversione a NO BET (non ci sono conversioni alternative praticabili qui).
+    """
+    result = []
+    for p in unified:
+        if p.get('pronostico') == 'NO BET':
+            result.append(p)
+            continue
+        tipo = p.get('tipo', '')
+        pr = p.get('pronostico', '')
+        quota = p.get('quota') or 0
+        if not (1.50 <= quota < 1.70):
+            result.append(p)
+            continue
+        trap = False
+        tag = ''
+        if tipo == 'DOPPIA_CHANCE' and pr == 'X2':
+            trap = True; tag = 'dcx2_f150169_trap'
+        elif tipo == 'GOL' and pr == 'Under 2.5':
+            trap = True; tag = 'u25_f150169_trap'
+        if trap:
+            p['original_pronostico'] = pr
+            p['original_quota'] = quota
+            p['pronostico'] = 'NO BET'
+            p['routing_rule'] = f'{tag}_nobet'
+            print(f"    🚫 TRAP f1.50-1.69 NO BET: {pr} @{quota:.2f} [{tag}]")
+        result.append(p)
+    return result
+
+
 def _apply_gol_stake5_q160_to_nogoal(unified, odds):
     """
     Conversione GOL stake 5 fascia quota 1.60-1.69 → NoGoal.
@@ -1939,13 +1975,14 @@ def _apply_weak_o25_recovery(unified, c_doc):
     segno1 = ec_preds.get('1') or next(
         (p for p in c_doc.get('pronostici', [])
          if p.get('tipo') == 'SEGNO' and p.get('pronostico') == '1'), None)
-    if segno1 and not has_segno:
-        sq = segno1.get('quota') or 0
-        if 1.50 <= sq < 2.51:
-            result[o25_idx] = _make_recovery(
-                'SEGNO', '1', sq, 'C_as_segno1_rec', 'as_o25_to_segno1', 0.65)
-            print(f"    🔄 O25 RECOVERY: Over 2.5 A+S (score {o25_pred.get('confidence')}) → SEGNO 1 @{sq:.2f}")
-            return result
+    # DISABILITATO 2026-04-18: HR 20% live, -28.2u su 5 partite
+    # if segno1 and not has_segno:
+    #     sq = segno1.get('quota') or 0
+    #     if 1.50 <= sq < 2.51:
+    #         result[o25_idx] = _make_recovery(
+    #             'SEGNO', '1', sq, 'C_as_segno1_rec', 'as_o25_to_segno1', 0.65)
+    #         print(f"    🔄 O25 RECOVERY: Over 2.5 A+S (score {o25_pred.get('confidence')}) → SEGNO 1 @{sq:.2f}")
+    #         return result
 
     # PRIORITÀ 2: DC X2 (calcolata da quote)
     # Se c'è già un SEGNO, la DC potrebbe contraddirlo (es. SEGNO 1 + DC X2)
@@ -2157,13 +2194,14 @@ def _apply_diamond_recovery(unified_pronostici, docs_by_sys, match_key, match_od
                 print(f"    💎 DIAMOND P18 L{level}: Over 2.5 3/3 concordano min_conf={min_conf:.0f} avg={avg_conf:.0f} @{best['quota']:.2f}")
 
     # === PATTERN 10: SEGNO 1, Sistema C, conf 70-79, quota >= 1.50 ===
-    if 'SEGNO' not in existing_markets:
-        pred = find_pred('C', 'SEGNO', '1')
-        if pred and 70 <= pred['confidence'] < 80 and pred['quota'] >= 1.50:
-            recovered.append({**pred, 'source': 'C_diamond_segno1', 'routing_rule': 'diamond_pattern_10'})
-            existing.add(('SEGNO', '1'))
-            pass  # no market lock
-            print(f"    💎 DIAMOND P10: SEGNO 1 recuperato da C conf={pred['confidence']:.0f} @{pred['quota']:.2f}")
+    # DISABILITATO 2026-04-18: HR 28.6% live (vs atteso 69%), -25.5u su 7 partite
+    # if 'SEGNO' not in existing_markets:
+    #     pred = find_pred('C', 'SEGNO', '1')
+    #     if pred and 70 <= pred['confidence'] < 80 and pred['quota'] >= 1.50:
+    #         recovered.append({**pred, 'source': 'C_diamond_segno1', 'routing_rule': 'diamond_pattern_10'})
+    #         existing.add(('SEGNO', '1'))
+    #         pass  # no market lock
+    #         print(f"    💎 DIAMOND P10: SEGNO 1 recuperato da C conf={pred['confidence']:.0f} @{pred['quota']:.2f}")
 
     # (Pattern 18 già gestito sopra)
 
@@ -2975,8 +3013,10 @@ def orchestrate_date(date_str, dry_run=False, match_time_filter=None, preserve_a
         if c_doc_for_combo:
             sim_data = c_doc_for_combo.get('simulation_data')
             unified_pronostici = _apply_combo96_dc_flip(unified_pronostici, match_odds, sim_data)
-            unified_pronostici = _apply_x_draw_combos(unified_pronostici, match_odds, sim_data)
-            unified_pronostici = _apply_home_win_combos(unified_pronostici, match_odds, sim_data)
+            # DISABILITATO 2026-04-18: regole speciali in perdita su 2 mesi live (-95u totali)
+            # Sostituiscono SEGNO C che funzionavano (HR 50% vs 52% C originale, PL -34u vs +20u)
+            # unified_pronostici = _apply_x_draw_combos(unified_pronostici, match_odds, sim_data)
+            # unified_pronostici = _apply_home_win_combos(unified_pronostici, match_odds, sim_data)
 
         # --- POST-PROCESSING: DC Downgrade — SEGNO AR + GG conf 60-65 → DC ---
         if c_doc_for_combo:
@@ -3335,6 +3375,7 @@ def orchestrate_date(date_str, dry_run=False, match_time_filter=None, preserve_a
         unified_pronostici = _apply_over15_stake5_low_to_under25(unified_pronostici, match_odds)
         unified_pronostici = _apply_gol_stake5_q160_to_nogoal(unified_pronostici, match_odds)
         unified_pronostici = _apply_gol_stake7_filter(unified_pronostici, match_odds)
+        unified_pronostici = _apply_f150_169_trap_filter(unified_pronostici, match_odds)  # DC X2 / U2.5 in 1.50-1.69 -> NO BET (18/04/2026)
         unified_pronostici = _apply_o25_stake6_to_goal(unified_pronostici, match_odds)
         unified_pronostici = _apply_segno_low_stake_filter(unified_pronostici)
         unified_pronostici = _apply_dc_stake1_to_under25(unified_pronostici, match_odds)
