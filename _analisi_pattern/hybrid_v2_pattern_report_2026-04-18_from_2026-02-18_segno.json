@@ -1,0 +1,492 @@
+{
+  "report_date": "2026-04-18",
+  "from_date": "2026-02-18",
+  "total_predictions": 1490,
+  "total_hits": 853,
+  "hit_rate_global": 57.2,
+  "conditions_extracted": 16,
+  "combos_tested": 318,
+  "source_patterns": 14,
+  "top_patterns": [
+    {
+      "pattern": "pron=1 + q1.6-1.79 + src=C + stelle>=4.0",
+      "hit_rate": 85.7,
+      "sample_size": 7,
+      "profit": 2.9,
+      "active": null,
+      "depth": 4
+    },
+    {
+      "pattern": "conf>=85 + pron=1",
+      "hit_rate": 81.8,
+      "sample_size": 11,
+      "profit": 4.1,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "conf60-69 + pron=1 + src=C + stelle3.0-3.5",
+      "hit_rate": 81.8,
+      "sample_size": 11,
+      "profit": 4.8,
+      "active": null,
+      "depth": 4
+    },
+    {
+      "pattern": "q1.6-1.79 + src=C + stelle>=4.0 + tipo=SEGNO",
+      "hit_rate": 81.2,
+      "sample_size": 16,
+      "profit": 5.6,
+      "active": null,
+      "depth": 4
+    },
+    {
+      "pattern": "conf>=70 + pron=1 + q1.6-1.79 + src=C",
+      "hit_rate": 80.0,
+      "sample_size": 15,
+      "profit": 5.1,
+      "active": null,
+      "depth": 4
+    },
+    {
+      "pattern": "conf80-100 + pron=1 + q1.6-1.79",
+      "hit_rate": 80.0,
+      "sample_size": 5,
+      "profit": 1.6,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf60-69 + pron=1 + q1.6-1.79 + stelle3.0-3.5",
+      "hit_rate": 80.0,
+      "sample_size": 5,
+      "profit": 1.6,
+      "active": null,
+      "depth": 4
+    },
+    {
+      "pattern": "pron=1 + src=C + stelle>=4.0",
+      "hit_rate": 78.6,
+      "sample_size": 28,
+      "profit": 9.4,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf60-69 + pron=1 + q1.6-1.79 + src=C",
+      "hit_rate": 78.6,
+      "sample_size": 14,
+      "profit": 4.2,
+      "active": null,
+      "depth": 4
+    },
+    {
+      "pattern": "conf80-100 + pron=1",
+      "hit_rate": 78.3,
+      "sample_size": 23,
+      "profit": 7.3,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "conf>=70 + q1.6-1.79 + src=C + tipo=SEGNO",
+      "hit_rate": 76.9,
+      "sample_size": 26,
+      "profit": 7.5,
+      "active": null,
+      "depth": 4
+    },
+    {
+      "pattern": "conf80-100 + q1.6-1.79 + tipo=SEGNO",
+      "hit_rate": 76.9,
+      "sample_size": 13,
+      "profit": 3.6,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "q1.6-1.79 + stelle>=4.0 + tipo=SEGNO",
+      "hit_rate": 76.5,
+      "sample_size": 17,
+      "profit": 4.6,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "pron=1 + q1.6-1.79 + src=C + stelle>=3.0",
+      "hit_rate": 76.2,
+      "sample_size": 42,
+      "profit": 10.9,
+      "active": null,
+      "depth": 4
+    },
+    {
+      "pattern": "conf80-100 + q1.6-1.79 + src=C",
+      "hit_rate": 75.0,
+      "sample_size": 16,
+      "profit": 4.0,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf60-69 + pron=1 + stelle3.0-3.5",
+      "hit_rate": 75.0,
+      "sample_size": 12,
+      "profit": 3.8,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "pron=1 + q1.6-1.79 + stelle>=4.0",
+      "hit_rate": 75.0,
+      "sample_size": 8,
+      "profit": 1.9,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "pron=1 + stelle>=4.0",
+      "hit_rate": 74.2,
+      "sample_size": 31,
+      "profit": 8.0,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "q1.6-1.79 + src=C + stelle>=3.0 + tipo=SEGNO",
+      "hit_rate": 73.8,
+      "sample_size": 61,
+      "profit": 13.6,
+      "active": null,
+      "depth": 4
+    },
+    {
+      "pattern": "conf60-69 + pron=1 + q1.6-1.79",
+      "hit_rate": 73.3,
+      "sample_size": 15,
+      "profit": 3.2,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf>=85 + src=C",
+      "hit_rate": 72.7,
+      "sample_size": 22,
+      "profit": 5.9,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "q1.6-1.79 + src=C + stelle3.0-3.5 + tipo=SEGNO",
+      "hit_rate": 72.7,
+      "sample_size": 22,
+      "profit": 4.2,
+      "active": null,
+      "depth": 4
+    },
+    {
+      "pattern": "pron=1 + q1.6-1.79 + src=C",
+      "hit_rate": 72.2,
+      "sample_size": 54,
+      "profit": 10.3,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf>=85 + tipo=SEGNO",
+      "hit_rate": 72.2,
+      "sample_size": 18,
+      "profit": 4.2,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "conf60-69 + q1.6-1.79 + src=C + tipo=SEGNO",
+      "hit_rate": 72.2,
+      "sample_size": 18,
+      "profit": 3.6,
+      "active": null,
+      "depth": 4
+    },
+    {
+      "pattern": "pron=1 + q1.6-1.79 + src=C + stelle3.0-3.5",
+      "hit_rate": 72.2,
+      "sample_size": 18,
+      "profit": 3.3,
+      "active": null,
+      "depth": 4
+    },
+    {
+      "pattern": "conf>=85 + stelle>=3.0",
+      "hit_rate": 71.4,
+      "sample_size": 28,
+      "profit": 5.8,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "conf50-59 + q1.6-1.79 + src=C",
+      "hit_rate": 71.4,
+      "sample_size": 21,
+      "profit": 3.4,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf>=85 + q1.6-1.79 + src=C",
+      "hit_rate": 71.4,
+      "sample_size": 7,
+      "profit": 1.3,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf50-59 + pron=1 + q1.6-1.79 + src=C",
+      "hit_rate": 70.6,
+      "sample_size": 17,
+      "profit": 2.5,
+      "active": null,
+      "depth": 4
+    },
+    {
+      "pattern": "conf50-59 + q1.6-1.79 + src=C + stelle3.0-3.5",
+      "hit_rate": 70.6,
+      "sample_size": 17,
+      "profit": 2.5,
+      "active": null,
+      "depth": 4
+    },
+    {
+      "pattern": "q1.6-1.79 + src=C + tipo=SEGNO",
+      "hit_rate": 70.3,
+      "sample_size": 74,
+      "profit": 12.0,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "q1.6-1.79 + stelle3.0-3.5 + tipo=SEGNO",
+      "hit_rate": 69.6,
+      "sample_size": 23,
+      "profit": 3.2,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "pron=1 + q1.6-1.79 + stelle>=3.0",
+      "hit_rate": 69.4,
+      "sample_size": 49,
+      "profit": 7.2,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "q1.6-1.79 + src=C + stelle>=4.0",
+      "hit_rate": 69.2,
+      "sample_size": 26,
+      "profit": 3.8,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf50-59 + pron=1 + q1.6-1.79 + src=C + stelle3.0-3.5",
+      "hit_rate": 69.2,
+      "sample_size": 13,
+      "profit": 1.7,
+      "active": null,
+      "depth": 5
+    },
+    {
+      "pattern": "q1.6-1.79 + stelle>=3.0 + tipo=SEGNO",
+      "hit_rate": 69.1,
+      "sample_size": 68,
+      "profit": 9.9,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf>=70 + pron=1 + src=C",
+      "hit_rate": 68.8,
+      "sample_size": 48,
+      "profit": 9.0,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf60-69 + pron=1 + src=C",
+      "hit_rate": 68.8,
+      "sample_size": 32,
+      "profit": 6.2,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf>=70 + q1.6-1.79 + tipo=SEGNO",
+      "hit_rate": 68.8,
+      "sample_size": 32,
+      "profit": 4.7,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf60-69 + q1.6-1.79 + tipo=SEGNO",
+      "hit_rate": 68.4,
+      "sample_size": 19,
+      "profit": 2.6,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "pron=1 + q1.6-1.79 + stelle3.0-3.5",
+      "hit_rate": 68.4,
+      "sample_size": 19,
+      "profit": 2.3,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf80-100 + q1.6-1.79",
+      "hit_rate": 68.2,
+      "sample_size": 22,
+      "profit": 2.9,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "conf50-59 + q1.6-1.79 + tipo=SEGNO",
+      "hit_rate": 68.2,
+      "sample_size": 22,
+      "profit": 2.4,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf80-100 + stelle>=3.0",
+      "hit_rate": 67.9,
+      "sample_size": 84,
+      "profit": 8.3,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "pron=1 + q1.6-1.79",
+      "hit_rate": 67.7,
+      "sample_size": 65,
+      "profit": 7.4,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "q1.6-1.79 + tipo=SEGNO",
+      "hit_rate": 67.1,
+      "sample_size": 85,
+      "profit": 9.1,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "conf60-69 + q1.6-1.79 + stelle>=3.0",
+      "hit_rate": 67.0,
+      "sample_size": 88,
+      "profit": 10.4,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf>=70 + q1.6-1.79 + src=C",
+      "hit_rate": 66.7,
+      "sample_size": 54,
+      "profit": 6.0,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf60-69 + pron=1 + stelle>=3.0",
+      "hit_rate": 66.7,
+      "sample_size": 33,
+      "profit": 5.2,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "q1.6-1.79 + src=C + stelle3.0-3.5",
+      "hit_rate": 66.7,
+      "sample_size": 27,
+      "profit": 2.6,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf>=70 + pron=1 + q1.6-1.79",
+      "hit_rate": 66.7,
+      "sample_size": 21,
+      "profit": 2.4,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf50-59 + pron=1 + q1.6-1.79",
+      "hit_rate": 66.7,
+      "sample_size": 18,
+      "profit": 1.5,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf50-59 + q1.6-1.79 + stelle3.0-3.5 + tipo=SEGNO",
+      "hit_rate": 66.7,
+      "sample_size": 18,
+      "profit": 1.5,
+      "active": null,
+      "depth": 4
+    },
+    {
+      "pattern": "conf>=85 + q1.6-1.79 + tipo=SEGNO",
+      "hit_rate": 66.7,
+      "sample_size": 6,
+      "profit": 0.6,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "q1.6-1.79 + src=C + stelle>=3.0",
+      "hit_rate": 66.1,
+      "sample_size": 121,
+      "profit": 12.4,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "pron=1 + src=C + stelle>=3.0",
+      "hit_rate": 65.9,
+      "sample_size": 123,
+      "profit": 18.7,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf80-100 + tipo=SEGNO",
+      "hit_rate": 65.9,
+      "sample_size": 44,
+      "profit": 5.1,
+      "active": null,
+      "depth": 2
+    },
+    {
+      "pattern": "conf60-69 + q1.6-1.79 + stelle3.0-3.5",
+      "hit_rate": 65.7,
+      "sample_size": 35,
+      "profit": 3.1,
+      "active": null,
+      "depth": 3
+    },
+    {
+      "pattern": "conf80-100 + q1.6-1.79 + stelle>=4.0",
+      "hit_rate": 65.0,
+      "sample_size": 20,
+      "profit": 1.6,
+      "active": null,
+      "depth": 3
+    }
+  ]
+}
