@@ -1976,6 +1976,7 @@ def _apply_weak_o25_recovery(unified, c_doc):
         (p for p in c_doc.get('pronostici', [])
          if p.get('tipo') == 'SEGNO' and p.get('pronostico') == '1'), None)
     # DISABILITATO 2026-04-18: HR 20% live, -28.2u su 5 partite
+    # Confermato 2026-04-19 - Cerotto 3 diagnostica: as_o25_to_segno1 N=5, Δ ROI -1.32 (ROI conv -61.33%)
     # if segno1 and not has_segno:
     #     sq = segno1.get('quota') or 0
     #     if 1.50 <= sq < 2.51:
@@ -1991,48 +1992,52 @@ def _apply_weak_o25_recovery(unified, c_doc):
         result.pop(o25_idx)
         print(f"    🗑️ O25 SCARTATO: Over 2.5 A+S (score {o25_pred.get('confidence')}) — SEGNO già presente, DC sarebbe incoerente")
         return result
-    if qx > 1 and q2 > 1:
-        dc_q = round(1 / (1/qx + 1/q2), 2)
-        if 2.00 <= dc_q <= 2.50:
-            # Converti a X2 solo se quota tra 2.00-2.50 (storico: 2 SALV, 1 DANN, P/L +27.9u)
-            has_dc = any(p.get('tipo') == 'DOPPIA_CHANCE' for p in unified)
-            if not has_dc:
-                result[o25_idx] = _make_recovery(
-                    'DOPPIA_CHANCE', 'X2', dc_q, 'C_as_dc_rec', 'as_o25_to_dc', 0.70)
-                print(f"    🔄 O25 RECOVERY: Over 2.5 A+S (score {o25_pred.get('confidence')}) → DC X2 @{dc_q:.2f}")
-                return result
+    # DISATTIVATA 19/04/2026 - Cerotto 3 diagnostica: regola tossica (vedi diagnostica_motore/04_no_bet/)
+    # as_o25_to_dc: N=21, Δ ROI -3.83 (ROI conv -9.07% vs orig +9.14%)
+    # if qx > 1 and q2 > 1:
+    #     dc_q = round(1 / (1/qx + 1/q2), 2)
+    #     if 2.00 <= dc_q <= 2.50:
+    #         # Converti a X2 solo se quota tra 2.00-2.50 (storico: 2 SALV, 1 DANN, P/L +27.9u)
+    #         has_dc = any(p.get('tipo') == 'DOPPIA_CHANCE' for p in unified)
+    #         if not has_dc:
+    #             result[o25_idx] = _make_recovery(
+    #                 'DOPPIA_CHANCE', 'X2', dc_q, 'C_as_dc_rec', 'as_o25_to_dc', 0.70)
+    #             print(f"    🔄 O25 RECOVERY: Over 2.5 A+S (score {o25_pred.get('confidence')}) → DC X2 @{dc_q:.2f}")
+    #             return result
 
-    # PRIORITÀ 3: Under 2.5 — gerarchia 2 livelli (78% HR vs 64% attuale)
-    # L1: DQ ≤ 0 (U2.5 costa meno di O2.5, mercato favorisce Under) → 100% HR
-    # L2: DQ > 0 + U2.5 ≥ 2.10 → 60% HR
-    # Altrimenti: NO BET
-    u25 = ec_preds.get('Under 2.5') or next(
-        (p for p in c_doc.get('pronostici', [])
-         if p.get('pronostico') == 'Under 2.5'), None)
-    if u25:
-        uq = u25.get('quota') or 0
-        o25_q = o25_pred.get('quota') or 0
-        dq = uq - o25_q if uq > 0 and o25_q > 0 else 999
-        l1 = dq <= 0                    # U2.5 ≤ O2.5: mercato favorisce Under
-        l2 = dq > 0 and uq >= 2.10     # U2.5 alta ma ≥ 2.10
-
-        if uq >= 1.35 and (l1 or l2):
-            lvl = 'L1' if l1 else 'L2'
-            result[o25_idx] = _make_recovery(
-                'GOL', 'Under 2.5', uq, 'C_as_u25_rec', 'as_o25_to_under25', 0.67)
-            print(f"    🔄 O25 RECOVERY({lvl}): Over 2.5 @{o25_q:.2f} → Under 2.5 @{uq:.2f} (DQ={dq:+.2f})")
-            return result
-
-        if uq > 0 and not (l1 or l2):
-            # Nessun livello soddisfatto → NO BET
-            result[o25_idx] = {
-                'tipo': 'GOL', 'pronostico': 'NO BET', 'quota': 0, 'stake': 0,
-                'original_pronostico': 'Over 2.5', 'original_quota': o25_q,
-                'routing_rule': 'as_o25_to_under25',
-                'source': o25_pred.get('source', ''),
-            }
-            print(f"    🚫 O25 RECOVERY: Over 2.5 @{o25_q:.2f}, U2.5 @{uq:.2f} (DQ={dq:+.2f}) → NO BET (fuori gerarchia)")
-            return result
+    # DISATTIVATA 19/04/2026 - Cerotto 3 diagnostica: regola tossica (vedi diagnostica_motore/04_no_bet/)
+    # as_o25_to_under25: N=6, Δ ROI -5.38 (ROI conv -41.39% vs orig +48.33%)
+    # # PRIORITÀ 3: Under 2.5 — gerarchia 2 livelli (78% HR vs 64% attuale)
+    # # L1: DQ ≤ 0 (U2.5 costa meno di O2.5, mercato favorisce Under) → 100% HR
+    # # L2: DQ > 0 + U2.5 ≥ 2.10 → 60% HR
+    # # Altrimenti: NO BET
+    # u25 = ec_preds.get('Under 2.5') or next(
+    #     (p for p in c_doc.get('pronostici', [])
+    #      if p.get('pronostico') == 'Under 2.5'), None)
+    # if u25:
+    #     uq = u25.get('quota') or 0
+    #     o25_q = o25_pred.get('quota') or 0
+    #     dq = uq - o25_q if uq > 0 and o25_q > 0 else 999
+    #     l1 = dq <= 0                    # U2.5 ≤ O2.5: mercato favorisce Under
+    #     l2 = dq > 0 and uq >= 2.10     # U2.5 alta ma ≥ 2.10
+    #
+    #     if uq >= 1.35 and (l1 or l2):
+    #         lvl = 'L1' if l1 else 'L2'
+    #         result[o25_idx] = _make_recovery(
+    #             'GOL', 'Under 2.5', uq, 'C_as_u25_rec', 'as_o25_to_under25', 0.67)
+    #         print(f"    🔄 O25 RECOVERY({lvl}): Over 2.5 @{o25_q:.2f} → Under 2.5 @{uq:.2f} (DQ={dq:+.2f})")
+    #         return result
+    #
+    #     if uq > 0 and not (l1 or l2):
+    #         # Nessun livello soddisfatto → NO BET
+    #         result[o25_idx] = {
+    #             'tipo': 'GOL', 'pronostico': 'NO BET', 'quota': 0, 'stake': 0,
+    #             'original_pronostico': 'Over 2.5', 'original_quota': o25_q,
+    #             'routing_rule': 'as_o25_to_under25',
+    #             'source': o25_pred.get('source', ''),
+    #         }
+    #         print(f"    🚫 O25 RECOVERY: Over 2.5 @{o25_q:.2f}, U2.5 @{uq:.2f} (DQ={dq:+.2f}) → NO BET (fuori gerarchia)")
+    #         return result
 
     # PRIORITÀ 4: nessuna alternativa → scarta
     result.pop(o25_idx)
@@ -3019,8 +3024,10 @@ def orchestrate_date(date_str, dry_run=False, match_time_filter=None, preserve_a
             # unified_pronostici = _apply_home_win_combos(unified_pronostici, match_odds, sim_data)
 
         # --- POST-PROCESSING: DC Downgrade — SEGNO AR + GG conf 60-65 → DC ---
-        if c_doc_for_combo:
-            unified_pronostici = _apply_gg_conf_dc_downgrade(unified_pronostici, c_doc_for_combo, match_odds=match_odds)
+        # DISATTIVATA 19/04/2026 - Cerotto 3 diagnostica: regola tossica (vedi diagnostica_motore/04_no_bet/)
+        # gg_conf_dc_downgrade: N=6, Δ ROI -4.64 (ROI conv -50.08% vs orig +27.17%)
+        # if c_doc_for_combo:
+        #     unified_pronostici = _apply_gg_conf_dc_downgrade(unified_pronostici, c_doc_for_combo, match_odds=match_odds)
 
         # --- POST-PROCESSING: Scrematura SEGNO per fasce di quota ---
         unified_pronostici = _apply_segno_scrematura(unified_pronostici, match_odds, base_doc, c_doc=c_doc_for_combo)
