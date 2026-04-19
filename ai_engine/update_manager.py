@@ -151,6 +151,9 @@ SCRAPER_SEQUENCE = [
       # ⭐ CALCOLO PROFIT/LOSS post-match (aggiorna esito + P/L per ogni pronostico)
       ("calculate_profit_loss.py", "💰 [29/31] Calcolo Profit/Loss", "Profit/loss non calcolati per pronostici passati", CURRENT_DIR),
 
+      # ⭐ REFRESH CALIBRATION TABLE — ricalcola HR reale per bin (usata da kelly_unified)
+      ("refresh_calibration_table.py", "🎯 [29.3/33] Refresh Calibration Table", "Tabella calibrazione Kelly non aggiornata", CURRENT_DIR),
+
       # ⭐ FEEDBACK LOOP — Analisi errori pronostici con Mistral AI (solo backend interno)
       ("feedback_loop_analyzer.py", "🔁 [29.5/33] Feedback Loop — Analisi Errori", "Errori pronostici non analizzati", CURRENT_DIR),
 
