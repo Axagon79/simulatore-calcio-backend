@@ -58,8 +58,13 @@ while not os.path.exists(os.path.join(current_path, 'config.py')):
         raise FileNotFoundError("Impossibile trovare config.py!")
     current_path = parent
 sys.path.append(current_path)
+# Per importare moduli condivisi in functions_python/ai_engine/
+_functions_python_path = os.path.join(current_path, 'functions_python')
+if os.path.isdir(_functions_python_path) and _functions_python_path not in sys.path:
+    sys.path.append(_functions_python_path)
 
 from config import db
+from ai_engine.stake_kelly import kelly_unified
 
 # Engine imports
 ENGINE_DIR = os.path.join(current_path, 'engine')
@@ -821,28 +826,25 @@ def convert_to_predictions(dist, odds):
     return pronostici
 
 
-# ==================== FASE 5: KELLY/STAKE + 5 MODIFICATORI ====================
+# ==================== FASE 5: KELLY UNIFICATO ====================
 
 def apply_kelly(pronostici, dist, odds=None):
-    """
-    Kelly Frazionario 1/4 + 5 Modificatori calibrabili.
-    La probabilita' MC e' direttamente la probabilita' reale.
-    """
-    if odds is None:
-        odds = {}
-    re_dir = calcola_re_direzione(dist['top_scores'], dist['valid_cycles'])
+    """Stake via kelly_unified (source='C').
 
-    # Pre-calcola conflitti tra mercati (Fattore 5)
-    has_over = any(p['tipo'] == 'GOL' and 'Over' in p.get('pronostico', '') for p in pronostici)
-    has_under = any(p['tipo'] == 'GOL' and 'Under' in p.get('pronostico', '') for p in pronostici)
-    has_gg = any(p['tipo'] == 'GOL' and p.get('pronostico') == 'Goal' for p in pronostici)
-    has_ng = any(p['tipo'] == 'GOL' and p.get('pronostico') == 'NoGoal' for p in pronostici)
-    conflitto_mercati = (has_over and has_ng) or (has_under and has_gg)
+    In precedenza: Kelly 3/4 + 5 modificatori proporzionali + fattore quota
+    a fasce + range stake_min/stake_max. Tutto rimosso a favore del Kelly
+    calibrato unificato (vedi `functions_python/ai_engine/stake_kelly.py` e
+    diagnostica 03_stake).
+
+    Parametri `dist` e `odds` restano nella firma per compatibilita`; non
+    sono piu` usati qui.
+    """
+    _ = dist, odds  # ora ignorati (modificatori rimossi)
 
     for p in pronostici:
-        prob = p['confidence'] / 100
         quota = p.get('quota')
         tipo = p['tipo']
+        conf = p.get('confidence', 0)
 
         # Rimuovi campi interni temporanei
         p.pop('_stake_hint', None)
@@ -850,131 +852,32 @@ def apply_kelly(pronostici, dist, odds=None):
         p.pop('_downgraded_from', None)
 
         if not quota or quota <= 1:
-            p['probabilita_stimata'] = round(p['confidence'], 1)
+            p['probabilita_stimata'] = round(conf, 1)
             p['prob_mercato'] = 0
-            p['prob_modello'] = round(p['confidence'], 1)
+            p['prob_modello'] = round(conf, 1)
             p['has_odds'] = False
             p['stake'] = 1
-            p['stake_min'] = 1
-            p['stake_max'] = 1
             p['edge'] = 0
+            p['low_value'] = True
+            p['source_group'] = 'C'
+            p['prob_calibrata'] = round(conf, 1)
             continue
 
         p_market = (1.0 / quota) * 0.96
-        edge_pct = (prob * quota - 1) * 100
 
-        # --- Kelly 3/4 base ---
-        if (prob * quota) <= 1:
-            stake_base = 1.0
-        else:
-            full_kelly = (prob * quota - 1) / (quota - 1)
-            tq_kelly = full_kelly * 3 / 4
-            stake_base = tq_kelly * 10  # scala 1-10
+        # Sistema C usa `confidence` MC come probabilita dichiarata
+        kelly = kelly_unified(db, conf, quota, source='C',
+                              mercato=tipo, kelly_fraction=0.25)
 
-        # --- 5 Modificatori (proporzionali al Kelly base, cap ±50%) ---
-        mod_pct = 0.0
-
-        # Fattore 1: % MC
-        if p['confidence'] >= 65:
-            mod_pct += 0.20
-        elif p['confidence'] < 50:
-            mod_pct -= 0.20
-
-        # Fattore 2: RE confermano/contraddicono
-        pron = p['pronostico']
-        if tipo in ('SEGNO', 'DOPPIA_CHANCE'):
-            if pron == '1' and re_dir['casa'] >= 25:
-                mod_pct += 0.20
-            elif pron == '2' and re_dir['ospite'] >= 25:
-                mod_pct += 0.20
-            elif pron in ('1X', 'X2'):
-                dc_sides = {'1X': ['casa', 'pari'], 'X2': ['ospite', 'pari']}
-                if sum(re_dir[s] for s in dc_sides.get(pron, [])) >= 35:
-                    mod_pct += 0.20
-        elif tipo == 'GOL':
-            if pron == 'Goal' and re_dir['gg'] >= 25:
-                mod_pct += 0.20
-            elif pron == 'Goal' and re_dir['ng'] >= 30:
-                mod_pct -= 0.20
-            elif pron == 'NoGoal' and re_dir['ng'] >= 25:
-                mod_pct += 0.20
-            elif pron == 'NoGoal' and re_dir['gg'] >= 30:
-                mod_pct -= 0.20
-
-        # Fattore 3: Valore quota (edge)
-        edge_val = prob - (1.0 / quota)
-        if edge_val > 0.10:
-            mod_pct += 0.20
-        elif edge_val < 0.03:
-            mod_pct -= 0.20
-
-        # Fattore 4: Book conferma/contradice
-        if tipo in ('SEGNO', 'DOPPIA_CHANCE'):
-            if pron in ('1', '2'):
-                q_fav = _get_quota(odds, pron)
-                q_other = _get_quota(odds, '2' if pron == '1' else '1')
-                if q_fav > 0 and q_other > 0 and q_fav > q_other:
-                    mod_pct -= 0.20  # Book non concorda sulla favorita
-            elif pron in ('1X', 'X2'):
-                book_second = _get_book_second_fav(odds)
-                if book_second and not _segno_in_dc(book_second, pron):
-                    mod_pct -= 0.20
-        elif tipo == 'GOL' and pron in ('Goal', 'NoGoal'):
-            q_gg = _get_quota(odds, 'gg', 'GG')
-            q_ng = _get_quota(odds, 'ng', 'NG')
-            if q_gg > 0 and q_ng > 0:
-                if pron == 'Goal' and q_ng < q_gg:
-                    mod_pct -= 0.20
-                elif pron == 'NoGoal' and q_gg < q_ng:
-                    mod_pct -= 0.20
-
-        # Fattore 5: Conflitti mercati
-        if conflitto_mercati and tipo == 'GOL':
-            mod_pct -= 0.20
-        elif not conflitto_mercati and len(pronostici) >= 3:
-            mod_pct += 0.20  # Tutto coerente
-
-        # Cap modificatori a ±50% del Kelly base
-        mod_pct = max(-0.50, min(0.50, mod_pct))
-        mod_value = stake_base * mod_pct
-
-        # Stake finale con range
-        raw_stake = max(1.0, min(10.0, stake_base + mod_value))
-        floor_val = int(raw_stake)
-        decimal_part = raw_stake - floor_val
-
-        if decimal_part > 0.25:
-            stake_min = floor_val
-            stake_max = floor_val + 1
-        else:
-            stake_min = floor_val - 1
-            stake_max = floor_val
-
-        # Clamp a 1-10
-        stake_min = max(1, min(10, stake_min))
-        stake_max = max(1, min(10, stake_max))
-        stake = max(1, min(10, round(raw_stake)))
-
-        # Fattore quota a fasce — bilancia stake con probabilità implicita del mercato
-        def _fq(s, q):
-            if q < 1.50: return max(1, min(10, round(s * 2.00 / q)))
-            elif q < 2.00: return s
-            elif q < 2.50: return max(1, min(10, round(s * 2.20 / q)))
-            elif q < 3.50: return max(1, min(10, round(s * 2.00 / q)))
-            elif q < 5.00: return max(1, min(10, round(s * 3.50 / q)))
-            else: return s
-        stake = _fq(stake, quota)
-        stake_min = _fq(stake_min, quota)
-        stake_max = _fq(stake_max, quota)
-
-        p['probabilita_stimata'] = round(prob * 100, 1)
+        p['probabilita_stimata'] = round(conf, 1)
         p['prob_mercato'] = round(p_market * 100, 1)
-        p['prob_modello'] = round(prob * 100, 1)
+        p['prob_modello'] = round(conf, 1)
         p['has_odds'] = True
-        p['stake'] = stake
-        p['stake_min'] = stake_min
-        p['stake_max'] = stake_max
-        p['edge'] = round(edge_pct, 2)
+        p['stake'] = kelly['stake']
+        p['edge'] = kelly['edge_pct']
+        p['low_value'] = kelly['low_value']
+        p['source_group'] = kelly['source_group']
+        p['prob_calibrata'] = kelly['prob_calibrata']
 
 
 # ==================== FASE 6: BUILD DOCUMENTO ====================
