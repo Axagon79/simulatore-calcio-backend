@@ -2766,14 +2766,40 @@ def _tc_categoria(q):
     return 'Alto Rendimento' if (q is not None and q > 2.50) else 'Pronostici'
 
 
-def _apply_toxic_combo_filter(unified, base_doc):
-    """Cerotto 4: scarta i pronostici colpiti da una delle 7 combo tossiche.
+# =====================================================
+# TOXIC DT LEAF A — Cerotto 5 (20/04/2026)
+# =====================================================
+# Foglia A del DecisionTreeClassifier (max_depth=4) estratto in
+# `ai_engine/diagnostica_motore/cerotto5_preview/`:
+#   quota <= 1.51 AND mc_avg_goals_away > 2.21 AND sig_strisce <= 49.75
+#
+# Verifica backend (2026-02-19 -> 2026-04-18, no dedup, stake pesato):
+#   N=24, HR=33%, ROI=-310%, PL=-74.49u, 0% overlap Cerotto 4.
+#
+# AVVERTENZA STATISTICA: volume campione molto piccolo (n=24).
+# Segnale forte ma non ancora confermato statisticamente. Da monitorare
+# nei prossimi 2 mesi; se il pattern non si riconferma, rimuovere.
+
+def _matches_foglia_dt_A(quota, mc_avg_goals_away, sig_strisce):
+    if quota is None or mc_avg_goals_away is None or sig_strisce is None:
+        return False
+    try:
+        q = float(quota)
+        mag = float(mc_avg_goals_away)
+        ss = float(sig_strisce)
+    except (TypeError, ValueError):
+        return False
+    return q <= 1.51 and mag > 2.21 and ss <= 49.75
+
+
+def _apply_toxic_combo_filter(unified, base_doc, sim_data=None, seg_det=None):
+    """Cerotto 4 + Cerotto 5: scarta pronostici su combo tossiche e foglia DT A.
 
     Ambito:
     - SOLO pronostici con `mixer != True`
     - NO BET già esistenti non vengono ri-scartati
 
-    Sette combo (Δ ROI negativo netto sul dataset storico, backend-style):
+    Sette combo Cerotto 4 (Δ ROI negativo netto sul dataset storico, backend-style):
       C2: SEGNO + tipo_partita=aperta                              (yield -44%)
       C4: tipo_partita=aperta + categoria=Alto Rendimento          (yield -50%)
       C5: SEGNO + Monday + tipo_partita=aperta                     (yield -103%)
@@ -2781,6 +2807,9 @@ def _apply_toxic_combo_filter(unified, base_doc):
       C8: Friday + fascia_quota=3.00+ + tipo_partita=equilibrata   (yield -89%)
       C9: fascia_quota=2.50-2.99 + tipo_partita=aperta             (yield -48%)
       C10: Friday + categoria=Alto Rendimento                      (yield -62%)
+
+    Foglia DT A Cerotto 5:
+      quota<=1.51 AND mc_avg_goals_away>2.21 AND sig_strisce<=49.75  (n=24, ROI -310%)
     """
     if not unified or not base_doc:
         return unified
@@ -2806,6 +2835,15 @@ def _apply_toxic_combo_filter(unified, base_doc):
 
     home = base_doc.get('home', '?')
     away = base_doc.get('away', '?')
+
+    # Contesto Foglia DT A (Cerotto 5): mc_avg_goals_away da Sistema C,
+    # sig_strisce da segno_dettaglio Sistema A
+    mc_avg_goals_away = None
+    if sim_data:
+        mc_avg_goals_away = sim_data.get('avg_goals_away')
+    sig_strisce = None
+    if seg_det:
+        sig_strisce = seg_det.get('strisce')
 
     for p in unified:
         if p.get('mixer') is True:
@@ -2838,24 +2876,42 @@ def _apply_toxic_combo_filter(unified, base_doc):
         if giorno == 'Friday' and cat == 'Alto Rendimento':
             hit_combos.append('C10')
 
-        if not hit_combos:
+        # Cerotto 5: Foglia DT A (solo se sim_data + seg_det disponibili)
+        dt_A_hit = _matches_foglia_dt_A(quota, mc_avg_goals_away, sig_strisce)
+
+        if not hit_combos and not dt_A_hit:
             continue
 
         original_pronostico = p.get('pronostico')
         original_quota = p.get('quota')
-        print(f"    🚫 TOXIC COMBO: {home} vs {away} {tipo} {original_pronostico} "
-              f"@{original_quota} → NO BET (combo: {','.join(hit_combos)}, "
-              f"tp={tp}, fo={fo}, giorno={giorno}, fq={fq})")
+
+        if hit_combos:
+            print(f"    🚫 TOXIC COMBO: {home} vs {away} {tipo} {original_pronostico} "
+                  f"@{original_quota} → NO BET (combo: {','.join(hit_combos)}, "
+                  f"tp={tp}, fo={fo}, giorno={giorno}, fq={fq})")
+        if dt_A_hit:
+            print(f"    🚫 TOXIC DT-A: {home} vs {away} {tipo} {original_pronostico} "
+                  f"@{original_quota} → NO BET "
+                  f"(quota<=1.51 AND mc_avg_goals_away={mc_avg_goals_away}>2.21 "
+                  f"AND sig_strisce={sig_strisce}<=49.75)")
 
         p['pronostico'] = 'NO BET'
         p['quota'] = 0
         p['stake'] = 0
         p['edge'] = 0
-        p['toxic_combo'] = True
-        p['toxic_combo_ids'] = hit_combos
+        if hit_combos:
+            p['toxic_combo'] = True
+            p['toxic_combo_ids'] = hit_combos
+        if dt_A_hit:
+            p['toxic_dt_A'] = True
         p['original_pronostico'] = original_pronostico
         p['original_quota'] = original_quota
-        p['routing_rule'] = f"toxic_combo_{'_'.join(hit_combos)}"
+        rule_parts = []
+        if hit_combos:
+            rule_parts.append(f"toxic_combo_{'_'.join(hit_combos)}")
+        if dt_A_hit:
+            rule_parts.append('toxic_dt_A')
+        p['routing_rule'] = '+'.join(rule_parts)
 
     return unified
 
@@ -3155,8 +3211,14 @@ def orchestrate_date(date_str, dry_run=False, match_time_filter=None, preserve_a
 
         match_odds = base_doc.get('odds', {})
 
-        # --- Cerotto 4 (20/04/2026): scarta 7 combo tossiche, salva MIXER ---
-        unified_pronostici = _apply_toxic_combo_filter(unified_pronostici, base_doc)
+        # --- Cerotto 4 + 5 (20/04/2026): scarta 7 combo tossiche + Foglia DT A, salva MIXER ---
+        _c_doc_tc = docs_by_sys['C'].get(match_key) or {}
+        _a_doc_tc = docs_by_sys['A'].get(match_key) or {}
+        _sim_tc = _c_doc_tc.get('simulation_data') or None
+        _seg_tc = _a_doc_tc.get('segno_dettaglio') or None
+        unified_pronostici = _apply_toxic_combo_filter(
+            unified_pronostici, base_doc, sim_data=_sim_tc, seg_det=_seg_tc
+        )
 
         # --- POST-PROCESSING: Multi-goal su pronostici deboli ---
         unified_pronostici = _apply_multigol(unified_pronostici, match_odds)
