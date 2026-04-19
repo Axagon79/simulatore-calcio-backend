@@ -1,0 +1,51 @@
+,importance
+quota,0.11608812092407032
+probabilita_stimata,0.10516490809315168
+prob_modello,0.09920681849457838
+stake,0.09420319300789567
+confidence,0.0934016460585465
+sd_bvs,0.08627142897723011
+sd_lucifero,0.0731483966824043
+sd_campo,0.06920445616442167
+stars,0.0671361166177749
+gd_att_vs_def,0.06032734115719383
+routing_rule_single,0.0179449037681699
+sd_affidabilita,0.015781514304854062
+tipo_SEGNO,0.01564660638494519
+source_C,0.013865927882239795
+tipo_GOL,0.00948361037596106
+routing_rule_OTHER,0.00921695992606997
+pronostico_2,0.009085174421059418
+pronostico_1,0.008388943310875908
+source_OTHER,0.005473697998878627
+pronostico_Goal,0.004782317767939145
+pronostico_X2,0.004219059587083798
+routing_rule_scrematura_segno,0.0031670265578086763
+source_C_screm,0.0029308326978240056
+tipo_DOPPIA_CHANCE,0.0028679702584312886
+pronostico_Under 2.5,0.0026816738183955283
+routing_rule_priority_chain,0.002655388139140525
+routing_rule_consensus_both,0.0019574696125965905
+source_A,0.0014865417422867118
+source_A+S,0.0014103490770678764
+pronostico_1X,0.0012279231623908982
+pronostico_Over 2.5,0.0010682968245570377
+pronostico_Over 1.5,0.0003055969644108921
+routing_rule_multigol_v6,0.00010585148096114004
+source_C_combo96,6.63911427892296e-05
+routing_rule_combo_96_dc_flip,2.754661599533063e-05
+source_C_hw,0.0
+source_A_mg,0.0
+source_C_as_dc_rec,0.0
+routing_rule_mc_filter_convert,0.0
+source_C_mg,0.0
+source_MC_hw,0.0
+routing_rule_as_o25_to_dc,0.0
+pronostico_MG 3-5,0.0
+pronostico_MG 2-4,0.0
+pronostico_MG 2-3,0.0
+pronostico_MG 1-2,0.0
+pronostico_Over 3.5,0.0
+pronostico_NoGoal,0.0
+pronostico_Under 3.5,0.0
+pronostico_X,0.0

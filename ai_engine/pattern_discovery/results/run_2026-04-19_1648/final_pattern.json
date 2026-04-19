@@ -1,0 +1,15 @@
+{
+  "pattern": [
+    {
+      "variable": "stake",
+      "direction": "ge",
+      "threshold": 8
+    },
+    {
+      "variable": "prob_modello",
+      "direction": "ge",
+      "threshold": 50
+    }
+  ],
+  "lasso_alpha": 0.3115652640027574
+}
