@@ -379,7 +379,7 @@
             "valore": 2.0
         },
         "DIVISORE_MEDIA_GOL": {
-            "valore": 0.50
+            "valore": 0.5
         },
         "POTENZA_FAVORITA_WINSHIFT": {
             "valore": 0.35
@@ -407,6 +407,14 @@
         },
         "THR_GG_GREEN": {
             "valore": 60.0
+        }
+    },
+    "KELLY_UNIFIED": {
+        "kelly_fraction": {
+            "valore": 0.25
+        },
+        "kelly_enabled": {
+            "valore": true
         }
     }
 }
