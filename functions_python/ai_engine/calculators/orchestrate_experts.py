@@ -2716,6 +2716,151 @@ def _check_ng_combo(markets_by_sys):
 
 
 # =====================================================
+# TOXIC COMBO FILTER — Cerotto 4 (19/04/2026)
+# =====================================================
+# Disattiva 7 combo tossiche identificate nel report globale sez. 6.1,
+# con yield negativo netto verificato sul metodo backend
+# (vedi diagnostica_motore/cerotto4_preview/impatto_backend_corretto.md).
+#
+# Ambito: applicato SOLO a pronostici NON in MIXER (se `p.mixer=True`,
+# salta la combo — il sistema Mixer ha già deciso che lavora bene).
+#
+# Azione: il pronostico colpito diventa NO BET con stake=0 e flag
+# `toxic_combo=True`, preservando original_pronostico / original_quota.
+
+
+def _tc_tipo_partita(qmin):
+    """Classifica la partita dall'equilibrio delle quote 1X2."""
+    if qmin is None or qmin <= 0:
+        return 'n/a'
+    if qmin < 1.40: return 'dominante'
+    if qmin < 1.80: return 'favorita'
+    if qmin < 2.30: return 'equilibrata'
+    return 'aperta'
+
+
+def _tc_fascia_oraria(match_time):
+    if not match_time or not isinstance(match_time, str):
+        return 'sconosciuto'
+    try:
+        h = int(match_time.split(':')[0])
+    except Exception:
+        return 'sconosciuto'
+    if h < 15: return 'mattina'
+    if h < 18: return 'pomeriggio'
+    if h < 21: return 'sera'
+    return 'notte'
+
+
+def _tc_fascia_quota(q):
+    if q is None or q <= 0: return 'n/a'
+    if q < 1.40: return '1.01-1.39'
+    if q < 1.70: return '1.40-1.69'
+    if q < 2.00: return '1.70-1.99'
+    if q < 2.50: return '2.00-2.49'
+    if q < 3.00: return '2.50-2.99'
+    return '3.00+'
+
+
+def _tc_categoria(q):
+    return 'Alto Rendimento' if (q is not None and q > 2.50) else 'Pronostici'
+
+
+def _apply_toxic_combo_filter(unified, base_doc):
+    """Cerotto 4: scarta i pronostici colpiti da una delle 7 combo tossiche.
+
+    Ambito:
+    - SOLO pronostici con `mixer != True`
+    - NO BET già esistenti non vengono ri-scartati
+
+    Sette combo (Δ ROI negativo netto sul dataset storico, backend-style):
+      C2: SEGNO + tipo_partita=aperta                              (yield -44%)
+      C4: tipo_partita=aperta + categoria=Alto Rendimento          (yield -50%)
+      C5: SEGNO + Monday + tipo_partita=aperta                     (yield -103%)
+      C6: fascia_oraria=sera + categoria=Alto Rendimento           (yield  -6%)
+      C8: Friday + fascia_quota=3.00+ + tipo_partita=equilibrata   (yield -89%)
+      C9: fascia_quota=2.50-2.99 + tipo_partita=aperta             (yield -48%)
+      C10: Friday + categoria=Alto Rendimento                      (yield -62%)
+    """
+    if not unified or not base_doc:
+        return unified
+
+    odds = base_doc.get('odds') or {}
+    q1 = float(odds.get('1') or 0)
+    qX = float(odds.get('X') or odds.get('x') or 0)
+    q2 = float(odds.get('2') or 0)
+    vals_1x2 = [v for v in (q1, qX, q2) if v and v > 0]
+    qmin = min(vals_1x2) if vals_1x2 else None
+    tp = _tc_tipo_partita(qmin)
+
+    match_time = base_doc.get('match_time') or ''
+    fo = _tc_fascia_oraria(match_time)
+
+    date_str = base_doc.get('date') or ''
+    giorno = None
+    try:
+        from datetime import datetime as _dt
+        giorno = _dt.strptime(date_str, '%Y-%m-%d').strftime('%A')  # 'Monday', ...
+    except Exception:
+        giorno = ''
+
+    home = base_doc.get('home', '?')
+    away = base_doc.get('away', '?')
+
+    for p in unified:
+        if p.get('mixer') is True:
+            continue
+        if p.get('pronostico') == 'NO BET':
+            continue
+
+        tipo = p.get('tipo')
+        pronostico = p.get('pronostico')
+        quota = p.get('quota')
+        if not quota or quota <= 1:
+            continue
+
+        fq = _tc_fascia_quota(quota)
+        cat = _tc_categoria(quota)
+
+        hit_combos = []
+        if tipo == 'SEGNO' and tp == 'aperta':
+            hit_combos.append('C2')
+        if tp == 'aperta' and cat == 'Alto Rendimento':
+            hit_combos.append('C4')
+        if tipo == 'SEGNO' and giorno == 'Monday' and tp == 'aperta':
+            hit_combos.append('C5')
+        if fo == 'sera' and cat == 'Alto Rendimento':
+            hit_combos.append('C6')
+        if giorno == 'Friday' and fq == '3.00+' and tp == 'equilibrata':
+            hit_combos.append('C8')
+        if fq == '2.50-2.99' and tp == 'aperta':
+            hit_combos.append('C9')
+        if giorno == 'Friday' and cat == 'Alto Rendimento':
+            hit_combos.append('C10')
+
+        if not hit_combos:
+            continue
+
+        original_pronostico = p.get('pronostico')
+        original_quota = p.get('quota')
+        print(f"    🚫 TOXIC COMBO: {home} vs {away} {tipo} {original_pronostico} "
+              f"@{original_quota} → NO BET (combo: {','.join(hit_combos)}, "
+              f"tp={tp}, fo={fo}, giorno={giorno}, fq={fq})")
+
+        p['pronostico'] = 'NO BET'
+        p['quota'] = 0
+        p['stake'] = 0
+        p['edge'] = 0
+        p['toxic_combo'] = True
+        p['toxic_combo_ids'] = hit_combos
+        p['original_pronostico'] = original_pronostico
+        p['original_quota'] = original_quota
+        p['routing_rule'] = f"toxic_combo_{'_'.join(hit_combos)}"
+
+    return unified
+
+
+# =====================================================
 # LOGICA ROUTING PER MERCATO
 # =====================================================
 def route_predictions(preds_by_sys, markets_by_sys):
@@ -3009,6 +3154,9 @@ def orchestrate_date(date_str, dry_run=False, match_time_filter=None, preserve_a
         unified_pronostici = route_predictions(preds_by_sys, markets_by_sys)
 
         match_odds = base_doc.get('odds', {})
+
+        # --- Cerotto 4 (20/04/2026): scarta 7 combo tossiche, salva MIXER ---
+        unified_pronostici = _apply_toxic_combo_filter(unified_pronostici, base_doc)
 
         # --- POST-PROCESSING: Multi-goal su pronostici deboli ---
         unified_pronostici = _apply_multigol(unified_pronostici, match_odds)
