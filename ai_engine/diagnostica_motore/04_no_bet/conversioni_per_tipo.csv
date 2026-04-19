@@ -1,0 +1,7 @@
+conv_type,n,pl_conv_1u,pl_orig_1u,delta,roi_conv,roi_orig,hr_conv,hr_orig,salvate_da_conv,peggiorate_da_conv
+DOPPIA_CHANCE → GOL,24,3.32,-0.42,3.74,13.83,-1.75,62.5,66.67,4,5
+GOL → DOPPIA_CHANCE,21,-1.91,1.92,-3.83,-9.07,9.14,42.86,66.67,4,9
+GOL → GOL,78,-5.01,-6.58,1.57,-6.43,-8.44,53.85,53.85,27,27
+GOL → SEGNO,5,-3.07,-1.75,-1.32,-61.33,-35.0,20.0,40.0,0,1
+SEGNO → DOPPIA_CHANCE,6,-3.0,1.63,-4.64,-50.08,27.17,33.33,50.0,1,2
+SEGNO → GOL,26,2.65,0.25,2.4,10.2,0.96,69.23,42.31,11,4

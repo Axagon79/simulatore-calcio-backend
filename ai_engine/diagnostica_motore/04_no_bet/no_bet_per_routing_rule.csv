@@ -1,0 +1,10 @@
+routing_rule,n,hr,pl,roi
+segno_s2_toxic_q_filter,37,27.03,-8.01,-21.65
+gol_s4_q180_filter,7,57.14,0.54,7.71
+x2_s2_filter,6,50.0,-0.88,-14.67
+u25_s7_nobet,6,66.67,2.15,35.83
+se2_s8_q190_filter,6,66.67,1.72,28.67
+gol_s3_filter,5,40.0,-1.26,-25.2
+gol_s7_filter,4,50.0,-1.27,-31.75
+gol_s4_filter,2,100.0,1.0,50.0
+segno_s1_low_q_filter,1,100.0,0.52,52.0

@@ -1,0 +1,161 @@
+date,home,away,tipo_conv,pronostico_conv,quota_conv,pl_conv_real,esito_conv_real,stake_conv,original_pronostico,original_quota,source,routing_rule,live_score,live_status,real_score,tipo_orig,esito_orig,pl_orig_sim_1u,pl_conv_1u,delta_1u,gruppo
+2026-04-18,Leverkusen,Augusta,GOL,Goal,1.5,0.5,True,1,Over 2.5,1.35,C_screm_o25_s6_conv,o25_s6_to_goal,1:2,Finished,1:2,GOL,True,0.3500000000000001,0.5,0.1499999999999999,C-derivati
+2026-04-18,Lille,Nizza,GOL,NoGoal,1.95,0.95,True,1,Goal,1.77,C_gol_s2_conv,gol_s2_to_ng,0:0,Finished,0:0,GOL,False,-1.0,0.95,1.95,C-derivati
+2026-04-18,SSV Ulm 1846,TSV Havelse,GOL,Under 2.5,2.5,-1.0,False,1,X2,2.08,C_screm_dc_s1_conv,dc_s1_to_u25,2:1,Finished,2:1,DOPPIA_CHANCE,False,-1.0,-1.0,0.0,C-derivati
+2026-04-18,Stade Reims,Red Star FC,GOL,Under 2.5,1.73,-1.0,False,1,X2,1.88,C_screm_dc_s1_conv,dc_s1_to_u25,3:2,Finished,3:2,DOPPIA_CHANCE,False,-1.0,-1.0,0.0,C-derivati
+2026-04-18,Troyes,US Boulogne,GOL,NoGoal,1.9,0.9,True,1,Goal,1.8,C_gol_s2_conv,gol_s2_to_ng,1:0,Finished,1:0,GOL,False,-1.0,0.9,1.9,C-derivati
+2026-04-18,Castellón,Burgos CF,GOL,Under 2.5,1.67,-1.0,False,1,Goal,1.95,C_goal_conv,goal_to_u25,3:1,Finished,3:1,GOL,True,0.95,-1.0,-1.95,C-derivati
+2026-04-18,CyD Leonesa,Córdoba CF,GOL,Over 2.5,1.75,0.75,True,1,2,2.6,C_segno_s6_conv,segno_s6_to_o25,1:2,Finished,1:2,SEGNO,True,1.6,0.75,-0.8500000000000001,C-derivati
+2026-04-18,Magdeburgo,Düsseldorf,GOL,Goal,1.45,-1.0,False,1,Over 2.5,1.5,A+S_o25_s6_conv,o25_s6_to_goal,2:0,Finished,2:0,GOL,False,-1.0,-1.0,0.0,A+S
+2026-04-18,Mantova,Avellino,GOL,NoGoal,1.95,0.95,True,1,Goal,1.77,C_gol_s2_conv,gol_s2_to_ng,0:2,Finished,0:2,GOL,False,-1.0,0.95,1.95,C-derivati
+2026-04-18,Modena,Frosinone,GOL,Over 2.5,1.7,0.7,True,1,2,3.1,C_segno_s6_conv,segno_s6_to_o25,1:2,Finished,1:2,SEGNO,True,2.1,0.7,-1.4000000000000001,C-derivati
+2026-04-18,San Luis,UNAM Pumas,GOL,Under 2.5,2.3,1.3,True,1,X2,1.41,C_screm_dc_dc_s1_conv,dc_s1_to_u25,0:2,Finished,0:2,DOPPIA_CHANCE,True,0.4099999999999999,1.3,0.8900000000000001,C-derivati
+2026-04-18,Torreense,Marítimo,GOL,Goal,1.7,-1.0,False,1,X2,1.38,A+S_dc_s6_conv,dc_s6_to_goal,1:0,Finished,1:0,DOPPIA_CHANCE,False,-1.0,-1.0,0.0,A+S
+2026-04-18,Barrow,FC Walsall,GOL,Goal,1.87,0.87,True,1,X2,1.54,C_combo96_dc_s6_conv,dc_s6_to_goal,1:3,Finished,1:3,DOPPIA_CHANCE,True,0.54,0.87,0.32999999999999996,C-derivati
+2026-04-18,Perugia,Campobasso,GOL,NoGoal,1.87,0.87,True,1,Goal,1.77,C_gol_s2_conv,gol_s2_to_ng,0:1,Finished,0:1,GOL,False,-1.0,0.87,1.87,C-derivati
+2026-04-18,Pianese,Juve Next Gen,GOL,NoGoal,1.8,0.8,True,1,Goal,1.83,C_gol_s2_conv,gol_s2_to_ng,0:0,Finished,0:0,GOL,False,-1.0,0.8,1.8,C-derivati
+2026-04-18,Reading,Cardiff,GOL,Over 2.5,1.6,0.6,True,1,2,1.61,C_segno_s6_conv,segno_s6_to_o25,1:3,Finished,1:3,SEGNO,True,0.6100000000000001,0.6,-0.01000000000000012,C-derivati
+2026-04-17,Roda JC,FC Emmen,GOL,Goal,1.5,0.5,True,1,Over 2.5,1.35,A+S_o25_s6_conv,o25_s6_to_goal,2:2,Finished,2:2,GOL,True,0.3500000000000001,0.5,0.1499999999999999,A+S
+2026-04-17,Sassuolo,Como,GOL,Over 2.5,1.75,0.75,True,1,2,1.67,C_segno_s6_conv,segno_s6_to_o25,2:1,Finished,2:1,SEGNO,False,-1.0,0.75,1.75,C-derivati
+2026-04-17,Helmond Sport,VVV-Venlo,GOL,NoGoal,2.45,1.45,True,1,Over 2.5,1.6,A+S_gol_s5_q160_conv,gol_s5_q160_to_ng,2:0,Finished,2:0,GOL,False,-1.0,1.45,2.45,A+S
+2026-04-17,ADO Den Haag,RKC Waalwijk,GOL,Goal,1.53,0.53,True,1,Over 2.5,1.55,A+S_o25_s6_conv,o25_s6_to_goal,5:1,Finished,5:1,GOL,True,0.55,0.53,-0.020000000000000018,A+S
+2026-04-17,Real Sociedad B,Racing,GOL,Goal,1.45,0.45,True,1,X2,1.35,A+S_dc_s6_conv,dc_s6_to_goal,1:3,Finished,1:3,DOPPIA_CHANCE,True,0.3500000000000001,0.45,0.09999999999999992,A+S
+2026-04-17,Académico Viseu,Feirense,GOL,Under 2.5,1.6,-1.0,False,1,Goal,1.97,C_goal_conv,goal_to_u25,3:0,Finished,3:0,GOL,False,-1.0,-1.0,0.0,C-derivati
+2026-04-17,Sampdoria,Monza,GOL,Under 2.5,1.63,-1.0,False,1,Goal,1.9,C_goal_conv,goal_to_u25,0:3,Finished,0:3,GOL,False,-1.0,-1.0,0.0,C-derivati
+2026-04-17,Willem II,AZ Alkmaar U21,GOL,Goal,1.4,-1.0,False,1,Over 2.5,1.35,A+S_o25_s6_conv,o25_s6_to_goal,3:0,Finished,3:0,GOL,True,0.3500000000000001,-1.0,-1.35,A+S
+2026-04-16,Bromley,Cambridge Utd.,GOL,Under 2.5,1.53,0.53,True,1,Goal,1.9,C_goal_conv,goal_to_u25,0:0,Finished,0:0,GOL,False,-1.0,0.53,1.53,C-derivati
+2026-04-14,FC Portsmouth,Ipswich,GOL,Under 2.5,1.65,0.65,True,1,Goal,1.9,C_goal_conv,goal_to_u25,2:0,Finished,2:0,GOL,False,-1.0,0.65,1.65,C-derivati
+2026-04-14,Bolton,Stevenage,GOL,NoGoal,1.87,-1.0,False,1,Goal,1.83,C_gol_s2_conv,gol_s2_to_ng,5:1,Finished,5:1,GOL,True,0.8300000000000001,-1.0,-1.83,C-derivati
+2026-04-14,Airdrieonians,Dunfermline A.,GOL,Goal,1.7,0.7,True,1,X2,1.37,A+S_dc_s6_conv,dc_s6_to_goal,2:2,Finished,2:2,DOPPIA_CHANCE,True,0.3700000000000001,0.7,0.32999999999999985,A+S
+2026-04-13,Ajax U21,TOP Oss,GOL,Goal,1.4,0.4,True,1,Over 2.5,1.45,A+S_o25_s6_conv,o25_s6_to_goal,1:2,Finished,1:2,GOL,True,0.44999999999999996,0.4,-0.04999999999999993,A+S
+2026-04-13,Columbus,Orlando,GOL,Goal,1.55,0.55,True,1,Over 2.5,1.4,A+S_o25_s6_conv,o25_s6_to_goal,1:1,Finished,1:1,GOL,False,-1.0,0.55,1.55,A+S
+2026-04-13,Sirius,Hammarby,GOL,NoGoal,2.35,1.35,True,1,X2,1.4,C_combo96_dc_s4_conv,dc_s4_to_ng,2:0,Finished,2:0,DOPPIA_CHANCE,False,-1.0,1.35,2.35,C-derivati
+2026-04-13,C. Rizespor,Gaziantep FK,GOL,NoGoal,2.25,-1.0,False,1,X2,2.08,C_screm_dc_s4_conv,dc_s4_to_ng,2:1,Finished,2:1,DOPPIA_CHANCE,False,-1.0,-1.0,0.0,C-derivati
+2026-04-13,Lus. Lourosa,FC Porto B,GOL,NoGoal,1.8,-1.0,False,1,Goal,1.85,C_gol_s2_conv,gol_s2_to_ng,1:1,Finished,1:1,GOL,True,0.8500000000000001,-1.0,-1.85,C-derivati
+2026-04-12,AZ Alkmaar,Heerenveen,GOL,NoGoal,2.85,1.85,True,1,X2,2.06,C_screm_dc_s4_conv,dc_s4_to_ng,3:0,Finished,3:0,DOPPIA_CHANCE,False,-1.0,1.85,2.85,C-derivati
+2026-04-12,Celta de Vigo,Real Oviedo,GOL,NoGoal,1.9,0.9,True,1,Goal,1.8,C_gol_s2_conv,gol_s2_to_ng,0:3,Finished,0:3,GOL,False,-1.0,0.9,1.9,C-derivati
+2026-04-12,Como,Inter,GOL,Under 2.5,1.8,-1.0,False,1,X2,1.36,A+S_dc_s1_conv,dc_s1_to_u25,3:4,Finished,3:4,DOPPIA_CHANCE,True,0.3600000000000001,-1.0,-1.36,A+S
+2026-04-12,Como,Inter,GOL,NoGoal,2.05,-1.0,False,1,Goal,1.67,C_gol_s5_q160_conv,gol_s5_q160_to_ng,3:4,Finished,3:4,GOL,True,0.6699999999999999,-1.0,-1.67,C-derivati
+2026-04-12,Falkirk FC,Glasgow Rangers,GOL,NoGoal,2.15,-1.0,False,1,Goal,1.6,C_gol_s5_q160_conv,gol_s5_q160_to_ng,3:6,Finished,3:6,GOL,True,0.6000000000000001,-1.0,-1.6,C-derivati
+2026-04-12,Tolosa,Lille,GOL,NoGoal,1.9,0.9,True,1,Goal,1.82,C_gol_s2_conv,gol_s2_to_ng,0:4,Finished,0:4,GOL,False,-1.0,0.9,1.9,C-derivati
+2026-04-12,Boca Juniors,Independiente,GOL,NoGoal,1.6,-1.0,False,1,Goal,2.2,C_gol_s2_conv,gol_s2_to_ng,0:1,Live,1:1,GOL,True,1.2000000000000002,-1.0,-2.2,C-derivati
+2026-04-12,Galatasaray,Kocaelispor,GOL,Goal,2.15,1.15,True,1,Over 2.5,1.5,A+S_o25_s6_conv,o25_s6_to_goal,1:1,Finished,1:1,GOL,False,-1.0,1.15,2.15,A+S
+2026-04-12,SC Braga,Arouca,GOL,Under 2.5,1.97,0.97,True,1,Goal,1.95,C_goal_conv,goal_to_u25,1:0,Finished,1:0,GOL,False,-1.0,0.97,1.97,C-derivati
+2026-04-12,Tigres UANL,Chivas,GOL,Goal,1.6,0.46,True,1,1X,1.46,A+S_dc_s6_conv,dc_s6_to_goal,,,4:1,DOPPIA_CHANCE,True,0.45999999999999996,0.46,5.551115123125783e-17,A+S
+2026-04-12,América,CD Cruz Azul,GOL,Goal,1.65,0.38,True,1,1X,1.38,A+S_dc_s6_conv,dc_s6_to_goal,,,1:1,DOPPIA_CHANCE,True,0.3799999999999999,0.38,1.1102230246251565e-16,A+S
+2026-04-11,Austin,LA Galaxy,GOL,NoGoal,2.3,-1.0,False,1,X2,1.76,C_combo96_dc_s4_conv,dc_s4_to_ng,1:2,Finished,1:2,DOPPIA_CHANCE,True,0.76,-1.0,-1.76,C-derivati
+2026-04-11,FC Groningen,Go Ahead Eagles,GOL,Goal,1.47,-1.0,False,1,Over 2.5,1.5,A+S_o25_s6_conv,o25_s6_to_goal,0:0,Finished,0:0,GOL,False,-1.0,-1.0,0.0,A+S
+2026-04-11,Raith Rovers,Morton,GOL,NoGoal,1.85,-1.0,False,1,Goal,1.8,C_gol_s2_conv,gol_s2_to_ng,3:2,Finished,3:2,GOL,True,0.8,-1.0,-1.8,C-derivati
+2026-04-11,Toronto,Cincinnati,SEGNO,1,2.1,-9.0,False,9,Over 2.5,1.6,C_as_segno1_rec,as_o25_to_segno1,1:1,Finished,1:1,GOL,False,-1.0,-1.0,0.0,C-derivati
+2026-04-11,Wolfsburg,Eintracht,GOL,Goal,1.5,0.5,True,1,Over 2.5,1.57,A+S_o25_s6_conv,o25_s6_to_goal,1:2,Finished,1:2,GOL,True,0.5700000000000001,0.5,-0.07000000000000006,A+S
+2026-04-11,Dortmund,Leverkusen,GOL,Goal,1.4,-1.0,False,1,Over 2.5,1.48,A+S_o25_s6_conv,o25_s6_to_goal,0:1,Finished,0:1,GOL,False,-1.0,-1.0,0.0,A+S
+2026-04-11,Ind. Rivadavia,Argentinos Jrs.,GOL,Under 2.5,1.48,-1.0,False,1,Goal,1.97,C_goal_conv,goal_to_u25,3:1,Finished,3:1,GOL,True,0.97,-1.0,-1.97,C-derivati
+2026-04-11,Milan,Udinese,GOL,Under 2.5,1.95,-1.0,False,1,Goal,1.95,C_goal_conv,goal_to_u25,0:3,Finished,0:3,GOL,False,-1.0,-1.0,0.0,C-derivati
+2026-04-11,St. Pauli,Bayern,GOL,Goal,1.65,-1.0,False,1,Over 2.5,1.48,A+S_o25_s6_conv,o25_s6_to_goal,0:5,Finished,0:5,GOL,True,0.48,-1.0,-1.48,A+S
+2026-04-11,Kayserispor,Fenerbahce,GOL,Goal,1.73,-1.0,False,1,Over 2.5,1.6,A+S_o25_s6_conv,o25_s6_to_goal,0:4,Finished,0:4,GOL,True,0.6000000000000001,-1.0,-1.6,A+S
+2026-04-11,Lincoln City,Leyton Orient,GOL,Under 2.5,1.9,-1.0,False,1,Goal,1.9,C_goal_conv,goal_to_u25,2:1,Finished,2:1,GOL,True,0.8999999999999999,-1.0,-1.9,C-derivati
+2026-04-11,US Boulogne,Le Mans FC,GOL,Under 2.5,1.57,0.57,True,1,Goal,1.9,C_goal_conv,goal_to_u25,0:0,Finished,0:0,GOL,False,-1.0,0.57,1.5699999999999998,C-derivati
+2026-04-11,Burton Albion,AFC Wimbledon,GOL,NoGoal,1.87,0.87,True,1,X2,1.88,C_screm_dc_s4_conv,dc_s4_to_ng,1:0,Finished,1:0,DOPPIA_CHANCE,False,-1.0,0.87,1.87,C-derivati
+2026-04-11,MK Dons,Bromley,GOL,NoGoal,1.87,-1.0,False,1,Goal,1.83,C_gol_s2_conv,gol_s2_to_ng,2:1,Finished,2:1,GOL,True,0.8300000000000001,-1.0,-1.83,C-derivati
+2026-04-11,Al-Najma,NEOM SC,GOL,Goal,1.65,0.65,True,1,2,1.53,C_segno_s9_f150_conv,segno_s9_f150_to_goal,2:1,Finished,2:1,SEGNO,False,-1.0,0.65,1.65,C-derivati
+2026-04-11,Triestina,Giana Erminio,GOL,Under 2.5,1.6,0.6,True,1,Goal,1.9,C_goal_conv,goal_to_u25,2:0,Finished,2:0,GOL,False,-1.0,0.6,1.6,C-derivati
+2026-04-11,IFK Göteborg,Häcken,GOL,NoGoal,2.45,1.45,True,1,Over 2.5,1.6,C_screm_gol_s5_q160_conv,gol_s5_q160_to_ng,0:2,Finished,0:2,GOL,False,-1.0,1.45,2.45,C-derivati
+2026-04-11,Vicenza,Novara,GOL,Over 2.5,1.85,0.85,True,1,1,1.65,C_segno_s6_conv,segno_s6_to_o25,3:1,Finished,3:1,SEGNO,True,0.6499999999999999,0.85,0.20000000000000007,C-derivati
+2026-04-11,Cardiff,Bolton,GOL,Over 2.5,1.45,-1.0,False,1,1,1.78,C_segno_s6_conv,segno_s6_to_o25,,,2:0,SEGNO,True,0.78,-1.0,-1.78,C-derivati
+2026-04-10,Augusta,Hoffenheim,GOL,Over 2.5,1.57,0.57,True,1,2,2.05,C_segno_s6_conv,segno_s6_to_o25,2:2,Finished,2:2,SEGNO,False,-1.0,0.57,1.5699999999999998,C-derivati
+2026-04-10,Düsseldorf,Holstein Kiel,GOL,Goal,1.5,0.5,True,1,Over 2.5,1.63,A+S_o25_s6_conv,o25_s6_to_goal,1:2,Finished,1:2,GOL,True,0.6299999999999999,0.5,-0.1299999999999999,A+S
+2026-04-10,Marsiglia,Metz,GOL,Goal,1.87,0.87,True,1,Over 2.5,1.35,A+S_o25_s6_conv,o25_s6_to_goal,3:1,Finished,3:1,GOL,True,0.3500000000000001,0.87,0.5199999999999999,A+S
+2026-04-10,Paris FC,Monaco,GOL,NoGoal,2.35,-1.0,False,1,Over 2.5,1.6,A+S_gol_s5_q160_conv,gol_s5_q160_to_ng,4:1,Finished,4:1,GOL,True,0.6000000000000001,-1.0,-1.6,A+S
+2026-04-10,FC Den Bosch,SC Cambuur,GOL,Goal,1.4,0.4,True,1,Over 2.5,1.45,A+S_o25_s6_conv,o25_s6_to_goal,1:1,Finished,1:1,GOL,False,-1.0,0.4,1.4,A+S
+2026-04-10,Famalicão,Moreirense,GOL,Over 2.5,1.9,-1.0,False,1,1,1.56,C_segno_s6_conv,segno_s6_to_o25,1:1,Finished,1:1,SEGNO,False,-1.0,-1.0,0.0,C-derivati
+2026-04-10,Stade Lavallois,Stade Reims,GOL,NoGoal,1.85,-1.0,False,1,Goal,1.83,C_gol_s2_conv,gol_s2_to_ng,2:2,Finished,2:2,GOL,True,0.8300000000000001,-1.0,-1.83,C-derivati
+2026-04-10,FC Eindhoven,Roda JC,GOL,Goal,1.45,0.45,True,1,X2,1.46,A+S_dc_s6_conv,dc_s6_to_goal,1:3,Finished,1:3,DOPPIA_CHANCE,True,0.45999999999999996,0.45,-0.009999999999999953,A+S
+2026-04-10,Dundalk FC,Derry City,GOL,Over 2.5,2.05,1.05,True,1,1,2.59,C_segno_s6_conv,segno_s6_to_o25,2:2,Finished,2:2,SEGNO,False,-1.0,1.05,2.05,C-derivati
+2026-04-08,FC Ingolstadt,Vikt. Colonia,GOL,Goal,1.5,0.5,True,1,Over 2.5,1.6,A+S_o25_s6_conv,o25_s6_to_goal,1:2,Finished,1:2,GOL,True,0.6000000000000001,0.5,-0.10000000000000009,A+S
+2026-04-07,Energie Cottbus,Monaco 1860,GOL,Goal,1.5,-1.0,False,1,Over 2.5,1.57,A+S_o25_s6_conv,o25_s6_to_goal,3:0,Finished,3:0,GOL,True,0.5700000000000001,-1.0,-1.57,A+S
+2026-04-07,Hatayspor,Adana Demirspor,DOPPIA_CHANCE,X2,2.21,-9.0,False,9,Over 2.5,1.45,C_as_dc_rec,as_o25_to_dc,,,4:0,GOL,True,0.44999999999999996,-1.0,-1.45,C-derivati
+2026-04-06,AlbinoLeffe,Pergolettese,GOL,Under 2.5,1.5,-1.0,False,1,Goal,1.97,C_goal_conv,goal_to_u25,3:0,Finished,3:0,GOL,False,-1.0,-1.0,0.0,C-derivati
+2026-04-06,Bari,Modena,GOL,Over 2.5,1.95,0.95,True,1,2,1.83,C_segno_s6_conv,segno_s6_to_o25,3:1,Finished,3:1,SEGNO,False,-1.0,0.95,1.95,C-derivati
+2026-04-06,Girona FC,Villarreal,GOL,NoGoal,2.4,1.4,True,1,Over 2.5,1.65,C_screm_gol_s5_q160_conv,gol_s5_q160_to_ng,1:0,Finished,1:0,GOL,False,-1.0,1.4,2.4,C-derivati
+2026-04-06,Helmond Sport,RKC Waalwijk,GOL,Goal,1.47,0.47,True,1,Over 2.5,1.55,A+S_o25_s6_conv,o25_s6_to_goal,2:2,Finished,2:2,GOL,True,0.55,0.47,-0.08000000000000007,A+S
+2026-04-06,Reading,Lincoln City,GOL,NoGoal,1.85,-1.0,False,1,Goal,1.85,C_gol_s2_conv,gol_s2_to_ng,1:2,Finished,1:2,GOL,True,0.8500000000000001,-1.0,-1.85,C-derivati
+2026-04-06,Reggiana,Pescara,GOL,Under 2.5,1.9,-4.0,False,4,Over 2.5,1.8,C_as_u25_rec,as_o25_to_under25,1:3,Finished,1:3,GOL,True,0.8,-1.0,-1.8,C-derivati
+2026-04-06,TOP Oss,Utrecht U21,GOL,Goal,1.45,0.45,True,1,Over 2.5,1.5,A+S_o25_s6_conv,o25_s6_to_goal,3:1,Finished,3:1,GOL,True,0.5,0.45,-0.04999999999999999,A+S
+2026-04-06,Udinese,Como,GOL,Under 2.5,1.75,0.75,True,1,Goal,1.9,C_goal_conv,goal_to_u25,0:0,Finished,0:0,GOL,False,-1.0,0.75,1.75,C-derivati
+2026-04-06,Vitesse,Ajax U21,GOL,Goal,1.47,0.47,True,1,Over 2.5,1.42,A+S_o25_s6_conv,o25_s6_to_goal,6:1,Finished,6:1,GOL,True,0.41999999999999993,0.47,0.050000000000000044,A+S
+2026-04-06,PSV U21,VVV-Venlo,GOL,Goal,1.35,-1.0,False,1,Over 2.5,1.35,A+S_o25_s6_conv,o25_s6_to_goal,1:0,Finished,1:0,GOL,False,-1.0,-1.0,0.0,A+S
+2026-04-06,SC Cambuur,FC Dordrecht,SEGNO,1,1.66,-9.0,False,9,Over 2.5,1.5,C_as_segno1_rec,as_o25_to_segno1,1:1,Finished,1:1,GOL,False,-1.0,-1.0,0.0,C-derivati
+2026-04-06,Venezia,Juve Stabia,GOL,NoGoal,1.7,-1.0,False,1,Goal,2.0,C_gol_s2_conv,gol_s2_to_ng,3:1,Finished,3:1,GOL,True,1.0,-1.0,-2.0,C-derivati
+2026-04-05,Atlanta,Columbus,GOL,Goal,1.53,0.65,True,1,Over 2.5,1.65,A+S_o25_s6_conv,o25_s6_to_goal,,,1:3,GOL,True,0.6499999999999999,0.65,1.1102230246251565e-16,A+S
+2026-04-05,Atlético-MG,Athletico-PR,GOL,Under 2.5,1.7,-3.0,False,3,Over 2.5,2.0,C_as_u25_rec,as_o25_to_under25,1:0,Live,2:1,GOL,True,1.0,-1.0,-2.0,C-derivati
+2026-04-05,CD Cruz Azul,Pachuca,GOL,Goal,1.57,0.65,True,1,Over 2.5,1.65,A+S_o25_s6_conv,o25_s6_to_goal,,,1:2,GOL,True,0.6499999999999999,0.65,1.1102230246251565e-16,A+S
+2026-04-05,E. Braunschweig,Norimberga,GOL,Goal,1.57,0.57,True,1,1X,1.42,A+S_dc_s6_conv,dc_s6_to_goal,1:1,Finished,1:1,DOPPIA_CHANCE,True,0.41999999999999993,0.57,0.15000000000000002,A+S
+2026-04-05,LA Galaxy,Minnesota,GOL,NoGoal,2.35,-1.0,False,1,Over 2.5,1.6,A+S_gol_s5_q160_conv,gol_s5_q160_to_ng,1:2,Finished,1:2,GOL,True,0.6000000000000001,-1.0,-1.6,A+S
+2026-04-05,Leiria,Lus. Lourosa,GOL,NoGoal,1.87,0.87,True,1,Over 1.5,1.3,C_goal_conv_gol_s1_conv,gol_s1_to_ng,0:0,Finished,0:0,GOL,False,-1.0,0.87,1.87,C-derivati
+2026-04-05,Livingston FC,Heart of Midl.,GOL,Goal,1.88,0.88,True,1,Over 2.5,1.67,ASC_diamond_o25_L1_o25_s6_conv,o25_s6_to_goal,2:2,Finished,2:2,GOL,True,0.6699999999999999,0.88,0.21000000000000008,Altro
+2026-04-05,Lorient,Paris FC,GOL,NoGoal,1.88,-1.0,False,1,Goal,1.83,C_gol_s2_conv,gol_s2_to_ng,1:1,Finished,1:1,GOL,True,0.8300000000000001,-1.0,-1.83,C-derivati
+2026-04-05,Pisa,Torino,GOL,NoGoal,1.87,0.87,True,1,X2,1.42,C_screm_dc_s4_conv,dc_s4_to_ng,0:1,Finished,0:1,DOPPIA_CHANCE,True,0.41999999999999993,0.87,0.45000000000000007,C-derivati
+2026-04-05,Querétaro FC,Toluca,GOL,Goal,1.65,-1.0,False,1,2,1.55,C_segno_s9_f150_conv,segno_s9_f150_to_goal,,,1:0,SEGNO,False,-1.0,-1.0,0.0,C-derivati
+2026-04-05,Samsunspor,Konyaspor,GOL,NoGoal,1.95,-1.0,False,1,X2,1.55,C_screm_dc_s4_conv,dc_s4_to_ng,2:2,Finished,2:2,DOPPIA_CHANCE,True,0.55,-1.0,-1.55,C-derivati
+2026-04-05,Santos Laguna,América,GOL,Goal,1.6,0.6,True,1,Over 2.5,1.63,A+S_o25_s6_conv,o25_s6_to_goal,,,1:1,GOL,False,-1.0,0.6,1.6,A+S
+2026-04-05,Vasco da Gama,Botafogo,GOL,Under 2.5,1.7,-1.0,False,1,X2,1.6,C_screm_dc_s1_conv,dc_s1_to_u25,,,1:2,DOPPIA_CHANCE,True,0.6000000000000001,-1.0,-1.6,C-derivati
+2026-04-05,Chapecoense,EC Vitória,SEGNO,1,2.4,-9.0,False,9,Over 2.5,2.05,C_as_segno1_rec,as_o25_to_segno1,1:1,Finished,1:1,GOL,False,-1.0,-1.0,0.0,C-derivati
+2026-04-05,Palermo,Avellino,GOL,NoGoal,1.87,0.87,True,1,Goal,1.85,C_gol_s2_conv,gol_s2_to_ng,2:0,Finished,2:0,GOL,False,-1.0,0.87,1.87,C-derivati
+2026-04-05,Schalke 04,Karlsruher SC,DOPPIA_CHANCE,X2,2.56,-9.0,False,9,Over 2.5,1.53,C_as_dc_rec,as_o25_to_dc,1:0,Finished,1:0,GOL,False,-1.0,-1.0,0.0,C-derivati
+2026-04-04,Al-Hilal,Al-Taawoun,DOPPIA_CHANCE,X2,3.67,24.03,True,9,Over 2.5,1.5,C_as_dc_rec,as_o25_to_dc,2:2,Finished,2:2,GOL,True,0.5,2.67,2.17,C-derivati
+2026-04-04,Arbroath,St. Johnstone,GOL,NoGoal,1.8,-1.0,False,1,Goal,1.3,C_gol_s2_conv,gol_s2_to_ng,,,2:4,GOL,True,0.30000000000000004,-1.0,-1.3,C-derivati
+2026-04-04,Arm. Bielefeld,Darmstadt,GOL,NoGoal,2.4,-1.0,False,1,Under 3.5,1.42,C_screm_gol_s5_q160_conv,gol_s5_q160_to_ng,,,2:1,GOL,True,0.41999999999999993,-1.0,-1.42,C-derivati
+2026-04-04,Ascoli,Vis Pesaro,GOL,NoGoal,1.73,-1.0,False,1,Over 2.5,1.75,C_goal_conv_gol_s1_conv,gol_s1_to_ng,2:1,Finished,2:1,GOL,True,0.75,-1.0,-1.75,C-derivati
+2026-04-04,Brest,Stade Rennes,GOL,NoGoal,2.1,-1.0,False,1,X2,1.48,C_screm_dc_s4_conv,dc_s4_to_ng,3:4,Finished,3:4,DOPPIA_CHANCE,True,0.48,-1.0,-1.48,C-derivati
+2026-04-04,Cavese,Casertana,GOL,NoGoal,1.7,0.7,True,1,Over 2.5,2.35,C_screm_gol_s1_conv,gol_s1_to_ng,0:1,Finished,0:1,GOL,False,-1.0,0.7,1.7,C-derivati
+2026-04-04,CyD Leonesa,Real Valladolid,GOL,Under 2.5,1.7,0.7,True,1,X2,1.45,C_screm_dc_s1_conv,dc_s1_to_u25,,,1:0,DOPPIA_CHANCE,False,-1.0,0.7,1.7,C-derivati
+2026-04-04,Excelsior,NEC Nijmegen,GOL,Goal,1.47,-1.0,False,1,Over 2.5,1.5,A+S_o25_s6_conv,o25_s6_to_goal,0:2,Finished,0:2,GOL,False,-1.0,-1.0,0.0,A+S
+2026-04-04,Farense,Feirense,GOL,NoGoal,1.7,0.7,True,1,X2,1.55,C_combo96_dc_s4_conv,dc_s4_to_ng,,,0:1,DOPPIA_CHANCE,True,0.55,0.7,0.1499999999999999,C-derivati
+2026-04-04,Independiente,Racing,GOL,Over 1.5,1.47,-3.0,False,3,1,2.63,C_hw_mc_conv,mc_filter_convert,0:0,Live,1:0,SEGNO,True,1.63,-1.0,-2.63,C-derivati
+2026-04-04,Leverkusen,Wolfsburg,GOL,Goal,1.57,0.57,True,1,Over 2.5,1.45,C_screm_o25_s6_conv,o25_s6_to_goal,,,6:3,GOL,True,0.44999999999999996,0.57,0.12,C-derivati
+2026-04-04,Moreirense,SC Braga,GOL,Goal,1.95,-1.0,False,1,2,1.5,C_segno_s9_f150_conv,segno_s9_f150_to_goal,0:1,Finished,0:1,SEGNO,True,0.5,-1.0,-1.5,C-derivati
+2026-04-04,Pro Vercelli,Inter U23,GOL,NoGoal,1.8,0.8,True,1,X2,1.47,C_screm_dc_s4_conv,dc_s4_to_ng,,,0:2,DOPPIA_CHANCE,True,0.47,0.8,0.33000000000000007,C-derivati
+2026-04-04,Ravenna,Pineto,GOL,NoGoal,1.7,0.7,True,1,Over 1.5,1.33,C_goal_conv_gol_s1_conv,gol_s1_to_ng,,,1:0,GOL,False,-1.0,0.7,1.7,C-derivati
+2026-04-04,San Lorenzo,Estudiantes LP,DOPPIA_CHANCE,X2,1.36,-10.0,False,10,2,2.63,C_dc_conv,gg_conf_dc_downgrade,,,1:0,SEGNO,False,-1.0,-1.0,0.0,C-derivati
+2026-04-04,San Lorenzo,Estudiantes LP,GOL,NoGoal,1.55,0.55,True,1,Goal,1.6,C_gol_s2_conv,gol_s2_to_ng,,,1:0,GOL,False,-1.0,0.55,1.55,C-derivati
+2026-04-04,Toronto,Colorado,DOPPIA_CHANCE,X2,1.77,-9.0,False,9,Over 2.5,2.1,C_as_dc_rec,as_o25_to_dc,3:2,Finished,3:2,GOL,True,1.1,-1.0,-2.1,C-derivati
+2026-04-03,CA Talleres,Boca Juniors,DOPPIA_CHANCE,1X,1.62,-9.0,False,9,2,2.25,C_dc_conv,gg_conf_dc_downgrade,,,0:1,SEGNO,True,1.25,-1.0,-2.25,C-derivati
+2026-04-03,USL Dunkerque,Rodez,DOPPIA_CHANCE,X2,1.7,4.2,True,6,Over 2.5,1.63,C_as_dc_rec,as_o25_to_dc,1:1,Finished,1:1,GOL,False,-1.0,0.7000000000000001,1.7000000000000002,C-derivati
+2026-04-03,Gil Vicente,Avs FS,DOPPIA_CHANCE,X2,2.92,-9.0,False,9,Over 2.5,1.9,C_as_dc_rec,as_o25_to_dc,3:0,Finished,3:0,GOL,True,0.8999999999999999,-1.0,-1.9,C-derivati
+2026-04-03,FC Eindhoven,De Graafschap,DOPPIA_CHANCE,X2,1.45,2.7,True,6,Over 2.5,1.37,C_as_dc_rec,as_o25_to_dc,2:2,Finished,2:2,GOL,True,0.3700000000000001,0.45,0.0799999999999999,C-derivati
+2026-04-03,MK Dons,Barrow,DOPPIA_CHANCE,X2,2.75,10.5,True,6,Over 2.5,1.65,C_as_dc_rec,as_o25_to_dc,0:0,Finished,0:0,GOL,False,-1.0,1.75,2.75,C-derivati
+2026-04-03,VVV-Venlo,SC Cambuur,GOL,Under 2.5,2.65,-3.0,False,3,Over 2.5,2.65,C_as_u25_rec,as_o25_to_under25,3:0,Finished,3:0,GOL,True,1.65,-1.0,-2.65,C-derivati
+2026-04-03,Almere City,TOP Oss,DOPPIA_CHANCE,X2,2.6,-6.0,False,6,Over 2.5,1.7,C_as_dc_rec,as_o25_to_dc,3:2,Finished,3:2,GOL,True,0.7,-1.0,-1.7,C-derivati
+2026-04-03,Lecco,Vicenza,GOL,Over 1.5,1.35,2.45,True,7,2,2.0,C_mc_conv,mc_filter_convert,2:0,Finished,2:0,SEGNO,False,-1.0,0.35000000000000003,1.35,C-derivati
+2026-04-03,MVV Maastricht,RKC Waalwijk,GOL,Under 2.5,2.45,-7.0,False,7,Over 2.5,2.45,C_as_u25_rec,as_o25_to_under25,1:3,Finished,1:3,GOL,True,1.4500000000000002,-1.0,-2.45,C-derivati
+2026-04-02,Cruzeiro,EC Vitória,DOPPIA_CHANCE,X2,2.1,-9.0,False,9,Over 2.5,1.75,C_as_dc_rec,as_o25_to_dc,,,3:0,GOL,True,0.75,-1.0,-1.75,C-derivati
+2026-04-02,Tigre,Ind. Rivadavia,GOL,Over 1.5,1.45,2.25,True,5,1,2.2,C_hw_mc_conv,mc_filter_convert,0:1,Live,0:2,SEGNO,False,-1.0,0.45,1.45,C-derivati
+2026-03-28,FC Eindhoven,FC Emmen,GOL,Under 2.5,2.3,3.9,True,3,Over 2.5,1.55,C_as_u25_rec,as_o25_to_under25,,,1:0,GOL,False,-1.0,1.3,2.3,C-derivati
+2026-03-28,Reading,Wigan,DOPPIA_CHANCE,X2,1.62,-6.0,False,6,Over 2.5,1.33,C_as_dc_rec,as_o25_to_dc,,,3:0,GOL,True,0.33000000000000007,-1.0,-1.33,C-derivati
+2026-03-22,Atlanta,D.C. United,DOPPIA_CHANCE,X2,1.97,2.91,True,9,Over 2.5,1.77,C_as_dc_rec,as_o25_to_dc,0:0,Finished,0:0,GOL,False,-1.0,0.32333333333333336,1.3233333333333333,C-derivati
+2026-03-22,FC Utrecht,Go Ahead Eagles,DOPPIA_CHANCE,X2,1.98,-3.0,False,9,Over 2.5,1.6,C_as_dc_rec,as_o25_to_dc,2:0,Finished,2:0,GOL,False,-1.0,-0.3333333333333333,0.6666666666666667,C-derivati
+2026-03-22,Standard Liegi,KVC Westerlo,DOPPIA_CHANCE,X2,1.51,0.51,True,7,2,2.8,C_dc_conv,gg_conf_dc_downgrade,0:0,Finished,0:0,SEGNO,False,-1.0,0.07285714285714286,1.072857142857143,C-derivati
+2026-03-22,Siracusa,Picerno,SEGNO,1,1.8,1.6,True,6,Over 2.5,1.4,C_as_segno1_rec,as_o25_to_segno1,2:1,Finished,2:1,GOL,True,0.3999999999999999,0.26666666666666666,-0.13333333333333325,C-derivati
+2026-03-22,Club Bruges,KV Mechelen,DOPPIA_CHANCE,X2,3.26,-4.0,False,9,Over 2.5,1.75,C_as_dc_rec,as_o25_to_dc,4:1,Finished,4:1,GOL,True,0.75,-0.4444444444444444,-1.1944444444444444,C-derivati
+2026-03-22,Magonza,Eintracht,DOPPIA_CHANCE,X2,1.61,-2.0,False,9,Over 2.5,1.37,C_as_dc_rec,as_o25_to_dc,2:1,Finished,2:1,GOL,True,0.3700000000000001,-0.2222222222222222,-0.5922222222222223,C-derivati
+2026-03-22,NEC Nijmegen,Heerenveen,DOPPIA_CHANCE,X2,1.87,2.61,True,9,Over 2.5,1.37,C_as_dc_rec,as_o25_to_dc,2:2,Finished,2:2,GOL,True,0.3700000000000001,0.29,-0.08000000000000013,C-derivati
+2026-03-22,St. Pauli,Friburgo,DOPPIA_CHANCE,X2,1.4,0.4,True,6,Over 2.5,1.83,C_as_dc_rec,as_o25_to_dc,1:2,Finished,1:2,GOL,True,0.8300000000000001,0.06666666666666667,-0.7633333333333334,C-derivati
+2026-03-22,Empoli,Pescara,DOPPIA_CHANCE,X2,1.7,-2.0,False,2,2,3.4,C_dc_conv,gg_conf_dc_downgrade,4:2,Finished,4:2,SEGNO,False,-1.0,-1.0,0.0,C-derivati
+2026-03-22,São Paulo,Palmeiras,GOL,Under 2.5,1.65,0.65,True,3,Over 2.5,1.65,C_as_u25_rec,as_o25_to_under25,,,0:1,GOL,False,-1.0,0.21666666666666667,1.2166666666666668,C-derivati
+2026-03-22,Bari,Carrarese,DOPPIA_CHANCE,1X,1.41,-1.0,False,7,2,2.5,C_dc_conv,gg_conf_dc_downgrade,0:3,Finished,0:3,SEGNO,True,1.5,-0.14285714285714285,-1.6428571428571428,C-derivati
+2026-03-22,Estudiantes RC,River Plate,GOL,Over 1.5,1.43,0.43,True,1,1,6.5,C_hw_mc_conv,mc_filter_convert,0:2,Finished,0:2,SEGNO,False,-1.0,0.43,1.43,C-derivati
+2026-03-21,Vélez Sarsfield,Lanús,GOL,Over 1.5,1.5,-1.0,False,1,X,3.0,MC_xdraw_mc_conv,mc_filter_convert,0:1,Finished,0:1,SEGNO,False,-1.0,-1.0,0.0,C-derivati
+2026-03-21,Falkirk FC,St. Mirren,SEGNO,1,1.83,-2.0,False,6,Over 2.5,1.85,C_as_segno1_rec,as_o25_to_segno1,1:2,Finished,1:2,GOL,True,0.8500000000000001,-0.3333333333333333,-1.1833333333333333,C-derivati
+2026-03-21,Leeds,Brentford,DOPPIA_CHANCE,X2,1.45,0.45,True,9,Over 2.5,1.8,C_as_dc_rec,as_o25_to_dc,0:0,Finished,0:0,GOL,False,-1.0,0.05,1.05,C-derivati
+2026-03-21,Levante,Real Oviedo,DOPPIA_CHANCE,X2,1.71,-2.0,False,9,Over 2.5,1.35,C_as_dc_rec,as_o25_to_dc,4:2,Finished,4:2,GOL,True,0.3500000000000001,-0.2222222222222222,-0.5722222222222223,C-derivati
+2026-03-21,Swansea City,Coventry City,DOPPIA_CHANCE,X2,1.52,0.52,True,8,2,2.88,C_dc_conv,gg_conf_dc_downgrade,0:3,Finished,0:3,SEGNO,True,1.88,0.065,-1.815,C-derivati
+2026-03-21,Racing,Albacete,DOPPIA_CHANCE,X2,2.05,3.15,True,9,Over 2.5,2.15,C_as_dc_rec,as_o25_to_dc,0:4,Finished,0:4,GOL,True,1.15,0.35,-0.7999999999999999,C-derivati
+2026-03-21,CA Osasuna,Girona FC,DOPPIA_CHANCE,X2,1.82,-3.0,False,9,Over 2.5,1.92,C_as_dc_rec,as_o25_to_dc,1:0,Finished,1:0,GOL,False,-1.0,-0.3333333333333333,0.6666666666666667,C-derivati
+2026-03-21,Renate,Vicenza,GOL,Over 1.5,1.43,0.43,True,3,2,2.05,C_mc_conv,mc_filter_convert,1:3,Finished,1:3,SEGNO,True,1.0499999999999998,0.14333333333333334,-0.9066666666666665,C-derivati
+2026-03-15,Lazio,Milan,GOL,Over 1.5,1.35,-1.0,False,3,2,1.95,C_mc_conv,mc_filter_convert,1:0,Finished,1:0,SEGNO,False,-1.0,-0.3333333333333333,0.6666666666666667,C-derivati
+2026-03-09,Monopoli,Casarano,GOL,Over 1.5,1.4,0.4,True,2,2,3.75,C_mc_conv,mc_filter_convert,2:1,Finished,2:1,SEGNO,False,-1.0,0.2,1.2,C-derivati
+2026-03-08,Benfica,FC Porto,GOL,Over 1.5,1.35,0.35,True,10,1,2.25,C_hw_mc_conv,mc_filter_convert,2:2,Finished,2:2,SEGNO,False,-1.0,0.034999999999999996,1.035,C-derivati
+2026-03-03,Lecco,Renate,GOL,Over 1.5,1.45,0.45,True,1,1,2.2,MC_hw_mc_conv,mc_filter_convert,,,0:3,SEGNO,False,-1.0,0.45,1.45,C-derivati
+2026-03-03,Banfield,Aldosivi,GOL,Over 1.5,1.43,0.43,True,2,1,1.85,C_mc_conv,mc_filter_convert,,,2:0,SEGNO,True,0.8500000000000001,0.215,-0.6350000000000001,C-derivati
+2026-02-22,Salernitana,Monopoli,GOL,Over 1.5,1.38,-1.0,False,3,2,5.75,C_mc_conv,mc_filter_convert,,,0:1,SEGNO,True,4.75,-0.3333333333333333,-5.083333333333333,C-derivati
+2026-02-21,Casertana,Picerno,GOL,Over 1.5,1.35,0.35,True,2,1,1.73,C_hw_mc_conv,mc_filter_convert,,,2:1,SEGNO,True,0.73,0.175,-0.5549999999999999,C-derivati

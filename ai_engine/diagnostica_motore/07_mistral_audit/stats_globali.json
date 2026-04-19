@@ -1,0 +1,21 @@
+{
+  "totale_docs": 618,
+  "finestra_date": "2026-03-09 14:11:47.426000 → 2026-04-19 06:22:57.012000",
+  "con_variables_impact": 618,
+  "con_root_cause": 618,
+  "con_ai_analysis": 618,
+  "con_suggested_adjustment": 618,
+  "con_pattern_tags": 607,
+  "severity_high": 399,
+  "severity_medium": 100,
+  "severity_low": 119,
+  "severity_null": 0,
+  "vi_form_mean": 0.058,
+  "vi_motivation_mean": 0.034,
+  "vi_home_advantage_mean": 0.042,
+  "vi_market_odds_mean": 0.405,
+  "vi_h2h_mean": 0.024,
+  "vi_fatigue_mean": 0.0,
+  "vi_streaks_mean": 0.266,
+  "vi_tactical_dna_mean": 0.124
+}

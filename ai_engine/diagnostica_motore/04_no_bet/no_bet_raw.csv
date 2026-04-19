@@ -1,0 +1,214 @@
+date,home,away,tipo,original_pronostico,original_quota,source,routing_rule,confidence,stars,probabilita_stimata,live_score,live_status,real_score,esito,pl,gruppo,scrematura
+2026-04-18,AC Oulu,VPS,SEGNO,X,3.4,MC_xdraw,segno_s2_toxic_q_filter,55.0,3.0,70.0,1:0,Finished,1:0,False,-1.0,C-derivati,True
+2026-04-18,Arbroath,Raith Rovers,SEGNO,,,,,0.0,,,2:1,Finished,2:1,,,Altro,False
+2026-04-18,Arm. Bielefeld,Norimberga,SEGNO,,,,,0.0,,,1:1,Finished,1:1,,,Altro,False
+2026-04-18,Brentford,FC Fulham,SEGNO,,,,,0.0,,,0:0,Finished,0:0,,,Altro,False
+2026-04-18,Chelsea,Manchester Utd.,SEGNO,X,3.56,MC_xdraw,segno_s2_toxic_q_filter,55.0,3.0,70.0,0:1,Finished,0:1,False,-1.0,C-derivati,True
+2026-04-18,Crawley Town,Shrewsbury,SEGNO,,,,,0.0,,,0:0,Finished,0:0,,,Altro,False
+2026-04-18,Crewe Alexandra,MK Dons,SEGNO,2,1.95,C,se2_s8_q190_filter,61.0,3.4,61.0,1:3,Finished,1:3,True,0.95,C,True
+2026-04-18,FF Jaro,KuPS,SEGNO,,,,,0.0,,,1:1,Finished,1:1,,,Altro,False
+2026-04-18,Real Saragozza,AD Ceuta,SEGNO,2,4.5,C,segno_s2_toxic_q_filter,54.0,3.1,54.0,2:2,Finished,2:2,False,-1.0,C,True
+2026-04-18,Real Saragozza,AD Ceuta,DOPPIA_CHANCE,X2,2.0,C_screm,x2_s2_filter,54.0,3.1,54.0,2:2,Finished,2:2,True,1.0,C-derivati,True
+2026-04-18,Ross County,Ayr United,DOPPIA_CHANCE,X2,1.56,C_combo96,x2_s2_filter,54.0,3.1,,2:1,Finished,2:1,False,-1.0,C-derivati,True
+2026-04-18,Sheff Wed,Charlton,SEGNO,,,,,0.0,,,1:1,Finished,1:1,,,Altro,False
+2026-04-18,FC Ingolstadt,VfL Osnabrück,SEGNO,2,1.91,C,se2_s8_q190_filter,87.0,4.5,87.0,0:1,Finished,0:1,True,0.9099999999999999,C,True
+2026-04-18,Genclerbirligi,Galatasaray,GOL,MG 3-5,1.89,C_screm,gol_s4_q180_filter,81.0,4.2,81.0,1:2,Finished,1:2,True,0.8899999999999999,C-derivati,True
+2026-04-18,Halmstads BK,IFK Göteborg,SEGNO,1,3.38,MC_hw,segno_s2_toxic_q_filter,55.0,3.0,75.0,1:1,Finished,1:1,False,-1.0,C-derivati,True
+2026-04-18,Montréal,New York,SEGNO,,,,,0.0,,,4:1,Finished,4:1,,,Altro,False
+2026-04-18,Casa Pia,Santa Clara,SEGNO,,,,,0.0,,,0:0,Finished,0:0,,,Altro,False
+2026-04-18,Colorado,Miami,SEGNO,1,3.3,MC_hw,segno_s2_toxic_q_filter,55.0,3.0,75.0,2:3,Finished,2:3,False,-1.0,C-derivati,True
+2026-04-18,Nacional,Alverca,SEGNO,2,3.4,C,segno_s2_toxic_q_filter,54.0,3.1,54.0,1:0,Finished,1:0,False,-1.0,C,True
+2026-04-18,Sirius,Västerås SK,SEGNO,,,,,0.0,,,4:1,Finished,4:1,,,Altro,False
+2026-04-18,Vasco da Gama,São Paulo,SEGNO,,,,,0.0,,,0:1,Live,2:1,,,Altro,False
+2026-04-18,Barnsley FC,Bradford,SEGNO,,,,,0.0,,,2:2,Finished,2:2,,,Altro,False
+2026-04-18,FC Portsmouth,Leicester City,SEGNO,,,,,0.0,,,1:0,Finished,1:0,,,Altro,False
+2026-04-18,Northampton,Doncaster Rov.,GOL,Under 3.5,1.35,A,gol_s7_filter,69.7,3.1,55.6,1:3,Finished,1:3,False,-1.0,A,True
+2026-04-18,Ravenna,Vis Pesaro,GOL,Goal,1.88,C,gol_s4_q180_filter,63.0,3.5,63.0,1:0,Finished,1:0,False,-1.0,C,True
+2026-04-18,TPS,SJK Seinäjoki,SEGNO,,,,,0.0,,,2:0,Finished,2:0,,,Altro,False
+2026-04-18,Hammarby,Örgryte,SEGNO,X,6.15,MC_xdraw,segno_s2_toxic_q_filter,55.0,3.0,70.0,8:1,Finished,8:1,False,-1.0,C-derivati,True
+2026-04-18,Mansfield Town,Luton,SEGNO,X,3.4,MC_xdraw,segno_s2_toxic_q_filter,55.0,3.0,70.0,2:2,Finished,2:2,True,2.4,C-derivati,True
+2026-04-18,Millwall,QPR,SEGNO,,,,,0.0,,,2:0,Finished,2:0,,,Altro,False
+2026-04-18,Paços Ferreira,Chaves,SEGNO,,,,,0.0,,,4:3,Finished,4:3,,,Altro,False
+2026-04-18,Spezia,Südtirol,SEGNO,X,3.18,MC_xdraw,segno_s2_toxic_q_filter,55.0,3.0,70.0,6:1,Finished,6:1,False,-1.0,C-derivati,True
+2026-04-18,Bolton,Huddersfield,SEGNO,,,,,0.0,,,3:3,Finished,3:3,,,Altro,False
+2026-04-18,FC Lahti,FC Inter,SEGNO,,,,,0.0,,,0:2,Finished,0:2,,,Altro,False
+2026-04-18,Morton,Queen's Park,SEGNO,,,,,0.0,,,0:0,Finished,0:0,,,Altro,False
+2026-04-18,Torres,Gubbio,GOL,Under 2.5,1.5,A,u25_s7_nobet,69.8,3.1,58.4,0:0,Finished,0:0,True,0.5,A,False
+2026-04-18,Wrexham,Stoke City,SEGNO,X,3.73,MC_xdraw,segno_s2_toxic_q_filter,55.0,3.0,70.0,2:0,Finished,2:0,False,-1.0,C-derivati,True
+2026-04-18,Hatayspor,Sakaryaspor,GOL,Under 2.5,2.75,C_as_u25_rec,u25_s7_nobet,69.5,3.1,67.0,1:1,Finished,1:1,True,1.75,C-derivati,False
+2026-04-18,Carpi,Forlì,SEGNO,1,2.25,MC_hw,segno_s2_toxic_q_filter,55.0,3.0,75.0,0:1,Finished,0:1,False,-1.0,C-derivati,True
+2026-04-17,AS Nancy,Annecy,SEGNO,2,2.69,C,segno_s2_toxic_q_filter,55.0,3.1,55.0,1:5,Finished,1:5,True,1.69,C,True
+2026-04-17,De Graafschap,SC Cambuur,SEGNO,,,,,0.0,,,3:1,Finished,3:1,,,Altro,False
+2026-04-17,Djurgården,Malmö FF,SEGNO,1,2.34,MC_hw,segno_s2_toxic_q_filter,55.0,3.0,75.0,0:1,Finished,0:1,False,-1.0,C-derivati,True
+2026-04-17,Elversberg,Karlsruher SC,SEGNO,,,,,0.0,,,3:0,Finished,3:0,,,Altro,False
+2026-04-17,Utrecht U21,FC Eindhoven,SEGNO,X,3.7,MC_xdraw,segno_s2_toxic_q_filter,55.0,3.0,70.0,3:0,Finished,3:0,False,-1.0,C-derivati,True
+2026-04-15,Tromsø IL,Lillestrøm SK,SEGNO,,,,,0.0,,,0:0,Finished,0:0,,,Altro,False
+2026-04-15,AFC Wimbledon,Stockport,GOL,MG 2-3,1.87,S_mg,gol_s3_filter,65.9,2.9,47.0,0:2,Finished,0:2,True,0.8700000000000001,Altro,True
+2026-04-14,Vélez Sarsfield,Central Córdoba,SEGNO,,,,,0.0,,,1:0,Finished,1:0,,,Altro,False
+2026-04-14,Catanzaro,Modena,SEGNO,X,3.3,MC_xdraw,segno_s2_toxic_q_filter,55.0,3.0,70.0,2:2,Finished,2:2,True,2.3,C-derivati,True
+2026-04-13,Eyüpspor,Samsunspor,SEGNO,2,1.91,C,se2_s8_q190_filter,72.0,3.8,72.0,1:2,Finished,1:2,True,0.9099999999999999,C,True
+2026-04-13,Sarmiento Junín,Gimnasia,GOL,Under 2.5,1.4,A,u25_s7_nobet,70.8,3.2,62.6,1:2,Finished,1:2,False,-1.0,A,False
+2026-04-13,Fiorentina,Lazio,SEGNO,,,,,0.0,,,1:0,Finished,1:0,,,Altro,False
+2026-04-13,Brommapojkarna,AIK,SEGNO,,,,,0.0,,,2:2,Finished,2:2,,,Altro,False
+2026-04-12,Botafogo,Coritiba FC,SEGNO,,,,,0.0,,,2:2,Finished,2:2,,,Altro,False
+2026-04-12,Charlotte,Nashville,GOL,MG 2-3,1.87,S_mg,gol_s3_filter,65.7,2.9,47.0,1:2,Finished,1:2,True,0.8700000000000001,Altro,True
+2026-04-12,Chelsea,Man City,SEGNO,,,,,0.0,,,0:3,Finished,0:3,,,Altro,False
+2026-04-12,Corinthians,Palmeiras,GOL,Over 1.5,1.35,A+S,gol_s7_filter,68.8,3.0,57.6,0:0,Live,0:0,False,-1.0,A+S,True
+2026-04-12,Genoa,Sassuolo,SEGNO,,,,,0.0,,,2:1,Finished,2:1,,,Altro,False
+2026-04-12,Kansas City,SJ Earthquakes,SEGNO,,,,,0.0,,,1:3,Finished,1:3,,,Altro,False
+2026-04-12,Nizza,Le Havre,SEGNO,,,,,0.0,,,1:1,Finished,1:1,,,Altro,False
+2026-04-12,Nott'm Forest,Aston Villa,SEGNO,,,,,0.0,,,1:1,Finished,1:1,,,Altro,False
+2026-04-12,Querétaro FC,Necaxa,SEGNO,X,3.3,MC_xdraw,segno_s2_toxic_q_filter,55.0,3.0,70.0,,,3:1,False,-1.0,C-derivati,True
+2026-04-12,Alverca,Casa Pia,SEGNO,,,,,0.0,,,3:1,Finished,3:1,,,Altro,False
+2026-04-12,Cádiz,FC Andorra,SEGNO,,,,,0.0,,,0:1,Finished,0:1,,,Altro,False
+2026-04-12,Halmstads BK,Degerfors,SEGNO,,,,,0.0,,,0:3,Finished,0:3,,,Altro,False
+2026-04-12,Malmö FF,GAIS,SEGNO,1,1.91,MC_hw,segno_s2_toxic_q_filter,55.0,3.0,75.0,3:1,Finished,3:1,True,0.9099999999999999,C-derivati,True
+2026-04-12,Mirandés,Castellón,SEGNO,,,,,0.0,,,2:2,Finished,2:2,,,Altro,False
+2026-04-12,Molde,HamKam,SEGNO,,,,,0.0,,,4:1,Finished,4:1,,,Altro,False
+2026-04-12,RCD Mallorca,Rayo Vallecano,SEGNO,,,,,0.0,,,3:0,Finished,3:0,,,Altro,False
+2026-04-12,Spezia,Mantova,SEGNO,,,,,0.0,,,0:2,Finished,0:2,,,Altro,False
+2026-04-12,VfL Bochum,E. Braunschweig,SEGNO,,,,,0.0,,,4:1,Finished,4:1,,,Altro,False
+2026-04-12,Colonia,Werder Brema,SEGNO,,,,,0.0,,,3:1,Finished,3:1,,,Altro,False
+2026-04-12,Djurgården,Kalmar FF,SEGNO,1,1.52,C_hw,segno_s1_low_q_filter,79.0,4.1,75.0,3:2,Finished,3:2,True,0.52,C-derivati,True
+2026-04-12,Fredrikstad FK,Vålerenga,DOPPIA_CHANCE,X2,1.53,C_combo96,x2_s2_filter,56.0,3.2,,1:1,Finished,1:1,True,0.53,C-derivati,True
+2026-04-12,Marítimo,Portimonense,GOL,Goal,1.85,C,gol_s4_q180_filter,65.0,3.5,65.0,1:0,Finished,1:0,False,-1.0,C,True
+2026-04-12,Monaco 1860,J. Regensburg,SEGNO,1,2.14,MC_hw,segno_s2_toxic_q_filter,55.0,3.0,75.0,2:2,Finished,2:2,False,-1.0,C-derivati,True
+2026-04-12,Atalanta U23,Monopoli,SEGNO,,,,,0.0,,,2:0,Finished,2:0,,,Altro,False
+2026-04-12,Athletico-PR,Chapecoense,SEGNO,,,,,0.0,,,2:0,Finished,2:0,,,Altro,False
+2026-04-12,Feirense,Vizela,SEGNO,,,,,0.0,,,1:0,Finished,1:0,,,Altro,False
+2026-04-12,Inter U23,Arzignano,SEGNO,,,,,0.0,,,0:1,Finished,0:1,,,Altro,False
+2026-04-12,Pontedera,Ravenna,SEGNO,,,,,0.0,,,0:1,Finished,0:1,,,Altro,False
+2026-04-12,Team Altamura,Giugliano,SEGNO,,,,,0.0,,,1:1,Finished,1:1,,,Altro,False
+2026-04-12,Trapani,Salernitana,SEGNO,,,,,0.0,,,1:2,Finished,1:2,,,Altro,False
+2026-04-12,Bologna,Lecce,SEGNO,,,,,0.0,,,2:0,Finished,2:0,,,Altro,False
+2026-04-12,Juve Next Gen,Guidonia,SEGNO,X,3.21,MC_xdraw,segno_s2_toxic_q_filter,55.0,3.0,70.0,1:0,Finished,1:0,False,-1.0,C-derivati,True
+2026-04-12,Latina,Casarano,SEGNO,2,3.35,C,segno_s2_toxic_q_filter,54.0,3.1,54.0,1:2,Finished,1:2,True,2.35,C,True
+2026-04-12,A. Keciörengücü,Serik Spor,SEGNO,,,,,0.0,,,0:0,Finished,0:0,,,Altro,False
+2026-04-11,Burnley,Brighton,SEGNO,,,,,0.0,,,0:2,Finished,0:2,,,Altro,False
+2026-04-11,Celtic Glasgow,St. Mirren,SEGNO,,,,,0.0,,,1:0,Finished,1:0,,,Altro,False
+2026-04-11,Real Sociedad,Alavés,SEGNO,,,,,0.0,,,3:3,Finished,3:3,,,Altro,False
+2026-04-11,Remo,Vasco da Gama,SEGNO,1,2.75,C_hw,segno_s2_toxic_q_filter,55.0,3.1,75.0,1:1,Finished,1:1,False,-1.0,C-derivati,True
+2026-04-11,Saint-Étienne,USL Dunkerque,GOL,MG 3-5,1.89,ASC_diamond_o25_L2,gol_s4_q180_filter,82.0,4.2,82.0,2:1,Finished,2:1,True,0.8899999999999999,Altro,True
+2026-04-11,Siviglia,Atlético,SEGNO,2,3.15,C,segno_s2_toxic_q_filter,55.0,3.1,55.0,2:1,Finished,2:1,False,-1.0,C,True
+2026-04-11,St. Johnstone,Airdrieonians,SEGNO,,,,,0.0,,,4:0,Finished,4:0,,,Altro,False
+2026-04-11,Belgrano,Aldosivi,SEGNO,,,,,0.0,,,,,1:0,,,Altro,False
+2026-04-11,Dep. Riestra,Instituto ACC,SEGNO,,,,,0.0,,,0:1,Finished,0:1,,,Altro,False
+2026-04-11,Heart of Midl.,Motherwell FC,SEGNO,,,,,0.0,,,3:1,Finished,3:1,,,Altro,False
+2026-04-11,Norimberga,Dynamo Dresda,SEGNO,,,,,0.0,,,0:2,Finished,0:2,,,Altro,False
+2026-04-11,Pr. Münster,Greuther Fürth,GOL,Over 2.5,1.8,ASC_diamond_o25_L3,gol_s3_filter,68.1,3.0,58.2,0:0,Finished,0:0,False,-1.0,Altro,True
+2026-04-11,Avs FS,Vit. Guimarães,SEGNO,,,,,0.0,,,1:1,Finished,1:1,,,Altro,False
+2026-04-11,Brentford,Everton,SEGNO,X,3.23,MC_xdraw,segno_s2_toxic_q_filter,55.0,3.0,70.0,2:2,Finished,2:2,True,2.23,C-derivati,True
+2026-04-11,CD Leganés,Albacete,SEGNO,,,,,0.0,,,2:1,Finished,2:1,,,Altro,False
+2026-04-11,Monza,Bari,GOL,Over 2.5,1.65,C_screm,gol_s3_filter,66.0,3.6,66.0,2:0,Finished,2:0,False,-1.0,C-derivati,True
+2026-04-11,Norwich,Ipswich,SEGNO,,,,,0.0,,,0:2,Finished,0:2,,,Altro,False
+2026-04-11,Pescara,Sampdoria,SEGNO,,,,,0.0,,,1:2,Finished,1:2,,,Altro,False
+2026-04-11,Salford,Gillingham,SEGNO,,,,,0.0,,,0:0,Finished,0:0,,,Altro,False
+2026-04-11,Santa Clara,Rio Ave,SEGNO,,,,,0.0,,,0:2,Finished,0:2,,,Altro,False
+2026-04-11,Tromsø IL,Kristiansund BK,GOL,Over 2.5,1.53,C_screm,gol_s3_filter,66.0,3.6,66.0,2:0,Finished,2:0,False,-1.0,C-derivati,True
+2026-04-11,VVV-Venlo,De Graafschap,GOL,Under 2.5,2.95,C_as_u25_rec,u25_s7_nobet,68.7,3.0,67.0,3:3,Finished,3:3,False,-1.0,C-derivati,False
+2026-04-11,Ayr United,Arbroath,DOPPIA_CHANCE,X2,1.57,C_combo96,x2_s2_filter,54.0,3.1,,1:0,Finished,1:0,False,-1.0,C-derivati,True
+2026-04-11,Bradford,Stevenage,SEGNO,,,,,0.0,,,0:1,Finished,0:1,,,Altro,False
+2026-04-11,Córdoba CF,Real Saragozza,SEGNO,,,,,0.0,,,1:0,Finished,1:0,,,Altro,False
+2026-04-11,Newport County,Harrogate Town,SEGNO,,,,,0.0,,,2:1,Finished,2:1,,,Altro,False
+2026-04-11,Sheff Utd,Hull City,SEGNO,,,,,0.0,,,2:1,Finished,2:1,,,Altro,False
+2026-04-11,Al-Taawoun,Al-Kholood,SEGNO,,,,,0.0,,,1:2,Finished,1:2,,,Altro,False
+2026-04-11,Alem. Aachen,Stoccarda II,SEGNO,,,,,0.0,,,3:1,Finished,3:1,,,Altro,False
+2026-04-11,Cagliari,Cremonese,SEGNO,1,2.15,MC_hw,segno_s2_toxic_q_filter,55.0,3.0,75.0,1:0,Finished,1:0,True,1.15,C-derivati,True
+2026-04-11,Charlton,Preston NE,SEGNO,,,,,0.0,,,1:2,Finished,1:2,,,Altro,False
+2026-04-11,Grimsby Town,Crewe Alexandra,SEGNO,,,,,0.0,,,3:2,Finished,3:2,,,Altro,False
+2026-04-11,Hansa Rostock,SSV Ulm 1846,SEGNO,,,,,0.0,,,5:1,Finished,5:1,,,Altro,False
+2026-04-11,Lillestrøm SK,IK Start,SEGNO,,,,,0.0,,,3:1,Finished,3:1,,,Altro,False
+2026-04-11,Lipsia,Bor. M'gladbach,SEGNO,,,,,0.0,,,1:0,Finished,1:0,,,Altro,False
+2026-04-11,Mirassol-SP,EC Bahia,SEGNO,1,2.45,MC_hw,segno_s2_toxic_q_filter,55.0,3.0,75.0,1:1,Live,1:2,False,-1.0,C-derivati,True
+2026-04-11,Pineto,Torres,GOL,Goal,1.8,C,gol_s4_q180_filter,64.0,3.5,64.0,0:0,Finished,0:0,False,-1.0,C,True
+2026-04-11,Barnet,Barrow,GOL,Goal,1.87,C,gol_s4_q180_filter,63.0,3.5,63.0,3:2,Finished,3:2,True,0.8700000000000001,C,True
+2026-04-11,Dundee United,Livingston FC,SEGNO,,,,,0.0,,,3:2,Finished,3:2,,,Altro,False
+2026-04-11,EC Vitória,São Paulo,SEGNO,,,,,0.0,,,2:0,Finished,2:0,,,Altro,False
+2026-04-11,Farense,Sporting B,SEGNO,2,3.09,C,segno_s2_toxic_q_filter,56.0,3.2,56.0,2:1,Finished,2:1,False,-1.0,C,True
+2026-04-11,Lumezzane,Union Brescia,GOL,Under 2.5,1.75,A,u25_s7_nobet,71.3,3.2,59.4,1:0,Finished,1:0,True,0.75,A,False
+2026-04-11,Penafiel,Académico Viseu,SEGNO,2,1.91,C,se2_s8_q190_filter,62.0,3.4,62.0,4:3,Finished,4:3,False,-1.0,C,True
+2026-04-11,Pergolettese,Virtus Verona,SEGNO,,,,,0.0,,,2:2,Finished,2:2,,,Altro,False
+2026-04-11,Blackpool,Peterborough,SEGNO,,,,,0.0,,,3:1,Finished,3:1,,,Altro,False
+2026-04-11,Elche,Valencia,SEGNO,,,,,0.0,,,1:0,Finished,1:0,,,Altro,False
+2026-04-11,Leicester City,Swansea City,SEGNO,,,,,0.0,,,0:1,Finished,0:1,,,Altro,False
+2026-04-11,Middlesbrough,FC Portsmouth,SEGNO,,,,,0.0,,,0:1,Finished,0:1,,,Altro,False
+2026-04-11,AJ Auxerre,FC Nantes,SEGNO,,,,,0.0,,,0:0,Finished,0:0,,,Altro,False
+2026-04-11,Chaves,Torreense,SEGNO,2,2.96,C,segno_s2_toxic_q_filter,54.0,3.1,54.0,2:0,Finished,2:0,False,-1.0,C,True
+2026-04-11,Pendikspor,Corum FK,SEGNO,X,3.11,MC_xdraw,segno_s2_toxic_q_filter,55.0,3.0,70.0,,,1:1,True,2.11,C-derivati,True
+2026-04-10,West Ham Utd.,Wolverhampton,SEGNO,,,,,0.0,,,4:0,Finished,4:0,,,Altro,False
+2026-04-10,VPS,FF Jaro,SEGNO,,,,,0.0,,,0:0,Finished,0:0,,,Altro,False
+2026-04-10,Amiens,Pau,GOL,Under 2.5,2.15,C_as_u25_rec,u25_s7_nobet,69.6,3.1,67.0,0:1,Finished,0:1,True,1.15,C-derivati,False
+2026-04-09,Bologna,Aston Villa,SEGNO,,,,,0.0,,,,,1:3,,,Altro,False
+2026-04-09,SC Freiburg,Celta Vigo,SEGNO,,,,,0.0,,,,,3:0,,,Altro,False
+2026-04-09,C. Rizespor,Samsunspor,SEGNO,,,,,0.0,,,4:1,Finished,4:1,,,Altro,False
+2026-04-09,Al-Ettifaq,Al-Riyadh,GOL,MG 3-5,1.89,C_screm,gol_s4_q180_filter,64.0,3.5,64.0,2:3,Finished,2:3,True,0.8899999999999999,C-derivati,True
+2026-04-08,Serik Spor,Van Spor FK,SEGNO,,,,,0.0,,,1:6,Finished,1:6,,,Altro,False
+2026-04-08,Querétaro FC,FC Juárez,SEGNO,,,,,0.0,,,1:1,Finished,1:1,,,Altro,False
+2026-04-07,KFUM Oslo,Sandefjord,SEGNO,1,1.9,C,segno_s2_toxic_q_filter,56.0,3.2,56.0,1:2,Finished,1:2,False,-1.0,C,True
+2026-04-07,Bandirma Spor,Sariyerspor,SEGNO,1,1.95,MC_hw,segno_s2_toxic_q_filter,55.0,3.0,75.0,,,0:0,False,-1.0,C-derivati,True
+2026-04-06,ADO Den Haag,FC Eindhoven,GOL,Over 2.5,1.38,ASC_diamond_o25_L3,gol_s7_filter,71.0,3.8,71.0,4:0,Finished,4:0,True,0.3799999999999999,Altro,True
+2026-04-06,Barrow,Chesterfield,SEGNO,2,1.95,C,se2_s8_q190_filter,74.0,3.9,74.0,0:1,Finished,0:1,True,0.95,C,True
+2026-04-06,Chivas,UNAM Pumas,SEGNO,,,,,0.0,,,,,2:2,,,Altro,False
+2026-04-06,Crewe Alexandra,Salford,SEGNO,X,3.25,MC_xdraw,segno_s2_toxic_q_filter,55.0,3.0,70.0,1:0,Finished,1:0,False,-1.0,C-derivati,True
+2026-04-06,EC Bahia,Palmeiras,SEGNO,,,,,0.0,,,0:0,Live,1:2,,,Altro,False
+2026-04-06,Exeter City,Doncaster Rov.,SEGNO,,,,,0.0,,,3:0,Finished,3:0,,,Altro,False
+2026-04-06,Grêmio,Remo,SEGNO,,,,,0.0,,,,,0:0,,,Altro,False
+2026-04-06,Mantova,Virtus Entella,SEGNO,1,1.95,C,segno_s2_toxic_q_filter,54.0,3.1,54.0,1:0,Finished,1:0,True,0.95,C,True
+2026-04-06,Roda JC,Willem II,SEGNO,1,2.25,C_hw,segno_s2_toxic_q_filter,54.0,3.1,75.0,0:1,Finished,0:1,False,-1.0,C-derivati,True
+2026-04-06,Shamrock Rovers,Shelbourne,SEGNO,,,,,0.0,,,3:2,Finished,3:2,,,Altro,False
+2026-04-06,Corinthians,Internacional,SEGNO,,,,,0.0,,,0:0,Live,0:1,,,Altro,False
+2026-04-06,Crawley Town,Grimsby Town,SEGNO,,,,,0.0,,,2:0,Finished,0:2,,,Altro,False
+2026-04-06,FC Porto B,Chaves,SEGNO,,,,,0.0,,,3:0,Finished,3:0,,,Altro,False
+2026-04-06,Mirassol-SP,RB Bragantino,SEGNO,,,,,0.0,,,,,0:1,,,Altro,False
+2026-04-06,De Graafschap,AZ Alkmaar U21,DOPPIA_CHANCE,X2,2.08,C_screm,x2_s2_filter,55.0,3.1,55.0,5:0,Finished,5:0,False,-1.0,C-derivati,True
+2026-04-06,Fleetwood,Barnet,SEGNO,X,3.25,MC_xdraw,segno_s2_toxic_q_filter,55.0,3.0,70.0,2:5,Finished,2:5,False,-1.0,C-derivati,True
+2026-04-05,Al-Okhdood,Al-Fateh,SEGNO,1,3.9,MC_hw,segno_s2_toxic_q_filter,55.0,3.0,75.0,1:0,Finished,1:0,True,2.9,C-derivati,True
+2026-04-05,Holstein Kiel,Pr. Münster,SEGNO,,,,,0.0,,,0:0,Finished,0:0,,,Altro,False
+2026-04-05,Kalmar FF,Västerås SK,SEGNO,1,2.3,MC_hw,segno_s2_toxic_q_filter,55.0,3.0,75.0,0:1,Finished,0:1,False,-1.0,C-derivati,True
+2026-04-05,NAC Breda,Sparta R.,SEGNO,,,,,0.0,,,0:0,Finished,0:0,,,Altro,False
+2026-04-05,New York City,St. Louis CITY,SEGNO,,,,,0.0,,,1:1,Finished,1:1,,,Altro,False
+2026-04-05,SJ Earthquakes,San Diego,SEGNO,,,,,0.0,,,3:0,Finished,3:0,,,Altro,False
+2026-04-05,Union Berlino,St. Pauli,SEGNO,1,1.91,C,segno_s2_toxic_q_filter,54.0,3.1,54.0,1:1,Finished,1:1,False,-1.0,C,True
+2026-04-05,Charlotte,Philadelphia,SEGNO,,,,,0.0,,,,,2:1,,,Altro,False
+2026-04-05,Vancouver,Portland,SEGNO,,,,,0.0,,,3:2,Finished,3:2,,,Altro,False
+2026-04-04,AS Nancy,Saint-Étienne,SEGNO,2,1.91,C,se2_s8_q190_filter,74.0,3.9,74.0,1:1,Finished,1:1,False,-1.0,C,True
+2026-04-04,Albacete,Burgos CF,DOPPIA_CHANCE,X2,1.59,C_combo96,x2_s2_filter,54.0,3.1,,,,2:3,True,0.5900000000000001,C-derivati,True
+2026-04-04,Friburgo,Bayern,GOL,Over 2.5,1.45,C_screm,gol_s4_filter,83.0,4.3,83.0,,,2:3,True,0.44999999999999996,C-derivati,True
+2026-04-04,IF Gnistan,AC Oulu,GOL,Over 2.5,1.55,C_screm,gol_s4_filter,64.0,3.5,64.0,,,1:5,True,0.55,C-derivati,True
+2026-04-04,Lazio,Parma,GOL,Over 1.5,1.35,C_mc_conv,gol_s7_filter,71.0,3.8,71.0,1:1,Finished,1:1,True,0.3500000000000001,C-derivati,True
+2026-04-03,Annecy,Guingamp,SEGNO,,,,,0.0,,,1:0,Finished,1:0,,,Altro,False
+2026-04-03,RB Bragantino,Flamengo,SEGNO,,,,,0.0,,,,,3:0,,,Altro,False
+2026-04-03,Birmingham,Blackburn,SEGNO,,,,,0.0,,,0:1,Finished,0:1,,,Altro,False
+2026-04-03,Charlton,Bristol City,SEGNO,,,,,0.0,,,1:2,Finished,1:2,,,Altro,False
+2026-04-03,Doncaster Rov.,Mansfield Town,SEGNO,,,,,0.0,,,0:2,Finished,0:2,,,Altro,False
+2026-04-03,Luton,Peterborough,SEGNO,,,,,0.0,,,2:1,Finished,2:1,,,Altro,False
+2026-04-03,Barnet,Bromley,SEGNO,,,,,0.0,,,2:2,Finished,2:2,,,Altro,False
+2026-04-03,Burton Albion,Barnsley FC,SEGNO,,,,,0.0,,,1:1,Finished,1:1,,,Altro,False
+2026-04-03,Colchester Utd.,Oldham Athletic,SEGNO,,,,,0.0,,,1:3,Finished,1:3,,,Altro,False
+2026-04-03,Grenoble,Clermont Foot,SEGNO,,,,,0.0,,,2:2,Finished,2:2,,,Altro,False
+2026-04-03,Novara,Lumezzane,SEGNO,,,,,0.0,,,1:3,Finished,1:3,,,Altro,False
+2026-04-03,Sporting,Santa Clara,SEGNO,,,,,0.0,,,4:2,Finished,4:2,,,Altro,False
+2026-04-03,Al-Ittihad,Al-Hazem,SEGNO,,,,,0.0,,,1:0,Finished,1:0,,,Altro,False
+2026-04-03,Bristol Rovers,Fleetwood,SEGNO,,,,,0.0,,,1:0,Finished,1:0,,,Altro,False
+2026-04-03,Carpi,Pontedera,SEGNO,,,,,0.0,,,2:0,Finished,2:0,,,Altro,False
+2026-04-02,EC Bahia,Athletico-PR,SEGNO,,,,,0.0,,,,,3:0,,,Altro,False
+2026-03-29,Real Saragozza,Racing,SEGNO,,,,,0.0,,,2:0,Finished,2:0,,,Altro,False
+2026-03-28,Wycombe Wand.,Port Vale,SEGNO,,,,,0.0,,,,,4:0,,,Altro,False
+2026-03-23,Boca Juniors,Instituto ACC,SEGNO,,,,,0.0,,,2:0,Finished,2:0,,,Altro,False
+2026-03-23,Corinthians,Flamengo,SEGNO,,,,,0.0,,,,,1:1,,,Altro,False
+2026-03-22,Dallas,Houston,SEGNO,,,,,0.0,,,4:3,Finished,4:3,,,Altro,False
+2026-03-22,Kansas City,Colorado,SEGNO,,,,,0.0,,,1:4,Finished,1:4,,,Altro,False
+2026-03-22,Burgos CF,Córdoba CF,SEGNO,,,,,0.0,,,4:0,Finished,4:0,,,Altro,False
+2026-03-22,St. Louis CITY,New England,SEGNO,,,,,0.0,,,3:1,Finished,3:1,,,Altro,False
+2026-03-22,RSC Anderlecht,Cercle Bruges,SEGNO,,,,,0.0,,,2:3,Finished,2:3,,,Altro,False
+2026-03-22,FC Groningen,AZ Alkmaar,SEGNO,,,,,0.0,,,3:0,Finished,3:0,,,Altro,False
+2026-03-22,Cerignola,Giugliano,SEGNO,,,,,0.0,,,1:0,Finished,1:0,,,Altro,False
+2026-03-22,Minnesota,Seattle,SEGNO,,,,,0.0,,,0:0,Finished,0:0,,,Altro,False
+2026-03-22,Roma,Lecce,SEGNO,,,,,0.0,,,1:0,Finished,1:0,,,Altro,False
+2026-03-22,Cincinnati,Montréal,SEGNO,,,,,0.0,,,4:3,Finished,4:3,,,Altro,False
+2026-03-21,Banfield,Tigre,SEGNO,,,,,0.0,,,1:0,Finished,1:0,,,Altro,False
+2026-03-21,Cádiz,Málaga CF,SEGNO,,,,,0.0,,,0:3,Finished,0:3,,,Altro,False
+2026-03-21,Elche,RCD Mallorca,SEGNO,,,,,0.0,,,2:1,Finished,2:1,,,Altro,False
+2026-03-21,Espanyol,Getafe CF,SEGNO,,,,,0.0,,,1:2,Finished,1:2,,,Altro,False
+2026-03-20,Clermont Foot,Red Star FC,SEGNO,,,,,0.0,,,0:1,Finished,0:1,,,Altro,False
+2026-03-20,Lipsia,Hoffenheim,SEGNO,,,,,0.0,,,5:0,Finished,5:0,,,Altro,False

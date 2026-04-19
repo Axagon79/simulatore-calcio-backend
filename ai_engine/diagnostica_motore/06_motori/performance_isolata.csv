@@ -1,0 +1,4 @@
+motore,n,hr,pl,roi
+A (daily_predictions),1314,56.7,-57.54,-4.38
+S (daily_predictions_sandbox),1347,57.02,-50.54,-3.75
+C (daily_predictions_engine_c),3890,52.26,-130.68,-3.36

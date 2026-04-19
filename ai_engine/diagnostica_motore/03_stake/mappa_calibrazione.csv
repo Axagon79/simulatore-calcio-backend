@@ -1,0 +1,106 @@
+gruppo,mercato,bin,n_cell,p_calibrata,source
+A,SEGNO,35-50,0,41.86,fallback_market_bin
+A,SEGNO,50-60,0,56.99,fallback_market_bin
+A,SEGNO,60-70,0,56.25,fallback_market_bin
+A,SEGNO,70-80,0,41.88,fallback_market_bin
+A,SEGNO,80+,0,64.44,fallback_market_bin
+A,DOPPIA_CHANCE,35-50,0,54.76,fallback_market_bin
+A,DOPPIA_CHANCE,50-60,0,73.75,fallback_market_bin
+A,DOPPIA_CHANCE,60-70,0,60.0,fallback_market_bin
+A,DOPPIA_CHANCE,70-80,0,50.0,fallback_market_bin
+A,DOPPIA_CHANCE,80+,0,62.5,fallback_market_bin
+A,GOL,35-50,8,58.12,"shrink(cell=8, fb=22)"
+A,GOL,50-60,53,67.92,cell
+A,GOL,60-70,39,61.54,cell
+A,GOL,70-80,16,77.41,"shrink(cell=16, fb=14)"
+A,GOL,80+,0,67.65,fallback_market_bin
+S,SEGNO,35-50,0,41.86,fallback_market_bin
+S,SEGNO,50-60,0,56.99,fallback_market_bin
+S,SEGNO,60-70,0,56.25,fallback_market_bin
+S,SEGNO,70-80,0,41.88,fallback_market_bin
+S,SEGNO,80+,0,64.44,fallback_market_bin
+S,DOPPIA_CHANCE,35-50,0,54.76,fallback_market_bin
+S,DOPPIA_CHANCE,50-60,0,73.75,fallback_market_bin
+S,DOPPIA_CHANCE,60-70,0,60.0,fallback_market_bin
+S,DOPPIA_CHANCE,70-80,0,50.0,fallback_market_bin
+S,DOPPIA_CHANCE,80+,0,62.5,fallback_market_bin
+S,GOL,35-50,0,56.52,fallback_market_bin
+S,GOL,50-60,3,63.61,"shrink(cell=3, fb=27)"
+S,GOL,60-70,3,61.48,"shrink(cell=3, fb=27)"
+S,GOL,70-80,1,67.02,"shrink(cell=1, fb=29)"
+S,GOL,80+,1,65.39,"shrink(cell=1, fb=29)"
+C,SEGNO,35-50,86,41.86,cell
+C,SEGNO,50-60,93,56.99,cell
+C,SEGNO,60-70,59,59.32,cell
+C,SEGNO,70-80,48,52.08,cell
+C,SEGNO,80+,45,64.44,cell
+C,DOPPIA_CHANCE,35-50,0,54.76,fallback_market_bin
+C,DOPPIA_CHANCE,50-60,0,73.75,fallback_market_bin
+C,DOPPIA_CHANCE,60-70,0,60.0,fallback_market_bin
+C,DOPPIA_CHANCE,70-80,0,50.0,fallback_market_bin
+C,DOPPIA_CHANCE,80+,0,62.5,fallback_market_bin
+C,GOL,35-50,0,56.52,fallback_market_bin
+C,GOL,50-60,14,47.08,"shrink(cell=14, fb=16)"
+C,GOL,60-70,92,55.43,cell
+C,GOL,70-80,72,69.44,cell
+C,GOL,80+,10,65.1,"shrink(cell=10, fb=20)"
+A+S,SEGNO,35-50,0,41.86,fallback_market_bin
+A+S,SEGNO,50-60,0,56.99,fallback_market_bin
+A+S,SEGNO,60-70,0,56.25,fallback_market_bin
+A+S,SEGNO,70-80,0,41.88,fallback_market_bin
+A+S,SEGNO,80+,0,64.44,fallback_market_bin
+A+S,DOPPIA_CHANCE,35-50,2,54.44,"shrink(cell=2, fb=28)"
+A+S,DOPPIA_CHANCE,50-60,24,84.75,"shrink(cell=24, fb=6)"
+A+S,DOPPIA_CHANCE,60-70,17,59.33,"shrink(cell=17, fb=13)"
+A+S,DOPPIA_CHANCE,70-80,6,53.33,"shrink(cell=6, fb=24)"
+A+S,DOPPIA_CHANCE,80+,5,65.42,"shrink(cell=5, fb=25)"
+A+S,GOL,35-50,0,56.52,fallback_market_bin
+A+S,GOL,50-60,86,58.14,cell
+A+S,GOL,60-70,81,62.96,cell
+A+S,GOL,70-80,42,69.05,cell
+A+S,GOL,80+,0,67.65,fallback_market_bin
+C-derivati,SEGNO,35-50,0,41.86,fallback_market_bin
+C-derivati,SEGNO,50-60,0,56.99,fallback_market_bin
+C-derivati,SEGNO,60-70,5,50.21,"shrink(cell=5, fb=25)"
+C-derivati,SEGNO,70-80,66,34.85,cell
+C-derivati,SEGNO,80+,0,64.44,fallback_market_bin
+C-derivati,DOPPIA_CHANCE,35-50,82,54.88,cell
+C-derivati,DOPPIA_CHANCE,50-60,56,67.86,cell
+C-derivati,DOPPIA_CHANCE,60-70,28,60.67,"shrink(cell=28, fb=2)"
+C-derivati,DOPPIA_CHANCE,70-80,42,47.62,cell
+C-derivati,DOPPIA_CHANCE,80+,3,59.58,"shrink(cell=3, fb=27)"
+C-derivati,GOL,35-50,25,62.75,"shrink(cell=25, fb=5)"
+C-derivati,GOL,50-60,69,72.46,cell
+C-derivati,GOL,60-70,48,64.58,cell
+C-derivati,GOL,70-80,78,55.13,cell
+C-derivati,GOL,80+,23,72.45,"shrink(cell=23, fb=7)"
+Altro,SEGNO,35-50,0,41.86,fallback_market_bin
+Altro,SEGNO,50-60,0,56.99,fallback_market_bin
+Altro,SEGNO,60-70,0,56.25,fallback_market_bin
+Altro,SEGNO,70-80,3,41.03,"shrink(cell=3, fb=27)"
+Altro,SEGNO,80+,0,64.44,fallback_market_bin
+Altro,DOPPIA_CHANCE,35-50,0,54.76,fallback_market_bin
+Altro,DOPPIA_CHANCE,50-60,0,73.75,fallback_market_bin
+Altro,DOPPIA_CHANCE,60-70,0,60.0,fallback_market_bin
+Altro,DOPPIA_CHANCE,70-80,0,50.0,fallback_market_bin
+Altro,DOPPIA_CHANCE,80+,0,62.5,fallback_market_bin
+Altro,GOL,35-50,13,48.7,"shrink(cell=13, fb=17)"
+Altro,GOL,50-60,1,64.5,"shrink(cell=1, fb=29)"
+Altro,GOL,60-70,3,64.81,"shrink(cell=3, fb=27)"
+Altro,GOL,70-80,5,68.24,"shrink(cell=5, fb=25)"
+Altro,GOL,80+,0,67.65,fallback_market_bin
+GLOBALE,SEGNO,35-50,86,41.86,cell
+GLOBALE,SEGNO,50-60,93,56.99,cell
+GLOBALE,SEGNO,60-70,64,56.25,cell
+GLOBALE,SEGNO,70-80,117,41.88,cell
+GLOBALE,SEGNO,80+,45,64.44,cell
+GLOBALE,DOPPIA_CHANCE,35-50,84,54.76,cell
+GLOBALE,DOPPIA_CHANCE,50-60,80,73.75,cell
+GLOBALE,DOPPIA_CHANCE,60-70,45,60.0,cell
+GLOBALE,DOPPIA_CHANCE,70-80,48,50.0,cell
+GLOBALE,DOPPIA_CHANCE,80+,8,62.5,"shrink(cell=8, fb=22)"
+GLOBALE,GOL,35-50,46,56.52,cell
+GLOBALE,GOL,50-60,226,63.27,cell
+GLOBALE,GOL,60-70,266,60.9,cell
+GLOBALE,GOL,70-80,214,65.89,cell
+GLOBALE,GOL,80+,34,67.65,cell

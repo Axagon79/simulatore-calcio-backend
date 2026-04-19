@@ -1,0 +1,140 @@
+date,home,away,tipo,original_pronostico,original_quota,source,routing_rule,confidence,stars,probabilita_stimata,live_score,live_status,real_score,esito,pl,gruppo,scrematura
+2026-04-18,Arbroath,Raith Rovers,SEGNO,,,,,0.0,,,2:1,Finished,2:1,,,Altro,False
+2026-04-18,Arm. Bielefeld,Norimberga,SEGNO,,,,,0.0,,,1:1,Finished,1:1,,,Altro,False
+2026-04-18,Brentford,FC Fulham,SEGNO,,,,,0.0,,,0:0,Finished,0:0,,,Altro,False
+2026-04-18,Crawley Town,Shrewsbury,SEGNO,,,,,0.0,,,0:0,Finished,0:0,,,Altro,False
+2026-04-18,FF Jaro,KuPS,SEGNO,,,,,0.0,,,1:1,Finished,1:1,,,Altro,False
+2026-04-18,Sheff Wed,Charlton,SEGNO,,,,,0.0,,,1:1,Finished,1:1,,,Altro,False
+2026-04-18,Montréal,New York,SEGNO,,,,,0.0,,,4:1,Finished,4:1,,,Altro,False
+2026-04-18,Casa Pia,Santa Clara,SEGNO,,,,,0.0,,,0:0,Finished,0:0,,,Altro,False
+2026-04-18,Sirius,Västerås SK,SEGNO,,,,,0.0,,,4:1,Finished,4:1,,,Altro,False
+2026-04-18,Vasco da Gama,São Paulo,SEGNO,,,,,0.0,,,0:1,Live,2:1,,,Altro,False
+2026-04-18,Barnsley FC,Bradford,SEGNO,,,,,0.0,,,2:2,Finished,2:2,,,Altro,False
+2026-04-18,FC Portsmouth,Leicester City,SEGNO,,,,,0.0,,,1:0,Finished,1:0,,,Altro,False
+2026-04-18,TPS,SJK Seinäjoki,SEGNO,,,,,0.0,,,2:0,Finished,2:0,,,Altro,False
+2026-04-18,Millwall,QPR,SEGNO,,,,,0.0,,,2:0,Finished,2:0,,,Altro,False
+2026-04-18,Paços Ferreira,Chaves,SEGNO,,,,,0.0,,,4:3,Finished,4:3,,,Altro,False
+2026-04-18,Bolton,Huddersfield,SEGNO,,,,,0.0,,,3:3,Finished,3:3,,,Altro,False
+2026-04-18,FC Lahti,FC Inter,SEGNO,,,,,0.0,,,0:2,Finished,0:2,,,Altro,False
+2026-04-18,Morton,Queen's Park,SEGNO,,,,,0.0,,,0:0,Finished,0:0,,,Altro,False
+2026-04-17,De Graafschap,SC Cambuur,SEGNO,,,,,0.0,,,3:1,Finished,3:1,,,Altro,False
+2026-04-17,Elversberg,Karlsruher SC,SEGNO,,,,,0.0,,,3:0,Finished,3:0,,,Altro,False
+2026-04-15,Tromsø IL,Lillestrøm SK,SEGNO,,,,,0.0,,,0:0,Finished,0:0,,,Altro,False
+2026-04-14,Vélez Sarsfield,Central Córdoba,SEGNO,,,,,0.0,,,1:0,Finished,1:0,,,Altro,False
+2026-04-13,Fiorentina,Lazio,SEGNO,,,,,0.0,,,1:0,Finished,1:0,,,Altro,False
+2026-04-13,Brommapojkarna,AIK,SEGNO,,,,,0.0,,,2:2,Finished,2:2,,,Altro,False
+2026-04-12,Botafogo,Coritiba FC,SEGNO,,,,,0.0,,,2:2,Finished,2:2,,,Altro,False
+2026-04-12,Chelsea,Man City,SEGNO,,,,,0.0,,,0:3,Finished,0:3,,,Altro,False
+2026-04-12,Genoa,Sassuolo,SEGNO,,,,,0.0,,,2:1,Finished,2:1,,,Altro,False
+2026-04-12,Kansas City,SJ Earthquakes,SEGNO,,,,,0.0,,,1:3,Finished,1:3,,,Altro,False
+2026-04-12,Nizza,Le Havre,SEGNO,,,,,0.0,,,1:1,Finished,1:1,,,Altro,False
+2026-04-12,Nott'm Forest,Aston Villa,SEGNO,,,,,0.0,,,1:1,Finished,1:1,,,Altro,False
+2026-04-12,Alverca,Casa Pia,SEGNO,,,,,0.0,,,3:1,Finished,3:1,,,Altro,False
+2026-04-12,Cádiz,FC Andorra,SEGNO,,,,,0.0,,,0:1,Finished,0:1,,,Altro,False
+2026-04-12,Halmstads BK,Degerfors,SEGNO,,,,,0.0,,,0:3,Finished,0:3,,,Altro,False
+2026-04-12,Mirandés,Castellón,SEGNO,,,,,0.0,,,2:2,Finished,2:2,,,Altro,False
+2026-04-12,Molde,HamKam,SEGNO,,,,,0.0,,,4:1,Finished,4:1,,,Altro,False
+2026-04-12,RCD Mallorca,Rayo Vallecano,SEGNO,,,,,0.0,,,3:0,Finished,3:0,,,Altro,False
+2026-04-12,Spezia,Mantova,SEGNO,,,,,0.0,,,0:2,Finished,0:2,,,Altro,False
+2026-04-12,VfL Bochum,E. Braunschweig,SEGNO,,,,,0.0,,,4:1,Finished,4:1,,,Altro,False
+2026-04-12,Colonia,Werder Brema,SEGNO,,,,,0.0,,,3:1,Finished,3:1,,,Altro,False
+2026-04-12,Atalanta U23,Monopoli,SEGNO,,,,,0.0,,,2:0,Finished,2:0,,,Altro,False
+2026-04-12,Athletico-PR,Chapecoense,SEGNO,,,,,0.0,,,2:0,Finished,2:0,,,Altro,False
+2026-04-12,Feirense,Vizela,SEGNO,,,,,0.0,,,1:0,Finished,1:0,,,Altro,False
+2026-04-12,Inter U23,Arzignano,SEGNO,,,,,0.0,,,0:1,Finished,0:1,,,Altro,False
+2026-04-12,Pontedera,Ravenna,SEGNO,,,,,0.0,,,0:1,Finished,0:1,,,Altro,False
+2026-04-12,Team Altamura,Giugliano,SEGNO,,,,,0.0,,,1:1,Finished,1:1,,,Altro,False
+2026-04-12,Trapani,Salernitana,SEGNO,,,,,0.0,,,1:2,Finished,1:2,,,Altro,False
+2026-04-12,Bologna,Lecce,SEGNO,,,,,0.0,,,2:0,Finished,2:0,,,Altro,False
+2026-04-12,A. Keciörengücü,Serik Spor,SEGNO,,,,,0.0,,,0:0,Finished,0:0,,,Altro,False
+2026-04-11,Burnley,Brighton,SEGNO,,,,,0.0,,,0:2,Finished,0:2,,,Altro,False
+2026-04-11,Celtic Glasgow,St. Mirren,SEGNO,,,,,0.0,,,1:0,Finished,1:0,,,Altro,False
+2026-04-11,Real Sociedad,Alavés,SEGNO,,,,,0.0,,,3:3,Finished,3:3,,,Altro,False
+2026-04-11,St. Johnstone,Airdrieonians,SEGNO,,,,,0.0,,,4:0,Finished,4:0,,,Altro,False
+2026-04-11,Belgrano,Aldosivi,SEGNO,,,,,0.0,,,,,1:0,,,Altro,False
+2026-04-11,Dep. Riestra,Instituto ACC,SEGNO,,,,,0.0,,,0:1,Finished,0:1,,,Altro,False
+2026-04-11,Heart of Midl.,Motherwell FC,SEGNO,,,,,0.0,,,3:1,Finished,3:1,,,Altro,False
+2026-04-11,Norimberga,Dynamo Dresda,SEGNO,,,,,0.0,,,0:2,Finished,0:2,,,Altro,False
+2026-04-11,Avs FS,Vit. Guimarães,SEGNO,,,,,0.0,,,1:1,Finished,1:1,,,Altro,False
+2026-04-11,CD Leganés,Albacete,SEGNO,,,,,0.0,,,2:1,Finished,2:1,,,Altro,False
+2026-04-11,Norwich,Ipswich,SEGNO,,,,,0.0,,,0:2,Finished,0:2,,,Altro,False
+2026-04-11,Pescara,Sampdoria,SEGNO,,,,,0.0,,,1:2,Finished,1:2,,,Altro,False
+2026-04-11,Salford,Gillingham,SEGNO,,,,,0.0,,,0:0,Finished,0:0,,,Altro,False
+2026-04-11,Santa Clara,Rio Ave,SEGNO,,,,,0.0,,,0:2,Finished,0:2,,,Altro,False
+2026-04-11,Bradford,Stevenage,SEGNO,,,,,0.0,,,0:1,Finished,0:1,,,Altro,False
+2026-04-11,Córdoba CF,Real Saragozza,SEGNO,,,,,0.0,,,1:0,Finished,1:0,,,Altro,False
+2026-04-11,Newport County,Harrogate Town,SEGNO,,,,,0.0,,,2:1,Finished,2:1,,,Altro,False
+2026-04-11,Sheff Utd,Hull City,SEGNO,,,,,0.0,,,2:1,Finished,2:1,,,Altro,False
+2026-04-11,Al-Taawoun,Al-Kholood,SEGNO,,,,,0.0,,,1:2,Finished,1:2,,,Altro,False
+2026-04-11,Alem. Aachen,Stoccarda II,SEGNO,,,,,0.0,,,3:1,Finished,3:1,,,Altro,False
+2026-04-11,Charlton,Preston NE,SEGNO,,,,,0.0,,,1:2,Finished,1:2,,,Altro,False
+2026-04-11,Grimsby Town,Crewe Alexandra,SEGNO,,,,,0.0,,,3:2,Finished,3:2,,,Altro,False
+2026-04-11,Hansa Rostock,SSV Ulm 1846,SEGNO,,,,,0.0,,,5:1,Finished,5:1,,,Altro,False
+2026-04-11,Lillestrøm SK,IK Start,SEGNO,,,,,0.0,,,3:1,Finished,3:1,,,Altro,False
+2026-04-11,Lipsia,Bor. M'gladbach,SEGNO,,,,,0.0,,,1:0,Finished,1:0,,,Altro,False
+2026-04-11,Dundee United,Livingston FC,SEGNO,,,,,0.0,,,3:2,Finished,3:2,,,Altro,False
+2026-04-11,EC Vitória,São Paulo,SEGNO,,,,,0.0,,,2:0,Finished,2:0,,,Altro,False
+2026-04-11,Pergolettese,Virtus Verona,SEGNO,,,,,0.0,,,2:2,Finished,2:2,,,Altro,False
+2026-04-11,Blackpool,Peterborough,SEGNO,,,,,0.0,,,3:1,Finished,3:1,,,Altro,False
+2026-04-11,Elche,Valencia,SEGNO,,,,,0.0,,,1:0,Finished,1:0,,,Altro,False
+2026-04-11,Leicester City,Swansea City,SEGNO,,,,,0.0,,,0:1,Finished,0:1,,,Altro,False
+2026-04-11,Middlesbrough,FC Portsmouth,SEGNO,,,,,0.0,,,0:1,Finished,0:1,,,Altro,False
+2026-04-11,AJ Auxerre,FC Nantes,SEGNO,,,,,0.0,,,0:0,Finished,0:0,,,Altro,False
+2026-04-10,West Ham Utd.,Wolverhampton,SEGNO,,,,,0.0,,,4:0,Finished,4:0,,,Altro,False
+2026-04-10,VPS,FF Jaro,SEGNO,,,,,0.0,,,0:0,Finished,0:0,,,Altro,False
+2026-04-09,Bologna,Aston Villa,SEGNO,,,,,0.0,,,,,1:3,,,Altro,False
+2026-04-09,SC Freiburg,Celta Vigo,SEGNO,,,,,0.0,,,,,3:0,,,Altro,False
+2026-04-09,C. Rizespor,Samsunspor,SEGNO,,,,,0.0,,,4:1,Finished,4:1,,,Altro,False
+2026-04-08,Serik Spor,Van Spor FK,SEGNO,,,,,0.0,,,1:6,Finished,1:6,,,Altro,False
+2026-04-08,Querétaro FC,FC Juárez,SEGNO,,,,,0.0,,,1:1,Finished,1:1,,,Altro,False
+2026-04-06,Chivas,UNAM Pumas,SEGNO,,,,,0.0,,,,,2:2,,,Altro,False
+2026-04-06,EC Bahia,Palmeiras,SEGNO,,,,,0.0,,,0:0,Live,1:2,,,Altro,False
+2026-04-06,Exeter City,Doncaster Rov.,SEGNO,,,,,0.0,,,3:0,Finished,3:0,,,Altro,False
+2026-04-06,Grêmio,Remo,SEGNO,,,,,0.0,,,,,0:0,,,Altro,False
+2026-04-06,Shamrock Rovers,Shelbourne,SEGNO,,,,,0.0,,,3:2,Finished,3:2,,,Altro,False
+2026-04-06,Corinthians,Internacional,SEGNO,,,,,0.0,,,0:0,Live,0:1,,,Altro,False
+2026-04-06,Crawley Town,Grimsby Town,SEGNO,,,,,0.0,,,2:0,Finished,0:2,,,Altro,False
+2026-04-06,FC Porto B,Chaves,SEGNO,,,,,0.0,,,3:0,Finished,3:0,,,Altro,False
+2026-04-06,Mirassol-SP,RB Bragantino,SEGNO,,,,,0.0,,,,,0:1,,,Altro,False
+2026-04-05,Holstein Kiel,Pr. Münster,SEGNO,,,,,0.0,,,0:0,Finished,0:0,,,Altro,False
+2026-04-05,NAC Breda,Sparta R.,SEGNO,,,,,0.0,,,0:0,Finished,0:0,,,Altro,False
+2026-04-05,New York City,St. Louis CITY,SEGNO,,,,,0.0,,,1:1,Finished,1:1,,,Altro,False
+2026-04-05,SJ Earthquakes,San Diego,SEGNO,,,,,0.0,,,3:0,Finished,3:0,,,Altro,False
+2026-04-05,Charlotte,Philadelphia,SEGNO,,,,,0.0,,,,,2:1,,,Altro,False
+2026-04-05,Vancouver,Portland,SEGNO,,,,,0.0,,,3:2,Finished,3:2,,,Altro,False
+2026-04-03,Annecy,Guingamp,SEGNO,,,,,0.0,,,1:0,Finished,1:0,,,Altro,False
+2026-04-03,RB Bragantino,Flamengo,SEGNO,,,,,0.0,,,,,3:0,,,Altro,False
+2026-04-03,Birmingham,Blackburn,SEGNO,,,,,0.0,,,0:1,Finished,0:1,,,Altro,False
+2026-04-03,Charlton,Bristol City,SEGNO,,,,,0.0,,,1:2,Finished,1:2,,,Altro,False
+2026-04-03,Doncaster Rov.,Mansfield Town,SEGNO,,,,,0.0,,,0:2,Finished,0:2,,,Altro,False
+2026-04-03,Luton,Peterborough,SEGNO,,,,,0.0,,,2:1,Finished,2:1,,,Altro,False
+2026-04-03,Barnet,Bromley,SEGNO,,,,,0.0,,,2:2,Finished,2:2,,,Altro,False
+2026-04-03,Burton Albion,Barnsley FC,SEGNO,,,,,0.0,,,1:1,Finished,1:1,,,Altro,False
+2026-04-03,Colchester Utd.,Oldham Athletic,SEGNO,,,,,0.0,,,1:3,Finished,1:3,,,Altro,False
+2026-04-03,Grenoble,Clermont Foot,SEGNO,,,,,0.0,,,2:2,Finished,2:2,,,Altro,False
+2026-04-03,Novara,Lumezzane,SEGNO,,,,,0.0,,,1:3,Finished,1:3,,,Altro,False
+2026-04-03,Sporting,Santa Clara,SEGNO,,,,,0.0,,,4:2,Finished,4:2,,,Altro,False
+2026-04-03,Al-Ittihad,Al-Hazem,SEGNO,,,,,0.0,,,1:0,Finished,1:0,,,Altro,False
+2026-04-03,Bristol Rovers,Fleetwood,SEGNO,,,,,0.0,,,1:0,Finished,1:0,,,Altro,False
+2026-04-03,Carpi,Pontedera,SEGNO,,,,,0.0,,,2:0,Finished,2:0,,,Altro,False
+2026-04-02,EC Bahia,Athletico-PR,SEGNO,,,,,0.0,,,,,3:0,,,Altro,False
+2026-03-29,Real Saragozza,Racing,SEGNO,,,,,0.0,,,2:0,Finished,2:0,,,Altro,False
+2026-03-28,Wycombe Wand.,Port Vale,SEGNO,,,,,0.0,,,,,4:0,,,Altro,False
+2026-03-23,Boca Juniors,Instituto ACC,SEGNO,,,,,0.0,,,2:0,Finished,2:0,,,Altro,False
+2026-03-23,Corinthians,Flamengo,SEGNO,,,,,0.0,,,,,1:1,,,Altro,False
+2026-03-22,Dallas,Houston,SEGNO,,,,,0.0,,,4:3,Finished,4:3,,,Altro,False
+2026-03-22,Kansas City,Colorado,SEGNO,,,,,0.0,,,1:4,Finished,1:4,,,Altro,False
+2026-03-22,Burgos CF,Córdoba CF,SEGNO,,,,,0.0,,,4:0,Finished,4:0,,,Altro,False
+2026-03-22,St. Louis CITY,New England,SEGNO,,,,,0.0,,,3:1,Finished,3:1,,,Altro,False
+2026-03-22,RSC Anderlecht,Cercle Bruges,SEGNO,,,,,0.0,,,2:3,Finished,2:3,,,Altro,False
+2026-03-22,FC Groningen,AZ Alkmaar,SEGNO,,,,,0.0,,,3:0,Finished,3:0,,,Altro,False
+2026-03-22,Cerignola,Giugliano,SEGNO,,,,,0.0,,,1:0,Finished,1:0,,,Altro,False
+2026-03-22,Minnesota,Seattle,SEGNO,,,,,0.0,,,0:0,Finished,0:0,,,Altro,False
+2026-03-22,Roma,Lecce,SEGNO,,,,,0.0,,,1:0,Finished,1:0,,,Altro,False
+2026-03-22,Cincinnati,Montréal,SEGNO,,,,,0.0,,,4:3,Finished,4:3,,,Altro,False
+2026-03-21,Banfield,Tigre,SEGNO,,,,,0.0,,,1:0,Finished,1:0,,,Altro,False
+2026-03-21,Cádiz,Málaga CF,SEGNO,,,,,0.0,,,0:3,Finished,0:3,,,Altro,False
+2026-03-21,Elche,RCD Mallorca,SEGNO,,,,,0.0,,,2:1,Finished,2:1,,,Altro,False
+2026-03-21,Espanyol,Getafe CF,SEGNO,,,,,0.0,,,1:2,Finished,1:2,,,Altro,False
+2026-03-20,Clermont Foot,Red Star FC,SEGNO,,,,,0.0,,,0:1,Finished,0:1,,,Altro,False
+2026-03-20,Lipsia,Hoffenheim,SEGNO,,,,,0.0,,,5:0,Finished,5:0,,,Altro,False
