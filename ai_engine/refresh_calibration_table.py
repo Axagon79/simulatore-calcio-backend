@@ -100,8 +100,10 @@ def main():
                 continue
             if p.get('pronostico') == 'NO BET':
                 continue
-            if p.get('profit_loss') is None:
-                continue  # esito non ancora noto
+            # Criterio backend-compatible: basta `esito` noto (prima richiedeva
+            # anche `profit_loss`, ora allineato a popola_pl_storico.py)
+            if p.get('esito') is None:
+                continue
             prob = p.get('probabilita_stimata')
             if prob is None:
                 continue
