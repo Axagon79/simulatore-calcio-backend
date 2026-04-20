@@ -38,10 +38,16 @@ print(f"{'='*50}\n")
 
 # --- FIX PERCORSI UNIVERSALE ---
 current_path = os.path.dirname(os.path.abspath(__file__))
-while not os.path.exists(os.path.join(current_path, 'config.py')):
+# Risali fino alla ROOT del backend (config.py + functions_python/ accanto).
+# Il walker ingenuo su `config.py` solo si ferma al config.py interno di
+# functions_python/ai_engine/, lasciando `ai_engine.stake_kelly` irraggiungibile.
+while not (
+    os.path.exists(os.path.join(current_path, 'config.py'))
+    and os.path.isdir(os.path.join(current_path, 'functions_python'))
+):
     parent = os.path.dirname(current_path)
     if parent == current_path:
-        raise FileNotFoundError("Impossibile trovare config.py!")
+        raise FileNotFoundError("Impossibile trovare la root del backend (config.py + functions_python/)")
     current_path = parent
 sys.path.append(current_path)
 # Per importare moduli condivisi in functions_python/ai_engine/

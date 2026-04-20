@@ -52,10 +52,16 @@ print(f"{'='*50}\n")
 
 # ==================== PATH SETUP ====================
 current_path = os.path.dirname(os.path.abspath(__file__))
-while not os.path.exists(os.path.join(current_path, 'config.py')):
+# Risali fino alla ROOT del backend (config.py + functions_python/ accanto).
+# Il walker ingenuo su `config.py` solo si ferma al config.py interno di
+# functions_python/ai_engine/, lasciando `ai_engine.stake_kelly` irraggiungibile.
+while not (
+    os.path.exists(os.path.join(current_path, 'config.py'))
+    and os.path.isdir(os.path.join(current_path, 'functions_python'))
+):
     parent = os.path.dirname(current_path)
     if parent == current_path:
-        raise FileNotFoundError("Impossibile trovare config.py!")
+        raise FileNotFoundError("Impossibile trovare la root del backend (config.py + functions_python/)")
     current_path = parent
 sys.path.append(current_path)
 # Per importare moduli condivisi in functions_python/ai_engine/
@@ -67,7 +73,10 @@ from config import db
 from ai_engine.stake_kelly import kelly_unified
 
 # Engine imports
-ENGINE_DIR = os.path.join(current_path, 'engine')
+# ENGINE_DIR vive in functions_python/ai_engine/engine/, non nella root backend.
+# Prima del fix walker, current_path era functions_python/ai_engine/ quindi
+# `current_path/engine` funzionava per caso. Ora punto esplicito.
+ENGINE_DIR = os.path.join(_functions_python_path, 'ai_engine', 'engine')
 sys.path.insert(0, ENGINE_DIR)
 sys.path.insert(0, current_path)
 
