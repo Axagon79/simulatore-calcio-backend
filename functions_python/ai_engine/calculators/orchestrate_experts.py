@@ -3660,6 +3660,36 @@ def orchestrate_date(date_str, dry_run=False, match_time_filter=None, preserve_a
             if new_stake != old_stake:
                 p['stake'] = new_stake
 
+        # --- KELLY UNIFICATO FINALE (20/04/2026) ---
+        # Dopo tutte le conversioni/filtri, ricalcola stake/edge/prob_calibrata/low_value
+        # sul pronostico DEFINITIVO (tipo, pronostico, quota finali).
+        # Lo stake empirico + fattore quota restano attivi come input per i filtri
+        # _apply_*_stake*_*; qui Kelly li sovrascrive prima del salvataggio su DB.
+        try:
+            from stake_kelly import kelly_unified as _kelly_unified_final
+        except ImportError:
+            _kelly_unified_final = None
+        if _kelly_unified_final is not None:
+            for p in unified_pronostici:
+                if p.get('pronostico') == 'NO BET' or p.get('tipo') == 'RISULTATO_ESATTO':
+                    continue
+                prob = p.get('probabilita_stimata')
+                quota = p.get('quota')
+                tipo = p.get('tipo')
+                source = p.get('source', '')
+                if prob is None or quota is None or tipo not in ('SEGNO', 'DOPPIA_CHANCE', 'GOL'):
+                    continue
+                try:
+                    k = _kelly_unified_final(db, prob, quota, source=source,
+                                             mercato=tipo, kelly_fraction=0.25)
+                except Exception:
+                    continue
+                p['stake'] = k['stake']
+                p['edge'] = k['edge_pct']
+                p['prob_calibrata'] = k['prob_calibrata']
+                p['low_value'] = k['low_value']
+                p['source_group'] = k['source_group']
+
         # Costruisci documento unified
         unified_doc = {}
         for field in MATCH_FIELDS:

@@ -37,19 +37,15 @@ print(f"AVVIO PRONOSTICI SANDBOX: {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}
 print(f"{'='*50}\n")
 
 # --- FIX PERCORSI UNIVERSALE ---
-# Path setup: risale 4 livelli (calculators → ai_engine → functions_python → root).
-# FUNCTIONS_PYTHON in cima al sys.path fa risolvere `ai_engine` al package
-# functions_python/ai_engine/ (dove vivono tutti i calculator con API bulk_cache
-# e stake_kelly). PROJECT_ROOT in coda per `from config import db`.
-PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
-FUNCTIONS_PYTHON = os.path.join(PROJECT_ROOT, "functions_python")
-if FUNCTIONS_PYTHON not in sys.path:
-    sys.path.insert(0, FUNCTIONS_PYTHON)
-if PROJECT_ROOT not in sys.path:
-    sys.path.append(PROJECT_ROOT)
+current_path = os.path.dirname(os.path.abspath(__file__))
+while not os.path.exists(os.path.join(current_path, 'config.py')):
+    parent = os.path.dirname(current_path)
+    if parent == current_path:
+        raise FileNotFoundError("Impossibile trovare config.py!")
+    current_path = parent
+sys.path.append(current_path)
 
 from config import db
-from ai_engine.stake_kelly import kelly_unified
 import json
 import random
 
@@ -2748,14 +2744,45 @@ def calcola_probabilita_stimata(quota, dettaglio, tipo, directions=None):
     }
 
 def calcola_stake_kelly(quota, probabilita_stimata, tipo='GOL'):
-    """[DEPRECATED] Sostituita da kelly_unified (stake_kelly.py).
+    """Quarter Kelly Criterion — tutti i pronostici ricevono stake 1-10."""
+    p = probabilita_stimata / 100
+    if not quota or quota <= 1:
+        return 1, 0.0  # Stake minimo anche senza quota
+    edge = (p * quota - 1) * 100
+    if (p * quota) <= 1:
+        # Edge negativo → stake minimo (il modello ha già filtrato)
+        return 1, round(edge, 2)
+    full_kelly = (p * quota - 1) / (quota - 1)
+    quarter_kelly = full_kelly / 4
+    stake = min(max(round(quarter_kelly * 100), 1), 10)
 
-    Mantenuta come wrapper sottile per compatibilita`. Usa il nuovo Kelly
-    unificato con source='S' (Sistema Sandbox).
-    """
-    res = kelly_unified(db, probabilita_stimata, quota,
-                        source='S', mercato=tipo, kelly_fraction=0.25)
-    return res['stake'], res['edge_pct']
+    # Protezioni tipo-specifiche
+    if tipo == 'SEGNO':
+        if quota < 1.30:
+            stake = min(stake, 2)   # Favorita fortissima
+        elif quota < 1.50:
+            stake = min(stake, 4)   # Favorita media
+    if quota < 1.20:
+        stake = min(stake, 2)       # Generale: quote bassissime
+    if probabilita_stimata > 85:
+        stake = min(stake, 3)       # Overconfidence protection
+    if quota > 5.0:
+        stake = min(stake, 2)       # Value trap protection
+
+    # Fattore quota a fasce — bilancia stake con probabilità implicita del mercato
+    if quota < 1.50:
+        stake = max(1, min(10, round(stake * 2.00 / quota)))
+    elif quota < 2.00:
+        pass  # stake originale — Kelly già ben calibrato in questa fascia
+    elif quota < 2.50:
+        stake = max(1, min(10, round(stake * 2.20 / quota)))
+    elif quota < 3.50:
+        stake = max(1, min(10, round(stake * 2.00 / quota)))
+    elif quota < 5.00:
+        stake = max(1, min(10, round(stake * 3.50 / quota)))
+    # 5.00+: stake originale
+
+    return stake, round(edge, 2)
 
 
 # ==================== FASE 4: DECISIONE FINALE ====================
@@ -3423,26 +3450,18 @@ def run_daily_predictions(target_date=None, match_time_filter=None):
                 dirs = gol_result.get('directions', {})
 
             prob_result = calcola_probabilita_stimata(quota_prono, det, tipo, dirs)
-            kelly = kelly_unified(db, prob_result['probabilita_stimata'],
-                                  quota_prono, source='S', mercato=tipo,
-                                  kelly_fraction=0.25)
+            stake, edge = calcola_stake_kelly(quota_prono, prob_result['probabilita_stimata'], tipo)
 
             p['quota'] = p.get('quota') or quota_prono
             p['probabilita_stimata'] = prob_result['probabilita_stimata']
             p['prob_mercato'] = prob_result['prob_mercato']
             p['prob_modello'] = prob_result['prob_modello']
             p['has_odds'] = prob_result['has_odds']
-            p['stake'] = kelly['stake']
-            p['edge'] = kelly['edge_pct']
-            p['prob_calibrata'] = kelly['prob_calibrata']
-            p['low_value'] = kelly['low_value']
-            p['source_group'] = kelly['source_group']
+            p['stake'] = stake
+            p['edge'] = edge
 
-            if kelly['stake'] > 0:
-                badge = ' ⚠️ LOW VALUE' if kelly['low_value'] else ''
-                print(f"      💰 {pronostico}: stake {kelly['stake']}/10 "
-                      f"(edge {kelly['edge_pct']:+.1f}%, prob {prob_result['probabilita_stimata']:.1f}% "
-                      f"→ cal {kelly['prob_calibrata']:.1f}%){badge}")
+            if stake > 0:
+                print(f"      💰 {pronostico}: stake {stake}/10 (edge {edge:+.1f}%, prob {prob_result['probabilita_stimata']:.1f}%)")
 
         # Prepara documento per DB
         prediction_doc = {
