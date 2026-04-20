@@ -3514,73 +3514,71 @@ def orchestrate_date(date_str, dry_run=False, match_time_filter=None, preserve_a
         if not unified_pronostici:
             continue
 
-        # DISABILITATO 20/04/2026 - Cerotto 1 Kelly unificato integra lo stake direttamente
-        # Ripristinare solo se kelly_enabled=False in tuning_settings
         # --- STAKE EMPIRICO: basato su HR reale per fascia di confidence e mercato ---
         # ⚠️ PER DISATTIVARE: commentare tutto il blocco fino a "# Costruisci documento unified"
         # e lo stake tornera' a quello calcolato dal Kelly Criterion (codice sopra)
         # Ogni entry: (conf_min, conf_max, stake) — ordinate per HR decrescente (stake 10 = migliore)
-        # STAKE_SEGNI = [
-        #     # Lv1 HR 76.8%: 57-59% + 81-86% + 90-92%
-        #     (57, 59, 10), (81, 86, 10), (90, 92, 10),
-        #     # Lv2 HR 67.7%: 66-71% + 75-77%
-        #     (66, 71, 9), (75, 77, 9),
-        #     # Lv3 HR 64.1%: 60-62% + 72-74% + 87-89%
-        #     (60, 62, 8), (72, 74, 8), (87, 89, 8),
-        #     # Lv4 HR 63.0%: 51-53%
-        #     (51, 53, 7),
-        #     # Lv5 HR 62.5%: 63-65%
-        #     (63, 65, 6),
-        #     # Lv6 HR 62.5%: 45-47%
-        #     (45, 47, 5),
-        #     # Lv7 HR 62.3%: 48-50%
-        #     (48, 50, 4),
-        #     # Lv8 HR 62.1%: 39-41%
-        #     (39, 41, 3),
-        #     # Lv9 HR 58.5%: 54-56%
-        #     (54, 56, 2),
-        #     # Lv10 HR 56.6%: 42-44% + 78-80%
-        #     (42, 44, 1), (78, 80, 1),
-        # ]
-        # STAKE_GOL = [
-        #     # Lv1 HR 89.5%: 42-44% + 48-50% + 84-86%
-        #     (42, 44, 10), (48, 50, 10), (84, 86, 10),
-        #     # Lv2 HR 80.0%: 51-53%
-        #     (51, 53, 9),
-        #     # Lv3 HR 80.0%: 78-80%
-        #     (78, 80, 8),
-        #     # Lv4 HR 69.8%: 69-71%
-        #     (69, 71, 7),
-        #     # Lv5 HR 66.2%: 72-74%
-        #     (72, 74, 6),
-        #     # Lv6 HR 62.7%: 39-41% + 45-47% + 75-77%
-        #     (39, 41, 5), (45, 47, 5), (75, 77, 5),
-        #     # Lv7 HR 60.7%: 63-65% + 81-83%
-        #     (63, 65, 4), (81, 83, 4),
-        #     # Lv8 HR 59.4%: 66-68%
-        #     (66, 68, 3),
-        #     # Lv9 HR 55.7%: 57-62%
-        #     (57, 62, 2),
-        #     # Lv10 HR 38.5%: 54-56%
-        #     (54, 56, 1),
-        # ]
-        #
-        # def _get_empirical_stake(conf, tipo):
-        #     table = STAKE_SEGNI if tipo in ('SEGNO', 'DOPPIA_CHANCE') else STAKE_GOL
-        #     conf_int = int(round(conf))
-        #     for c_min, c_max, stake in table:
-        #         if c_min <= conf_int <= c_max:
-        #             return stake
-        #     return 3  # fallback se fuori da tutte le fasce
-        #
-        # for p in unified_pronostici:
-        #     if p.get('pronostico') == 'NO BET' or p.get('tipo') == 'RISULTATO_ESATTO':
-        #         continue
-        #     old_stake = p.get('stake', 1)
-        #     new_stake = _get_empirical_stake(p.get('confidence', 50), p.get('tipo', ''))
-        #     p['stake'] = new_stake
-        #     if old_stake != new_stake:
-        #         pass  # silenzioso — troppi log altrimenti
+        STAKE_SEGNI = [
+            # Lv1 HR 76.8%: 57-59% + 81-86% + 90-92%
+            (57, 59, 10), (81, 86, 10), (90, 92, 10),
+            # Lv2 HR 67.7%: 66-71% + 75-77%
+            (66, 71, 9), (75, 77, 9),
+            # Lv3 HR 64.1%: 60-62% + 72-74% + 87-89%
+            (60, 62, 8), (72, 74, 8), (87, 89, 8),
+            # Lv4 HR 63.0%: 51-53%
+            (51, 53, 7),
+            # Lv5 HR 62.5%: 63-65%
+            (63, 65, 6),
+            # Lv6 HR 62.5%: 45-47%
+            (45, 47, 5),
+            # Lv7 HR 62.3%: 48-50%
+            (48, 50, 4),
+            # Lv8 HR 62.1%: 39-41%
+            (39, 41, 3),
+            # Lv9 HR 58.5%: 54-56%
+            (54, 56, 2),
+            # Lv10 HR 56.6%: 42-44% + 78-80%
+            (42, 44, 1), (78, 80, 1),
+        ]
+        STAKE_GOL = [
+            # Lv1 HR 89.5%: 42-44% + 48-50% + 84-86%
+            (42, 44, 10), (48, 50, 10), (84, 86, 10),
+            # Lv2 HR 80.0%: 51-53%
+            (51, 53, 9),
+            # Lv3 HR 80.0%: 78-80%
+            (78, 80, 8),
+            # Lv4 HR 69.8%: 69-71%
+            (69, 71, 7),
+            # Lv5 HR 66.2%: 72-74%
+            (72, 74, 6),
+            # Lv6 HR 62.7%: 39-41% + 45-47% + 75-77%
+            (39, 41, 5), (45, 47, 5), (75, 77, 5),
+            # Lv7 HR 60.7%: 63-65% + 81-83%
+            (63, 65, 4), (81, 83, 4),
+            # Lv8 HR 59.4%: 66-68%
+            (66, 68, 3),
+            # Lv9 HR 55.7%: 57-62%
+            (57, 62, 2),
+            # Lv10 HR 38.5%: 54-56%
+            (54, 56, 1),
+        ]
+
+        def _get_empirical_stake(conf, tipo):
+            table = STAKE_SEGNI if tipo in ('SEGNO', 'DOPPIA_CHANCE') else STAKE_GOL
+            conf_int = int(round(conf))
+            for c_min, c_max, stake in table:
+                if c_min <= conf_int <= c_max:
+                    return stake
+            return 3  # fallback se fuori da tutte le fasce
+
+        for p in unified_pronostici:
+            if p.get('pronostico') == 'NO BET' or p.get('tipo') == 'RISULTATO_ESATTO':
+                continue
+            old_stake = p.get('stake', 1)
+            new_stake = _get_empirical_stake(p.get('confidence', 50), p.get('tipo', ''))
+            p['stake'] = new_stake
+            if old_stake != new_stake:
+                pass  # silenzioso — troppi log altrimenti
 
         # --- CONVERSIONI POST-STAKE (ricalcolano stake sul nuovo pronostico) ---
         # ⚠️ ORDINE IMPORTANTE: le conversioni devono girare PRIMA dei filtri quota,
@@ -3652,17 +3650,15 @@ def orchestrate_date(date_str, dry_run=False, match_time_filter=None, preserve_a
         if dedup_remove2:
             unified_pronostici = [p for i, p in enumerate(unified_pronostici) if i not in dedup_remove2]
 
-        # DISABILITATO 20/04/2026 - Cerotto 1 Kelly unificato integra lo stake direttamente
-        # Ripristinare solo se kelly_enabled=False in tuning_settings
         # --- FATTORE QUOTA FINALE: aggiusta lo stake in base alla fascia di quota ---
-        # for p in unified_pronostici:
-        #     if p.get('pronostico') == 'NO BET' or p.get('tipo') == 'RISULTATO_ESATTO':
-        #         continue
-        #     quota = p.get('quota') or 0
-        #     old_stake = p.get('stake', 1)
-        #     new_stake = _apply_fattore_quota(old_stake, quota)
-        #     if new_stake != old_stake:
-        #         p['stake'] = new_stake
+        for p in unified_pronostici:
+            if p.get('pronostico') == 'NO BET' or p.get('tipo') == 'RISULTATO_ESATTO':
+                continue
+            quota = p.get('quota') or 0
+            old_stake = p.get('stake', 1)
+            new_stake = _apply_fattore_quota(old_stake, quota)
+            if new_stake != old_stake:
+                p['stake'] = new_stake
 
         # Costruisci documento unified
         unified_doc = {}
