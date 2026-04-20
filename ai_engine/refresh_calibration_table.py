@@ -26,18 +26,15 @@ import os
 import sys
 from datetime import datetime, timezone
 
-# Fix percorsi: trova config.py risalendo
-current_path = os.path.dirname(os.path.abspath(__file__))
-while not os.path.exists(os.path.join(current_path, 'config.py')):
-    parent = os.path.dirname(current_path)
-    if parent == current_path:
-        raise FileNotFoundError('Impossibile trovare config.py')
-    current_path = parent
-sys.path.insert(0, current_path)
-# Esporta anche functions_python/ al path per importare stake_kelly/source_classify
-fp_path = os.path.join(current_path, 'functions_python')
-if fp_path not in sys.path:
-    sys.path.insert(0, fp_path)
+# Path setup: risale 1 livello (ai_engine → root).
+# FUNCTIONS_PYTHON in cima fa risolvere `ai_engine` al package
+# functions_python/ai_engine/ (dove vivono stake_kelly e source_classify).
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+FUNCTIONS_PYTHON = os.path.join(PROJECT_ROOT, "functions_python")
+if FUNCTIONS_PYTHON not in sys.path:
+    sys.path.insert(0, FUNCTIONS_PYTHON)
+if PROJECT_ROOT not in sys.path:
+    sys.path.append(PROJECT_ROOT)
 
 from config import db  # noqa: E402
 from ai_engine.source_classify import classify as classify_source  # noqa: E402

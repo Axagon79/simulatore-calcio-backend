@@ -51,34 +51,23 @@ print(f"Cicli MC: {SIMULATION_CYCLES} | Algoritmo: Master (mode {ALGO_MODE})")
 print(f"{'='*50}\n")
 
 # ==================== PATH SETUP ====================
-current_path = os.path.dirname(os.path.abspath(__file__))
-# Risali fino alla ROOT del backend (config.py + functions_python/ accanto).
-# Il walker ingenuo su `config.py` solo si ferma al config.py interno di
-# functions_python/ai_engine/, lasciando `ai_engine.stake_kelly` irraggiungibile.
-while not (
-    os.path.exists(os.path.join(current_path, 'config.py'))
-    and os.path.isdir(os.path.join(current_path, 'functions_python'))
-):
-    parent = os.path.dirname(current_path)
-    if parent == current_path:
-        raise FileNotFoundError("Impossibile trovare la root del backend (config.py + functions_python/)")
-    current_path = parent
-sys.path.append(current_path)
-# Per importare moduli condivisi in functions_python/ai_engine/
-_functions_python_path = os.path.join(current_path, 'functions_python')
-if os.path.isdir(_functions_python_path) and _functions_python_path not in sys.path:
-    sys.path.append(_functions_python_path)
+# Path setup: risale 4 livelli (calculators → ai_engine → functions_python → root).
+# FUNCTIONS_PYTHON in cima al sys.path fa risolvere `ai_engine` al package
+# functions_python/ai_engine/. AI_ENGINE_DIR (functions_python/ai_engine/) serve
+# per risolvere `from engine.engine_core` (namespace package senza __init__.py).
+# PROJECT_ROOT in coda per `from config import db`.
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+FUNCTIONS_PYTHON = os.path.join(PROJECT_ROOT, "functions_python")
+AI_ENGINE_DIR = os.path.join(FUNCTIONS_PYTHON, "ai_engine")
+if FUNCTIONS_PYTHON not in sys.path:
+    sys.path.insert(0, FUNCTIONS_PYTHON)
+if AI_ENGINE_DIR not in sys.path:
+    sys.path.insert(0, AI_ENGINE_DIR)
+if PROJECT_ROOT not in sys.path:
+    sys.path.append(PROJECT_ROOT)
 
 from config import db
 from ai_engine.stake_kelly import kelly_unified
-
-# Engine imports
-# ENGINE_DIR vive in functions_python/ai_engine/engine/, non nella root backend.
-# Prima del fix walker, current_path era functions_python/ai_engine/ quindi
-# `current_path/engine` funzionava per caso. Ora punto esplicito.
-ENGINE_DIR = os.path.join(_functions_python_path, 'ai_engine', 'engine')
-sys.path.insert(0, ENGINE_DIR)
-sys.path.insert(0, current_path)
 
 from engine.engine_core import predict_match, preload_match_data
 from engine.goals_converter import calculate_goals_from_engine, load_tuning

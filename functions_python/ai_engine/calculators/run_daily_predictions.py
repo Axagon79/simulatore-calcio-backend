@@ -38,23 +38,16 @@ print(f"AVVIO PRONOSTICI: {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}")
 print(f"{'='*50}\n")
 
 # --- FIX PERCORSI UNIVERSALE ---
-current_path = os.path.dirname(os.path.abspath(__file__))
-# Risali fino alla ROOT del backend (config.py + functions_python/ accanto).
-# Il walker ingenuo su `config.py` solo si ferma al config.py interno di
-# functions_python/ai_engine/, lasciando `ai_engine.stake_kelly` irraggiungibile.
-while not (
-    os.path.exists(os.path.join(current_path, 'config.py'))
-    and os.path.isdir(os.path.join(current_path, 'functions_python'))
-):
-    parent = os.path.dirname(current_path)
-    if parent == current_path:
-        raise FileNotFoundError("Impossibile trovare la root del backend (config.py + functions_python/)")
-    current_path = parent
-sys.path.append(current_path)
-# Per importare moduli condivisi in functions_python/ai_engine/
-_functions_python_path = os.path.join(current_path, 'functions_python')
-if os.path.isdir(_functions_python_path) and _functions_python_path not in sys.path:
-    sys.path.append(_functions_python_path)
+# Path setup: risale 4 livelli (calculators → ai_engine → functions_python → root).
+# FUNCTIONS_PYTHON in cima al sys.path fa risolvere `ai_engine` al package
+# functions_python/ai_engine/ (dove vivono tutti i calculator con API bulk_cache
+# e stake_kelly). PROJECT_ROOT in coda per `from config import db`.
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+FUNCTIONS_PYTHON = os.path.join(PROJECT_ROOT, "functions_python")
+if FUNCTIONS_PYTHON not in sys.path:
+    sys.path.insert(0, FUNCTIONS_PYTHON)
+if PROJECT_ROOT not in sys.path:
+    sys.path.append(PROJECT_ROOT)
 
 from config import db
 from ai_engine.stake_kelly import kelly_unified
