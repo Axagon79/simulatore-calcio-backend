@@ -148,15 +148,6 @@ SCRAPER_SEQUENCE = [
       # ⭐ REPORT TRACK RECORD (genera JSON + TXT con statistiche pronostici vs risultati)
       ("generate_track_record_report.py", "📊 [28/31] Report Track Record", "Report statistiche non generato", CURRENT_DIR),
 
-      # ⭐ CALCOLO PROFIT/LOSS post-match (aggiorna esito + P/L per ogni pronostico)
-      ("calculate_profit_loss.py", "💰 [29/31] Calcolo Profit/Loss", "Profit/loss non calcolati per pronostici passati", CURRENT_DIR),
-
-      # ⭐ REFRESH CALIBRATION TABLE — ricalcola HR reale per bin (usata da kelly_unified)
-      ("refresh_calibration_table.py", "🎯 [29.3/33] Refresh Calibration Table", "Tabella calibrazione Kelly non aggiornata", CURRENT_DIR),
-
-      # ⭐ FEEDBACK LOOP — Analisi errori pronostici con Mistral AI (solo backend interno)
-      ("feedback_loop_analyzer.py", "🔁 [29.5/33] Feedback Loop — Analisi Errori", "Errori pronostici non analizzati", CURRENT_DIR),
-
       # ⭐ SISTEMA C — PRONOSTICI MONTE CARLO (100 cicli, Master mode 5, collection separata)
       ("run_daily_predictions_engine_c.py", "🎲 [30/31] Pronostici Sistema C (MC)", "Pronostici Monte Carlo non generati", FP_CALCULATORS_DIR),
 
@@ -168,6 +159,19 @@ SCRAPER_SEQUENCE = [
 
       # 🧪 TAG MIXER — Tagga pronostici che matchano i 74 pattern mixer
       ("tag_mixer.py", "🧪 [33/38] Tag Mixer", "Pronostici mixer non taggati", FP_CALCULATORS_DIR),
+
+      # ⭐ CALCOLO PROFIT/LOSS post-match (aggiorna esito + P/L per ogni pronostico)
+      # Spostato dopo tag_elite/tag_mixer (20/04/2026): gira su unified DEFINITIVO
+      # così le scatole elite/alto_rendimento del report usano i flag corretti.
+      # Prima di snapshot_nightly così lo snapshot cattura anche esito/pl delle
+      # partite già finite al momento del lancio (es. sudamericane mattutine).
+      ("calculate_profit_loss.py", "💰 [29/31] Calcolo Profit/Loss", "Profit/loss non calcolati per pronostici passati", CURRENT_DIR),
+
+      # ⭐ REFRESH CALIBRATION TABLE — ricalcola HR reale per bin (usata da kelly_unified)
+      ("refresh_calibration_table.py", "🎯 [29.3/33] Refresh Calibration Table", "Tabella calibrazione Kelly non aggiornata", CURRENT_DIR),
+
+      # ⭐ FEEDBACK LOOP — Analisi errori pronostici con Mistral AI (solo backend interno)
+      ("feedback_loop_analyzer.py", "🔁 [29.5/33] Feedback Loop — Analisi Errori", "Errori pronostici non analizzati", CURRENT_DIR),
 
       # ⭐ SNAPSHOT NIGHTLY — Salva versione nightly di tutti i match in prediction_versions
       ("snapshot_nightly.py", "📸 [34/39] Snapshot Nightly (Versioning)", "Storico versioni pronostici non salvato", FP_CALCULATORS_DIR),
