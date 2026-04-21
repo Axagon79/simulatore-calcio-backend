@@ -1086,6 +1086,60 @@ def _apply_multigol(unified, odds):
         )
 
         if is_candidate:
+            # --- REGOLA A (21/04/2026): zona MG 1-2 vs Under 2.5 ---
+            # Se il candidato è in zona 1-2 (MG 1-2) e Under 2.5 è disponibile
+            # con quota >= 1.35, preferisci Under se MG non paga almeno il 25%
+            # in più rispetto a Under.
+            # Motivo: Under 2.5 copre anche lo 0-0, MG 1-2 no. Il payout extra
+            # di MG deve compensare gli 0-0 persi (15-20% dei match low-lambda).
+            use_under_instead = False
+            if zone['range'] == '1-2':
+                try:
+                    u25 = float(odds.get('under_25') or 0)
+                except (TypeError, ValueError):
+                    u25 = 0
+                if u25 >= 1.35 and mg_quota < u25 * 1.25:
+                    use_under_instead = True
+
+            if use_under_instead:
+                # Emetti Under 2.5 al posto di MG 1-2
+                # Prob stima: Poisson cumulata P(totale <= 2) = probs[0] + probs[1] + probs[2]
+                u25_prob = probs[0] + probs[1] + probs[2]
+                u25_pred = {
+                    'tipo': 'GOL',
+                    'pronostico': 'Under 2.5',
+                    'confidence': conf,
+                    'stars': p.get('stars', 3.0),
+                    'quota': u25,
+                    'probabilita_stimata': round(u25_prob * 100, 1),
+                    'has_odds': True,
+                    'source': p.get('source', '?') + '_u25_vs_mg',
+                    'routing_rule': 'multigol_v6_to_under25',
+                    'multigol_detail': {
+                        'lambda': round(l_tot, 3),
+                        'zone': zone['range'],
+                        'original': pron,
+                        'reason': 'mg_quota_insufficient',
+                        'mg_quota_calc': mg_quota,
+                        'under_25_quota': u25,
+                    },
+                }
+                # Calcola stake con Kelly 3/4 su Under 2.5
+                edge_u25 = u25_prob - (1.0 / u25)
+                if edge_u25 > 0:
+                    kelly_fraction = 0.75
+                    kelly = kelly_fraction * (edge_u25 * u25 - (1 - edge_u25)) / (u25 - 1)
+                    u25_pred['stake'] = _apply_fattore_quota(max(1, min(10, round(kelly * 10))), u25)
+                    u25_pred['edge'] = round(edge_u25 * 100, 1)
+                    u25_pred['prob_mercato'] = round(100.0 / u25, 1)
+                    u25_pred['prob_modello'] = round(u25_prob * 100, 1)
+                else:
+                    u25_pred['stake'] = 1
+                    u25_pred['edge'] = 0
+                print(f"    🔄 MG→U2.5: {pron} → Under 2.5 @{u25:.2f} (MG 1-2 @{mg_quota} < 25% sopra Under)")
+                result.append(u25_pred)
+                continue
+
             mg = {
                 'tipo': 'GOL',
                 'pronostico': f'MG {zone["range"]}',
@@ -3222,6 +3276,28 @@ def orchestrate_date(date_str, dry_run=False, match_time_filter=None, preserve_a
 
         # --- POST-PROCESSING: Multi-goal su pronostici deboli ---
         unified_pronostici = _apply_multigol(unified_pronostici, match_odds)
+
+        # --- REGOLA B (21/04/2026): scarta Goal in match low-scoring ---
+        # Se lambda (totale gol atteso, calcolato da quota Under 2.5) < 1.8,
+        # il match è classificato "pochi gol". Un pronostico Goal in questo
+        # contesto è logicamente contraddittorio (HR Goal empirico 41-46% in
+        # fascia lambda < 1.8, sotto break-even per la maggior parte delle
+        # quote Goal tipiche).
+        try:
+            _u25_b = float(match_odds.get('under_25') or 0)
+        except (TypeError, ValueError):
+            _u25_b = 0
+        if _u25_b > 1.0:
+            _l_b = _calc_lambda(_u25_b)
+            if _l_b is not None and _l_b < 1.8:
+                _before = len(unified_pronostici)
+                unified_pronostici = [
+                    p for p in unified_pronostici
+                    if not (p.get('tipo') == 'GOL' and p.get('pronostico') == 'Goal')
+                ]
+                _removed = _before - len(unified_pronostici)
+                if _removed:
+                    print(f"    🚫 GOAL SCARTATO (λ={_l_b:.2f} < 1.8): rimossi {_removed} pronostici Goal")
 
         # --- POST-PROCESSING: Combo #96 — SEGNO 2 → DC X2 ---
         c_doc_for_combo = docs_by_sys['C'].get(match_key)
