@@ -83,6 +83,13 @@ def get_matched_patterns(p):
     if tipo == 'SEGNO' and 1.60 <= quota < 1.80 and source == 'C' and stars >= 3.0:
         matched.append('P18')
 
+    # === P_ultimo (21/04/2026) — pattern orfano scoperto tramite analisi discriminante
+    # SEGNO + quota 2.00-2.19 + stars 2.5-2.9
+    # Storico 15/03-20/04: N=17, W=11, HR 64.7%, PL +20.01u, ROI +35.7%
+    # Ridondanza con Elite/Mixer esistenti: 0% (nicchia non coperta)
+    if tipo == 'SEGNO' and 2.00 <= quota < 2.20 and 2.5 <= stars < 3.0:
+        matched.append('P_ultimo')
+
     # Rimuovi pattern meno specifici quando uno più specifico li copre
     return _remove_subsets(matched)
 
@@ -107,6 +114,7 @@ PATTERN_CONDITIONS = {
     'P16': 3,  # tipo + quota + confidence
     'P17': 4,  # pronostico + quota + routing + stelle (+ source != C)
     'P18': 4,  # tipo + quota + source + stelle
+    'P_ultimo': 3,  # tipo + quota + stelle
 }
 
 # Quali pattern sono "contenuti" in altri (il meno specifico è coperto dal più specifico)
@@ -142,7 +150,8 @@ def _remove_subsets(matched):
 
 # Pattern in produzione vs in prova
 PATTERNS_PRODUZIONE = {'P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7', 'P8',
-                       'P9', 'P10', 'P11', 'P12', 'P13', 'P14', 'P15', 'P16'}
+                       'P9', 'P10', 'P11', 'P12', 'P13', 'P14', 'P15', 'P16',
+                       'P_ultimo'}
 PATTERNS_PROVA = {'P17', 'P18'}
 
 
