@@ -160,6 +160,10 @@ SCRAPER_SEQUENCE = [
       # 🧪 TAG MIXER — Tagga pronostici che matchano i 74 pattern mixer
       ("tag_mixer.py", "🧪 [33/38] Tag Mixer", "Pronostici mixer non taggati", FP_CALCULATORS_DIR),
 
+      # ⭐ TAG SUPER SELECTION — Flagga pronostici con >=2 flag su 3 (AR, Elite, Mixer)
+      # Aggiunto 22/04/2026. Gira dopo tag_elite/tag_mixer (dipende dai loro flag).
+      ("tag_super_selection.py", "⭐ [33.5/39] Tag Super Selection", "Flag super_selection non applicato", FP_CALCULATORS_DIR),
+
       # ⭐ CALCOLO PROFIT/LOSS post-match (aggiorna esito + P/L per ogni pronostico)
       # Spostato dopo tag_elite/tag_mixer (20/04/2026): gira su unified DEFINITIVO
       # così le scatole elite/alto_rendimento del report usano i flag corretti.
