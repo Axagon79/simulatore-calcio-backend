@@ -288,11 +288,30 @@ def main():
 
     # Verifica
     total = db.pl_storico.count_documents({})
-    sample = db.pl_storico.find_one(sort=[('date', -1)])
     print(f"\n Totale documenti in pl_storico: {total}")
-    if sample:
-        print(f"  Ultimo giorno: {sample['date']}")
-        print(f"  Tutti: {sample['tutti']['bets']} bet, P/L {sample['tutti']['pl']}u, HR {sample['tutti']['hr']}%")
+
+    # --- Mini report cumulativo per scatola (esclude giorni a 0 bet) ---
+    scatole = ['tutti', 'pronostici', 'elite', 'alto_rendimento', 'mixer', 'super_selection']
+    agg = {k: {'pl': 0.0, 'bets': 0, 'wins': 0, 'staked': 0.0} for k in scatole}
+    for d in db.pl_storico.find({}):
+        for k in scatole:
+            s = d.get(k) or {}
+            agg[k]['pl'] += s.get('pl', 0) or 0
+            agg[k]['bets'] += s.get('bets', 0) or 0
+            agg[k]['wins'] += s.get('wins', 0) or 0
+            agg[k]['staked'] += s.get('staked', 0) or 0
+
+    print("\n=== RIEPILOGO CUMULATIVO (tutte le date scritte in pl_storico) ===")
+    print(f"{'Scatola':<20}{'Bets':>6}{'Wins':>6}{'HR':>8}{'Stake':>8}{'PL':>10}{'ROI':>8}")
+    print('-' * 66)
+    for k in scatole:
+        a = agg[k]
+        if a['bets'] == 0:
+            print(f"{k:<20}{'-':>6}")
+            continue
+        hr = a['wins'] / a['bets'] * 100
+        roi = a['pl'] / a['staked'] * 100 if a['staked'] > 0 else 0
+        print(f"{k:<20}{a['bets']:>6}{a['wins']:>6}{hr:>7.1f}%{a['staked']:>8.0f}{a['pl']:>+9.2f}u{roi:>+7.1f}%")
 
 
 if __name__ == '__main__':
