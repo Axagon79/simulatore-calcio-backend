@@ -108,6 +108,8 @@ exports = async function(changeEvent) {
     pronostici: { pl: 0, bets: 0, wins: 0, staked: 0 },
     elite: { pl: 0, bets: 0, wins: 0, staked: 0 },
     alto_rendimento: { pl: 0, bets: 0, wins: 0, staked: 0 },
+    mixer: { pl: 0, bets: 0, wins: 0, staked: 0 },
+    super_selection: { pl: 0, bets: 0, wins: 0, staked: 0 },
   };
 
   for (const doc of dayDocs) {
@@ -161,6 +163,16 @@ exports = async function(changeEvent) {
       if (isAltoRendimento) {
         sez.alto_rendimento.bets++; sez.alto_rendimento.staked += stake; sez.alto_rendimento.pl += profit;
         if (isHit) sez.alto_rendimento.wins++;
+      }
+
+      if (p.mixer) {
+        sez.mixer.bets++; sez.mixer.staked += stake; sez.mixer.pl += profit;
+        if (isHit) sez.mixer.wins++;
+      }
+
+      if (p.super_selection) {
+        sez.super_selection.bets++; sez.super_selection.staked += stake; sez.super_selection.pl += profit;
+        if (isHit) sez.super_selection.wins++;
       }
     }
   }
