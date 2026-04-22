@@ -118,6 +118,8 @@ def calcola_pl_giorno(docs, results_map=None):
         'pronostici': {'pl': 0, 'bets': 0, 'wins': 0, 'staked': 0},
         'elite': {'pl': 0, 'bets': 0, 'wins': 0, 'staked': 0},
         'alto_rendimento': {'pl': 0, 'bets': 0, 'wins': 0, 'staked': 0},
+        'mixer': {'pl': 0, 'bets': 0, 'wins': 0, 'staked': 0},
+        'super_selection': {'pl': 0, 'bets': 0, 'wins': 0, 'staked': 0},
     }
 
     for doc in docs:
@@ -191,6 +193,20 @@ def calcola_pl_giorno(docs, results_map=None):
                 if is_hit:
                     sez['alto_rendimento']['wins'] += 1
 
+            if p.get('mixer'):
+                sez['mixer']['bets'] += 1
+                sez['mixer']['staked'] += stake
+                sez['mixer']['pl'] += profit
+                if is_hit:
+                    sez['mixer']['wins'] += 1
+
+            if p.get('super_selection'):
+                sez['super_selection']['bets'] += 1
+                sez['super_selection']['staked'] += stake
+                sez['super_selection']['pl'] += profit
+                if is_hit:
+                    sez['super_selection']['wins'] += 1
+
     # Arrotonda e calcola HR/ROI
     for s in sez.values():
         s['pl'] = round(s['pl'], 2)
@@ -250,6 +266,8 @@ def main():
                     'pronostici': sez['pronostici'],
                     'elite': sez['elite'],
                     'alto_rendimento': sez['alto_rendimento'],
+                    'mixer': sez['mixer'],
+                    'super_selection': sez['super_selection'],
                     'updated_at': datetime.utcnow(),
                 },
                 '$setOnInsert': {

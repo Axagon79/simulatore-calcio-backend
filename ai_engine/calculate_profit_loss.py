@@ -297,6 +297,8 @@ try:
         'pronostici': {'pl': 0.0, 'bets': 0, 'wins': 0, 'staked': 0.0},
         'elite': {'pl': 0.0, 'bets': 0, 'wins': 0, 'staked': 0.0},
         'alto_rendimento': {'pl': 0.0, 'bets': 0, 'wins': 0, 'staked': 0.0},
+        'mixer': {'pl': 0.0, 'bets': 0, 'wins': 0, 'staked': 0.0},
+        'super_selection': {'pl': 0.0, 'bets': 0, 'wins': 0, 'staked': 0.0},
     }
 
     for doc in month_docs:
@@ -352,6 +354,22 @@ try:
                 sezioni['alto_rendimento']['pl'] += profit
                 if esito is True:
                     sezioni['alto_rendimento']['wins'] += 1
+
+            # Mixer (trasversale: p.mixer == True)
+            if p.get('mixer', False):
+                sezioni['mixer']['bets'] += 1
+                sezioni['mixer']['staked'] += stake
+                sezioni['mixer']['pl'] += profit
+                if esito is True:
+                    sezioni['mixer']['wins'] += 1
+
+            # Super Selection (>=2 flag su 3: AR + Elite + Mixer)
+            if p.get('super_selection', False):
+                sezioni['super_selection']['bets'] += 1
+                sezioni['super_selection']['staked'] += stake
+                sezioni['super_selection']['pl'] += profit
+                if esito is True:
+                    sezioni['super_selection']['wins'] += 1
 
     # Salva nel DB
     for sez_key, s in sezioni.items():
