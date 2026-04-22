@@ -4,7 +4,9 @@ POPOLA PL_STORICO — Script one-shot
 Legge tutti i documenti da daily_predictions_unified,
 calcola il P/L giorno-per-giorno per sezione, e scrive in pl_storico.
 
-Uso: python popola_pl_storico.py
+Uso:
+    python popola_pl_storico.py         # Incrementale: solo giorni modificati (default, usato in pipeline)
+    python popola_pl_storico.py --full  # Full rebuild: riscrive TUTTI i giorni (manuale)
 """
 
 import os, sys, re
@@ -218,16 +220,17 @@ def calcola_pl_giorno(docs, results_map=None):
 
 
 def main():
+    # Default: incrementale (safe per pipeline). --full per rebuild totale manuale.
+    incremental = '--full' not in sys.argv
+
     print("=" * 60)
-    print("POPOLA PL_STORICO — Calcolo storico completo")
+    print(f"POPOLA PL_STORICO — {'Incrementale (solo giorni modificati)' if incremental else 'Full rebuild'}")
     print("=" * 60)
 
     # Raggruppa tutti i documenti per data
     print("\n Caricamento documenti da daily_predictions_unified...")
-    all_docs = list(db.daily_predictions_unified.find(
-        {},
-        {'date': 1, 'home': 1, 'away': 1, 'pronostici': 1, 'live_score': 1, 'live_status': 1, 'match_time': 1}
-    ))
+    proj = {'date': 1, 'home': 1, 'away': 1, 'pronostici': 1, 'live_score': 1, 'live_status': 1, 'match_time': 1, 'updated_at': 1}
+    all_docs = list(db.daily_predictions_unified.find({}, proj))
     print(f"  {len(all_docs)} documenti trovati")
 
     # Raggruppa per data
@@ -240,8 +243,26 @@ def main():
             by_date[d] = []
         by_date[d].append(doc)
 
-    dates = sorted(by_date.keys())
-    print(f"  {len(dates)} giornate da {dates[0]} a {dates[-1]}")
+    all_dates = sorted(by_date.keys())
+    print(f"  {len(all_dates)} giornate da {all_dates[0]} a {all_dates[-1]}")
+
+    # In modalità incrementale, filtra solo i giorni con almeno un doc modificato dopo l'ultimo pl_storico
+    # (stessa filosofia di calculate_profit_loss.py: processa solo ciò che è cambiato)
+    if incremental:
+        pl_updated_map = {d['date']: d.get('updated_at') for d in db.pl_storico.find({}, {'date': 1, 'updated_at': 1})}
+        dates = []
+        for date in all_dates:
+            pl_ts = pl_updated_map.get(date)
+            if pl_ts is None:
+                dates.append(date)  # Giorno nuovo: da scrivere
+                continue
+            # Giorno esistente: processa solo se almeno un doc è stato modificato dopo pl_storico.
+            # Se un doc non ha updated_at (doc vecchi pre-refactor), safe default: processa.
+            if any(doc.get('updated_at') is None or doc.get('updated_at') > pl_ts for doc in by_date[date]):
+                dates.append(date)
+        print(f"  {len(dates)} giornate da riprocessare (incrementale)")
+    else:
+        dates = all_dates
 
     # Calcola e scrivi
     print("\n Calcolo P/L e scrittura in pl_storico...")

@@ -171,6 +171,10 @@ SCRAPER_SEQUENCE = [
       # partite già finite al momento del lancio (es. sudamericane mattutine).
       ("calculate_profit_loss.py", "💰 [29/31] Calcolo Profit/Loss", "Profit/loss non calcolati per pronostici passati", CURRENT_DIR),
 
+      # ⭐ POPOLA PL_STORICO — riallinea pl_storico con tutte le 6 scatole (tutti/pronostici/elite/alto_rendimento/mixer/super_selection)
+      # Il trigger Atlas aggiorna pl_storico on-the-fly ma come safety-net lo rifacciamo in pipeline.
+      ("popola_pl_storico.py", "📊 [29.1/39] Popola PL Storico", "pl_storico non aggiornato (scatole mixer/super_selection mancanti)", CURRENT_DIR),
+
       # ⭐ REFRESH CALIBRATION TABLE — ricalcola HR reale per bin (usata da kelly_unified)
       ("refresh_calibration_table.py", "🎯 [29.3/33] Refresh Calibration Table", "Tabella calibrazione Kelly non aggiornata", CURRENT_DIR),
 
