@@ -500,17 +500,26 @@ def do_confronto_singolo(date_str):
         return
 
     # Cerca i JSON nelle sottocartelle mattino/intermedio/serale
+    # Salta file vuoti o JSON corrotti (es. fallimento chiamata API che ha lasciato file a 0 byte)
     snapshots = []
     for label in ["mattino", "intermedio", "serale"]:
         label_dir = os.path.join(date_dir, label)
         if not os.path.exists(label_dir):
             continue
         json_files = sorted([f for f in os.listdir(label_dir) if f.endswith(".json")])
-        if json_files:
-            path = os.path.join(label_dir, json_files[-1])
+        if not json_files:
+            continue
+        path = os.path.join(label_dir, json_files[-1])
+        try:
+            if os.path.getsize(path) == 0:
+                print(f"  Skip {label}: file vuoto ({json_files[-1]})")
+                continue
             with open(path, "r", encoding="utf-8") as fh:
                 snap = json.load(fh)
                 snapshots.append(snap)
+        except (json.JSONDecodeError, OSError) as e:
+            print(f"  Skip {label}: JSON corrotto ({json_files[-1]}) - {e}")
+            continue
 
     if len(snapshots) < 2:
         print(f"Servono almeno 2 snapshot per il confronto. Trovati: {len(snapshots)}")
