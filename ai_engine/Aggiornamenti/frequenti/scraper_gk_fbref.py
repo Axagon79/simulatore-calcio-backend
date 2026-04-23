@@ -521,7 +521,7 @@ def main():
             print("   ⚠️ Nessun portiere da scrivere per questa lega.")
 
         # Pausa
-        time.sleep(10)
+        time.sleep(4)
 
     print("\n✅ SCRAPER GK FBREF COMPLETATO.")
 

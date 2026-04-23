@@ -688,21 +688,21 @@ def main():
             print("   ⚠️ Nessun centrocampista, salto lega.")
             continue
 
-        time.sleep(10)
+        time.sleep(4)
 
         # --- PASSING ---
         print(f"➡️  Scarico PASSING: {lg['passing_url']}")
         scrape_passing(scraper, lg["passing_url"], mids)
         print(f"   ➜ Dati PASSING aggiunti")
 
-        time.sleep(10)
+        time.sleep(4)
 
         # --- DEFENSE ---
         print(f"➡️  Scarico DEFENSE: {lg['defense_url']}")
         scrape_defense(scraper, lg["defense_url"], mids)
         print(f"   ➜ Dati DEFENSE aggiunti")
 
-        time.sleep(10)
+        time.sleep(4)
 
         # --- MISC ---
         print(f"➡️  Scarico MISC: {lg['misc_url']}")
@@ -776,7 +776,7 @@ def main():
             print("   ⚠️ Nessun centrocampista da scrivere per questa lega.")
 
         # Pausa tra leghe
-        time.sleep(10)
+        time.sleep(4)
 
     print("\n✅ SCRAPER CENTROCAMPISTI FBREF COMPLETATO.")
 

@@ -3,6 +3,7 @@ import random
 import sys
 import os
 import tempfile
+import shutil
 import winreg # Libreria standard di Windows per leggere il registro
 import undetected_chromedriver as uc
 from selenium.webdriver.common.by import By
@@ -23,8 +24,27 @@ class BrowserIntelligente:
     def __init__(self):
         # Porta Chrome separata per esecuzione parallela (env da update_manager)
         self._debug_port = int(os.environ.get("CHROME_DEBUG_PORT", "9222"))
-        self._user_data_dir = tempfile.mkdtemp(prefix=f"fbref_chrome_{self._debug_port}_")
+        # Cartella fissa per porta (evita accumulo di temp dirs tra esecuzioni).
+        self._user_data_dir = os.path.join(
+            os.environ.get("TEMP", tempfile.gettempdir()),
+            f"fbref_chrome_profile_{self._debug_port}"
+        )
+        os.makedirs(self._user_data_dir, exist_ok=True)
         self._nav_count = 0  # Contatore navigazioni per pulizia periodica
+
+        # --- STATO IBRIDO (curl_cffi dopo sblocco Chrome) ---
+        # Dopo uno sblocco Cloudflare riuscito salvo cookies+UA e uso curl_cffi
+        # per le pagine successive (60x piu' veloce). Se curl_cffi fallisce, ricado su Chrome.
+        self._cf_cookies = None      # dict dei cookies Chrome (cf_clearance, __cf_bm, ...)
+        self._cf_user_agent = None   # UA usato da Chrome (da copiare in curl_cffi)
+        self._curl_session = None    # session curl_cffi riutilizzabile (lazy init)
+
+        # Cleanup cache HTML vecchia (>2 giorni)
+        try:
+            import fbref_cache
+            fbref_cache.cleanup_old(days=2)
+        except Exception:
+            pass
 
         print(f"🤖 [Gestore Accessi] Avvio Chrome (porta {self._debug_port})...")
 
@@ -168,8 +188,8 @@ class BrowserIntelligente:
         except Exception:
             pass
 
-        # Nuova directory temporanea per partire puliti
-        self._user_data_dir = tempfile.mkdtemp(prefix=f"fbref_chrome_{self._debug_port}_")
+        # Cartella user-data-dir FISSA: riuso la stessa (non ricreo)
+        os.makedirs(self._user_data_dir, exist_ok=True)
 
         options = uc.ChromeOptions()
         options.add_argument("--disable-blink-features=AutomationControlled")
@@ -195,7 +215,81 @@ class BrowserIntelligente:
         except Exception:
             return False
 
+    def _salva_cookies_da_chrome(self):
+        """Estrae cookies + UA da Chrome per usarli con curl_cffi."""
+        try:
+            selenium_cookies = self.driver.get_cookies()
+            self._cf_cookies = {c["name"]: c["value"] for c in selenium_cookies if c.get("name")}
+            self._cf_user_agent = self.driver.execute_script("return navigator.userAgent")
+            return True
+        except Exception:
+            return False
+
+    def _get_via_curl(self, url, timeout=30):
+        """Tenta scraping via curl_cffi usando cookies salvati. Ritorna HTML o None."""
+        if not self._cf_cookies:
+            return None
+        try:
+            from curl_cffi import requests as curl_requests
+            if self._curl_session is None:
+                self._curl_session = curl_requests.Session(impersonate="chrome")
+            headers = {
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+                "Accept-Language": "en-US,en;q=0.9,it;q=0.8",
+                "Accept-Encoding": "gzip, deflate, br",
+                "Referer": "https://fbref.com/",
+                "Upgrade-Insecure-Requests": "1",
+            }
+            if self._cf_user_agent:
+                headers["User-Agent"] = self._cf_user_agent
+            resp = self._curl_session.get(
+                url,
+                cookies=self._cf_cookies,
+                headers=headers,
+                timeout=timeout,
+            )
+            if resp.status_code == 200 and "Just a moment" not in resp.text and len(resp.text) >= 100_000:
+                return resp.text
+            return None
+        except Exception:
+            return None
+
     def get(self, url, timeout=60):
+        # --- CACHE CHECK (prima di tutto) ---
+        try:
+            import fbref_cache
+            cached_html = fbref_cache.get_cached(url)
+            if cached_html:
+                print(f"   💾 Cache HIT: {url[:80]}")
+                class RispostaCache:
+                    def __init__(self, html_content):
+                        self.text = html_content
+                        self.content = html_content.encode('utf-8')
+                        self.status_code = 200
+                return RispostaCache(cached_html)
+        except Exception:
+            pass
+
+        # --- TENTATIVO CURL_CFFI (se abbiamo cookies validi) ---
+        # Dopo che Chrome ha sbloccato Cloudflare almeno una volta, proviamo curl_cffi
+        # per le pagine successive (60x piu' veloce). Se fallisce ricadiamo su Chrome.
+        if self._cf_cookies:
+            curl_html = self._get_via_curl(url, timeout=30)
+            if curl_html:
+                print(f"   ⚡ curl_cffi OK: {url[:80]}")
+                try:
+                    import fbref_cache
+                    fbref_cache.save_cache(url, curl_html)
+                except Exception:
+                    pass
+                class RispostaCurl:
+                    def __init__(self, html_content):
+                        self.text = html_content
+                        self.content = html_content.encode('utf-8')
+                        self.status_code = 200
+                return RispostaCurl(curl_html)
+            # curl ha fallito: proseguo con Chrome e rinfreschero' i cookies
+
         # Pulizia preventiva ogni 5 navigazioni
         self._nav_count += 1
         if self._nav_count % 5 == 0:
@@ -247,7 +341,20 @@ class BrowserIntelligente:
                     self.content = html_content.encode('utf-8')
                     self.status_code = 200
 
-            return RispostaFinta(self.driver.page_source)
+            html_result = self.driver.page_source
+            # Salva in cache solo se pagina valida: no Cloudflare challenge + dimensione sensata (>100KB).
+            # FBref pages normali sono 500KB-1MB; sotto 100KB e' probabilmente una pagina di errore.
+            try:
+                is_not_cloudflare = "Just a moment" not in self.driver.title and "Cloudflare" not in html_result[:2000]
+                is_large_enough = len(html_result) >= 100_000
+                if is_not_cloudflare and is_large_enough:
+                    import fbref_cache
+                    fbref_cache.save_cache(url, html_result)
+                    # Salva/rinfresca cookies per usare curl_cffi alle prossime get()
+                    self._salva_cookies_da_chrome()
+            except Exception:
+                pass
+            return RispostaFinta(html_result)
 
         except Exception as e:
             error_msg = str(e).lower()
@@ -263,7 +370,17 @@ class BrowserIntelligente:
                                 self.text = html_content
                                 self.content = html_content.encode('utf-8')
                                 self.status_code = 200
-                        return RispostaFinta(self.driver.page_source)
+                        html_result = self.driver.page_source
+                        try:
+                            is_not_cloudflare = "Just a moment" not in self.driver.title and "Cloudflare" not in html_result[:2000]
+                            is_large_enough = len(html_result) >= 100_000
+                            if is_not_cloudflare and is_large_enough:
+                                import fbref_cache
+                                fbref_cache.save_cache(url, html_result)
+                                self._salva_cookies_da_chrome()
+                        except Exception:
+                            pass
+                        return RispostaFinta(html_result)
                     except Exception as e2:
                         print(f"   ❌ Recovery fallito: {e2}")
 
@@ -278,6 +395,7 @@ class BrowserIntelligente:
             self.driver.quit()
         except:
             pass
+        # Cartella user-data-dir FISSA: non cancellare, verrà riutilizzata alla prossima esecuzione.
 
 def crea_scraper_intelligente():
     return BrowserIntelligente()

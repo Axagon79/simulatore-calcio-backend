@@ -617,14 +617,14 @@ def main():
             print("   ⚠️ Nessun difensore, salto lega.")
             continue
 
-        time.sleep(10)
+        time.sleep(4)
 
         # --- MISC ---
         print(f"➡️  Scarico MISC: {lg['misc_url']}")
         scrape_misc(scraper, lg["misc_url"], defs)
         print(f"   ➜ Dati MISC aggiunti")
 
-        time.sleep(10)
+        time.sleep(4)
 
         # --- PLAYINGTIME ---
         print(f"➡️  Scarico PLAYINGTIME: {lg['playingtime_url']}")
@@ -698,7 +698,7 @@ def main():
             print("   ⚠️ Nessun difensore da scrivere per questa lega.")
 
         # Pausa tra leghe
-        time.sleep(10)
+        time.sleep(4)
 
     print("\n✅ SCRAPER DIFENSORI FBREF COMPLETATO.")
 

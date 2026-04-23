@@ -291,7 +291,7 @@ def scrape_match_results(scraper):
         
         print(f"\n🌍 Calendario: {league_name}")
         try:
-            time.sleep(random.uniform(4, 7))
+            time.sleep(random.uniform(3, 5))
             response = scraper.get(url)
             if response.status_code != 200: continue
 

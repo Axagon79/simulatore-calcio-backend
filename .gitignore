@@ -84,6 +84,9 @@ docs/
 
 # Cache analisi temporanee
 _results_cache_*.pkl
+
+# Cache HTML FBref (auto-invalidata giornalmente)
+ai_engine/_cache_fbref/
 *.pkl
 
 # Script deploy locali

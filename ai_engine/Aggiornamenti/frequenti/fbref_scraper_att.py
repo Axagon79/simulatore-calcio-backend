@@ -755,28 +755,28 @@ def main():
             print("   ⚠️ Nessun attaccante, salto lega.")
             continue
 
-        time.sleep(10)
+        time.sleep(4)
 
         # --- SHOOTING ---
         print(f"➡️  Scarico SHOOTING: {lg['shooting_url']}")
         scrape_shooting(scraper, lg["shooting_url"], atts)
         print(f"   ➜ Dati SHOOTING aggiunti")
 
-        time.sleep(10)
+        time.sleep(4)
 
         # --- POSSESSION ---
         print(f"➡️  Scarico POSSESSION: {lg['possession_url']}")
         scrape_possession(scraper, lg["possession_url"], atts)
         print(f"   ➜ Dati POSSESSION aggiunti")
 
-        time.sleep(10)
+        time.sleep(4)
 
         # --- PASSING ---
         print(f"➡️  Scarico PASSING: {lg['passing_url']}")
         scrape_passing(scraper, lg["passing_url"], atts)
         print(f"   ➜ Dati PASSING aggiunti")
 
-        time.sleep(10)
+        time.sleep(4)
 
         # --- MISC ---
         print(f"➡️  Scarico MISC: {lg['misc_url']}")
@@ -856,7 +856,7 @@ def main():
             print("   ⚠️ Nessun attaccante da scrivere per questa lega.")
 
         # Pausa tra leghe
-        time.sleep(10)
+        time.sleep(4)
 
     print("\n✅ SCRAPER ATTACCANTI FBREF COMPLETATO.")
 
