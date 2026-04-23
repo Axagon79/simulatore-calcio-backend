@@ -62,6 +62,159 @@ RUNS = [
 
 
 # =====================================================
+# WHITELIST -1h: filtra i tip NUOVI che il -1h aggiunge su partite
+# che erano vuote al passo precedente (update_3h o nightly).
+# Analisi storica (40 giorni, 118 tip "nuovi puri"): -13.91u senza filtro,
+# +2.84u con whitelist. Accetta solo tip che matchano almeno 1 dei 10 pattern.
+# =====================================================
+def _matches_whitelist_1h(tip):
+    tipo = tip.get('tipo')
+    pron = tip.get('pronostico')
+    quota = tip.get('quota')
+    source = tip.get('source') or ''
+    # 1. DC 1X
+    if tipo == 'DOPPIA_CHANCE' and pron == '1X':
+        return True
+    # 2. SEGNO quota 1.50-1.69
+    if tipo == 'SEGNO' and quota is not None and 1.50 <= quota < 1.70:
+        return True
+    # 3. DC quota 1.30-1.49
+    if tipo == 'DOPPIA_CHANCE' and quota is not None and 1.30 <= quota < 1.50:
+        return True
+    # 4. flag MIXER
+    if tip.get('mixer') is True:
+        return True
+    # 5. flag ELITE
+    if tip.get('elite') is True:
+        return True
+    # 6. source A+S
+    if source == 'A+S':
+        return True
+    # 7. DC + source A+S (ridondante con 6 ma esplicito)
+    if tipo == 'DOPPIA_CHANCE' and source == 'A+S':
+        return True
+    # 8. GOL Over 2.5
+    if tipo == 'GOL' and pron == 'Over 2.5':
+        return True
+    # 9. GOL NoGoal
+    if tipo == 'GOL' and pron and pron.lower() == 'nogoal':
+        return True
+    # 10. SEGNO 1
+    if tipo == 'SEGNO' and pron == '1':
+        return True
+    return False
+
+
+# =====================================================
+# WHITELIST PROTEZIONE -1h: impedisce al -1h di TOGLIERE tip che matchano
+# pattern storicamente vincenti. Analisi storica: 250 tip tolti con 49% vincenti.
+# Con questa whitelist salviamo 47 tip (74.5% vincenti) → +14.14u su 37 giorni.
+# Un tip "era al mattino" se 'tip_era_al_mattino' è True.
+# =====================================================
+def _matches_protezione_1h(tip, tip_era_al_mattino):
+    tipo = tip.get('tipo')
+    q = tip.get('quota') or 0
+    src = tip.get('source') or ''
+    elite = tip.get('elite') is True
+    mixer = tip.get('mixer') is True
+    low = tip.get('low_value') is True
+    # 1. Elite + Mixer + noLow
+    if elite and mixer and not low:
+        return True
+    # 2. Quota 1.50-1.69 + Mixer + noLow
+    if 1.50 <= q < 1.70 and mixer and not low:
+        return True
+    # 3. Mixer + noLow + origine_mattino
+    if mixer and not low and tip_era_al_mattino:
+        return True
+    # 4. GOL + quota 1.50-1.69 + source C_screm
+    if tipo == 'GOL' and 1.50 <= q < 1.70 and src == 'C_screm':
+        return True
+    # 5. SEGNO + Mixer + origine_mattino
+    if tipo == 'SEGNO' and mixer and tip_era_al_mattino:
+        return True
+    # 6. source C_goal_conv
+    if src == 'C_goal_conv':
+        return True
+    return False
+
+
+# =====================================================
+# WHITELIST PROTEZIONE -3h: impedisce al -3h di ELIMINARE tip del mattino
+# che matchano pattern vincenti. Analisi storica (101 tip eliminati dal -3h):
+# 8 pattern salvano 57 tip (80.7% vincenti, +18.25u). Questi tip sono protetti
+# ANCHE dal -1h (non possono essere eliminati a cascata).
+# =====================================================
+def _matches_protezione_3h(tip):
+    tipo = tip.get('tipo')
+    pron = tip.get('pronostico')
+    q = tip.get('quota') or 0
+    s = tip.get('stars') or 0
+    src = tip.get('source') or ''
+    elite = tip.get('elite') is True
+    mixer = tip.get('mixer') is True
+    low = tip.get('low_value') is True
+    # 1. DC X2 + quota 1.50-1.69
+    if tipo == 'DOPPIA_CHANCE' and pron == 'X2' and 1.50 <= q < 1.70:
+        return True
+    # 2. Quota 1.30-1.49 + Elite
+    if 1.30 <= q < 1.50 and elite:
+        return True
+    # 3. Quota 1.50-1.69 + stelle 2.5-2.9
+    if 1.50 <= q < 1.70 and 2.5 <= s < 3.0:
+        return True
+    # 4. Quota 1.50-1.69 + source C
+    if 1.50 <= q < 1.70 and src == 'C':
+        return True
+    # 5. Quota 1.90-2.19 + non Elite + non Mixer + non Low
+    if 1.90 <= q < 2.20 and not elite and not mixer and not low:
+        return True
+    # 6. GOL Over 2.5
+    if tipo == 'GOL' and pron == 'Over 2.5':
+        return True
+    # 7. SEGNO 1 + quota 1.90-2.19
+    if tipo == 'SEGNO' and pron == '1' and 1.90 <= q < 2.20:
+        return True
+    # 8. Qualunque Elite
+    if elite:
+        return True
+    return False
+
+
+# =====================================================
+# WHITELIST -3h: filtra i tip NUOVI che il -3h aggiunge su partite che al
+# mattino erano NO BET (nessun tip attivo). Analisi storica (37 giorni, 122 tip):
+# senza filtro -16.94u, con filtro +9.47u (delta +26.41u).
+# Accetta solo i tip che matchano almeno 1 dei 6 pattern.
+# =====================================================
+def _matches_whitelist_3h(tip):
+    tipo = tip.get('tipo')
+    pron = tip.get('pronostico')
+    q = tip.get('quota') or 0
+    s = tip.get('stars') or 0
+    src = tip.get('source') or ''
+    # 1. Stelle ≥ 4.0
+    if s >= 4.0:
+        return True
+    # 2. GOL + quota 1.50-1.69
+    if tipo == 'GOL' and 1.50 <= q < 1.70:
+        return True
+    # 3. Quota 1.90-2.19 + source C + non Mixer
+    if 1.90 <= q < 2.20 and src == 'C' and not (tip.get('mixer') is True):
+        return True
+    # 4. SEGNO + quota 1.90-2.19 + source C
+    if tipo == 'SEGNO' and 1.90 <= q < 2.20 and src == 'C':
+        return True
+    # 5. DC X2 + quota 1.30-1.49
+    if tipo == 'DOPPIA_CHANCE' and pron == 'X2' and 1.30 <= q < 1.50:
+        return True
+    # 6. GOL NoGoal
+    if tipo == 'GOL' and pron and pron.lower() == 'nogoal':
+        return True
+    return False
+
+
+# =====================================================
 # RAGGRUPPAMENTO PER ORARIO
 # =====================================================
 def parse_match_time(time_str):
@@ -487,6 +640,63 @@ def run_full_cycle(date_str, target_date, block_times, run_label):
         if skipped > 0:
             print(f"   🎯 Rifinitura: {len(effective_times)} partite attive, {skipped} scartate (skip)")
 
+    # 0a. (SOLO update_3h) Salva snapshot dei tip del MATTINO (nightly)
+    # per poter ripristinare quelli protetti se il -3h li elimina.
+    tip_pre_3h = {}  # match_key -> list of tip dicts attivi al mattino
+    if run_label == 'update_3h':
+        nightly_versions_0 = list(versions_collection.find({
+            'date': date_str,
+            'match_time': {'$in': effective_times},
+            'version': 'nightly'
+        }))
+        for nv in nightly_versions_0:
+            mk = nv.get('match_key', '')
+            active = []
+            for t in (nv.get('tips') or []):
+                if t.get('pronostico') and t.get('pronostico') != 'NO BET' and (t.get('stake') or 0) > 0:
+                    active.append(dict(t))
+            if active:
+                tip_pre_3h[mk] = active
+
+    # 0b. (SOLO update_1h) Salva snapshot "pre-orchestratore" dei tip attivi
+    # per poter eventualmente ripristinare quelli protetti dopo l'esecuzione.
+    tip_pre_1h = {}  # match_key -> list of tip dicts con campo _era_al_mattino
+    if run_label == 'update_1h':
+        # Stato corrente (= intermedio = post update_3h)
+        pre_docs = list(unified_collection.find(
+            {'date': date_str, 'match_time': {'$in': effective_times}},
+            {'home': 1, 'away': 1, 'pronostici': 1}
+        ))
+        # Recupera anche i tip del mattino (nightly) per sapere l'origine
+        mattino_versions = list(versions_collection.find({
+            'date': date_str,
+            'match_time': {'$in': effective_times},
+            'version': 'nightly'
+        }))
+        mattino_tips_map = {}  # mk -> set di (tipo, pronostico) attivi al mattino
+        for pv in mattino_versions:
+            mk = pv.get('match_key', '')
+            active = set()
+            for t in (pv.get('tips') or []):
+                if t.get('pronostico') and t.get('pronostico') != 'NO BET' and (t.get('stake') or 0) > 0:
+                    active.add((t.get('tipo'), t.get('pronostico')))
+            mattino_tips_map[mk] = active
+
+        for doc in pre_docs:
+            mk = normalize_match_key(date_str, doc.get('home', ''), doc.get('away', ''))
+            matt_active = mattino_tips_map.get(mk, set())
+            active_tips = []
+            for p in (doc.get('pronostici') or []):
+                if not p.get('pronostico') or p.get('pronostico') == 'NO BET':
+                    continue
+                if (p.get('stake') or 0) <= 0:
+                    continue
+                tip_copy = dict(p)
+                tip_copy['_era_al_mattino'] = (p.get('tipo'), p.get('pronostico')) in matt_active
+                active_tips.append(tip_copy)
+            if active_tips:
+                tip_pre_1h[mk] = active_tips
+
     # 1. Esegui i 4 sistemi con filtro orario
     print(f"\n--- Sistema A ---")
     run_system_a(target_date=target_date, match_time_filter=effective_times)
@@ -541,6 +751,206 @@ def run_full_cycle(date_str, target_date, block_times, run_label):
         if changed_mixer:
             unified_collection.update_one({'_id': doc['_id']}, {'$set': {'pronostici': pronostici}})
     print(f"   🎛️ Mixer ri-taggati: {mixer_count} pronostici")
+
+    # 1c-ter. PROTEZIONE -3h: ripristina tip del mattino che matchano la whitelist
+    # di protezione se il -3h li ha eliminati. Marca i tip ripristinati con
+    # _protected_3h=True così il -1h non li potrà eliminare.
+    if run_label == 'update_3h' and tip_pre_3h:
+        restored_3h = 0
+        docs_3h = list(unified_collection.find(
+            {'date': date_str, 'match_time': {'$in': effective_times}},
+            {'_id': 1, 'home': 1, 'away': 1, 'pronostici': 1}
+        ))
+        for doc in docs_3h:
+            mk = normalize_match_key(date_str, doc.get('home', ''), doc.get('away', ''))
+            pre_tips = tip_pre_3h.get(mk, [])
+            if not pre_tips:
+                continue
+            pronostici = doc.get('pronostici') or []
+            changed = False
+            for pre_t in pre_tips:
+                pre_tipo = pre_t.get('tipo')
+                pre_pron = pre_t.get('pronostico')
+                # Cerca corrispondente nello stato post-orchestratore
+                found_active = False
+                idx_nobet = None
+                for i, p in enumerate(pronostici):
+                    if p.get('tipo') == pre_tipo and p.get('pronostico') == pre_pron:
+                        if (p.get('stake') or 0) > 0:
+                            found_active = True
+                        break
+                    if p.get('tipo') == pre_tipo and (p.get('pronostico') == 'NO BET' or (p.get('stake') or 0) <= 0):
+                        idx_nobet = i
+                if found_active:
+                    continue  # tip ancora attivo
+                if not _matches_protezione_3h(pre_t):
+                    continue
+                # Ripristino con marker di protezione
+                pre_clean = dict(pre_t)
+                pre_clean['_protected_3h'] = True
+                if idx_nobet is not None:
+                    pronostici[idx_nobet] = pre_clean
+                else:
+                    pronostici.append(pre_clean)
+                restored_3h += 1
+                changed = True
+            if changed:
+                unified_collection.update_one({'_id': doc['_id']}, {'$set': {'pronostici': pronostici}})
+        print(f"   🛡️ Protezione -3h: {restored_3h} tip ripristinati (matchavano whitelist protezione)")
+
+    # 1c-bis. PROTEZIONE -1h: ripristina tip che matchano la whitelist di protezione
+    # Se il -1h ha tolto un tip (attivo all'intermedio, ora NO BET/stake=0) che
+    # matcha i pattern di protezione, lo rimettiamo come era.
+    if run_label == 'update_1h' and tip_pre_1h:
+        restored_count = 0
+        restored_docs = list(unified_collection.find(
+            {'date': date_str, 'match_time': {'$in': effective_times}},
+            {'_id': 1, 'home': 1, 'away': 1, 'pronostici': 1}
+        ))
+        for doc in restored_docs:
+            mk = normalize_match_key(date_str, doc.get('home', ''), doc.get('away', ''))
+            pre_tips = tip_pre_1h.get(mk, [])
+            if not pre_tips:
+                continue
+            pronostici = doc.get('pronostici') or []
+            changed = False
+            # Per ogni tip attivo all'intermedio, verifica se è stato rimosso e se è protetto
+            for pre_t in pre_tips:
+                pre_tipo = pre_t.get('tipo')
+                pre_pron = pre_t.get('pronostico')
+                era_matt = pre_t.get('_era_al_mattino', False)
+                # Cerca il corrispondente nello stato post-orchestratore
+                found_active = False
+                idx_nobet = None
+                for i, p in enumerate(pronostici):
+                    if p.get('tipo') == pre_tipo and p.get('pronostico') == pre_pron:
+                        if (p.get('stake') or 0) > 0:
+                            found_active = True
+                        break
+                    if p.get('tipo') == pre_tipo and (p.get('pronostico') == 'NO BET' or (p.get('stake') or 0) <= 0):
+                        idx_nobet = i
+                if found_active:
+                    continue  # tip ancora attivo → nulla da ripristinare
+                # Tip è stato rimosso: ripristina SE protetto dal -3h O se matcha whitelist -1h
+                is_protected_3h = pre_t.get('_protected_3h') is True
+                if not is_protected_3h and not _matches_protezione_1h(pre_t, era_matt):
+                    continue
+                # Ripristino: rimetti il tip pre come era (mantiene _protected_3h se presente)
+                pre_clean = {k: v for k, v in pre_t.items() if k != '_era_al_mattino'}
+                if idx_nobet is not None:
+                    pronostici[idx_nobet] = pre_clean
+                else:
+                    pronostici.append(pre_clean)
+                restored_count += 1
+                changed = True
+            if changed:
+                unified_collection.update_one({'_id': doc['_id']}, {'$set': {'pronostici': pronostici}})
+        print(f"   🛡️ Protezione -1h: {restored_count} tip ripristinati (matchavano whitelist protezione)")
+
+    # 1d-bis. WHITELIST FILTER (solo su update_3h)
+    # Se il -3h sta aggiungendo un tip su una partita che al mattino era NO BET
+    # (nessun tip attivo in 'nightly'), accetta il tip solo se matcha la whitelist.
+    # Altrimenti rimuovi il tip (NO BET + stake=0). Il -1h può comunque riattivarlo.
+    if run_label == 'update_3h':
+        # Recupera la versione nightly per capire quali partite erano NO BET al mattino
+        nightly_versions = list(versions_collection.find({
+            'date': date_str,
+            'match_time': {'$in': effective_times},
+            'version': 'nightly'
+        }))
+        had_tip_at_nightly = set()
+        for nv in nightly_versions:
+            mk = nv.get('match_key', '')
+            for t in (nv.get('tips') or []):
+                if t.get('pronostico') and t.get('pronostico') != 'NO BET' and (t.get('stake') or 0) > 0:
+                    had_tip_at_nightly.add(mk)
+                    break
+
+        kept_3h = 0
+        removed_3h = 0
+        current_docs_3h = list(unified_collection.find(
+            {'date': date_str, 'match_time': {'$in': effective_times}},
+            {'_id': 1, 'home': 1, 'away': 1, 'pronostici': 1}
+        ))
+        for doc in current_docs_3h:
+            mk = normalize_match_key(date_str, doc.get('home', ''), doc.get('away', ''))
+            if mk in had_tip_at_nightly:
+                continue  # partita aveva già tip al mattino: non filtro
+            pronostici = doc.get('pronostici') or []
+            changed = False
+            for p in pronostici:
+                if not p.get('pronostico') or p.get('pronostico') == 'NO BET':
+                    continue
+                if (p.get('stake') or 0) <= 0:
+                    continue
+                if _matches_whitelist_3h(p):
+                    kept_3h += 1
+                else:
+                    p['pronostico'] = 'NO BET'
+                    p['stake'] = 0
+                    p['stake_min'] = 0
+                    p['stake_max'] = 0
+                    removed_3h += 1
+                    changed = True
+            if changed:
+                unified_collection.update_one({'_id': doc['_id']}, {'$set': {'pronostici': pronostici}})
+        print(f"   🎯 Whitelist -3h: {kept_3h} tip tenuti, {removed_3h} tip filtrati (partite NO BET al mattino)")
+
+    # 1d. WHITELIST FILTER (solo su update_1h)
+    # Se il -1h sta aggiungendo un tip su una partita che era VUOTA alla versione
+    # precedente (update_3h), accetta il tip solo se matcha la whitelist storica.
+    # Altrimenti rimuovi il tip (metti pronostico='NO BET' + stake=0).
+    if run_label == 'update_1h':
+        # Recupera la versione precedente (update_3h) per capire quali partite erano vuote
+        prev_versions = list(versions_collection.find({
+            'date': date_str,
+            'match_time': {'$in': effective_times},
+            'version': 'update_3h'
+        }))
+        # Set di match_key che alla versione precedente avevano ALMENO un tip attivo
+        had_tip_at_3h = set()
+        for pv in prev_versions:
+            mk = pv.get('match_key', '')
+            for t in (pv.get('tips') or []):
+                if t.get('pronostico') and t.get('pronostico') != 'NO BET' and (t.get('stake') or 0) > 0:
+                    had_tip_at_3h.add(mk)
+                    break
+
+        filter_count_kept = 0
+        filter_count_removed = 0
+        current_docs = list(unified_collection.find(
+            {'date': date_str, 'match_time': {'$in': effective_times}},
+            {'_id': 1, 'home': 1, 'away': 1, 'pronostici': 1}
+        ))
+        for doc in current_docs:
+            mk = normalize_match_key(date_str, doc.get('home', ''), doc.get('away', ''))
+            # Filtro solo se la partita era vuota a update_3h
+            if mk in had_tip_at_3h:
+                continue  # partita aveva già tip prima: non toccare
+            pronostici = doc.get('pronostici') or []
+            changed = False
+            for p in pronostici:
+                # Tip "attivo" = non NO BET e stake > 0
+                if not p.get('pronostico') or p.get('pronostico') == 'NO BET':
+                    continue
+                if (p.get('stake') or 0) <= 0:
+                    continue
+                # Applica whitelist (ma NON toccare tip protetti dal -3h)
+                if p.get('_protected_3h') is True:
+                    filter_count_kept += 1
+                elif _matches_whitelist_1h(p):
+                    filter_count_kept += 1
+                else:
+                    # Rimuovi tip: NO BET + stake=0
+                    p['pronostico'] = 'NO BET'
+                    p['stake'] = 0
+                    p['stake_min'] = 0
+                    p['stake_max'] = 0
+                    filter_count_removed += 1
+                    changed = True
+            if changed:
+                unified_collection.update_one({'_id': doc['_id']}, {'$set': {'pronostici': pronostici}})
+        print(f"   🎯 Whitelist -1h: {filter_count_kept} tip tenuti, {filter_count_removed} tip filtrati (partite vuote a -3h)")
 
     # 2. Snapshot + change detection
     all_changes = save_snapshot_and_detect_changes(date_str, block_times, run_label)
