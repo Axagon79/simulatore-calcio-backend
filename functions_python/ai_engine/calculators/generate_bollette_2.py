@@ -32,7 +32,7 @@ from config import db
 # Usa gli stessi 85 pattern del Mixer (tag_mixer.py)
 # Un pronostico entra nel pool non-elite se matcha almeno uno di questi
 
-from tag_mixer import _check, PATTERNS
+from tag_mixer import _check, PATTERNS, _BOLLETTE_EXTRA
 
 def matches_bollette_pattern(sel):
     """Controlla se una selezione matcha almeno uno degli 85 pattern Mixer.
@@ -45,6 +45,18 @@ def matches_bollette_pattern(sel):
         p['tipo'] = p['mercato']
     flags = _check(p)
     return any(all(flags.get(c, False) for c in conds) for conds in PATTERNS.values())
+
+
+def matches_bollette_extra_only(sel):
+    """Controlla se una selezione matcha uno degli 11 pattern EXTRA bollette (S01-S11).
+    Questi sono pattern aggiuntivi rispetto ai 74 Mixer (non taggano Mixer=True)."""
+    if sel.get("pronostico") == "NO BET":
+        return False
+    p = dict(sel)
+    if 'mercato' in p and 'tipo' not in p:
+        p['tipo'] = p['mercato']
+    flags = _check(p)
+    return any(all(flags.get(c, False) for c in conds) for conds in _BOLLETTE_EXTRA.values())
 
 
 try:
@@ -181,8 +193,6 @@ REGOLE COMPOSIZIONE
 
    📌 ELITE — Campo "tipo": "elite"
    - Fino a 3 bollette elite
-   - TUTTE le selezioni DEVONO essere ★ELITE dal POOL ELITE (100%, nessuna eccezione)
-   - NON inserire MAI selezioni non-elite in bollette di tipo elite
    - Le bollette elite NON hanno vincolo sulle date: possono avere partite di oggi, domani o dopodomani liberamente
    - Quota totale MASSIMO 8.00
    - Minimo 2, massimo 5 selezioni per bolletta
@@ -673,6 +683,8 @@ def build_pool(today_str, skip_time_filter=False):
                 "confidence": p.get("confidence", 0),
                 "stars": p.get("stars", 0),
                 "elite": p.get("elite", False),
+                "mixer": p.get("mixer", False),
+                "super_selection": p.get("super_selection", False),
                 "source": p.get("source", ""),
                 "routing_rule": p.get("routing_rule", ""),
                 "edge": p.get("edge", 0) or 0,
@@ -2266,16 +2278,16 @@ def serialize_pool_for_prompt(pool):
                 if stats_text:
                     lines.append(stats_text)
 
-    # Pool elite separato
+    # Pool elite: sezione informativa (24/04/2026: il vincolo 100% elite NON e' piu' attivo
+    # — elite e' ora una fascia "media" composta da qualsiasi pronostico del pool)
     if elite_pool:
-        lines.append("\n╔══════════════════════════════════════╗")
-        lines.append("║  POOL ELITE — usa SOLO queste per    ║")
-        lines.append("║  bollette di tipo \"elite\"             ║")
-        lines.append("╚══════════════════════════════════════╝")
+        lines.append("\n╔══════════════════════════════════════════╗")
+        lines.append("║  PRONOSTICI CON FLAG ★ELITE (info)       ║")
+        lines.append("║  Da preferire quando possibile, ma non   ║")
+        lines.append("║  obbligatorio per bollette \"elite\"        ║")
+        lines.append("╚══════════════════════════════════════════╝")
         _render_pool(elite_pool, show_elite_tag=True)
-        lines.append(f"\n  Totale selezioni elite: {len(elite_pool)}")
-    else:
-        lines.append("\n⚠️ Nessuna selezione elite disponibile — NON generare bollette elite")
+        lines.append(f"\n  Totale selezioni con flag elite: {len(elite_pool)}")
 
     # Pool completo diviso in 5 BLOCCHI per Media Normalizzata
     # Blocco 1: MN >= 0.70, Blocco 2: MN >= 0.65, ..., Blocco 5: MN >= 0.50
@@ -2482,13 +2494,9 @@ def _classify_tipo(raw_tipo, selezioni, quota_totale, pool_index, today_str):
     n_sel = len(selezioni)
 
     if raw_tipo == "elite":
-        elite_count = sum(1 for s in selezioni if pool_index.get(
-            (f"{s['home']} vs {s['away']}|{s['match_date']}", s['mercato'], s['pronostico']),
-            {}
-        ).get("elite", False))
-        if elite_count == n_sel:
-            return "elite"
-        logger.warning(f" Bolletta elite con solo {elite_count}/{n_sel} elite (servono 100%) — riclassificata")
+        # Vincolo 100% elite rimosso (24/04/2026): pool ora e' solo super_selection,
+        # la fascia elite accetta qualsiasi biglietto che rispetti i vincoli di quota/selezioni.
+        return "elite"
 
     if raw_tipo == "oggi" and solo_oggi:
         return "oggi"
@@ -2637,18 +2645,9 @@ def validate_with_errors(raw_bollette, pool, today_str, existing_counters=None, 
         # --- Determina tipo ---
         tipo = _classify_tipo(raw_tipo, selezioni, quota_totale, pool_index, today_str)
 
-        # --- #7: elite insufficiente ---
-        if raw_tipo == "elite" and tipo != "elite":
-            elite_count = sum(1 for s in selezioni if pool_index.get(
-                (f"{s['home']} vs {s['away']}|{s['match_date']}", s['mercato'], s['pronostico']),
-                {}
-            ).get("elite", False))
-            errors.append({
-                "code": "ELITE_INSUFFICIENTE",
-                "bolletta_idx": i, "tipo": "elite",
-                "feedback": f"Bolletta #{i+1} (elite): solo {elite_count}/{n_sel} selezioni elite, "
-                           f"servono {n_sel}/{n_sel} (100%). Usa SOLO selezioni dal POOL ELITE"
-            })
+        # --- #7: ELITE_INSUFFICIENTE — rimosso (24/04/2026)
+        # Il vincolo "100% elite" non si applica piu' perche' il pool e' tutto super_selection.
+        # _classify_tipo mantiene sempre raw_tipo="elite" come valido.
 
         # --- #9: manca partita di oggi (escluse elite) ---
         has_today = any(s["match_date"] == today_str for s in selezioni)
@@ -3080,9 +3079,8 @@ def _check_feasibility(fascia, pool, today_str):
     # Filtra pool per la sezione
     if fascia == "oggi":
         section_pool = [s for s in pool if s.get("match_date") == today_str]
-    elif fascia == "elite":
-        section_pool = [s for s in pool if s.get("elite")]
     else:
+        # Elite (e altre fasce) attingono all'intero pool (24/04/2026)
         section_pool = pool
 
     # Check 0: abbastanza selezioni con punteggio sufficiente?
@@ -3098,11 +3096,8 @@ def _check_feasibility(fascia, pool, today_str):
     if len(unique_matches) < min_sel:
         return False, f"solo {len(unique_matches)} partite uniche, servono almeno {min_sel}", section_pool
 
-    # Check 2: elite — servono almeno 2 selezioni elite (100% richiesto)
-    if fascia == "elite":
-        elite_count = sum(1 for s in section_pool if s.get("elite"))
-        if elite_count < 2:
-            return False, f"solo {elite_count} selezioni elite, servono almeno 2", section_pool
+    # Check 2: elite — rimosso (24/04/2026). Pool gia' super_selection, fascia elite
+    # accetta qualsiasi biglietto che rispetti vincoli di quota/selezioni.
 
     # Check 3: quota minima raggiungibile?
     if min_quota:
@@ -3813,14 +3808,16 @@ def _generate_all_v2(pool, today_str, use_deepseek=False):
             quota_totale *= s["quota"]
         quota_totale = round(quota_totale, 2)
 
-        # Verifica se tutte le selezioni sono elite
-        all_elite = all(s.get("elite") for s in selezioni_valid)
+        # Rispetta raw_tipo di Mistral se valido (24/04/2026): pool e' tutto super_selection,
+        # elite non richiede piu' 100% elite. Se Mistral ha marcato "elite" e la quota e'
+        # nel range valido, preserva la fascia.
+        raw_tipo = raw.get("tipo", "").lower()
 
         # Assegna fascia
         all_today = all(s["match_date"] == today_str for s in selezioni_valid)
         if all_today:
             assigned_fascia = "oggi"
-        elif all_elite and quota_totale <= 8.0:
+        elif raw_tipo == "elite" and quota_totale <= 8.0:
             assigned_fascia = "elite"
         elif quota_totale <= 4.50:
             assigned_fascia = "selettiva"
@@ -3836,10 +3833,55 @@ def _generate_all_v2(pool, today_str, use_deepseek=False):
     bollette_docs = []
     counters = {"oggi": 0, "elite": 0, "selettiva": 0, "bilanciata": 0, "ambiziosa": 0}
     urna_selezioni = []  # selezioni smontate dalle bollette in eccesso
+    # Set di fingerprint per evitare biglietti identici (stesso insieme di selezioni)
+    bolletta_fingerprints = set()
+
+    def _fingerprint(selezioni_list):
+        """Crea una chiave unica per un set di selezioni (ordine-indipendente)."""
+        keys = sorted(f"{s['match_key']}|{s['mercato']}:{s['pronostico']}" for s in selezioni_list)
+        return "||".join(keys)
+
+    # Funzione helper: trova la fascia di fallback per quota quando la preferita e' piena
+    def _fallback_fascia(fascia_orig, quota, n_sel):
+        """Se la fascia scelta e' piena, cerca una fascia alternativa libera con stessa quota.
+        Priorita': oggi -> selettiva -> bilanciata -> elite -> ambiziosa."""
+        # Ordine di priorita' dei fallback: prima fasce "simili" per quota, poi tutto
+        alternative = ["oggi", "selettiva", "elite", "bilanciata", "ambiziosa"]
+        # Rimuovi la fascia originale per mettere fallback
+        alternative = [f for f in alternative if f != fascia_orig]
+        for alt in alternative:
+            if counters.get(alt, 0) >= MAX_PER_FASCIA:
+                continue
+            # Verifica vincoli di quota della fascia alternativa
+            from bollette_config import CATEGORY_CONSTRAINTS
+            c = CATEGORY_CONSTRAINTS.get(alt, {})
+            lo = c.get("min_quota")
+            hi = c.get("max_quota")
+            min_s = c.get("min_sel", 1)
+            max_s = c.get("max_sel", 99)
+            if lo is not None and quota < lo: continue
+            if hi is not None and quota > hi: continue
+            if n_sel < min_s or n_sel > max_s: continue
+            return alt
+        return None
 
     for fascia, selezioni_valid, quota_totale, reasoning in validated:
+        # Check anti-duplicato: rifiuta biglietti con lo stesso identico set di selezioni
+        fp = _fingerprint(selezioni_valid)
+        if fp in bolletta_fingerprints:
+            logger.info(f"   ♻️ Biglietto duplicato (stesse selezioni) — scartato")
+            continue
+        # Se la fascia preferita e' piena, prova a spostare il biglietto in un'altra fascia
+        # compatibile per quota/selezioni (24/04/2026: evita di buttare biglietti validi
+        # quando Mistral concentra tutto su una fascia, tipicamente "oggi")
+        if counters[fascia] >= MAX_PER_FASCIA:
+            alt = _fallback_fascia(fascia, quota_totale, len(selezioni_valid))
+            if alt:
+                logger.info(f"   🔀 Biglietto spostato da {fascia} (piena) → {alt} (quota {quota_totale})")
+                fascia = alt
         if counters[fascia] < MAX_PER_FASCIA:
             counters[fascia] += 1
+            bolletta_fingerprints.add(fp)
             bollette_docs.append(_build_bolletta_doc(
                 fascia, counters[fascia], selezioni_valid, quota_totale, reasoning, today_str
             ))
@@ -3851,6 +3893,60 @@ def _generate_all_v2(pool, today_str, use_deepseek=False):
                     urna_selezioni.append(s)
 
     logger.info(f"📋 Fase 2: {len(bollette_docs)} bollette accettate, {len(urna_selezioni)} selezioni in urna")
+
+    # === FASE 2b: COMPLETAMENTO AMBIZIOSA da biglietti bilanciata (24/04/2026) ===
+    # Se ambiziosa e' vuota/incompleta, prende i biglietti bilanciata esistenti piu' "alti"
+    # come base e aggiunge selezioni dal pool per spingere la quota >= 8.00.
+    # Logica: NON smonta pezzi, estende il biglietto gia' valido.
+    ambiziose_mancanti_2b = MAX_PER_FASCIA - counters.get("ambiziosa", 0)
+    if ambiziose_mancanti_2b > 0:
+        # Trova i candidati base: bilanciate con quota piu' alta, max 7 sel per poter aggiungere
+        candidati = sorted(
+            [i for i, doc in enumerate(bollette_docs)
+             if doc.get("tipo") == "bilanciata" and len(doc.get("selezioni", [])) <= 7],
+            key=lambda i: -bollette_docs[i].get("quota_totale", 0)
+        )
+
+        # Costruisci il pool di selezioni candidate (ordinato per rating)
+        pool_sorted = sorted(pool, key=lambda s: -(s.get("punteggio_finale") or s.get("confidence") or 0))
+
+        for base_idx in candidati:
+            if ambiziose_mancanti_2b <= 0:
+                break
+            base_doc = bollette_docs[base_idx]
+            base_sel = list(base_doc.get("selezioni", []))
+            base_match_keys = {s["match_key"] for s in base_sel}
+            base_quota = base_doc.get("quota_totale", 0)
+
+            # Aggiungi selezioni dal pool (non duplicate per partita) fino a raggiungere quota >=8
+            new_sel = list(base_sel)
+            new_qt = base_quota
+            for p_sel in pool_sorted:
+                if new_qt >= 8.0:
+                    break
+                if len(new_sel) >= 8:
+                    break
+                if p_sel["match_key"] in base_match_keys:
+                    continue
+                new_sel.append(p_sel)
+                base_match_keys.add(p_sel["match_key"])
+                new_qt = round(new_qt * p_sel["quota"], 2)
+
+            if new_qt >= 8.0 and 4 <= len(new_sel) <= 8:
+                # Controlla che non sia duplicato di un biglietto gia' esistente
+                fp_new = _fingerprint(new_sel)
+                if fp_new in bolletta_fingerprints:
+                    continue
+                # Aggiungi il nuovo biglietto ambiziosa (senza rimuovere il bilanciata)
+                counters["ambiziosa"] = counters.get("ambiziosa", 0) + 1
+                ambiziose_mancanti_2b -= 1
+                bolletta_fingerprints.add(fp_new)
+                bollette_docs.append(_build_bolletta_doc(
+                    "ambiziosa", counters["ambiziosa"], new_sel, new_qt,
+                    base_doc.get("reasoning", "") + " (estesa da bilanciata)",
+                    today_str
+                ))
+                logger.info(f"  🎯 Ambiziosa estesa da bilanciata: {len(base_sel)}→{len(new_sel)} sel, quota {base_quota}→{new_qt}")
 
     # === FASE 3: Ricomposizione dall'urna ===
     # Ordina per confidence decrescente, compone bollette da max 8 selezioni,
@@ -4063,11 +4159,21 @@ def main():
     pool = deduplicate_pool(pool)
     logger.info(f"📊 Pool AI: {len(pool)} selezioni uniche")
 
-    # 1b. Filtra pool con pattern bollette (85 pattern Mixer + elite)
+    # 1b. Filtra pool: SOLO super_selection
+    # Strategia attuale (24/04/2026): pool ristretto ai soli pronostici super_selection
+    # (>=2 flag tra AR/Elite/Mixer). Qualita' massima, volumi piccoli.
+    #
+    # [ARCHIVIATO] Inizialmente avevamo testato anche gli 11 pattern extra (S01-S11)
+    # ma l'analisi ha mostrato che su 165 match unici (dal 15/03 al 24/04) solo 2
+    # erano pronostici "veramente unici" (non gia' in elite/mixer/SS/AR).
+    # Performance storica S01-S11: HR 72.6%, ROI +6.6%, PL +66.99u.
+    # Se in futuro serve riattivarli: aggiungere `or matches_bollette_extra_only(s)`
+    # nel filtro sotto e scommentare la chiamata. La funzione e' mantenuta sopra.
     pool_before = len(pool)
-    pool = [s for s in pool if s.get("elite") or matches_bollette_pattern(s)]
-    logger.info(f"🎯 Filtro pattern: {pool_before} → {len(pool)} selezioni "
-          f"({pool_before - len(pool)} escluse, {len(PATTERNS)} pattern caricati)")
+    pool = [s for s in pool if s.get("super_selection")]
+    logger.info(f"🎯 Filtro pool (solo super_selection): "
+                f"{pool_before} → {len(pool)} selezioni "
+                f"({pool_before - len(pool)} escluse)")
 
     # 1c. Arricchisci pool con dati statistici (classifica, forma, trend, motivazioni, strisce, affidabilità, DNA)
     classifiche_cache = enrich_pool_with_stats(pool)

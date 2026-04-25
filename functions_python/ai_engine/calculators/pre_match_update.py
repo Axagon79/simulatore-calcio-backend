@@ -752,6 +752,50 @@ def run_full_cycle(date_str, target_date, block_times, run_label):
             unified_collection.update_one({'_id': doc['_id']}, {'$set': {'pronostici': pronostici}})
     print(f"   🎛️ Mixer ri-taggati: {mixer_count} pronostici")
 
+    # 1c-quater. Ri-tagging Super Selection STICKY dopo Elite/Mixer
+    # SS = ≥2 flag su 3 (AR + Elite + Mixer). Sticky: una volta SS, sempre SS
+    # all'interno della stessa giornata. Si legge dalla versione precedente
+    # (update_3h o nightly) per recuperare il flag perso dalla rigenerazione.
+    from tag_super_selection import is_super_selection
+    # Carica versione precedente per fingerprint dei pronostici già SS
+    prev_ss_keys = set()
+    prev_versions_for_ss = []
+    if run_label == 'update_3h':
+        prev_versions_for_ss = ['nightly']
+    elif run_label == 'update_1h':
+        prev_versions_for_ss = ['update_3h', 'nightly']
+    for prev_ver in prev_versions_for_ss:
+        prev_docs = list(versions_collection.find({
+            'date': date_str,
+            'match_time': {'$in': effective_times},
+            'version': prev_ver
+        }))
+        for pdoc in prev_docs:
+            mk = pdoc.get('match_key', '')
+            for pp in pdoc.get('pronostici', []):
+                if pp.get('super_selection') is True:
+                    prev_ss_keys.add((mk, pp.get('tipo')))
+    ss_count = 0
+    ss_docs = list(unified_collection.find(
+        {'date': date_str, 'match_time': {'$in': effective_times}},
+        {'_id': 1, 'home': 1, 'away': 1, 'pronostici': 1}
+    ))
+    for doc in ss_docs:
+        mk = normalize_match_key(date_str, doc.get('home', ''), doc.get('away', ''))
+        pronostici = doc.get('pronostici', [])
+        changed_ss = False
+        for p in pronostici:
+            was_ss_prev = (mk, p.get('tipo')) in prev_ss_keys
+            new_ss = was_ss_prev or is_super_selection(p)
+            if p.get('super_selection') != new_ss:
+                p['super_selection'] = new_ss
+                changed_ss = True
+            if new_ss:
+                ss_count += 1
+        if changed_ss:
+            unified_collection.update_one({'_id': doc['_id']}, {'$set': {'pronostici': pronostici}})
+    print(f"   ⭐ Super Selection ri-taggati (sticky): {ss_count} pronostici")
+
     # 1c-ter. PROTEZIONE -3h: ripristina tip del mattino che matchano la whitelist
     # di protezione se il -3h li ha eliminati. Marca i tip ripristinati con
     # _protected_3h=True così il -1h non li potrà eliminare.
