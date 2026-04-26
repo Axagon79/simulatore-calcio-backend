@@ -601,6 +601,12 @@ def _apply_gol_stake7_filter(unified, odds):
             p['original_pronostico'] = old_pr
             p['original_quota'] = quota
             p['pronostico'] = 'NO BET'
+            p['quota'] = 0
+            p['stake'] = 0
+            if 'stake_min' in p:
+                p['stake_min'] = 0
+            if 'stake_max' in p:
+                p['stake_max'] = 0
             p['routing_rule'] = f'{tag}_nobet'
             print(f"    🚫 GOL(s7) NO BET: {old_pr} @{quota:.2f} [{tag}]")
         result.append(p)
@@ -638,6 +644,12 @@ def _apply_f150_169_trap_filter(unified, odds):
             p['original_pronostico'] = pr
             p['original_quota'] = quota
             p['pronostico'] = 'NO BET'
+            p['quota'] = 0
+            p['stake'] = 0
+            if 'stake_min' in p:
+                p['stake_min'] = 0
+            if 'stake_max' in p:
+                p['stake_max'] = 0
             p['routing_rule'] = f'{tag}_nobet'
             print(f"    🚫 TRAP f1.50-1.69 NO BET: {pr} @{quota:.2f} [{tag}]")
         result.append(p)
