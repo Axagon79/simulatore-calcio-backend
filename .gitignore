@@ -96,3 +96,18 @@ deploy.ps1
 functions_python/ai_engine/calculators/_*.py
 
 node_modules
+
+# Script analisi/dump/test temporanei nella root (convenzione prefisso _tmp_)
+_tmp_*.py
+_tmp_*.json
+_tmp_*.csv
+
+# Note locali sparse
+VERIFICA_FORMULE_BADGE.md
+
+# Output diagnostica motore (analisi locali, riproducibili)
+ai_engine/diagnostica_motore/alto_rendimento_*.py
+ai_engine/diagnostica_motore/alto_rendimento_*.md
+ai_engine/diagnostica_motore/alto_rendimento_*.csv
+ai_engine/diagnostica_motore/kelly_final_step_*.py
+ai_engine/diagnostica_motore/kelly_final_step_*.md
