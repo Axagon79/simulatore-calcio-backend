@@ -1,19 +1,18 @@
 const express = require('express');
+const admin = require('../config/firebaseAdmin');
 const router = express.Router();
 
-// GET /onboarding/status — controlla se l'utente ha completato l'onboarding
+const firestore = admin.firestore();
+
 router.get('/status', async (req, res) => {
   try {
-    const db = req.db;
     const userId = req.userId;
 
-    const userDoc = await db.collection('users').findOne(
-      { firebaseUid: userId },
-      { projection: { onboarding_completed: 1 } }
-    );
+    const userDoc = await firestore.collection('users').doc(userId).get();
+    const data = userDoc.exists ? userDoc.data() : null;
 
     res.json({
-      onboarding_completed: !!(userDoc?.onboarding_completed)
+      onboarding_completed: !!(data?.onboarding_completed)
     });
   } catch (err) {
     console.error('Errore GET /onboarding/status:', err);
@@ -21,21 +20,16 @@ router.get('/status', async (req, res) => {
   }
 });
 
-// POST /onboarding/complete — segna l'onboarding come completato
 router.post('/complete', async (req, res) => {
   try {
-    const db = req.db;
     const userId = req.userId;
 
-    await db.collection('users').updateOne(
-      { firebaseUid: userId },
+    await firestore.collection('users').doc(userId).set(
       {
-        $set: {
-          onboarding_completed: true,
-          onboarding_completed_at: new Date()
-        }
+        onboarding_completed: true,
+        onboarding_completed_at: admin.firestore.FieldValue.serverTimestamp()
       },
-      { upsert: true }
+      { merge: true }
     );
 
     res.json({ success: true });

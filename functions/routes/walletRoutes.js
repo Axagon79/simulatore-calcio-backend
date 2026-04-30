@@ -1,47 +1,47 @@
 const express = require('express');
+const admin = require('../config/firebaseAdmin');
 const router = express.Router();
 
-// GET /wallet/balance — Saldo crediti e shield
+const firestore = admin.firestore();
+
 router.get('/balance', async (req, res) => {
   try {
-    const db = req.db;
     const userId = req.userId;
+    const userRef = firestore.collection('users').doc(userId);
+    const snap = await userRef.get();
 
-    let userDoc = await db.collection('users').findOne({ firebaseUid: userId });
-
-    // Se il documento non esiste, crealo con saldo 0
-    if (!userDoc) {
-      userDoc = {
-        firebaseUid: userId,
+    if (!snap.exists) {
+      const initial = {
         credits: 0,
         shields: 0,
         subscription: null,
         subscription_expires_at: null,
-        created_at: new Date()
+        created_at: admin.firestore.FieldValue.serverTimestamp()
       };
-      await db.collection('users').insertOne(userDoc);
+      await userRef.set(initial, { merge: true });
+      return res.json({
+        credits: 0,
+        shields: 0,
+        subscription: null,
+        subscription_expires_at: null
+      });
     }
 
-    // Se i campi non esistono, inizializzali
-    if (userDoc.credits === undefined || userDoc.shields === undefined) {
-      await db.collection('users').updateOne(
-        { firebaseUid: userId },
-        {
-          $set: {
-            credits: userDoc.credits ?? 0,
-            shields: userDoc.shields ?? 0,
-            subscription: userDoc.subscription ?? null,
-            subscription_expires_at: userDoc.subscription_expires_at ?? null
-          }
-        }
-      );
+    const data = snap.data();
+    const patch = {};
+    if (data.credits === undefined) patch.credits = 0;
+    if (data.shields === undefined) patch.shields = 0;
+    if (data.subscription === undefined) patch.subscription = null;
+    if (data.subscription_expires_at === undefined) patch.subscription_expires_at = null;
+    if (Object.keys(patch).length > 0) {
+      await userRef.set(patch, { merge: true });
     }
 
     res.json({
-      credits: userDoc.credits ?? 0,
-      shields: userDoc.shields ?? 0,
-      subscription: userDoc.subscription ?? null,
-      subscription_expires_at: userDoc.subscription_expires_at ?? null
+      credits: data.credits ?? 0,
+      shields: data.shields ?? 0,
+      subscription: data.subscription ?? null,
+      subscription_expires_at: data.subscription_expires_at ?? null
     });
   } catch (err) {
     console.error('Errore GET /wallet/balance:', err);
@@ -49,31 +49,29 @@ router.get('/balance', async (req, res) => {
   }
 });
 
-// GET /wallet/transactions — Storico transazioni
 router.get('/transactions', async (req, res) => {
   try {
-    const db = req.db;
     const userId = req.userId;
     const limit = parseInt(req.query.limit) || 50;
     const skip = parseInt(req.query.skip) || 0;
 
-    const transactions = await db.collection('wallet_transactions')
-      .find({ user_id: userId })
-      .sort({ created_at: -1 })
-      .skip(skip)
-      .limit(limit)
-      .toArray();
+    const txCol = firestore.collection('wallet_transactions');
 
-    // Riepilogo mese corrente
+    const allSnap = await txCol
+      .where('user_id', '==', userId)
+      .orderBy('created_at', 'desc')
+      .limit(skip + limit)
+      .get();
+
+    const transactions = allSnap.docs.slice(skip).map(d => ({ id: d.id, ...d.data() }));
+
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-    const monthTransactions = await db.collection('wallet_transactions')
-      .find({
-        user_id: userId,
-        created_at: { $gte: startOfMonth }
-      })
-      .toArray();
+    const monthSnap = await txCol
+      .where('user_id', '==', userId)
+      .where('created_at', '>=', startOfMonth)
+      .get();
 
     const summary = {
       credits_acquired: 0,
@@ -83,7 +81,8 @@ router.get('/transactions', async (req, res) => {
       total_eur: 0,
     };
 
-    for (const t of monthTransactions) {
+    for (const doc of monthSnap.docs) {
+      const t = doc.data();
       if (t.credits_delta > 0 && t.type !== 'rimborso') {
         summary.credits_acquired += t.credits_delta;
       }
@@ -96,9 +95,8 @@ router.get('/transactions', async (req, res) => {
       summary.total_eur += t.amount_eur || 0;
     }
 
-    // Saldo shield attuale
-    const userDoc = await db.collection('users').findOne({ firebaseUid: userId });
-    summary.shields_current = userDoc?.shields ?? 0;
+    const userSnap = await firestore.collection('users').doc(userId).get();
+    summary.shields_current = userSnap.exists ? (userSnap.data().shields ?? 0) : 0;
 
     res.json({ transactions, summary });
   } catch (err) {
@@ -107,26 +105,47 @@ router.get('/transactions', async (req, res) => {
   }
 });
 
-// GET /wallet/purchases — Acquisti pronostici per data
+router.get('/shielded-matches', async (req, res) => {
+  try {
+    const userId = req.userId;
+
+    const snap = await firestore.collection('wallet_transactions')
+      .where('user_id', '==', userId)
+      .where('type', '==', 'shield_attivato')
+      .get();
+
+    const matchKeys = snap.docs
+      .map(d => d.data().metadata?.match_key)
+      .filter(Boolean);
+
+    res.json({ match_keys: Array.from(new Set(matchKeys)) });
+  } catch (err) {
+    console.error('Errore GET /wallet/shielded-matches:', err);
+    res.status(500).json({ error: 'Errore nel recupero shield attivi' });
+  }
+});
+
 router.get('/purchases', async (req, res) => {
   try {
-    const db = req.db;
     const userId = req.userId;
     const date = req.query.date;
 
-    const filter = { user_id: userId, type: 'pronostico_sbloccato' };
-    if (date) filter['metadata.date'] = date;
+    let q = firestore.collection('wallet_transactions')
+      .where('user_id', '==', userId)
+      .where('type', '==', 'pronostico_sbloccato');
 
-    const purchases = await db.collection('wallet_transactions')
-      .find(filter)
-      .project({ 'metadata.match_key': 1, created_at: 1 })
-      .toArray();
+    if (date) q = q.where('metadata.date', '==', date);
+
+    const snap = await q.get();
 
     res.json({
-      purchases: purchases.map(p => ({
-        match_key: p.metadata?.match_key,
-        purchased_at: p.created_at,
-      })),
+      purchases: snap.docs.map(d => {
+        const data = d.data();
+        return {
+          match_key: data.metadata?.match_key,
+          purchased_at: data.created_at,
+        };
+      }),
     });
   } catch (err) {
     console.error('Errore GET /wallet/purchases:', err);
@@ -134,10 +153,8 @@ router.get('/purchases', async (req, res) => {
   }
 });
 
-// POST /wallet/transaction — Registra transazione (uso interno + acquisto pacchetti beta)
 router.post('/transaction', async (req, res) => {
   try {
-    const db = req.db;
     const userId = req.userId;
     const { type, credits_delta, shields_delta, amount_eur, description, metadata } = req.body;
 
@@ -158,57 +175,58 @@ router.post('/transaction', async (req, res) => {
       return res.status(400).json({ error: `Tipo non valido. Valori: ${validTypes.join(', ')}` });
     }
 
-    // Controlla crediti sufficienti per sblocco pronostico
-    if (type === 'pronostico_sbloccato' && credits_delta < 0) {
-      const currentUser = await db.collection('users').findOne({ firebaseUid: userId });
-      const currentCredits = currentUser?.credits ?? 0;
-      if (currentCredits + credits_delta < 0) {
-        return res.status(400).json({ error: 'Crediti insufficienti' });
+    const userRef = firestore.collection('users').doc(userId);
+    const txRef = firestore.collection('wallet_transactions').doc();
+
+    const balanceAfter = await firestore.runTransaction(async (tx) => {
+      const snap = await tx.get(userRef);
+      const current = snap.exists ? snap.data() : {};
+      const currentCredits = current.credits ?? 0;
+      const currentShields = current.shields ?? 0;
+
+      if (type === 'pronostico_sbloccato' && credits_delta < 0) {
+        if (currentCredits + credits_delta < 0) {
+          throw new Error('CREDITI_INSUFFICIENTI');
+        }
       }
-    }
 
-    // Aggiorna saldo utente
-    const updateFields = {};
-    if (credits_delta) updateFields.credits = credits_delta;
-    if (shields_delta) updateFields.shields = shields_delta;
+      const newCredits = currentCredits + (credits_delta || 0);
+      const newShields = currentShields + (shields_delta || 0);
 
-    let userDoc;
-    if (Object.keys(updateFields).length > 0) {
-      userDoc = await db.collection('users').findOneAndUpdate(
-        { firebaseUid: userId },
-        { $inc: updateFields },
-        { returnDocument: 'after', upsert: true }
-      );
-    } else {
-      userDoc = await db.collection('users').findOne({ firebaseUid: userId });
-    }
+      const userPatch = {};
+      if (credits_delta) userPatch.credits = newCredits;
+      if (shields_delta) userPatch.shields = newShields;
 
-    const balanceAfter = {
-      credits: userDoc?.credits ?? userDoc?.value?.credits ?? 0,
-      shields: userDoc?.shields ?? userDoc?.value?.shields ?? 0,
-    };
+      if (Object.keys(userPatch).length > 0) {
+        tx.set(userRef, userPatch, { merge: true });
+      }
 
-    // Salva transazione
-    const transaction = {
-      user_id: userId,
-      type,
-      description: description || type,
-      credits_delta: credits_delta || 0,
-      shields_delta: shields_delta || 0,
-      amount_eur: amount_eur || 0,
-      balance_after: balanceAfter,
-      metadata: metadata || {},
-      created_at: new Date()
-    };
+      const transaction = {
+        user_id: userId,
+        type,
+        description: description || type,
+        credits_delta: credits_delta || 0,
+        shields_delta: shields_delta || 0,
+        amount_eur: amount_eur || 0,
+        balance_after: { credits: newCredits, shields: newShields },
+        metadata: metadata || {},
+        created_at: admin.firestore.FieldValue.serverTimestamp()
+      };
+      tx.set(txRef, transaction);
 
-    await db.collection('wallet_transactions').insertOne(transaction);
+      return { credits: newCredits, shields: newShields };
+    });
 
+    const txSnap = await txRef.get();
     res.json({
       success: true,
-      transaction,
+      transaction: { id: txRef.id, ...txSnap.data() },
       balance: balanceAfter
     });
   } catch (err) {
+    if (err.message === 'CREDITI_INSUFFICIENTI') {
+      return res.status(400).json({ error: 'Crediti insufficienti' });
+    }
     console.error('Errore POST /wallet/transaction:', err);
     res.status(500).json({ error: 'Errore nel salvataggio transazione' });
   }
