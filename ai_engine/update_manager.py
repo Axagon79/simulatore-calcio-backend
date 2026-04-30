@@ -54,6 +54,8 @@ CALCULATORS_DIR = os.path.join(BASE_PROJECT_DIR, "ai_engine", "calculators")
 
 FP_CALCULATORS_DIR = os.path.join(BASE_PROJECT_DIR, "functions_python", "ai_engine", "calculators")
 
+AI_ENGINE_DIR = os.path.join(BASE_PROJECT_DIR, "ai_engine")
+
 # (Questa serve solo se qualche funzione vecchia la usa ancora)
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -197,7 +199,10 @@ SCRAPER_SEQUENCE = [
       ("generate_bollette_2.py", "🎫 [38/39] Generazione Bollette", "Bollette non generate", FP_CALCULATORS_DIR),
 
       # ⭐ QUOTE ANOMALE — Scrapa quote apertura da LuckSport (pre-match -2h aggiornerà le live)
-      ("scraper_quote_anomale_lucksport.py", "📈 [39/39] Quote Anomale (LuckSport)", "Quote anomale apertura non scrapeate", FREQUENT_DIR),
+      ("scraper_quote_anomale_lucksport.py", "📈 [39/40] Quote Anomale (LuckSport)", "Quote anomale apertura non scrapeate", FREQUENT_DIR),
+
+      # ⭐ INDICIZZAZIONE RAW VAULT — Embedding Mistral + insert MongoDB (RAG su raw/sessioni/)
+      ("index_raw_to_vector.py", "🧠 [40/40] Indicizzazione raw vault (RAG)", "Sessioni raw non indicizzate per ricerca semantica", AI_ENGINE_DIR),
 ]
 
 
