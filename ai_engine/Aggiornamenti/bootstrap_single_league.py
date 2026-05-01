@@ -210,8 +210,8 @@ def step7_lucifero():
 def step8_standings():
     with step_timer(f"STEP 8: Standings per {TARGET_LEAGUE}"):
         try:
-            from injector_standings_to_matches import run_injection
-            run_injection()
+            from injector_standings_to_matches import inject_standings_final
+            inject_standings_final()
         except Exception as e:
             print(f"   Nota: {e}")
 
