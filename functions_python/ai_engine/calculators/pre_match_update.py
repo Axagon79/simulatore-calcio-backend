@@ -62,6 +62,27 @@ RUNS = [
 
 
 # =====================================================
+# Match versione "nightly" — schema legacy era 'nightly' esatto, dal 20/03/2026
+# (commit 6ec90379) snapshot_nightly.py scrive 'nightly_YYYY-MM-DD' per
+# mantenere lo storico per data. Questo helper accetta entrambi i formati con
+# $regex '^nightly' così le query del pre_match continuano a trovare il doc del
+# mattino sia per dati vecchi sia nuovi.
+# =====================================================
+NIGHTLY_VERSION_REGEX = {'$regex': '^nightly'}
+
+
+def _find_nightly_docs(date_str, match_times):
+    """Recupera i doc snapshot nightly per (date, match_times) supportando
+    sia 'nightly' (legacy) sia 'nightly_YYYY-MM-DD' (corrente).
+    """
+    return list(versions_collection.find({
+        'date': date_str,
+        'match_time': {'$in': match_times},
+        'version': NIGHTLY_VERSION_REGEX,
+    }))
+
+
+# =====================================================
 # WHITELIST -1h: filtra i tip NUOVI che il -1h aggiunge su partite
 # che erano vuote al passo precedente (update_3h o nightly).
 # Analisi storica (40 giorni, 118 tip "nuovi puri"): -13.91u senza filtro,
@@ -326,11 +347,14 @@ def save_snapshot_and_detect_changes(date_str, match_time_filter, version_label)
     if previous_versions:
         # Prendi la versione più recente disponibile per ogni match
         for prev_ver in reversed(previous_versions):
-            prev_docs = list(versions_collection.find({
-                'date': date_str,
-                'match_time': {'$in': match_time_filter},
-                'version': prev_ver
-            }))
+            if prev_ver == 'nightly':
+                prev_docs = _find_nightly_docs(date_str, match_time_filter)
+            else:
+                prev_docs = list(versions_collection.find({
+                    'date': date_str,
+                    'match_time': {'$in': match_time_filter},
+                    'version': prev_ver
+                }))
             for doc in prev_docs:
                 mk = doc.get('match_key', '')
                 if mk and mk not in prev_index:
@@ -644,15 +668,11 @@ def run_full_cycle(date_str, target_date, block_times, run_label):
     # per poter ripristinare quelli protetti se il -3h li elimina.
     tip_pre_3h = {}  # match_key -> list of tip dicts attivi al mattino
     if run_label == 'update_3h':
-        nightly_versions_0 = list(versions_collection.find({
-            'date': date_str,
-            'match_time': {'$in': effective_times},
-            'version': 'nightly'
-        }))
+        nightly_versions_0 = _find_nightly_docs(date_str, effective_times)
         for nv in nightly_versions_0:
             mk = nv.get('match_key', '')
             active = []
-            for t in (nv.get('tips') or []):
+            for t in (nv.get('pronostici') or []):
                 if t.get('pronostico') and t.get('pronostico') != 'NO BET' and (t.get('stake') or 0) > 0:
                     active.append(dict(t))
             if active:
@@ -668,16 +688,12 @@ def run_full_cycle(date_str, target_date, block_times, run_label):
             {'home': 1, 'away': 1, 'pronostici': 1}
         ))
         # Recupera anche i tip del mattino (nightly) per sapere l'origine
-        mattino_versions = list(versions_collection.find({
-            'date': date_str,
-            'match_time': {'$in': effective_times},
-            'version': 'nightly'
-        }))
+        mattino_versions = _find_nightly_docs(date_str, effective_times)
         mattino_tips_map = {}  # mk -> set di (tipo, pronostico) attivi al mattino
         for pv in mattino_versions:
             mk = pv.get('match_key', '')
             active = set()
-            for t in (pv.get('tips') or []):
+            for t in (pv.get('pronostici') or []):
                 if t.get('pronostico') and t.get('pronostico') != 'NO BET' and (t.get('stake') or 0) > 0:
                     active.add((t.get('tipo'), t.get('pronostico')))
             mattino_tips_map[mk] = active
@@ -765,11 +781,14 @@ def run_full_cycle(date_str, target_date, block_times, run_label):
     elif run_label == 'update_1h':
         prev_versions_for_ss = ['update_3h', 'nightly']
     for prev_ver in prev_versions_for_ss:
-        prev_docs = list(versions_collection.find({
-            'date': date_str,
-            'match_time': {'$in': effective_times},
-            'version': prev_ver
-        }))
+        if prev_ver == 'nightly':
+            prev_docs = _find_nightly_docs(date_str, effective_times)
+        else:
+            prev_docs = list(versions_collection.find({
+                'date': date_str,
+                'match_time': {'$in': effective_times},
+                'version': prev_ver
+            }))
         for pdoc in prev_docs:
             mk = pdoc.get('match_key', '')
             for pp in pdoc.get('pronostici', []):
@@ -897,15 +916,11 @@ def run_full_cycle(date_str, target_date, block_times, run_label):
     # Altrimenti rimuovi il tip (NO BET + stake=0). Il -1h può comunque riattivarlo.
     if run_label == 'update_3h':
         # Recupera la versione nightly per capire quali partite erano NO BET al mattino
-        nightly_versions = list(versions_collection.find({
-            'date': date_str,
-            'match_time': {'$in': effective_times},
-            'version': 'nightly'
-        }))
+        nightly_versions = _find_nightly_docs(date_str, effective_times)
         had_tip_at_nightly = set()
         for nv in nightly_versions:
             mk = nv.get('match_key', '')
-            for t in (nv.get('tips') or []):
+            for t in (nv.get('pronostici') or []):
                 if t.get('pronostico') and t.get('pronostico') != 'NO BET' and (t.get('stake') or 0) > 0:
                     had_tip_at_nightly.add(mk)
                     break
@@ -955,7 +970,7 @@ def run_full_cycle(date_str, target_date, block_times, run_label):
         had_tip_at_3h = set()
         for pv in prev_versions:
             mk = pv.get('match_key', '')
-            for t in (pv.get('tips') or []):
+            for t in (pv.get('pronostici') or []):
                 if t.get('pronostico') and t.get('pronostico') != 'NO BET' and (t.get('stake') or 0) > 0:
                     had_tip_at_3h.add(mk)
                     break
