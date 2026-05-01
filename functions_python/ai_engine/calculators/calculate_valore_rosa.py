@@ -73,10 +73,10 @@ def compute_age_multiplier(age, ages):
         # Quanto sono lontano dalla media verso il basso?
         distanza_norm = (A_mean - age) / (A_mean - A_min)
         # Se sono al minimo (distanza=1), tolgo 0.5. Se sono alla media (distanza=0), tolgo 0.
-        mult = 1.0 - (0.3 * distanza_norm)
-        
+        mult = 1.0 - (0.5 * distanza_norm)
+
         # Sicurezza per non andare sotto 0.5 (es. se age < A_min per qualche errore dati)
-        if mult < 3.0: mult = 3.0
+        if mult < 0.5: mult = 0.5
         return round(mult, 4)
 
     # Caso VECCHIO (sopra media): sale linearmente da 1.0 a 1.5
@@ -86,7 +86,7 @@ def compute_age_multiplier(age, ages):
         # Quanto sono lontano dalla media verso l'alto?
         distanza_norm = (age - A_mean) / (A_max - A_mean)
         # Se sono al massimo (distanza=1), aggiungo 0.5.
-        mult = 1.0 + (0.3 * distanza_norm)
+        mult = 1.0 + (0.5 * distanza_norm)
 
         # Sicurezza per non andare sopra 1.5
         if mult > 1.5: mult = 1.5
