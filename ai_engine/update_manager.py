@@ -199,10 +199,13 @@ SCRAPER_SEQUENCE = [
       ("generate_bollette_2.py", "🎫 [38/39] Generazione Bollette", "Bollette non generate", FP_CALCULATORS_DIR),
 
       # ⭐ QUOTE ANOMALE — Scrapa quote apertura da LuckSport (pre-match -2h aggiornerà le live)
-      ("scraper_quote_anomale_lucksport.py", "📈 [39/40] Quote Anomale (LuckSport)", "Quote anomale apertura non scrapeate", FREQUENT_DIR),
+      ("scraper_quote_anomale_lucksport.py", "📈 [39/41] Quote Anomale (LuckSport)", "Quote anomale apertura non scrapeate", FREQUENT_DIR),
 
       # ⭐ INDICIZZAZIONE RAW VAULT — Embedding Mistral + insert MongoDB (RAG su raw/sessioni/)
-      ("index_raw_to_vector.py", "🧠 [40/40] Indicizzazione raw vault (RAG)", "Sessioni raw non indicizzate per ricerca semantica", AI_ENGINE_DIR),
+      ("index_raw_to_vector.py", "🧠 [40/41] Indicizzazione raw vault (RAG)", "Sessioni raw non indicizzate per ricerca semantica", AI_ENGINE_DIR),
+
+      # ⭐ PROCESS SHIELD REFUNDS — Chiama endpoint Node per accreditare rimborsi pronostici protetti
+      ("process_shield_refunds.py", "🛡️ [41/41] Process Shield Refunds (rimborsi pronostici protetti)", "Rimborsi shield non processati", FREQUENT_DIR),
 ]
 
 
