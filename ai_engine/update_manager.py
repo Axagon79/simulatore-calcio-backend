@@ -202,10 +202,13 @@ SCRAPER_SEQUENCE = [
       ("scraper_quote_anomale_lucksport.py", "📈 [39/41] Quote Anomale (LuckSport)", "Quote anomale apertura non scrapeate", FREQUENT_DIR),
 
       # ⭐ INDICIZZAZIONE RAW VAULT — Embedding Mistral + insert MongoDB (RAG su raw/sessioni/)
-      ("index_raw_to_vector.py", "🧠 [40/41] Indicizzazione raw vault (RAG)", "Sessioni raw non indicizzate per ricerca semantica", AI_ENGINE_DIR),
+      ("index_raw_to_vector.py", "🧠 [40/42] Indicizzazione raw vault (RAG)", "Sessioni raw non indicizzate per ricerca semantica", AI_ENGINE_DIR),
+
+      # ⭐ INDICIZZAZIONE WIKI VAULT — Embedding Mistral + insert MongoDB (RAG su wiki/**)
+      ("index_wiki_to_vector.py", "📚 [41/42] Indicizzazione wiki vault (RAG)", "Pagine wiki non indicizzate per ricerca semantica", AI_ENGINE_DIR),
 
       # ⭐ PROCESS SHIELD REFUNDS — Chiama endpoint Node per accreditare rimborsi pronostici protetti
-      ("process_shield_refunds.py", "🛡️ [41/41] Process Shield Refunds (rimborsi pronostici protetti)", "Rimborsi shield non processati", FREQUENT_DIR),
+      ("process_shield_refunds.py", "🛡️ [42/42] Process Shield Refunds (rimborsi pronostici protetti)", "Rimborsi shield non processati", FREQUENT_DIR),
 ]
 
 
