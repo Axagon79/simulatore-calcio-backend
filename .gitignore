@@ -111,3 +111,6 @@ ai_engine/diagnostica_motore/alto_rendimento_*.md
 ai_engine/diagnostica_motore/alto_rendimento_*.csv
 ai_engine/diagnostica_motore/kelly_final_step_*.py
 ai_engine/diagnostica_motore/kelly_final_step_*.md
+
+# Pattern Match Engine — cache CSV (derivati, non in repo)
+ai_engine/pattern_match/_cache_pattern_match/
